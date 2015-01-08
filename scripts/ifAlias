@@ -1,17 +1,17 @@
 #!/bin/bash
-# (c) 2013, f0o@devilcode.org
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# (c) 2013, 2014, f0o@devilcode.org
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BASE='.1.3.6.1.2.1.31.1.1.1.18'
 ID=$(cut -d . -f 13 <<< $2)
@@ -45,6 +45,29 @@ if [ "X${IFACE}" = "X" ]; then
 	echo noSuchName
 else
 	echo "string"
-	echo $(grep "^# $IFACE:" /etc/network/interfaces | sed "s/^# $IFACE: //")
+	if [ -x /usr/bin/distro ]; then
+		case $(distro | cut -d " " -f 1) in
+			Debian)
+				cnf="/etc/network/interfaces"
+			;;
+			Gentoo)
+				cnf="/etc/conf.d/net"
+			;;
+			CentOS|RedHat|SuSE|Mandriva|Mandrake)
+				cnf="/etc/sysconfig/network-scripts/ifcfg-$IFACE"
+			;;
+			Archlinux)
+				cnf="/etc/conf.d/net-conf-$IFACE"
+			;;
+			*)
+				cnf=""
+			;;
+		esac
+	fi
+	if [ -n "$cnf" ]; then
+		echo $(grep -i "^# $IFACE:" $cnf | sed "s/^# $IFACE: //i")
+	else
+		echo
+	fi
 fi
 exit 0
