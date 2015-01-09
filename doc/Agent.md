@@ -34,3 +34,5 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 * Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 * Then under Applications, enable the apps that you plan to monitor.
 * Wait, in around 10 minutes you should start seeing data in your graphs under Apps for the device.
+* 
+
