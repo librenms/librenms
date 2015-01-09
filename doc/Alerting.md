@@ -164,3 +164,4 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 ```php
 $config['alert']['transports']['irc'] = true;
 ```
+
