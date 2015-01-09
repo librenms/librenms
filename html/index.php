@@ -300,7 +300,7 @@ if($config['enable_footer'] == 1) {
     <div class="row">
       <div class="col-md-12 text-center">
 <?php
-echo('<em>        Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name'].'</a>.</em><br/>');
+echo('<em>        Powered by <a href="/about/" target="_blank">' . $config['project_name'].'</a>.</em><br/>');
 ?>
       </div>
     </div>
