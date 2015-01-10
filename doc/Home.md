@@ -1,6 +1,3 @@
-Welcome to Observium users
---------------------------
-
 LibreNMS is a fork of Observium.  The reason for the fork is nothing to do
 with Observium's [recent move to community vs. paid versions][1].  It is
 simply that we have different priorities and values to the Observium
@@ -11,7 +8,7 @@ for more information about the kind of community we're trying to promote.
 
 LibreNMS was forked from [the last GPL-licensed version of Observium][3].
 This has a few implications:
-- It doesn't look as nice as the current version of Observium.
+- ~~It doesn't look as nice as the current version of Observium.~~
 - We've lost quite a bit of functionality that has been added to Observium
   in the last year.
 - You won't be able to take an existing Observium installation later than
@@ -65,8 +62,7 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "Free Software Foundation - what is free software?"
 [7]: http://libertysys.com.au/blog/observium-and-gpl
 "Paul's blog on what the GPL offers users"
-[8]: https://github.com/librenms/librenms/blob/master/doc/CONTRIBUTING.md
+[8]: https://github.com/librenms/librenms/blob/master/doc/CONTRIBUTING.md 
 "Contribution guidelines"
 [9]: https://github.com/librenms/librenms/issues
 "LibreNMS issue database at GitHub"
-
