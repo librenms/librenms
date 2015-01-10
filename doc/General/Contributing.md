@@ -22,7 +22,7 @@ id in the file (so that it can be matched to your commits), and stating in
 the commit log:
 ```
 	I agree to the conditions of the Contributor Agreement
-	contained in doc/CONTRIBUTING.md.
+	contained in doc/General/Contributing.md.
 ```
 
 
@@ -92,7 +92,7 @@ message.
 - To incorporate larger blocks of code from third parties (e.g. JavaScript
   libraries):
     - Include its name, source URL, copyright notice, and license in
-      doc/CREDITS.md
+      doc/General/Credits.md
     - preferred locations are html/js, html/lib, and lib
     - Add it in a separate commit into its own directory, using
       'git subtree --squash' if it is available via git.

@@ -57,7 +57,7 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "LibreNMS README"
 [3]: http://fisheye.observium.org/rdiff/Observium?csid=3251&u&N
 "Link to Observium license change"
-[4]: https://github.com/librenms/librenms/blob/master/doc/ROADMAP.md
+[4]: https://github.com/librenms/librenms/blob/master/doc/General/Roadmap.md
 "LibreNMS ROADMAP"
 [5]: https://github.com/librenms/librenms/blob/master/LICENSE.txt
 "LibreNMS copy of GPL v3"
@@ -65,7 +65,7 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "Free Software Foundation - what is free software?"
 [7]: http://libertysys.com.au/blog/observium-and-gpl
 "Paul's blog on what the GPL offers users"
-[8]: https://github.com/librenms/librenms/blob/master/doc/CONTRIBUTING.md
+[8]: https://github.com/librenms/librenms/blob/master/doc/General/Contributing.md
 "Contribution guidelines"
 [9]: https://github.com/librenms/librenms/issues
 "LibreNMS issue database at GitHub"
