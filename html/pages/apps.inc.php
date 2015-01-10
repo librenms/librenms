@@ -4,6 +4,7 @@ $graphs['apache']     = array('bits', 'hits', 'scoreboard', 'cpu');
 $graphs['drbd']       = array('disk_bits', 'network_bits', 'queue', 'unsynced');
 $graphs['mysql']      = array('network_traffic', 'connections', 'command_counters', 'select_types');
 $graphs['memcached']  = array('bits', 'commands', 'data', 'items');
+$graphs['nginx']      = array('connections', 'req');
 
 print_optionbar_start();
 
