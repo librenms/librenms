@@ -86,8 +86,8 @@ echo "</tr></thead><tbody>";
 foreach (dbFetchRows("SELECT * FROM `processes` WHERE `device_id` = ? ORDER BY ".$order." ".$by, array($device['device_id'])) as $entry) {
 	echo '<tr>';
 	echo '<td>'.$entry['pid'].'</td>';
-	echo '<td>'.format_si($entry['vsz']).'</td>';
-	echo '<td>'.format_si($entry['rss']).'</td>';
+	echo '<td>'.format_si($entry['vsz']*1024).'</td>';
+	echo '<td>'.format_si($entry['rss']*1024).'</td>';
 	echo '<td>'.$entry['pcpu'].'</td>';
 	echo '<td>'.$entry['user'].'</td>';
 	echo '<td>'.$entry['command'].'</td>';
