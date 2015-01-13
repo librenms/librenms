@@ -59,9 +59,10 @@ $heads = array(
 
 echo "<div class='table-responsive'><table class='table table-hover'><thead><tr>";
 foreach( $heads as $head=>$extra ) {
-	unset($icon, $lhead, $bhead);
+	unset($lhead, $bhead);
 	$lhead = strtolower($head);
 	$bhead = 'asc';
+	$icon = "";
 	if( '`'.$lhead.'`' == $order ) {
 		$icon = " class='glyphicon glyphicon-chevron-";
 		if( $by == 'asc' ) {

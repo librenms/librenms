@@ -87,7 +87,9 @@ if ($device['os_group'] == "unix")
       {
         $process = preg_replace("/\(([0-9]*),(.*),([0-9]*),([0-9]*),([0-9\.]*)\)\ (.*)/", "\\1|\\2|\\3|\\4|\\5|\\6", $process);
         list($pid, $user, $vsz, $rss, $pcpu, $command) = explode("|", $process, 6);
-        dbInsert(array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command), 'processes');
+        if( !empty($command) ) {
+          dbInsert(array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command), 'processes');
+        }
       }
       echo("\n");
     }
