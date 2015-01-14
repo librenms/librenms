@@ -2,8 +2,14 @@
 
 namespace InfluxDB\Filter;
 
+/**
+ * This filter manipulates response
+ */
 class ColumnsPointsFilter implements FilterInterface
 {
+    /**
+     * {@inheritDoc}
+     */
     public function filter($metrics)
     {
         $response = [];
