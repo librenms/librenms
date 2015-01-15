@@ -82,6 +82,15 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
+    if (@dbFetchCell("SELECT 1 FROM processes WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    {
+      echo('<li class="' . $select['processes'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'processes')).'">
+      <img src="images/16/application_osx_terminal.png" align="absmiddle" border="0" /> Processes
+    </a>
+  </li>');
+    }
+
     if (isset($config['collectd_dir']) && is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
     {
       echo('<li class="' . $select['collectd'] . '">
