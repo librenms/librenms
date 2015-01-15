@@ -23,7 +23,6 @@
   ],
   "keywords": [],
   "dependencies": {
-    "jquery": "git+https://github.com/jquery/jquery.git#2.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
