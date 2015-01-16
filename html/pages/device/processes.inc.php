@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Alerts Tracking
+ * Process Listing
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
