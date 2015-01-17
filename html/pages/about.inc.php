@@ -130,6 +130,7 @@ $git_log = `git log -10`;
 
 
 echo("
+<div class='table-responsive'>
     <table class='table table-condensed' border='0'>
       <tr valign=top><td width=150><b>$project_name</b></td><td><a href='http://www.librenms.org/changelog.html'>$project_version</a></td></tr>
       <tr valign=top><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
@@ -138,6 +139,7 @@ echo("
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
       <tr valign=top><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
     </table>
+</div>
 ");
 
 
