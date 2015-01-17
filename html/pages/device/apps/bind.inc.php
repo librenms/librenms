@@ -23,7 +23,7 @@
  */
 
 global $config;
-$graphs = array('bind_queries' => 'bind - Queries');
+$graphs = array('bind_queries' => 'Queries');
 foreach( $graphs as $key => $text ) {
 	$graph_type            = $key;
 	$graph_array['height'] = "100";
