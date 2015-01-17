@@ -31,6 +31,7 @@ $unit_text    = "Query/sec";
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-bind-".$app['app_id'].".rrd";
 $array        = array( 'any', 'a', 'aaaa', 'cname', 'mx', 'ns', 'ptr', 'soa', 'srv', 'spf' );
 $colours      = "merged";
+$rrd_list     = array();
 
 $config['graph_colours']['merged'] = array_merge($config['graph_colours']['greens'], $config['graph_colours']['blues']);
 

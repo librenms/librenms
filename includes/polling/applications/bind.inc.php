@@ -26,7 +26,8 @@ if( !empty($agent_data['app']['bind']) && $app['app_id'] > 0 ) {
 	echo " bind ";
 	$bind = $agent_data['app']['bind'];
 	$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-bind-".$app['app_id'].".rrd";
-	unset($bind_parsed);
+	$bind_parsed = array();
+	$prefix = "";
 	foreach( explode("\n",$bind) as $line ) {
 		$pattern = '/^\+\+ ([^+]+) \+\+$/';
 		preg_match($pattern, $line, $matches);
