@@ -34,5 +34,30 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 * Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 * Then under Applications, enable the apps that you plan to monitor.
 * Wait, in around 10 minutes you should start seeing data in your graphs under Apps for the device.
-* 
 
+## Application Specific Configuration
+
+### BIND9/named
+
+Create stats file with appropriate permissions:
+```shell
+~$ touch /etc/bind/named.stats
+~$ chown bind:bind /etc/bind/named.stats
+```
+Change `user:group` to the user and group that's running bind/named.
+
+Bind/named configuration:
+```text
+options {
+	...
+	statistics-file "/etc/bind/named.stats";
+	zone-statistics yes;
+	...
+};
+```
+Restart your bind9/named after changing the configuration.
+
+Verify that everything works by executing `rdnc stats && cat /etc/bind/named.stats`.  
+In case you get a `Permission Denied` error, make sure you chown'ed correctly.
+
+Note: if you change the path you will need to change the path in `scripts/agent-local/bind`.
