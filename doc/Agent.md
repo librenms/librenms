@@ -61,3 +61,31 @@ Verify that everything works by executing `rdnc stats && cat /etc/bind/named.sta
 In case you get a `Permission Denied` error, make sure you chown'ed correctly.
 
 Note: if you change the path you will need to change the path in `scripts/agent-local/bind`.
+
+### TinyDNS/djbdns
+
+__Installation__:
+
+1. Get tinystats sources from http://www.morettoni.net/tinystats.en.html
+2. Compile like as advised.  
+  _Note_: In case you get `Makefile:9: *** missing separator.  Stop.`, compile manually using:  
+    * With IPv6: `gcc -Wall -O2 -fstack-protector -DWITH_IPV6 -o tinystats tinystats.c`  
+    * Without IPv6: `gcc -Wall -O2 -fstack-protector -o tinystats tinystats.c`  
+3. Install into prefered path, like `/usr/bin/`.
+
+__Configuration__:
+
+_Note_: In this part we assume that you use DJB's [Daemontools](http://cr.yp.to/daemontools.html) to start/stop tinydns.  
+And that your tinydns-instance is located in `/service/dns`, adjust this path if necesary.
+
+1. Replace your _log_'s `run` file, typically located in `/service/dns/log/run` with:  
+  ```
+  #!/bin/sh
+  
+  exec setuidgid dnslog tinystats ./main/tinystats/ multilog t n3 s250000 ./main/
+  ```
+2. Create tinystats directory and chown:  
+  `mkdir /service/dns/log/main/tinystats && chown dnslog:nofiles /service/dns/log/main/tinystats`
+3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`  
+   _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesnt rehook the logging and I'm forced to restart it entirely.
+
