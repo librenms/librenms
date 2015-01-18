@@ -6,6 +6,7 @@ $graphs['mysql']      = array('network_traffic', 'connections', 'command_counter
 $graphs['memcached']  = array('bits', 'commands', 'data', 'items');
 $graphs['nginx']      = array('connections', 'req');
 $graphs['bind']       = array('queries');
+$graphs['tinydns']    = array('queries', 'errors', 'dnssec', 'other');
 
 print_optionbar_start();
 
