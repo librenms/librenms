@@ -944,6 +944,10 @@ $config['os'][$os]['text']              = "Cisco Meraki";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "meraki";
 
+$os = "hikvision";
+$config['os'][$os]['text']              = "Hikvision";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "hikvision";
 
 foreach ($config['os'] as $this_os => $blah)
 {

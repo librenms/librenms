@@ -4,6 +4,10 @@ $pagetitle[] = "Search";
 
 $sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address', 'arp' => 'ARP Table');
 
+if( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
+  $sections['packages'] = 'Packages';
+}
+
 if (!isset($vars['search'])) { $vars['search'] = "ipv4"; }
 
 print_optionbar_start('', '');
@@ -30,17 +34,10 @@ unset ($sep);
 
 print_optionbar_end('', '');
 
-switch ($vars['search'])
-{
-  case 'ipv4':
-  case 'ipv6':
-  case 'mac':
-  case 'arp':
-    include('pages/search/'.$vars['search'].'.inc.php');
-    break;
-  default:
-    echo(report_this('Unknown search type '.$vars['search']));
-    break;
+if( file_exists('pages/search/'.$vars['search'].'.inc.php') ) {
+  include('pages/search/'.$vars['search'].'.inc.php');
+} else {
+  echo(report_this('Unknown search type '.$vars['search']));
 }
 
 ?>

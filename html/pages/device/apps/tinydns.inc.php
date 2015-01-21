@@ -14,33 +14,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Global Settings
- * @author f0o <f0o@devilcode.org>
+ * TinyDNS Application
+ * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
- * @subpackage Page
+ * @subpackage Apps
  */
 
-/**
- * Array-To-Table
- * @param array $a N-Dimensional, Associative Array
- * @return string
- */
-function a2t($a) {
-	$r = "<table class='table table-condensed table-hover'><tbody>";
-	foreach( $a as $k=>$v ) {
-		if( !empty($v) ) {
-			$r .= "<tr><td class='col-md-2'><i><b>".$k."</b></i></td><td class='col-md-10'>".(is_array($v)?a2t($v):"<code>".wordwrap($v,75,"<br/>")."</code>")."</td></tr>";
-		}
-	}
-	$r .= '</tbody></table>';
-	return $r;
-}
-
-if( $_SESSION['userlevel'] == 10 ) {
-	echo "<div class='table-responsive'>".a2t($config)."</div>";
-} else {
-	include("includes/error-no-perm.inc.php");
+global $config;
+$graphs = array('tinydns_queries' => 'Queries', 'tinydns_errors' => 'Errors', 'tinydns_dnssec' => 'DNSSec', 'tinydns_other' => 'Other');
+foreach( $graphs as $key => $text ) {
+	$graph_type            = $key;
+	$graph_array['height'] = "100";
+	$graph_array['width']  = "215";
+	$graph_array['to']     = $config['time']['now'];
+	$graph_array['id']     = $app['app_id'];
+	$graph_array['type']   = "application_".$key;
+	echo "<h3>$text</h3><tr bgcolor='$row_colour'><td colspan=5>";
+	include("includes/print-graphrow.inc.php");
+	echo "</td></tr>";
 }
 ?>

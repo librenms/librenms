@@ -6,7 +6,7 @@
 # |           | |___| | | |  __/ (__|   <    | |  | | . \            |
 # |            \____|_| |_|\___|\___|_|\_\___|_|  |_|_|\_\           |
 # |                                                                  |
-# | Copyright Mathias Kettner 2013             mk@mathias-kettner.de |
+# | Copyright Mathias Kettner 2014             mk@mathias-kettner.de |
 # +------------------------------------------------------------------+
 #
 # This file is part of Check_MK.
@@ -29,6 +29,15 @@ unset LANG
 
 export MK_LIBDIR="/usr/lib/check_mk_agent"
 export MK_CONFDIR="/etc/check_mk"
+export MK_VARDIR="/var/lib/check_mk_agent"
+
+# Provide information about the remote host. That helps when data
+# is being sent only once to each remote host.
+if [ "$REMOTE_HOST" ] ; then
+    export REMOTE=$REMOTE_HOST
+elif [ "$SSH_CLIENT" ] ; then
+    export REMOTE=${SSH_CLIENT%% *}
+fi
 
 # Make sure, locally installed binaries are found
 PATH=$PATH:/usr/local/bin
@@ -45,8 +54,7 @@ LOCALDIR=$MK_LIBDIR/local
 
 # All files in SPOOLDIR will simply appended to the agent
 # output if they are not outdated (see below)
-SPOOLDIR=$MK_CONFDIR/spool
-
+SPOOLDIR=$MK_VARDIR/spool
 
 # close standard input (for security reasons) and stderr
 if [ "$1" = -d ]
@@ -58,21 +66,26 @@ fi
 
 # Runs a command asynchronous by use of a cache file
 function run_cached () {
+    local section=
     if [ "$1" = -s ] ; then local section="echo '<<<$2>>>' ; " ; shift ; fi
     local NAME=$1
     local MAXAGE=$2
     shift 2
     local CMDLINE="$section$@"
 
-    if [ ! -d $MK_CONFDIR/cache ]; then mkdir -p $MK_CONFDIR/cache ; fi
-    CACHEFILE="$MK_CONFDIR/cache/$NAME.cache"
+    if [ ! -d $MK_VARDIR/cache ]; then mkdir -p $MK_VARDIR/cache ; fi
+    CACHEFILE="$MK_VARDIR/cache/$NAME.cache"
 
-    # Check if the creation of the cache takes suspiciously long and return 
+    # Check if the creation of the cache takes suspiciously long and return
     # nothing if the age (access time) of $CACHEFILE.new is twice the MAXAGE
     local NOW=$(date +%s)
     if [ -e "$CACHEFILE.new" ] ; then
         local CF_ATIME=$(stat -c %X "$CACHEFILE.new")
-        if [ $((NOW - CF_ATIME)) -ge $((MAXAGE * 2)) ] ; then 
+        if [ $((NOW - CF_ATIME)) -ge $((MAXAGE * 2)) ] ; then
+            # Kill the process still accessing that file in case
+            # it is still running. This avoids overlapping processes!
+            fuser -k -9 "$CACHEFILE.new" >/dev/null 2>&1
+            rm -f "$CACHEFILE.new"
             return
         fi
     fi
@@ -88,17 +101,21 @@ function run_cached () {
 
     # Cache file outdated and new job not yet running? Start it
     if [ -z "$USE_CACHEFILE" -a ! -e "$CACHEFILE.new" ] ; then
-        echo "set -o noclobber ; exec > \"$CACHEFILE.new\" || exit 1 ; $CMDLINE && mv \"$CACHEFILE.new\" \"$CACHEFILE\" || rm -f \"$CACHEFILE\" \"$CACHEFILE.new\"" | nohup bash 2>/dev/null &
+        echo "set -o noclobber ; exec > \"$CACHEFILE.new\" || exit 1 ; $CMDLINE && mv \"$CACHEFILE.new\" \"$CACHEFILE\" || rm -f \"$CACHEFILE\" \"$CACHEFILE.new\"" | nohup bash >/dev/null 2>&1 &
     fi
 }
 
+# Make run_cached available for subshells (plugins, local checks, etc.)
+export -f run_cached
+
 echo '<<<check_mk>>>'
-echo Version: 1.2.4p5
+echo Version: 1.2.6b5
 echo AgentOS: linux
+echo AgentDirectory: $MK_CONFDIR
+echo DataDirectory: $MK_VARDIR
+echo SpoolDirectory: $SPOOLDIR
 echo PluginsDirectory: $PLUGINSDIR
 echo LocalDirectory: $LOCALDIR
-echo SpoolDirectory: $SPOOLDIR
-echo AgentDirectory: $MK_CONFDIR
 
 # If we are called via xinetd, try to find only_from configuration
 if [ -n "$REMOTE_HOST" ]
@@ -117,13 +134,20 @@ fi
 echo '<<<df>>>'
 # The exclusion list is getting a bit of a problem. -l should hide any remote FS but seems
 # to be all but working.
-excludefs="-x smbfs -x tmpfs -x cifs -x iso9660 -x udf -x nfsv4 -x nfs -x mvfs -x zfs"
+excludefs="-x smbfs -x cifs -x iso9660 -x udf -x nfsv4 -x nfs -x mvfs -x zfs"
 df -PTlk $excludefs | sed 1d
+
+# df inodes information
+echo '<<<df>>>'
+echo '[df_inodes_start]'
+df -PTli $excludefs | sed 1d
+echo '[df_inodes_end]'
 
 # Filesystem usage for ZFS
 if type zfs > /dev/null 2>&1 ; then
     echo '<<<zfsget>>>'
-    zfs get -Hp name,quota,used,avail,mountpoint,type
+    zfs get -Hp name,quota,used,avail,mountpoint,type -t filesystem,volume || \
+       zfs get -Hp name,quota,used,avail,mountpoint,type
     echo '[df]'
     df -PTlk -t zfs | sed 1d
 fi
@@ -149,6 +173,20 @@ then
 	    printf '\n'|| echo "$MP hanging 0 0 0 0"
 	 fi
 	done
+
+    echo '<<<cifsmounts>>>'
+    sed -n '/ cifs\? /s/[^ ]* \([^ ]*\) .*/\1/p' < /proc/mounts |
+        sed 's/\\040/ /g' |
+        while read MP
+        do
+         if [ $STAT_VERSION != $STAT_BROKE ]; then
+            waitmax -s 9 2 stat -f -c "$MP ok %b %f %a %s" "$MP" || \
+                echo "$MP hanging 0 0 0 0"
+         else
+            waitmax -s 9 2 stat -f -c "$MP ok %b %f %a %s" "$MP" && \
+            printf '\n'|| echo "$MP hanging 0 0 0 0"
+         fi
+        done
 fi
 
 # Check mount options. Filesystems may switch to 'ro' in case
@@ -158,8 +196,7 @@ grep ^/dev < /proc/mounts
 
 # processes including username, without kernel processes
 echo '<<<ps>>>'
-ps ax -o user,vsz,rss,pcpu,command --columns 10000 | sed -e 1d -e 's/ *\([^ ]*\) *\([^ ]*\) *\([^ ]*\) *\([^ ]*\) */(\1,\2,\3,\4) /'
-
+ps ax -o user,vsz,rss,cputime,pid,command --columns 10000 | sed -e 1d -e 's/ *\([^ ]*\) *\([^ ]*\) *\([^ ]*\) *\([^ ]*\) *\([^ ]*\) */(\1,\2,\3,\4,\5) /'
 
 # Memory usage
 echo '<<<mem>>>'
@@ -183,7 +220,7 @@ then
     do
         echo "[$eth]"
         ethtool $eth | egrep '(Speed|Duplex|Link detected|Auto-negotiation):'
-        echo -en "\tAddress: " ; cat /sys/class/net/$eth/address
+        echo -en "\tAddress: " ; cat /sys/class/net/$eth/address ; echo
     done
 fi
 
@@ -210,21 +247,11 @@ echo '<<<tcp_conn_stats>>>'
 # New implementation: netstat is very slow for large TCP tables
 cat /proc/net/tcp /proc/net/tcp6 2>/dev/null | awk ' /:/ { c[$4]++; } END { for (x in c) { print x, c[x]; } }'
 
-# Platten- und RAID-Status von LSI-Controlleren, falls vorhanden
-if type cfggen > /dev/null ; then
-   echo '<<<lsi>>>'
-   cfggen 0 DISPLAY | egrep '(Target ID|State|Volume ID|Status of volume)[[:space:]]*:' | sed -e 's/ *//g' -e 's/:/ /'
-fi
-
-# Multipathgeraete
+# Linux Multipathing
 if type multipath >/dev/null ; then
     echo '<<<multipath>>>'
     multipath -l
 fi
-
-# Soft-RAID
-echo '<<<md>>>'
-cat /proc/mdstat
 
 # Performancecounter Platten
 echo '<<<diskstat>>>'
@@ -254,69 +281,81 @@ fi
 
 # IPMI data via ipmi-sensors (of freeipmi). Please make sure, that if you
 # have installed freeipmi that IPMI is really support by your hardware.
-# The agent tries to avoid hanging forever by setting a limit of 300 seconds
-# for the first run (where the cache is created). If ipmi-sensors runs into
-# that timeout, it leaves and empty cache file. We skip this check forever
-# if we find that empty cache file.
-sdrcache=/var/cache/.freeipmi/sdr-cache/sdr-cache-$(hostname | cut -d. -f1).127.0.0.1
-if type ipmi-sensors >/dev/null && [ ! -e "$sdrcache" -o -s "$sdrcache" ]
+if type ipmi-sensors >/dev/null
 then
     echo '<<<ipmi_sensors>>>'
-    # No cache file existing? => Impose a high time limit. We do not suffice
-    # in creating the cache we most probably run on a hardware where this tool
-    # is hanging forever. We make sure that we never try again in that case!
-    if [ ! -e "$sdrcache" ]
-    then
-        WAITMAX="waitmax 300"
-    elif tail --bytes 2 < "$sdrcache" | od -t x2 | grep -q 0a0a
-    then
-        WAITMAX="waitmax 3"
-    else
-        # Cache file corrupt. Must end with two linefeeds.
-        rm -f $sdrcache
-	WAITMAX=
-    fi
     # Newer ipmi-sensors version have new output format; Legacy format can be used
     if ipmi-sensors --help | grep -q legacy-output; then
         IPMI_FORMAT="--legacy-output"
     else
         IPMI_FORMAT=""
     fi
-    # Aquire lock with flock in order to avoid multiple runs of ipmi-sensors
-    # in case of parallel or overlapping calls of the agent.
-    (
-        flock -n 200 --wait 60
-        # At least with ipmi-sensoirs 0.7.16 this group is Power_Unit instead of "Power Unit"
-        for class in Temperature Power_Unit Fan
-        do
-            $WAITMAX ipmi-sensors $IPMI_FORMAT --sdr-cache-directory /var/cache -g "$class" | sed -e 's/ /_/g' -e 's/:_\?/ /g' -e 's@ \([^(]*\)_(\([^)]*\))@ \2_\1@'
-            # In case of a timeout immediately leave loop.
+    # At least with ipmi-sensoirs 0.7.16 this group is Power_Unit instead of "Power Unit"
+    run_cached -s ipmi_sensors 300 "for class in Temperature Power_Unit Fan
+    do
+        ipmi-sensors $IPMI_FORMAT --sdr-cache-directory /var/cache -g "$class" | sed -e 's/ /_/g' -e 's/:_\?/ /g' -e 's@ \([^(]*\)_(\([^)]*\))@ \2_\1@'
+        # In case of a timeout immediately leave loop.
         if [ $? = 255 ] ; then break ; fi
-            WAITMAX="waitmax 3"
-        done
-    ) 200>>"$sdrcache"
+    done"
 fi
 
-# State of LSI MegaRAID controller via MegaCli. You can download that tool from:
-# http://www.lsi.com/downloads/Public/MegaRAID%20Common%20Files/8.02.16_MegaCLI.zip
+# RAID status of Linux software RAID
+echo '<<<md>>>'
+cat /proc/mdstat
 
+# RAID status of Linux RAID via device mapper
+if type dmraid >/dev/null && DMSTATUS=$(dmraid -r)
+then
+    echo '<<<dmraid>>>'
+
+    # Output name and status
+    dmraid -s | grep -e ^name -e ^status
+
+    # Output disk names of the RAID disks
+    DISKS=$(echo "$DMSTATUS" | cut -f1 -d\:)
+
+    for disk in $DISKS ; do
+        device=$(cat /sys/block/$(basename $disk)/device/model )
+        status=$(echo "$DMSTATUS" | grep ^${disk})
+        echo "$status Model: $device"
+    done
+fi
+
+# RAID status of LSI controllers via cfggen
+if type cfggen > /dev/null ; then
+   echo '<<<lsi>>>'
+   cfggen 0 DISPLAY | egrep '(Target ID|State|Volume ID|Status of volume)[[:space:]]*:' | sed -e 's/ *//g' -e 's/:/ /'
+fi
+
+# RAID status of LSI MegaRAID controller via MegaCli. You can download that tool from:
+# http://www.lsi.com/downloads/Public/MegaRAID%20Common%20Files/8.02.16_MegaCLI.zip
 if type MegaCli >/dev/null ; then
+    MegaCli_bin="MegaCli"
+elif type MegaCli64 >/dev/null ; then
+    MegaCli_bin="MegaCli64"
+elif type megacli >/dev/null ; then
+    MegaCli_bin="megacli"
+else
+    MegaCli_bin="unknown"
+fi
+
+if [ "$MegaCli_bin" != "unknown" ]; then
     echo '<<<megaraid_pdisks>>>'
-    for part in $(MegaCli -EncInfo -aALL -NoLog < /dev/null \
+    for part in $($MegaCli_bin -EncInfo -aALL -NoLog < /dev/null \
         | sed -rn 's/:/ /g; s/[[:space:]]+/ /g; s/^ //; s/ $//; s/Number of enclosures on adapter ([0-9]+).*/adapter \1/g; /^(Enclosure|Device ID|adapter) [0-9]+$/ p'); do
         [ $part = adapter ] && echo ""
         [ $part = 'Enclosure' ] && echo -ne "\ndev2enc"
         echo -n " $part"
     done
     echo
-    MegaCli -PDList -aALL -NoLog < /dev/null | egrep 'Enclosure|Raw Size|Slot Number|Device Id|Firmware state|Inquiry|Adapter'
+    $MegaCli_bin -PDList -aALL -NoLog < /dev/null | egrep 'Enclosure|Raw Size|Slot Number|Device Id|Firmware state|Inquiry|Adapter'
     echo '<<<megaraid_ldisks>>>'
-    MegaCli -LDInfo -Lall -aALL -NoLog < /dev/null | egrep 'Size|State|Number|Adapter|Virtual'
+    $MegaCli_bin -LDInfo -Lall -aALL -NoLog < /dev/null | egrep 'Size|State|Number|Adapter|Virtual'
     echo '<<<megaraid_bbu>>>'
-    MegaCli -AdpBbuCmd -GetBbuStatus -aALL -NoLog < /dev/null | grep -v Exit
+    $MegaCli_bin -AdpBbuCmd -GetBbuStatus -aALL -NoLog < /dev/null | grep -v Exit
 fi
 
-# 3WARE disk controller (by Radoslaw Bak)
+# RAID status of 3WARE disk controller (by Radoslaw Bak)
 if type tw_cli > /dev/null ; then
     for C in $(tw_cli show | awk 'NR < 4 { next } { print $1 }'); do
         echo '<<<3ware_info>>>'
@@ -328,11 +367,17 @@ if type tw_cli > /dev/null ; then
     done
 fi
 
+# RAID controllers from areca (Taiwan)
+# cli64 can be found at ftp://ftp.areca.com.tw/RaidCards/AP_Drivers/Linux/CLI/
+if type cli64 >/dev/null ; then
+    run_cached -s arc_raid_status 300 "cli64 rsf info | tail -n +3 | head -n -2"
+fi
+
 # VirtualBox Guests. Section must always been output. Otherwise the
 # check would not be executed in case no guest additions are installed.
 # And that is something the check wants to detect
 echo '<<<vbox_guest>>>'
-if type VBoxControl > /dev/null 2>&1 ; then
+if type VBoxControl >/dev/null 2>&1 ; then
     VBoxControl -nologo guestproperty enumerate | cut -d, -f1,2
     [ ${PIPESTATUS[0]} = 0 ] || echo "ERROR"
 fi
@@ -341,12 +386,19 @@ fi
 # /etc/openvpn. We might find a safer way to find the configuration later.
 if [ -e /etc/openvpn/openvpn-status.log ] ; then
     echo '<<<openvpn_clients:sep(44)>>>'
-    sed -n -e '/CLIENT LIST/,/ROUTING TABLE/p' < /etc/openvpn/openvpn-status.log  | sed -e 1,3d -e '$d' 
+    sed -n -e '/CLIENT LIST/,/ROUTING TABLE/p' < /etc/openvpn/openvpn-status.log  | sed -e 1,3d -e '$d'
 fi
 
+# Time synchronization with NTP
 if type ntpq > /dev/null 2>&1 ; then
    # remove heading, make first column space separated
-   run_cached -s ntp 30 "waitmax 5 ntpq -p | sed -e 1,2d -e 's/^\(.\)/\1 /' -e 's/^ /%/'"
+   run_cached -s ntp 30 "waitmax 5 ntpq -np | sed -e 1,2d -e 's/^\(.\)/\1 /' -e 's/^ /%/'"
+fi
+
+# Time synchronization with Chrony
+if type chronyc > /dev/null 2>&1 ; then
+    # Force successful exit code. Otherwise section will be missing if daemon not running
+    run_cached -s chrony 30 "waitmax 5 chronyc tracking || true"
 fi
 
 if type nvidia-settings >/dev/null && [ -S /tmp/.X11-unix/X0 ]
@@ -380,7 +432,7 @@ if type lpstat > /dev/null 2>&1; then
             echo '---'
             lpstat -o | while read LINE
             do
-                PRINTER=$(echo $LINE | awk '{print $2}')
+                PRINTER=${LINE%%-*}
                 if echo "$LOCAL_PRINTERS" | grep -q "$PRINTER"; then
                     echo $LINE
                 fi
@@ -429,9 +481,17 @@ fi
 # Only handle the last 6 lines (includes the summary line at the bottom and
 # the last message in the queue. The last message is not used at the moment
 # but it could be used to get the timestamp of the last message.
-if type mailq >/dev/null 2>&1 && [ -x /usr/sbin/postfix ] && getent passwd postfix >/dev/null 2>&1; then
+if type postconf >/dev/null ; then
     echo '<<<postfix_mailq>>>'
-    mailq | tail -n 6
+    postfix_queue_dir=$(postconf -h queue_directory)
+    postfix_count=$(find $postfix_queue_dir/deferred -type f | wc -l)
+    postfix_size=$(du -ks $postfix_queue_dir/deferred | awk '{print $1 }')
+    if [ $postfix_count -gt 0 ]
+    then
+       echo -- $postfix_size Kbytes in $postfix_count Requests.
+    else
+       echo Mail queue is empty
+    fi
 elif [ -x /usr/sbin/ssmtp ] ; then
     echo '<<<postfix_mailq>>>'
     mailq 2>&1 | sed 's/^[^:]*: \(.*\)/\1/' | tail -n 6
@@ -447,7 +507,7 @@ fi
 # Check status of OMD sites
 if type omd >/dev/null
 then
-    run_cached omd_status 60 "echo '<<<omd_status>>>' ; omd status --bare --auto"
+    run_cached -s omd_status 60 "omd status --bare --auto"
 fi
 
 
@@ -486,7 +546,7 @@ fi
 # is a sub directory per user that ran a job. That directory must be
 # owned by the user so that a symlink or hardlink attack for reading
 # arbitrary files can be avoided.
-if pushd /var/lib/check_mk_agent/job >/dev/null; then
+if pushd $MK_VARDIR/job >/dev/null; then
     echo '<<<job>>>'
     for username in *
     do
@@ -504,9 +564,16 @@ if ls /sys/class/thermal/thermal_zone* >/dev/null 2>&1; then
     echo '<<<lnx_thermal>>>'
     for F in /sys/class/thermal/thermal_zone*; do
         echo -n "${F##*/} "
+        if [ ! -e $F/mode ] ; then echo -n "- " ; fi
         cat $F/{mode,type,temp,trip_point_*} | tr \\n " "
         echo
     done
+fi
+
+# Libelle Business Shadow
+if type trd >/dev/null; then
+   echo "<<<libelle_business_shadow:sep(58)>>>"
+   trd -s
 fi
 
 # MK's Remote Plugin Executor

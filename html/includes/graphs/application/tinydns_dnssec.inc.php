@@ -14,33 +14,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Global Settings
- * @author f0o <f0o@devilcode.org>
+ * TinyDNS DNSSec Graph
+ * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
- * @subpackage Page
+ * @subpackage Graphs
  */
 
-/**
- * Array-To-Table
- * @param array $a N-Dimensional, Associative Array
- * @return string
- */
-function a2t($a) {
-	$r = "<table class='table table-condensed table-hover'><tbody>";
-	foreach( $a as $k=>$v ) {
-		if( !empty($v) ) {
-			$r .= "<tr><td class='col-md-2'><i><b>".$k."</b></i></td><td class='col-md-10'>".(is_array($v)?a2t($v):"<code>".wordwrap($v,75,"<br/>")."</code>")."</td></tr>";
-		}
+include("includes/graphs/common.inc.php");
+
+$i            = 0;
+$scale_min    = 0;
+$nototal      = 1;
+$unit_text    = "Query/sec";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-tinydns-".$app['app_id'].".rrd";
+//$array        = explode(":","hinfo:rp:sig:key:axfr:total");
+$array        = array( "key", "sig" );
+$colours      = "mixed";
+$rrd_list     = array();
+
+if( is_file($rrd_filename) ) {
+	foreach( $array as $ds ) {
+		$rrd_list[$i]['filename'] = $rrd_filename;
+		$rrd_list[$i]['descr']    = strtoupper($ds);
+		$rrd_list[$i]['ds']       = $ds;
+		$i++;
 	}
-	$r .= '</tbody></table>';
-	return $r;
+} else {
+	echo "file missing: $file";
 }
 
-if( $_SESSION['userlevel'] == 10 ) {
-	echo "<div class='table-responsive'>".a2t($config)."</div>";
-} else {
-	include("includes/error-no-perm.inc.php");
-}
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 ?>
