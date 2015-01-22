@@ -70,3 +70,4 @@ Usage:
 - Create a key like described above
 - Scan provided QR or click on 'Manual' and type down the Secret
 - On next login, enter the passcode that the App provides
+
