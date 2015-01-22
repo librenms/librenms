@@ -30,7 +30,7 @@ Option | Default-Value | Notes
 `$config['irc_maxretry]` | `5` | Optional; How many connection attempts should be made before giving up
 `$config['irc_nick']` | `LibreNMS` | Optional;
 `$config['irc_pass']` |  | Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect
-`$config['irc_port]` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
+`$config['irc_port']` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
 
 ### <a name="commands">IRC-Commands</a>
 
