@@ -1,5 +1,96 @@
 <?php
 
+// Observium Includes
+include_once($config['install_dir'] . "/includes/dbFacile.php");
+
+// Connect to database
+$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$database_link)
+{
+        echo("<h2>MySQL Error</h2>");
+        echo(mysql_error());
+        die;
+}
+$database_db = mysql_select_db($config['db_name'], $database_link);
+
+function create_array(&$arr,$string,$data,$type)
+{
+  // The original source of this code is from Stackoverflow (www.stackoverflow.com).
+  // http://stackoverflow.com/questions/9145902/create-variable-length-array-from-string
+  // Answer provided by stewe (http://stackoverflow.com/users/511300/stewe)
+  // This code is slightly adapted from the original posting.
+
+  $a=explode(',',$string);
+  $last=count($a)-1;
+  $p=&$arr;
+
+  foreach($a as $k=>$key)
+  {
+    if ($k==$last)
+    {
+      if($type == 'multi')
+      {
+        $p[$key]=explode(',',$data);
+      }
+      elseif($type == 'single')
+      {
+        $p[$key]=$data;
+      }
+    }
+    else if (is_array($p))
+    {
+//      $p[$key]=array();
+    }
+  $p=&$p[$key];
+  }
+}
+
+// We should be able to get config values from the DB now.
+// Single field config values
+$config_vars = get_defined_vars();
+$single_config = dbFetchRows("SELECT `config_name`, `config_value` FROM  `config` WHERE `config_type` = 'single' AND `config_disabled` = '0'");
+foreach ($single_config as $config_data)
+{
+  $tmp_name = $config_data['config_name'];
+  if(!array_key_exists($config[$tmp_name], $config_vars))
+  {
+    $config[$tmp_name] = $config_data['config_value'];
+  }
+}
+// Array config values
+$config_vars = get_defined_vars();
+$array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'array' AND `config_disabled` =  '0' GROUP BY config_name");
+foreach ($array_config as $config_data)
+{
+  $tmp_name = $config_data['config_name'];
+  if(!array_key_exists($config[$tmp_name], $config_vars))
+  {
+    $config[$tmp_name] = explode(',',$config_data['config_value']);
+  }
+}
+
+// Multi-array config values
+$config_vars = get_defined_vars();
+$multi_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'multi-array' AND `config_disabled` =  '0' GROUP BY config_name");
+foreach ($multi_array_config as $config_data)
+{
+  create_array($config,$config_data['config_name'],$config_data['config_value'],'multi');
+}
+
+// Single-array config values
+$config_vars = get_defined_vars();
+$single_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'single-array' AND `config_disabled` =  '0' GROUP BY config_name");
+foreach ($single_array_config as $config_data)
+{
+//  $tmp_name = explode(',',$config_data['config_name']);
+//  $new_name = implode('][',$tmp_name);
+//  if(!array_key_exists($config["{$tmp_name}"], $config_vars))
+//  {
+//    $config["{$new_name}"] = $config_data['config_value'];
+//  }
+  create_array($config,$config_data['config_name'],$config_data['config_value'],'single');
+}
+
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
 /////////////////////////////////////////////////////////
@@ -1726,17 +1817,7 @@ if (isset($_SERVER['HTTPS']))
   $config['base_url'] = preg_replace('/^http:/','https:', $config['base_url']);
 }
 
-// Connect to database
-$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$database_link)
-{
-        echo("<h2>MySQL Error</h2>");
-        echo(mysql_error());
-        die;
-}
-$database_db = mysql_select_db($config['db_name'], $database_link);
-
-if ($config['memcached']['enable'])
+if ($config['memcached']['enable'] === TRUE)
 {
   if (class_exists("Memcached"))
   {
