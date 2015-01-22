@@ -106,7 +106,7 @@ if ($vars['view'] == 'minigraphs')
 
   foreach ($ports as $port)
   {
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $state = $memcache->get('port-'.$port['port_id'].'-state');
       if($debug) { print_r($state); }

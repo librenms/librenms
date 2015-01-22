@@ -97,7 +97,7 @@ function poll_sensor($device, $class, $unit)
       log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . " above threshold: " . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
     }
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $memcache->set('sensor-'.$sensor['sensor_id'].'-value', $sensor_value);
     } else {
