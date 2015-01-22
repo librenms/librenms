@@ -19,7 +19,6 @@ $git_log = `git log -10`;
 </div>
 <div style="margin: 10px;">
   <div style="float: right; padding: 0px; width: 49%">
-<?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
     <pre>
 Copyright (C) 2006-2012 Adam Armstrong
@@ -37,11 +36,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</pre>
-<?php print_optionbar_end(); ?>
 
     &nbsp;
 
-<?php print_optionbar_start(NULL); ?>
 
     <h3>Statistics</h3>
 
@@ -71,10 +68,11 @@ $stat_vrf = dbFetchCell("SELECT COUNT(vrf_id) FROM `vrfs`");
 $stat_vlans = dbFetchCell("SELECT COUNT(vlan_id) FROM `vlans`");
 
 echo("
-    <table width=95% cellpadding=5 cellspacing=0>
+<div class='table-responsive'>
+    <table class='table table-condensed'>
       <tr>
-        <td width=45%><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
-        <td width=45%><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
+        <td><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
+        <td><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
       </tr>
       <tr>
         <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td align=right>$stat_ipv4_addy</td>
@@ -109,9 +107,10 @@ echo("
         <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner</td>
       </tr>
     </table>
+</div>
 ");
 
-print_optionbar_end(); ?>
+?>
   </div>
 
   <div style="float: left; padding: 0px; width: 49%">
@@ -127,29 +126,30 @@ $mysql_version = dbFetchCell("SELECT version()");
 $netsnmp_version = shell_exec($config['snmpget'] . " --version 2>&1");
 $rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
 $schema_version = dbFetchCell("SELECT version FROM dbSchema");
-$git_log = `git log -10`;
+$version = `git rev-parse --short HEAD`;
 
-print_optionbar_start(NULL);
 
 echo("
-    <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td width=150><b>$project_name</b></td><td><a href='http://www.librenms.org/changelog.html'>$project_version</a></td></tr>
-      <tr valign=top><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
-      <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
-      <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
-      <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
-      <tr valign=top><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
+<div class='table-responsive'>
+    <table class='table table-condensed' border='0'>
+      <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version</a></td></tr>
+      <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
+      <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
+      <tr><td><b>PHP</b></td><td>$php_version</td></tr>
+      <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>
+      <tr><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
     </table>
+</div>
 ");
 
-print_optionbar_end();
 
 ?>
 
     <h5>LibreNMS is a community-based project. Please feel free to join us and contribute code, documentation, and bug reports:</h5>
 
     <p>
-      <a href="https://github.com/librenms/">Web site</a> |
+      <a href="http://www.librenms.org/">Web site</a> |
+      <a href="https://github.com/librenms/">GitHub</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
       <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
       <a href="http://twitter.com/librenms">Twitter</a> |
@@ -160,12 +160,12 @@ print_optionbar_end();
   <div style="margin-top:10px;">
   </div>
 
-    <h4>The Team</h4>
+    <h3>The Team</h3>
 
     <img src="images/icons/flags/au.png"> <strong>Paul Gear</strong> Project Founder<br />
     <img src="images/icons/flags/us.png"> <strong>Tyler Christiansen</strong> Developer<br />
 
-    <h4>Acknowledgements</h4>
+    <h3>Acknowledgements</h3>
 
     <b>Observium</b> Codebase for fork. <br />
     <b>Mark James</b> Silk Iconset. <br />
