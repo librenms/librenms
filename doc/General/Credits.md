@@ -25,3 +25,4 @@ Other components (needs details filled in):
 - check_mk (scripts/observium_agent*): GPLv2
 - qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
 
+
