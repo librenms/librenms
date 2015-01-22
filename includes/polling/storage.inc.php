@@ -36,7 +36,7 @@ foreach (dbFetchRows("SELECT * FROM storage WHERE device_id = ?", array($device[
 
   rrdtool_update($storage_rrd,"N:".$storage['used'].":".$storage['free']);
 
-  if ($config['memcached']['enable'])
+  if ($config['memcached']['enable'] === TRUE)
   {
     $memcache->set('storage-'.$storage['storage_id'].'-used', $storage['used']);
     $memcache->set('storage-'.$storage['storage_id'].'-free', $storage['free']);
