@@ -160,7 +160,7 @@ $config['alert']['transports']['nagios'] = "/path/to/my.fifo"; //Flapjack expect
 ## <a name="transports-irc">IRC</a>
 
 The IRC transports only works together with the LibreNMS IRC-Bot.  
-Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/IRC-Bot.md).  
+Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).  
 ```php
 $config['alert']['transports']['irc'] = true;
 ```
