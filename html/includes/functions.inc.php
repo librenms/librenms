@@ -367,13 +367,15 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
   if ($percent > "100") { $size_percent = "100"; } else { $size_percent = $percent; }
 
   $output = '
-<div style="font-size:11px;">
-  <div style=" width:'.$width.'px; height:'.$height.'px; background-color:#'.$right_background.';">
-    <div style="width:'.$size_percent.'%; height:'.$height.'px; background-color:#'.$left_background.'; border-right:0px white solid;"></div>
-    <div style="vertical-align: middle;height: '.$height.'px;margin-top:-'.($height).'px; color:#'.$left_colour .'; padding-left :4px;"><b>'.$left_text.'</b></div>
-    <div style="vertical-align: middle;height: '.$height.'px;margin-top:-'.($height).'px; color:#'.$right_colour.'; padding-right:4px;text-align:right;"><b>'.$right_text.'</b></div>
+<div class="container" style="width:'.$width.'px; height:'.$height.'px;">
+ <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;">
+  <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
   </div>
-</div>';
+ </div>
+ <b class="pull-left" style="padding-left: 4px; height: '.$height.'px;margin-top:-'.($height*2).'px; color:#'.$left_colour.';">'.$left_text.'</b>
+ <b class="pull-right" style="padding-right: 4px; height: '.$height.'px;margin-top:-'.($height*2).'px; color:#'.$right_colour.';">'.$right_text.'</b>
+</div>
+';
 
   return $output;
 }
