@@ -13,7 +13,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($devi
 {
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  if ($config['memcached']['enable'])
+  if ($config['memcached']['enable'] === TRUE)
   {
     $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
     if($debug) { print_r($state); }
