@@ -194,5 +194,5 @@ git push origin issue-####
 "LibreNMS issue database"
 [4]: http://www.observium.org/wiki/License
 "Observium License"
-[5] https://github.com/librenms/librenms/blob/master/AUTHORS.md
+[5]: https://github.com/librenms/librenms/blob/master/AUTHORS.md
 "LibreNMS contributor list"
