@@ -1,4 +1,4 @@
-ontributor Agreement
+Contributor Agreement
 ---------------------
 
 By contributing code to LibreNMS (whether by a github pull request, or by
