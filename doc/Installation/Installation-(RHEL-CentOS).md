@@ -73,7 +73,9 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 </VirtualHost>
 ```
 
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode`
+__Notes:__  
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode`.  
+If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
 
 ### Using Nginx and PHP-FPM ###
 
