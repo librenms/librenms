@@ -81,7 +81,11 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory:
 
     mkdir rrd logs
-    chown www-data:www-data logs/ rrd/
+    chown www-data:www-data logs/
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms www-data
+    chmod 775 rrd/
+    chown librenms:librenms rrd/
 
 > NOTE: If you're not running Ubuntu or Debian, you will need to change `www-data` to the user and group which run the Apache web server.
 

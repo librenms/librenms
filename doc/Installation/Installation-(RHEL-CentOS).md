@@ -160,10 +160,15 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
+    useradd librenms -d /opt/librenms -M -r
+    chmod 775 rrd/
+    chown librenms:librenms rrd/
     # For HTTPd (Apache):
-    chown apache:apache rrd/
+    chown apache:apache logs/
+    usermod -a -G librenms apache
     # For Nginx:
-    chown nginx:nginx rrd/
+    chown nginx:nginx logs/
+    usermod -a -G librenms nginx
 
 Start the web-server:
 
