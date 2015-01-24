@@ -75,7 +75,11 @@ To prepare the web interface (and adding devices shortly), you'll need to set up
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
-    chown www-data:www-data rrd/
+    chown www-data:www-data logs/
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms www-data
+    chmod 775 rrd/
+    chown librenms:librenms rrd/
 
 Next, add the following to `/etc/lighttpd/librenms.conf`
 
