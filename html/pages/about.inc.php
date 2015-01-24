@@ -160,10 +160,9 @@ echo("
   <div style="margin-top:10px;">
   </div>
 
-    <h3>The Team</h3>
+    <h3>Contributors</h3>
 
-    <img src="images/icons/flags/au.png"> <strong>Paul Gear</strong> Project Founder<br />
-    <img src="images/icons/flags/us.png"> <strong>Tyler Christiansen</strong> Developer<br />
+    <p>See the <a href="https://github.com/librenms/librenms/blob/master/AUTHORS.md">list of contributors</a> on GitHub.</p>
 
     <h3>Acknowledgements</h3>
 
