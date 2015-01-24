@@ -17,9 +17,9 @@ any other means), you assert that:
   date of Observium r3250).
 
 To agree with these assertions, please submit a github pull request against
-the file doc/AUTHORS.md including your name, email address, and github user
-id in the file (so that it can be matched to your commits), and stating in
-the commit log:
+[AUTHORS.md][5] including your name, email address, and github user id in
+the file (so that it can be matched to your commits), and stating in the
+commit log:
 ```
 	I agree to the conditions of the Contributor Agreement
 	contained in doc/General/Contributing.md.
@@ -194,3 +194,5 @@ git push origin issue-####
 "LibreNMS issue database"
 [4]: http://www.observium.org/wiki/License
 "Observium License"
+[5] https://github.com/librenms/librenms/blob/master/AUTHORS.md
+"LibreNMS contributor list"
