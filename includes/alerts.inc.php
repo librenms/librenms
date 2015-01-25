@@ -66,13 +66,29 @@ function RunRules($device) {
 	}
 	foreach( dbFetchRows("SELECT * FROM alert_rules WHERE alert_rules.disabled = 0 && ( alert_rules.device_id = -1 || alert_rules.device_id = ? ) ORDER BY device_id,id",array($device)) as $rule ) {
 		echo " #".$rule['id'].":";
+		$inv = json_decode($rule['extra'],true);
+		if( isset($inv['invert']) ) {
+			$inv = (bool) $inv['invert'];
+		} else {
+			$inv = false;
+		}
 		$chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
 		$sql = GenSQL($rule['rule']);
 		$qry = dbFetchRows($sql,array($device));
-		if( sizeof($qry) > 0 ) {
+		$s = sizeof($qry);
+		if( $s == 0 && $inv === false ) {
+			$doalert = false;
+		} elseif( $s > 0 && $inv === false ) {
+			$doalert = true;
+		} elseif( $s == 0 && $inv === true ) {
+			$doalert = true;
+		} else { //( $s > 0 && $inv == false ) {
+			$doalert = false;
+		}
+		if( $doalert ) {
 			if( $chk['state'] === "2" ) {
 				echo " SKIP  ";
-			} elseif( $chk['state'] === "1" ) {
+			} elseif( $chk['state'] >= "1" ) {
 				echo " NOCHG ";
 			} else {
 				$extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)),9);

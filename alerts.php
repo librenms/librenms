@@ -23,8 +23,8 @@
  * @subpackage Alerts
  */
 
-include("includes/defaults.inc.php");
-include("config.php");
+include_once("includes/defaults.inc.php");
+include_once("config.php");
 
 $lock = false;
 if( file_exists($config['install_dir']."/.alerts.lock") ) {
@@ -36,17 +36,60 @@ if( file_exists($config['install_dir']."/.alerts.lock") ) {
 }
 
 if( $lock === true ) {
-	exit('Alreading running with PID '.$lpid."\r\n");
+	exit(1);
 } else {
 	file_put_contents($config['install_dir']."/.alerts.lock", getmypid());
 }
 
-include("includes/definitions.inc.php");
-include("includes/functions.php");
+include_once($config['install_dir']."/includes/definitions.inc.php");
+include_once($config['install_dir']."/includes/functions.php");
+include_once($config['install_dir']."/includes/alerts.inc.php");
 
-RunAlerts();
+if( !defined("TEST") ) {
+	echo "Start: ".date('r')."\r\n";
+	echo "RunFollowUp():\r\n";
+	RunFollowUp();
+	echo "RunAlerts():\r\n";
+	RunAlerts();
+	echo "End  : ".date('r')."\r\n";
+}
 
 unlink($config['install_dir']."/.alerts.lock");
+
+/**
+ * Run Follow-Up alerts
+ * @return void
+ */
+function RunFollowUp() {
+	global $config;
+	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 0") as $alert ) {
+		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
+		$alert['details'] = json_decode(gzuncompress($alert['details']),true);
+		$rextra = json_decode($alert['extra'],true);
+		if( $rextra['invert'] ) {
+			continue;
+		}
+		$chk = dbFetchRows(GenSQL($alert['rule']),array($alert['device_id']));
+		$o = sizeof($alert['details']['rule']);
+		$n = sizeof($chk);
+		$ret = "Alert #".$alert['id'];
+		$state = 0;
+		if( $n > $o ) {
+			$ret .= " Worsens";
+			$state = 3;
+		} elseif( $n < $o ) {
+			$ret .= " Betters";
+			$state = 4;
+		}
+		if( $state > 0 ) {
+			$alert['details']['rule'] = $chk;
+			if( dbInsert(array('state' => $state, 'device_id' => $alert['device_id'], 'rule_id' => $alert['rule_id'], 'details' => gzcompress(json_encode($alert['details']),9)), 'alert_log') ) {
+				dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1),'alerts','rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+			}
+			echo $ret." (".$o."/".$n.")\r\n";
+		}
+	}
+}
 
 /**
  * Run all alerts
@@ -54,9 +97,9 @@ unlink($config['install_dir']."/.alerts.lock");
  */
 function RunAlerts() {
 	global $config;
-	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: %rule\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
+	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
 	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1") as $alert ) {
-		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
+		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
 		$alert['details'] = json_decode(gzuncompress($alert['details']),true);
 		$noiss = false;
 		$noacc = false;
@@ -138,39 +181,50 @@ function ExtTransports($obj) {
  * @return string
  */
 function FormatAlertTpl($tpl,$obj) {
-	$tpl = addslashes($tpl);
-
-	/**
-	 * {if ..}..{else}..{/if}
-	 */
-	preg_match_all('/\\{if (.+)\\}(.+)\\{\\/if\\}/Uims',$tpl,$m);
-	foreach( $m[1] as $k=>$if ) {
-		$if = preg_replace('/%(\w+)/i','\$obj["$1"]', $if);
-		$ret = "";
-		$cond = "if( $if ) {\r\n".'$ret = "'.str_replace("{else}",'";'."\r\n} else {\r\n".'$ret = "',$m[2][$k]).'";'."\r\n}\r\n";
-		eval($cond); //FIXME: Eval is Evil
-		$tpl = str_replace($m[0][$k],$ret,$tpl);
+	$msg = '$ret .= "'.str_replace(array("{else}","{/if}","{/foreach}"),array('"; } else { $ret .= "','"; } $ret .= "','"; } $ret .= "'),addslashes($tpl)).'";';
+	$parsed = $msg;
+	$s = strlen($msg);
+	$x = $pos = -1;
+	$buff = "";
+	$if = $for = false;
+	while( ++$x < $s ) {
+		if( $msg[$x] == "{" && $buff == "" ) {
+			$buff .= $msg[$x];
+		} elseif( $buff == "{ " ) {
+			$buff = "";
+		} elseif( $buff != "" ) {
+			$buff .= $msg[$x];
+		}
+		if( $buff == "{if" ) {
+			$pos = $x;
+			$if  = true;
+		} elseif( $buff == "{foreach" ) {
+			$pos = $x;
+			$for = true;
+		}
+		if( $pos != -1 && $msg[$x] == "}" ) {
+			$orig   = $buff;
+			$buff   = "";
+			$pos    = -1;
+			if( $if ) {
+				$if     = false;
+				$o      = 3;
+				$native = array('"; if( ',' ) { $ret .= "');
+			} elseif( $for ) {
+				$for    = false;
+				$o      = 8;
+				$native = array('"; foreach( ',' as $key=>$value) { $ret .= "');
+			} else {
+				continue;
+			}
+			$cond   = preg_replace('/%(\w+)/i','\$obj["$1"]', substr($orig,$o,-1));
+			$native = $native[0].$cond.$native[1];
+			$parsed = str_replace($orig,$native,$parsed);
+			unset($cond, $o, $orig, $native);
+		}
 	}
-
-	/**
-	 * {foreach %var}..{/foreach}
-	 */
-	preg_match_all('/\\{foreach (.+)\\}(.+)\\{\\/foreach\\}/Uims',$tpl,$m);
-	foreach( $m[1] as $k=>$for ) {
-		$for = preg_replace('/%(\w+)/i','\$obj["$1"]', $for);
-		$ret = "";
-		$loop = 'foreach( '.$for.' as $key=>$value ) { $ret .= "'.str_replace(array("%key","%value"),array('$key','$value'),$m[2][$k]).'"; }';
-		eval($loop); //FIXME: Eval is Evil
-		$tpl = str_replace($m[0][$k],$ret,$tpl);
-	}
-
-	/**
-	 * Populate variables with data
-	 */
-	foreach( $obj as $k=>$v ) {
-		$tpl = str_replace("%".$k, $v, $tpl);
-	}
-	return $tpl;
+	$parsed = populate($parsed);
+	return RunJail($parsed,$obj);
 }
 
 /**
@@ -184,18 +238,24 @@ function DescribeAlert($alert) {
 	$device = dbFetchRow("SELECT hostname FROM devices WHERE device_id = ?",array($alert['device_id']));
 	$obj['hostname'] = $device['hostname'];
 	$extra = $alert['details'];
-	if( $alert['state'] == 1 ) {
+	if( $alert['state'] >= 1 ) {
 		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
+		if( $alert['state'] == 3 ) {
+			$obj['title'] .= " got worse";
+		} elseif( $alert['state'] == 4 ) {
+			$obj['title'] .= " got better";
+		}
 		foreach( $extra['rule'] as $incident ) {
 			$i++;
+			$obj['faults'][$i] = $incident;
 			foreach( $incident as $k=>$v ) {
 				if( !empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1 ) {
-					$obj['faults'][$i] .= $k.' => '.$v."; ";
+					$obj['faults'][$i]['string'] .= $k.' => '.$v."; ";
 				}
 			}
 		}
 	} elseif( $alert['state'] == 0 ) {
-		$id = dbFetchRow("SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state = 1 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id'],$alert['id']));
+		$id = dbFetchRow("SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id'],$alert['id']));
 		if( empty($id['id']) ) {
 			return false;
 		}
@@ -210,6 +270,7 @@ function DescribeAlert($alert) {
 	$obj['uid'] = $alert['id'];
 	$obj['severity'] = $alert['severity'];
 	$obj['rule'] = $alert['rule'];
+	$obj['name'] = $alert['name'];
 	$obj['timestamp'] = $alert['time_logged'];
 	$obj['contacts'] = $extra['contacts'];
 	$obj['state'] = $alert['state'];
@@ -240,5 +301,44 @@ function TimeFormat($secs){
 		return "none";
 	}
 	return join(' ', $ret);
+}
+
+/**
+ * "Safely" run eval
+ * @param string $code Code to run
+ * @param array $obj Object with variables
+ * @return string|mixed
+ */
+function RunJail($code,$obj) {
+	$ret = "";
+	eval($code);
+	return $ret;
+}
+
+/**
+ * Populate variables
+ * @param string Text with variables
+ * @return string
+ */
+function populate($txt) {
+	preg_match_all('/%([\w\.]+)/', $txt, $m);
+	foreach( $m[1] as $tmp ) {
+		$orig = $tmp;
+		$rep = false;
+		if( $tmp == "key" || $tmp == "value" ) {
+			$rep = '$'.$tmp;
+		} else {
+			if( strstr($tmp,'.') ) {
+				$tmp = explode('.',$tmp,2);
+				$pre = '$'.$tmp[0];
+				$tmp = $tmp[1];
+			} else {
+				$pre = '$obj';
+			}
+			$rep = "{".$pre."['".str_replace('.',"']['",$tmp)."']}";
+		}
+		$txt = str_replace("%".$orig,$rep,$txt);
+	}
+	return $txt;
 }
 ?>
