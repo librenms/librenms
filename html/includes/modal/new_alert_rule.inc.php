@@ -160,9 +160,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
                 var delay = extra['delay'];
             }
             $('#delay').val(delay);
-            if(extra['mute']) {
-                $('#mute').click();
-            }
+            $("[name='mute']").bootstrapSwitch('state',extra['mute']);
             $('#name').val(output['name']);
         }
     });
