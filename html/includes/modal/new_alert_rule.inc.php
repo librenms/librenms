@@ -99,6 +99,10 @@ if(is_admin() === false) {
             <div class='col-sm-2'>
                 <input type="checkbox" name="mute" id="mute">
             </div>
+            <label for='invert' class='col-sm-3 control-label'>Invert match: </label>
+            <div class='col-sm-2'>
+                <input type='checkbox' name='invert' id='invert'>
+            </div>
         </div>
         <div class='form-group'>
             <label for='name' class='col-sm-3 control-label'>Rule name: </label>
@@ -120,6 +124,7 @@ if(is_admin() === false) {
 <script>
 
 $("[name='mute']").bootstrapSwitch('offColor','danger');
+$("[name='invert']").bootstrapSwitch('offColor','danger');
 
 $('#create-alert').on('hide.bs.modal', function (event) {
     $('#response').data('tagmanager').empty();
@@ -161,6 +166,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
             }
             $('#delay').val(delay);
             $("[name='mute']").bootstrapSwitch('state',extra['mute']);
+            $("[name='invert']").bootstrapSwitch('state',extra['invert']);
             $('#name').val(output['name']);
         }
     });
