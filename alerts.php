@@ -217,7 +217,7 @@ function FormatAlertTpl($tpl,$obj) {
 			} else {
 				continue;
 			}
-			$cond   = preg_replace('/%(\w+)/i','\$obj["$1"]', substr($orig,$o,-1));
+			$cond   = trim(populate(substr($orig,$o,-1),false));
 			$native = $native[0].$cond.$native[1];
 			$parsed = str_replace($orig,$native,$parsed);
 			unset($cond, $o, $orig, $native);
@@ -317,10 +317,11 @@ function RunJail($code,$obj) {
 
 /**
  * Populate variables
- * @param string Text with variables
+ * @param string $txt Text with variables
+ * @param bool $wrap Wrap variable for text-usage (default: true)
  * @return string
  */
-function populate($txt) {
+function populate($txt,$wrap=true) {
 	preg_match_all('/%([\w\.]+)/', $txt, $m);
 	foreach( $m[1] as $tmp ) {
 		$orig = $tmp;
@@ -335,7 +336,10 @@ function populate($txt) {
 			} else {
 				$pre = '$obj';
 			}
-			$rep = "{".$pre."['".str_replace('.',"']['",$tmp)."']}";
+			$rep = $pre."['".str_replace('.',"']['",$tmp)."']";
+			if( $wrap ) {
+				$rep = "{".$rep."}";
+			}
 		}
 		$txt = str_replace("%".$orig,$rep,$txt);
 	}
