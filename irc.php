@@ -69,6 +69,13 @@ class ircbot {
 				$this->chan = array($this->config['irc_chan']);
 			}
 		}
+		if($this->config['irc_alert_chan']) {
+			if(strstr($this->config['irc_alert_chan'],",")) {
+				$this->config['irc_alert_chan'] = explode(",",$this->config['irc_alert_chan']);
+			} else {
+				$this->config['irc_alert_chan'] = array($this->config['irc_alert_chan']);
+			}
+		}
 		if($this->config['irc_pass']) {
 			$this->pass = $this->config['irc_pass'];
 		}
@@ -155,13 +162,26 @@ class ircbot {
 	private function alertData() {
 		if( ($alert = $this->read("alert")) !== false ) {
 			$alert = json_decode($alert,true);
-			foreach( $this->authd as $nick=>$data ) {
-				if( $data['expire'] >= time() ) {
-					$this->irc_raw("PRIVMSG ".$nick." :".trim($alert['title'])." - Rule: ".trim($alert['rule'])." - Faults".(sizeof($alert['faults']) > 3 ? " (showing first 3 out of ".sizeof($alert['faults'])." )" : "" ).":");
+			if( !is_array($alert) ) {
+				return false;
+			}
+			if( $this->config['irc_alert_chan'] ) {
+				foreach( $this->config['irc_alert_chan'] as $chan ) {
+					$this->irc_raw("PRIVMSG ".$chan." :".trim($alert['title'])." - Rule: ".trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? " - Faults:" : ""));
 					foreach( $alert['faults'] as $k=>$v ) {
-						$this->irc_raw("PRIVMSG ".$nick." :#".$k." ".$v);
-						if( $k >= 3 )
-							break;
+						$this->irc_raw("PRIVMSG ".$chan." :#".$k." ".$v['string']);
+					}
+				}
+			} else {
+				foreach( $this->authd as $nick=>$data ) {
+					if( $data['expire'] >= time() ) {
+						$this->irc_raw("PRIVMSG ".$nick." :".trim($alert['title'])." - Rule: ".trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? " - Faults".(sizeof($alert['faults']) > 3 ? " (showing first 3 out of ".sizeof($alert['faults'])." )" : "" ).":" : ""));
+						foreach( $alert['faults'] as $k=>$v ) {
+							$this->irc_raw("PRIVMSG ".$nick." :#".$k." ".$v['string']);
+							if( $k >= 3 ) {
+								break;
+							}
+						}
 					}
 				}
 			}
