@@ -84,7 +84,7 @@ function RunAlerts() {
 		if( $updet ) {
 			dbUpdate(array('details' => gzcompress(json_encode($alert['details']),9)),'alert_log','id = ?',array($alert['id']));
 		}
-		if( !empty($rextra['muted']) ) {
+		if( !empty($rextra['mute']) ) {
 			echo "Muted Alert-UID #".$alert['id']."\r\n";
 			$noiss = true;
 		}
