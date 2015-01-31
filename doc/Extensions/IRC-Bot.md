@@ -22,12 +22,13 @@ The Bot will reply the same way it's being called. If you send it the commands v
 Option | Default-Value | Notes
 --- | --- | ---
 `$config['irc_alert']` | `false` | Optional; Enables Alerting-Socket. `EXPERIMENTAL`
+`$config['irc_alert_chan']` | `false` | Optional; Multiple channels can be defined as Array or delimited with `,`. `EXPERIMENTAL`
 `$config['irc_authtime']` | `3` | Optional; Defines how long in Hours an auth-session is valid.
 `$config['irc_chan']` | `##librenms` | Optional; Multiple channels can be defined as Array or delimited with `,`
 `$config['irc_debug']` | `false` | Optional; Enables debug output (Wall of text)
 `$config['irc_external']` |  | Optional; Array or `,` delimited string with commands to include from `includes/ircbot/*.inc.php`
 `$config['irc_host']` |  | Required; Domain or IP to connect. If it's an IPv6 Address, embed it in `[]`.  (Example: `[::1]`)
-`$config['irc_maxretry]` | `5` | Optional; How many connection attempts should be made before giving up
+`$config['irc_maxretry']` | `5` | Optional; How many connection attempts should be made before giving up
 `$config['irc_nick']` | `LibreNMS` | Optional;
 `$config['irc_pass']` |  | Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect
 `$config['irc_port']` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
