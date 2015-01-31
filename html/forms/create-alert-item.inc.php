@@ -23,6 +23,7 @@ $alert_id = $_POST['alert_id'];
 $count = mres($_POST['count']);
 $delay = mres($_POST['delay']);
 $mute = mres($_POST['mute']);
+$invert = mres($_POST['invert']);
 $name = mres($_POST['name']);
 
 if(empty($rule)) {
@@ -38,7 +39,12 @@ if(empty($rule)) {
     } else {
         $mute = false;
     }
-    $extra = array('mute'=>$mute,'count'=>$count,'delay'=>$delay_sec);
+    if($invert == 'on') {
+        $invert = true;
+    } else {
+        $invert = false;
+    }
+    $extra = array('mute'=>$mute,'count'=>$count,'delay'=>$delay_sec,'invert'=>$invert);
     $extra_json = json_encode($extra);
     if(is_numeric($alert_id) && $alert_id > 0) {
         if(dbUpdate(array('rule' => $rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name), 'alert_rules', 'id=?',array($alert_id)) >= 0) {

@@ -51,7 +51,7 @@ if(isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = 'AND `alerts`.`device_id`=?';
     $param = array($device['device_id']);
 }
-$query = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE `state` IN (1,2) $sql ORDER BY `alerts`.`timestamp` DESC";
+$query = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE `state` IN (1,2,3,4) $sql ORDER BY `alerts`.`timestamp` DESC";
 $count_query = $count_query . $query;
 $count = dbFetchCell($count_query,$param);
 if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -88,12 +88,18 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
 	echo "<td><i>".htmlentities($rule['rule'])."</i></td>";
         echo "<td>".$alert['hostname']."</td>";
 	echo "<td>".($alert['timestamp'] ? $alert['timestamp'] : "N/A")."</td>";
-	echo "<td>".$rule['severity']."</td>";
+	echo "<td>".$rule['severity'];
+        if($alert['state'] == 3) {
+            echo " <strong>+</strong>";
+        } elseif($alert['state'] == 4) {
+            echo " <strong>-</strong>";
+        }
+        echo "</td>";
         echo "<td>";
         if ($_SESSION['userlevel'] == '10') {
             $ack_ico = 'volume-up';
             $ack_col = 'success';
-            if($alert['state'] == 2) {
+            if(in_array($alert['state'],array(2,3,4))) {
                 $ack_ico = 'volume-off'; 
                 $ack_col = 'danger';
             }

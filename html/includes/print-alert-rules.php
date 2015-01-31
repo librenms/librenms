@@ -116,7 +116,11 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
 	echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
 	echo "<td><i>#".((int) $rulei++)."</i></td>";
         echo "<td>".$rule['name']."</td>";
-	echo "<td><i>".htmlentities($rule['rule'])."</i></td>";
+        echo "<td>";
+        if($rule_extra['invert'] === true) {
+            echo "<strong><em>Inverted</em></strong> ";
+        }
+        echo "<i>".htmlentities($rule['rule'])."</i></td>";
 	echo "<td>".$rule['severity']."</td>";
 	echo "<td><span id='alert-rule-".$rule['id']."' class='glyphicon glyphicon-".$ico." glyphicon-large text-".$col."'></span> ";
         if($rule_extra['mute'] === true) {
