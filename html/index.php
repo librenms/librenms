@@ -309,12 +309,19 @@ echo('<em>        Powered by <a href="/about/" target="_blank">' . $config['proj
 <?php
 }
 
+if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1",array()) > 0) {
+    $msg_box[] = array('type' => 'warning', 'message' => "It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)",'title' => 'Devices unpolled');
+}
+
 if(is_array($msg_box)) {
   echo("<script>
 toastr.options.timeout = 10;
 toastr.options.extendedTimeOut = 20;
 ");
   foreach ($msg_box as $message) {
+    $message['type'] = mres($message['type']);
+    $message['message'] = mres($message['message']);
+    $message['title'] = mres($message['title']);
     echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
   }
   echo("</script>");
