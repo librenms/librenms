@@ -12,6 +12,9 @@
  *
  */
 
+// Set variables
+$msg_box = array();
+
 include("../includes/defaults.inc.php");
 include("../config.php");
 include_once("../includes/definitions.inc.php");
