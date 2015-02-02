@@ -82,7 +82,6 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
       if( !$config['twofactor'] || $_SESSION['twofactor'] ) {
         $_SESSION['authenticated'] = true;
         dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged In'), 'authlog');
-        header("Location: ".$_SERVER['REQUEST_URI']);
       }
     }
     if (isset($_POST['remember']))
