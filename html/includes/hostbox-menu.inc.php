@@ -12,20 +12,14 @@
  * the source code distribution for details.
  */
 
-echo('<td><div class="collapse navbar-collapse" id="navHeaderCollapse">
-          <div class="btn-group">
-              <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-expand="false">Action <span class="caret"></span></button>
-              <ul class="dropdown-menu dropdown-menu-right">');
+echo('<td>');
     if (device_permitted($device['device_id'])) {
-        echo '<li><a href="'.generate_device_url($device).'"> <img src="images/16/server.png" border="0" align="absmiddle" /> View device</a></li>';
-        echo '<li><a href="'.generate_device_url($device, array('tab' => 'alerts')).'"> <img src="images/16/bell.png" border="0" align="absmiddle" /> View alerts</a></li>';
+        echo '<a href="'.generate_device_url($device).'"> <img src="images/16/server.png" border="0" align="absmiddle" alt="View device" /></a> ';
+        echo '<a href="'.generate_device_url($device, array('tab' => 'alerts')).'"> <img src="images/16/bell.png" border="0" align="absmiddle" alt="View alerts"  /></a> ';
         if ($_SESSION['userlevel'] >= "7") {
-            echo '<li><a href="'.generate_device_url($device, array('tab' => 'edit')).'"> <img src="images/16/wrench.png" border="0" align="absmiddle" /> Edit device</a></li>';
+            echo '<a href="'.generate_device_url($device, array('tab' => 'edit')).'"> <img src="images/16/wrench.png" border="0" align="absmiddle" alt="Edit device" /></a> ';
         }
     }
-echo('
-              </ul>
-          </div>
-      </div></td>');
+echo('</td>');
 
 ?>
