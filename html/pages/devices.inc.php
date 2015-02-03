@@ -283,6 +283,7 @@ if($format == "graph")
     <th>Platform</th>
     <th>Operating System</th>
     <th>Uptime/Location</th>
+    <th>Actions</th>
   </tr>');
   }
 
@@ -293,6 +294,7 @@ if($format == "graph")
       if (!$location_filter || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
         || $device['location'] == $location_filter))
       {
+        $cell_click = 'onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;"';
         if ($subformat == "detail")
         {
           include("includes/hostbox.inc.php");

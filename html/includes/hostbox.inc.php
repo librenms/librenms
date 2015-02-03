@@ -35,24 +35,25 @@ $device['os_text'] = $config['os'][$device['os']]['text'];
 $port_count   = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
 $sensor_count = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?", array($device['device_id']));
 
-echo('  <tr onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;">
-          <td class="'. $table_tab_colour .'"></td>
-          <td>' . $image . '</td>
-          <td><span style="font-size: 15px;">' . generate_device_link($device) . '</span>
+echo('  <tr>
+          <td class="'. $table_tab_colour .' '. $cell_click .'"></td>
+          <td '. $cell_click .'>' . $image . '</td>
+          <td '. $cell_click .'><span style="font-size: 15px;">' . generate_device_link($device) . '</span>
           <br />' . $device['sysName'] . '</td>'
         );
 
-echo('<td>');
+echo('<td '. $cell_click .'>');
 if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
 echo('<br />');
 if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
 echo('</td>');
-echo('    <td>' . $device['hardware'] . '<br />' . $device['features'] . '</td>');
-echo('    <td>' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
-echo('    <td>' . formatUptime($device['uptime'], 'short') . ' <br />');
+echo('    <td '. $cell_click .'>' . $device['hardware'] . '<br />' . $device['features'] . '</td>');
+echo('    <td '. $cell_click .'>' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
+echo('    <td '. $cell_click .'>' . formatUptime($device['uptime'], 'short') . ' <br />');
 
 if (get_dev_attrib($device,'override_sysLocation_bool')) {  $device['location'] = get_dev_attrib($device,'override_sysLocation_string'); }
 echo('    ' . truncate($device['location'],32, '') . '</td>');
+require 'hostbox-menu.inc.php';
 
 echo(' </tr>');
 
