@@ -59,13 +59,13 @@ if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
 
 $updating = 0;
 
-$include_dir_regexp = "/\.sql$/";
+$include_dir_regexp = "/\.(php|sql)$/";
 
-if ($handle = opendir($config['install_dir'] . '/sql-schema'))
+if ($handle = opendir($config['install_dir'] . '/update-files'))
 {
   while (false !== ($file = readdir($handle)))
   {
-    if (filetype($config['install_dir'] . '/sql-schema/' . $file) == 'file' && preg_match($include_dir_regexp, $file))
+    if (filetype($config['install_dir'] . '/update-files/' . $file) == 'file' && preg_match($include_dir_regexp, $file))
     {
       $filelist[] = $file;
     }
@@ -82,50 +82,54 @@ foreach ($filelist as $file)
   {
     if (!$updating)
     {
-      echo "-- Updating database schema\n";
+      echo "-- Updating\n";
     }
 
-    echo sprintf("%03d",$db_rev) . " -> " . sprintf("%03d",$filename) . " ...";
+    echo sprintf("%03d",$db_rev) . " -> " . sprintf("%03d - %s",$filename, $extension) . " ...";
 
-    $err = 0;
+    if ("sql" == "$extension") {
+      $err = 0;
 
-    if ($fd = @fopen($config['install_dir'] . '/sql-schema/' . $file,'r'))
-    {
-      $data = fread($fd,4096);
-      while (!feof($fd))
+      if ($fd = @fopen($config['install_dir'] . '/update-files/' . $file,'r'))
       {
-        $data .= fread($fd,4096);
-      }
-
-      foreach (explode("\n", $data) as $line)
-      {
-        if (trim($line))
+        $data = fread($fd,4096);
+        while (!feof($fd))
         {
-          if ($debug) { echo("$line \n"); }
-          if ($line[0] != "#")
+          $data .= fread($fd,4096);
+        }
+        foreach (explode("\n", $data) as $line)
+        {
+          if (trim($line))
           {
-            $update = mysql_query($line);
-            if (!$update)
+            if ($debug) { echo("$line \n"); }
+            if ($line[0] != "#")
             {
-              $err++;
-              if ($debug) { echo(mysql_error() . "\n"); }
+              $update = mysql_query($line);
+              if (!$update)
+              {
+                $err++;
+                if ($debug) { echo(mysql_error() . "\n"); }
+              }
             }
           }
         }
-      }
-
-      if ($db_rev < 5)
-      {
-        echo(" done.\n");
+        if ($db_rev < 5)
+        {
+          echo(" done.\n");
+        }
+        else
+        {
+          echo(" done ($err errors).\n");
+        }
       }
       else
       {
-        echo(" done ($err errors).\n");
+        echo(" Could not open file!\n");
       }
     }
-    else
+    else if ("php" == "$extension") 
     {
-      echo(" Could not open file!\n");
+      include($config['install_dir'] . '/update-files/' . $file);
     }
 
     $updating++;

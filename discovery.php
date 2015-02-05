@@ -94,7 +94,7 @@ if (!$where)
   exit;
 }
 
-include("includes/sql-schema/update.php");
+include("includes/update.php");
 
 $discovered_devices = 0;
 
