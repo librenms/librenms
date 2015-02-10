@@ -196,7 +196,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m.setLatLng(newPos);
 			
 			if (m.setOpacity) {
-				m.setOpacity(1);
+				m.clusterShow();
 			}
 
 
