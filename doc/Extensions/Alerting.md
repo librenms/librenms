@@ -68,20 +68,22 @@ Controls:
 - foreach-loop:  
 `{foreach %placeholder}Key: %key<br/>Value: %value{/foreach}`
 
-__Limitations__: Currently it is not possible to have nested `if` controls, so `if` inside an `if`. It is also not possible to have an `if` inside a `foreach` control. These limitations are going to be resolved in (near?) future.
-
 Placeholders:
 - Hostname of the Device: `%hostname`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
 - Unique-ID: `%uid`
-- Faults, Only available on alert (`%state == 1`), must be iterated in a foreach: `%faults`
+- Faults, Only available on alert (`%state != 0`), must be iterated in a foreach (`{foreach %faults}`). Holds all available information about the Fault, accessable in the format `%value.Column`, for example: `%value.ifDescr`. Special field `%value.string` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
 - State: `%state`
 - Severity: `%severity`
 - Rule: `%rule`
+- Rule-Name: `%name`
 - Timestamp: `%timestamp`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
+
+The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
+Templates can be matched against several rules.
 
 ## <a name="templates-examples">Examples</a>
 
@@ -92,9 +94,9 @@ Severity: %severity\r\n
 {if %state == 0}Time elapsed: %elapsed\r\n{/if}
 Timestamp: %timestamp\r\n
 Unique-ID: %uid\r\n
-Rule: %rule\r\n
+Rule: {if %name}%name{else}%rule{/if}\r\n
 {if %faults}Faults:\r\n
-{foreach %faults}  #%key: %value\r\n{/foreach}{/if}
+{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
 
@@ -121,17 +123,20 @@ $config['alert']['transports']['mail'] = true;
 The E-Mail transports uses the same email-configuration like the rest of LibreNMS.  
 As a small reminder, here is it's configuration directives including defaults:
 ```php
-$config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
-$config['email_from']                 = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
-$config['email_user']                 = $config['project_id'];
-$config['email_sendmail_path']        = '/usr/sbin/sendmail'; // The location of the sendmail program.
-$config['email_smtp_host']            = 'localhost';          // Outgoing SMTP server name.
-$config['email_smtp_port']            = 25;                   // The port to connect.
-$config['email_smtp_timeout']         = 10;                   // SMTP connection timeout in seconds.
-$config['email_smtp_secure']          = NULL;                 // Enable encryption. Use 'tls' or 'ssl'
-$config['email_smtp_auth']            = FALSE;                // Whether or not to use SMTP authentication.
-$config['email_smtp_username']        = NULL;                 // SMTP username.
-$config['email_smtp_password']        = NULL;                 // Password for SMTP authentication.
+$config['email_backend']                   = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
+$config['email_from']                      = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
+$config['email_user']                      = $config['project_id'];
+$config['email_sendmail_path']             = '/usr/sbin/sendmail'; // The location of the sendmail program.
+$config['email_smtp_host']                 = 'localhost';          // Outgoing SMTP server name.
+$config['email_smtp_port']                 = 25;                   // The port to connect.
+$config['email_smtp_timeout']              = 10;                   // SMTP connection timeout in seconds.
+$config['email_smtp_secure']               = NULL;                 // Enable encryption. Use 'tls' or 'ssl'
+$config['email_smtp_auth']                 = FALSE;                // Whether or not to use SMTP authentication.
+$config['email_smtp_username']             = NULL;                 // SMTP username.
+$config['email_smtp_password']             = NULL;                 // Password for SMTP authentication.
+
+$config['alerts']['email']['default_only'] = FALSE;                // Only send alerts to default-contact
+$config['alerts']['email']['default']      = NULL;                 // Default-Contact
 ```
 
 ## <a name="transports-api">API</a>
