@@ -169,7 +169,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			//If it is a marker, add it now and we'll animate it out
 			if (m.setOpacity) {
 				m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
-				m.setOpacity(0);
+				m.clusterHide();
 			
 				fg.addLayer(m);
 
@@ -287,7 +287,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			//Hack override the location to be our center
 			if (m.setOpacity) {
 				m._setPos(thisLayerPos);
-				m.setOpacity(0);
+				m.clusterHide();
 			} else {
 				fg.removeLayer(m);
 			}
@@ -329,7 +329,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 
 
 				if (m.setOpacity) {
-					m.setOpacity(1);
+					m.clusterShow();
 					m.setZIndexOffset(0);
 				}
 
