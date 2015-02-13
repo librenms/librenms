@@ -10,6 +10,7 @@ Contributors to LibreNMS:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
+- Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 
 [1]: http://observium.org/ "Observium web site"
 
