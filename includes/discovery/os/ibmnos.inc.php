@@ -9,17 +9,9 @@
 * option) any later version.  Please see LICENSE.txt at the top level of
 * the source code distribution for details.
 */
-
-if (!$os)
-	{
-	if (stristr($sysDescr, "IBM Networking Operating System"))
-		{
-		$os = "ibmnos";
-		}
-	elseif (stristr($sysDescr, "IBM Flex System Fabric"))
-		{
-		$os = "ibmnos";
-		}
-	}
-
+if (!$os) {
+    if (stristr($sysDescr, "IBM Networking Operating System") || stristr($sysDescr, "IBM Flex System Fabric")) {
+        $os = "ibmnos";
+    }
+}
 ?>
