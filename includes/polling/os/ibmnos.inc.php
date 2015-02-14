@@ -28,8 +28,7 @@ if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
         $version = trim(snmp_get($device, ".1.3.6.1.4.1.20301.2.7.13.1.1.1.10.0", "-Ovq") , '" ');
         $serial = trim(snmp_get($device, ".1.3.6.1.4.1.20301.100.100.14.9.0", "-Ovq") , '" ');
     }
-}
-elseif (strpos($sysdescr_value, 'IBM Flex System Fabric') !== false) {
+} elseif (strpos($sysdescr_value, 'IBM Flex System Fabric') !== false) {
     $hardware = str_replace("IBM Flex System Fabric", "", $sysdescr_value);
     $version = trim(snmp_get($device, ".1.3.6.1.2.1.47.1.1.1.1.10.1", "-Ovq") , '" ');
     $serial = trim(snmp_get($device, ".1.3.6.1.2.1.47.1.1.1.1.11.1", "-Ovq") , '" ');
