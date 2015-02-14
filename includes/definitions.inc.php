@@ -621,6 +621,13 @@ $config['os'][$os]['text']              = "Blade Network Technologies";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "bnt";
 
+$os = "ibmnos";
+$config['os'][$os]['text']              = "IBM Networking Operating System";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "ibmnos";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
 $os = "comware";
 $config['os'][$os]['text']              = "HP Comware";
 $config['os'][$os]['type']              = "network";
