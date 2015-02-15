@@ -465,7 +465,7 @@ if ($_SESSION['authenticated'])
      </ul>
      <form role="search" class="navbar-form navbar-left">
          <div class="form-group">
-             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
+             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
          </div>
      </form>
    </div>
