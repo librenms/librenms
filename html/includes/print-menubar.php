@@ -388,7 +388,7 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> Plugins<b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> <img src="images/16/package.png" border="0" alt="Plugins"> Plugins<b class="caret"></b></a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');
