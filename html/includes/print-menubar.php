@@ -485,7 +485,7 @@ if ($_SESSION['authenticated'])
       name: 'ports',
       remote : 'ajax_search.php?search=%QUERY&type=ports',
       header : '<h5><strong>&nbsp;Ports</strong></h5>',
-      template: '<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></p></a>',
+      template: '<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}</small></p></a>',
       valueKey: "name",
       engine: Hogan
     },
