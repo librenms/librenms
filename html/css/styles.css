@@ -1609,7 +1609,6 @@ tr.search:nth-child(odd) {
     font-size: 14px;
     line-height: 1.428571429;
     border: 1px solid transparent;
-    width: 250px;
 }
 
 .ui-autocomplete {
