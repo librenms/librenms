@@ -180,6 +180,15 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "alcatellucent";
 
+// Barracuda
+
+$os = "barracudaloadbalancer";
+$config['os'][$os]['text']              = "Barracuda Load Balancer";
+$config['os'][$os]['type']              = "loadbalancer";
+$config['os'][$os]['icon']              = "barracuda";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
 // Cisco OSes
 
 $os = "ios";
