@@ -236,6 +236,10 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
   } elseif ($vars['user_id'] && $vars['edit']) {
 
+      if($_SESSION['userlevel'] == 10) {
+          demo_account();
+      } else {
+
     if(!empty($vars['new_level']))
     {
       if($vars['can_modify_passwd'] == 'on') {
@@ -368,6 +372,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     } else {
       echo print_error("Authentication method doesn't support updating users");
     }
+      }
   } else {
 
     $user_list = get_userlist();
