@@ -120,7 +120,11 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	// but how merge these field placeholders with actual $parameters array for the WHERE clause
 	$sql = 'UPDATE `' . $table . '` SET ';
 	foreach($data as $key => $value) {
-                $sql .= "`".$key."` = '" . $value . "',";
+                if ($value == "NOW()") {
+                  $sql .= "`".$key."` = " . $value . ",";
+                } else {
+                  $sql .= "`".$key."` = '" . $value . "',";
+                }
 	}
 	$sql = substr($sql, 0, -1); // strip off last comma
 
