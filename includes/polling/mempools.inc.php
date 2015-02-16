@@ -31,8 +31,20 @@ foreach (dbFetchRows("SELECT * FROM mempools WHERE device_id = ?", array($device
   }
   rrdtool_update($mempool_rrd,"N:".$mempool['used'].":".$mempool['free']);
 
-  $mempool['state'] = array('mempool_used' => $mempool['used'], 'mempool_perc' => $percent, 'mempool_free' => $mempool['free'],
-                 'mempool_total' => $mempool['total'], 'mempool_largestfree' => $mempool['largestfree'], 'mempool_lowestfree' => $mempool['lowestfree']);
+  $mempool['state'] = array(
+    'mempool_used' => $mempool['used'],
+    'mempool_perc' => $percent,
+    'mempool_free' => $mempool['free'],
+    'mempool_total' => $mempool['total']
+  );
+
+  if (!empty($mempool['largestfree'])) {
+    $mempool['state']['mempool_largestfree'] = $mempool['largestfree'];
+  }
+
+  if (!empty($mempool['lowestfree'])) {
+    $mempool['state']['mempool_lowestfree'] = $mempool['lowestfree'];
+  }
 
   if ($config['memcached']['enable'])
   {
