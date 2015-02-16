@@ -80,7 +80,7 @@ foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` A
     if (empty($devtype['type'])) {
         $devtype['type'] = 'Generic';
     }
-    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['type'] . '" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . ' <span class="badge alert-info">' . $devtype['total_type'] . '</span></a></li>');
+    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><span class="badge alert-info">' . $devtype['total_type'] . '</span> <img src="images/icons/' . $devtype['type'] . '" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . '</a></li>');
 }
         echo ('</ul>
              </li>');
