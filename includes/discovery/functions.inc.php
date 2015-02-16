@@ -118,8 +118,8 @@ function discover_device($device, $options = NULL)
   }
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
-
-  dbUpdate(array('last_discovered' => array('NOW()'), 'type' => $device['type'], 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
+  
+  dbUpdate(array('last_discovered' => 'NOW()', 'type' => $device['type'], 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
 
   echo("Discovered in $device_time seconds\n");
 
