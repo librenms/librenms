@@ -71,25 +71,22 @@ if ($_SESSION['userlevel'] == '10') {
         <li class="dropdown">
           <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices<b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a></li>
-            <li role="presentation" class="divider"></li>
+            <li class="dropdown-submenu">
+              <a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a>
+              <ul class="dropdown-menu scrollable-menu">
 <?php
 
-foreach ($config['device_types'] as $devtype)
-{
-  if (in_array($devtype['type'],array_keys($cache['device_types'])))
-  {
-    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
-  }
+foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $devtype) {
+    if (empty($devtype['type'])) {
+        $devtype['type'] = 'Generic';
+    }
+    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['type'] . '" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . ' <span class="badge alert-info">' . $devtype['total_type'] . '</span></a></li>');
 }
+        echo ('</ul>
+             </li>');
+            echo '<li role="presentation" class="divider"></li>';
 
-if ($_SESSION['userlevel'] >= '10')
-{
-  if (count($cache['device_types']))
-  {
-    echo('            <li role="presentation" class="divider"></li>');
-  }
-
+if ($_SESSION['userlevel'] >= '10') {
 if ($config['show_locations'])
 {
 
