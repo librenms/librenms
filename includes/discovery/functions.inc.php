@@ -132,7 +132,7 @@ function discover_device($device, $options = NULL)
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp', $entPhysicalIndex = NULL, $entPhysicalIndex_measured = NULL)
 {
   global $config, $debug;
-
+  
   if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n"); }
 
   if (is_null($low_warn_limit) || !is_null($warn_limit))
@@ -334,7 +334,7 @@ function sensor_limit($class, $current)
 function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 {
   $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ?", array($class, $device['device_id'], $poller_type));
-
+  
   if (count($entries))
   {
     foreach ($entries as $entry)
@@ -374,13 +374,29 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
 function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
 {
   global $config, $debug, $link_exists;
-
+  
+  if ($debug) {
+    echo("\n");
+    var_dump($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version);
+  }
+ 
   if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?",
                   array($remote_hostname, $local_port_id, $protocol, $remote_port)) == "0")
   {
+    $insert_data = array(
+      'local_port_id'   => $local_port_id,
+      'protocol'        => $protocol,
+      'remote_hostname' => $remote_hostname,
+      'remote_port'     => $remote_port,
+      'remote_platform' => $remote_platform,
+      'remote_version' => $remote_version
+    );
+    
+    if (!empty($remote_port_id)) {
+        $insert_data['remote_port_id'] = $remote_port_id;
+    }
 
-    $inserted = dbInsert(array('local_port_id' => $local_port_id,'protocol' => $protocol,'remote_port_id' => $remote_port_id,'remote_hostname' => $remote_hostname,
-             'remote_port' => $remote_port,'remote_platform' => $remote_platform,'remote_version' => $remote_version), 'links');
+    $inserted = dbInsert($insert_data, 'links');
 
     echo("+"); if ($debug) { echo("( $inserted inserted )"); }
   }
@@ -393,7 +409,16 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
     }
     else
     {
-      $updated = dbUpdate(array('remote_port_id' => $remote_port_id, 'remote_platform' => $remote_platform, 'remote_version' => $remote_version), 'links', '`id` = ?', array($data['id']));
+      $update_data = array(
+        'remote_platform' => $remote_platform,
+        'remote_version' => $remote_version
+      );
+      
+      if (!empty($remote_port_id)) {
+        $update_data['remote_port_id'] = $remote_port_id;
+      }
+
+      $updated = dbUpdate($update_data, 'links', '`id` = ?', array($data['id']));
       echo("U"); if ($debug) { echo("( $updated updated )"); }
     }
   }
