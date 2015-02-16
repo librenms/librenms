@@ -14,11 +14,30 @@
 
 echo('<td>');
     if (device_permitted($device['device_id'])) {
+        echo ('<div class="row">
+                   <div class="col-xs-1">');
         echo '<a href="'.generate_device_url($device).'"> <img src="images/16/server.png" border="0" align="absmiddle" alt="View device" /></a> ';
+        echo ('</div>
+               <div class="col-xs-1">');
         echo '<a href="'.generate_device_url($device, array('tab' => 'alerts')).'"> <img src="images/16/bell.png" border="0" align="absmiddle" alt="View alerts"  /></a> ';
+        echo '</div>';
         if ($_SESSION['userlevel'] >= "7") {
-            echo '<a href="'.generate_device_url($device, array('tab' => 'edit')).'"> <img src="images/16/wrench.png" border="0" align="absmiddle" alt="Edit device" /></a> ';
+            echo ('<div class="col-xs-1">
+                       <a href="'.generate_device_url($device, array('tab' => 'edit')).'"> <img src="images/16/wrench.png" border="0" align="absmiddle" alt="Edit device" /></a>
+                   </div>');
         }
+        echo ('</div>
+               <div class="row">
+                   <div class="col-xs-1">
+                       <a href="telnet://' . $device['hostname']  . '"><img src="images/16/telnet.png" alt="telnet" border="0" width="16" height="16"></a>
+                   </div>
+                   <div class="col-xs-1">
+                       <a href="ssh://' . $device['hostname']  . '"><img src="images/16/ssh.png" alt="ssh" border="0" width="16" height="16"></a>
+                   </div>
+                   <div class="col-xs-1">
+                       <a href="https://' . $device['hostname']  . '"><img src="images/16/http.png" alt="https" border="0" width="16" height="16" target="_blank"></a>
+                   </div>
+               </div>');
     }
 echo('</td>');
 
