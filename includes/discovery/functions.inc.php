@@ -475,20 +475,55 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
-
-  if ($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n"); }
+  
+  if ($debug) {
+    echo("\n");
+    var_dump($device, $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex);
+  }
+  
+   #FIXME implement the mempool_perc, mempool_used, etc.
   if ($descr)
   {
     if (dbFetchCell("SELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
-      $inserted = dbInsert(array('entPhysicalIndex' => $entPhysicalIndex, 'hrDeviceIndex' => $hrDeviceIndex, 'device_id' => $device['device_id'],'mempool_descr' => $descr, 'mempool_index' => $index, 'mempool_type' => $type, 'mempool_precision' => $precision), 'mempools');
+      $insert_data = array(
+        'device_id'         => $device['device_id'],
+        'mempool_descr'     => $descr,
+        'mempool_index'     => $index,
+        'mempool_type'      => $type,
+        'mempool_precision' => $precision,
+        'mempool_perc'      => 0,
+        'mempool_used'      => 0,
+        'mempool_free'      => 0,
+        'mempool_total'     => 0
+      );
+
+      if (!empty($entPhysicalIndex)) {
+        $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
+      }
+
+      if (!empty($hrDeviceIndex)) {
+        $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
+      }
+     
+      $inserted = dbInsert($insert_data, 'mempools');
       echo("+");
       log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', $inserted);
     }
     else
     {
       echo(".");
-      dbUpdate(array('mempool_descr' => $descr, 'entPhysicalIndex' => $entPhysicalIndex, 'hrDeviceIndex' => $hrDeviceIndex), 'mempools', 'device_id=? AND mempool_index=? AND mempool_type',array($device['device_id'],$index,$type));
+      $update_data['mempool_descr'] = $descr;
+      
+      if (!empty($entPhysicalIndex)) {
+        $update_data['entPhysicalIndex'] = $entPhysicalIndex;
+      }
+ 
+      if (!empty($hrDeviceIndex)) {
+        $update_data['hrDeviceIndex'] = $hrDeviceIndex;
+      }
+
+      dbUpdate($update_data, 'mempools', 'device_id=? AND mempool_index=? AND mempool_type=?',array($device['device_id'],$index,$type));
       if ($debug) { print $query . "\n"; }
     }
     $valid[$type][$index] = 1;
