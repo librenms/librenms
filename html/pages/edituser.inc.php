@@ -316,6 +316,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
         <option value='1'"); if( $vars['new_level'] == '1') { echo("selected"); } echo(">Normal User</option>
         <option value='5'"); if( $vars['new_level'] == '5') { echo("selected"); } echo(">Global Read</option>
         <option value='10'"); if( $vars['new_level'] == '10') { echo("selected"); } echo(">Administrator</option>
+        <option value='11'"); if( $vars['new_level'] == '11') { echo("selected"); } echo(">Demo account</option>
       </select>
     </div>
     <div class='col-sm-6'>

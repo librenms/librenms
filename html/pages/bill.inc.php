@@ -2,7 +2,7 @@
 
 $bill_id = mres($vars['bill_id']);
 
-if ($_SESSION['userlevel'] == "10")
+if ($_SESSION['userlevel'] >= "10")
 {
   include("pages/bill/actions.inc.php");
 }
@@ -94,7 +94,7 @@ if (bill_permitted($bill_id))
   echo('<A href="'.generate_url($vars, array('view' => 'history')).'">Historical Usage</a>');
   if ($vars['view'] == "history") { echo("</span>"); }
 
-  if ($_SESSION['userlevel'] == "10")
+  if ($_SESSION['userlevel'] >= "10")
   {
     echo(" | ");
     if ($vars['view'] == "edit") { echo("<span class='pagemenu-selected'>"); }
@@ -116,15 +116,15 @@ if (bill_permitted($bill_id))
 
   print_optionbar_end();
 
-  if ($vars['view'] == "edit" && $_SESSION['userlevel'] == "10")
+  if ($vars['view'] == "edit" && $_SESSION['userlevel'] >= "10")
   {
     include("pages/bill/edit.inc.php");
   }
-  elseif ($vars['view'] == "delete" && $_SESSION['userlevel'] == "10")
+  elseif ($vars['view'] == "delete" && $_SESSION['userlevel'] >= "10")
   {
     include("pages/bill/delete.inc.php");
   }
-  elseif ($vars['view'] == "reset" && $_SESSION['userlevel'] == "10")
+  elseif ($vars['view'] == "reset" && $_SESSION['userlevel'] >= "10")
   {
     include("pages/bill/reset.inc.php");
   }

@@ -3,13 +3,13 @@
 echo('<div style="padding: 10px;">');
 
 if ($_POST['addsrv']) {
-  if ($_SESSION['userlevel'] == '10') {
+  if ($_SESSION['userlevel'] >= '10') {
     include("includes/service-add.inc.php");
   }
 }
 
 if ($_POST['delsrv']) {
-  if ($_SESSION['userlevel'] == '10') {
+  if ($_SESSION['userlevel'] >= '10') {
     include("includes/service-delete.inc.php");
   }
 }
