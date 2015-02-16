@@ -428,20 +428,44 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 {
   global $config, $debug;
 
-  if ($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n"); }
+  if ($debug) {
+    echo("\n");
+    var_dump($device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex);
+  }
+
   if ($descr)
   {
     $descr = trim(str_replace("\"", "", $descr));
     if (dbFetchCell("SELECT COUNT(processor_id) FROM `processors` WHERE `processor_index` = ? AND `device_id` = ? AND `processor_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
-      $inserted = dbInsert(array('entPhysicalIndex' => $entPhysicalIndex, 'hrDeviceIndex' => $hrDeviceIndex, 'device_id' => $device['device_id'],'processor_descr' => $descr, 'processor_index' => $index, 'processor_oid' => $oid, 'processor_usage' => $current, 'processor_type' => $type, 'processor_precision' => $precision), 'processors');
+      $insert_data = array(
+        'entPhysicalIndex'    => $entPhysicalIndex,
+        'device_id'           => $device['device_id'],
+        'processor_descr'     => $descr,
+        'processor_index'     => $index,
+        'processor_oid'       => $oid,
+        'processor_usage'     => $current,
+        'processor_type'      => $type,
+        'processor_precision' => $precision
+      );
+      if (!empty($hrDeviceIndex)) {
+        $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
+      }
+
+      $inserted = dbInsert($insert_data, 'processors');
       echo("+");
       log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'processor', $inserted);
     }
     else
     {
       echo(".");
-      dbUpdate(array('processor_descr' => $descr, 'processor_oid' => $oid, 'processor_precision' => $precision), 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?',array($device['device_id'],$index,$type));
+      $update_data = array(
+        'processor_descr'     => $descr,
+        'processor_oid'       => $oid,
+        'processor_usage'     => $current,
+        'processor_precision' => $precision
+      );
+      dbUpdate($update_data, 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?',array($device['device_id'],$index,$type));
       if ($debug) { print $query . "\n"; }
     }
     $valid[$type][$index] = 1;
