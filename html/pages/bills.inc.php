@@ -64,7 +64,7 @@ elseif ($vars['view'] == "add")
   print_optionbar_start();
   echo("<span style='font-weight: bold;'>Bill</span> &#187; ");
   if (!$vars['view']) { $vars['view'] = "add"; }
-  if ($_SESSION['userlevel'] == "10")
+  if ($_SESSION['userlevel'] >= "10")
   {
     if ($vars['view'] == "add") { echo("<span class='pagemenu-selected'>"); }
     echo('<A href="'.generate_url(array('page' => "bills/add")).'">Add</a>');

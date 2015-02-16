@@ -8,7 +8,7 @@ else
 {
   if ($_POST['addsrv'])
   {
-    if ($_SESSION['userlevel'] == '10')
+    if ($_SESSION['userlevel'] >= '10')
     {
       $updated = '1';
 

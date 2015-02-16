@@ -46,7 +46,7 @@ echo '<div class="table-responsive">
   </tr>';
 
 echo ('<td colspan="7">');
-if ($_SESSION['userlevel'] == '10') {
+if ($_SESSION['userlevel'] >= '10') {
     echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'. $device['device_id'] .'">Create new alert rule</button>');
 }
 echo ('</td>
@@ -128,12 +128,12 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
         }
         echo "<td><small>Max: ".$rule_extra['count']."<br />Delay: ".$rule_extra['delay']."</small></td>";
         echo "<td>";
-        if ($_SESSION['userlevel'] == '10') {
+        if ($_SESSION['userlevel'] >= '10') {
             echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small'>";
         }
         echo "</td>";
         echo "<td>";
-        if ($_SESSION['userlevel'] == '10') {
+        if ($_SESSION['userlevel'] >= '10') {
             echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
             echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
         }
@@ -153,7 +153,7 @@ echo '</table>
 </div>';
 
 if($count < 1) {
-    if ($_SESSION['userlevel'] == '10') {
+    if ($_SESSION['userlevel'] >= '10') {
         echo '<div class="row">
                   <div class="col-sm-12">
                       <form role="form" method="post">

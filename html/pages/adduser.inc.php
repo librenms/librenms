@@ -4,6 +4,9 @@ if ($_SESSION['userlevel'] < '10')
 {
   include("includes/error-no-perm.inc.php");
 }
+elseif ($_SESSION['userlevel'] == 11) {
+    demo_account();
+}
 else
 {
   echo("<h3>Add User</h3>");
@@ -92,6 +95,7 @@ echo("
         <option value='1'>Normal User</option>
         <option value='5'>Global Read</option>
         <option value='10'>Administrator</option>
+        <option value='11'>Demo account</option>
       </select>
     </div>
     <div class='col-sm-6'>
