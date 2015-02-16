@@ -357,6 +357,15 @@ $config['os'][$os]['text']              = "ZTE ZXR10";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "zte";
 
+// Ruckus Wireless
+
+$os = "ruckuswireless";
+$config['os'][$os]['text']              = "Ruckus Wireless";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "ruckus";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
 // Supermicro Switch
 
 $os = "supermicro-switch";
