@@ -24,8 +24,9 @@ if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `senso
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = trim($descr);
-
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'cisco', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
+        
+        
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'cisco', $descr, '1', '1', NULL, NULL, NULL, NULL, stristr($temperature, " degrees", true));
       }
     }
   }
