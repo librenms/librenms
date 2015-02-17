@@ -76,7 +76,7 @@ echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; fl
 
 echo("<div style='padding: 3px 10px; background: #fff;'>");
 
-if ($_SESSION['userlevel'] == '10')
+if ($_SESSION['userlevel'] >= '10')
 {
 $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'";
 } else {
@@ -91,7 +91,7 @@ foreach (dbFetchRows($sql) as $device)
 
 }
 
-if ($_SESSION['userlevel'] == '10')
+if ($_SESSION['userlevel'] >= '10')
 {
 $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
 } else {
@@ -130,7 +130,7 @@ foreach (dbFetchRows($sql) as $service)
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
-  if ($_SESSION['userlevel'] == '10')
+  if ($_SESSION['userlevel'] >= '10')
   {
     $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0";
   } else {
@@ -148,7 +148,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-  if ($_SESSION['userlevel'] == '10')
+  if ($_SESSION['userlevel'] >= '10')
   {
   $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0";
   } else {
@@ -191,7 +191,7 @@ if ($config['enable_syslog'])
     <h3>Recent Eventlog Entries</h3>
   ");
 
-  if ($_SESSION['userlevel'] == '10')
+  if ($_SESSION['userlevel'] >= '10')
   {
     $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %T') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
   } else {

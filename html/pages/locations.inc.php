@@ -35,7 +35,7 @@ echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">')
 
 foreach (getlocations() as $location)
 {
-  if ($_SESSION['userlevel'] == '10')
+  if ($_SESSION['userlevel'] >= '10')
   {
     $num = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ?", array($location));
     $net = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND type = 'network'", array($location));

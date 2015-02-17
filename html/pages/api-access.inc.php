@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if ($_SESSION['userlevel'] == '10')
+if ($_SESSION['userlevel'] >= '10')
 {
 if(empty($_POST['token'])) {
     $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));

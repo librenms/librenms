@@ -38,7 +38,7 @@ function a2t($a) {
 	return $r;
 }
 
-if( $_SESSION['userlevel'] == 10 ) {
+if( $_SESSION['userlevel'] >= 10 ) {
 	echo "<div class='table-responsive'>".a2t($config)."</div>";
 } else {
 	include("includes/error-no-perm.inc.php");

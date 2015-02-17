@@ -4,6 +4,12 @@ $pagetitle[] = "Preferences";
 
 echo("<h3>User Preferences</h3>");
 
+if ($_SESSION['userlevel'] == 11) {
+
+    demo_account();
+
+} else {
+
 if ($_POST['action'] == "changepass")
 {
   if (authenticate($_SESSION['username'],$_POST['old_pass']))
@@ -165,6 +171,8 @@ if( $config['twofactor'] === true ) {
     }
     echo '</div>';
   }
+}
+
 }
 
 echo("<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>");

@@ -712,12 +712,16 @@ function generate_pagination($count,$limit,$page,$links = 2) {
 }
 
 function is_admin() {
-    if ($_SESSION['userlevel'] == '10') {
+    if ($_SESSION['userlevel'] >= '10') {
         $allowed = true;
     } else {
         $allowed = false;
     }
     return $allowed;
+}
+
+function demo_account() {
+    print_error("You are logged in as a demo account, this page isn't accessible to you");
 }
 
 ?>
