@@ -586,5 +586,6 @@ $config['dateformat']['time']                             = "H:i:s";
 $config['enable_clear_discovery']                        = 1;// Set this to 0 if you want to disable the web option to rediscover devices
 
 $config['enable_footer']                                 = 1;// Set this to 0 if you want to disable the footer copyright in the web interface
+$config['api_demo']                                      = 0;// Set this to 1 if you want to disable some untrusting features for the API
 
 ?>

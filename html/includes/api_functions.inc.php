@@ -265,9 +265,12 @@ function del_device()
   // Default status to error and change it if we need to.
   $status = "error";
   $code = 500;
-  if(empty($hostname))
+  if(empty($hostname) || $config['api_demo'] == 1)
   {
     $message = "No hostname has been provided to delete";
+    if ($config['api_demo'] == 1) {
+        $message = "This feature isn\'t available in the demo";
+    }
     $output = array("status" => $status, "message" => $message);
   }
   else
