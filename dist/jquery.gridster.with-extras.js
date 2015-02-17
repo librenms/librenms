@@ -1,6 +1,6 @@
-/*! gridster.js - v0.5.6 - 2014-12-31
+/*! gridster.js - v0.5.6 - 2015-02-17
 * http://gridster.net/
-* Copyright (c) 2014 ducksboard; Licensed MIT */
+* Copyright (c) 2015 ducksboard; Licensed MIT */
 
 ;(function(root, factory) {
 
@@ -288,20 +288,22 @@
                 var area_coords = self.calculate_overlapped_area_coords(
                     player_coords, collider_coords);
                 var area = self.calculate_overlapped_area(area_coords);
-                var collider_data = {
-                    area: area,
-                    area_coords : area_coords,
-                    region: region,
-                    coords: collider_coords,
-                    player_coords: player_coords,
-                    el: $collider
-                };
+                if ( 0 != area ) {
+                    var collider_data = {
+                        area: area,
+                        area_coords : area_coords,
+                        region: region,
+                        coords: collider_coords,
+                        player_coords: player_coords,
+                        el: $collider
+                    };
 
-                if (self.options.on_overlap) {
-                    self.options.on_overlap.call(this, collider_data);
+                    if (self.options.on_overlap) {
+                        self.options.on_overlap.call(this, collider_data);
+                    }
+                    colliders_coords.push($collider_coords_ins);
+                    colliders_data.push(collider_data);
                 }
-                colliders_coords.push($collider_coords_ins);
-                colliders_data.push(collider_data);
             }
         }
 
