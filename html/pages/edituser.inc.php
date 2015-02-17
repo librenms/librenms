@@ -236,7 +236,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
   } elseif ($vars['user_id'] && $vars['edit']) {
 
-      if($_SESSION['userlevel'] == 10) {
+      if($_SESSION['userlevel'] == 11) {
           demo_account();
       } else {
 
