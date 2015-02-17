@@ -27,7 +27,7 @@ echo '<div class="table-responsive">
   </tr>';
 
 echo ('<td colspan="5">');
-if ($_SESSION['userlevel'] == '10') {
+if ($_SESSION['userlevel'] >= '10') {
     echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'. $device['device_id'] .'">Create new alert rule</button>');
 }
 echo ('</td>
@@ -96,7 +96,7 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
         }
         echo "</td>";
         echo "<td>";
-        if ($_SESSION['userlevel'] == '10') {
+        if ($_SESSION['userlevel'] >= '10') {
             $ack_ico = 'volume-up';
             $ack_col = 'success';
             if(in_array($alert['state'],array(2,3,4))) {

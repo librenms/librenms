@@ -11,6 +11,10 @@ if ($_SESSION['userlevel'] < 10)
 
 $pagetitle[] = "Delete device";
 
+if ($_SESSION['userlevel'] == 11) {
+    demo_account();
+} else {
+
 if (is_numeric($_REQUEST['id']))
 {
   echo('
@@ -81,5 +85,6 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
   </div>
 </form>
 <?php
+}
 }
 ?>

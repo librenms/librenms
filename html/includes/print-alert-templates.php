@@ -27,7 +27,7 @@ echo '<div class="table-responsive">
   <tr>
     <td>';
 
-if ($_SESSION['userlevel'] == '10') {
+if ($_SESSION['userlevel'] >= '10') {
     echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template">Create new alert template</button>');
 }
 
@@ -62,7 +62,7 @@ foreach( dbFetchRows($full_query, $param) as $template ) {
     echo '<tr id="row_'.$template['id'].'">
             <td>'.$template['name'].'</td>
             <td>';
-    if ($_SESSION['userlevel'] == '10') {
+    if ($_SESSION['userlevel'] >= '10') {
         echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#alert-template' data-template_id='".$template['id']."' data-template_action='edit' name='edit-alert-template'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
         echo "<button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#confirm-delete-alert-template' data-template_id='".$template['id']."' name='delete-alert-template'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button> ";
         echo "<button type='button' class='btn btn-warning btn-sm' data-toggle='modal' data-target='#attach-alert-template' data-template_id='".$template['id']."' name='attach-alert-template'><span class='glyphicon glyphicon-th-list' aria-hidden='true'></span></button>";
