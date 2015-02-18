@@ -130,7 +130,7 @@ function RunAlerts() {
 			$noacc = false;
 		}
 		if( $updet ) {
-			dbUpdate(array('details' => gzcompress(json_encode($alert['details']),9)),'alert_log','id = ?',array($alert['id']));
+			dbUpdate(array('details' => mysql_real_escape_string(gzcompress(json_encode($alert['details']),9))),'alert_log','id = '.$alert['id']);
 		}
 		if( !empty($rextra['mute']) ) {
 			echo "Muted Alert-UID #".$alert['id']."\r\n";
