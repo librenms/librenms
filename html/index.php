@@ -12,6 +12,37 @@
  *
  */
 
+$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
+
+function logErrors($errno, $errstr, $errfile, $errline) {
+    global $php_debug;
+    $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
+}
+
+function catchFatal() {
+    $last_error = error_get_last();
+    if ($last_error['type'] == 1) {
+        logErrors($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
+    }
+}
+
+if (strpos($_SERVER['PATH_INFO'], "debug"))
+{
+  $debug = "1";
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+  set_error_handler('logErrors');
+  register_shutdown_function('catchFatal');
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('error_reporting', 0);
+}
+
 // Set variables
 $msg_box = array();
 
@@ -37,29 +68,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
-
-if (strpos($_SERVER['PATH_INFO'], "debug"))
-{
-  $debug = "1";
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('log_errors', 1);
-  ini_set('error_reporting', E_ALL);
-  set_error_handler('logErrors');
-} else {
-  $debug = FALSE;
-  ini_set('display_errors', 0);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
-}
-
-function logErrors($errno, $errstr, $errfile, $errline) {
-    global $php_debug;
-    $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
-}
 
 foreach ($_GET as $key=>$get_var)
 {
