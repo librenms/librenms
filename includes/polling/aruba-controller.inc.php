@@ -49,7 +49,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos')
   $graphs['wifi_clients'] = TRUE;
 
 
-  $ap_db = dbFetchRows("SELECT * FROM `accesspoint` WHERE `device_id` = ?", array($device['device_id']));
+  $ap_db = dbFetchRows("SELECT * FROM `access_points` WHERE `device_id` = ?", array($device['device_id']));
 
 
   foreach ($aruba_apnames as $key => $value) {
@@ -122,9 +122,9 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos')
 
 
     if ($foundid==0) {
-      $ap_id = dbInsert(array('device_id' => $device['device_id'], 'name' => $name,'radio_number'=>$radionum, 'type'=>$type,'mac_addr'=>$mac,'channel'=>$channel,'txpow'=>$txpow,'radioutil'=>$radioutil,'numasoclients'=>$numasoclients,'nummonclients'=>$nummonclients,'numactbssid'=>$numactbssid,'nummonbssid'=>$nummonbssid,'interference'=>$interference), 'accesspoint');
+      $ap_id = dbInsert(array('device_id' => $device['device_id'], 'name' => $name,'radio_number'=>$radionum, 'type'=>$type,'mac_addr'=>$mac,'channel'=>$channel,'txpow'=>$txpow,'radioutil'=>$radioutil,'numasoclients'=>$numasoclients,'nummonclients'=>$nummonclients,'numactbssid'=>$numactbssid,'nummonbssid'=>$nummonbssid,'interference'=>$interference), 'access_points');
     } else {
-      dbUpdate(array('mac_addr' => $mac,'deleted'=>0,'channel'=>$channel,'txpow'=>$txpow,'radioutil'=>$radioutil,'numasoclients'=>$numasoclients,'nummonclients'=>$nummonclients,'numactbssid'=>$numactbssid,'nummonbssid'=>$nummonbssid,'interference'=>$interference), 'accesspoint', '`accesspoint_id` = ?', Array($foundid));
+      dbUpdate(array('mac_addr' => $mac,'deleted'=>0,'channel'=>$channel,'txpow'=>$txpow,'radioutil'=>$radioutil,'numasoclients'=>$numasoclients,'nummonclients'=>$nummonclients,'numactbssid'=>$numactbssid,'nummonbssid'=>$nummonbssid,'interference'=>$interference), 'access_points', '`accesspoint_id` = ?', Array($foundid));
     }
 
 
@@ -134,7 +134,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos')
   //mark APs which are not on this controller anymore as deleted
   for ($z=0;$z<sizeof($ap_db);$z++) {
     if (!isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted']==0) {
-      dbUpdate(array('deleted'=>1), 'accesspoint', '`accesspoint_id` = ?', Array($ap_db[$z]['accesspoint_id']));
+      dbUpdate(array('deleted'=>1), 'access_points', '`accesspoint_id` = ?', Array($ap_db[$z]['accesspoint_id']));
     }
 	  
 

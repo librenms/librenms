@@ -60,8 +60,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
     $health =  dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '" . $device['device_id'] . "'") +
                dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("SELECT COUNT(*) FROM cempMemPool WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("SELECT COUNT(*) FROM cpmCPU WHERE device_id = '" . $device['device_id'] . "'") +
                dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '" . $device['device_id'] . "'");
 
     if ($health)
@@ -127,7 +125,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if (@dbFetchCell("SELECT COUNT(accesspoint_id) FROM accesspoint WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(accesspoint_id) FROM access_points WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['accesspoints'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'accesspoints')). '">

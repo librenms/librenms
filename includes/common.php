@@ -286,7 +286,7 @@ function device_by_name($name, $refresh = 0)
 
 function accesspoint_by_id($ap_id, $refresh = '0') {
 
-  $ap = dbFetchRow("SELECT * FROM `accesspoint` WHERE `accesspoint_id` = ?", array($ap_id));
+  $ap = dbFetchRow("SELECT * FROM `access_points` WHERE `accesspoint_id` = ?", array($ap_id));
 
   return $ap;
 
