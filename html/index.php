@@ -22,7 +22,8 @@ function logErrors($errno, $errstr, $errfile, $errline) {
 function catchFatal() {
     $last_error = error_get_last();
     if ($last_error['type'] == 1) {
-        logErrors($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
+        $log_error = array($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
+        print_r($log_error);
     }
 }
 
