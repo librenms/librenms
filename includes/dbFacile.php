@@ -35,10 +35,13 @@ function dbQuery($sql, $parameters = array()) {
 	*/
 
 	$result = mysql_query($fullSql); // sets $this->result
-       	if (!empty(mysql_error())) {
+       	if (mysql_error()) {
          echo("\nSQL[".$fullSql."] "); 
          print mysql_error();
         }
+	if(mysql_error()) {
+		file_put_contents('/tmp/mysql_strict.log',date("Y-m-d H:i:s").','.$fullSql.','.mysql_error()."\n",FILE_APPEND);
+	}
 	/*
 	if($this->logFile) {
 		$time_end = microtime(true);
