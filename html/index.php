@@ -47,12 +47,18 @@ if (strpos($_SERVER['PATH_INFO'], "debug"))
   ini_set('display_startup_errors', 1);
   ini_set('log_errors', 1);
   ini_set('error_reporting', E_ALL);
+  set_error_handler('logErrors');
 } else {
   $debug = FALSE;
   ini_set('display_errors', 0);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
   ini_set('error_reporting', 0);
+}
+
+function logErrors($errno, $errstr, $errfile, $errline) {
+    global $php_debug;
+    $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
 }
 
 foreach ($_GET as $key=>$get_var)
@@ -330,6 +336,13 @@ toastr.options.extendedTimeOut = 20;
   echo("</script>");
 }
 
+if (is_array($sql_debug) && is_array($php_debug)) {
+
+    include_once "includes/print-debug.php";
+
+}
+
 ?>
+
 </body>
 </html>

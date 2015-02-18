@@ -1628,3 +1628,6 @@ tr.search:nth-child(odd) {
     font-size: 2.5em;
 }
 
+.navbar-debug {
+  min-height: 25px;
+}
