@@ -85,7 +85,7 @@ function discover_device($device, $options = NULL)
   }
 
   echo("\n");
-
+  
   // If we've specified a module, use that, else walk the modules array
   if ($options['m'])
   {
@@ -158,9 +158,30 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       list($high_limit, $low_limit) = array($low_limit, $high_limit);
     }
 
-    $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
-                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit,
-                    'sensor_limit_low_warn' => $low_warn_limit, 'sensor_current' => $current, 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured );
+    $insert = array(
+      'poller_type'               => $poller_type,
+      'sensor_class'              => $class,
+      'device_id'                 => $device['device_id'],
+      'sensor_oid'                => $oid,
+      'sensor_index'              => $index,
+      'sensor_type'               => $type,
+      'sensor_descr'              => $descr,
+      'sensor_divisor'            => $divisor,
+      'sensor_multiplier'         => $multiplier,
+      'sensor_limit'              => $high_limit,
+      'sensor_limit_warn'         => $warn_limit,
+      'sensor_limit_low'          => $low_limit,
+      'sensor_limit_low_warn'     => $low_warn_limit,
+      'sensor_current'            => $current,
+      'entPhysicalIndex'          => $entPhysicalIndex,
+      'entPhysicalIndex_measured' => $entPhysicalIndex_measured
+    );
+
+    foreach ($insert as $key => $val_check){
+      if (!isset($val_check)) {
+        unset($insert[$key]);
+      }
+    }
 
     $inserted = dbInsert($insert, 'sensors');
 
