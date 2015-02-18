@@ -50,6 +50,7 @@ function CollectData($bill_id)
 
   $port_list = dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id", array($bill_id));
   print_r($port_list);
+  $now = dbFetchCell("SELECT NOW()");
   foreach ($port_list as $port_data)
   {
     $port_id = $port_data['port_id'];
@@ -60,8 +61,6 @@ function CollectData($bill_id)
 
     $port_data['in_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], "In");
     $port_data['out_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], "Out");
-
-    $now = dbFetchCell("SELECT NOW()");
 
     $last_data = getLastPortCounter($port_id,in);
     if ($last_data['state'] == "ok")
