@@ -16,6 +16,10 @@
     position: absolute;
 }
 
+.gridster.collapsed .gs-w {
+    position: static !important;
+}
+
 .ready .gs-w:not(.preview-holder) {
     -webkit-transition: opacity .3s, left .3s, top .3s;
     -moz-transition: opacity .3s, left .3s, top .3s;

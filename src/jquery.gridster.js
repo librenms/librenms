@@ -32,6 +32,7 @@
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
         auto_init: true,
+        responsive_breakpoint: false,
         serialize_params: function($w, wgd) {
             return {
                 col: wgd.col,
@@ -138,11 +139,12 @@
             this.options.widget_selector).addClass('gs-w');
         this.widgets = [];
         this.$changed = $([]);
-        this.wrapper_width = this.$wrapper.width();
-        this.min_widget_width = (this.options.widget_margins[0] * 2) +
-          this.options.widget_base_dimensions[0];
-        this.min_widget_height = (this.options.widget_margins[1] * 2) +
-          this.options.widget_base_dimensions[1];
+        this.min_widget_width = this.options.widget_base_dimensions[0];
+        this.min_widget_height = this.options.widget_base_dimensions[1];
+
+        if(this.is_responsive()) {
+          this.min_widget_width = this.get_responsive_col_width();
+        }
 
         this.generated_stylesheets = [];
         this.$style_tags = $([]);
@@ -355,7 +357,6 @@
         this.register_widget($w);
 
         this.add_faux_rows(pos.size_y);
-        //this.add_faux_cols(pos.size_x);
 
         if (max_size) {
             this.set_widget_max_size($w, max_size);
@@ -492,6 +493,86 @@
         return $widget;
     };
 
+    /**
+     * Expand the widget. Width is set to the current grid width.
+     *
+     * @method expand_widget
+     * @param {HTMLElement} $widget The jQuery wrapped HTMLElement
+     *  representing the widget.
+     * @param {Number} size_y The number of rows that will occupy the widget.
+     * @param {Function} [callback] Function executed when the widget is removed.
+     * @return {HTMLElement} Returns $widget.
+     */
+    fn.expand_widget = function($widget, size_y, callback) {
+      var wgd = $widget.coords().grid;
+      var max_size_x = Math.floor(($(window).width() - this.options.widget_margins[0] * 2) /
+          (this.min_widget_width + this.options.widget_margins[0] * 2));
+      var size_x = Math.min(max_size_x, this.cols);
+      size_y || (size_y = wgd.size_y);
+
+      var old_size_y = wgd.size_y;
+      $widget.attr('pre_expand_col', wgd.col);
+      $widget.attr('pre_expand_sizex', wgd.size_x);
+      $widget.attr('pre_expand_sizey', wgd.size_y);
+      var new_col = 1;
+
+      if (size_y > old_size_y) {
+        this.add_faux_rows(Math.max(size_y - old_size_y, 0));
+      }
+
+      var new_grid_data = {
+        col: new_col,
+        row: wgd.row,
+        size_x: size_x,
+        size_y: size_y
+      };
+
+      this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
+
+      this.set_dom_grid_height();
+      this.set_dom_grid_width();
+
+      if (callback) {
+        callback.call(this, new_grid_data.size_x, new_grid_data.size_y);
+      }
+
+      return $widget;
+    };
+
+    /**
+     * Collapse the widget to it's pre-expanded size
+     *
+     * @method expand_widget
+     * @param {HTMLElement} $widget The jQuery wrapped HTMLElement
+     *  representing the widget.
+     * @param {Function} [callback] Function executed when the widget is removed.
+     * @return {HTMLElement} Returns $widget.
+     */
+    fn.collapse_widget = function($widget, callback) {
+      var wgd = $widget.coords().grid;
+      var size_x = parseInt($widget.attr('pre_expand_sizex'));
+      var size_y = parseInt($widget.attr('pre_expand_sizey'));
+
+      var new_col = parseInt($widget.attr('pre_expand_col'));
+
+      var new_grid_data = {
+        col: new_col,
+        row: wgd.row,
+        size_x: size_x,
+        size_y: size_y
+      };
+
+      this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
+
+      this.set_dom_grid_height();
+      this.set_dom_grid_width();
+
+      if (callback) {
+        callback.call(this, new_grid_data.size_x, new_grid_data.size_y);
+      }
+
+      return $widget;
+    };
 
     /**
     * Mutate widget dimensions and position in the grid map.
@@ -504,7 +585,6 @@
     * @return {HTMLElement} Returns instance of gridster Class.
     */
     fn.mutate_widget_in_gridmap = function($widget, wgd, new_wgd) {
-        var old_size_x = wgd.size_x;
         var old_size_y = wgd.size_y;
 
         var old_cells_occupied = this.get_cells_occupied(wgd);
@@ -564,10 +644,10 @@
 
         //update coords instance attributes
         $widget.data('coords').update({
-            width: (new_wgd.size_x * this.options.widget_base_dimensions[0] +
-                ((new_wgd.size_x - 1) * this.options.widget_margins[0]) * 2),
+            width: (new_wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
+                ((new_wgd.size_x - 1) * this.options.widget_margins[0])),
             height: (new_wgd.size_y * this.options.widget_base_dimensions[1] +
-                ((new_wgd.size_y - 1) * this.options.widget_margins[1]) * 2)
+                ((new_wgd.size_y - 1) * this.options.widget_margins[1]))
         });
 
         $widget.attr({
@@ -580,7 +660,7 @@
         if (empty_cols.length) {
             var cols_to_remove_holes = [
                 empty_cols[0], new_wgd.row,
-                empty_cols.length,
+                empty_cols[empty_cols.length - 1] - empty_cols[0] + 1,
                 Math.min(old_size_y, new_wgd.size_y),
                 $widget
             ];
@@ -901,6 +981,45 @@
 
 
     /**
+    * Update the width and height for a widgets coordinate data.
+    *
+    * @param {HTMLElement} $widget The widget to update.
+    * @param width The new width for this widget.
+    * @param height The new height for this widget.
+    * @method update_widget_dimensions
+    * @return {Class} Returns the instance of the Gridster Class.
+    */
+    fn.update_widget_dimensions = function($widget, width, height) {
+        $widget.data('coords').update({
+            width: width,
+            height: height
+        });
+        return this;
+    };
+
+
+    /**
+    * Update dimensions for all widgets in the grid.
+    *
+    * @method update_widgets_dimensions
+    * @return {Class} Returns the instance of the Gridster Class.
+    */
+    fn.update_widgets_dimensions = function() {
+        $.each(this.$widgets, $.proxy(function(idx, widget) {
+            var wgd = $(widget).coords().grid;
+            var width = (wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
+            ((wgd.size_x - 1) * this.options.widget_margins[0]));
+
+            var height = (wgd.size_y * this.options.widget_base_dimensions[1] +
+            ((wgd.size_y - 1) * this.options.widget_margins[1]));
+
+            this.update_widget_dimensions($(widget), width, height);
+        }, this));
+        return this;
+    };
+
+
+    /**
     * Remove a widget from the mapped array of positions.
     *
     * @method remove_from_gridmap
@@ -947,7 +1066,7 @@
         var draggable_options = $.extend(true, {}, this.options.draggable, {
             offset_left: this.options.widget_margins[0],
             offset_top: this.options.widget_margins[1],
-            container_width: this.cols * this.min_widget_width,
+            container_width: (this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]),
             limit: true,
             start: function(event, ui) {
                 self.$widgets.filter('.player-revert')
@@ -1249,10 +1368,12 @@
             bottom: ui.$player.is('.' + this.resize_handle_class + '-y')
         };
 
-        this.$resized_widget.css({
+        if(!this.is_responsive()) {
+          this.$resized_widget.css({
             'min-width': this.options.widget_base_dimensions[0],
             'min-height': this.options.widget_base_dimensions[1]
-        });
+          });
+        }
 
         var nodeName = this.$resized_widget.get(0).tagName;
         this.$resize_preview_holder = $('<' + nodeName + ' />', {
@@ -1323,7 +1444,7 @@
     fn.on_resize = function(event, ui) {
         var rel_x = (ui.pointer.diff_left);
         var rel_y = (ui.pointer.diff_top);
-        var wbd_x = this.options.widget_base_dimensions[0];
+        var wbd_x = this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0];
         var wbd_y = this.options.widget_base_dimensions[1];
         var margin_x = this.options.widget_margins[0];
         var margin_y = this.options.widget_margins[1];
@@ -1333,8 +1454,6 @@
         var min_size_y = this.resize_min_size_y;
         var autogrow = this.options.autogrow_cols;
         var width;
-        var max_width = Infinity;
-        var max_height = Infinity;
 
         var inc_units_x = Math.ceil((rel_x / (wbd_x + margin_x * 2)) - 0.2);
         var inc_units_y = Math.ceil((rel_y / (wbd_y + margin_y * 2)) - 0.2);
@@ -1344,17 +1463,17 @@
 
         var max_cols = (this.container_width / this.min_widget_width) -
             this.resize_initial_col + 1;
-        var limit_width = ((max_cols * this.min_widget_width) - margin_x * 2);
+        var limit_width = (max_cols * this.min_widget_width) + (this.is_responsive() ? (max_cols - 1) * margin_x : -(margin_x * 2));
 
         size_x = Math.max(Math.min(size_x, max_size_x), min_size_x);
         size_x = Math.min(max_cols, size_x);
-        width = (max_size_x * wbd_x) + ((size_x - 1) * margin_x * 2);
+        width = (max_size_x * wbd_x) + ((size_x - 1) * margin_x );
         max_width = Math.min(width, limit_width);
-        min_width = (min_size_x * wbd_x) + ((size_x - 1) * margin_x * 2);
+        min_width = (min_size_x * wbd_x) + ((size_x - 1) * margin_x);
 
         size_y = Math.max(Math.min(size_y, max_size_y), min_size_y);
-        max_height = (max_size_y * wbd_y) + ((size_y - 1) * margin_y * 2);
-        min_height = (min_size_y * wbd_y) + ((size_y - 1) * margin_y * 2);
+        max_height = (max_size_y * wbd_y) + ((size_y - 1) * margin_y);
+        min_height = (min_size_y * wbd_y) + ((size_y - 1) * margin_y);
 
         if (this.resize_dir.right) {
             size_y = this.resize_initial_sizey;
@@ -2751,7 +2870,7 @@
     fn.set_dom_grid_height = function(height) {
         if (typeof height === 'undefined') {
             var r = this.get_highest_occupied_cell().row;
-            height = r * this.min_widget_height;
+            height = ((r + 1) * this.options.widget_margins[1]) + (r * this.min_widget_height);
         }
 
         this.container_height = height;
@@ -2774,11 +2893,75 @@
             this.cols);
 
         cols = Math.min(max_cols, Math.max(cols, this.options.min_cols));
-        this.container_width = cols * this.min_widget_width;
+        this.container_width = ((cols + 1) * this.options.widget_margins[0]) + (cols * this.min_widget_width);
         this.$el.css('width', this.container_width);
+
+        if(this.is_responsive()) {
+          this.$el.css({'min-width': '100%', 'max-width': '100%'});
+          return this;
+        }
         return this;
     };
 
+
+    /**
+    * Checks if this grid is responsive.
+    * autogenerate_stylesheet be true, the widget base width should be auto, and there must be a max_cols set.
+    * @returns {Boolean}
+    */
+    fn.is_responsive = function() {
+      return this.options.autogenerate_stylesheet && this.options.widget_base_dimensions[0] === 'auto' && this.options.max_cols !== Infinity;
+    };
+
+    /**
+    *
+    * @returns {number}
+    */
+    fn.get_responsive_col_width = function() {
+      var cols = this.cols || this.options.max_cols;
+      return (this.$el.width() - ((cols + 1) * this.options.widget_margins[0])) / cols;
+    };
+
+    fn.resize_responsive_layout = function() {
+      this.min_widget_width = this.get_responsive_col_width();
+      this.generate_grid_and_stylesheet();
+      this.update_widgets_dimensions();
+      this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols) * this.options.widget_margins[0]));
+    };
+
+    fn.toggle_collapsed_grid = function(collapse, opts) {
+      if(collapse) {
+        this.$widgets.css({
+          'margin-top' : opts.widget_margins[0],
+          'margin-bottom' : opts.widget_margins[0],
+          'min-height': opts.widget_base_dimensions[1]
+        });
+
+        this.$el.addClass('collapsed');
+
+        if(this.options.resize.enabled && this.resize_api) {
+          this.disable_resize();
+        }
+
+        if(this.drag_api) {
+          this.disable();
+        }
+      } else {
+        this.$widgets.css({
+          'margin-top' : 'auto',
+          'margin-bottom' : 'auto',
+          'min-height': 'auto'
+        });
+        this.$el.removeClass('collapsed');
+        if(this.options.resize.enabled && this.resize_api) {
+          this.enable_resize();
+        }
+
+        if(this.drag_api) {
+          this.enable();
+        }
+      }
+    }
 
     /**
     * It generates the neccessary styles to position the widgets.
@@ -2791,10 +2974,8 @@
     fn.generate_stylesheet = function(opts) {
         var styles = '';
         var max_size_x = this.options.max_size_x || this.cols;
-        var max_rows = 0;
-        var max_cols = 0;
         var i;
-        var rules;
+        var full_width =  this.is_responsive() && this.options.responsive_breakpoint && ($(window).width() < this.options.responsive_breakpoint);
 
         opts || (opts = {});
         opts.cols || (opts.cols = this.cols);
@@ -2802,12 +2983,16 @@
         opts.namespace || (opts.namespace = this.options.namespace);
         opts.widget_base_dimensions ||
             (opts.widget_base_dimensions = this.options.widget_base_dimensions);
-        opts.widget_margins ||
-            (opts.widget_margins = this.options.widget_margins);
-        opts.min_widget_width = (opts.widget_margins[0] * 2) +
-            opts.widget_base_dimensions[0];
-        opts.min_widget_height = (opts.widget_margins[1] * 2) +
-            opts.widget_base_dimensions[1];
+
+
+        if(this.is_responsive()) {
+          opts.widget_base_dimensions = [this.get_responsive_col_width(), opts.widget_base_dimensions[1]];
+        }
+
+        opts.widget_margins || (opts.widget_margins = this.options.widget_margins);
+
+
+        this.toggle_collapsed_grid(full_width, opts);
 
         // don't duplicate stylesheets for the same configuration
         var serialized_opts = $.param(opts);
@@ -2819,31 +3004,27 @@
         Gridster.generated_stylesheets.push(serialized_opts);
 
         /* generate CSS styles for cols */
-        for (i = opts.cols; i >= 0; i--) {
-            styles += (opts.namespace + ' [data-col="'+ (i + 1) + '"] { left:' +
-                ((i * opts.widget_base_dimensions[0]) +
-                (i * opts.widget_margins[0]) +
-                ((i + 1) * opts.widget_margins[0])) + 'px; }\n');
+        for(i = 1; i <= opts.cols + 1; i++) {
+          styles += (opts.namespace + ' [data-col="' + i + '"] { left:' +
+          (full_width ?  this.options.widget_margins[0] : ((i * opts.widget_margins[0]) + ((i - 1) * opts.widget_base_dimensions[0])))
+          + 'px; }\n');
         }
 
         /* generate CSS styles for rows */
-        for (i = opts.rows; i >= 0; i--) {
-            styles += (opts.namespace + ' [data-row="' + (i + 1) + '"] { top:' +
-                ((i * opts.widget_base_dimensions[1]) +
-                (i * opts.widget_margins[1]) +
-                ((i + 1) * opts.widget_margins[1]) ) + 'px; }\n');
+        for(i = 1; i <= opts.rows + 1; i++) {
+          styles += (opts.namespace + ' [data-row="' + i + '"] { top:' +
+          ((i * opts.widget_margins[1]) + ((i - 1) * opts.widget_base_dimensions[1]))
+          + 'px; }\n');
         }
 
         for (var y = 1; y <= opts.rows; y++) {
-            styles += (opts.namespace + ' [data-sizey="' + y + '"] { height:' +
-                (y * opts.widget_base_dimensions[1] +
-                (y - 1) * (opts.widget_margins[1] * 2)) + 'px; }\n');
+          styles += (opts.namespace + ' [data-sizey="' + y + '"] { height:' +
+          (full_width ? 'auto' : ((y * opts.widget_base_dimensions[1]) + ((y - 1) * opts.widget_margins[1]))) + 'px; }\n');
         }
 
         for (var x = 1; x <= max_size_x; x++) {
             styles += (opts.namespace + ' [data-sizex="' + x + '"] { width:' +
-                (x * opts.widget_base_dimensions[0] +
-                (x - 1) * (opts.widget_margins[0] * 2)) + 'px; }\n');
+            (full_width ? ($(window).width() - this.options.widget_margins[0] * 2) : ((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
         }
 
         this.remove_style_tags();
@@ -3023,6 +3204,10 @@
                 top: this.baseY + (coords.data.row -1) * this.min_widget_height
             });
         }, this));
+
+        if (this.is_responsive()) {
+          this.resize_responsive_layout();
+        }
 
         return this;
     };
