@@ -1,3 +1,15 @@
+<a name="v0.6.0"></a>
+## v0.6.0 (2015-02-18)
+
+
+#### Bug Fixes
+
+* **gridster:** changed the way widgets were getting positioned so that margins are actually the ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
+#### Features
+
+* **gridster:** make grid responsive ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
 <a name="v0.5.6"></a>
 ### v0.5.6 (2014-09-25)
 
