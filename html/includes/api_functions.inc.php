@@ -76,8 +76,10 @@ function get_port_stats_by_port_hostname()
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
+  $hostname = $router['hostname'];
+  $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
   $ifName = urldecode($router['ifname']);
-  $stats = dbFetchRow("SELECT * FROM `ports` WHERE `ifName`=?", array($ifName));
+  $stats = dbFetchRow("SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?", array($device_id,$ifName));
   $output = array("status" => "ok", "port" => $stats);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
