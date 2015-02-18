@@ -5,22 +5,13 @@
   "version": "0.5.6",
   "homepage": "http://gridster.net/",
   "author": {
-    "name": "ducksboard",
-    "email": "hackers@ducksboard.com"
+    "name": "decksterteam",
+    "email": "deckster@42six.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ducksboard/gridster.js.git"
+    "url": "git://github.com/DecksterTeam/gridster.js.git"
   },
-  "bugs": {
-    "url": "https://github.com/ducksboard/gridster.js/issues"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/ducksboard/gridster.js/blob/master/LICENSE"
-    }
-  ],
   "keywords": [],
   "dependencies": {
     "jquery": "git+https://github.com/jquery/jquery.git#2.0.3"

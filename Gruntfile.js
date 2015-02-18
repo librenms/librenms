@@ -70,7 +70,7 @@ module.exports = function(grunt) {
 
       dist_demo: {
         files: {
-          'gh-pages/dist/jquery.<%= pkg.name %>.min.js': ['<%= concat.dist_js.dest %>'],
+          'gh-pages/dist/jquery.<%= pkg.name %>.min.js': ['<%= concat.dist_js.dest %>']
         }
       },
 
