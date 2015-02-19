@@ -39,7 +39,8 @@ if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
-        discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
+        //discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $usage, $entPhysicalIndex, NULL);
       }
     }
   }
@@ -47,6 +48,7 @@ if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
   if (!is_array($valid['processor']['cpm']))
   {
     $avgBusy5 = snmp_get($device, ".1.3.6.1.4.1.9.2.1.58.0", "-Oqv");
+    
     if (is_numeric($avgBusy5))
     {
       discover_processor($valid['processor'], $device, ".1.3.6.1.4.1.9.2.1.58.0", "0", "ios", "Processor", "1", $avgBusy5, NULL, NULL);
