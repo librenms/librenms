@@ -24,7 +24,7 @@ Usage
 function dbQuery($sql, $parameters = array()) {
 	global $fullSql, $debug;
 	$fullSql = dbMakeQuery($sql, $parameters);
-        
+
         if($debug) { 
           print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
           echo("\nSQL[".$fullSql."] "); 
@@ -36,8 +36,8 @@ function dbQuery($sql, $parameters = array()) {
 	*/
 
 	$result = mysql_query($fullSql); // sets $this->result
-       	
-       if (mysql_error()) {
+       
+        if (mysql_error()) {
 	 #hold on for further testing! 
          echo("\nSQL[".$fullSql."] "); 
          print mysql_error();
