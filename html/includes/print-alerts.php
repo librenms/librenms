@@ -85,8 +85,8 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
         $orig_class = $extra;
 	echo "<tr class='".$extra."' id='row_".$alert['id']."'>";
 	echo "<td><i>#".((int) $rulei++)."</i></td>";
-	echo "<td><i>".htmlentities($rule['rule'])."</i></td>";
-        echo "<td>".$alert['hostname']."</td>";
+	echo "<td><i title=\"".htmlentities($rule['rule'])."\">".htmlentities($rule['name'])."</i></td>";
+	echo "<td><a href=\"device/device=".$alert['device_id']."\">".$alert['hostname']."</a></td>";
 	echo "<td>".($alert['timestamp'] ? $alert['timestamp'] : "N/A")."</td>";
 	echo "<td>".$rule['severity'];
         if($alert['state'] == 3) {
