@@ -41,7 +41,9 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a></li>
+          <li class="dropdown-submenu">
+            <a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a>
+            <ul class="dropdown-menu scrollable-menu">
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
@@ -50,6 +52,8 @@ if ($_SESSION['userlevel'] >= '10') {
 <?php
 }
 ?>
+            </ul>
+          </li>
             <li role="presentation" class="divider"></li>
 <?php if (isset($config['enable_map']) && $config['enable_map']) {
   echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
