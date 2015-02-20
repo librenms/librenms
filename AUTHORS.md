@@ -12,6 +12,7 @@ Contributors to LibreNMS:
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
+- Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
 
 [1]: http://observium.org/ "Observium web site"
 
