@@ -47,6 +47,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
+<li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a></li>
 <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><img src="images/16/monitor_go.png" border="0" align="absmiddle" /> Alert Rules</a></li>
 <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><img src="images/16/monitor_link.png" border="0" align="absmiddle" /> Alert Templates</a></li>
 <?php
