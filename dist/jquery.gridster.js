@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.0 - 2015-02-18
+/*! gridster.js - v0.6.1 - 2015-02-21
 * http://gridster.net/
 * Copyright (c) 2015 decksterteam; Licensed  */
 
@@ -1216,7 +1216,7 @@
         this.set_dom_grid_width();
         this.set_dom_grid_height();
 
-        this.drag_api.set_limits(this.cols * this.min_widget_width);
+        this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
 
         return $w.fadeIn();
     };
@@ -1346,15 +1346,15 @@
      * @method expand_widget
      * @param {HTMLElement} $widget The jQuery wrapped HTMLElement
      *  representing the widget.
+     * @param {Number} size_x The number of cols that will occupy the widget.
      * @param {Number} size_y The number of rows that will occupy the widget.
      * @param {Function} [callback] Function executed when the widget is removed.
      * @return {HTMLElement} Returns $widget.
      */
-    fn.expand_widget = function($widget, size_y, callback) {
+    fn.expand_widget = function($widget, size_x, size_y, callback) {
       var wgd = $widget.coords().grid;
-      var max_size_x = Math.floor(($(window).width() - this.options.widget_margins[0] * 2) /
-          (this.min_widget_width + this.options.widget_margins[0] * 2));
-      var size_x = Math.min(max_size_x, this.cols);
+      var max_size_x = Math.floor(($(window).width() - this.options.widget_margins[0] * 2) / this.min_widget_width);
+      size_x =  size_x || Math.min(max_size_x, this.cols);
       size_y || (size_y = wgd.size_y);
 
       var old_size_y = wgd.size_y;
@@ -2080,7 +2080,7 @@
             if (prcol >= this.cols - 1 && this.options.max_cols >= this.cols + 1) {
                 this.add_faux_cols(1);
                 this.set_dom_grid_width(this.cols + 1);
-                this.drag_api.set_limits(this.container_width);
+                this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
             }
 
             this.collision_api.set_colliders(this.faux_grid);
@@ -2171,7 +2171,7 @@
         this.set_dom_grid_width();
 
         if (this.options.autogrow_cols) {
-            this.drag_api.set_limits(this.cols * this.min_widget_width);
+            this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
         }
     };
 
@@ -3761,7 +3761,7 @@
     };
 
     /**
-    *
+    * Generates the width of the grid columns based on the width of the window.
     * @returns {number}
     */
     fn.get_responsive_col_width = function() {
@@ -3769,13 +3769,25 @@
       return (this.$el.width() - ((cols + 1) * this.options.widget_margins[0])) / cols;
     };
 
+    /**
+    * Changes the minimum width of a widget based on the width of the window and the number of cols that can
+    * fit in it.
+    * @returns {Gridster}
+    */
     fn.resize_responsive_layout = function() {
       this.min_widget_width = this.get_responsive_col_width();
       this.generate_grid_and_stylesheet();
       this.update_widgets_dimensions();
-      this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols) * this.options.widget_margins[0]));
+      this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
+      return this;
     };
 
+    /**
+    * Switches between collapsed widgets the span the full width when the responsive_breakpoint is triggered.
+    * @param collapse
+    * @param opts
+    * @returns {Gridster}
+    */
     fn.toggle_collapsed_grid = function(collapse, opts) {
       if(collapse) {
         this.$widgets.css({
@@ -3786,7 +3798,7 @@
 
         this.$el.addClass('collapsed');
 
-        if(this.options.resize.enabled && this.resize_api) {
+        if(this.resize_api) {
           this.disable_resize();
         }
 
@@ -3800,7 +3812,7 @@
           'min-height': 'auto'
         });
         this.$el.removeClass('collapsed');
-        if(this.options.resize.enabled && this.resize_api) {
+        if(this.resize_api) {
           this.enable_resize();
         }
 
@@ -3808,10 +3820,11 @@
           this.enable();
         }
       }
-    }
+      return this;
+    };
 
     /**
-    * It generates the neccessary styles to position the widgets.
+    * It generates the necessary styles to position the widgets.
     *
     * @method generate_stylesheet
     * @param {Number} rows Number of columns.
