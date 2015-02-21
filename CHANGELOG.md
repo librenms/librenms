@@ -1,3 +1,14 @@
+<a name="v0.6.1"></a>
+### v0.6.1 (2015-02-21)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * fixed expand_widget bug not expanding full width of window fix(gridster): user c ([dbc226d4](http://github.com/DecksterTeam/gridster.js/commit/dbc226d46c8224f753c07af6aff259785c60425f))
+  * fixing drag limit issues when using autogrow_cols ([afd83fea](http://github.com/DecksterTeam/gridster.js/commit/afd83fead8c719615ae01ef7b5d3863701ff2243))
+  * changed the way widgets were getting positioned so that margins are actually the ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
 <a name="v0.6.0"></a>
 ## v0.6.0 (2015-02-18)
 
