@@ -105,7 +105,7 @@ else
   echo("|");
 
   if ($vars['graph'] == "prefixes_ipv6multicast") { echo("<span class='pagemenu-selected'>"); }
-  echo(generate_link("IPv4",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6multicast')));
+  echo(generate_link("IPv6",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6multicast')));
   if ($vars['graph'] == "prefixes_ipv6multicast") { echo("</span>"); }
   echo(")");
 
