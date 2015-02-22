@@ -60,6 +60,7 @@
 		    }
 		}
 	    }
+            $var = array();
 	    $var['offset']			= (isset($ntp['offset']) ? $ntp['offset'] : "U");
 	    $var['frequency']			= (isset($ntp['frequency']) ? $ntp['frequency'] : "U");
 	    if ($newstats_style) {

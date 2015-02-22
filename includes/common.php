@@ -147,6 +147,7 @@ function get_port_by_ifIndex($device_id, $ifIndex)
 function get_all_devices($device, $type = "")
 {
   global $cache;
+  $devices = array();
 
   // FIXME needs access control checks!
   // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.

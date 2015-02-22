@@ -132,6 +132,7 @@ function percent_colour($perc)
 function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
+  $errors = array();
 
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
@@ -584,6 +585,7 @@ function match_network($nets, $ip, $first=false)
 function snmp2ipv6($ipv6_snmp)
 {
   $ipv6 = explode('.',$ipv6_snmp);
+  $ipv6_2 = array();
 
   # Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
   # < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
@@ -600,6 +602,7 @@ function snmp2ipv6($ipv6_snmp)
 
 function ipv62snmp($ipv6)
 {
+  $ipv6_split = array();
   $ipv6_ex = explode(':',Net_IPv6::uncompress($ipv6));
   for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad($ipv6_ex[$i],4); }
   $ipv6_ip = implode('',$ipv6_ex);

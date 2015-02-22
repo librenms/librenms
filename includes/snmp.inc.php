@@ -53,6 +53,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(external_exec($cmd));
   $runtime_stats['snmpget']++;
+  $array = array();
   foreach (explode("\n", $data) as $entry)
   {
     list($oid,$value) = explode("=", $entry);
@@ -189,7 +190,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   return $data;
 }
 
-function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
+function snmpwalk_cache_cip($device, $oid, $array = array(), $mib = 0)
 {
   global $config;
 
