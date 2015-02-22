@@ -204,12 +204,12 @@ function get_port_by_id($port_id)
   if (is_numeric($port_id))
   {
     $port = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($port_id));
-  }
-  if (is_array($port))
-  {
-    return $port;
-  } else {
-    return FALSE;
+    if (is_array($port))
+    {
+      return $port;
+    } else {
+      return FALSE;
+    }
   }
 }
 
@@ -218,12 +218,12 @@ function get_application_by_id($application_id)
   if (is_numeric($application_id))
   {
     $application = dbFetchRow("SELECT * FROM `applications` WHERE `app_id` = ?", array($application_id));
-  }
-  if (is_array($application))
-  {
-    return $application;
-  } else {
-    return FALSE;
+    if (is_array($application))
+    {
+      return $application;
+    } else {
+      return FALSE;
+    }
   }
 }
 
@@ -232,12 +232,12 @@ function get_sensor_by_id($sensor_id)
   if (is_numeric($sensor_id))
   {
     $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", array($sensor_id));
-  }
-  if (is_array($sensor))
-  {
-    return $sensor;
-  } else {
-    return FALSE;
+    if (is_array($sensor))
+    {
+      return $sensor;
+    } else {
+      return FALSE;
+    }
   }
 }
 
@@ -246,12 +246,12 @@ function get_device_id_by_port_id($port_id)
   if (is_numeric($port_id))
   {
     $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `port_id` = ?", array($port_id));
-  }
-  if (is_numeric($device_id))
-  {
-    return $device_id;
-  } else {
-    return FALSE;
+    if (is_numeric($device_id))
+    {
+      return $device_id;
+    } else {
+      return FALSE;
+    }
   }
 }
 
@@ -260,12 +260,12 @@ function get_device_id_by_app_id($app_id)
   if (is_numeric($app_id))
   {
     $device_id = dbFetchCell("SELECT `device_id` FROM `applications` WHERE `app_id` = ?", array($app_id));
-  }
-  if (is_numeric($device_id))
-  {
-    return $device_id;
-  } else {
-    return FALSE;
+    if (is_numeric($device_id))
+    {
+      return $device_id;
+    } else {
+      return FALSE;
+    }
   }
 }
 
@@ -494,6 +494,7 @@ function formatStorage($value, $round = '2', $sf = '3')
 
 function format_si($value, $round = '2', $sf = '3')
 {
+  $neg = 0;
   if ($value < "0")
   {
     $neg = 1;
@@ -513,7 +514,7 @@ function format_si($value, $round = '2', $sf = '3')
     for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) { $value = $value * 1000; $ext  = $sizes[$i]; }
   }
 
-  if ($neg) { $value = $value * -1; }
+  if ($neg == 1) { $value = $value * -1; }
 
   return format_number_short(round($value, $round),$sf).$ext;
 }
