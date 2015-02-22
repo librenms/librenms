@@ -489,7 +489,8 @@ class Console_Table
         $this->_splitMultilineRows();
 
         // Update cell lengths.
-        for ($i = 0; $i < count($this->_headers); $i++) {
+        $count_headers = count($this->_headers);
+        for ($i = 0; $i < $count_headers; $i++) {
             $this->_calculateCellLengths($this->_headers[$i]);
         }
         for ($i = 0; $i < $this->_max_rows; $i++) {
@@ -570,8 +571,10 @@ class Console_Table
         $separator = $this->_getSeparator();
 
         $return = array();
-        for ($i = 0; $i < count($this->_data); $i++) {
-            for ($j = 0; $j < count($this->_data[$i]); $j++) {
+        $count_data = count($this->_data);
+        for ($i = 0; $i < $count_data; $i++) {
+            $count_data_i = count($his->_data[$i]);
+            for ($j = 0; $j < $count_data_i; $j++) {
                 if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE &&
                     $this->_strlen($this->_data[$i][$j]) <
                     $this->_cell_lengths[$j]) {
@@ -648,7 +651,8 @@ class Console_Table
     function _getHeaderLine()
     {
         // Make sure column count is correct
-        for ($j = 0; $j < count($this->_headers); $j++) {
+        $count_headers = count($this->_headers);
+        for ($j = 0; $j < $count_headers; $j++) {
             for ($i = 0; $i < $this->_max_cols; $i++) {
                 if (!isset($this->_headers[$j][$i])) {
                     $this->_headers[$j][$i] = '';
@@ -656,8 +660,10 @@ class Console_Table
             }
         }
 
-        for ($j = 0; $j < count($this->_headers); $j++) {
-            for ($i = 0; $i < count($this->_headers[$j]); $i++) {
+        $count_headers = count($this->_headers);
+        for ($j = 0; $j < $count_headers; $j++) {
+            $count_headers_j = count($this->_headers[$j]);
+            for ($i = 0; $i < $count_headers_j; $i++) {
                 if ($this->_strlen($this->_headers[$j][$i]) <
                     $this->_cell_lengths[$i]) {
                     $this->_headers[$j][$i] =
@@ -733,7 +739,8 @@ class Console_Table
      */
     function _calculateCellLengths($row)
     {
-        for ($i = 0; $i < count($row); $i++) {
+        $count_row = count($row);
+        for ($i = 0; $i < $count_row; $i++) {
             if (!isset($this->_cell_lengths[$i])) {
                 $this->_cell_lengths[$i] = 0;
             }
