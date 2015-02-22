@@ -43,6 +43,7 @@
 		    }
 		}
 	    }
+            $var = array();
 	    $var['mess_recv']		= (isset($stats['mess_recv']) ? $stats['mess_recv'] : "U");
 	    $var['mess_rejected']	= (isset($stats['mess_rejected']) ? $stats['mess_rejected'] : "U");
 	    $var['mess_relay']		= (isset($stats['mess_relay']) ? $stats['mess_relay'] : "U");

@@ -139,6 +139,7 @@ function deluser($username)
 function get_userlist()
 {
   global $config, $ds;
+  $userlist = array();
 
   $filter = '(' . $config['auth_ldap_prefix'] . '*)';
 
