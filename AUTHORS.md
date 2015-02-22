@@ -13,6 +13,7 @@ Contributors to LibreNMS:
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 - Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
+- Nicolas Armando <nicearma@yahoo.com> (nicearma)
 
 [1]: http://observium.org/ "Observium web site"
 
