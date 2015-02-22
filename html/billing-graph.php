@@ -105,14 +105,14 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
 {
   @$timestamp = $row['formatted_date'];
   if (!$first) { $first = $timestamp; }
-  @$delta = $row['delta'];
-  @$period = $row['period'];
-  @$in_delta = $row['in_delta'];
-  @$out_delta = $row['out_delta'];
-  @$in_value = round($in_delta * 8 / $period, 2);
-  @$out_value = round($out_delta * 8 / $period, 2);
+  $delta = $row['delta'];
+  $period = $row['period'];
+  $in_delta = $row['in_delta'];
+  $out_delta = $row['out_delta'];
+  $in_value = round($in_delta * 8 / $period, 2);
+  $out_value = round($out_delta * 8 / $period, 2);
 
-  @$last = $timestamp;
+  $last = $timestamp;
 
   $iter_in      += $in_delta;
   $iter_out     += $out_delta;
