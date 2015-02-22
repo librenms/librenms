@@ -456,7 +456,7 @@ if ($_SESSION['userlevel'] >= '10')
 if ($_SESSION['authenticated'])
 {
   echo('
-           <li><a href="logout/">Logout</a></li>
+           <li><a href="logout/"><img src="images/16/lock_go.png" with="16" height="16" alt="Logout"> Logout</a></li>
 ');
 }
 ?>
