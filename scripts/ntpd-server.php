@@ -58,6 +58,7 @@
 		    }
 		}
 	    }
+            $var = array();
 	    $var['stratum']			= (isset($ntpd['stratum']) ? $ntpd['stratum'] : "U");
 	    $var['offset']			= (isset($ntpd['offset']) ? $ntpd['offset'] : "U");
 	    $var['frequency']			= (isset($ntpd['frequency']) ? $ntpd['frequency'] : "U");

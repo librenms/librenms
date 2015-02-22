@@ -110,6 +110,7 @@
 
   // Device Information
   function listBillPorts($bill_id) {
+    $device = array();
     $res       = "";
     $res      .= "<table>";
     $res      .= "  <tr>";
@@ -146,6 +147,7 @@
   // Bitrate Graph overview
   function graphOverviewBitrate($bill_id, $history) {
     global $pdf;
+    $img = array();
 
     $img['bitrate'] = genGraphs($bill_id, "bitrate", $history['timestampfrom'], $history['timestampto'], $history['type']);
     $bitrate        = $pdf->serializeTCPDFtagParameters(array($img['bitrate'], 10, 44, 280, '', 'PNG', '', 'T'));
@@ -157,6 +159,7 @@
   // Transfer Graph overview
   function graphOverviewTransfer($bill_id, $history) {
     global $pdf;
+    $img = array();
 
     $img['bw_day']  = genGraphs($bill_id, "day", $history['timestampfrom'], $history['timestampto']);
     $img['bw_hour'] = genGraphs($bill_id, "hour", $history['timestampfrom'], $history['timestampto']);

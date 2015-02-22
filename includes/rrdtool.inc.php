@@ -205,6 +205,7 @@ function rrdtool_create($filename, $options)
 
 function rrdtool_update($filename, $options)
 {
+  $values = array();
   // Do some sanitisation on the data if passed as an array.
   if (is_array($options))
   {
