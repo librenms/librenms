@@ -273,6 +273,7 @@ $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires
 $config['enable_vrfs']                  = 1; # Enable VRFs
+$config['enable_vrf_lite_cisco']        = 1; # Enable VRF lite cisco  
 $config['enable_printers']              = 0; # Enable Printer support
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 
@@ -542,6 +543,9 @@ $config['discovery_modules']['ports-stack']               = 1;
 $config['discovery_modules']['entity-physical']           = 1;
 $config['discovery_modules']['processors']                = 1;
 $config['discovery_modules']['mempools']                  = 1;
+//this module is preferred to be charge before bgp-peers, ipv4-addresses,
+// ipv6-addresses, arp-table and all other module-context-related 
+$config['discovery_modules']['cisco-vrf-lite']            = 1;
 $config['discovery_modules']['ipv4-addresses']            = 1;
 $config['discovery_modules']['ipv6-addresses']            = 1;
 $config['discovery_modules']['sensors']                   = 1;
