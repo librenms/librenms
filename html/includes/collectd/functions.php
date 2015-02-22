@@ -560,7 +560,8 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 	$rrd_cmd = array_merge($rrd_cmd, $config['rrd_opts_array'], $opts['rrd_opts'], $graph);
 
 	$cmd = RRDTOOL;
-	for ($i = 1; $i < count($rrd_cmd); $i++)
+        $count_rrd_cmd = count($rrd_cmd);
+	for ($i = 1; $i < $count_rrd_cmd; $i++)
 		$cmd .= ' '.escapeshellarg($rrd_cmd[$i]);
 
 	return $cmd;
@@ -611,7 +612,8 @@ function collectd_draw_generic($timespan, $host, $plugin, $pinst = null, $type, 
 
 		$rrdgraph = array_merge($rrd_cmd, $rrd_args);
 		$cmd = RRDTOOL;
-		for ($i = 1; $i < count($rrdgraph); $i++)
+                $count_rrdgraph = count($rrdgraph);
+		for ($i = 1; $i < $count_rrdgraph; $i++)
 			$cmd .= ' '.escapeshellarg($rrdgraph[$i]);
 
 		return $cmd;
@@ -712,7 +714,8 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
 	}
 
 	$rrdcmd = RRDTOOL;
-	for ($i = 1; $i < count($cmd); $i++)
+        $count_cmd = count($cmd);
+	for ($i = 1; $i < $count_cmd; $i++)
 		$rrdcmd .= ' '.escapeshellarg($cmd[$i]);
 	return $rrdcmd;
 }
@@ -793,7 +796,8 @@ function collectd_draw_meta_line(&$opts, &$sources) {
 	}
 
 	$rrdcmd = RRDTOOL;
-	for ($i = 1; $i < count($cmd); $i++)
+        $count_cmd = count($cmd);
+	for ($i = 1; $i < $count_cmd; $i++)
 		$rrdcmd .= ' '.escapeshellarg($cmd[$i]);
 	return $rrdcmd;
 }

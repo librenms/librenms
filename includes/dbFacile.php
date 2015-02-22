@@ -313,7 +313,8 @@ function dbMakeQuery($sql, $parameters) {
 		// every-other item in $result will be the placeholder that was found
 
 		$query = '';
-		for($i = 0; $i < sizeof($result); $i+=2) {
+                $res_size = sizeof($result);
+		for($i = 0; $i < $res_size; $i+=2) {
 			$query .= $result[ $i ];
 
 			$j = $i+1;
