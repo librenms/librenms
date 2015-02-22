@@ -49,6 +49,7 @@ function getDates($dayofmonth, $months=0)
   $last_from = date_format($date_start, 'Ymd') . "000000";
   $last_to   = date_format($date_end, 'Ymd') . "235959";
 
+  $return = array();
   $return['0'] = $date_from;
   $return['1'] = $date_to;
   $return['2'] = $last_from;
@@ -76,6 +77,7 @@ function getValue($host, $port, $id, $inout)
 
 function getLastPortCounter($port_id,$inout)
 {
+  $return = array();
   $rows = dbFetchCell("SELECT count(counter) from `port_" . mres($inout) . "_measurements` WHERE `port_id`='" . mres($port_id)."'");
 
   if ($rows > 0)
@@ -92,6 +94,7 @@ function getLastPortCounter($port_id,$inout)
 
 function getLastMeasurement($bill_id)
 {
+  $return = array();
   $rows = dbFetchCell("SELECT count(delta) from bill_data WHERE bill_id='".mres($bill_id)."'");
 
   if ($rows > 0)
@@ -142,6 +145,7 @@ function get95thout($bill_id,$datefrom,$dateto)
 
 function getRates($bill_id,$datefrom,$dateto)
 {
+  $data = array();
   $mq_text = "SELECT count(delta) FROM bill_data ";
   $mq_text .= " WHERE bill_id = '".mres($bill_id)."'";
   $mq_text .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";

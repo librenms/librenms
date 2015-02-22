@@ -73,6 +73,7 @@
 	function doSNMPv2($vars) {
 	    $res = array();
 	    foreach ($vars as $items=>$server) {
+                $var = array();
 		$var['bitrate']		= (isset($server['5']) ? (($server['5'] / 8) * 1000) : "0");
 		//$var['bitrate']		= (isset($server['5']) ? ($server['5'] * 1024) : "0");
 		$var['traf_in']		= (isset($server['1']) ? ($var['bitrate'] * $server['1']) : "0");
