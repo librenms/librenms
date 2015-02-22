@@ -7,6 +7,7 @@ function poll_sensor($device, $class, $unit)
   foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?", array($class, $device['device_id'])) as $sensor)
   {
     echo("Checking (" . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . "... ");
+    $sensor_value = '';
 
     if ($sensor['poller_type'] == "snmp")
     {

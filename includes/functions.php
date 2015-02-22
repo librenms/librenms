@@ -108,7 +108,8 @@ function getHostOS($device)
     echo("| $sysDescr | $sysObjectId | ");
   }
 
-  $dir_handle = @opendir($config['install_dir'] . "/includes/discovery/os") or die("Unable to open $path");
+  $path = $config['install_dir'] . "/includes/discovery/os";
+  $dir_handle = @opendir($path) or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
     if (preg_match("/.php$/", $file))
@@ -136,6 +137,8 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
 
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
+  $in_errors = 0;
+  $out_errors = 0;
   foreach (explode("\n", $data) as $entry)
   {
     list($in, $out) = explode(" ", $entry);
@@ -175,6 +178,9 @@ function getImage($device)
         $image = '<img src="' . $config['base_url'] . '/images/os/' . $distro . '.png" />';
       }
     }
+    if (empty($image)) {
+        $image = '<img src="' . $config['base_url'] . '/images/os/generic.png" />';
+    }
   }
 
   return $image;
@@ -207,6 +213,9 @@ function getImageSrc($device)
         $image = $config['base_url'] . '/images/os/' . $distro . '.png';
       }
     }
+    if (empty($image)) {
+        $image = $config['base_url'] . '/images/os/generic.png';
+    }
   }
 
   return $image;
@@ -219,13 +228,14 @@ function renamehost($id, $new, $source = 'console')
   // FIXME does not check if destination exists!
   $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
-  $return = dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
+  dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
   log_event("Hostname changed -> $new ($source)", $id, 'system');
 }
 
 function delete_device($id)
 {
   global $config;
+  $ret = '';
 
   $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
 
@@ -267,8 +277,6 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
       // Test reachability
       if (isPingable($host))
       {
-        $added = 0;
-
         if (empty($snmpver))
         {
           // Try SNMPv2c
@@ -324,7 +332,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
             if (isSNMPable($device))
             {
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-              if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
+              if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host)))
               {
                 $device_id = createHost ($host, $community, $snmpver, $port, $transport);
                 return $device_id;
@@ -369,7 +377,6 @@ function scanUDP($host, $port, $timeout)
   $write = fwrite($handle,"\x00");
   if (!$write) { next; }
   $startTime = time();
-  $header = fread($handle, 1);
   $endTime = time();
   $timeDiff = $endTime - $startTime;
   if ($timeDiff >= $timeout)
@@ -409,7 +416,7 @@ function netmask2cidr($netmask)
   return $addr->bitmask;
 }
 
-function cidr2netmask()
+function cidr2netmask($netmask)
 {
   return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
 }
