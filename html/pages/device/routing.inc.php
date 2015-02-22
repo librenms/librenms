@@ -18,6 +18,7 @@ $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
 $type_text['ospf'] = "OSPF";
 $type_text['vrf'] = "VRFs";
+$type_text['route'] = "Route";
 
 print_optionbar_start();
 

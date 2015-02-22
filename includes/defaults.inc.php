@@ -542,6 +542,7 @@ $config['discovery_modules']['ports-stack']               = 1;
 $config['discovery_modules']['entity-physical']           = 1;
 $config['discovery_modules']['processors']                = 1;
 $config['discovery_modules']['mempools']                  = 1;
+
 $config['discovery_modules']['ipv4-addresses']            = 1;
 $config['discovery_modules']['ipv6-addresses']            = 1;
 $config['discovery_modules']['sensors']                   = 1;
@@ -556,7 +557,8 @@ $config['discovery_modules']['vlans']                     = 1;
 $config['discovery_modules']['cisco-mac-accounting']      = 1;
 $config['discovery_modules']['cisco-pw']                  = 1;
 $config['discovery_modules']['cisco-vrf']                 = 1;
-#$config['discovery_modules']['cisco-cef']                 = 1;
+#$config['discovery_modules']['cisco-cef']                = 1;
+$config['discovery_modules']['route']                     = 1;
 $config['discovery_modules']['cisco-sla']                 = 1;
 $config['discovery_modules']['vmware-vminfo']             = 1;
 $config['discovery_modules']['libvirt-vminfo']            = 1;

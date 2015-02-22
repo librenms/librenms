@@ -226,6 +226,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     $device_routing_count['vrf'] = @dbFetchCell("SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
 
+    $device_routing_count['route'] = @dbFetchCell("SELECT COUNT(*) FROM `route` WHERE `device_id` = ? limit 0,1", array($device['device_id']));
+    if ($device_routing_count['route']) { $routing_tabs[] = 'route'; }
+    
     if (is_array($routing_tabs))
     {
       echo('<li class="' . $select['routing'] . '">
