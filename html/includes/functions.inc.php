@@ -102,7 +102,7 @@ function generate_overlib_content($graph_array, $text)
 
 function get_percentage_colours($percentage)
 {
-
+  $background = array();
   if ($percentage > '90') { $background['left']='c4323f'; $background['right']='C96A73'; }
   elseif ($percentage > '75') { $background['left']='bf5d5b'; $background['right']='d39392'; }
   elseif ($percentage > '50') { $background['left']='bf875b'; $background['right']='d3ae92'; }
@@ -330,7 +330,7 @@ function print_graph_tag($args)
 
 function generate_graph_tag($args)
 {
-
+  $urlargs = array();
   foreach ($args as $key => $arg)
   {
     $urlargs[] = $key."=".$arg;
@@ -410,6 +410,7 @@ function generate_port_link($port, $text = NULL, $type = NULL)
 {
   global $config;
 
+  $graph_array = array();
   $port = ifNameDescr($port);
   if (!$text) { $text = fixIfName($port['label']); }
   if ($type) { $port['graph_type'] = $type; }
@@ -535,6 +536,8 @@ function devclass($device)
 
 function getlocations()
 {
+  $ignore_dev_location = array();
+  $locations = array();
   # Fetch override locations, not through get_dev_attrib, this would be a huge number of queries
   $rows = dbFetchRows("SELECT attrib_type,attrib_value,device_id FROM devices_attribs WHERE attrib_type LIKE 'override_sysLocation%' ORDER BY attrib_type");
   foreach ($rows as $row)
@@ -610,6 +613,7 @@ function generate_ap_link($args, $text = NULL, $type = NULL)
   $content = "<div class=list-large>".$args['text']." - " . fixifName($args['label']) . "</div>";
   if ($args['ifAlias']) { $content .= $args['ifAlias']."<br />"; }
   $content .= "<div style=\'width: 850px\'>";
+  $graph_array = array();
   $graph_array['type']     = $args['graph_type'];
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";

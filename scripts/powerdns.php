@@ -51,6 +51,7 @@
 		    }
 		}
 	    }
+            $var = array();
 	    $var['corrupt-packets']		= (isset($pdns['corrupt-packets']) ? $pdns['corrupt-packets'] : "U");
 	    $var['deferred-cache-inserts']	= (isset($pdns['deferred-cache-inserts']) ? $pdns['deferred-cache-inserts'] : "U");
 	    $var['deferred-cache-lookup']	= (isset($pdns['deferred-cache-lookup']) ? $pdns['deferred-cache-lookup'] : "U");
