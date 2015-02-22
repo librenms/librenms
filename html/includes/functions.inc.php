@@ -483,7 +483,7 @@ function print_port_thumbnail($args)
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
   echo('
-        <div class="well">
+        <div class="well well-sm">
 ');
 }
 
