@@ -573,7 +573,7 @@ class Console_Table
         $return = array();
         $count_data = count($this->_data);
         for ($i = 0; $i < $count_data; $i++) {
-            $count_data_i = count($his->_data[$i]);
+            $count_data_i = count($this->_data[$i]);
             for ($j = 0; $j < $count_data_i; $j++) {
                 if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE &&
                     $this->_strlen($this->_data[$i][$j]) <
