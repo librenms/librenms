@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS `route` ( `device_id` int(11) NOT NULL, `ipRouteDest` varchar(256) not null, `ipRouteIfIndex` varchar(256), `ipRouteMetric` varchar(256) not null, `ipRouteNextHop` varchar(256) not null, `ipRouteType` varchar(256) not null, `ipRouteProto` varchar(256) not null, `discoveredAt` int(11) NOT NULL, `ipRouteMask` varchar(256) not null   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+ALTER TABLE `route` DROP INDEX `device` ,ADD INDEX `device` (`device_id` ASC, `ipRouteDest`(255) ASC, `ipRouteNextHop` ASC);
