@@ -223,7 +223,6 @@ function poll_device($device, $options)
       rrdtool_update($ping_rrd, "N:$ping_time");
     }
 
-    $update_array = array();
     $update_array['last_polled'] = array('NOW()');
     $update_array['last_polled_timetaken'] = $device_time;
     $update_array['last_ping'] = array('NOW()');
