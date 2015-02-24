@@ -16,6 +16,10 @@
     position: absolute;
 }
 
+.gridster.collapsed {
+   height: auto !important;
+}
+
 .gridster.collapsed .gs-w {
     position: static !important;
 }
