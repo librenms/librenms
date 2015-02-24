@@ -2929,7 +2929,7 @@
     */
     fn.resize_responsive_layout = function() {
       this.min_widget_width = this.get_responsive_col_width();
-      this.generate_grid_and_stylesheet();
+      this.generate_stylesheet();
       this.update_widgets_dimensions();
       this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
       return this;
