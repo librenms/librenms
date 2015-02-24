@@ -1,3 +1,11 @@
+<a name="v0.6.2"></a>
+### v0.6.2 (2015-02-23)
+
+
+#### Bug Fixes
+
+* **gridster:** forcing height of gridster container to auto when in collapsed mode ([749f37a5](http://github.com/DecksterTeam/gridster.js/commit/749f37a52074bd16362528f94ab28ec314379ee3))
+
 <a name="v0.6.1"></a>
 ### v0.6.1 (2015-02-21)
 

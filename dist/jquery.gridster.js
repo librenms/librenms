@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.1 - 2015-02-21
+/*! gridster.js - v0.6.2 - 2015-02-23
 * http://gridster.net/
 * Copyright (c) 2015 decksterteam; Licensed  */
 
