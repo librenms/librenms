@@ -38,8 +38,8 @@ function dbQuery($sql, $parameters = array()) {
 	$result = mysql_query($fullSql); // sets $this->result
        
         if (mysql_error()) {
-	$error_string = ">>error>>\nSQL[".$fullSql."] ".mysql_error()."\n>>>>>>>>\n";
-	logfile($error_string); 
+	  $error_string = ">>error>>\nSQL[".$fullSql."] ".mysql_error()."\n>>>>>>>>\n";
+	  logfile($error_string); 
 
 	#hold on for further testing! 
          echo("\nSQL[".$fullSql."] "); 
