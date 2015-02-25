@@ -5,6 +5,10 @@
   "dependencies": {
     "jquery": "~1.11.2"
   },
+  "main": [
+    "dist/jquery.gridster.js",
+    "dist/jquery.gridster.css"
+  ],
   "private": true,
   "ignore": [
     ".bowerrc",
