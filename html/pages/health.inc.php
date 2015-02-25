@@ -2,6 +2,7 @@
 
 $datas = array('mempool','processor','storage');
 if ($used_sensors['temperature']) $datas[] = 'temperature';
+if ($used_sensors['charge']) $datas[] = 'charge';
 if ($used_sensors['humidity']) $datas[] = 'humidity';
 if ($used_sensors['fanspeed']) $datas[] = 'fanspeed';
 if ($used_sensors['voltage']) $datas[] = 'voltage';
@@ -13,6 +14,7 @@ if ($used_sensors['dBm']) $datas[] = 'dBm';
 // FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
+$type_text['charge'] = "Battery Charge";
 $type_text['humidity'] = "Humidity";
 $type_text['mempool'] = "Memory";
 $type_text['storage'] = "Disk Usage";
