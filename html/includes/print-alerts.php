@@ -122,7 +122,7 @@ echo '</table>
 
 <script>
 $("[name='ack-alert']").click('', function(e) {
-    event.preventDefault();
+    e.preventDefault();
     var alert_id = $(this).data("alert_id");
     var state = $(this).data("state");
     $.ajax({
