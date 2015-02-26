@@ -563,6 +563,7 @@ $config['discovery_modules']['libvirt-vminfo']            = 1;
 $config['discovery_modules']['toner']                     = 1;
 $config['discovery_modules']['ucd-diskio']                = 1;
 $config['discovery_modules']['services']                  = 1;
+$config['discovery_modules']['charge']                    = 1;
 
 $config['modules_compat']['rfc1628']['liebert']           = 1;
 $config['modules_compat']['rfc1628']['netmanplus']        = 1;

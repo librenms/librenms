@@ -5,6 +5,7 @@ $diskio       = dbFetchCell("select count(*) from ucd_diskio WHERE device_id = ?
 $mempools     = dbFetchCell("select count(*) from mempools WHERE device_id = ?", array($device['device_id']));
 $processor    = dbFetchCell("select count(*) from processors WHERE device_id = ?", array($device['device_id']));
 
+$charge       = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $temperatures = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
 $humidity     = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
 $fans         = dbFetchCell("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = ?", array($device['device_id']));
@@ -20,6 +21,7 @@ if ($processor) { $datas[] = 'processor'; }
 if ($mempools) { $datas[] = 'mempool'; }
 if ($storage) { $datas[] = 'storage'; }
 if ($diskio) { $datas[] = 'diskio'; }
+if ($charge) { $datas[] = 'charge'; }
 if ($temperatures) { $datas[] = 'temperature'; }
 if ($humidity) { $datas[] = 'humidity'; }
 if ($fans) { $datas[] = 'fanspeed'; }
@@ -30,6 +32,7 @@ if ($power) { $datas[] = 'power'; }
 if ($dBm) { $datas[] = 'dbm'; }
 
 $type_text['overview'] = "Overview";
+$type_text['charge'] = "Battery Charge";
 $type_text['temperature'] = "Temperature";
 $type_text['humidity'] = "Humidity";
 $type_text['mempool'] = "Memory";
