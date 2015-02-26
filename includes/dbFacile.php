@@ -24,10 +24,10 @@ Usage
 function dbQuery($sql, $parameters = array()) {
 	global $fullSql, $debug;
 	$fullSql = dbMakeQuery($sql, $parameters);
-        //if($debug) { 
-          //print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
-          //echo("\nSQL[".$fullSql."] "); 
-        //}
+        if($debug) { 
+          print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
+          #echo("\nSQL[".$fullSql."] "); 
+        }
 
 	/*
 	if($this->logFile)
@@ -35,13 +35,6 @@ function dbQuery($sql, $parameters = array()) {
 	*/
 
 	$result = mysql_query($fullSql); // sets $this->result
-       	if (mysql_error()) {
-         echo("\nSQL[".$fullSql."] "); 
-         print mysql_error();
-        }
-	if(mysql_error()) {
-		file_put_contents('/tmp/mysql_strict.log',date("Y-m-d H:i:s").','.$fullSql.','.mysql_error()."\n",FILE_APPEND);
-	}
 	/*
 	if($this->logFile) {
 		$time_end = microtime(true);
@@ -121,13 +114,9 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 
 	// need field name and placeholder value
 	// but how merge these field placeholders with actual $parameters array for the WHERE clause
-	$sql = 'UPDATE `' . $table . '` SET ';
+	$sql = 'UPDATE `' . $table . '` set ';
 	foreach($data as $key => $value) {
-                if ($value == "NOW()") {
-                  $sql .= "`".$key."` = " . $value . ",";
-                } else {
-                  $sql .= "`".$key."` = '" . $value . "',";
-                }
+                $sql .= "`".$key."` ". '=:' . $key . ',';
 	}
 	$sql = substr($sql, 0, -1); // strip off last comma
 

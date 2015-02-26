@@ -132,7 +132,7 @@ function discover_device($device, $options = NULL)
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp', $entPhysicalIndex = NULL, $entPhysicalIndex_measured = NULL)
 {
   global $config, $debug;
-  
+
   if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n"); }
 
   if (is_null($low_warn_limit) || !is_null($warn_limit))
@@ -355,7 +355,7 @@ function sensor_limit($class, $current)
 function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 {
   $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ?", array($class, $device['device_id'], $poller_type));
-  
+ 
   if (count($entries))
   {
     foreach ($entries as $entry)
@@ -475,8 +475,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
   global $config, $debug;
 
   if ($debug) {
-    echo("\n");
-    var_dump($device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex);
+      echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
   }
 
   if ($descr)
@@ -523,8 +522,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
   global $config, $debug;
   
   if ($debug) {
-    echo("\n");
-    var_dump($device, $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex);
+      echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
   }
   
    #FIXME implement the mempool_perc, mempool_used, etc.
