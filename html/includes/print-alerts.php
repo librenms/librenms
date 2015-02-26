@@ -66,6 +66,7 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
 	$rule = dbFetchRow("SELECT * FROM alert_rules WHERE id = ? LIMIT 1", array($alert['rule_id']));
 	$log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
         $log_detail = json_decode(gzuncompress($log),true);
+	$fault_detail = '';
 	foreach( $log_detail['rule'] as $tmp_alerts ) {
 		foreach ($tmp_alerts as $k=>$v) {
 			if( !empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1 ) {
