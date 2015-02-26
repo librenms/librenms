@@ -7,7 +7,7 @@ if ($device['os'] == "apc") {
     }
 
     // Try High-Precision First
-    if ($oids) {
+    if (!empty($oids)) {
         echo("APC UPS Battery Charge High Precision");
         $type = "apc";
         list($oid,$current) = explode(' ',$oids);
@@ -30,7 +30,7 @@ if ($device['os'] == "apc") {
             echo($oids."\n");
         }
 
-        if ($oids) {
+        if (!empty($oids)) {
             echo("APC UPS Battery Charge");
             $type = "apc";
             list($oid,$current) = explode(' ',$oids);
