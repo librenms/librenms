@@ -4,11 +4,12 @@ $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND dev
 
 if (count($sensors))
 {
-  echo('<div class="row">
+  echo('<div class="container-fluid ">
+        <div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">');
-  echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=' . strtolower($sensor_type) . '/"><img src="images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a><');
+  echo('<a href="device/device='.$device['device_id'].'/tab=health/metric=' . strtolower($sensor_type) . '/"><img src="images/icons/' . strtolower($sensor_type) . '.png"><strong> ' . $sensor_type . '</strong></a>');
   echo('      </div>
                 <table class="table table-hover table-condensed table-striped">');
   foreach ($sensors as $sensor)
