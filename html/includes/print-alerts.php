@@ -72,6 +72,7 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
 				$fault_detail .= $k.' => '.$v."\n ";
 			}
 	        }
+		$fault_detail .= "\n";
 	}
 
 	$ico = "ok";
