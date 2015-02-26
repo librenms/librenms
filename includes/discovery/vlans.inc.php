@@ -64,7 +64,7 @@ foreach ($device['vlans'] as $domain_id => $vlans)
 	
         if ($from_db['port_vlan_id'])
         {
-          dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ". $from_db['port_vlan_id']);
+          dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ?", array($from_db['port_vlan_id']));
           echo("Updated");
         } else {
           dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
