@@ -39,6 +39,7 @@ include("overview/storage.inc.php");
 if(is_array($entity_state['group']['c6kxbar'])) { include("overview/c6kxbar.inc.php"); }
 
 include("overview/toner.inc.php");
+include("overview/sensors/charge.inc.php");
 include("overview/sensors/temperatures.inc.php");
 include("overview/sensors/humidity.inc.php");
 include("overview/sensors/fanspeeds.inc.php");
