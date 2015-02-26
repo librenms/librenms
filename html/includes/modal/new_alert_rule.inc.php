@@ -137,7 +137,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
     var modal = $(this)
     $('#device_id').val(device_id);
     $('#alert_id').val(alert_id);
-    $('#response').data('tagmanager').empty();
+    $('#tagmanager').tagmanager();
     $('#response').tagmanager({
            strategy: 'array',
            tagFieldName: 'rules[]'
