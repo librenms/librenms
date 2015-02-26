@@ -7,3 +7,4 @@ rrd
 html/plugins/*
 !html/plugins/Test/
 nbproject
+.alerts.lock
