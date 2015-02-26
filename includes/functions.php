@@ -1120,7 +1120,7 @@ function convert_delay($delay) {
     } elseif(is_numeric($delay)) {
         $delay_sec = $delay;
     } else {
-        $delay_sec = 0;
+        $delay_sec = 300;
     }
     return($delay_sec);
 }
