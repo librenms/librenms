@@ -75,7 +75,7 @@ if (isset($_REQUEST['search']))
     
     } elseif($_REQUEST['type'] == 'ports') {
       // Search ports
-      $results = dbFetchRows("SELECT `ports`.* AS P,`devices`.* AS D FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%" . $search . "%' OR `ifDescr` LIKE '%" . $search . "%' ORDER BY ifDescr LIMIT 8");
+      $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%" . $search . "%' OR `ifDescr` LIKE '%" . $search . "%' ORDER BY ifDescr LIMIT 8");
 
       if (count($results))
       {
@@ -128,7 +128,7 @@ if (isset($_REQUEST['search']))
 
     } elseif($_REQUEST['type'] == 'bgp') {
       // Search bgp peers
-      $results = dbFetchRows("SELECT `bgpPeers`.* AS B,`devices`.* AS D FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%' ORDER BY `astext` LIMIT 8");
+      $results = dbFetchRows("SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%' ORDER BY `astext` LIMIT 8");
       if (count($results))
       {
         $found = 1;
