@@ -64,6 +64,14 @@ $full_query = $full_query . $query . " LIMIT $start,$results";
 
 foreach( dbFetchRows($full_query, $param) as $alert ) {
 	$rule = dbFetchRow("SELECT * FROM alert_rules WHERE id = ? LIMIT 1", array($alert['rule_id']));
+	$log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
+        $log_detail = json_decode(gzuncompress($log),true);
+	foreach( $log_detail['rule'][0] as $k=>$v ) {
+		if( !empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1 ) {
+			$fault_detail .= $k.' => '.$v."; ";
+	        }
+	}
+
 	$ico = "ok";
 	$col = "green";
 	$extra = "";
@@ -86,7 +94,7 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
 	echo "<tr class='".$extra."' id='row_".$alert['id']."'>";
 	echo "<td><i>#".((int) $rulei++)."</i></td>";
 	echo "<td><i title=\"".htmlentities($rule['rule'])."\">".htmlentities($rule['name'])."</i></td>";
-	echo "<td><a href=\"device/device=".$alert['device_id']."\">".$alert['hostname']."</a></td>";
+	echo "<td><a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."</i></a></td>";
 	echo "<td>".($alert['timestamp'] ? $alert['timestamp'] : "N/A")."</td>";
 	echo "<td>".$rule['severity'];
         if($alert['state'] == 3) {
