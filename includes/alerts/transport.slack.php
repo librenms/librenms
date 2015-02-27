@@ -22,14 +22,21 @@
  */
 
 foreach( $opts as $method=>$apis ) {
-	foreach( $apis as $api ) {
-		list($host, $api) = explode("?",$api,2);
+	foreach( $apis as $tmp_api ) {
+		list($host, $api) = explode("?",$tmp_api['url'],2);
 		foreach( $obj as $k=>$v ) {
 			$api = str_replace("%".$k,$method == "get" ? urlencode($v) : $v, $api);
 		}
 		$curl = curl_init();
-                $data = array('text' => $obj['msg']);
+                $data = array(
+				'text' => $obj['msg'],
+				'channel' => $tmp_api['channel'],
+				'username' => $tmp_api['username'],
+				'icon_url' => $tmp_api['icon_url'],
+				'icon_emoji' => $tmp_api['icon_emoji'],
+		);
                 $alert_message = "payload=" . json_encode($data);
+print_r($alert_message);
 		curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host."?".$api : $host) );
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($curl, CURLOPT_POST,true);
