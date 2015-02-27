@@ -152,7 +152,7 @@ $('#add_line').click('', function(e) {
 });
 
 $('button[name="control-add"],button[name="placeholder-add"],button[name="operator-add"]').click('', function(e) {
-    event.preventDefault();
+    e.preventDefault();
     var type = $(this).data("type");
     var value = $(this).data("value");
     var line = $('#line').val();
