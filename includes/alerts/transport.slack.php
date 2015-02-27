@@ -36,7 +36,6 @@ foreach( $opts as $method=>$apis ) {
 				'icon_emoji' => $tmp_api['icon_emoji'],
 		);
                 $alert_message = "payload=" . json_encode($data);
-print_r($alert_message);
 		curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host."?".$api : $host) );
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($curl, CURLOPT_POST,true);
