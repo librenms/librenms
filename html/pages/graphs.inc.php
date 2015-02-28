@@ -124,31 +124,6 @@ if (!$auth)
   echo("<hr />");
 
   // datetime range picker
-  echo("
-    <form id='customrange' action=\"test\">
-    <p>
-  ");
-  echo("<input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
-  echo('<div class="row">
-        <div class="col-sm-2">
-            <div class="form-group">
-                <label for="dtpickerfrom">From: </label>
-                <div class="input-group date" id="dtpicker1">
-                    <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-2">
-            <div class="form-group">
-                <label for="dtpickerto">To: </label>
-                <div class="input-group date" id="dtpicker2">
-                    <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date('Y-m-d H:i', $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-                </div>
-            </div>
-        </div>
-    </div>');
 ?>
     <script type="text/javascript">
         $(function () {
@@ -169,12 +144,34 @@ if (!$auth)
         }
     </script>
 <?php
-    echo("
-    <input type='submit' class='btn btn-default' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
-    </p>
+  echo("
+    <form class='form-inline' id='customrange' action='test'>
+    <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
+  echo('<div class="row">
+        <div class="col-sm-2 form-group">
+	    <label class="control-label" for="dtpicker1">From:</label>
+	    <div class="input-group date" id="dtpicker1">
+		<input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
+		<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+	    </div>
+	</div>
+	<div class="col-sm-2 form-group">
+	    <label class="control-label" for="dtpicker2">To: </label>
+	    <div class="input-group date" id="dtpicker2">
+		<input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date('Y-m-d H:i', $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
+		<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+	    </div>
+	</div>
+	<div class="col-sm-2 form-group">
+	    <label class="control-label" for="submit">&nbsp;</label>
+	    <div class="input-group">
+		<input type="submit" class="btn btn-default" id="submit" value="Update" onclick="javascript:submitCustomRange(this.form);">
+	    </div>
+	</div>
+    </div>
     </form>
 
-  ");
+  ');
 
   echo("<hr />");
 
