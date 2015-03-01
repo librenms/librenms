@@ -118,7 +118,7 @@ foreach ($menu_options as $option => $text)
 print_optionbar_end();
 print_optionbar_start();
 
-if(isset($vars['searchbar']) && $vars['searchbar'] != "hide")
+if((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar']))
 {
 
 ?>
