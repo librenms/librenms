@@ -148,7 +148,7 @@ function rrdtool_graph($graph_file, $options)
 
 function rrdtool($command, $filename, $options)
 {
-  global $config, $debug, $rrd_pipes;
+  global $config, $debug, $rrd_pipes, $console_color;
 
   $cmd = "$command $filename $options";
   if ($command != "create" && $config['rrdcached'])
@@ -158,7 +158,7 @@ function rrdtool($command, $filename, $options)
 
   if ($config['norrd'])
   {
-    print Console_Color::convert("[%rRRD Disabled%n]");
+    print $console_color->convert("[%rRRD Disabled%n]");
   } else {
     fwrite($rrd_pipes[0], $cmd."\n");
   }
@@ -166,7 +166,7 @@ function rrdtool($command, $filename, $options)
   {
     echo stream_get_contents($rrd_pipes[1]);
     echo stream_get_contents($rrd_pipes[2]);
-    print Console_Color::convert("RRD[%g".$cmd."%n] ");
+    print $console_color->convert("RRD[%g".$cmd."%n] ");
   } else {
     $tmp  = stream_get_contents($rrd_pipes[1]).stream_get_contents($rrd_pipes[2]);
   }
@@ -182,15 +182,15 @@ function rrdtool($command, $filename, $options)
 
 function rrdtool_create($filename, $options)
 {
-  global $config, $debug;
+  global $config, $debug, $console_color;
 
   if ($config['norrd'])
   {
-    print Console_Color::convert("[%gRRD Disabled%n] ", false);
+    print $console_color->convert("[%gRRD Disabled%n] ", false);
   } else {
     $command = $config['rrdtool'] . " create $filename $options";
   }
-  if ($debug) { print Console_Color::convert("RRD[%g".$command."%n] "); }
+  if ($debug) { print $console_color->convert("RRD[%g".$command."%n] "); }
 
   return shell_exec($command);
 }

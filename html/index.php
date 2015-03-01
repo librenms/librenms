@@ -132,7 +132,7 @@ if (isset($config['branding']) && is_array($config['branding']))
 }
 
 # page_title_prefix is displayed, unless page_title is set
-if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title']; }
+if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page_title']; }
 
 ?>
 <!DOCTYPE HTML>
@@ -185,7 +185,7 @@ if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['fav
 
 <?php
 
-if (!$vars['bare'] == "yes") {
+if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
 
   if ($_SESSION['authenticated'])
   {
@@ -213,7 +213,7 @@ if ($_SESSION['authenticated'])
 <?php
 
 // To help debug the new URLs :)
-if ($devel || $vars['devel'])
+if (isset($devel) || isset($vars['devel']))
 {
   echo("<pre>");
   print_r($_GET);
@@ -284,7 +284,7 @@ if ($config['page_gen'])
   echo('  <br />Generated in ' . $gentime . ' seconds.');
 }
 
-if (is_array($pagetitle))
+if (isset($pagetitle) && is_array($pagetitle))
 {
   # if prefix is set, put it in front
   if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
