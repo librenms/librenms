@@ -586,8 +586,9 @@ Output:
    "device_id": "1",
    "rule": "%devices.os != \"Juniper\"",
    "severity": "warning",
-   "extra": "{\"mute\":true,\"count\":\"15\",\"delay\":null}",
-   "disabled": "0"
+   "extra": "{\"mute\":true,\"count\":\"15\",\"delay\":null,\"invert\":false}",
+   "disabled": "0",
+   "name": "A test rule"
   }
  ]
 }
@@ -648,8 +649,9 @@ Output:
    "device_id": "-1",
    "rule": "%devices.os != \"Juniper\"",
    "severity": "critical",
-   "extra": "{\"mute\":false,\"count\":\"15\",\"delay\":\"300\"}",
-   "disabled": "0"
+   "extra": "{\"mute\":false,\"count\":\"15\",\"delay\":\"300\",\"invert\":false}",
+   "disabled": "0",
+   "name": "A test rule"
   },
 }
 ```
@@ -671,6 +673,8 @@ Input (JSON):
  - count: This is how many polling runs before an alert will trigger and the frequency.
  - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
+ - invert: This would invert the rules check.
+ - name: This is the name of the rule and is mandatory.
 
 
 Example:
@@ -705,6 +709,8 @@ Input (JSON):
  - count: This is how many polling runs before an alert will trigger and the frequency.
  - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
+ - invert: This would invert the rules check.
+ - name: This is the name of the rule and is mandatory.
 
 Example:
 ```curl
