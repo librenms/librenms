@@ -17,20 +17,20 @@ if(isset($vars['state']))
   }
 }
 
-if ($vars['hostname']) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
-if ($vars['os'])       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
-if ($vars['version'])  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
-if ($vars['hardware']) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
-if ($vars['features']) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
-if ($vars['type'])     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
-if ($vars['state'])    {
+if (isset($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
+if (isset($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
+if (isset($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
+if (isset($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
+if (isset($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
+if (isset($vars['type']))     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
+if (isset($vars['state']))    {
   $where .= " AND status= ?";       $sql_param[] = $state;
   $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
 }
-if ($vars['disabled']) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
-if ($vars['ignore'])   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
-if ($vars['location'] == "Unset") { $location_filter = ''; }
-if ($vars['location']) { $location_filter = $vars['location']; }
+if (isset($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
+if (isset($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
+if (isset($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
+if (isset($vars['location'])) { $location_filter = $vars['location']; }
 
 $pagetitle[] = "Devices";
 
@@ -94,7 +94,7 @@ foreach ($menu_options as $option => $text)
 
 <?php
 
-  if ($vars['searchbar'] == "hide")
+  if (isset($vars['searchbar']) && $vars['searchbar'] == "hide")
   {
     echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Restore Search</a>');
   } else {
@@ -103,7 +103,7 @@ foreach ($menu_options as $option => $text)
 
   echo("  | ");
 
-  if ($vars['bare'] == "yes")
+  if (isset($vars['bare']) && $vars['bare'] == "yes")
   {
     echo('<a href="'. generate_url($vars, array('bare' => '')).'">Restore Header</a>');
   } else {
@@ -118,7 +118,7 @@ foreach ($menu_options as $option => $text)
 print_optionbar_end();
 print_optionbar_start();
 
-if($vars['searchbar'] != "hide")
+if(isset($vars['searchbar']) && $vars['searchbar'] != "hide")
 {
 
 ?>
@@ -235,7 +235,13 @@ foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDE
 
 print_optionbar_end();
 
-$query = "SELECT * FROM `devices` WHERE 1 ".$where." ORDER BY hostname";
+$query = "SELECT * FROM `devices` WHERE 1 ";
+
+if (isset($where)) {
+    $query .= $where;
+}
+
+$query .= " ORDER BY hostname";
 
 list($format, $subformat) = explode("_", $vars['format']);
 
@@ -291,7 +297,7 @@ if($format == "graph")
   {
     if (device_permitted($device['device_id']))
     {
-      if (!$location_filter || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
+      if (!isset($location_filter) || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
         || $device['location'] == $location_filter))
       {
         $cell_click = 'onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;"';
