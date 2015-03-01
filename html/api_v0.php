@@ -16,7 +16,6 @@ include_once("../includes/defaults.inc.php");
 include_once("../config.php");
 include_once("../includes/definitions.inc.php");
 include_once("../includes/common.php");
-include_once("../includes/console_colour.php");
 include_once("../includes/dbFacile.php");
 include_once("../includes/rewrites.php");
 include_once("includes/functions.inc.php");

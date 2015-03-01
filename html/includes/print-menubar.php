@@ -165,12 +165,12 @@ if ($_SESSION['userlevel'] >= '10')
 
 <?php
 
-if ($ports['errored'])
+if (isset($ports['errored']))
 {
   echo('            <li><a href="ports/errors=1/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if ($ports['ignored'])
+if (isset($ports['ignored']))
 {
   echo('            <li><a href="ports/ignore=1/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
@@ -254,7 +254,7 @@ if ($menu_sensors)
 
 foreach (array('fanspeed','humidity','temperature') as $item)
 {
-  if ($menu_sensors[$item])
+  if (isset($menu_sensors[$item]))
   {
     echo('            <li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.nicecase($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
@@ -269,7 +269,7 @@ if ($sep)
 
 foreach (array('current','frequency','power','voltage') as $item)
 {
-  if ($menu_sensors[$item])
+  if (isset($menu_sensors[$item]))
   {
     echo('            <li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.nicecase($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
@@ -306,10 +306,12 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
   $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
   foreach ($app_list as $app)
   {
-    $image = $config['html_dir']."/images/icons/".$row['app_type'].".png";
-    $icon = (file_exists($image) ? $row['app_type'] : "apps");
+      if (isset($row['app_type'])) {
+          $image = $config['html_dir']."/images/icons/".$row['app_type'].".png";
+          $icon = (file_exists($image) ? $row['app_type'] : "apps");
 echo('
-            <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
+          <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
+      }
   }
 ?>
           </ul>

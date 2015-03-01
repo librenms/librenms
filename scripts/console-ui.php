@@ -9,6 +9,8 @@ include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("../html/includes/functions.inc.php");
 
+$console_color = new Console_Color2();
+
 $long_opts = array('list::','device-stats');
 $options = getopt("l:d:",$long_opts);
 
@@ -36,9 +38,9 @@ while($end == 0)
   // Include the required SQL queries to get our data
   require('../includes/db/status_count.inc.php');
 
-  $tbl->addRow(array('Devices ('.$devices['count'].')',Console_Color::convert("%g".$devices['up']." Up%n"),Console_Color::convert("%r".$devices['down']." Down%n"),Console_Color::convert("%y".$devices['ignored']." Ignored%n"),Console_Color::convert("%p".$devices['disabled']." Disabled%n")));
-  $tbl->addRow(array('Ports ('.$ports['count'].')',Console_Color::convert("%g".$ports['up']." Up%n"),Console_Color::convert("%r".$ports['down']." Down%n"),Console_Color::convert("%y".$ports['ignored']." Ignored%n"),Console_Color::convert("%p".$ports['shutdown']." Shutdown%n")));
-  $tbl->addRow(array('Services ('.$services['count'].')',Console_Color::convert("%g".$services['up']." Up%n"),Console_Color::convert("%r".$services['down']." Down%n"),Console_Color::convert("%y".$services['ignored']." Ignored%n"),Console_Color::convert("%p".$services['disabled']." Shutdown%n")));
+  $tbl->addRow(array('Devices ('.$devices['count'].')',print $console_color->convert("%g".$devices['up']." Up%n"),print $console_color->convert("%r".$devices['down']." Down%n"),print $console_color->convert("%y".$devices['ignored']." Ignored%n"),print $console_color->convert("%p".$devices['disabled']." Disabled%n")));
+  $tbl->addRow(array('Ports ('.$ports['count'].')',print $console_color->convert("%g".$ports['up']." Up%n"),print $console_color->convert("%r".$ports['down']." Down%n"),print $console_color->convert("%y".$ports['ignored']." Ignored%n"),print $console_color->convert("%p".$ports['shutdown']." Shutdown%n")));
+  $tbl->addRow(array('Services ('.$services['count'].')',print $console_color->convert("%g".$services['up']." Up%n"),print $console_color->convert("%r".$services['down']." Down%n"),print $console_color->convert("%y".$services['ignored']." Ignored%n"),print $console_color->convert("%p".$services['disabled']." Shutdown%n")));
 
   echo $tbl->getTable();
 
@@ -129,7 +131,7 @@ while($end == 0)
 ");
   exit;
   }
-  echo(Console_Color::convert("%rLast update at ". date("Y-m-d h:i:s")."%n\n\n"));
+  echo(print $console_color->convert("%rLast update at ". date("Y-m-d h:i:s")."%n\n\n"));
   sleep(5);
 }
 

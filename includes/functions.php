@@ -30,6 +30,8 @@ include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
 
+$console_color = new Console_Color2();
+
 if ($config['alerts']['email']['enable'])
 {
   include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
@@ -161,7 +163,7 @@ function getImage($device)
   {
     $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['icon'] . '.png" />';
   }
-  elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png"))
+  elseif (isset($config['os'][$device['os']]['icon']) && $config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png"))
   {
     $image = '<img src="' . $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png" />';
   } else {

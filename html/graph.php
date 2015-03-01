@@ -54,6 +54,8 @@ include_once("includes/authenticate.inc.php");
 
 include("includes/graphs/graph.inc.php");
 
+$console_color = new Console_Color2();
+
 $end = utime(); $run = $end - $start;;
 
 if($debug) { echo("<br />Runtime ".$run." secs");

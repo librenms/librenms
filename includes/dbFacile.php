@@ -22,10 +22,10 @@ Usage
  * Used by the other _query functions.
  * */
 function dbQuery($sql, $parameters = array()) {
-	global $fullSql, $debug;
+	global $fullSql, $debug, $console_color;
 	$fullSql = dbMakeQuery($sql, $parameters);
         if($debug) { 
-          print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
+          print $console_color->convert("\nSQL[%y".$fullSql."%n] ");
           #echo("\nSQL[".$fullSql."] "); 
         }
 

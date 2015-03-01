@@ -14,7 +14,6 @@ if (!isset($alert_entry['device'])) {
   </td>");
 }
 
-echo("<td>".$alert_entry['link']."</td>");
 echo("<td>".htmlspecialchars($alert_entry['name']) . "</td>
 
 </tr>");
