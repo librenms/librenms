@@ -268,19 +268,7 @@ if ($config['page_gen'])
   echo('  <br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
   echo('  <br />Generated in ' . $gentime . ' seconds.');
 }
-?>
-  <script class="content_tooltips" type="text/javascript">
-    $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
 
-    $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
-      if ($(this).val() == $(this).attr('title')) {
-        $(this).val('');
-        $(this).removeClass('auto-hint');
-      }
-    });
-  </script>
-
-<?php
 if (is_array($pagetitle))
 {
   # if prefix is set, put it in front
