@@ -8,3 +8,5 @@ html/plugins/*
 !html/plugins/Test/
 nbproject
 .alerts.lock
+includes/console_color.php
+incluldes/console_table.php
