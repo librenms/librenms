@@ -1,6 +1,6 @@
 <?php
 
-if ($bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b; }
+if (isset($bg) && $bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b; }
 
 if ($device['status'] == '0')
 {

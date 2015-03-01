@@ -63,7 +63,7 @@ echo('<div style="float: right;">');
   <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> |
 
 <?php
-  if ($vars['searchbar'] == "hide")
+  if (isset($vars['searchbar']) && $vars['searchbar'] == "hide")
   {
     echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Search</a>');
   } else {
@@ -72,7 +72,7 @@ echo('<div style="float: right;">');
 
   echo("  | ");
 
-  if ($vars['bare'] == "yes")
+  if (isset($vars['bare']) && $vars['bare'] == "yes")
   {
     echo('<a href="'. generate_url($vars, array('bare' => '')).'">Header</a>');
   } else {
@@ -84,7 +84,7 @@ echo('</div>');
 print_optionbar_end();
 print_optionbar_start();
 
-if($vars['searchbar'] != "hide")
+if(isset($vars['searchbar']) && $vars['searchbar'] != "hide")
 {
 
 ?>

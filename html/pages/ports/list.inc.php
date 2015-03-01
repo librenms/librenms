@@ -15,7 +15,7 @@ $cols = array('device' => 'Device',
 
 foreach ($cols as $sort => $col)
 {
-  if ($vars['sort'] == $sort)
+  if (isset($vars['sort']) && $vars['sort'] == $sort)
   {
     echo('<th>'.$col.' *</th>');
   } else {
@@ -42,7 +42,7 @@ foreach ($ports as $port)
     $type = humanmedia($port['ifType']);
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-    if ($port['in_errors'] > 0 || $port['out_errors'] > 0)
+    if ((isset($port['in_errors']) && $port['in_errors'] > 0) || (isset($ports['out_errors']) && $port['out_errors'] > 0))
     {
       $error_img = generate_port_link($port,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
