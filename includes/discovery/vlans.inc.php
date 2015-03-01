@@ -55,16 +55,16 @@ foreach ($device['vlans'] as $domain_id => $vlans)
                     'port_id' => $port['port_id'],
                     'vlan' => $vlan_id);
 
-        $db_a = array('baseport' => $vlan_port_id,
-                    'priority' => $vlan_port['dot1dStpPortPriority'],
-                    'state' => $vlan_port['dot1dStpPortState'],
-                    'cost' => $vlan_port['dot1dStpPortPathCost']);
+        $db_a['baseport'] = $vlan_port_id;
+        $db_a['priority'] = isset($vlan_port['dot1dStpPortPriority']) ? $vlan_port['dot1dStpPortPriority'] : 0;
+        $db_a['state']    = isset($vlan_port['dot1dStpPortState']) ? $vlan_port['dot1dStpPortState'] : "unknown";
+        $db_a['cost']     = isset($vlan_port['dot1dStpPortPathCost']) ? $vlan_port['dot1dStpPortPathCost'] : 0;
 
         $from_db = dbFetchRow("SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?", array($device['device_id'], $port['port_id'], $vlan_id));
-
+	
         if ($from_db['port_vlan_id'])
         {
-          dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ?", $from_db['port_vlan_id']);
+          dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ". $from_db['port_vlan_id']);
           echo("Updated");
         } else {
           dbInsert(array_merge($db_w, $db_a), 'ports_vlans');

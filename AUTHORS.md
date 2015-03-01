@@ -11,6 +11,7 @@ Contributors to LibreNMS:
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
+- Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 - Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
 - Nicolas Armando <nicearma@yahoo.com> (nicearma)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)

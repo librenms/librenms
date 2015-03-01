@@ -172,6 +172,37 @@ if ($device['os'] == "apc")
   }
 
   unset($oids);
+
+  # APC UPS
+  $oids = snmp_walk($device, "upsHighPrecOutputCurrent", "-OsqnU", "PowerNet-MIB");
+  if ($oids)
+  { 
+    if ($debug) { echo($oids."\n"); }
+    $oids = trim($oids);
+    if ($oids) echo("APC PowerNet-MIB Phase ");
+    $type = "apc";
+    $precision = "10";
+    foreach (explode("\n", $oids) as $data)
+    { 
+      $data = trim($data);
+      if ($data)
+      { 
+        list($oid,$kind) = explode(" ", $data);
+        $split_oid = explode('.',$oid);
+        $index = $split_oid[count($split_oid)-1];
+        
+        $current_oid   = "1.3.6.1.4.1.318.1.1.1.4.3.4.0";
+        
+        $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;         
+        
+        $descr     = "Output";
+        
+        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+      }
+    }
+  }
+
+  unset($oids);
 }
 
 ?>

@@ -43,11 +43,17 @@ foreach (explode("\n", $ipNetToMedia_data) as $data)
       dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=?',array($interface['port_id'],$ip));
       echo(".");
     }
-    else
+    elseif (isset($interface['port_id'])) 
     {
       echo("+");
     #echo("Add MAC $mac\n");
-      dbInsert(array('port_id' => $interface['port_id'], 'mac_address' => $clean_mac, 'ipv4_address' => $ip), 'ipv4_mac');
+      $insert_data = array(
+        'port_id' => $interface['port_id'],
+        'mac_address' => $clean_mac,
+        'ipv4_address' => $ip
+      );
+
+      dbInsert($insert_data, 'ipv4_mac');
     }
   }
 }
