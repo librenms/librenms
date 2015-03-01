@@ -5,4 +5,4 @@ imports:
 
 # FIXME: find a way to keep excluded_paths list sorted
 filter:
-    excluded_paths: [ html/includes/geshi/*, html/includes/jpgraph/*, html/js/bootstrap*, html/js/jqplot/*, html/js/jquery.cycle*, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/*, html/css/bootstrap*, html/includes/Slim/*, html/css/toastr*, html/js/toastr*, html/js/datetime/*, html/js/moment/*, html/js/hogan*, html/js/jquery*, html/js/overlib_mini*, html/js/tagmanager.js, html/js/typeahead.min.js ]
+    excluded_paths: [ html/includes/geshi/*, html/includes/jpgraph/*, html/js/bootstrap*, html/js/jqplot/*, html/js/jquery.cycle*, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/*, html/css/bootstrap*, html/includes/Slim/*, html/css/toastr*, html/js/toastr*, html/js/datetime/*, html/js/moment/*, html/js/hogan*, html/js/jquery*, html/js/overlib_mini*, html/js/tagmanager.js, html/js/typeahead.min.js, includes/console_color.php, incluldes/console_table.php ]
