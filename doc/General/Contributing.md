@@ -80,6 +80,8 @@ General Guidelines
   able.  Collaborating in real time makes the coordination of contributions
   easier.
 
+- Ensure you read the Code Guidelines documention and understand the code style that should be adhered to [6]. 
+
 
 Integrating other code
 ----------------------
@@ -196,3 +198,4 @@ git push origin issue-####
 "Observium License"
 [5]: https://github.com/librenms/librenms/blob/master/AUTHORS.md
 "LibreNMS contributor list"
+[6]: https://github.com/librenms/librenms/blob/master/doc/Developing/Code-Guidelines.md
