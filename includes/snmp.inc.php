@@ -58,7 +58,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   {
     list($oid,$value) = explode("=", $entry);
     $oid = trim($oid); $value = trim($value);
-    list($oid, $index) = explode(".", $oid);
+    list($oid, $index) = explode(".", $oid,2); //this is more generic
     if (!strstr($value, "at this OID") && isset($oid) && isset($index))
     {
       $array[$index][$oid] = $value;
@@ -771,7 +771,17 @@ function snmp_gen_auth (&$device)
 
   if ($device['snmpver'] === "v3")
   {
-    $cmd = " -v3 -n \"\" -l " . $device['authlevel'];
+        $cmd = ' -v3 ';
+    
+    
+    //add context if exist context
+    if(key_exists('context_name', $device)){
+        $cmd .= ' -n "'.$device['context_name'].'"';
+    }else{
+         $cmd .= ' -n ""';
+    }  
+
+    $cmd .= " -l " . $device['authlevel'];
 
     if ($device['authlevel'] === "noAuthNoPriv")
     {
