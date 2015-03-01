@@ -964,34 +964,6 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin-top: -4px
 }
 
-### qTip stuff
-
-.qtip .qtip-content {
-   padding: 10px;
-   overflow: hidden;
-}
-   
-   .qtip .qtip-content .qtip-title,
-   .qtip-cream .qtip-content .qtip-title {
-  background-color: #F0DE7D;
-   }
-   
-   .qtip-light .qtip-content .qtip-title {
-  background-color: #f1f1f1;
-   }
-
-   .qtip-dark .qtip-content .qtip-title {
-  background-color: #404040;
-   }
-
-   .qtip-red .qtip-content .qtip-title {
-  background-color: #F28279;
-   }
-   
-   .qtip-green .qtip-content .qtip-title {
-  background-color: #B9DB8C;
-   }
-
 /* Navigation Bar */
 
 #menium {
