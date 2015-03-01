@@ -25,7 +25,7 @@ How LibreNMS will be different from Observium:
 - Development decisions will be community-driven.  We want to make software
   that fulfills its users' needs.  See the [ROADMAP][4] for more thoughts
   on our current plans.
-- Development will probably proceed at a slower pace, at least initially.
+- ~~Development will probably proceed at a slower pace, at least initially.~~
 - There are no plans for a paid version, and we don't anticipate this ever
   changing.
 - There are no current plans for paid support, but this may be added later
@@ -36,7 +36,7 @@ How LibreNMS will be different from Observium:
 Reasons why you might want to use Observium instead of LibreNMS:
 - You have a financial investment in Observium and aren't concerned about
   community contributions.
-- You need functionality that has been added to Observium since r3250.
+- ~~You need functionality that has been added to Observium since r3250.~~ The beauty of LibreNMS is that you can contribute missing features.
 - You don't like the [GNU General Public License, version 3][5] or the
   [philosophy of Free Software/copyleft][6] in general.
 
@@ -45,6 +45,7 @@ Reasons why you might want to use LibreNMS instead of Observium:
   investment of time and effort will not be wasted][7].
 - You want to add and experiment with features that are not a priority for
   the Observium developers.  See [CONTRIBUTING][8] for more details.
+- You want to make use of the additional features LibreNMS can offer.
 
 [1]: http://postman.memetic.org/pipermail/observium/2013-October/003915.html
 "Observium edition split announcement"
