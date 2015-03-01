@@ -484,7 +484,6 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
     if (dbFetchCell("SELECT COUNT(processor_id) FROM `processors` WHERE `processor_index` = ? AND `device_id` = ? AND `processor_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
       $insert_data = array(
-        'entPhysicalIndex'    => $entPhysicalIndex,
         'device_id'           => $device['device_id'],
         'processor_descr'     => $descr,
         'processor_index'     => $index,
@@ -495,6 +494,9 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
       );
       if (!empty($hrDeviceIndex)) {
         $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
+      }
+      if( !empty($entPhysicalIndex) ) {
+        $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
       }
 
       $inserted = dbInsert($insert_data, 'processors');

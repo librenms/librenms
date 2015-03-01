@@ -31,7 +31,7 @@ if (is_array($hrDevices))
       }
       else
       {
-        $inserted_rows = dbInsert(array('hrDeviceIndex' => mres($hrDevice['hrDeviceIndex']), 'device_id' => mres($device['device_id']), 'hrDeviceType' => mres($hrDevice['hrDeviceType']),'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']), 'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']), 'hrDeviceErrors' => mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
+        $inserted_rows = dbInsert(array('hrDeviceIndex' => mres($hrDevice['hrDeviceIndex']), 'device_id' => mres($device['device_id']), 'hrDeviceType' => mres($hrDevice['hrDeviceType']),'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']), 'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']), 'hrDeviceErrors' => (int) mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
         echo("+");
         if ($debug) { print_r($hrDevice); echo("$inserted_rows row inserted"); }
       }
