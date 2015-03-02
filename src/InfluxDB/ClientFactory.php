@@ -38,6 +38,9 @@ abstract class ClientFactory
             case 'InfluxDB\\Adapter\\GuzzleAdapter':
                 $adapter = new $adapterName(new GuzzleClient($options["adapter"]["options"]), $adapterOptions);
                 break;
+            case 'InfluxDB\\Adapter\\HttpAdapter':
+                $adapter = new $adapterName($adapterOptions, new GuzzleClient($options["adapter"]["options"]));
+                break;
             default:
                 throw new \InvalidArgumentException("Missing adapter {$adapter}");
         }
