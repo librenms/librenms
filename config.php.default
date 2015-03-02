@@ -41,5 +41,3 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 $config['poller-wrapper']['alerter'] = FALSE;
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
-
-?>
