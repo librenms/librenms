@@ -61,12 +61,13 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @group factory
      * @group tcp
+     * @dataProvider getTcpAdapters
      */
-    public function testCreateTcpClient()
+    public function testCreateTcpClient($adapter)
     {
         $options = [
             "adapter" => [
-                "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
+                "name" => $adapter,
             ],
             "options" => [
                 "host" => "127.0.0.1",
@@ -78,21 +79,30 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $client = ClientFactory::create($options);
         $this->assertInstanceOf("InfluxDB\\Client", $client);
 
-        $this->assertInstanceOf("InfluxDB\\Adapter\\GuzzleAdapter", $client->getAdapter());
+        $this->assertInstanceOf($adapter, $client->getAdapter());
         $this->assertEquals("127.0.0.1", $client->getAdapter()->getOptions()->getHost());
         $this->assertEquals("user", $client->getAdapter()->getOptions()->getUsername());
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
     }
 
+    public function getTcpAdapters()
+    {
+        return [
+            ["InfluxDB\\Adapter\\GuzzleAdapter"],
+            ["InfluxDB\\Adapter\\HttpAdapter"],
+        ];
+    }
+
     /**
      * @group factory
      * @group filters
+     * @dataProvider getTcpAdapters
      */
-    public function testCreateTcpClientWithFilter()
+    public function testCreateTcpClientWithFilter($adapter)
     {
         $options = [
             "adapter" => [
-                "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
+                "name" => $adapter,
             ],
             "options" => [
                 "host" => "127.0.0.1",
@@ -109,7 +119,7 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $client = ClientFactory::create($options);
         $this->assertInstanceOf("InfluxDB\\Client", $client);
 
-        $this->assertInstanceOf("InfluxDB\\Adapter\\GuzzleAdapter", $client->getAdapter());
+        $this->assertInstanceOf($adapter, $client->getAdapter());
         $this->assertEquals("127.0.0.1", $client->getAdapter()->getOptions()->getHost());
         $this->assertEquals("user", $client->getAdapter()->getOptions()->getUsername());
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
