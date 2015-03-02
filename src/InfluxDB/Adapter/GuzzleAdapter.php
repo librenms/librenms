@@ -5,8 +5,10 @@ use GuzzleHttp\Client;
 use InfluxDB\Options;
 
 /**
- * Integration of Guzzle HttpClient how InfluxDB client adapter
- * @link http://guzzle.readthedocs.org/en/latest/
+ * Class GuzzleAdapter
+ * @package InfluxDB\Adapter
+ *
+ * @deprecated
  */
 class GuzzleAdapter implements AdapterInterface, QueryableInterface
 {
