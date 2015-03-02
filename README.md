@@ -77,20 +77,27 @@ $client = new Client();
 $client->setAdapter($adapter);
 ```
 
-### Using HTTP Adapter
+### Using HTTP Adapters
 
 Actually Guzzle is used as HTTP client library
 
 ```php
 <?php
-$guzzle = new \GuzzleHttp\Client();
 
 $options = new Options();
-$adapter = new GuzzleAdapter($guzzle, $options);
+$adapter = new HttpAdapter($options);
 
 $client = new Client();
 $client->setAdapter($adapter);
 ```
+
+#### Supported types of exceptions
+
+* InfluxGeneralException
+* InfluxAuthorizationException (extends InfluxGeneralException)
+* InfluxBadResponseException (extends InfluxGeneralException)
+* InfluxNoSeriesException (extends InfluxGeneralException)
+* InfluxUnexpectedResponseException (extends InfluxGeneralException)
 
 ### Create your client with the factory method
 
@@ -100,7 +107,7 @@ reason you can you the factory method provided with the library.
 ```php
 $options = [
     "adapter" => [
-        "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
+        "name" => "InfluxDB\\Adapter\\HttpAdapter",
         "options" => [
             // guzzle options
         ],
@@ -144,7 +151,7 @@ $influx->query("select * from mine", "s"); // with time_precision
 ```
 
 You can query the database only if the adapter is queryable (implements
-`QueryableInterface`), actually `GuzzleAdapter`.
+`QueryableInterface`), actually `HttpAdapter`.
 
 The adapter returns the json decoded body of the InfluxDB response, something
 like:

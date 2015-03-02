@@ -4,8 +4,18 @@ namespace InfluxDB;
 use Zend\Stdlib\Hydrator\ClassMethods;
 use GuzzleHttp\Client as GuzzleClient;
 
+/**
+ * Create your static client
+ */
 abstract class ClientFactory
 {
+    /**
+     * Create new client
+     * @param array $options
+     * @return Client
+     * @throws InvalidArgumentException If not exist adapter name
+     * or not find adapter
+     */
     public static function create(array $options)
     {
         $defaultOptions = [
@@ -37,6 +47,9 @@ abstract class ClientFactory
                 break;
             case 'InfluxDB\\Adapter\\GuzzleAdapter':
                 $adapter = new $adapterName(new GuzzleClient($options["adapter"]["options"]), $adapterOptions);
+                break;
+            case 'InfluxDB\\Adapter\\HttpAdapter':
+                $adapter = new $adapterName($adapterOptions, new GuzzleClient($options["adapter"]["options"]));
                 break;
             default:
                 throw new \InvalidArgumentException("Missing adapter {$adapter}");
