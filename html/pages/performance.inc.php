@@ -19,7 +19,7 @@ $perf_tabs = array(array("name" => 'Pollers', 'icon' => 'clock_link'));
 foreach ($perf_tabs as $tab) {
     echo('
             <li>
-                <a href="/performance/'. lcfirst($tab["name"]) .'">
+                <a href="/performance/tab='. lcfirst($tab["name"]) .'">
                    <img src="images/16/'. $tab["icon"] .'.png" align="absmiddle" border="0"> ' . $tab["name"] . '
                 </a>
             </li>');
