@@ -60,7 +60,7 @@ if ($_SESSION['userlevel'] >= '5')
 }
 $count_query = "SELECT COUNT(time_logged) $query";
 $count = dbFetchCell($count_query,$param);
-$full_query = "SELECT D.device_id,name,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate $query LIMIT $start,$numresults";
+$full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate $query LIMIT $start,$numresults";
             echo('<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
