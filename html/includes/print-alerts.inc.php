@@ -19,20 +19,31 @@ echo("<td>".htmlspecialchars($alert_entry['name']) . "</td>");
 
 if ($alert_state!='') {
     if ($alert_state=='0') {
-        echo("<td><b><span class='glyphicon glyphicon-ok' style='color:green'></span> Ok</b></td>");
+        $glyph_icon = 'ok';
+        $glyph_color = 'green';
+        $text = 'Ok';
     }
     elseif ($alert_state=='1') {
-        echo("<td><b><span class='glyphicon glyphicon-remove' style='color:red'></span> Alert</b></td>");
+        $glyph_icon = 'remove';
+        $glyph_color = 'red';
+        $text = 'Alert';
     }
     elseif ($alert_state=='2') {
-        echo("<td><b><span class='glyphicon glyphicon-info-sign' style='color:lightgrey'></span> Ack</b></td>");
+        $glyph_icon = 'info-sign';
+        $glyph_color = 'lightgrey';
+        $text = 'Ack';
     }
     elseif ($alert_state=='3') {
-        echo("<td><b><span class='glyphicon glyphicon-arrow-down' style='color:orange'></span> Worse</b></td>");
+        $glyph_icon = 'arrow-down';
+        $glyph_color = 'orange';
+        $text = 'Worse';
     }
     elseif ($alert_state=='4') {
-        echo("<td><b><span class='glyphicon glyphicon-arrow-up' style='color:khaki'></span> Better</b></td>");
+        $glyph_icon = 'arrow-up';
+        $glyph_color = 'khaki';
+        $text = 'Better';
     }
+    echo("<td><b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b></td>");
 }
 
 echo("</tr>");
