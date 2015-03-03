@@ -17,20 +17,20 @@ if(isset($vars['state']))
   }
 }
 
-if (isset($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
-if (isset($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
-if (isset($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
-if (isset($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
-if (isset($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
-if (isset($vars['type']))     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
-if (isset($vars['state']))    {
+if (!empty($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
+if (!empty($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
+if (!empty($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
+if (!empty($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
+if (!empty($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
+if (!empty($vars['type']))     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
+if (!empty($vars['state']))    {
   $where .= " AND status= ?";       $sql_param[] = $state;
   $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
 }
-if (isset($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
-if (isset($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
-if (isset($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
-if (isset($vars['location'])) { $location_filter = $vars['location']; }
+if (!empty($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
+if (!empty($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
+if (!empty($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
+if (!empty($vars['location'])) { $location_filter = $vars['location']; }
 
 $pagetitle[] = "Devices";
 
