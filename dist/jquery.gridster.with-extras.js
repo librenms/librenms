@@ -1,6 +1,6 @@
-/*! gridster.js - v0.5.6 - 2014-09-25
+/*! gridster.js - v0.5.6 - 2015-03-03
 * http://gridster.net/
-* Copyright (c) 2014 ducksboard; Licensed MIT */
+* Copyright (c) 2015 ducksboard; Licensed MIT */
 
 ;(function(root, factory) {
 
@@ -1686,7 +1686,7 @@
     *  than the original.
     */
     fn.register_widget = function($el) {
-        var isDOM = $el instanceof jQuery;
+        var isDOM = $el instanceof $;
         var wgd = isDOM ? this.dom_to_coords($el) : $el;
         var posChanged = false;
         isDOM || ($el = wgd.el);
