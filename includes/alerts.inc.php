@@ -38,7 +38,7 @@ function GenSQL($rule) {
 			$rule = str_replace($opt,$tmpp[0].'.'.$tmpp[1],$rule);
 		}
 	}
-	$tables = array_unique($tables);
+	$tables = array_keys(array_flip($tables));
 	$x = sizeof($tables);
 	$i = 0;
 	$join = "";
