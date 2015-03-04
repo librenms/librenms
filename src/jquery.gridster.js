@@ -327,7 +327,7 @@
     * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
     *  the widget that was just created.
     */
-    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size) {
+    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size, callback) {
         var pos;
         size_x || (size_x = 1);
         size_y || (size_y = 1);
@@ -371,7 +371,7 @@
 
         this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
 
-        return $w.fadeIn();
+        return $w.fadeIn({complete: function () { if(callback) callback.call(this); }});
     };
 
 
