@@ -84,7 +84,7 @@ if ($device['os'] == "apc")
     echo($oids."\n");
   }
 
-  if ($oids)
+  if ($oids !== false)
   {
     echo("APC Portable Supply Temp ");
     list($oid,$current_raw) = explode(' ',$oids);
@@ -92,7 +92,7 @@ if ($device['os'] == "apc")
     $current = $current_raw / $precision;
     $sensorType = "apc";
     $index = 0;
-    if ($set_oids) {
+    if ($set_oids !== false) {
        list(, $set_point_raw) = explode(' ',$set_oids);
        $set_point = $set_point_raw / $precision;
        $descr = "Supply Temp - Setpoint: ".$set_point."&deg;C";
@@ -109,7 +109,7 @@ if ($device['os'] == "apc")
     echo($oids."\n");
   }
 
-  if ($oids)
+  if ($oids !== false)
   {
     echo("APC Portable Return Temp ");
     list($oid,$current_raw) = explode(' ',$oids);
@@ -117,7 +117,7 @@ if ($device['os'] == "apc")
     $current = $current_raw / $precision;
     $sensorType = "apc";
     $index = 1;
-    if ($set_oids) {
+    if ($set_oids !== false) {
        list(, $set_point_raw) = explode(' ',$set_oids);
        $set_point = $set_point_raw / $precision;
        $descr = "Return Temp - Setpoint: ".$set_point."&deg;C";
@@ -134,7 +134,7 @@ if ($device['os'] == "apc")
     echo($oids."\n");
   }
 
-  if ($oids)
+  if ($oids !== false)
   {
     echo("APC Portable Remote Temp ");
     list($oid,$current_raw) = explode(' ',$oids);
@@ -142,7 +142,7 @@ if ($device['os'] == "apc")
     $current = $current_raw / $precision;
     $sensorType = "apc";
     $index = 2;
-    if ($set_oids) {
+    if ($set_oids !== false) {
        list(, $set_point_raw) = explode(' ',$set_oids);
        $set_point = $set_point_raw / $precision;
        $descr = "Remote Temp - Setpoint: ".$set_point."&deg;C";
