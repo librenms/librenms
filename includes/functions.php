@@ -249,14 +249,11 @@ function delete_device($id)
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
 
-  dbDelete('devices', "`device_id` =  ?", array($id));
-
-  $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog',
-                         'syslog', 'ports', 'services', 'toner', 'frequency', 'current', 'sensors','ciscoASA');
-
-  foreach ($device_tables as $table)
-  {
-    dbDelete($table, "`device_id` =  ?", array($id));
+  $fields = array('device_id','host');
+  foreach( $fields as $field ) {
+    foreach( dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?",array($config['db_name'],$field)) as $table ) {
+      dbDelete($table, "`$field` =  ?", array($id));
+    }
   }
 
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
