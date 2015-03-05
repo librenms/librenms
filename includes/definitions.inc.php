@@ -30,11 +30,15 @@ function create_array(&$arr,$string,$data,$type)
     {
       if($type == 'multi')
       {
-        $p[$key]=explode(',',$data);
+        if (!isset($p[$key])) {
+            $p[$key]=explode(',',$data);
+        }
       }
       elseif($type == 'single')
       {
-        $p[$key]=$data;
+        if (!isset($p[$key])) {
+          $p[$key]=$data;
+        }
       }
     }
     else if (is_array($p))
@@ -52,7 +56,7 @@ $single_config = dbFetchRows("SELECT `config_name`, `config_value` FROM  `config
 foreach ($single_config as $config_data)
 {
   $tmp_name = $config_data['config_name'];
-  if(!array_key_exists($config[$tmp_name], $config_vars))
+  if(!isset($config[$tmp_name]))
   {
     $config[$tmp_name] = $config_data['config_value'];
   }
@@ -63,7 +67,7 @@ $array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` 
 foreach ($array_config as $config_data)
 {
   $tmp_name = $config_data['config_name'];
-  if(!array_key_exists($config[$tmp_name], $config_vars))
+  if(!isset($config[$tmp_name]))
   {
     $config[$tmp_name] = explode(',',$config_data['config_value']);
   }
@@ -82,14 +86,9 @@ $config_vars = get_defined_vars();
 $single_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'single-array' AND `config_disabled` =  '0' GROUP BY config_name");
 foreach ($single_array_config as $config_data)
 {
-//  $tmp_name = explode(',',$config_data['config_name']);
-//  $new_name = implode('][',$tmp_name);
-//  if(!array_key_exists($config["{$tmp_name}"], $config_vars))
-//  {
-//    $config["{$new_name}"] = $config_data['config_value'];
-//  }
   create_array($config,$config_data['config_name'],$config_data['config_value'],'single');
 }
+unset($config_vars);
 
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
