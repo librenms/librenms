@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
-    die('ERROR: You need to be admin');
-}
+if(is_admin() !== false) {
 
 ?>
 
@@ -229,3 +227,9 @@ $('#rule-submit').click('', function(e) {
 });
 
 </script>
+
+<?php
+
+}
+
+?>
