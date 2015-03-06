@@ -142,9 +142,6 @@ if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<?php
-if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
-?>
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
@@ -340,6 +337,24 @@ if (is_array($sql_debug) && is_array($php_debug)) {
 }
 
 ?>
-
 </body>
+<?php
+
+if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
+    $refresh = $config['page_refresh'] * 1000;
+    echo('<script> type="text/javascript">
+        $(document).ready(function() {
+            setInterval("refreshPage()", '. $refresh .');
+        });
+
+        function refreshPage() {
+            location.reload();
+        }
+
+    </script>');
+
+}
+
+?>
+
 </html>
