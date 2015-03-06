@@ -1,7 +1,7 @@
 {
   "name": "gridster",
   "homepage": "https://github.com/DecksterTeam/gridster.js",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "dependencies": {
     "jquery": "~1.11.2"
   },
