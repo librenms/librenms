@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.2 - 2015-02-23
+/*! gridster.js - v0.6.2 - 2015-03-06
 * http://gridster.net/
 * Copyright (c) 2015 decksterteam; Licensed  */
 
@@ -1174,7 +1174,7 @@
     * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
     *  the widget that was just created.
     */
-    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size) {
+    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size, callback) {
         var pos;
         size_x || (size_x = 1);
         size_y || (size_y = 1);
@@ -1218,7 +1218,7 @@
 
         this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
 
-        return $w.fadeIn();
+        return $w.fadeIn({complete: function () { if(callback) callback.call(this); }});
     };
 
 
@@ -1348,7 +1348,7 @@
      *  representing the widget.
      * @param {Number} size_x The number of cols that will occupy the widget.
      * @param {Number} size_y The number of rows that will occupy the widget.
-     * @param {Function} [callback] Function executed when the widget is removed.
+     * @param {Function} [callback] Function executed when the widget is expanded.
      * @return {HTMLElement} Returns $widget.
      */
     fn.expand_widget = function($widget, size_x, size_y, callback) {
@@ -1392,7 +1392,7 @@
      * @method expand_widget
      * @param {HTMLElement} $widget The jQuery wrapped HTMLElement
      *  representing the widget.
-     * @param {Function} [callback] Function executed when the widget is removed.
+     * @param {Function} [callback] Function executed when the widget is collapsed.
      * @return {HTMLElement} Returns $widget.
      */
     fn.collapse_widget = function($widget, callback) {
@@ -1407,6 +1407,44 @@
         row: wgd.row,
         size_x: size_x,
         size_y: size_y
+      };
+
+      this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
+
+      this.set_dom_grid_height();
+      this.set_dom_grid_width();
+
+      if (callback) {
+        callback.call(this, new_grid_data.size_x, new_grid_data.size_y);
+      }
+
+      return $widget;
+    };
+
+    /**
+     * Fit the size of a widget to its content (best guess)
+     *
+     * @method fit_to_content
+     * @param $widget  {HTMLElement} $widget The jQuery wrapped HTMLElement
+     * @param max_cols {Number} max number of columns a widget can take up
+     * @param max_rows {Number} max number of rows a widget can take up
+     * @param {Function} [callback] Function executed when the widget is fit to content.
+     * @return {HTMLElement} Returns $widget.
+     */
+    fn.fit_to_content = function($widget, max_cols, max_rows, callback) {
+      var wgd = $widget.coords().grid;
+      var width = this.$wrapper.width();
+      var height = this.$wrapper.height();
+      var col_size = this.options.widget_base_dimensions[0] + (2 * this.options.widget_margins[0]);
+      var row_size = this.options.widget_base_dimensions[1] + (2 * this.options.widget_margins[1]);
+      var best_cols = Math.ceil((width + (2 * this.options.widget_margins[0])) / col_size);
+      var best_rows = Math.ceil((height + (2 * this.options.widget_margins[1])) / row_size);
+
+      var new_grid_data = {
+        col: wgd.col,
+        row: wgd.row,
+        size_x: Math.min(max_cols, best_cols),
+        size_y: Math.min(max_rows, best_rows)
       };
 
       this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
@@ -2308,9 +2346,10 @@
         var size_x = Math.max(1, this.resize_initial_sizex + inc_units_x);
         var size_y = Math.max(1, this.resize_initial_sizey + inc_units_y);
 
-        var max_cols = (this.container_width / this.min_widget_width) -
-            this.resize_initial_col + 1;
-        var limit_width = (max_cols * this.min_widget_width) + (this.is_responsive() ? (max_cols - 1) * margin_x : -(margin_x * 2));
+        // Max number of cols this widget can be in width
+        var max_cols = Math.floor((this.container_width / this.min_widget_width) - this.resize_initial_col + 1);
+
+        var limit_width = (max_cols * this.min_widget_width) + ((max_cols - 1) * margin_x);
 
         size_x = Math.max(Math.min(size_x, max_size_x), min_size_x);
         size_x = Math.min(max_cols, size_x);
@@ -4074,6 +4113,36 @@
 
 
     /**
+     * Resize dimensions of widgets in grid based on given options
+     *
+     * @method resize_widget_dimensions
+     * @param options
+     * @returns {Gridster}
+     */
+    fn.resize_widget_dimensions = function(options) {
+      if (options.widget_margins) {
+        this.options.widget_margins = options.widget_margins;
+      }
+
+      if (options.widget_base_dimensions) {
+        this.options.widget_base_dimensions = options.widget_base_dimensions;
+      }
+
+      this.$widgets.each($.proxy(function(i, widget) {
+        var $widget = $(widget);
+        this.resize_widget($widget);
+      }, this));
+
+      this.generate_grid_and_stylesheet();
+      this.get_widgets_from_DOM();
+      this.set_dom_grid_height();
+      this.set_dom_grid_width();
+
+      return this;
+    };
+
+
+    /**
     * Get all widgets in the DOM and register them.
     *
     * @method get_widgets_from_DOM
@@ -4100,6 +4169,39 @@
 
 
     /**
+     * Helper function used to set the current number of columns in the grid
+     *
+     * @param wrapper
+     */
+    fn.set_num_columns = function (wrapper) {
+
+      var max_cols = this.options.max_cols;
+
+      var cols = Math.floor(wrapper / (this.min_widget_width + this.options.widget_margins[0])) +
+      this.options.extra_cols;
+
+      var actual_cols = this.$widgets.map(function() {
+        return $(this).attr('data-col');
+      }).get();
+
+      //needed to pass tests with phantomjs
+      actual_cols.length || (actual_cols = [0]);
+
+      var min_cols = Math.max.apply(Math, actual_cols);
+
+      this.cols = Math.max(min_cols, cols, this.options.min_cols);
+
+      if (max_cols !== Infinity && max_cols >= min_cols && max_cols < this.cols) {
+        this.cols = max_cols;
+      }
+
+      if (this.drag_api) {
+        this.drag_api.set_limits((this.cols * this.min_widget_width) + ((this.cols + 1) * this.options.widget_margins[0]));
+      }
+    };
+
+
+    /**
     * Calculate columns and rows to be set based on the configuration
     *  parameters, grid dimensions, etc ...
     *
@@ -4108,25 +4210,8 @@
     */
     fn.generate_grid_and_stylesheet = function() {
         var aw = this.$wrapper.width();
-        var max_cols = this.options.max_cols;
 
-        var cols = Math.floor(aw / this.min_widget_width) +
-                   this.options.extra_cols;
-
-        var actual_cols = this.$widgets.map(function() {
-            return $(this).attr('data-col');
-        }).get();
-
-        //needed to pass tests with phantomjs
-        actual_cols.length || (actual_cols = [0]);
-
-        var min_cols = Math.max.apply(Math, actual_cols);
-
-        this.cols = Math.max(min_cols, cols, this.options.min_cols);
-
-        if (max_cols !== Infinity && max_cols >= min_cols && max_cols < this.cols) {
-            this.cols = max_cols;
-        }
+        this.set_num_columns(aw);
 
         // get all rows that could be occupied by the current widgets
         var max_rows = this.options.extra_rows;
