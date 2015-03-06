@@ -1,3 +1,12 @@
+<a name="v0.6.3"></a>
+### v0.6.3 (2015-03-06)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * fixing resize limits when in fixed width mode feature(gridster): added fix_to_co ([6bb47dc1](http://github.com/DecksterTeam/gridster.js/commit/6bb47dc1ce36aef670b2acb7c244ec5f4ea440e0))
+
 <a name="v0.6.2"></a>
 ### v0.6.2 (2015-02-23)
 
