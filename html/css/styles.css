@@ -1572,6 +1572,7 @@ tr.search:nth-child(odd) {
 .tt-dropdown-menu
 {
     min-width: 500px;
+    left: -400px !important;
 }
 
 .twitter-typeahead .tt-hint {
