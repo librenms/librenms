@@ -324,13 +324,18 @@
     * @param {Array} [max_size] max_size Maximun size (in units) for width and height.
     * @param {Array} [min_size] min_size Minimum size (in units) for width and height.
     * @param {string} [model_id] reference to backbone model.
+    * @param {Boolean} [fade_in] fade the widget into view immediately.
     * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
     *  the widget that was just created.
     */
-    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size, model_id) {
+    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size, model_id, fade_in) {
         var pos;
         size_x || (size_x = 1);
         size_y || (size_y = 1);
+
+	    if ( undefined === fade_in ) {
+		    fade_in = true;
+	    }
 
         if (!col & !row) {
             pos = this.next_position(size_x, size_y);
@@ -373,7 +378,11 @@
 
         this.drag_api.set_limits(this.cols * this.min_widget_width);
 
-        return $w.fadeIn();
+	    if ( fade_in ) {
+		    return $w.fadeIn();
+	    } else {
+		    return $w;
+	    }
     };
 
 
