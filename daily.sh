@@ -4,7 +4,7 @@ cd $(dirname $0) || exit 1
 
 if [ $(php daily.php -f update) -eq 1 ]; then 
   git pull --quiet
-  php includes/sql-schema/update.php
+  php includes/update.php
 fi
 
 php daily.php -f syslog
