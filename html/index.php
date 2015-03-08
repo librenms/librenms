@@ -342,15 +342,55 @@ if (is_array($sql_debug) && is_array($php_debug)) {
 
 if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
     $refresh = $config['page_refresh'] * 1000;
-    echo('<script> type="text/javascript">
+    echo('<script type="text/javascript">
         $(document).ready(function() {
-            setInterval("refreshPage()", '. $refresh .');
+
+           $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+           var Countdown = {
+               sec: '. $config['page_refresh'] .',
+
+               Start: function() {
+                   var cur = this;
+                   this.interval = setInterval(function() {
+                       $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+                       cur.sec -= 1;
+                       display_time = cur.sec;
+                       if (display_time == 0) {
+                           location.reload();
+                       }
+                       if (display_time % 1 === 0 && display_time <= 300) {
+                           $("#countdown_timer").html("<img src=\"images/16/clock.png\"> Refresh in " + display_time);
+                       }
+                   }, 1000);
+               },
+
+               Pause: function() {
+                   clearInterval(this.interval);
+                   $("#countdown_timer_status").html("<img src=\"images/16/clock_play.png\"> Resume");
+                   delete this.interval;
+               },
+
+               Resume: function() {
+                   if (!this.interval) this.Start();
+               }
+           };
+
+           Countdown.Start();
+
+           $("#countdown_timer_status").click("", function(event) {
+               event.preventDefault();
+               if (Countdown.interval) {
+                   Countdown.Pause();
+               } else {
+                   Countdown.Resume();
+               }
+           });
+
+           $("#countdown_timer").click("", function(event) {
+               event.preventDefault();
+           });
+
         });
-
-        function refreshPage() {
-            location.reload();
-        }
-
     </script>');
 
 }
