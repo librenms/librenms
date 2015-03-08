@@ -142,9 +142,6 @@ if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<?php
-if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
-?>
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
@@ -340,6 +337,64 @@ if (is_array($sql_debug) && is_array($php_debug)) {
 }
 
 ?>
-
 </body>
+<?php
+
+if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
+    $refresh = $config['page_refresh'] * 1000;
+    echo('<script type="text/javascript">
+        $(document).ready(function() {
+
+           $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+           var Countdown = {
+               sec: '. $config['page_refresh'] .',
+
+               Start: function() {
+                   var cur = this;
+                   this.interval = setInterval(function() {
+                       $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+                       cur.sec -= 1;
+                       display_time = cur.sec;
+                       if (display_time == 0) {
+                           location.reload();
+                       }
+                       if (display_time % 1 === 0 && display_time <= 300) {
+                           $("#countdown_timer").html("<img src=\"images/16/clock.png\"> Refresh in " + display_time);
+                       }
+                   }, 1000);
+               },
+
+               Pause: function() {
+                   clearInterval(this.interval);
+                   $("#countdown_timer_status").html("<img src=\"images/16/clock_play.png\"> Resume");
+                   delete this.interval;
+               },
+
+               Resume: function() {
+                   if (!this.interval) this.Start();
+               }
+           };
+
+           Countdown.Start();
+
+           $("#countdown_timer_status").click("", function(event) {
+               event.preventDefault();
+               if (Countdown.interval) {
+                   Countdown.Pause();
+               } else {
+                   Countdown.Resume();
+               }
+           });
+
+           $("#countdown_timer").click("", function(event) {
+               event.preventDefault();
+           });
+
+        });
+    </script>');
+
+}
+
+?>
+
 </html>

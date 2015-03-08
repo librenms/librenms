@@ -452,12 +452,19 @@ if ($_SESSION['userlevel'] >= '10')
              <li><a href="api-access/"><img src="images/16/script.png" /> API Settings</a></li>
              <li><a href="https://github.com/librenms/librenms/wiki/API-Docs" target="_blank"><img src="images/16/report.png" /> API Documentation</a></li>
            </ul>
+           </li>
            <li role="presentation" class="divider"></li>');
     } ?>
 <?php
 if ($_SESSION['authenticated'])
 {
   echo('
+           <li class="dropdown-submenu">
+               <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+               <ul class="dropdown-menu scrollable-menu">
+                   <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+               </ul>
+           </li>
            <li><a href="logout/"><img src="images/16/lock_go.png" with="16" height="16" alt="Logout"> Logout</a></li>
 ');
 }
