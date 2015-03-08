@@ -13,8 +13,7 @@ any other means), you assert that:
 - You have not viewed code written under the [Observium License][4] in the
   production of contributed code.  This includes all Observium code after
   Subversion revision 3250 and any patches or other code covered by that
-  license from Observium web sites after Tue May 29 13:08:01 2012 +0000 (the
-  date of Observium r3250).
+  license after Tue May 29 13:08:01 2012 +0000 (the date of Observium r3250).
 
 To agree with these assertions, please submit a github pull request against
 [AUTHORS.md][5] including your name, email address, and github user id in
@@ -80,7 +79,8 @@ General Guidelines
   able.  Collaborating in real time makes the coordination of contributions
   easier.
 
-- Ensure you read the Code Guidelines documention and understand the code style that should be adhered to [6]. 
+- Ensure you read the Code Guidelines documention and understand the code
+  style that should be adhered to [6].
 
 
 Integrating other code
@@ -89,7 +89,8 @@ Integrating other code
 Giving credit where credit is due is critical to the Free Software
 philosophy.  If you use code from somewhere else, even if it's trivial,
 be sure to note this as a comment in the code (preferably) or the commit
-message.
+message.  Accurate attribution is crucial to our success as a Free Software
+project.
 
 - To incorporate larger blocks of code from third parties (e.g. JavaScript
   libraries):
@@ -182,7 +183,8 @@ git pull
 git checkout issue-####
 git pull
 ````
-- Push your changes to your remote git hub branch so you can submit a pull from your issue-#### branch:
+- Push your changes to your remote git hub branch so you can submit a pull
+  from your issue-#### branch:
 ````
 git push origin issue-####
 ````
