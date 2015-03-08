@@ -1,6 +1,6 @@
 <?php
 
-echo("Bettery Charge: ");
+echo("Battery Charge: ");
 
 // Include all discovery modules
 
