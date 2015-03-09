@@ -2,7 +2,7 @@
 
 if (!$os)
 {
-  if (strstr($sysDescr, "HP V1910-")) { $os = "hp"; }
+  if(preg_match('/HP [a-zA-Z0-9-]+ Switch Software Version/',$string)) { $os = "hp"; }
 }
 
 ?>
