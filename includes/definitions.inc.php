@@ -982,6 +982,12 @@ $config['os'][$os]['text']              = "Hikvision";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "hikvision";
 
+$os = "hp";
+$config['os'][$os]['text']              = "HP";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+$config['os'][$os]['type']              = "network";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
