@@ -117,6 +117,10 @@ Change `librenms.example.com` to the appropriate hostname for your domain, then 
     a2enmod rewrite
     service apache2 restart
 
+If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site setup in Ubuntu:
+
+    a2dissite 000-default
+
 (To get to your LibreNMS install externally, you'll also need add it to your DNS or hosts file.)
 
 ### Manual vs. web installer ###
