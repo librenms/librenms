@@ -26,7 +26,7 @@ if (isset($data[149]['entPhysicalName']) && !empty($data[149]['entPhysicalName']
 }
 
 if (isset($data[10]) && !empty($data[10]['entPhysicalSerialNum'])) {
-        $serial = $data[10]['entPhysicalSerialNum'];
+    $serial = $data[10]['entPhysicalSerialNum'];
 }
 
 ?>
