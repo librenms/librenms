@@ -1,11 +1,12 @@
-Feb 2015
- Bug fixes
+###Feb 2015
+
+####Bug fixes
  - Removed header redirect causing page load delays (PR436)
  - Fixed stale alerting data (PR475)
  - Fixed api call for port stats to use device_id / hostname (PR478)
  - Work started on ensuring MySQL strict mode is supported (PR521)
 
- Improvements
+####Improvements
  - Added support for Cisco Wireless Controllers (PR422)
  - Updated IRC Bot to support alerting system (PR434)
  - Added new message box to alert when a device hasn't polled for 15 minutes or more (PR435)
@@ -26,16 +27,16 @@ Feb 2015
  - Added Slack support for alert system (PR525)
  - Added new debug for php / sql option to page footer (PR484)
 
-Jan 2015
+###Jan 2015
 
- Bug fixes
+####Bug fixes
  - Reverted chmod to make poller.php executable again (PR394)
  - Fixed duplicate port listing (PR396)
  - Fixed create bill from port page (PR404)
  - Fixed autodiscovery to use $config['mydomain'] correctly (PR423)
  - Fixed mute bug for alerts (PR428)
 
- Improvements
+####Improvements
  - Updated login page visually (PR391)
  - Added Hikvision support (PR393)
  - Added ability to search for packages using unix agent (PR395)
@@ -50,14 +51,14 @@ Jan 2015
  - Updated install docs to cover CentOS7 (PR424)
  - Alerting system updated with more features (PR429, PR430)
 
-Dec 2014
+###Dec 2014
 
- Bug fixes
+####Bug fixes
  - Fixed Global Search box bootstrap (PR357)
  - Fixed display issues when calculating CDR in billing system (PR359)
  - Fixed API route order to resolve get_port_graphs working (PR364)
 
- Improvements
+####Improvements
  - Added new API route to retrieve list of graphs for a device (PR355)
  - Added new API route to retrieve list of port for a device (PR356)
  - Added new API route to retrieve billing info (PR360)
@@ -66,15 +67,15 @@ Dec 2014
  - Added git log link to about page (PR378)
  - Added Two factor authentication (PR383)
 
-Nov 2014
+###Nov 2014
 
- Bug fixes
+####Bug fixes
  - Updated Alcatel-Lucent OmniSwitch detection (PR340)
  - Added fix for DLink port detection (PR347)
  - Fixed BGP session count (PR334)
  - Fixed errors with BGP polling and storing data in RRD (PR346)
 
- Improvements
+####Improvements
  - Added option to clean old perf_times table entries (PR343)
  - Added nginx+php-fpm instructions (PR345)
  - Added BGP route to API (PR335)
@@ -85,9 +86,9 @@ Nov 2014
  - Added VyOS and EdgeOS detection (PR351 / PR352)
  - Documentation style and markdown updates (PR353)
 
-Oct 2014
+###Oct 2014
 
- Bug fixes
+####Bug fixes
  - Fixed displaying device image in device list (PR296)
  - Fixed placement of popups (PR297)
  - Updated authToken response code in API to 401 (PR310)
@@ -102,7 +103,7 @@ Oct 2014
  - Fixed daily.sh not running from outside install directory (cron) (PR328)
  - Removed --no-edit from daily.php git pull (PR309)
 
- Improvements
+####Improvements
  - Added ability to create api tokens (PR294)
  - Added icmp and poller graphs for devices (PR295)
  - Added urldecode/urlencode support for interface names in API (PR298)
@@ -117,50 +118,50 @@ Oct 2014
  - Added icmp / snnmp to device down alerts for debugging (PR324)
  - Added function to page results for large result pages (PR333)
 
-Sep 2014
+###Sep 2014
 
- Bug fixes
+####Bug fixes
  - Updated vtpversion check to fix vlan discovery issues (PR289)
  - Fixed mac address change false positives (PR292)
 
- Improvements
+####Improvements
  - Hide snmp passwords on edit snmp form (PR290)
  - Updates to API (PR291)
 
-Aug 2014
+###Aug 2014
 
- Bug fixes
+####Bug fixes
  - Disk % not showing in health view (PR284)
  - Fixed layout issue for ports list (PR286)
  - Removed session regeneration (PR287)
  - Updated edit button on edit user screen (PR288)
   
- Improvements
+####Improvements
  - Added email field for add user form (PR278)
  - V0 of API release (PR282)
 
-Jul 2014
+###Jul 2014
 
- Bug fixes
+####Bug fixes
  - Fixed RRD creation using MAX twice (PR266)
  - Fixed variables leaking in poller run (PR267)
  - Fixed links to health graphs (PR271)
  - Fixed install docs to remove duplicate snmpd on install (PR276)
 
- Improvements
+####Improvements
  - Added support for Cisco ASA connection graphs (PR268)
  - Updated delete device page (PR270)
 
-Jun 2014
+###Jun 2014
 
- Bug fixes
+####Bug fixes
  - Fixed a couple of DB queries (PR222)
  - Fixes to make interface more mobile friendly (PR227)
  - Fixed link to device on overview apps page (PR228)
  - Fixed missing backticks on SQL queries (PR253 / PR254)
  - Fixed user permissions page (PR265)
 
- Improvements
+####Improvements
  - Updated index page (PR224)
  - Updated global search visually (PR223)
  - Added contributors aggrement (PR225)
@@ -178,9 +179,9 @@ Jun 2014
  - Added validate_device_id function (PR257)
  - Added auto detect of install location (PR259)
 
-Mar 2014
+###Mar 2014
 
- Bug fixes
+####Bug fixes
  - Removed link to pdf in billing history (PR146)
  - librenms logs now saved in correct location (PR163)
  - Updated pfsense detection (PR182)
@@ -194,7 +195,7 @@ Mar 2014
  - Updated hardware detection for RouterOS (PR217)
  - Restore _GET variables for logging in (PR218)
 
- Improvements
+####Improvements
  - Updated inventory page to use bootstrap (PR141)
  - Updated mac / arp pages to use bootstrap (PR147)
  - Updated devices page to use bootstrap (PR149)
@@ -215,16 +216,16 @@ Mar 2014
  - Added purge options for syslog / eventlog (PR204)
  - Added BGP to global search box (PR205)
 
-Feb 2014
+###Feb 2014
 
- Bug fixes
+####Bug fixes
  - Set poller-wrapper.py to be executable (PR89)
  - Fix device/port down boxes (PR99)
  - Ports set to be ignored honoured for threshold alerts (PR104)
  - Added PasswordHash.php to adduser.php (PR119)
  - build-base.php update to run DB updates (PR128)
 
- Improvements
+####Improvements
  - Added web based installer (PR75)
  - Updated login page design (PR78)
  - Ability to enable / disable topX boxes (PR100)
@@ -236,9 +237,9 @@ Feb 2014
  - Updated device/port/services box to use bootstrap (PR117)
  - Updated eventlog / syslog to use bootstrap (PR132 / PR134)
 
-Jan 2014
+###Jan 2014
 
- Bug fixes
+####Bug fixes
  - Moved location redirect for logout (PR55)
  - Remove debug statements from process_syslog (PR57)
  - Stop print-syslog.inc.php from shortening hostnames (PR62)
@@ -246,25 +247,25 @@ Jan 2014
  - Fixed title being set correctly (PR73)
  - Added documentation to enable billing module (PR74)
 
- Improvements
+####Improvements
  - Deleting devices now asks for confirmation (PR53)
  - Added ARP discovered device name and IP to eventlog (PR54)
  - Initial updated design release (PR59)
  - Added ifAlias script (PR70)
  - Added console ui (PR72)
 
-Nov 2013
+###Nov 2013
 
- Bug fixes
+####Bug fixes
  - Updates to fix arp discovery 
 
- Improvements
+####Improvements
  - Added poller-wrapper (f8debf4)
- - Documentation improvements and additions
+ - Documentation####Improvements and additions
  - Added auto update feature
  - Visual updates
  - License tidy up started
 
-Oct 2013
+###Oct 2013
 
  - Initial release
