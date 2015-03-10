@@ -84,7 +84,7 @@ if ($_SESSION['userlevel'] >= '10') {
 
 foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $devtype) {
     if (empty($devtype['type'])) {
-        $devtype['type'] = 'Generic';
+        $devtype['type'] = 'generic';
     }
     echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['type'] . '.png" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . '</a></li>');
 }
