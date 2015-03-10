@@ -14,7 +14,7 @@ if (count($sensors))
                 <table class="table table-hover table-condensed table-striped">');
   foreach ($sensors as $sensor)
   {
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
     }
