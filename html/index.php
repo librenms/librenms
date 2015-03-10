@@ -142,6 +142,22 @@ if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php
+if (empty($config['favicon'])) {
+?>
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/favicon-152.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/favicon-144.png">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/favicon-120.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/favicon-114.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
+  <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
+  <link rel="icon" href="images/favicon-32.png" sizes="32x32">
+  <meta name="msapplication-TileImage" content="images/favicon-144.png">
+<?php
+} else {
+    echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
+}
+?>
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
@@ -161,9 +177,6 @@ if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page
   <script src="js/typeahead.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
-<?php
-if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
-?>
   <script type="text/javascript">
 
     <!-- Begin
