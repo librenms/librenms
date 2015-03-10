@@ -306,9 +306,9 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
   $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
   foreach ($app_list as $app)
   {
-      if (isset($row['app_type'])) {
-          $image = $config['html_dir']."/images/icons/".$row['app_type'].".png";
-          $icon = (file_exists($image) ? $row['app_type'] : "apps");
+      if (isset($app['app_type'])) {
+          $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
+          $icon = (file_exists($image) ? $app['app_type'] : "apps");
 echo('
           <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
       }
