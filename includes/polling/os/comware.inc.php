@@ -12,5 +12,8 @@ $hardware = snmp_get($device, "sysObjectID.0", "-OQsv", "SNMPv2-MIB:HH3C-PRODUCT
 list(,$version,$features) = explode(",", $poll_device['sysDescr']);
 list(,,,$version) = explode(" ", $version);
 list(,,$features) = explode(" ", $features);
+if (empty($version)) {
+    list($version) = explode("\r", substr($poll_device['sysDescr'], strpos($poll_device['sysDescr'], "Release")+8));
+}
 
 ?>
