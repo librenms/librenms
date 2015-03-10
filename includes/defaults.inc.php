@@ -106,7 +106,6 @@ $config['project_issues']   = "https://github.com/librenms/librenms/issues";
 $config['title_image']      = "";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
-$config['favicon']          = "";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to disable
 $config['front_page']       = "pages/front/default.php";
