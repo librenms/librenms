@@ -38,7 +38,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
     <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a></li>
           <li class="dropdown-submenu">
@@ -75,7 +75,7 @@ if ($_SESSION['userlevel'] >= '10') {
           </ul>
         </li>
         <li class="dropdown">
-          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices<b class="caret"></b></a>
+          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
               <a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a>
@@ -129,7 +129,7 @@ if ($config['show_services'])
 {
 ?>
         <li class="dropdown">
-          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services<b class="caret"></b></a>
+          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a>
           <ul class="dropdown-menu">
             <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
 
@@ -159,7 +159,7 @@ if ($_SESSION['userlevel'] >= '10')
 
     <!-- PORTS -->
         <li class="dropdown">
-          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports<b class="caret"></b></a>
+          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
           <ul class="dropdown-menu">
             <li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
 
@@ -240,7 +240,7 @@ $menu_sensors = $used_sensors;
 ?>
 
         <li class="dropdown">
-          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health<b class="caret"></b></a>
+          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health</a>
           <ul class="dropdown-menu">
             <li><a href="health/metric=mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
             <li><a href="health/metric=processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
@@ -299,7 +299,7 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
 {
 ?>
         <li class="dropdown">
-          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/apps.png" border="0" align="absmiddle" /> Apps<b class="caret"></b></a>
+          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/apps.png" border="0" align="absmiddle" /> Apps</a>
           <ul class="dropdown-menu">
 <?php
 
@@ -329,7 +329,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 ?>
         <li class="dropdown">
-          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing<b class="caret"></b></a>
+          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
           <ul class="dropdown-menu">
 <?php
   $separator = 0;
@@ -393,7 +393,7 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> <img src="images/16/package.png" border="0" alt="Plugins"> Plugins<b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> <img src="images/16/package.png" border="0" alt="Plugins"> Plugins</a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');
@@ -417,8 +417,15 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 
 ?>
 
+    </ul>
+     <form role="search" class="navbar-form navbar-right">
+         <div class="form-group">
+             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+         </div>
+     </form>
+    <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li role="presentation" class="divider"></li>
@@ -475,11 +482,6 @@ if ($_SESSION['authenticated'])
          </ul>
        </li>
      </ul>
-     <form role="search" class="navbar-form navbar-right">
-         <div class="form-group">
-             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
-         </div>
-     </form>
    </div>
  </div>
 </nav>
