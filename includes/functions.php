@@ -236,7 +236,7 @@ function renamehost($id, $new, $source = 'console')
 
 function delete_device($id)
 {
-  global $config;
+  global $config, $debug;
   $ret = '';
 
   $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
@@ -249,19 +249,20 @@ function delete_device($id)
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
 
-  dbDelete('devices', "`device_id` =  ?", array($id));
-
-  $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog',
-                         'syslog', 'ports', 'services', 'toner', 'frequency', 'current', 'sensors','ciscoASA');
-
-  foreach ($device_tables as $table)
-  {
-    dbDelete($table, "`device_id` =  ?", array($id));
+  $fields = array('device_id','host');
+  foreach( $fields as $field ) {
+    foreach( dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?",array($config['db_name'],$field)) as $table ) {
+      $table = $table['table_name'];
+      $entries = (int) dbDelete($table, "`$field` =  ?", array($id));
+      if( $entries > 0 && $debug === true ) {
+        $ret .= "$field@$table = #$entries\n";
+      }
+    }
   }
 
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
 
-  $ret = "Removed device $host";
+  $ret .= "Removed device $host\n";
   return $ret;
 }
 
