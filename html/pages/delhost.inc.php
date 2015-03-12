@@ -23,7 +23,7 @@ if (is_numeric($_REQUEST['id']))
 ');
   if ($_REQUEST['confirm'])
   {
-    print_message(delete_device(mres($_REQUEST['id']))."\n");
+    print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
   }
   else
   {
