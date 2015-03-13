@@ -367,9 +367,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    echo ('<li style="float: right;"><a href="https://' . $device['hostname']  . '"><img src="images/16/http.png" alt="https" border="0" width="16" height="16" target="_blank"></a></li>
-           <li style="float: right;"><a href="ssh://' . $device['hostname']  . '"><img src="images/16/ssh.png" alt="ssh" border="0" width="16" height="16"></a></li>
-           <li style="float: right;"><a href="telnet://' . $device['hostname']  . '"><img src="images/16/telnet.png" alt="telnet" border="0" width="16" height="16"></a></li>');
+    echo ('<li style="float: right;"><a href="https://' . $device['hostname']  . '"><img src="images/16/http.png" alt="https" title="Launch browser to https://' . $device['hostname']  . '" border="0" width="16" height="16" target="_blank"></a></li>
+           <li style="float: right;"><a href="ssh://' . $device['hostname']  . '"><img src="images/16/ssh.png" alt="ssh" title="SSH to ' . $device['hostname']  . '" border="0" width="16" height="16"></a></li>
+           <li style="float: right;"><a href="telnet://' . $device['hostname']  . '"><img src="images/16/telnet.png" alt="telnet" title="Telnet to ' . $device['hostname']  . '" border="0" width="16" height="16"></a></li>');
 
     if ($_SESSION['userlevel'] >= "7")
     {
