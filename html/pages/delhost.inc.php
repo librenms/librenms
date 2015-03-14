@@ -55,7 +55,8 @@ else
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-7">
-<?php print_error("Warning, this will remove the device from being monitered and if selected, all data will be removed as well!");?>
+<?php print_error("Warning, this will remove the device from being monitered!</p>
+                   <p>It will also remove historical data about this device such as <mark>Syslog</mark>, <mark>Eventlog</mark> and <mark>Alert log</mark> data.</p>");?>
     </div>
   </div>
   <div class="form-group">
