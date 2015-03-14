@@ -22,7 +22,13 @@ if (!empty($vars['os']))       { $where .= " AND os = ?";          $sql_param[] 
 if (!empty($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
 if (!empty($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
 if (!empty($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
-if (!empty($vars['type']))     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
+if (!empty($vars['type']))     {
+  if ($vars['type'] == 'generic') {
+    $where .= " AND ( type = ? OR type = '')";        $sql_param[] = $vars['type'];
+  } else {
+    $where .= " AND type = ?";        $sql_param[] = $vars['type'];
+  }
+}
 if (!empty($vars['state']))    {
   $where .= " AND status= ?";       $sql_param[] = $state;
   $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
