@@ -128,7 +128,7 @@ class ircbot {
 	
 	private function connect_alert() {
 		$f = $this->config['install_dir']."/.ircbot.alert";
-		if( ( file_exists($f) && filetype($f) != "fifo" && !unlink($f) ) || ( !file_exists($f) && !posix_mkfifo($f,0644) ) ) {
+		if( ( file_exists($f) && filetype($f) != "fifo" && !unlink($f) ) || ( !file_exists($f) && !shell_exec("mkfifo $f && echo 1") ) ) {
 			$this->log("Error - Cannot create Alert-File");
 			return false;
 		}
