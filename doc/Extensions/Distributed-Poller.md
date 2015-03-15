@@ -12,8 +12,6 @@ In order to enable distributed polling, set `$config['distributed_poller'] = tru
 By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`.  
 Usually the poller's name is equal to the machine's hostname, if you want to change it set `$config['distributed_poller_name']`.
 
-__Note__: Eventhough you pin devices to pollers, these pollers will still poll devices with `poller_group = 0`. If you do not want this, consequently define groups for all your devices!
-
 ## Configuration
 ```php
 // Distributed Poller-Settings
