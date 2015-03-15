@@ -175,6 +175,29 @@ foreach ($config['snmp']['transports'] as $transport)
         </div>
       </div>
     </div>
+<?php
+
+if ($config['distributed_poller'] === TRUE) {
+    echo('
+      <div class="form-group">
+          <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
+          <div class="col-sm-9">
+              <select name="poller_group" id="poller_group" class="form-control input-sm">
+                  <option value="0"> Default poller group</option>
+    ');
+
+    foreach (dbFetchRows("SELECT `id`,`poller_name` FROM `pollers`") as $poller) {
+        echo '<option value="' . $poller['id'] . '">' . $poller['poller_name'] . '</option>';
+    }
+
+    echo('
+              </select>
+          </div>
+      </div>
+    ');
+}
+
+?>
     <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
   </div>
 </form>

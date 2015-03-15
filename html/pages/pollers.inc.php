@@ -14,12 +14,13 @@
 
 echo('<ul class="nav nav-tabs">');
 
-$perf_tabs = array(array("name" => 'Pollers', 'icon' => 'clock_link'));
+$poll_tabs = array(array("name" => 'Pollers', 'icon' => 'clock_link'),
+             array("name" => 'Groups', 'icon' => 'clock_add'));
 
-foreach ($perf_tabs as $tab) {
+foreach ($poll_tabs as $tab) {
     echo('
             <li>
-                <a href="/performance/tab='. lcfirst($tab["name"]) .'">
+                <a href="/pollers/tab='. lcfirst($tab["name"]) .'">
                    <img src="images/16/'. $tab["icon"] .'.png" align="absmiddle" border="0"> ' . $tab["name"] . '
                 </a>
             </li>');
@@ -29,5 +30,5 @@ foreach ($perf_tabs as $tab) {
 echo ('</ul>');
 
 if (isset($vars['tab'])) {
-    require_once "pages/performance/".mres($vars['tab']).".inc.php";
+    require_once "pages/pollers/".mres($vars['tab']).".inc.php";
 }

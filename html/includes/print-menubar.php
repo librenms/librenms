@@ -447,9 +447,10 @@ if ($_SESSION['userlevel'] >= '10')
            <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>
            <li role="presentation" class="divider"></li>
            <li class="dropdown-submenu">
-               <a href="#"><img src="images/16/clock.png" alt="Performance" width="16" height="16" /> Performance</a>
+               <a href="#"><img src="images/16/clock.png" alt="Pollers" width="16" height="16" /> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-                    <li><a href="/performance/tab=pollers/"><img src="images/16/clock_link.png" alt="Pollers" width="16" height="16" /> Pollers</a></li>
+                    <li><a href="/pollers/tab=pollers/"><img src="images/16/clock_link.png" alt="Pollers" width="16" height="16" /> Pollers</a></li>
+                    <li><a href="/pollers/tab=groups/"><img src="images/16/clock_add.png" alt="Groups" width="16" height="16" /> Groups</a></li>
                </ul>
            </li>
            <li role="presentation" class="divider"></li>
