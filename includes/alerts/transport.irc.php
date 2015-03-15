@@ -23,8 +23,9 @@
 
 $f = $config['install_dir']."/.ircbot.alert";
 $f = fopen($f,"w+");
-$f = fwrite($f,json_encode($obj)."\n");
-if( $f === false ) {
+$r = fwrite($f,json_encode($obj)."\n");
+$f = fclose($f);
+if( $r === false ) {
 	return false;
 } else {
 	return true;
