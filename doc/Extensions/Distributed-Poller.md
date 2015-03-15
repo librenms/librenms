@@ -1,4 +1,4 @@
-= Distributed Poller =
+# Distributed Poller
 LibreNMS has the ability to distribute polling of devices to other machines.
 
 These machines can be in a different physical location and therefore minimize network latencies for colocations.
@@ -14,7 +14,7 @@ Usually the poller's name is equal to the machine's hostname, if you want to cha
 
 __Note__: Eventhough you pin devices to pollers, these pollers will still poll devices with `poller_group = 0`. If you do not want this, consequently define groups for all your devices!
 
-== Configuration ==
+## Configuration
 ```php
 // Distributed Poller-Settings
 $config['distributed_poller']                            = false;
