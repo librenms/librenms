@@ -128,11 +128,11 @@ class ircbot {
 	
 	private function connect_alert() {
 		$f = $this->config['install_dir']."/.ircbot.alert";
-		if( (file_exists($f) || !touch($f)) && (!unlink($f) || !touch($f)) ) {
+		if( ( file_exists($f) && filetype($f) != "fifo" && !unlink($f) ) || ( !file_exists($f) && !posix_mkfifo($f,0644) ) ) {
 			$this->log("Error - Cannot create Alert-File");
 			return false;
 		}
-		if( ($this->socket['alert'] = fopen($f,'r')) ) {
+		if( ($this->socket['alert'] = fopen($f,'r+')) ) {
 			$this->log("Opened Alert-File");
 			stream_set_blocking($this->socket['alert'], false);
 			return true;
@@ -147,7 +147,7 @@ class ircbot {
 		$r = strlen($r);
 		if(strstr($this->buff[$buff],"\n")) {
 			$tmp = explode("\n",$this->buff[$buff],2);
-			$this->buff[$buff] = substr($this->buff[$buff], strlen($tmp[0])+2);
+			$this->buff[$buff] = substr($this->buff[$buff], strlen($tmp[0])+1);
 			if( $this->debug ) {
 				$this->log("Returning buffer '$buff': '".trim($tmp[0])."'");
 			}
