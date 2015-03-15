@@ -29,9 +29,9 @@ $query = "SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`)
 
 foreach (dbFetchRows($query) as $poller) {
     $old = $poller['now'] - $poller['then'];
-    if ($old > 600) {
+    if ($old >= 300) {
         $row_class = 'danger';
-    } elseif ($old >= 280 && $old <= 300) {
+    } elseif ($old >= 280 && $old < 300) {
         $row_class = 'warning';
     } else {
         $row_class = 'success';
