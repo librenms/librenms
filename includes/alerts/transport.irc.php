@@ -21,4 +21,11 @@
  * @subpackage Alerts
  */
 
-return file_put_contents($config['install_dir']."/.ircbot.alert", json_encode($obj)."\n", FILE_APPEND);
+$f = $config['install_dir']."/.ircbot.alert";
+$f = fopen($f,"w+");
+$f = fwrite($f,json_encode($obj)."\n");
+if( $f === false ) {
+	return false;
+} else {
+	return true;
+}
