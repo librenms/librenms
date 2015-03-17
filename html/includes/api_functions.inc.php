@@ -441,7 +441,7 @@ function get_graphs() {
     $graphs[] = array('desc' => 'Ping Response', 'name' => 'device_ping_perf');
     foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph", array($device_id)) as $graph) {
         $desc = $config['graph_types']['device'][$graph['graph']]['descr'];
-        $graphs[] = array('desc' => $desc, 'name' => $graph['graph']);
+        $graphs[] = array('desc' => $desc, 'name' => 'device_'.$graph['graph']);
     }
     $total_graphs = count($graphs);
     $output = array("status" => "$status", "err-msg" => $message, "count" => $total_graphs, "graphs" => $graphs);
