@@ -2970,6 +2970,41 @@
 
 
     /**
+    * Move a widget to a specific row and column.
+    * If the widget has widgets below, all of these widgets will be moved also
+    *
+    * @method move_widget
+    * @param {HTMLElement} $widget The jQuery wrapped HTMLElement of the
+    * widget is going to be moved.
+    * @param {Number} new_col the column number to be set in widget
+    * @param {Number} new_row the row number to be set in widget
+    * @param {Function} callback is called when whole process is done.
+    * @return {Class} Returns the instance of the Gridster Class.
+    */
+    fn.move_widget = function($widget, new_col, new_row, callback) {
+        var wgd = $widget.coords().grid;
+
+        var new_grid_data = {
+            col: new_col,
+            row: new_row,
+            size_x: wgd.size_x,
+            size_y: wgd.size_y
+        };
+
+        this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
+
+        this.set_dom_grid_height();
+        this.set_dom_grid_width();
+
+        if (callback) {
+            callback.call(this, new_grid_data.col, new_grid_data.row);
+        }
+
+        return $widget;
+    };
+
+
+    /**
     * Move a widget to a specific row. The cell or cells must be empty.
     * If the widget has widgets below, all of these widgets will be moved also
     * if they can.
