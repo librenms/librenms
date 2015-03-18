@@ -446,6 +446,9 @@ if ($_SESSION['userlevel'] >= '10')
            <li><a href="edituser/"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
            <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>
            <li role="presentation" class="divider"></li>
+');
+      if($config['distributed_poller'] === TRUE) {
+          echo('
            <li class="dropdown-submenu">
                <a href="#"><img src="images/16/clock.png" alt="Pollers" width="16" height="16" /> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
@@ -454,6 +457,10 @@ if ($_SESSION['userlevel'] >= '10')
                </ul>
            </li>
            <li role="presentation" class="divider"></li>
+           ');
+       }
+
+echo('
            <li class="dropdown-submenu">
            <a href="#"><img src="images/16/building.png" border="0" align="absmiddle" /> API</a>
            <ul class="dropdown-menu scrollable-menu">
