@@ -115,7 +115,7 @@ echo("
 
   <div style="float: left; padding: 0px; width: 49%">
 
-    <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system forked from the last GPL-licensed revision of Observium.</h3>
+    <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
 <?php
 
 $project_name = $config['project_name'];
