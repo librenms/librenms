@@ -165,6 +165,7 @@ if (empty($config['favicon'])) {
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
+  <link href="css/loading.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
@@ -177,6 +178,7 @@ if (empty($config['favicon'])) {
   <script src="js/typeahead.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
+  <script src="js/pace.min.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
