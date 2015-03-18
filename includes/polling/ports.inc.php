@@ -253,7 +253,7 @@ foreach ($ports as $port)
     // Update IF-MIB data
     foreach ($data_oids as $oid)
     {
-      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
+      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]) && $this_port['ifAdminStatus'] != 'down')
       {
         $port['update'][$oid] = NULL;
         log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['port_id']);
