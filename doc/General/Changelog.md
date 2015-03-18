@@ -1,3 +1,20 @@
+### Mar 2015
+
+####Bug fixes
+  - Updates to alert rules split (PR550)
+  - Updated get_graphs() for API to resolve graph names (PR613)
+
+####Improvements
+  - Visual updates to alert logs (PR541)
+  - Added temperature support for APC AC units (PR545)
+  - Added ability to pause and resume page refresh (PR557)
+  - Added polling support for NXOS (PR562)
+  - Added discovery support for 3Com switches (PR568)
+  - Updated Comware support (PR583)
+  - Added new logo (PR584)
+  - Added dynamic removal of device data when removing device (PR592)
+  - Updated alerting to use fifo (PR607)
+
 ###Feb 2015
 
 ####Bug fixes
