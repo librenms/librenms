@@ -425,7 +425,7 @@ if(is_file("includes/print-menubar-custom.inc.php"))
      </form>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /></a>
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" alt="System menu" title="System menu" /></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li role="presentation" class="divider"></li>
