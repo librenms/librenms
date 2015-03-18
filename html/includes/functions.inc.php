@@ -547,7 +547,7 @@ function getlocations()
       $ignore_dev_location[$row['device_id']] = 1;
     }
     # We can do this because of the ORDER BY, "bool" will be handled before "string"
-    elseif ($row['attrib_type'] == 'override_sysLocation_string' && $ignore_dev_location[$row['device_id']] == 1)
+    elseif ($row['attrib_type'] == 'override_sysLocation_string' && (isset($ignore_dev_location[$row['device_id']]) && $ignore_dev_location[$row['device_id']] == 1))
     {
       if (!in_array($row['attrib_value'],$locations)) { $locations[] = $row['attrib_value']; }
     }
@@ -564,7 +564,7 @@ function getlocations()
   foreach ($rows as $row)
   {
     # Only add it as a location if it wasn't overridden (and not already there)
-    if ($row['location'] != '' && !$ignore_dev_location[$row['device_id']])
+    if ($row['location'] != '' && !isset($ignore_dev_location[$row['device_id']]))
     {
       if (!in_array($row['location'],$locations)) { $locations[] = $row['location']; }
     }

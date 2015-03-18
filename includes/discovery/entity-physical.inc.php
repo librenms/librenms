@@ -13,7 +13,7 @@
   $entity_array = snmpwalk_cache_twopart_oid($device, "entAliasMappingIdentifier", $entity_array, "ENTITY-MIB:IF-MIB");
 
   foreach ($entity_array as $entPhysicalIndex => $entry) {
-
+    
     $entPhysicalDescr                = $entry['entPhysicalDescr'];
     $entPhysicalContainedIn        = $entry['entPhysicalContainedIn'];
     $entPhysicalClass                = $entry['entPhysicalClass'];
@@ -30,10 +30,16 @@
     $entPhysicalAlias             = $entry['entPhysicalAlias'];
     $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
 
-    if (isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }
+    if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
+      $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];
+    }
 
-    if (!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
-    list(,$ifIndex) = explode(".", $ifIndex);
+    if (!strpos($ifIndex, "fIndex") || $ifIndex == "") {
+      unset($ifIndex);
+    } else {
+      $ifIndex_array = explode(".", $ifIndex);
+      $ifIndex = $ifIndex_array[1];
+    }
 
     if ($entPhysicalVendorTypes[$entPhysicalVendorType] && !$entPhysicalModelName)
     {
@@ -47,10 +53,52 @@
       $entPhysical_id = dbFetchCell("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = ? AND entPhysicalIndex = ?",array($device['device_id'], $entPhysicalIndex));
 
       if ($entPhysical_id) {
-        dbUpdate(array('entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr, 'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID), 'entPhysical', 'device_id=? AND entPhysicalIndex=?',array($device['device_id'],$entPhysicalIndex));
+        $update_data = array(
+          'entPhysicalIndex'        => $entPhysicalIndex,
+          'entPhysicalDescr'        => $entPhysicalDescr,
+          'entPhysicalClass'        => $entPhysicalClass,
+          'entPhysicalName'         => $entPhysicalName,
+          'entPhysicalModelName'    => $entPhysicalModelName,
+          'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+          'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+          'entPhysicalMfgName'      => $entPhysicalMfgName,
+          'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+          'entPhysicalVendorType'   => $entPhysicalVendorType,
+          'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+          'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+          'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+          'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+          'entPhysicalAlias'        => $entPhysicalAlias,
+          'entPhysicalAssetID'      => $entPhysicalAssetID
+        );
+        dbUpdate($update_data, 'entPhysical', 'device_id=? AND entPhysicalIndex=?',array($device['device_id'],$entPhysicalIndex));
         echo(".");
       } else {
-        dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr,'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID, 'ifIndex' => $ifIndex), 'entPhysical');
+        $insert_data = array(
+          'device_id'               => $device['device_id'],
+          'entPhysicalIndex'        => $entPhysicalIndex,
+          'entPhysicalDescr'        => $entPhysicalDescr,
+          'entPhysicalClass'        => $entPhysicalClass,
+          'entPhysicalName'         => $entPhysicalName,
+          'entPhysicalModelName'    => $entPhysicalModelName,
+          'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+          'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+          'entPhysicalMfgName'      => $entPhysicalMfgName,
+          'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+          'entPhysicalVendorType'   => $entPhysicalVendorType,
+          'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+          'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+          'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+          'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+          'entPhysicalAlias'        => $entPhysicalAlias,
+          'entPhysicalAssetID'      => $entPhysicalAssetID
+        );
+
+        if (!empty($ifIndex)) {
+          $insert_data['ifIndex'] = $ifIndex;
+        }
+
+        dbInsert($insert_data, 'entPhysical');
         echo("+");
       }
 

@@ -39,7 +39,7 @@ if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
-        discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $usage, $entPhysicalIndex, NULL);
       }
     }
   }

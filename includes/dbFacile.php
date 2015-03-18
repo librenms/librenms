@@ -22,12 +22,15 @@ Usage
  * Used by the other _query functions.
  * */
 function dbQuery($sql, $parameters = array()) {
-	global $fullSql, $debug;
+	global $fullSql, $debug, $sql_debug, $console_color;
 	$fullSql = dbMakeQuery($sql, $parameters);
         if($debug) { 
-          print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
-          #echo("\nSQL[".$fullSql."] "); 
-        }
+          if(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+            print $console_color->convert("\nSQL[%y".$fullSql."%n] ");
+          } else {
+            $sql_debug[] = $fullSql;
+          }
+	}
 
 	/*
 	if($this->logFile)

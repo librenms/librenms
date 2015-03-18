@@ -103,7 +103,7 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 
 $config['project_url']      = "https://github.com/librenms/";
 $config['project_issues']   = "https://github.com/librenms/librenms/issues";
-$config['title_image']      = "";
+$config['title_image']      = "images/librenms_logo.png";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
 $config['favicon']          = "";

@@ -74,6 +74,84 @@ if ($device['os'] == "apc")
       echo(discover_sensor($valid['sensor'], 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
     }
   }
+
+  # Portable Air Conditioner
+  $set_oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.13.2.2.4.0", "-OsqnU", "");
+  
+  $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.13.2.2.10.0", "-OsqnU", "");
+  if ($debug) {
+    echo($set_oids."\n");
+    echo($oids."\n");
+  }
+
+  if ($oids !== false)
+  {
+    echo("APC Portable Supply Temp ");
+    list($oid,$current_raw) = explode(' ',$oids);
+    $precision = 10;
+    $current = $current_raw / $precision;
+    $sensorType = "apc";
+    $index = 0;
+    if ($set_oids !== false) {
+       list(, $set_point_raw) = explode(' ',$set_oids);
+       $set_point = $set_point_raw / $precision;
+       $descr = "Supply Temp - Setpoint: ".$set_point."&deg;C";
+    } else {
+       $descr = "Supply Temperature";
+    }
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, $precision, '1', NULL, NULL, NULL, NULL, $current);
+  } 
+
+  unset($oids);
+  $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.13.2.2.12.0", "-OsqnU", "");
+  if ($debug) {
+    echo($oids."\n");
+  }
+
+  if ($oids !== false)
+  {
+    echo("APC Portable Return Temp ");
+    list($oid,$current_raw) = explode(' ',$oids);
+    $precision = 10;
+    $current = $current_raw / $precision;
+    $sensorType = "apc";
+    $index = 1;
+    if ($set_oids !== false) {
+       list(, $set_point_raw) = explode(' ',$set_oids);
+       $set_point = $set_point_raw / $precision;
+       $descr = "Return Temp - Setpoint: ".$set_point."&deg;C";
+    } else {
+       $descr = "Return Temperature";
+    }
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, $precision, '1', NULL, NULL, NULL, NULL, $current);
+  }
+  
+  unset($oids);
+  $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.13.2.2.14.0", "-OsqnU", "");
+  if ($debug) {
+    echo($oids."\n");
+  }
+
+  if ($oids !== false)
+  {
+    echo("APC Portable Remote Temp ");
+    list($oid,$current_raw) = explode(' ',$oids);
+    $precision = 10;
+    $current = $current_raw / $precision;
+    $sensorType = "apc";
+    $index = 2;
+    if ($set_oids !== false) {
+       list(, $set_point_raw) = explode(' ',$set_oids);
+       $set_point = $set_point_raw / $precision;
+       $descr = "Remote Temp - Setpoint: ".$set_point."&deg;C";
+    } else {
+       $descr = "Remote Temperature";
+    }
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, $precision, '1', NULL, NULL, NULL, NULL, $current);
+  }
 }
 
 ?>

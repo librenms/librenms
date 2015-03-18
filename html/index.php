@@ -12,6 +12,38 @@
  *
  */
 
+$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
+
+function logErrors($errno, $errstr, $errfile, $errline) {
+    global $php_debug;
+    $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
+}
+
+function catchFatal() {
+    $last_error = error_get_last();
+    if ($last_error['type'] == 1) {
+        $log_error = array($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
+        print_r($log_error);
+    }
+}
+
+if (strpos($_SERVER['PATH_INFO'], "debug"))
+{
+  $debug = "1";
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+  set_error_handler('logErrors');
+  register_shutdown_function('catchFatal');
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('error_reporting', 0);
+}
+
 // Set variables
 $msg_box = array();
 
@@ -37,23 +69,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
-
-if (strpos($_SERVER['PATH_INFO'], "debug"))
-{
-  $debug = "1";
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('log_errors', 1);
-  ini_set('error_reporting', E_ALL);
-} else {
-  $debug = FALSE;
-  ini_set('display_errors', 0);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
-}
 
 foreach ($_GET as $key=>$get_var)
 {
@@ -117,7 +132,7 @@ if (isset($config['branding']) && is_array($config['branding']))
 }
 
 # page_title_prefix is displayed, unless page_title is set
-if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title']; }
+if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page_title']; }
 
 ?>
 <!DOCTYPE HTML>
@@ -128,7 +143,20 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php
-if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
+if (empty($config['favicon'])) {
+?>
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/favicon-152.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/favicon-144.png">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/favicon-120.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/favicon-114.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
+  <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
+  <link rel="icon" href="images/favicon-32.png" sizes="32x32">
+  <meta name="msapplication-TileImage" content="images/favicon-144.png">
+<?php
+} else {
+    echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
+}
 ?>
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
@@ -149,9 +177,6 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script src="js/typeahead.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
-<?php
-if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
-?>
   <script type="text/javascript">
 
     <!-- Begin
@@ -170,7 +195,7 @@ if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['fav
 
 <?php
 
-if (!$vars['bare'] == "yes") {
+if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
 
   if ($_SESSION['authenticated'])
   {
@@ -198,7 +223,7 @@ if ($_SESSION['authenticated'])
 <?php
 
 // To help debug the new URLs :)
-if ($devel || $vars['devel'])
+if (isset($devel) || isset($vars['devel']))
 {
   echo("<pre>");
   print_r($_GET);
@@ -268,20 +293,8 @@ if ($config['page_gen'])
   echo('  <br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
   echo('  <br />Generated in ' . $gentime . ' seconds.');
 }
-?>
-  <script class="content_tooltips" type="text/javascript">
-    $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
 
-    $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
-      if ($(this).val() == $(this).attr('title')) {
-        $(this).val('');
-        $(this).removeClass('auto-hint');
-      }
-    });
-  </script>
-
-<?php
-if (is_array($pagetitle))
+if (isset($pagetitle) && is_array($pagetitle))
 {
   # if prefix is set, put it in front
   if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
@@ -330,6 +343,71 @@ toastr.options.extendedTimeOut = 20;
   echo("</script>");
 }
 
+if (is_array($sql_debug) && is_array($php_debug)) {
+
+    include_once "includes/print-debug.php";
+
+}
+
 ?>
 </body>
+<?php
+
+if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
+    $refresh = $config['page_refresh'] * 1000;
+    echo('<script type="text/javascript">
+        $(document).ready(function() {
+
+           $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+           var Countdown = {
+               sec: '. $config['page_refresh'] .',
+
+               Start: function() {
+                   var cur = this;
+                   this.interval = setInterval(function() {
+                       $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+                       cur.sec -= 1;
+                       display_time = cur.sec;
+                       if (display_time == 0) {
+                           location.reload();
+                       }
+                       if (display_time % 1 === 0 && display_time <= 300) {
+                           $("#countdown_timer").html("<img src=\"images/16/clock.png\"> Refresh in " + display_time);
+                       }
+                   }, 1000);
+               },
+
+               Pause: function() {
+                   clearInterval(this.interval);
+                   $("#countdown_timer_status").html("<img src=\"images/16/clock_play.png\"> Resume");
+                   delete this.interval;
+               },
+
+               Resume: function() {
+                   if (!this.interval) this.Start();
+               }
+           };
+
+           Countdown.Start();
+
+           $("#countdown_timer_status").click("", function(event) {
+               event.preventDefault();
+               if (Countdown.interval) {
+                   Countdown.Pause();
+               } else {
+                   Countdown.Resume();
+               }
+           });
+
+           $("#countdown_timer").click("", function(event) {
+               event.preventDefault();
+           });
+
+        });
+    </script>');
+
+}
+
+?>
+
 </html>

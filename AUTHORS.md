@@ -14,6 +14,9 @@ Contributors to LibreNMS:
 - Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
 - Nicolas Armando <nicearma@yahoo.com> (nicearma)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
+- Kevin Fleshman <fleshmank@hotmail.com> (KFleshman)
+- Markus Heberling <markus@tisoft.de> (tisoft)
 
 [1]: http://observium.org/ "Observium web site"
+
 

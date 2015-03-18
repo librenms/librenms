@@ -9,8 +9,7 @@ echo("Comware OS...");
 
 $hardware = snmp_get($device, "sysObjectID.0", "-OQsv", "SNMPv2-MIB:HH3C-PRODUCT-ID-MIB", "+".$config['install_dir']."/mibs/h3c");
 
-list(,$version,$features) = explode(",", $poll_device['sysDescr']);
-list(,,,$version) = explode(" ", $version);
-list(,,$features) = explode(" ", $features);
+preg_match('/Software Version (.+), Release ([a-zA-Z0-9]+)/',$poll_device['sysDescr'],$match);
+list(,$version,$features) = $match;
 
 ?>

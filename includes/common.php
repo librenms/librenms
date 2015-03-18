@@ -59,9 +59,10 @@ function isCli()
 
 function print_error($text)
 {
+  global $console_color;
   if (isCli())
   {
-    print Console_Color::convert("%r".$text."%n\n", false);
+    print $console_color->convert("%r".$text."%n\n", false);
   } else {
     echo('<div class="alert alert-danger"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
   }
@@ -71,7 +72,7 @@ function print_message($text)
 {
   if (isCli())
   {
-    print Console_Color::convert("%g".$text."%n\n", false);
+    print Console_Color2::convert("%g".$text."%n\n", false);
   } else {
     echo('<div class="alert alert-success"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
   }

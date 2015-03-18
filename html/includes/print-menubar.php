@@ -84,9 +84,9 @@ if ($_SESSION['userlevel'] >= '10') {
 
 foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $devtype) {
     if (empty($devtype['type'])) {
-        $devtype['type'] = 'Generic';
+        $devtype['type'] = 'generic';
     }
-    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['type'] . '" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . '</a></li>');
+    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['type'] . '.png" border="0" align="absmiddle" /> ' . ucfirst($devtype['type']) . '</a></li>');
 }
         echo ('</ul>
              </li>');
@@ -165,12 +165,12 @@ if ($_SESSION['userlevel'] >= '10')
 
 <?php
 
-if ($ports['errored'])
+if (isset($ports['errored']))
 {
   echo('            <li><a href="ports/errors=1/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if ($ports['ignored'])
+if (isset($ports['ignored']))
 {
   echo('            <li><a href="ports/ignore=1/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
@@ -254,7 +254,7 @@ if ($menu_sensors)
 
 foreach (array('fanspeed','humidity','temperature') as $item)
 {
-  if ($menu_sensors[$item])
+  if (isset($menu_sensors[$item]))
   {
     echo('            <li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.nicecase($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
@@ -269,7 +269,7 @@ if ($sep)
 
 foreach (array('current','frequency','power','voltage') as $item)
 {
-  if ($menu_sensors[$item])
+  if (isset($menu_sensors[$item]))
   {
     echo('            <li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.nicecase($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
@@ -306,10 +306,12 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
   $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
   foreach ($app_list as $app)
   {
-    $image = $config['html_dir']."/images/icons/".$row['app_type'].".png";
-    $icon = (file_exists($image) ? $row['app_type'] : "apps");
+      if (isset($app['app_type'])) {
+          $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
+          $icon = (file_exists($image) ? $app['app_type'] : "apps");
 echo('
-            <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
+          <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
+      }
   }
 ?>
           </ul>
@@ -450,12 +452,19 @@ if ($_SESSION['userlevel'] >= '10')
              <li><a href="api-access/"><img src="images/16/script.png" /> API Settings</a></li>
              <li><a href="https://github.com/librenms/librenms/wiki/API-Docs" target="_blank"><img src="images/16/report.png" /> API Documentation</a></li>
            </ul>
+           </li>
            <li role="presentation" class="divider"></li>');
     } ?>
 <?php
 if ($_SESSION['authenticated'])
 {
   echo('
+           <li class="dropdown-submenu">
+               <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+               <ul class="dropdown-menu scrollable-menu">
+                   <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+               </ul>
+           </li>
            <li><a href="logout/"><img src="images/16/lock_go.png" with="16" height="16" alt="Logout"> Logout</a></li>
 ');
 }
@@ -466,7 +475,7 @@ if ($_SESSION['authenticated'])
          </ul>
        </li>
      </ul>
-     <form role="search" class="navbar-form navbar-left">
+     <form role="search" class="navbar-form navbar-right">
          <div class="form-group">
              <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
          </div>

@@ -430,6 +430,12 @@ foreach ($ports as $port)
       $memcache->set('port-'.$port['port_id'].'-state', $port['state']);
     }
 
+    foreach ($port['update'] as $key => $val_check){
+      if (!isset($val_check)) {
+        unset($port['update'][$key]);
+      }
+    }
+
     // Update Database
     if (count($port['update']))
     {

@@ -100,13 +100,13 @@ function auth_usermanagement()
   return 1;
 }
 
-function adduser($username, $password, $level, $email = "", $realname = "", $can_modify_passwd='1')
+function adduser($username, $password, $level, $email = "", $realname = "", $can_modify_passwd=1, $description ="", $twofactor=0)
 {
   if (!user_exists($username))
   {
     $hasher = new PasswordHash(8, FALSE);
     $encrypted = $hasher->HashPassword($password);
-    return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd), 'users');
+    return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description, 'twofactor' => $twofactor), 'users');
   } else {
     return FALSE;
   }
@@ -114,7 +114,8 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
 
 function user_exists($username)
 {
-  return @dbFetchCell("SELECT COUNT(*) FROM users WHERE username = ?", array($username));
+  $return = @dbFetchCell("SELECT COUNT(*) FROM users WHERE username = ?", array($username));
+  return $return;
 }
 
 function get_userlevel($username)
