@@ -1604,3 +1604,8 @@ tr.search:nth-child(odd) {
 .navbar-debug {
   min-height: 25px;
 }
+
+.navbar-brand {
+  padding-left: 15px !important;
+  padding-top: 8px !important;
+}
