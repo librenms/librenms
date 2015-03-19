@@ -50,7 +50,8 @@ if ($_POST['hostname'])
     {
       print_error("Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?");
     }
-    $result = addHost($hostname, $snmpver, $port, $transport);
+    $poller_group = $_POST['poller_group'];
+    $result = addHost($hostname, $snmpver, $port, $transport,0,$poller_group);
     if ($result)
     {
       print_message("Device added ($result)");
@@ -186,8 +187,8 @@ if ($config['distributed_poller'] === TRUE) {
                   <option value="0"> Default poller group</option>
     ');
 
-    foreach (dbFetchRows("SELECT `id`,`poller_name` FROM `pollers`") as $poller) {
-        echo '<option value="' . $poller['id'] . '">' . $poller['poller_name'] . '</option>';
+    foreach (dbFetchRows("SELECT `id`,`group_name` FROM `poller_groups`") as $group) {
+        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
     }
 
     echo('

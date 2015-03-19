@@ -10,6 +10,7 @@ if ($_POST['editing'])
     $port = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
     $timeout = mres($_POST['timeout']);
     $retries = mres($_POST['retries']);
+    $poller_group = mres($_POST['poller_group']);
     $v3 = array (
       'authlevel' => mres($_POST['authlevel']),
       'authname' => mres($_POST['authname']),
@@ -24,7 +25,8 @@ if ($_POST['editing'])
       'community' => $community,
       'snmpver' => $snmpver,
       'port' => $port,
-      'transport' => $transport
+      'transport' => $transport,
+      'poller_group' => $poller_group
     );
 
     if ($_POST['timeout']) { $update['timeout'] = $timeout; }
@@ -168,6 +170,31 @@ echo("      </select>
       </div>
     </div>
   </div>");
+
+if ($config['distributed_poller'] === TRUE) {
+    echo('
+      <div class="form-group">
+          <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
+          <div class="col-sm-4">
+              <select name="poller_group" id="poller_group" class="form-control input-sm">
+                  <option value="0"> Default poller group</option>
+    ');
+
+    foreach (dbFetchRows("SELECT `id`,`group_name` FROM `poller_groups`") as $group) {
+        echo '<option value="' . $group['id'] . '"';
+        if ($device['poller_group'] == $group['id']) {
+            echo ' selected';
+        }
+        echo '>' . $group['group_name'] . '</option>';
+    }
+
+    echo('
+              </select>
+          </div>
+      </div>
+    ');
+}
+
 
 echo('
   <button type="submit" name="Submit" class="btn btn-default">Save</button>

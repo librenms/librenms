@@ -266,7 +266,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0')
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0')
 {
   global $config;
 
@@ -315,7 +315,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
               if (empty($snmphost) or ($snmphost == $host || $hostshort = $host))
               {
-                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3);
+                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group);
                 return $device_id;
               } else {
                 if($quiet == '0') {print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); }
@@ -337,7 +337,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
               if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host)))
               {
-                $device_id = createHost ($host, $community, $snmpver, $port, $transport);
+                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group);
                 return $device_id;
               } else {
                 if($quiet == '0') { print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); }
@@ -520,7 +520,7 @@ function utime()
   return $sec + $usec;
 }
 
-function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array())
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0')
 {
   $host = trim(strtolower($host));
 
@@ -530,7 +530,8 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
                   'port' => $port,
                   'transport' => $transport,
                   'status' => '1',
-                  'snmpver' => $snmpver
+                  'snmpver' => $snmpver,
+                  'poller_group' => $poller_group
             );
 
   $device = array_merge($device, $v3);
