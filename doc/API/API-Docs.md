@@ -364,6 +364,8 @@ Input (JSON):
  - port: SNMP port (defaults to port defined in config).
  - transport: SNMP protocol (defaults to transport defined in config).
  - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+ - poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
+ - force_add: Force the device to be added regardless of it being able to respond to snmp or icmp.
 
  For SNMP v1 or v2c
 
