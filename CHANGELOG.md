@@ -1,3 +1,12 @@
+<a name="v0.6.4"></a>
+### v0.6.4 (2015-03-19)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * added ability to center widgets in grid
+
 <a name="v0.6.3"></a>
 ### v0.6.3 (2015-03-06)
 
