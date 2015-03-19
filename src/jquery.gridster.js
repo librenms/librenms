@@ -32,7 +32,7 @@
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
         auto_init: true,
-        gulcenter_widgets: false,
+        center_widgets: false,
         responsive_breakpoint: false,
         serialize_params: function($w, wgd) {
             return {
