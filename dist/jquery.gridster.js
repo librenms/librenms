@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.3 - 2015-03-06
+/*! gridster.js - v0.6.3 - 2015-03-19
 * http://gridster.net/
 * Copyright (c) 2015 decksterteam; Licensed  */
 
@@ -879,6 +879,7 @@
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
         auto_init: true,
+        gulcenter_widgets: false,
         responsive_breakpoint: false,
         serialize_params: function($w, wgd) {
             return {
@@ -988,6 +989,9 @@
         this.$changed = $([]);
         this.min_widget_width = this.options.widget_base_dimensions[0];
         this.min_widget_height = this.options.widget_base_dimensions[1];
+
+        this.min_col_count = this.options.min_cols;
+        this.prev_col_count = this.min_col_count;
 
         if(this.is_responsive()) {
           this.min_widget_width = this.get_responsive_col_width();
@@ -1459,6 +1463,87 @@
       return $widget;
     };
 
+
+    /**
+     * Centers widgets in grid
+     *
+     * @method center_widgets
+     */
+    fn.center_widgets = debounce(function () {
+      var window_width = $(window).width();
+      var col_size = this.options.widget_base_dimensions[0] + (2 * this.options.widget_margins[0]);
+      var col_count = Math.floor(Math.max(Math.floor(window_width / col_size), this.min_col_count) / 2) * 2;
+
+      this.options.min_cols = col_count;
+      this.options.max_cols = col_count;
+      this.options.extra_cols = 0;
+      this.options.max_size_x = col_count;
+      this.set_dom_grid_width(col_count);
+
+      var col_dif = (col_count - this.prev_col_count) / 2;
+
+      if (col_dif < 0) {
+        if (this.get_min_col() > col_dif * -1) {
+          this.shift_cols(col_dif);
+        } else {
+          this.resize_widget_dimensions(this.options);
+        }
+
+        setTimeout($.proxy(function () {
+          this.resize_widget_dimensions(this.options);
+        }, this), 0);
+
+      } else if (col_dif > 0) {
+        this.resize_widget_dimensions(this.options);
+
+        setTimeout($.proxy(function () {
+          this.shift_cols(col_dif);
+        }, this), 0);
+
+      } else {
+        this.resize_widget_dimensions(this.options);
+
+        setTimeout($.proxy(function () {
+          this.resize_widget_dimensions(this.options);
+        }, this), 0);
+
+      }
+
+      this.prev_col_count = col_count;
+      return this;
+    }, 200);
+
+
+    fn.get_min_col = function () {
+      var min_col = this.min_col_count;
+      this.$widgets.each($.proxy(function(i, widget) {
+        var $widget = $(widget);
+        var value = parseInt($widget.attr("data-col"));
+        min_col = Math.min(min_col, value);
+      }, this));
+      return min_col;
+    };
+
+
+    fn.shift_cols = function (col_dif) {
+      this.$widgets.each($.proxy(function(i, widget) {
+        var $widget = $(widget);
+        var wgd = $widget.coords().grid;
+        var value = parseInt($widget.attr("data-col"));
+        var new_grid_data = {
+          col: Math.round(value + col_dif),
+          row: wgd.row,
+          size_x: wgd.size_x,
+          size_y: wgd.size_y
+        };
+
+        setTimeout($.proxy(function () {
+          this.mutate_widget_in_gridmap($widget, wgd, new_grid_data);
+        }, this), 0);
+      }, this));
+    };
+
+
     /**
     * Mutate widget dimensions and position in the grid map.
     *
@@ -1839,6 +1924,12 @@
         this.add_to_gridmap(wgd, $el);
 
         this.options.resize.enabled && this.add_resize_handle($el);
+
+        if (this.options.center_widgets) {
+          setTimeout($.proxy(function () {
+            this.center_widgets();
+          }, this), 0);
+        }
 
         return posChanged;
     };
@@ -4106,6 +4197,10 @@
 
         if (this.is_responsive()) {
           this.resize_responsive_layout();
+        }
+
+        if (this.options.center_widgets) {
+          this.center_widgets();
         }
 
         return this;
