@@ -207,6 +207,8 @@ function add_device()
   $hostname = $data['hostname'];
   $port = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
   $transport = $data['transport'] ? mres($data['transport']) : "udp";
+  $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
+  $force_add = $data['force_add'] ? mres($data['force_add']) : 0;
   if($data['version'] == "v1" || $data['version'] == "v2c")
   {
     if ($data['community'])
@@ -237,7 +239,7 @@ function add_device()
   }
   if(empty($message))
   {
-    $result = addHost($hostname, $snmpver, $port, $transport, 1);
+    $result = addHost($hostname, $snmpver, $port, $transport, 1, $poller_group,$force_add);
     if($result)
     {
       $code = 201;
