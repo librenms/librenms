@@ -5,6 +5,7 @@ use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use InfluxDB\Options;
 use InfluxDB\Adapter\UdpAdapter;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use InfluxDB\Filter\ColumnsPointsFilter;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -144,6 +145,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(4, $body[0]["points"]);
         $this->assertEquals("udp.test", $body[0]["name"]);
+    }
+
+    /**
+     * @group filter
+     */
+    public function testColumnsPointsFilterWorksCorrectly()
+    {
+        $this->object->setFilter(new ColumnsPointsFilter());
+        $this->object->mark("tcp.test", ["time" => 1410591552, "mark" => "element"], "s");
+
+        $body = $this->object->query("select mark from tcp.test", "ms");
+
+        $this->assertCount(1, $body);
+        $this->assertEquals("element", $body["tcp.test"][0]["mark"]);
+        $this->assertSame(1410591552000, $body["tcp.test"][0]["time"]);
     }
 
     public function testListActiveDatabses()
