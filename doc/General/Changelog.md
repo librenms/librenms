@@ -3,6 +3,7 @@
 ####Bug fixes
   - Updates to alert rules split (PR550)
   - Updated get_graphs() for API to resolve graph names (PR613)
+  - Fixed use of REMOTE_ADDR to use X_FORWARDED_FOR if available (PR620)
 
 ####Improvements
   - Visual updates to alert logs (PR541)
@@ -14,6 +15,7 @@
   - Added new logo (PR584)
   - Added dynamic removal of device data when removing device (PR592)
   - Updated alerting to use fifo (PR607)
+  - Added distributed poller support (PR609 and PR610)
 
 ###Feb 2015
 
