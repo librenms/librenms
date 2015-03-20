@@ -15,11 +15,11 @@ class ColumnsPointsFilter implements FilterInterface
         $response = [];
 
         foreach ($metrics as $metric) {
-            $columns = $metric->columns;
-            $response[$metric->name] = [];
+            $columns = $metric["columns"];
+            $response[$metric["name"]] = [];
 
-            foreach ($metric->points as $point) {
-                $response[$metric->name][] = array_combine($columns, $point);
+            foreach ($metric["points"] as $point) {
+                $response[$metric["name"]][] = array_combine($columns, $point);
             }
         }
 
