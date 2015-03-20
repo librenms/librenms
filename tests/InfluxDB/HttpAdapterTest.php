@@ -3,6 +3,7 @@ namespace InfluxDB;
 
 use InfluxDB\Adapter\HttpAdapter;
 use InfluxDB\Adapter\UdpAdapter;
+use InfluxDB\Filter\ColumnsPointsFilter;
 
 class HttpAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -107,6 +108,21 @@ class HttpAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("tcp.test", $body[0]["name"]);
 
         $this->assertEquals("1410591552000", $body[0]["points"][0][0]);
+    }
+
+    /**
+     * @group filter
+     */
+    public function testColumnsPointsFilterWorksCorrectly()
+    {
+        $this->object->setFilter(new ColumnsPointsFilter());
+        $this->object->mark("tcp.test", ["time" => 1410591552, "mark" => "element"], "s");
+
+        $body = $this->object->query("select mark from tcp.test", "ms");
+
+        $this->assertCount(1, $body);
+        $this->assertEquals("element", $body["tcp.test"][0]["mark"]);
+        $this->assertSame(1410591552000, $body["tcp.test"][0]["time"]);
     }
 
     public function testListActiveDatabses()

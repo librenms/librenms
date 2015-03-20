@@ -19,7 +19,7 @@ class ColumnsPointsFilterSpec extends ObjectBehavior
 
     function it_should_map_columns_with_points()
     {
-        $response = json_decode('[{"name":"hd_used","columns":["time","sequence_number","value","host","mount","time_precision"],"points":[[1410591684,11820001,23.2,"serverA","/mnt","s"]]}]');
+        $response = json_decode('[{"name":"hd_used","columns":["time","sequence_number","value","host","mount","time_precision"],"points":[[1410591684,11820001,23.2,"serverA","/mnt","s"]]}]', true);
 
         $this->filter($response)->shouldBeEqualTo([
             "hd_used" => [
@@ -37,7 +37,7 @@ class ColumnsPointsFilterSpec extends ObjectBehavior
 
     function it_should_map_also_a_series_list()
     {
-        $response = json_decode('[{"name":"list_series_result","columns":["time","name"],"points":[[0,"hd_used"]]}]');
+        $response = json_decode('[{"name":"list_series_result","columns":["time","name"],"points":[[0,"hd_used"]]}]', true);
 
         $this->filter($response)->shouldBeEqualTo([
             "list_series_result" => [
@@ -51,7 +51,7 @@ class ColumnsPointsFilterSpec extends ObjectBehavior
 
     function it_should_reply_to_an_empty_set()
     {
-        $response = json_decode('[]');
+        $response = json_decode('[]', true);
 
         $this->filter($response)->shouldBeEqualTo([]);
     }
