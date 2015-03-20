@@ -73,9 +73,11 @@ It's not necessary to run discovery services on all pollers. In fact, you should
 
 ####Config sample
 Memcache:
+
  - This doesn't require any special config. The example setup is running "-m 64 -p 11211 -l <ip>"
 
 RRDCached:
+
  - You will need to tune RRDCached to suite your environment.
  - The following is used in this example setup "-l 0:42217 -j /var/lib/rrdcached/journal/ -F -b /opt/librenms/rrd -B -w 1800 -z 900 -p /var/run/rrdcached.pid"
 
