@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = TRUE;
+
 if ($_SESSION['userlevel'] < 10)
 {
   include("includes/error-no-perm.inc.php");
