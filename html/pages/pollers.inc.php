@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+$no_refresh = TRUE;
+
 echo('<ul class="nav nav-tabs">');
 
 $poll_tabs = array(array("name" => 'Pollers', 'icon' => 'clock_link'),

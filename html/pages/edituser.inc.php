@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = TRUE;
+
 include("includes/javascript-interfacepicker.inc.php");
 
 echo("<div style='margin: 10px;'>");
