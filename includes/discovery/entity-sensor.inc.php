@@ -69,6 +69,7 @@ if (is_array($oids))
       if ($entry['entPhySensorScale'] == "kilo")  { $divisor = "1"; $multiplier = "1000"; }
       if ($entry['entPhySensorScale'] == "mega")  { $divisor = "1"; $multiplier = "1000000"; }
       if ($entry['entPhySensorScale'] == "giga")  { $divisor = "1"; $multiplier = "1000000000"; }
+      if ($entry['entPhySensorScale'] == "yocto")  { $divisor = "1"; $multiplier = "1";  }
 
       if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], "0"); }
       $current = $current * $multiplier / $divisor;
