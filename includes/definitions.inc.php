@@ -366,6 +366,13 @@ $config['os'][$os]['icon']              = "ruckus";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
+// Meraki Wireless
+
+$os = "meraki-wap";
+$config['os'][$os]['text']              = "Meraki Wireless";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "meraki";
+
 // Supermicro Switch
 
 $os = "supermicro-switch";
