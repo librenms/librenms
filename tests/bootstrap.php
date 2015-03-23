@@ -1,18 +1,18 @@
 <?php
 return [
     "tcp" => [
-        "host" => "localhost",
-        "port" => 8086,
-        "protocol" => "http",
-        "database" => "tcp.test",
-        "username" => "root",
-        "password" =>  "root",
+        "host" => getenv('HOST'),
+        "port" => getenv('TCP_PORT'),
+        "protocol" => getenv('TCP_PROTOCOL'),
+        "database" => getenv('TCP_DB'),
+        "username" => getenv('USERNAME'),
+        "password" =>  getenv('PASSWORD'),
     ],
     "udp" => [
-        "host" => "localhost",
-        "port" => 5551,
-        "database" => "udp.test",
-        "username" => "root",
-        "password" => "root"
+        "host" => getenv('HOST'),
+        "port" => getenv('UDP_PORT'),
+        "database" => getenv('UDP_DB'),
+        "username" => getenv('USERNAME'),
+        "password" =>  getenv('PASSWORD'),
     ],
 ];
