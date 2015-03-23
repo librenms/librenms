@@ -28,7 +28,7 @@ dbDelete('session', "`session_expiry` <  ?", array(time()));
 
 if ($vars['page'] == "logout" && $_SESSION['authenticated'])
 {
-  dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged Out'), 'authlog');
+  dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
   dbDelete('session', "`session_username` =  ? AND session_value = ?", array($_SESSION['username'],$_COOKIE['sess_id']));
   unset($_SESSION);
   unset($_COOKIE);
@@ -81,7 +81,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
       }
       if( !$config['twofactor'] || $_SESSION['twofactor'] ) {
         $_SESSION['authenticated'] = true;
-        dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged In'), 'authlog');
+        dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
       }
     }
     if (isset($_POST['remember']))
@@ -113,7 +113,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
   {
     $auth_message = "Authentication Failed";
     unset ($_SESSION['authenticated']);
-    dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Authentication Failure'), 'authlog');
+    dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
   }
 }
 ?>

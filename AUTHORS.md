@@ -16,6 +16,8 @@ Contributors to LibreNMS:
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 - Kevin Fleshman <fleshmank@hotmail.com> (KFleshman)
 - Markus Heberling <markus@tisoft.de> (tisoft)
+- Alan Gregory <alan@opcaonet.com.br> (alangregory)
+- Joubert RedRat <me+github@redrat.com.br> (joubertredrat)
 
 [1]: http://observium.org/ "Observium web site"
 

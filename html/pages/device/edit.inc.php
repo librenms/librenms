@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = TRUE;
+
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
                     'tab' => 'edit');

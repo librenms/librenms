@@ -1,3 +1,9 @@
+<?php
+
+$no_refresh = TRUE;
+
+?>
+
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
@@ -243,4 +249,5 @@ function changePage(page,e) {
     $('#page_number').val(page);
     $('#result_form').submit();
 }
+
 </script>
