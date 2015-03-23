@@ -282,8 +282,8 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
     // Test if IP or Hostname
-    if (!(inet_pton($host))) 
-    {
+    //if (!(inet_pton($host))) 
+    //{
       // Test reachability
       if ($force_add == 1 || isPingable($host))
       {
@@ -368,10 +368,10 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         // failed Reachability
         if($quiet == '0') { print_error("Could not ping $host"); }
       }
-    } else {
+    //} else {
       // Failed DNS lookup
-      if($quiet == '0') { print_error("$host looks like an IP address, please use FQDN"); }
-    }
+     // if($quiet == '0') { print_error("$host looks like an IP address, please use FQDN"); }
+    //}
   } else {
     // found in database
     if($quiet == '0') { print_error("Already got host $host"); }
