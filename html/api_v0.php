@@ -64,6 +64,10 @@ $app->group('/api', function() use ($app) {
     $app->get('/rules', 'authToken', 'list_alert_rules')->name('list_alert_rules');//api/v0/rules
     $app->post('/rules', 'authToken', 'add_edit_rule')->name('add_rule');//api/v0/rules (json data needs to be passed)
     $app->put('/rules', 'authToken', 'add_edit_rule')->name('edit_rule');//api/v0/rules (json data needs to be passed)
+    // Inventory section
+    $app->group('/inventory', function() use ($app) {
+        $app->get('/:hostname', 'authToken', 'get_inventory')->name('get_inventory');
+    });// End Inventory
   });
   $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });

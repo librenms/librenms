@@ -659,3 +659,41 @@ function ack_alert() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function get_inventory() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $status = 'error';
+    $err_msg = '';
+    $code = 500;
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $sql = '';
+    $params = array();
+    if (isset($_GET['entPhysicalClass']) && !empty($_GET['entPhysicalClass'])) {
+        $sql .= ' AND entPhysicalClass=?';
+        $params[] = mres($_GET['entPhysicalClass']);
+    }
+    if (isset($_GET['entPhysicalContainedIn']) && !empty($_GET['entPhysicalContainedIn'])) {
+        $sql .= ' AND entPhysicalContainedIn=?';
+        $params[] = mres($_GET['entPhysicalContainedIn']);
+    } else {
+        $sql .= ' AND entPhysicalContainedIn="0"';
+    }
+    if (!is_numeric($device_id)) {
+        $err_msg = 'Invalid device provided';
+        $total_inv = 0;
+        $inventory = array();
+    } else {
+        $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql",$params);
+        $code = 200;
+        $status = 'ok';
+        $total_inv = count($inventory);
+    }
+    $output = array("status" => $status, "err-msg" => $err_msg, "count" => $total_inv, "inventory" => $inventory);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
