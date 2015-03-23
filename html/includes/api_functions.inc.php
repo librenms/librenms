@@ -666,7 +666,6 @@ function get_inventory() {
     $router = $app->router()->getCurrentRoute()->getParams();
     $status = 'error';
     $err_msg = '';
-    $message = '';
     $code = 500;
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
@@ -685,6 +684,8 @@ function get_inventory() {
     }
     if (!is_numeric($device_id)) {
         $err_msg = 'Invalid device provided';
+        $total_inv = 0;
+        $inventory = array();
     } else {
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql",$params);
         $code = 200;
