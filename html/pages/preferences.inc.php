@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = TRUE;
+
 $pagetitle[] = "Preferences";
 
 echo("<h3>User Preferences</h3>");

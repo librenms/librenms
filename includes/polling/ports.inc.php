@@ -253,12 +253,12 @@ foreach ($ports as $port)
     // Update IF-MIB data
     foreach ($data_oids as $oid)
     {
-      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
+      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]) && $this_port['ifAdminStatus'] != 'down')
       {
         $port['update'][$oid] = NULL;
         log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
-      } elseif ($port[$oid] != $this_port[$oid]) {
+      } elseif ($port[$oid] != $this_port[$oid] && $this_port['ifAdminStatus'] != 'down') {
         $port['update'][$oid] = $this_port[$oid];
         log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }

@@ -37,7 +37,7 @@ include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
 
-if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) { if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; } }
+if (get_client_ip() != $_SERVER['SERVER_ADDR']) { if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; } }
 require_once("includes/jpgraph/src/jpgraph.php");
 require_once("includes/jpgraph/src/jpgraph_line.php");
 require_once("includes/jpgraph/src/jpgraph_bar.php");
@@ -46,7 +46,7 @@ require_once("includes/jpgraph/src/jpgraph_date.php");
 
 if (is_numeric($_GET['bill_id']))
 {
-  if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR'])
+  if (get_client_ip() != $_SERVER['SERVER_ADDR'])
   {
     if (bill_permitted($_GET['bill_id']))
     {

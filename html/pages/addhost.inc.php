@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = TRUE;
+
 if ($_SESSION['userlevel'] < 10)
 {
   include("includes/error-no-perm.inc.php");
@@ -50,7 +52,14 @@ if ($_POST['hostname'])
     {
       print_error("Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?");
     }
-    $result = addHost($hostname, $snmpver, $port, $transport);
+    $poller_group = $_POST['poller_group'];
+    $force_add = $_POST['force_add'];
+    if ($force_add == 'on') {
+        $force_add = 1;
+    } else {
+        $force_add = 0;
+    }
+    $result = addHost($hostname, $snmpver, $port, $transport,0,$poller_group,$force_add);
     if ($result)
     {
       print_message("Device added ($result)");
@@ -175,6 +184,38 @@ foreach ($config['snmp']['transports'] as $transport)
         </div>
       </div>
     </div>
+<?php
+
+if ($config['distributed_poller'] === TRUE) {
+    echo('
+      <div class="form-group">
+          <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
+          <div class="col-sm-9">
+              <select name="poller_group" id="poller_group" class="form-control input-sm">
+                  <option value="0"> Default poller group</option>
+    ');
+
+    foreach (dbFetchRows("SELECT `id`,`group_name` FROM `poller_groups`") as $group) {
+        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
+    }
+
+    echo('
+              </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-9">
+              <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="force_add" id="force_add"> Force add
+                  </label>
+              </div>
+          </div>
+      </div>
+    ');
+}
+
+?>
     <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
   </div>
 </form>
