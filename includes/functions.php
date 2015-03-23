@@ -266,7 +266,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0')
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0')
 {
   global $config;
 
@@ -278,7 +278,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
     if (!(inet_pton($host))) 
     {
       // Test reachability
-      if (isPingable($host))
+      if ($force_add == 1 || isPingable($host))
       {
         if (empty($snmpver))
         {
@@ -310,7 +310,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
           {
             $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3);
             if($quiet == '0') { print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... "); }
-            if (isSNMPable($device))
+            if ($force_add == 1 || isSNMPable($device))
             {
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
               if (empty($snmphost) or ($snmphost == $host || $hostshort = $host))
@@ -332,7 +332,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
           {
             $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
             if($quiet == '0') { print_message("Trying community $community ..."); }
-            if (isSNMPable($device))
+            if ($force_add == 1 || isSNMPable($device))
             {
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
               if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host)))

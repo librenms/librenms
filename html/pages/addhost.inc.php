@@ -53,7 +53,13 @@ if ($_POST['hostname'])
       print_error("Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?");
     }
     $poller_group = $_POST['poller_group'];
-    $result = addHost($hostname, $snmpver, $port, $transport,0,$poller_group);
+    $force_add = $_POST['force_add'];
+    if ($force_add == 'on') {
+        $force_add = 1;
+    } else {
+        $force_add = 0;
+    }
+    $result = addHost($hostname, $snmpver, $port, $transport,0,$poller_group,$force_add);
     if ($result)
     {
       print_message("Device added ($result)");
@@ -195,6 +201,15 @@ if ($config['distributed_poller'] === TRUE) {
 
     echo('
               </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-9">
+              <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="force_add" id="force_add"> Force add
+                  </label>
+              </div>
           </div>
       </div>
     ');
