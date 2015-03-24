@@ -65,7 +65,8 @@ $full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-md-2">
-                            <strong>Alert Log entries</strong>
+                            <strong>Alert Log entries</strong><br /><br />
+                            <a href="pdf.php?report=alert-log&device_id='.$_POST['device'].'&string='.$_POST['string'].'&results='.$numresults.'&start='.$page_number.'"><img src="images/16/pdf.png" width="16" height="16" alt="Export to pdf"> Export to pdf</a>
                         </div>
                         <div class="col-md-8" align="center">'. generate_pagination($count,$numresults,$page_number) .'</div>
                         <div class="col-md-2">
