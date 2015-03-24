@@ -1,3 +1,4 @@
+<script src="js/vis.min.js"></script>
 <?php
 
 /*
@@ -18,12 +19,12 @@ if (!empty($device['hostname'])) {
     $sql = ' WHERE `devices`.`hostname`=?';
     $sql_array = array($device['hostname']);
 }
-foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`hostname`, `remote_hostname`) AS `remote_hostname`, GREATEST(`remote_hostname`,`devices`.`hostname`) AS `hostname` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` $sql", $sql_array) as $link_devices) {
-    $link_dev = dbFetchRow("SELECT `location` FROM `devices` WHERE `hostname`=?",array($link_devices['hostname']));
-    $tmp_devices[] = array('id'=>$link_devices['hostname'],'label'=>$link_devices['hostname'],'title'=>$link_devices['hostname'],'group'=>$link_dev['location']);
+foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_device_id`) AS `remote_device_id`, GREATEST(`remote_device_id`,`devices`.`device_id`) AS `local_device_id` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` $sql", $sql_array) as $link_devices) {
+    $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['local_device_id']));
+    $tmp_devices[] = array('id'=>$link_devices['local_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     $tmp_id++;
-    $link_dev = dbFetchRow("SELECT `location` FROM `devices` WHERE `hostname`=?",array($link_devices['remote_hostname']));
-    $tmp_devices[] = array('id'=>$link_devices['remote_hostname'],'label'=>$link_devices['remote_hostname'],'title'=>$link_devices['remote_hostname'],'group'=>$link_dev['location']);
+    $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['remote_device_id']));
+    $tmp_devices[] = array('id'=>$link_devices['remote_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     $tmp_id++;
 }
  
@@ -89,9 +90,12 @@ echo $edges;
     };
     var options = {physics: {barnesHut: {gravitationalConstant: -11900, centralGravity: 1.4, springLength: 203, springConstant: 0.05, damping: 0.3}}, smoothCurves: false};
     var network = new vis.Network(container, data, options);
-    //network.on('click', function (properties) {
-    //    window.location.href = "/device/device="
-    //});
+    network.on("resize", function(params) {console.log(params.width,params.height)});
+    network.on('click', function (properties) {
+        if (properties.nodes > 0) {
+            window.location.href = "/device/device="+properties.nodes
+        }
+    });
 </script>
 
 <?php

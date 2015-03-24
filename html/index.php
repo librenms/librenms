@@ -180,7 +180,6 @@ if (empty($config['favicon'])) {
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
   <script src="js/mktree.js"></script>
-  <script src="js/vis.min.js"></script>
   <script type="text/javascript">
 
     <!-- Begin

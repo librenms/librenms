@@ -119,7 +119,8 @@ if ($config['show_locations'])
             <li><a href="delhost/"><img src="images/16/server_delete.png" border="0" align="absmiddle" /> Delete Device</a></li>');
 }
 ?>
-
+              <li role="presentation" class="divider"></li>
+              <li><a href="map/"><img src="images/16/chart_organisation.png" border="0" alt="Network Map" width="16" height="16" /> Network Map</a></li>
           </ul>
         </li>
 
