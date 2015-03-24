@@ -14,6 +14,9 @@ LibreNMS ships with the following software components:
   http://momentjs.com
   MIT License
 
+- MKTree
+  http://www.javascripttoolbox.com/lib/mktree/
+  MIT and GPL License
 
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
