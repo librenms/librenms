@@ -454,18 +454,24 @@ if ($_SESSION['userlevel'] >= '10')
            <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>
            <li role="presentation" class="divider"></li>
 ');
-      if($config['distributed_poller'] === TRUE) {
           echo('
            <li class="dropdown-submenu">
                <a href="#"><img src="images/16/clock.png" alt="Pollers" width="16" height="16" /> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="/poll-log/"><img src="images/16/information.png" alt="Poll-log" width="16" height="16" /> Poll-log</a></li>
+
+            ');
+          if($config['distributed_poller'] === TRUE) {
+            echo ('
                     <li><a href="/pollers/tab=pollers/"><img src="images/16/clock_link.png" alt="Pollers" width="16" height="16" /> Pollers</a></li>
                     <li><a href="/pollers/tab=groups/"><img src="images/16/clock_add.png" alt="Groups" width="16" height="16" /> Groups</a></li>
+              ');
+            }
+            echo ('
                </ul>
            </li>
            <li role="presentation" class="divider"></li>
            ');
-       }
 
 echo('
            <li class="dropdown-submenu">
