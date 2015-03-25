@@ -43,7 +43,7 @@ Try It
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download the [VirtualBox / VMWare][11] and open it, and log in with credentials provided. 
+Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
 Enter the following commands:
 
     cd /opt/librenms
