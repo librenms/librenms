@@ -537,6 +537,7 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
 
+$config['discovery_modules']['os']                        = 1;
 $config['discovery_modules']['ports']                     = 1;
 $config['discovery_modules']['ports-stack']               = 1;
 $config['discovery_modules']['entity-physical']           = 1;
