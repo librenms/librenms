@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
@@ -66,6 +66,7 @@ if ($_SESSION['userlevel'] >= '10') {
 } ?>
 <!--        <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
             <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'poll-log'))); ?>"><img src="images/16/information.png" border="0" align="absmiddle" /> Polling</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header"> Search</li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
