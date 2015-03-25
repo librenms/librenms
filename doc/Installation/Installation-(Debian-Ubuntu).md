@@ -154,13 +154,13 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
-LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing `librenms.cron` before copying (or by editing `/etc/cron.d/librenms` if you've already copied the cron file).  Just add a number after `poller-wrapper.py`, as in the example below:
+LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).  Just add a number after `poller-wrapper.py`, as in the example below:
 
     /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
 
 Create the cronjob
 
-    ln -s $PWD/librenms.cron /etc/cron.d/librenms
+    cp librenms.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 
