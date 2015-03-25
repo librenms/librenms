@@ -1,5 +1,7 @@
 <?php
 
+echo("OS: ");
+
 // MYSQL Check - FIXME
 // 1 UPDATE
 
