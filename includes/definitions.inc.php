@@ -580,6 +580,11 @@ $config['os'][$os]['text']              = "D-Link Access Point";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "dlink";
 
+$os = "ubiquitiap";
+$config['os'][$os]['text']              = "Ubiquiti Networks Wireless";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "ubiquiti";
+
 $os = "axiscam";
 $config['os'][$os]['text']              = "AXIS Network Camera";
 $config['os'][$os]['icon']              = "axis";
