@@ -16,7 +16,12 @@
         "**/.*",
         "node_modules",
         "bower_components",
+        "example",
+        "spec",
         "test",
         "tests"
-    ]
+    ],
+    "dependencies": {
+        "leaflet": ">= 0.7.0"
+    }
 }
