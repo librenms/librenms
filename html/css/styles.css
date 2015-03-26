@@ -2,6 +2,8 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0px;
   padding: 0px;
+  padding-bottom: 50px;
+  padding-top: 50px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   font-size: 10pt;
@@ -1610,6 +1612,3 @@ tr.search:nth-child(odd) {
   padding-top: 8px !important;
 }
 
-.fa-custom-danger {
-    
-}
