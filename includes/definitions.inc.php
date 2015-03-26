@@ -1307,5 +1307,6 @@ if (!isset($config['rrd_dir']))  { $config['rrd_dir']  = $config['install_dir'] 
 if (!isset($config['log_dir']))  { $config['log_dir']  = $config['install_dir'] . '/logs'; }
 if (!isset($config['log_file'])) { $config['log_dir'] . "/" . $config['project_id'] . ".log"; }
 if (!isset($config['plugin_dir']))  { $config['plugin_dir']  = $config['html_dir'] . '/plugins'; }
+if (!isset($config['title_image'])) { $config['title_image']      = "images/librenms_logo_".$config['site_style'].".png"; }
 
 ?>
