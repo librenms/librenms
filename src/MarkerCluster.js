@@ -169,7 +169,7 @@ L.MarkerCluster = L.Marker.extend({
 					//Only do it if the icon is still on the map
 					if (m._icon) {
 						m._setPos(center);
-						m.setOpacity(0);
+						m.clusterHide();
 					}
 				}
 			},
@@ -180,7 +180,7 @@ L.MarkerCluster = L.Marker.extend({
 					cm = childClusters[j];
 					if (cm._icon) {
 						cm._setPos(center);
-						cm.setOpacity(0);
+						cm.clusterHide();
 					}
 				}
 			}
@@ -195,10 +195,10 @@ L.MarkerCluster = L.Marker.extend({
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
 				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
 				if (c._isSingleParent() && previousZoomLevel - 1 === newZoomLevel) {
-					c.setOpacity(1);
+					c.clusterShow();
 					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
-					c.setOpacity(0);
+					c.clusterHide();
 				}
 
 				c._addToMap();
@@ -208,7 +208,7 @@ L.MarkerCluster = L.Marker.extend({
 
 	_recursivelyBecomeVisible: function (bounds, zoomLevel) {
 		this._recursively(bounds, 0, zoomLevel, null, function (c) {
-			c.setOpacity(1);
+			c.clusterShow();
 		});
 	},
 
@@ -231,8 +231,8 @@ L.MarkerCluster = L.Marker.extend({
 						nm._backupLatlng = nm.getLatLng();
 
 						nm.setLatLng(startPos);
-						if (nm.setOpacity) {
-							nm.setOpacity(0);
+						if (nm.clusterHide) {
+							nm.clusterHide();
 						}
 					}
 
@@ -284,8 +284,8 @@ L.MarkerCluster = L.Marker.extend({
 					m = c._markers[i];
 					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
 						c._group._featureGroup.removeLayer(m);
-						if (m.setOpacity) {
-							m.setOpacity(1);
+						if (m.clusterShow) {
+							m.clusterShow();
 						}
 					}
 				}
@@ -296,8 +296,8 @@ L.MarkerCluster = L.Marker.extend({
 					m = c._childClusters[i];
 					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
 						c._group._featureGroup.removeLayer(m);
-						if (m.setOpacity) {
-							m.setOpacity(1);
+						if (m.clusterShow) {
+							m.clusterShow();
 						}
 					}
 				}
@@ -314,7 +314,7 @@ L.MarkerCluster = L.Marker.extend({
 	_recursively: function (boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel) {
 		var childClusters = this._childClusters,
 		    zoom = this._zoom,
-			i, c;
+		    i, c;
 
 		if (zoomLevelToStart > zoom) { //Still going down to required depth, just recurse to child clusters
 			for (i = childClusters.length - 1; i >= 0; i--) {

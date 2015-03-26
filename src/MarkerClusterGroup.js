@@ -151,8 +151,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (this._featureGroup.hasLayer(layer)) {
 			this._featureGroup.removeLayer(layer);
-			if (layer.setOpacity) {
-				layer.setOpacity(1);
+			if (layer.clusterShow) {
+				layer.clusterShow();
 			}
 		}
 
@@ -279,8 +279,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			if (fg.hasLayer(m)) {
 				fg.removeLayer(m);
-				if (m.setOpacity) {
-					m.setOpacity(1);
+				if (m.clusterShow) {
+					m.clusterShow();
 				}
 			}
 		}
@@ -970,7 +970,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				c._recursivelyAddChildrenToMap(null, newZoomLevel, bounds);
 			} else {
 				//Fade out old cluster
-				c.setOpacity(0);
+				c.clusterHide();
 				c._recursivelyAddChildrenToMap(startPos, newZoomLevel, bounds);
 			}
 
@@ -992,7 +992,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//TODO Maybe? Update markers in _recursivelyBecomeVisible
 		fg.eachLayer(function (n) {
 			if (!(n instanceof L.MarkerCluster) && n._icon) {
-				n.setOpacity(1);
+				n.clusterShow();
 			}
 		});
 
@@ -1006,7 +1006,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			//update the positions of the just added clusters/markers
 			this._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
 				fg.removeLayer(c);
-				c.setOpacity(1);
+				c.clusterShow();
 			});
 
 			this._animationEnd();
@@ -1042,8 +1042,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				var m = cluster._markers[0];
 				//If we were in a cluster animation at the time then the opacity and position of our child could be wrong now, so fix it
 				m.setLatLng(m.getLatLng());
-				if (m.setOpacity) {
-					m.setOpacity(1);
+				if (m.clusterShow) {
+					m.clusterShow();
 				}
 			} else {
 				cluster._recursively(bounds, newZoomLevel, 0, function (c) {
@@ -1066,11 +1066,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._animationStart();
 
 				layer._setPos(this._map.latLngToLayerPoint(newCluster.getLatLng()));
-				layer.setOpacity(0);
+				layer.clusterHide();
 
 				this._enqueue(function () {
 					fg.removeLayer(layer);
-					layer.setOpacity(1);
+					layer.clusterShow();
 
 					me._animationEnd();
 				});
