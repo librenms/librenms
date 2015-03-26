@@ -44,19 +44,19 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
     <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw"></i> Overview</a>
           <ul class="dropdown-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw"></i> Overview</a></li>
           <li class="dropdown-submenu">
-            <a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a>
+            <a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-exclamation-circle fa-fw"></i> Alerts</a>
             <ul class="dropdown-menu scrollable-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><img src="images/16/report.png" border="0" align="absmiddle" /> Alert Log</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-exclamation-circle fa-fw"></i> Alerts</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw"></i> Alert Log</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><img src="images/16/monitor_go.png" border="0" align="absmiddle" /> Alert Rules</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><img src="images/16/monitor_link.png" border="0" align="absmiddle" /> Alert Templates</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw"></i> Alert Rules</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw"></i> Alert Templates</a></li>
 <?php
 }
 ?>
@@ -64,27 +64,26 @@ if ($_SESSION['userlevel'] >= '10') {
           </li>
             <li role="presentation" class="divider"></li>
 <?php if (isset($config['enable_map']) && $config['enable_map']) {
-  echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
+  echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><i class="fa fa-globe fa-fw"></i> Network Map</a></li>');
 } ?>
-            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><img src="images/16/report.png" border="0" align="absmiddle" /> Eventlog</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw"></i> Eventlog</a></li>
 <?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-  echo('              <li><a href="'.generate_url(array('page'=>'syslog')).'"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
+  echo('              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw"></i> Syslog</a></li>');
 } ?>
-<!--        <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
-            <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><i class="fa fa-cube fa-fw"></i> Inventory</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header"> Search</li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><img src="images/16/email_link.png" border="0" align="absmiddle" /> ARP Tables</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><i class="fa fa-search fa-fw"></i> IPv4 Search</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw"></i> IPv6 Search</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw"></i> MAC Search</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw"></i> ARP Tables</a></li>
           </ul>
         </li>
         <li class="dropdown">
-          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
+          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw"></i> Devices</a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
-              <a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a>
+              <a href="devices/"><i class="fa fa-server fa-fw"></i> All Devices</a>
               <ul class="dropdown-menu scrollable-menu">
 <?php
 
@@ -104,14 +103,14 @@ if ($config['show_locations'])
 
   echo('
             <li class="dropdown-submenu">
-              <a href="#"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
+              <a href="#"><i class="fa fa-map-marker fa-fw"></i> Locations</a>
               <ul class="dropdown-menu scrollable-menu">
   ');
   if ($config['show_locations_dropdown'])
   {
     foreach (getlocations() as $location)
     {
-      echo('            <li><a href="devices/location=' . urlencode($location) . '/"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
+      echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building-o fa-fw"></i> ' . $location . ' </a></li>');
     }
 
   }
@@ -121,8 +120,8 @@ if ($config['show_locations'])
   ');
 }
   echo('
-            <li><a href="addhost/"><img src="images/16/server_add.png" border="0" align="absmiddle" /> Add Device</a></li>
-            <li><a href="delhost/"><img src="images/16/server_delete.png" border="0" align="absmiddle" /> Delete Device</a></li>');
+            <li><a href="addhost/"><i class="fa fa-desktop fa-fw"></i> Add Device</a></li>
+            <li><a href="delhost/"><i class="fa fa-desktop fa-fw"></i> Delete Device</a></li>');
 }
 
 if ($links['count'] > 0) {
@@ -145,9 +144,9 @@ if ($config['show_services'])
 {
 ?>
         <li class="dropdown">
-          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a>
+          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw"></i> Services</a>
           <ul class="dropdown-menu">
-            <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
+            <li><a href="services/"><i class="fa fa-cogs fa-fw"></i> All Services </a></li>
 
 <?php
 
@@ -155,15 +154,15 @@ if ($service_alerts)
 {
   echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="services/status=0/"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
+            <li><a href="services/status=0/"><i class="fa fa-cog fa-fw"></i> Alerts ('.$service_alerts.')</a></li>');
 }
 
 if ($_SESSION['userlevel'] >= '10')
 {
   echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="addsrv/"><img src="images/16/cog_add.png" border="0" align="absmiddle" /> Add Service</a></li>
-            <li><a href="delsrv/"><img src="images/16/cog_delete.png" border="0" align="absmiddle" /> Delete Service</a></li>');
+            <li><a href="addsrv/"><i class="fa fa-cog fa-fw"></i> Add Service</a></li>
+            <li><a href="delsrv/"><i class="fa fa-cog fa-fw"></i> Delete Service</a></li>');
 }
 ?>
           </ul>
@@ -175,9 +174,9 @@ if ($_SESSION['userlevel'] >= '10')
 
     <!-- PORTS -->
         <li class="dropdown">
-          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
+          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw"></i> Ports</a>
           <ul class="dropdown-menu">
-            <li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
+            <li><a href="ports/"><i class="fa fa-link fa-fw"></i> All Ports</a></li>
 
 <?php
 
@@ -441,7 +440,7 @@ if(is_file("includes/print-menubar-custom.inc.php"))
      </form>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" alt="System menu" title="System menu" /></a>
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li role="presentation" class="divider"></li>
