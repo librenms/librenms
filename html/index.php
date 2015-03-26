@@ -166,6 +166,7 @@ if (empty($config['favicon'])) {
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
   <link href="css/mktree.css" rel="stylesheet" type="text/css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
