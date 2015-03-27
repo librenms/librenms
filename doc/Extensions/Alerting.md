@@ -199,6 +199,7 @@ The HipChat transport requires the following:
 __room_id__ = HipChat Room ID
 
 __url__ = HipChat API URL+API Key
+
 __from__ = The name that will be displayed
 
 The HipChat transport makes the following optional:
