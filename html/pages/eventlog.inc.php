@@ -63,8 +63,7 @@ var grid = $("#eventlog").bootgrid({
     {
         return {
             id: "eventlog",
-            string: '<?php echo $_POST['string']; ?>',
-            device: '<?php echo $_POST['device']; ?>'
+            device: '<?php echo htmlspecialchars($_POST['device']); ?>'
         };
     },
     url: "/ajax_table.php"
