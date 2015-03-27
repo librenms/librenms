@@ -205,7 +205,9 @@ __from__ = The name that will be displayed
 The HipChat transport makes the following optional:
 
 __color__ = Any of HipChat's supported message colors
+
 __message_format__ = Any of HipChat's supported message formats
+
 __notify__ = 0 or 1
 
 See the HipChat API Documentation for
