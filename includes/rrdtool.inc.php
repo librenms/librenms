@@ -251,7 +251,9 @@ function rrdtool_escape($string, $maxlength = NULL)
   $result = str_replace('%','%%',$result);
 
   // FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
-  
+
+  $result = shorten_interface_type($result);
+
   if ($maxlength != NULL)
   {
     return substr(str_pad($result, $maxlength),0,$maxlength+(strlen($result)-strlen($string)));
@@ -260,6 +262,15 @@ function rrdtool_escape($string, $maxlength = NULL)
   {
     return $result;
   }
+}
+
+function shorten_interface_type($string) {
+
+    return str_ireplace(
+               array('FastEthernet','GigbitEthernet','TenGigabitEthernet'),
+               array('Fa','Gi','Te'),
+               $string
+           );
 }
 
 ?>
