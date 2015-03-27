@@ -520,7 +520,7 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
-$os = "bigip";
+$os = "f5";
 $config['os'][$os]['text']              = "F5 Big IP";
 $config['os'][$os]['type']              = "loadbalancer";
 $config['os'][$os]['icon']              = "f5";
