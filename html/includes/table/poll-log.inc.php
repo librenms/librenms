@@ -1,7 +1,6 @@
 <?php
 
-$count_sql = "SELECT count(D.device_id) FROM `devices` AS `D`";
-$sql = "SELECT D.device_id,D.hostname AS `hostname`, D.last_polled AS `last_polled`, D.last_polled_timetaken AS `last_polled_timetaken` FROM `devices` AS D";
+$sql = " FROM `devices` AS D";
 
 if (is_admin() === FALSE) {
     $sql .= ", devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.ignore = '0'";
@@ -17,9 +16,10 @@ if (!isset($sort) || empty($sort)) {
     $sort = 'last_polled_timetaken DESC';
 }
 
-$sql .= " AND D.status ='1' AND D.ignore='0' AND D.disabled='0' ORDER BY $sort";
-
+$count_sql = "SELECT COUNT(`D`.`device_id`) $sql";
 $total = dbFetchCell($count_sql);
+
+$sql .= " AND D.status ='1' AND D.ignore='0' AND D.disabled='0' ORDER BY $sort";
 
 if (isset($current)) {
     $limit_low = ($current * $rowCount) - ($rowCount);
@@ -29,6 +29,8 @@ if (isset($current)) {
 if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
+
+$sql = "SELECT D.device_id,D.hostname AS `hostname`, D.last_polled AS `last_polled`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
 foreach (dbFetchRows($sql) as $device) {
     $response[] = array('hostname' => "<a class='list-device' href='" .generate_device_url($device, array('tab' => 'graphs', 'group' => 'poller')). "'>" .$device['hostname']. "</a>",

@@ -21,12 +21,12 @@ if ($_SESSION['userlevel'] >= '5') {
     $param[] = $_SESSION['user_id'];
 }
 
-$count_sql = "SELECT COUNT(datetime) $sql";
-$total = dbFetchCell($count_sql,$param);
-
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%')";
 }
+
+$count_sql = "SELECT COUNT(datetime) $sql";
+$total = dbFetchCell($count_sql,$param);
 
 if (!isset($sort) || empty($sort)) {
     $sort = 'datetime DESC';
