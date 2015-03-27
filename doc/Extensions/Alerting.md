@@ -13,6 +13,7 @@ Table of Content:
     - [Nagios-Compatible](#transports-nagios)
     - [IRC](#transports-irc)
     - [Slack](#transports-slack)
+    - [HipChat](#transports-hipchat)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -190,6 +191,51 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.com/services/A12B34CDE/F56GH78JK/L901LmNopqrSTUVw2w3XYZAB4C", 'channel' => '@john', 'username' => 'LibreNMS', 'icon_emoji' => ':ghost:');
 
 ```
+
+## <a name="transports-hipchat">HipChat</a>
+
+The HipChat transport requires the following:
+
+__room_id__ = HipChat Room ID
+
+__url__ = HipChat API URL+API Key
+
+__from__ = The name that will be displayed
+
+The HipChat transport makes the following optional:
+
+__color__ = Any of HipChat's supported message colors
+
+__message_format__ = Any of HipChat's supported message formats
+
+__notify__ = 0 or 1
+
+See the HipChat API Documentation for
+[rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
+for details on acceptable values.
+
+> You may notice that the link points at the "deprecated" v1 API.  This is
+> because the v2 API is still in beta.
+
+Below are two examples of sending messages to a HipChat room.
+
+```php
+$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=9109jawregoaih",
+                                                    "room_id" => "1234567",
+                                                    "from" => "LibreNMS");
+
+$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj",
+                                                    "room_id" => "7654321",
+                                                    "from" => "LibreNMS",
+                                                    "color" => "red",
+                                                    "notify" => 1,
+                                                    "message_format" => "text");
+```
+
+> Note: The default message format for HipChat messages is HTML.  It is
+> recommended that you specify the `text` message format to prevent unexpected
+> results, such as HipChat attempting to interpret angled brackets (`<` and
+> `>`).
 
 # <a name="entities">Entities
 
