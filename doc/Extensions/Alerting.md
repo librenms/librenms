@@ -196,15 +196,16 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 
 The HipChat transport requires the following:
 
-__room_id__: HipChat Room ID
-__url__: HipChat API URL+API Key
-__from__: The name that will be displayed
+__room_id__ = HipChat Room ID
+
+__url__ = HipChat API URL+API Key
+__from__ = The name that will be displayed
 
 The HipChat transport makes the following optional:
 
-__color__: Any of HipChat's supported message colors
-__message_format__: Any of HipChat's supported message formats
-__notify__: 0 or 1
+__color__ = Any of HipChat's supported message colors
+__message_format__ = Any of HipChat's supported message formats
+__notify__ = 0 or 1
 
 See the HipChat API Documentation for
 [rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
