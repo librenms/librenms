@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Timeline | Group example</title>
+
+  <style>
+    body, html {
+      font-family: arial, sans-serif;
+      font-size: 11pt;
+    }
+
+    #visualization {
+      box-sizing: border-box;
+      width: 100%;
+    }
+  </style>
+
+  <script src="../dist/vis.js"></script>
+  <link href="../dist/vis.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<div>
+  <label for="orientation">Orientation</label>
+  <select id="orientation">
+    <option value="top">top</option>
+    <option value="bottom" selected>bottom</option>
+  </select>
+</div>
+<script>
+  var o = document.getElementById('orientation');
+  o.onchange = function () {
+    timeline.setOptions({
+      orientation: o.value
+    });
+  };
+</script>
+<br>
+
+<div id="visualization"></div>
+
+<script>
+  var moment = vis.moment;
+
+  var now = moment().minutes(0).seconds(0).milliseconds(0);
+  var groupCount = 3;
+  var itemCount = 20;
+
+  // create a data set with groups
+  var names = ['John (0)', 'Alston (1)', 'Lee (2)', 'Grant (3)'];
+  var groups = new vis.DataSet();
+  for (var g = 0; g < groupCount; g++) {
+    groups.add({id: g, content: names[g], title: 'Title of group ' + g, 'className': 'myGroup'});
+  }
+
+  // create a dataset with items
+  var items = new vis.DataSet();
+  for (var i = 0; i < itemCount; i++) {
+    var start = now.clone().add(Math.random() * 200, 'hours');
+    var group = Math.floor(Math.random() * groupCount);
+    items.add({
+      id: i,
+      group: group,
+      content: 'item ' + i +
+          ' <span style="color:#97B0F8;">(' + names[group] + ')</span>',
+      start: start,
+      title: 'Title for item ' + i,
+      type: 'box',
+      className: 'myItem'
+    });
+  }
+
+  // create visualization
+  var container = document.getElementById('visualization');
+  var options = {
+    //orientation: 'top',
+    editable: {
+      add: true,
+      remove: true,
+      updateTime: true,
+      updateGroup: true
+    },
+
+
+    onAdd: function (item, callback) {
+      item.content = prompt('Enter text content for new item:', item.content);
+      if (item.content != null) {
+        callback(item); // send back adjusted new item
+      }
+      else {
+        callback(null); // cancel item creation
+      }
+    },
+
+    onMove: function (item, callback) {
+      if (confirm('Do you really want to move the item to\n' +
+          'start: ' + item.start + '\n' +
+          'end: ' + item.end + '?')) {
+        callback(item); // send back item as confirmation (can be changed)
+      }
+      else {
+        callback(null); // cancel editing item
+      }
+    },
+
+    onMoving: function (item, callback) {
+      var min = moment().minutes(0).seconds(0).milliseconds(0).add(2, 'day').toDate();
+      if (item.start < min) {
+        item.start = min;
+      }
+
+      callback(item); // send back item as confirmation (can be changed)
+    },
+
+    onUpdate: function (item, callback) {
+      item.content = prompt('Edit items text:', item.content);
+      if (item.content != null) {
+        callback(item); // send back adjusted item
+      }
+      else {
+        callback(null); // cancel updating the item
+      }
+    },
+
+    onRemove: function (item, callback) {
+      if (confirm('Remove item ' + item.content + '?')) {
+        callback(item); // confirm deletion
+      }
+      else {
+        callback(null); // cancel deletion
+      }
+    },
+
+    //stack: false,
+    //height: 200,
+    groupOrder: 'content'
+  };
+
+  console.time('create timeline');
+  var timeline = new vis.Timeline(container);
+  console.timeEnd('create timeline');
+
+  console.time('set options');
+  timeline.setOptions(options);
+  console.timeEnd('set options');
+
+  console.time('set groups');
+  timeline.setGroups(groups);
+  console.timeEnd('set groups');
+
+  console.time('set items');
+  timeline.setItems(items);
+  console.timeEnd('set items');
+
+  timeline.on('select', function (selection) {
+    console.log('select', selection);
+  });
+
+  /*
+  timeline.on('rangechange', function (range) {
+    console.log('rangechange', range);
+  });
+  timeline.on('rangechanged', function (range) {
+    console.log('rangechanged', range);
+  });
+  */
+
+  timeline.on('click', function (props) {
+    console.log('click', props);
+  });
+
+  timeline.on('doubleClick', function (props) {
+    console.log('doubleClick', props);
+  });
+
+  timeline.on('contextmenu', function (props) {
+    console.log('contextmenu', props);
+  });
+
+  items.on('add',    console.log.bind(console));
+  items.on('update', console.log.bind(console));
+  items.on('remove', console.log.bind(console));
+
+  groups.on('add',    console.log.bind(console));
+  groups.on('update', console.log.bind(console));
+  groups.on('remove', console.log.bind(console));
+
+  function log (msg) {
+    var logs = document.getElementById('logs');
+    logs.innerHTML = msg + '<br>' + logs.innerHTML;
+  }
+
+</script>
+<div id="logs"></div>
+</body>
+</html>
