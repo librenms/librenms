@@ -5,6 +5,12 @@
 $service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
 $if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
+if ($_SESSION['userlevel'] >= 5) {
+    $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
+} else {
+	$links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `L`.`local_device_id` = `D`.`device_id`", array($_SESSION['user_id']));
+}
+
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
   $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
@@ -118,9 +124,18 @@ if ($config['show_locations'])
             <li><a href="addhost/"><img src="images/16/server_add.png" border="0" align="absmiddle" /> Add Device</a></li>
             <li><a href="delhost/"><img src="images/16/server_delete.png" border="0" align="absmiddle" /> Delete Device</a></li>');
 }
+
+if ($links['count'] > 0) {
+
 ?>
               <li role="presentation" class="divider"></li>
               <li><a href="map/"><img src="images/16/chart_organisation.png" border="0" alt="Network Map" width="16" height="16" /> Network Map</a></li>
+<?php
+
+}
+
+?>
+
           </ul>
         </li>
 
