@@ -1611,6 +1611,6 @@ tr.search:nth-child(odd) {
 }
 
 #visualization {
-    width: 600px;
+    width: 90%;
     height: 600px;
 }
