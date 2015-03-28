@@ -5,7 +5,7 @@
 
 ## On the database server ##
 
-This host is where the MySQL database runs.  It could be the same machine as your network management server (this is hte most common initial deployment scenario).
+This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
     apt-get install mysql-server mysql-client
     mysql -uroot -p
