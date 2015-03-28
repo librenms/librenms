@@ -18,6 +18,10 @@ LibreNMS ships with the following software components:
   http://www.javascripttoolbox.com/lib/mktree/
   MIT and GPL License
 
+- Jquery Bootgrid
+  http://www.jquery-bootgrid.com/
+  MIT License
+
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 
