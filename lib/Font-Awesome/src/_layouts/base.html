@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic Page Needs
+ ================================================== -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Font Awesome, the iconic font and CSS framework">
+  <meta name="author" content="Dave Gandy">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="shortcut icon" href="{{ page.relative_path }}assets/ico/favicon.ico">
+
+  <title>{% if page.title %}{{ page.title }}{% endif %}</title>
+
+  <!-- CSS
+  ================================================== -->
+  <link rel="stylesheet" href="{{ page.relative_path }}assets/css/site.css">
+  <link rel="stylesheet" href="{{ page.relative_path }}assets/css/pygments.css">
+  <link rel="stylesheet" href="{{ page.relative_path }}assets/font-awesome/css/font-awesome.css">
+
+  <!--[if lt IE 9]>
+    <script src="{{ page.relative_path }}assets/js/html5shiv.js"></script>
+    <script src="{{ page.relative_path }}assets/js/respond.min.js"></script>
+  <![endif]-->
+
+  <script type="text/javascript" src="//use.typekit.net/wnc7ioh.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30136587-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</head>
+<body>
+<script type="text/javascript">
+  (function(){
+    var bsa = document.createElement('script');
+    bsa.type = 'text/javascript';
+    bsa.async = true;
+    bsa.src = 'http://s3.buysellads.com/ac/bsa.js';
+    (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(bsa);
+  })();
+</script>
+<div id="wrap"> <!-- necessary for sticky footer. wrap all content except footer -->
+  {% include navbar.html %}
+
+  {{ content }}
+</div>
+{% include footer.html %}
+
+<script src="http://platform.twitter.com/widgets.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/{{ site.jquery.version }}/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/{{ site.bootstrap.version }}/js/bootstrap.min.js"></script>
+<script src="{{ page.relative_path}}assets/js/tabcomplete.min.js"></script>
+<script src="{{ page.relative_path }}assets/js/site.js"></script>
+<script type="text/javascript">
+  (function() {
+    window._pa = window._pa || {};
+    var pa = document.createElement('script'); pa.type = 'text/javascript'; pa.async = true;
+    pa.src = ('https:' == document.location.protocol ? 'https:' : 'http:') + "//tag.perfectaudience.com/serve/54bfdab8751a087f190000f8.js";
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(pa, s);
+  })();
+</script>
+</body>
+</html>

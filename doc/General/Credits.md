@@ -18,6 +18,10 @@ LibreNMS ships with the following software components:
   http://www.javascripttoolbox.com/lib/mktree/
   MIT and GPL License
 
+- Font Awesome
+  http://fontawesome.io/
+  Varying licenses but GPL friendly
+
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 
