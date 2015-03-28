@@ -1609,3 +1609,8 @@ tr.search:nth-child(odd) {
   padding-left: 15px !important;
   padding-top: 8px !important;
 }
+
+#visualization {
+    width: 90%;
+    height: 600px;
+}
