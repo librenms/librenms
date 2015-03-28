@@ -22,6 +22,10 @@ LibreNMS ships with the following software components:
   http://www.jquery-bootgrid.com/
   MIT License
 
+- Font Awesome
+  http://fontawesome.io/
+  Varying licenses but GPL friendly
+
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 
