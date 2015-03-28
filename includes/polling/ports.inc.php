@@ -277,8 +277,15 @@ foreach ($ports as $port)
         $attrib_key = "port_descr_".$attrib;
         if ($port_ifAlias[$attrib] != $port[$attrib_key])
         {
+          if (!isset($port_ifAlias[$attrib])) {
+              $port_ifAlias[$attrib] = array('NULL');
+              $log_port = 'NULL';
+          } else {
+              $log_port = $port_ifAlias[$attrib];
+          }
           $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['port_id']);
+          log_event($attrib . ": ".$port[$attrib_key]." -> " . $log_port, $device, 'interface', $port['port_id']);
+          unset($log_port);
         }
       }
     }
