@@ -75,6 +75,7 @@ if (is_array($tmp_devices[0])) {
 ?>
  
 <div id="visualization"></div>
+<script src="js/vis.min.js"></script>
 <script type="text/javascript">
 
     // create an array with nodes
