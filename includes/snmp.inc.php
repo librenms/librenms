@@ -58,7 +58,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   {
     list($oid,$value) = explode("=", $entry);
     $oid = trim($oid); $value = trim($value);
-    list($oid, $index) = explode(".", $oid);
+    list($oid, $index) = explode(".", $oid,2);
     if (!strstr($value, "at this OID") && isset($oid) && isset($index))
     {
       $array[$index][$oid] = $value;
