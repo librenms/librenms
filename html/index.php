@@ -311,7 +311,7 @@ if($config['enable_footer'] == 1) {
     <div class="row">
       <div class="col-md-12 text-center">
 <?php
-echo('<h5>Powered by <a href="http://www.librenms.org/" target="_blank" class="red">' . $config['project_name'].'</a>.</h5>');
+echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" class="red">' . $config['project_name'].'</a>.</h5>');
 ?>
       </div>
     </div>

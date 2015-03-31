@@ -102,6 +102,7 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 }
 
 $config['project_url']      = "https://github.com/librenms/";
+$config['project_home']     = 'http://www.librenms.org/';
 $config['project_issues']   = "https://github.com/librenms/librenms/issues";
 $config['site_style']       = "light"; // Options are dark or light
 $config['stylesheet']       = "css/styles.css";
