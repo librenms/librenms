@@ -4,6 +4,12 @@
   - Updates to alert rules split (PR550)
   - Updated get_graphs() for API to resolve graph names (PR613)
   - Fixed use of REMOTE_ADDR to use X_FORWARDED_FOR if available (PR620)
+  - Added yocto support from entPhySensorScale (PR632)
+  - Eventlog search fixed (PR644)
+  - Added missing OS discovery to default list (PR660)
+  - Fixed logging issue when description of a port was removed (PR673)
+  - Fixed logging issue when ports changed status (PR675)
+  - Shortened interface names for graph display (PR676)
 
 ####Improvements
   - Visual updates to alert logs (PR541)
@@ -16,6 +22,17 @@
   - Added dynamic removal of device data when removing device (PR592)
   - Updated alerting to use fifo (PR607)
   - Added distributed poller support (PR609 and PR610)
+  - Added PowerConnect 55xx (PR635)
+  - Added inventory API endpoint (PR640)
+  - Added serial number detection for ASA firewalls (PR642)
+  - Added missing MKTree library for inventory support (PR646)
+  - Added support for exporting Alert logs to PDF (PR653)
+  - Added basic Ubiquiti support (PR659)
+  - Numerous docs update (PR662, PR663, PR677, PR694)
+  - Added Polling information page (PR664)
+  - Added HipChat notification support (PR669)
+  - Implemented Jquery Bootgrid support (PR671)
+  - Added new map to show xDP discovered links and devices (PR679 + PR680)
 
 ###Feb 2015
 
