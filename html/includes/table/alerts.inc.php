@@ -49,17 +49,27 @@ foreach (dbFetchRows($sql,$param) as $alert) {
     $ico = "ok";
     $col = "green";
     $extra = "";
+    $msg = "";
     if ( (int) $alert['state'] === 0 ) {
         $ico = "ok";
         $col = "green";
-    } elseif ( (int) $alert['state'] === 1 ) {
+        $extra = "success";
+        $msg = "OK";
+    } elseif ( (int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
         $ico = "volume-up";
         $col = "red";
         $extra = "danger";
-    } elseif ( (int) $alert['state'] === 2 ) {
+        $msg = "ALERT";
+        if ( (int) $alert['state'] === 3) {
+            $msg = "WORSE";
+        } elseif ( (int) $alert['state'] === 4) {
+            $msg = "BETTER";
+        }
+    } elseif ( (int) $alert['state'] === 2) {
         $ico = "volume-off";
         $col = "#800080";
         $extra = "warning";
+        $msg = "MUTED";
     }
     $alert_checked = '';
     $orig_ico = $ico;
@@ -91,7 +101,8 @@ foreach (dbFetchRows($sql,$param) as $alert) {
                         'state'=>$alert['state'],
                         'alert_id'=>$alert['id'],
                         'ack_ico'=>$ack_ico,
-                        'extra'=>$extra);
+                        'extra'=>$extra,
+                        'msg'=>$msg);
 
 }
 

@@ -11,6 +11,7 @@ require_once('includes/modal/new_alert_rule.inc.php');
     <table id="alerts" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
+                <th data-column-id="status" data-formatter="status" data-sortable="false">Status</th>
                 <th data-column-id="id" data-sortable="false">#</th>
                 <th data-column-id="rule">Rule</th>
                 <th data-column-id="hostname">Hostname</th>
@@ -35,6 +36,9 @@ var grid = $("#alerts").bootgrid({
     },
     url: "/ajax_table.php",
     formatters: {
+        "status": function(column,row) {
+            return "<span class='label label-"+row.extra+"'>" + row.msg + "</span>";
+        },
         "ack": function(column,row) {
             return "<button type='button' class='btn btn-"+row.ack_col+" btn-sm command-ack-alert' data-target='#ack-alert' data-state='"+row.state+"' data-alert_id='"+row.alert_id+"' name='ack-alert' id='ack-alert' data-extra='"+row.extra+"'><span class='glyphicon glyphicon-"+row.ack_ico+"'aria-hidden='true'></span></button>";
         }
