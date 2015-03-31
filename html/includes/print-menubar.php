@@ -384,7 +384,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
     echo('
             <li><a href="routing/protocol=bgp/type=all/graph=NULL/"><i class="fa fa-link fa-fw fa-lg"></i> BGP All Sessions </a></li>
             <li><a href="routing/protocol=bgp/type=external/graph=NULL/"><i class="fa fa-external-link fa-fw fa-lg"></i> BGP External</a></li>
-            <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><i class="fa fa-external-link fa-rotate-180 fa-inverse fa-fw fa-lg"></i> BGP Internal</a></li>');
+            <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><i class="fa fa-external-link fa-rotate-180 fa-fw fa-lg"></i> BGP Internal</a></li>');
   }
 
   // Do Alerts at the bottom
