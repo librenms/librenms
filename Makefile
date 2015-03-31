@@ -1,4 +1,5 @@
 GIT=git
+GIT_SUBTREE=$(GIT) subtree pull --squash
 SYNC=rsync -rtvx --cvs-exclude --exclude '.*.swp'
 
 default:
@@ -29,6 +30,10 @@ push-personal pp:
 push-testing:
 	$(GIT) push testing
 
-update-subtrees:
-	$(GIT) subtree pull --squash --prefix=html/js/datetime https://github.com/Eonasdan/bootstrap-datetimepicker master
-	$(GIT) subtree pull --squash --prefix=html/js/moment   https://github.com/moment/moment master
+update-subtrees: datetime-subtree moment-subtree
+
+datetime-subtree:
+	$(GIT_SUBTREE) --prefix=html/js/datetime https://github.com/Eonasdan/bootstrap-datetimepicker master
+
+moment-subtree:
+	$(GIT_SUBTREE) --prefix=html/js/moment   https://github.com/moment/moment master
