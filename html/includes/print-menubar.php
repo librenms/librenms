@@ -16,7 +16,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
 }
 
-if (isset($config['site_style']) && $config['site_style'] == 'dark') {
+if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config['site_style'] == 'mono')) {
     $navbar = 'navbar-inverse';
 }
 
