@@ -18,6 +18,7 @@ Contributors to LibreNMS:
 - Markus Heberling <markus@tisoft.de> (tisoft)
 - Alan Gregory <alan@opcaonet.com.br> (alangregory)
 - Joubert RedRat <me+github@redrat.com.br> (joubertredrat)
+- Len Lin <Ultra2D@users.noreply.github.com> (Ultra2D)
 
 [1]: http://observium.org/ "Observium web site"
 
