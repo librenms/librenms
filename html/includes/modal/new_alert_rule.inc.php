@@ -147,9 +147,9 @@ $('#create-alert').on('show.bs.modal', function (event) {
         dataType: "json",
         success: function(output) {
             var arr = [];
-            for (elem in output['rules']) {
-                arr.push(output['rules'][elem]);
-            }
+            $.each ( output['rules'], function( key, value ) {
+                arr.push(value);
+            });
             $('#response').data('tagmanager').populate(arr);
             $('#severity').val(output['severity']).change;
             var extra = $.parseJSON(output['extra']);
