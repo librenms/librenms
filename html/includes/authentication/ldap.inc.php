@@ -30,7 +30,7 @@ function authenticate($username,$password)
       }
       else
       {
-        if (ldap_compare($ds,$config['auth_ldap_group'],'memberUid',$username))
+        if (ldap_compare($ds,$config['auth_ldap_group'], $config['auth_ldap_groupmemberattr'],get_membername($username))===true)
         {
           return 1;
         }
@@ -97,7 +97,7 @@ function get_userlevel($username)
   $userlevel = 0;
 
   # Find all defined groups $username is in
-  $filter = "(&(|(cn=" . join(")(cn=", array_keys($config['auth_ldap_groups'])) . "))(memberUid=" . $username . "))";
+  $filter = "(&(|(cn=" . join(")(cn=", array_keys($config['auth_ldap_groups'])) . "))(". $config['auth_ldap_groupmemberattr']. "=" . get_membername($username) . "))";
   $search = ldap_search($ds, $config['auth_ldap_groupbase'], $filter);
   $entries = ldap_get_entries($ds, $search);
 
@@ -154,7 +154,7 @@ function get_userlist()
       $realname = $entry['cn'][0];
       $user_id  = $entry['uidnumber'][0];
 
-      if (!isset($config['auth_ldap_group']) || ldap_compare($ds,$config['auth_ldap_group'],'memberUid',$username))
+      if (!isset($config['auth_ldap_group']) || ldap_compare($ds,$config['auth_ldap_group'],$config['auth_ldap_groupmemberattr'],get_membername($username))===true)
       {
         $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
       }
@@ -180,6 +180,20 @@ function update_user($user_id,$realname,$level,$can_modify_passwd,$email)
 {
   # not supported
   return 0;
+}
+
+function get_membername ($username)
+{
+  global $config;
+  if ($config['auth_ldap_groupmembertype'] == "fulldn") 
+  {
+    $membername = $config['auth_ldap_prefix'] . $username . $config['auth_ldap_suffix'];
+  }
+  else
+  {
+    $membername = $username;
+  }
+  return $membername;
 }
 
 ?>
