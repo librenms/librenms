@@ -11,7 +11,9 @@ if (isset($rewrite_fortinet_hardware[$poll_device['sysObjectID']]))
   $hardware = $rewrite_fortinet_hardware[$poll_device['sysObjectID']];
 }
 
-$hardware     = snmp_get($device, "ENTITY-MIB::entPhysicalModelName.1", "-Ovq");
+if (empty($hardware)) {
+  $hardware = snmp_get($device, "ENTITY-MIB::entPhysicalModelName.1", "-Ovq");
+}
 
 $sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate_sessions.rrd";
 $sessions = snmp_get($device, "FORTINET-FORTIGATE-MIB::fgSysSesCount.0", "-Ovq");
