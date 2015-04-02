@@ -71,17 +71,6 @@ ul ul ul { list-style: square outside; }
  border-color: #000;
 }
 
-input,select {
-  background: #FFFFFF url('/images/textbg.png') repeat-x scroll 0 0;
-  font-size: 1em;
-  border: 1px solid #B2B2B2;
-  border-color: #B2B2B2 #d2d2d2 #d2d2d2 #B2B2B2;
-  border-style: solid;
-  border-width: 1px;
-  margin: 1px;
-  padding: 1px;
-}
-
 .rounded {
   display:block;
 }
