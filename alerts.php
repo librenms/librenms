@@ -25,7 +25,6 @@
 
 include_once("includes/defaults.inc.php");
 include_once("config.php");
-
 $lock = false;
 if( file_exists($config['install_dir']."/.alerts.lock") ) {
 	$pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));

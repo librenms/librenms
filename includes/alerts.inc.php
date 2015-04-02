@@ -23,6 +23,21 @@
  */
 
 /**
+ * Get Rules for device, group, etc
+ * @param int $device Device-ID
+ * @return array
+ */
+function GetRules($device) {
+	$where = " alert_rules.target = -1 || alert_rules.target = ? ";
+	$params = array($device);
+	foreach( dbFetchRows("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'alert_group' AND device_id = ?", $params) as $group ) {
+		$where .= "|| alert_rules.target = ? ";
+		$params[] = "g".$group['attrib_value'];
+	}
+	return dbFetchRows("SELECT * FROM alert_rules WHERE alert_rules.disabled = 0 && ( ".$where." ) ORDER BY target,id", $params);
+}
+
+/**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string
@@ -64,7 +79,7 @@ function RunRules($device) {
 	if( $chk['id'] > 0 ) {
 		return false;
 	}
-	foreach( dbFetchRows("SELECT * FROM alert_rules WHERE alert_rules.disabled = 0 && ( alert_rules.device_id = -1 || alert_rules.device_id = ? ) ORDER BY device_id,id",array($device)) as $rule ) {
+	foreach( GetRules($device) as $rule ) {
 		echo " #".$rule['id'].":";
 		$inv = json_decode($rule['extra'],true);
 		if( isset($inv['invert']) ) {

@@ -12,14 +12,14 @@ $no_refresh = TRUE;
 <?php
 
 if(isset($_POST['create-default'])) {
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%devices.status != "1" && %devices.disabled = "0" && %devices.ignore = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Devices up/down');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%devices.uptime < "300" && %devices.disabled = "0" && %devices.ignore = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'Device rebooted');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%bgpPeers.bgpPeerState != "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'BGP Session down');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%bgpPeers.bgpPeerFsmEstablishedTime < "300" && %bgpPeers.bgpPeerState = "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'BGP Session establised');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%ports.ifOperStatus != "up" && %ports.ifAdminStatus = "up" && %ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'Port status up/down');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100 >= 80', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Port utilisation over threshold');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%sensors.sensor_current > %sensors.sensor_limit', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Sensor over limit');
-    $default_rules[] = array('device_id' => '-1', 'rule' => '%sensors.sensor_current < %sensors.sensor_limit_low', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Sensor under limit');
+    $default_rules[] = array('target' => '-1', 'rule' => '%devices.status != "1" && %devices.disabled = "0" && %devices.ignore = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Devices up/down');
+    $default_rules[] = array('target' => '-1', 'rule' => '%devices.uptime < "300" && %devices.disabled = "0" && %devices.ignore = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'Device rebooted');
+    $default_rules[] = array('target' => '-1', 'rule' => '%bgpPeers.bgpPeerState != "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'BGP Session down');
+    $default_rules[] = array('target' => '-1', 'rule' => '%bgpPeers.bgpPeerFsmEstablishedTime < "300" && %bgpPeers.bgpPeerState = "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'BGP Session establised');
+    $default_rules[] = array('target' => '-1', 'rule' => '%ports.ifOperStatus != "up" && %ports.ifAdminStatus = "up" && %ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"300"}', 'disabled' => 0, 'name' => 'Port status up/down');
+    $default_rules[] = array('target' => '-1', 'rule' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100 >= 80', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Port utilisation over threshold');
+    $default_rules[] = array('target' => '-1', 'rule' => '%sensors.sensor_current > %sensors.sensor_limit', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Sensor over limit');
+    $default_rules[] = array('target' => '-1', 'rule' => '%sensors.sensor_current < %sensors.sensor_limit_low', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"300"}', 'disabled' => 0, 'name' => 'Sensor under limit');
     foreach( $default_rules as $add_rule ) {
         dbInsert($add_rule,'alert_rules');
     }
@@ -73,10 +73,10 @@ $full_query = "SELECT *";
 $sql = '';
 $param = array();
 if(isset($device['device_id']) && $device['device_id'] > 0) {
-    $sql = 'WHERE (device_id=? OR device_id="-1")';
+    $sql = 'WHERE (target=? OR target="-1")';
     $param = array($device['device_id']);
 }
-$query = " FROM alert_rules $sql ORDER BY device_id,id";
+$query = " FROM alert_rules $sql ORDER BY target,id";
 $count_query = $count_query . $query;
 $count = dbFetchCell($count_query,$param);
 if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -140,7 +140,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
         echo "</td>";
         echo "<td>";
         if ($_SESSION['userlevel'] >= '10') {
-            echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
+            echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['target']."' data-alert_id='".$rule['id']."' name='edit-alert-rule'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
             echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
         }
         echo "</td>";
