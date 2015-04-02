@@ -76,10 +76,10 @@ var grid = $("#inventory").bootgrid({
         return {
             id: "inventory",
             device: '<?php echo htmlspecialchars($_POST['device']); ?>',
-            string: '<?php echo $_POST['string']; ?>',
-            device_string: '<?php echo $_POST['device_string']; ?>',
-            part: '<?php echo $_POST['part']; ?>',
-            serial: '<?php echo $_POST['serial']; ?>'
+            string: '<?php echo mres($_POST['string']); ?>',
+            device_string: '<?php echo mres($_POST['device_string']); ?>',
+            part: '<?php echo mres($_POST['part']); ?>',
+            serial: '<?php echo mres($_POST['serial']); ?>'
         };
     },
     url: "/ajax_table.php"
