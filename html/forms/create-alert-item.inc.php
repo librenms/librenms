@@ -53,7 +53,7 @@ if(empty($rule)) {
             $update_message = "ERROR: Failed to edit Rule: <i>".$rule."</i>";
         }
     } else {
-        if( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name),'alert_rules') ) {
+        if( dbInsert(array('target'=>$device_id,'rule'=>$rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name),'alert_rules') ) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
         } else {
             $update_message = "ERROR: Failed to add Rule: <i>".$rule."</i>";

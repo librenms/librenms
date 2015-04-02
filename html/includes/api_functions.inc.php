@@ -597,7 +597,7 @@ function add_edit_rule() {
             } else {
                 $message = 'Failed to update existing alert rule';
             }
-        } elseif( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json),'alert_rules') ) {
+        } elseif( dbInsert(array('target'=>$device_id,'rule'=>$rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json),'alert_rules') ) {
             $status = 'ok';
             $code = 200;
         } else {
