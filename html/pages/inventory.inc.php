@@ -48,58 +48,41 @@ $pagetitle[] = "Inventory";
 
 print_optionbar_end();
 
-$param = array();
-
-if ($_SESSION['userlevel'] >= '5')
-{
-  $sql = "SELECT * from entPhysical AS E, devices AS D WHERE D.device_id = E.device_id";
-} else {
-  $sql = "SELECT * from entPhysical AS E, devices AS D, devices_perms AS P WHERE D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
-  $param[] = $_SESSION['user_id'];
-}
-
-if (isset($_POST['string']) && strlen($_POST['string']))
-{
-  $sql  .= " AND E.entPhysicalDescr LIKE ?";
-  $param[] = "%".$_POST['string']."%";
-}
-
-if (isset($_POST['device_string']) && strlen($_POST['device_string']))
-{
-  $sql .= " AND D.hostname LIKE ?";
-  $param[] = "%".$_POST['device_string']."%";
-}
-
-if (isset($_POST['part']) && strlen($_POST['part']))
-{
-  $sql .= " AND E.entPhysicalModelName = ?";
-  $param[] = $_POST['part'];
-}
-
-if (isset($_POST['serial']) && strlen($_POST['serial']))
-{
-  $sql .= " AND E.entPhysicalSerialNum LIKE ?";
-  $param[] = "%".$_POST['serial']."%";
-}
-
-if (isset($_POST['device']) && is_numeric($_POST['device']))
-{
-  $sql .= " AND D.device_id = ?";
-  $param[] = $_POST['device'];
-}
-
-            echo('<div class="panel panel-default panel-condensed">
-              <div class="panel-heading">
-                <strong>Inventory</strong>
-              </div>
-              <table class="table table-hover table-condensed table-striped">');
-echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>Serial No</th></tr>");
-
-foreach (dbFetchRows($sql, $param) as $entry)
-{
-  echo('<tr><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
-     '</td><td>' . $entry['entPhysicalName']  . '</td><td>' . $entry['entPhysicalModelName']  . '</td><td>' . $entry['entPhysicalSerialNum'] . '</td></tr>');
-}
-echo("</table>");
-echo('</div>');
 ?>
+
+<div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <strong>Inventory</strong>
+    </div>
+    <table id="inventory" class="table table-hover table-condensed table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="hostname" data-order="asc">Hostname</th>
+                <th data-column-id="description">Description</th>
+                <th data-column-id="name">Name</th>
+                <th data-column-id="model">Part No</th>
+                <th data-column-id="serial">Serial No</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<script>
+
+var grid = $("#inventory").bootgrid({
+    ajax: true,
+    post: function ()
+    {
+        return {
+            id: "inventory",
+            device: '<?php echo htmlspecialchars($_POST['device']); ?>',
+            string: '<?php echo $_POST['string']; ?>',
+            device_string: '<?php echo $_POST['device_string']; ?>',
+            part: '<?php echo $_POST['part']; ?>',
+            serial: '<?php echo $_POST['serial']; ?>'
+        };
+    },
+    url: "/ajax_table.php"
+});
+
+</script>
