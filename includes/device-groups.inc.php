@@ -1,0 +1,95 @@
+<?php
+/* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/**
+ * Device-Grouping
+ * @author Daniel Preussker <f0o@devilcode.org>
+ * @copyright 2015 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Devices
+ */
+
+/**
+ * Generate SQL from Group-Pattern
+ * @param string $pattern Pattern to generate SQL for
+ * @return string
+ */
+function GenGroupSQL($pattern) {
+	$tmp = explode(" ",$pattern);
+	$tables = array();
+	foreach( $tmp as $opt ) {
+		if( strstr($opt,'%') && strstr($opt,'.') ) {
+			$tmpp = explode(".",$opt,2);
+			$tmpp[0] = str_replace("%","",$tmpp[0]);
+			$tables[] = mres(str_replace("(","",$tmpp[0]));
+			$pattern = str_replace($opt,$tmpp[0].'.'.$tmpp[1],$pattern);
+		}
+	}
+	$tables = array_keys(array_flip($tables));
+	$x = sizeof($tables);
+	$i = 0;
+	$join = "";
+	while( $i < $x ) {
+		if( isset($tables[$i+1]) ) {
+			$join .= $tables[$i].".device_id = ".$tables[$i+1].".device_id && ";
+		}
+		$i++;
+	}
+	$sql = "SELECT ".str_replace("(","",$tables[0]).".device_id FROM ".implode(",",$tables)." WHERE (".str_replace(array("%","@","!~","~"),array("","%","NOT LIKE","LIKE"),$pattern).")";
+	return $sql;
+}
+
+/**
+ * Get all devices of Group
+ * @param int $group_id Group-ID
+ * @return string
+ */
+function GetDevicesFromGroup($group_id) {
+	$pattern = dbFetchCell("SELECT pattern FROM device_groups WHERE id = ?",array($group_id));
+	if( !empty($pattern) ) {
+		return dbFetchRows(GenGroupSQL($pattern));
+	}
+	return false;
+}
+
+/**
+ * Get all Device-Groups
+ * @return array
+ */
+function GetDeviceGroups() {
+	return dbFetchRows("SELECT * FROM device_groups");
+}
+
+/**
+ * Get all groups of Device
+ * @param int $device Device-ID
+ * @return array
+ */
+function GetGroupsFromDevice($device) {
+	$ret = array();
+	foreach( GetDeviceGroups() as $group ) {
+		foreach( GetDevicesFromGroup($group['id']) as $dev ) {
+			if( $dev['device_id'] == $device ) {
+				if( !in_array($group['id'],$ret) ) {
+					$ret[] = $group['id'];
+				}
+				continue 2;
+			}
+		}
+	}
+	return $ret;
+}
+?>
