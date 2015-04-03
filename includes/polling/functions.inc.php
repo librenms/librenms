@@ -247,11 +247,9 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
   global $config;
 
   echo("This is mag_poll_mib_def Processing\n");
-  $rrd      = array();
   $mib      = NULL;
-  $table    = NULL;
   
-  list($mib,$table) = explode(":", $mib_name_table, 2);
+  list($mib,) = explode(":", $mib_name_table, 2);
 
   //$mib_dirs = mib_dirs($mib_subdir);
   

@@ -21,4 +21,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:radio1TempC:MAX:%0.2lf%s\\\l ";
 }
 
-?>
