@@ -66,7 +66,7 @@ foreach (dbFetchRows($sql,$param) as $alertlog) {
         $glyph_color = 'khaki';
         $text = 'Better';
     }
-    $response[] = array('humandate'=>$alertlog['humandate'],
+    $response[] = array('time_logged'=>$alertlog['humandate'],
                         'hostname'=>generate_device_link($dev, shorthost($dev['hostname'])),
                         'alert'=>htmlspecialchars($alertlog['alert']),
                         'status'=>"<b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b>");
