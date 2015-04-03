@@ -29,7 +29,22 @@ if (isset($_REQUEST['search']))
   {
     $found = 0;
 
-    if($_REQUEST['type'] == 'device') {
+    if( $_REQUEST['type'] == 'group' ) {
+      include_once('../includes/device-groups.inc.php');
+      foreach( dbFetchRows("SELECT name FROM device_groups WHERE name LIKE '%".$search."%'") as $group ) {
+        if( $_REQUEST['map'] ) {
+          $results[] = array('name'=>'g:'.$group['name']);
+        } else {
+          $results[] = array('name'=>$group['name']);
+        }
+      }
+      die(json_encode($results));
+    } elseif( $_REQUEST['type'] == 'alert-rules' ) {
+      foreach( dbFetchRows("SELECT name FROM alert_rules WHERE name LIKE '%".$search."%'") as $rules ) {
+        $results[] = array('name'=>$rules['name']);
+      }
+      die(json_encode($results));
+    } elseif($_REQUEST['type'] == 'device') {
 
       // Device search
       $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%" . $search . "%' OR `location` LIKE '%" . $search . "%' ORDER BY hostname LIMIT 8");

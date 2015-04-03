@@ -55,6 +55,15 @@ if(empty($rule)) {
     } else {
         if( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name),'alert_rules') ) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
+            if( is_array($_POST['maps']) ) {
+                foreach( $_POST['maps'] as $target ) {
+                    $_POST['rule'] = $name;
+                    $_POST['target'] = $target;
+                    $_POST['map_id'] = '';
+                    include('forms/create-map-item.inc.php');
+                    unset($ret,$target,$raw,$rule,$msg,$map_id);
+                }
+            }
         } else {
             $update_message = "ERROR: Failed to add Rule: <i>".$rule."</i>";
         }
