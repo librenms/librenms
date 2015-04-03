@@ -2,31 +2,7 @@
 $param = array();
 
 $pagetitle[] = "Alert Log";
-print_optionbar_start();
-?>
 
-<form method="post" action="" class="form-inline" role="form" id="result_form">
-    <div class="form-group">
-      <label>
-        <strong>Device</strong>
-      </label>
-      <select name="device_id" id="device_id" class="form-control input-sm">
-        <option value="">All Devices</option>
-        <?php
-          foreach (get_all_devices() as $hostname)
-          {
-            echo("<option value='".getidbyname($hostname)."'");
-            if (getidbyname($hostname) == $_POST['device_id']) { echo("selected"); }
-            echo(">".$hostname."</option>");
-          }
-        ?>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-default input-sm">Filter</button>
-</form>
-
-<?php
-print_optionbar_end();
             echo('<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -44,7 +20,7 @@ print_optionbar_end();
 <table id="alertlog" class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
-            <th data-column-id="humandate" data-order="desc">Time logged</th>
+            <th data-column-id="time_logged" data-order="desc">Time logged</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">alert</th>
             <th data-column-id="status" data-sortable="false">Status</th>
@@ -57,6 +33,31 @@ print_optionbar_end();
 
 var grid = $("#alertlog").bootgrid({
     ajax: true,
+    templates: {
+        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
+                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\" id=\"result_form\">"+
+                "<div class=\"form-group\">"+
+                "<label>"+
+                "<strong>Device&nbsp;</strong>"+
+                "</label>"+
+                "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Devices</option>"+
+<?php
+    foreach (get_all_devices() as $hostname) {
+        echo('"<option value=\"'.getidbyname($hostname).'\""+');
+            if (getidbyname($hostname) == $_POST['device_id']) {
+                echo('" selected "+');
+            }
+            echo('">'.$hostname.'</option>"+');
+        }
+?>
+               "</select>"+
+               "</div>"+
+               "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
+               "</form></span></div>"+
+               "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
+    },
     post: function ()
     {
         return {
