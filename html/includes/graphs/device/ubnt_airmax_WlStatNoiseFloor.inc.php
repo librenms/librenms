@@ -16,4 +16,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:WlStatNoiseFloor:MAX:%3.2lf\\\l ";
 }
 
-?>

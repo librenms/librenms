@@ -16,4 +16,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:RadioTxPower:MAX:%3.2lf\\\l ";
 }
 
-?>

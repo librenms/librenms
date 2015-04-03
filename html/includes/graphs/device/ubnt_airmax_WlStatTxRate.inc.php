@@ -17,4 +17,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:WlStatTxRateC:MAX:%0.2lf%s\\\l ";
 }
 
-?>

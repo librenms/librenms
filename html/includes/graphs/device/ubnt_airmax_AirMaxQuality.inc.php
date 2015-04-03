@@ -16,4 +16,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:AirMaxQuality:MAX:%3.0lf\\\l ";
 }
 
-?>

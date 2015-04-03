@@ -16,4 +16,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:txpktsAll:MAX:%0.2lf%s\\\l ";
 }
 
-?>

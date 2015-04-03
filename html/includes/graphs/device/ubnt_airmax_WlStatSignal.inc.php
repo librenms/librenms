@@ -16,4 +16,3 @@ if (file_exists($rrdfilename))
   $rrd_options .= " GPRINT:WlStatSignal:MAX:%3.2lf\\\l ";
 }
 
-?>
