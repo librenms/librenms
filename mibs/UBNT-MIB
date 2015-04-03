@@ -1,0 +1,108 @@
+UBNT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises FROM SNMPv2-SMI
+        DisplayString FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF;
+
+    ubntMIB MODULE-IDENTITY
+    LAST-UPDATED "201402270000Z"
+    ORGANIZATION "Ubiquiti Networks, Inc."
+    CONTACT-INFO "support@ubnt.com"
+    DESCRIPTION  "The MIB module for Ubiquiti Networks, Inc. entities"
+    REVISION "201402270000Z"
+    DESCRIPTION "Split revision"
+    ::= { ubnt 1 }
+
+    -- --------------------------------------------------------------------------------
+    --                         Ubiquiti Networks Root
+    -- --------------------------------------------------------------------------------
+
+    ubnt OBJECT IDENTIFIER ::= { enterprises 41112 }
+
+    -- --------------------------------------------------------------------------------
+    --                         Ubiquiti Networks SNMP Information
+    -- --------------------------------------------------------------------------------
+
+    ubntSnmpInfo OBJECT IDENTIFIER ::= { ubntMIB 2 }
+    ubntSnmpGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 1}
+    ubntAirosGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 2}
+    ubntAirFiberGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 3}
+    ubntEdgeMaxGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 4}
+    ubntUniFiGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 5}
+    ubntAirVisionGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 6}
+    ubntMFiGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 7}
+    ubntUniTelGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 8}
+
+    -- --------------------------------------------------------------------------------
+    --                         Ubiquiti Networks Products
+    -- --------------------------------------------------------------------------------
+    
+    ubntAirFIBER OBJECT IDENTIFIER ::= { ubntMIB 3 }
+    ubntEdgeMax OBJECT IDENTIFIER ::= { ubntMIB 5 }
+    ubntUniFi OBJECT IDENTIFIER ::= { ubntMIB 6 }
+    ubntAirVision OBJECT IDENTIFIER ::= { ubntMIB 7 }
+    ubntMFi OBJECT IDENTIFIER ::= { ubntMIB 8 }
+    ubntUniTel OBJECT IDENTIFIER ::= { ubntMIB 9 }
+
+    -- --------------------------------------------------------------------------------
+    --                         Ubiquiti Networks OR table
+    -- --------------------------------------------------------------------------------
+
+    ubntORTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntOREntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Capabilities"
+        ::= { ubntMIB 1 }
+
+    ubntOREntry OBJECT-TYPE
+       SYNTAX     UbntOREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntORTable"
+       INDEX      { ubntORIndex }
+       ::= { ubntORTable 1 }
+
+    UbntOREntry ::= SEQUENCE {
+        ubntORIndex     Integer32,
+        ubntORID        OBJECT IDENTIFIER,
+        ubntORDescr     DisplayString
+    }
+
+    ubntORIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Index for the ubntORTable"
+        ::= { ubntOREntry 1 }
+
+    ubntORID OBJECT-TYPE
+        SYNTAX     OBJECT IDENTIFIER
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "OR ID"
+        ::= { ubntOREntry 2 }
+
+    ubntORDescr OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Description of idenfifier"
+        ::= { ubntOREntry 3 }
+
+    ubntORInfoGroup OBJECT-GROUP
+        OBJECTS { ubntORID,
+                  ubntORDescr }
+        STATUS current
+        DESCRIPTION "Collection of related objects"
+        ::= { ubntSnmpGroups 1 }
+
+    ubntORCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION "The compliance statement for Ubiquiti entities."
+        MODULE
+            GROUP ubntORInfoGroup
+            DESCRIPTION "This group is for Ubiquiti systems."
+        ::= { ubntSnmpGroups 2 }
+
+END
