@@ -20,6 +20,9 @@ if (!$os)
       $os = "airos";
       if (strpos(trim(snmp_get($device, "dot11manufacturerProductName.5", "-Osqnv", "IEEE802dot11-MIB")), "UAP") !== FALSE) { $os = "unifi"; }
       elseif (strpos(trim(snmp_get($device, "dot11manufacturerProductName.2", "-Osqnv", "IEEE802dot11-MIB")), "UAP") !== FALSE) { $os = "unifi"; }
+      elseif (strpos(trim(snmp_get($device, "dot11manufacturerProductName.3", "-Osqnv", "IEEE802dot11-MIB")), "UAP") !== FALSE) { $os = "unifi"; }
+      elseif (strpos(trim(snmp_get($device, "dot11manufacturerProductName.4", "-Osqnv", "IEEE802dot11-MIB")), "UAP") !== FALSE) { $os = "unifi"; }
+      elseif (strpos(trim(snmp_get($device, "dot11manufacturerProductName.6", "-Osqnv", "IEEE802dot11-MIB")), "UAP") !== FALSE) { $os = "unifi"; }
       elseif (trim(snmp_get($device, "fwVersion.1", "-Osqnv", "UBNT-AirFIBER-MIB")) != '') { $os = "airos-af"; }
     }
     else
