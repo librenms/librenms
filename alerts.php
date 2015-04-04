@@ -57,16 +57,37 @@ if( !defined("TEST") ) {
 unlink($config['install_dir']."/.alerts.lock");
 
 /**
+ * Re-Validate Rule-Mappings
+ * @param int $device Device-ID
+ * @param int $rule Rule-ID
+ * @return boolean
+ */
+function IsRuleValid($device,$rule) {
+	global $rulescache;
+//	var_dump("D:".$device." R:".$rule);
+	if( empty($rulescache[$device]) || !isset($rulescache[$device]) ) {
+		foreach( GetRules($device) as $chk ) {
+			$rulescache[$device][$chk['id']] = true;
+		}
+	}
+	if( $rulescache[$device][$rule] === true ) {
+		return true;
+	}
+	return false;
+}
+
+/**
  * Run Follow-Up alerts
  * @return void
  */
 function RunFollowUp() {
 	global $config;
-	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts,alert_rules WHERE alerts.rule_id = alert_rules.id && alert_rules.disabled = 0 && alerts.state != 2 && alerts.open = 0") as $alert ) {
+	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts LEFT JOIN alert_rules ON alerts.rule_id = alert_rules.id WHERE alerts.state != 2 && alerts.open = 0") as $alert ) {
 		$tmp = array($alert['rule_id'],$alert['device_id']);
-		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
-		if( empty($alert['rule']) ) {
+		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
+		if( empty($alert['rule']) || !IsRuleValid($tmp[1],$tmp[0]) ) {
 			// Alert-Rule does not exist anymore, let's remove the alert-state.
+			echo "Stale-Rule: #".$tmp[0]."/".$tmp[1]."\r\n";
 			dbDelete('alerts','rule_id = ? && device_id = ?',array($tmp[0],$tmp[1]));
 			continue;
 		}
@@ -104,10 +125,11 @@ function RunFollowUp() {
 function RunAlerts() {
 	global $config;
 	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
-	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts,alert_rules WHERE alerts.rule_id = alert_rules.id && alert_rules.disabled = 0 && alerts.state != 2 && alerts.open = 1") as $alert ) {
+	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts LEFT JOIN alert_rules ON alerts.rule_id = alert_rules.id WHERE alerts.state != 2 && alerts.open = 1") as $alert ) {
 		$tmp = array($alert['rule_id'],$alert['device_id']);
-		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
-		if( empty($alert['rule_id']) ) {
+		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
+		if( empty($alert['rule_id']) || !IsRuleValid($tmp[1],$tmp[0]) ) {
+			echo "Stale-Rule: #".$tmp[0]."/".$tmp[1]."\r\n";
 			// Alert-Rule does not exist anymore, let's remove the alert-state.
 			dbDelete('alerts','rule_id = ? && device_id = ?',array($tmp[0],$tmp[1]));
 			continue;
