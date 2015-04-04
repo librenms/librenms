@@ -26,7 +26,7 @@ if( empty($rule) || empty($target) ) {
 } else {
 	$raw = $rule;
 	$rule = dbFetchCell('SELECT id FROM alert_rules WHERE name = ?',array($rule));
-	if( !is_numeric($target) && $target[0] != "g" ) {
+	if( !is_numeric($rule) ) {
 		array_unshift($ret, "ERROR: Could not find rule for '".$raw."'");
 	} else {
 		$raw = $target;
@@ -35,7 +35,7 @@ if( empty($rule) || empty($target) ) {
 		} else {
 			$target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?',array($target));
 		}
-		if( !is_numeric($target) && $target[0] != "g" ) {
+		if( !is_numeric(str_replace('g','',$target)) ) {
 			array_unshift($ret, "ERROR: Could not find entry for '".$raw."'");
 		} else {
 			if(is_numeric($map_id) && $map_id > 0) {
@@ -49,6 +49,13 @@ if( empty($rule) || empty($target) ) {
 					$ret[] = "Added Map: <i>".$rule." = ".$target."</i>";
 				} else {
 					array_unshift($ret,"ERROR: Failed to add Map: <i>".$rule." = ".$target."</i>");
+				}
+			}
+			if( ($tmp=dbFetchCell('SELECT device_id FROM alert_rules WHERE id = ?',array($rule))) && $tmp[0] != ":" ) {
+				if(dbUpdate(array('device_id' => ':'.$tmp), 'alert_rules', 'id=?',array($rule)) >= 0) {
+					$ret[] = "Edited Rule: <i>".$rule." device_id = ':".$tmp."'</i>";
+				} else {
+					array_unshift($ret,"ERROR: Failed to edit Rule: <i>".$rule.": device_id = ':".$tmp."'</i>");
 				}
 			}
 		}
