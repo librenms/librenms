@@ -36,12 +36,14 @@ foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_devic
     array_push($tmp_ids,$link_devices['local_device_id']);
     array_push($tmp_ids,$link_devices['remote_device_id']);
 }
-foreach (dbFetchRows("SELECT DISTINCT `remote_hostname` AS `hostname` FROM `links` WHERE `remote_device_id`= 0") as $link_devices) {
+
+$tmp_ids = implode(',',$tmp_ids);
+
+foreach (dbFetchRows("SELECT DISTINCT `remote_hostname` AS `hostname` FROM `links` WHERE `remote_device_id`= 0 AND `local_device_id` IN ($tmp_ids)") as $link_devices) {
     $tmp_devices[] = array('id'=>md5($link_devices['hostname']),'label'=>$link_devices['hostname'],'title'=>$link_devices['hostname'],'group'=>'');
     array_push($tmp_host,$link_devices['hostname']);
 }
 
-$tmp_ids = implode(',',$tmp_ids);
 $tmp_host = "'".implode("','",$tmp_host)."'";
  
 $nodes = json_encode($tmp_devices);
