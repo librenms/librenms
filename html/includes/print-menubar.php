@@ -60,6 +60,7 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
 if ($_SESSION['userlevel'] >= '10') {
 ?>
 <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Alert Rules</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Alert Map</a></li>
 <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Alert Templates</a></li>
 <?php
 }
@@ -97,6 +98,13 @@ foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` A
     }
     echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> ' . ucfirst($devtype['type']) . '</a></li>');
 }
+
+require_once('../includes/device-groups.inc.php');
+foreach( GetDeviceGroups() as $group ) {
+	echo '<li><a href="'.generate_url(array('page'=>'devices','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
+}
+unset($group);
+
         echo ('</ul>
              </li>');
 
@@ -125,6 +133,7 @@ if ($config['show_locations'])
 }
   echo('
             <li role="presentation" class="divider"></li>
+            <li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>
             <li><a href="addhost/"><i class="fa fa-desktop fa-col-success fa-fw fa-lg"></i> Add Device</a></li>
             <li><a href="delhost/"><i class="fa fa-desktop fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
 }
