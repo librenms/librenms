@@ -22,6 +22,8 @@
  * @subpackage Alerts
  */
 
+include_once('includes/device-groups.inc.php');
+
 /**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
@@ -52,6 +54,21 @@ function GenSQL($rule) {
 	return $sql;
 }
 
+/**
+ * Get Alert-Rules for Devices
+ * @param int $device Device-ID
+ * @return array
+ */
+function GetRules($device) {
+	$groups = GetGroupsFromDevice($device);
+	$params = array($device,$device);
+	$where = "";
+	foreach( $groups as $group ) {
+		$where .= " || alert_map.target = ?";
+		$params[] = 'g'.$group;
+	}
+	return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || ( alert_map.target = ? '.$where.' )',$params);
+}
 
 /**
  * Run all rules for a device
@@ -64,7 +81,7 @@ function RunRules($device) {
 	if( $chk['id'] > 0 ) {
 		return false;
 	}
-	foreach( dbFetchRows("SELECT * FROM alert_rules WHERE alert_rules.disabled = 0 && ( alert_rules.device_id = -1 || alert_rules.device_id = ? ) ORDER BY device_id,id",array($device)) as $rule ) {
+	foreach( GetRules($device) as $rule ) {
 		echo " #".$rule['id'].":";
 		$inv = json_decode($rule['extra'],true);
 		if( isset($inv['invert']) ) {
