@@ -26,6 +26,10 @@ LibreNMS ships with the following software components:
   http://fontawesome.io/
   Varying licenses but GPL friendly
 
+- Code for UBNT Devices
+  Mark Gibbons <mgibbons@oemcomp.com>
+  Initial code base submited via PR721
+
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 
