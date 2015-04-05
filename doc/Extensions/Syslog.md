@@ -65,4 +65,44 @@ Next start syslog-ng:
 service syslog-ng restart
 ```
 
+### Client configuration
+
+Below are sample configurations for a variety of clients. You should understand the config before using it as you may want to make some slight changes.
+
+Replace librenms.ip with IP or hostname of your LibreNMS install.
+
+Replace any variables in <brackets> with the relevant information.
+
+#### syslog
+```config
+*.*     @librenms.ip
+```
+
+#### rsyslog
+```config
+*.* @librenms.ip:514
+```
+
+#### Cisco ASA
+```config
+logging enable
+logging timestamp
+logging buffer-size 200000
+logging buffered debugging
+logging trap notifications
+logging host <outside interface name> librenms.ip
+```
+
+#### Cisco IOS
+```config
+logging trap debugging
+logging facility local6
+logging librenms.ip
+```
+
+#### Cisco NXOS
+```config
+logging server librenms.ip 5 use-vrf default facility local6
+```
+
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web ui.
