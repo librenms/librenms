@@ -23,6 +23,7 @@
  */
 
 include_once('includes/device-groups.inc.php');
+include_once('html/includes/authentication/'.$config['auth_mechanism'].'.inc.php');
 
 /**
  * Generate SQL from Rule
@@ -144,6 +145,7 @@ function GetContacts($results) {
 	if( $config['alerts']['email']['default_only'] ) {
 		return array($config['alerts']['email']['default'] => 'NOC');
 	}
+	$users = get_userlist();
 	$contacts = array();
 	$uids = array();
 	foreach( $results as $result ) {
@@ -163,22 +165,19 @@ function GetContacts($results) {
 			}
 		}
 	}
-	if( $config["alert"]["globals"] ) {
-		$tmpa = dbFetchRows("SELECT realname,email FROM users WHERE level >= 5 AND level < 10");
-		foreach( $tmpa as $tmp ) {
-			$contacts[$tmp['email']] = $tmp['realname'];
+	foreach( $users as $user ) {
+		if( empty($user['email']) ) {
+			continue;
+		} elseif( empty($user['realname']) ) {
+			$user['realname'] = $user['username'];
 		}
-	}
-	if( $config["alert"]["admins"] ) {
-		$tmpa = dbFetchRows("SELECT realname,email FROM users WHERE level = 10");
-		foreach( $tmpa as $tmp ) {
-			$contacts[$tmp['email']] = $tmp['realname'];
-		}
-	}
-	if( is_array($uids) ) {
-		foreach( $uids as $uid ) {
-			$tmp = dbFetchRow("SELECT realname,email FROM users WHERE user_id = ?", array($uid));
-			$contacts[$tmp['email']] = $tmp['realname'];
+		$user['level'] = get_userlevel($user['username']);
+		if( $config["alert"]["globals"] && ( $user['level'] >= 5 && $user['level'] < 10 ) ) {
+			$contacts[$user['email']] = $user['realname'];
+		} elseif( $config["alert"]["admins"] && $user['level'] == 10 ) {
+			$contacts[$user['email']] = $user['realname'];
+		} elseif( in_array($user['user_id'],$uids) ) {
+			$contacts[$user['email']] = $user['realname'];
 		}
 	}
 	return $contacts;
