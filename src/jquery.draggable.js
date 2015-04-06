@@ -423,7 +423,7 @@
     };
 
     //jQuery adapter
-    $.fn.drag = function ( options ) {
+    $.fn.gridDraggable = function ( options ) {
         return new Draggable(this, options);
     };
 
