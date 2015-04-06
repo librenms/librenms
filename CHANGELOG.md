@@ -1,3 +1,11 @@
+<a name="v0.6.5"></a>
+### v0.6.5 (2015-04-06)
+
+
+#### Bug Fixes
+
+* **gridster:** fixed bugs in centering_widgets (widgets were getting smushed when being resized ([86053f8b](http://github.com/DecksterTeam/gridster.js/commit/86053f8be3d73a9db3d7eabc595324123dbcff13))
+
 <a name="v0.6.4"></a>
 ### v0.6.4 (2015-03-19)
 
