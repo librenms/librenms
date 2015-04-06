@@ -40,7 +40,7 @@ if(is_admin() === false) {
 </div>
 
 <script>
-$('#confirm-delete').on('show.bs.modal', function(e) {
+$('#confirm-delete').on('show.bs.modal', function(event) {
     event.preventDefault();
     map_id = $(e.relatedTarget).data('map_id');
     $("#map_id").val(map_id);
