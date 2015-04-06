@@ -1,3 +1,19 @@
+### Apr 2015
+
+####Bug fixes
+  - Fixed ack of worse/better alerts (PR720)
+  - Fixed ORIG_PATH_INFO warnings (PR727)
+
+####Improvements
+  - New theme support added (light,dark and mono) (PR682,PR683,PR701)
+  - Tables being converted to Jquery Bootgrid (PR693,PR706,PR716)
+  - Detect Cisco ASA Hardware and OS Version (PR708)
+  - Update LDAP support (PR707)
+  - Updated APC powernet MIB (PR713)
+  - Update to Foritgate support (PR709)
+  - Added support for UBNT AirOS and AirFibre (PR721,PR730,PR731)
+  - Added support device groups + alerts to be mapped to devices or groups (PR722)
+
 ### Mar 2015
 
 ####Bug fixes
