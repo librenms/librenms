@@ -12,12 +12,6 @@
  * the source code distribution for details.
  */
 
-include_once("includes/defaults.inc.php");
-include_once("config.php");
-include_once($config['install_dir']."/includes/definitions.inc.php");
-include_once($config['install_dir']."/includes/functions.php");
-include_once($config['install_dir']."/includes/alerts.inc.php");
-
 $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
 if ($enabled == 1) {
 
@@ -84,7 +78,7 @@ if ($enabled == 1) {
     rtrim($fields, '&');
 
     $post = curl_init();
-    curl_setopt($post, CURLOPT_URL, 'http://lathwood.co.uk/log/log.php');
+    curl_setopt($post, CURLOPT_URL, $config['callback_post']);
     curl_setopt($post, CURLOPT_POST, count($submit));
     curl_setopt($post, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($post, CURLOPT_RETURNTRANSFER, 1);
@@ -95,7 +89,7 @@ if ($enabled == 1) {
     $fields = "uuid=$uuid";
 
     $clear = curl_init();
-    curl_setopt($clear, CURLOPT_URL, 'http://lathwood.co.uk/log/clear.php');
+    curl_setopt($clear, CURLOPT_URL, $config['callback_clear']);
     curl_setopt($clear, CURLOPT_POST, count($clear));
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);

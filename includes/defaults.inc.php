@@ -599,4 +599,8 @@ $config['distributed_poller_group']                      = 0;
 $config['distributed_poller_memcached_host']             = 'example.net';
 $config['distributed_poller_memcached_port']             = '11211';
 
+// Stats callback system
+$config['callback_post']                                 = 'http://lathwood.co.uk/log/log.php';
+$config['callback_clear']                                = 'http://lathwood.co.uk/log/clear.php';
+
 ?>
