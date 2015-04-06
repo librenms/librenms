@@ -12,7 +12,7 @@
   - Updated APC powernet MIB (PR713)
   - Update to Foritgate support (PR709)
   - Added support for UBNT AirOS and AirFibre (PR721,PR730,PR731)
-  - Added support device groups + alert grouping (PR722)
+  - Added support device groups + alerts to be mapped to devices or groups (PR722)
 
 ### Mar 2015
 
