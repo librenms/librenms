@@ -526,10 +526,11 @@
      *  representing the widget.
      * @param {Number} size_x The number of cols that will occupy the widget.
      * @param {Number} size_y The number of rows that will occupy the widget.
+     * @param {Number} col The column to resize the widget from.
      * @param {Function} [callback] Function executed when the widget is expanded.
      * @return {HTMLElement} Returns $widget.
      */
-    fn.expand_widget = function($widget, size_x, size_y, callback) {
+    fn.expand_widget = function($widget, size_x, size_y, col, callback) {
       var wgd = $widget.coords().grid;
       var max_size_x = Math.floor(($(window).width() - this.options.widget_margins[0] * 2) / this.min_widget_width);
       size_x =  size_x || Math.min(max_size_x, this.cols);
@@ -539,7 +540,7 @@
       $widget.attr('pre_expand_col', wgd.col);
       $widget.attr('pre_expand_sizex', wgd.size_x);
       $widget.attr('pre_expand_sizey', wgd.size_y);
-      var new_col = 1;
+      var new_col = col || 1;
 
       if (size_y > old_size_y) {
         this.add_faux_rows(Math.max(size_y - old_size_y, 0));
