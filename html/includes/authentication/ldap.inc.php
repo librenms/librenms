@@ -204,11 +204,14 @@ function get_membername ($username)
 function get_group_list() {
   global $config;
 
-  $ldap_groups = [];
-  $ldap_groups[] = $config['auth_ldap_groupbase'];
+  $ldap_groups = array();
+  $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';
+  if($config['auth_ldap_group'] !== $default_group) {
+    array_push($ldap_groups, $config['auth_ldap_group']);
+  }
   foreach($config['auth_ldap_groups'] as $key => $value) {
     $dn = "cn=$key," . $config['auth_ldap_groupbase'];
-    $ldap_groups[] = $dn;
+    array_push($ldap_groups, $dn);
   }
   return $ldap_groups;
 }
