@@ -1493,7 +1493,12 @@
      */
     fn.center_widgets = debounce(function () {
       var wrapper_width = this.$wrapper.width();
-      var col_size = this.options.widget_base_dimensions[0] + (2 * this.options.widget_margins[0]);
+     var col_size;
+     if (this.is_responsive()) {
+      col_size = this.get_responsive_col_width();
+     } else {
+      col_size = this.options.widget_base_dimensions[0] + (2 * this.options.widget_margins[0]);
+     }
       var col_count = Math.floor(Math.max(Math.floor(wrapper_width / col_size), this.min_col_count) / 2) * 2;
 
       this.options.min_cols = col_count;
@@ -1554,11 +1559,11 @@
       widgets_coords.each($.proxy(function(i, widget) {
         var $widget = $(widget.el);
         var wgd = $widget.coords().grid;
-        var col = parseInt($widget.attr("data-col"));
+        var col = parseInt($widget.attr('data-col'));
 
         var new_grid_data = {
-          col: col + col_dif,
-          row: wgd.row,
+         col: Math.max(Math.round(col + col_dif), 1),
+         row: wgd.row,
           size_x: wgd.size_x,
           size_y: wgd.size_y
         };
@@ -3885,17 +3890,16 @@
             cols = this.get_highest_occupied_cell().col;
         }
 
-        var max_cols = (this.options.autogrow_cols ? this.options.max_cols :
-            this.cols);
+        var max_cols = (this.options.autogrow_cols ? this.options.max_cols : this.cols);
 
         cols = Math.min(max_cols, Math.max(cols, this.options.min_cols));
         this.container_width = ((cols + 1) * this.options.widget_margins[0]) + (cols * this.min_widget_width);
+        if(this.is_responsive()) {
+         this.$el.css({'min-width': '100vw', 'max-width': '100vw'});
+         return this; //if we are responsive exit before setting the width of $el
+        }
         this.$el.css('width', this.container_width);
 
-        if(this.is_responsive()) {
-          this.$el.css({'min-width': '100%', 'max-width': '100%'});
-          return this;
-        }
         return this;
     };
 
