@@ -251,8 +251,12 @@ foreach ($ports as $port)
     echo("VLAN == ".$this_port['ifVlan']);
 
     // Update IF-MIB data
+    $brk = false;
     foreach ($data_oids as $oid)
     {
+      if( $brk === true ) {
+        break;
+      }
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
         $port['update'][$oid] = array('NULL');
@@ -262,6 +266,9 @@ foreach ($ports as $port)
         $port['update'][$oid] = $this_port[$oid];
         log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
+      }
+      if( ( $oid == 'ifOperStatus' || $oid == 'ifAdminStatus' ) && $this_port[$oid] == 'down' ) {
+        $brk = true;
       }
     }
 
