@@ -214,12 +214,12 @@ function get_group_list() {
   $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';
   if(isset($config['auth_ldap_group'])) {
     if($config['auth_ldap_group'] !== $default_group) {
-      array_push($ldap_groups, $config['auth_ldap_group']);
+      $ldap_groups[] = $config['auth_ldap_group'];
     }
   }
   foreach($config['auth_ldap_groups'] as $key => $value) {
     $dn = "cn=$key," . $config['auth_ldap_groupbase'];
-    array_push($ldap_groups, $dn);
+    $ldap_groups[] = $dn;
   }
   return $ldap_groups;
 }
