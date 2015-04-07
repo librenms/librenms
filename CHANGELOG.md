@@ -55,6 +55,9 @@
 
 * **gridster:** make grid responsive ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
 
+<a name="v0.5.7"></a>
+### v0.5.7 (2015-02-17)
+
 <a name="v0.5.6"></a>
 ### v0.5.6 (2014-09-25)
 
