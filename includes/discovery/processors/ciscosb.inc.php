@@ -14,10 +14,10 @@ if ($device['os'] == "ciscosb") {
     echo("Cisco SB : ");
 
     $descr = "CPU";
-    $usage = snmp_get($device, "rlCpuUtilDuringLastMinute", "-Ovqn", "CISCOSB-rndMng");
+    $usage = snmp_get($device, "rlCpuUtilDuringLastMinute.0", "-Ovqn", "CISCOSB-rndMng");
 
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, "CISCOSB-rndMng::rlCpuUtilDuringLastMinute", "0", "ciscosb", $descr, "1", $usage, NULL, NULL);
+        discover_processor($valid['processor'], $device, "CISCOSB-rndMng::rlCpuUtilDuringLastMinute.0", "0", "ciscosb", $descr, "1", $usage, NULL, NULL);
     }
 }
 
