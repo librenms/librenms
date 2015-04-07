@@ -165,7 +165,7 @@ function get_userlist()
                                         $ldap_group, 
                                         $config['auth_ldap_groupmemberattr'],
                                         get_membername($username));
-        if (!isset($config['auth_ldap_group']) || ldap_compare($ldap_comparison === true)) {
+        if (!isset($config['auth_ldap_group']) || $ldap_comparison === true) {
           $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
         }
       }
