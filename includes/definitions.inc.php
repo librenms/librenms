@@ -1016,6 +1016,12 @@ $config['os'][$os]['text']              = "Hikvision";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "hikvision";
 
+// Canopy / Cambium support
+$os = "canopy";
+$config['os'][$os]['text']              = "Cambium";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "cambium";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
