@@ -17,7 +17,8 @@
 
  }(this, function($, Draggable, Collision) {
 
-    var defaults = {
+    var $window = $( window ),
+        defaults = {
         namespace: '',
         widget_selector: 'li',
         widget_margins: [10, 10],
@@ -125,7 +126,7 @@
     *        `[min_cols_occupied, min_rows_occupied]`
     *       @param {Function} [options.resize.start] Function executed
     *        when resizing starts.
-    *       @param {Function} [otions.resize.resize] Function executed
+    *       @param {Function} [options.resize.resize] Function executed
     *        during the resizing.
     *       @param {Function} [options.resize.stop] Function executed
     *        when resizing stops.
@@ -265,7 +266,7 @@
             }, this), 0);
         }
 
-        $(window).bind('resize.gridster', throttle(
+        $window.bind('resize.gridster', throttle(
             $.proxy(this.recalculate_faux_grid, this), 200));
     };
 
@@ -388,6 +389,7 @@
         }
 
         return $w.fadeIn({complete: function () { if(callback) callback.call(this); }});
+
     };
 
 
@@ -857,10 +859,11 @@
             });
 
         $nexts.not($exclude).each($.proxy(function(i, w) {
-            var wgd = $(w).coords().grid;
+            var $w = $( w ),
+                wgd = $w.coords().grid;
             if ( !(wgd.row <= (row + size_y - 1))) { return; }
             var diff =  (row + size_y) - wgd.row;
-            this.move_widget_down($(w), diff);
+            this.move_widget_down($w, diff);
         }, this));
 
         this.set_dom_grid_height();
@@ -3338,6 +3341,8 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_faux_rows = function(rows) {
+        rows = window.parseInt( rows, 10 );
+
         var actual_rows = this.rows;
         var max_rows = actual_rows + (rows || 1);
 
@@ -3364,6 +3369,8 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_faux_cols = function(cols) {
+        cols = window.parseInt( cols, 10 );
+
         var actual_cols = this.cols;
         var max_cols = actual_cols + (cols || 1);
         max_cols = Math.min(max_cols, this.options.max_cols);
@@ -3393,7 +3400,7 @@
     */
     fn.recalculate_faux_grid = function() {
         var aw = this.$wrapper.width();
-        this.baseX = ($(window).width() - aw) / 2;
+        this.baseX = ($window.width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;
 
         $.each(this.faux_grid, $.proxy(function(i, coords) {
@@ -3524,7 +3531,7 @@
 
         this.rows = Math.max(max_rows, this.options.min_rows);
 
-        this.baseX = ($(window).width() - aw) / 2;
+        this.baseX = ($window.width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;
 
         if (this.options.autogenerate_stylesheet) {
@@ -3545,10 +3552,14 @@
         this.$el.removeData('gridster');
 
         // remove bound callback on window resize
-        $(window).unbind('.gridster');
+        $window.unbind('.gridster');
 
         if (this.drag_api) {
             this.drag_api.destroy();
+        }
+
+        if (this.resize_api) {
+            this.resize_api.destroy();
         }
 
         this.remove_style_tags();
@@ -3562,8 +3573,9 @@
     //jQuery adapter
     $.fn.gridster = function(options) {
         return this.each(function() {
-            if (! $(this).data('gridster')) {
-                $(this).data('gridster', new Gridster( this, options ));
+            var $this = $( this );
+            if (! $this.data('gridster')) {
+                $this.data('gridster', new Gridster( this, options ));
             }
         });
     };
