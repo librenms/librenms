@@ -15,7 +15,7 @@ if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional
 function authenticate($username,$password)
 {
   global $config, $ds;
-
+  
   if ($username && $ds)
   {
     if ($config['auth_ldap_version'])
@@ -30,9 +30,12 @@ function authenticate($username,$password)
       }
       else
       {
-        if (ldap_compare($ds,$config['auth_ldap_group'], $config['auth_ldap_groupmemberattr'],get_membername($username))===true)
-        {
-          return 1;
+        $ldap_groups = get_group_list();
+        foreach($ldap_groups as $ldap_group) {
+          if (ldap_compare($ds,$ldap_group, $config['auth_ldap_groupmemberattr'],get_membername($username))===true)
+          {
+            return 1;
+          }
         }
       }
     }
@@ -153,10 +156,12 @@ function get_userlist()
       $username = $entry['uid'][0];
       $realname = $entry['cn'][0];
       $user_id  = $entry['uidnumber'][0];
-
-      if (!isset($config['auth_ldap_group']) || ldap_compare($ds,$config['auth_ldap_group'],$config['auth_ldap_groupmemberattr'],get_membername($username))===true)
-      {
-        $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
+      $ldap_groups = get_group_list();
+      foreach($ldap_groups as $ldap_group) {
+        if (!isset($config['auth_ldap_group']) || ldap_compare($ds,$config['auth_ldap_group'],$config['auth_ldap_groupmemberattr'],get_membername($username))===true)
+        {
+          $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
+        }
       }
     }
   }
@@ -194,6 +199,16 @@ function get_membername ($username)
     $membername = $username;
   }
   return $membername;
+}
+
+function get_group_list() {
+  $ldap_groups = [];
+  $ldap_groups[] = $config['auth_ldap_groupbase'];
+  foreach($config['auth_ldap_groups'] as $key => $value) {
+    $dn = "cn=$key," . $config['auth_ldap_groupbase'];
+    $ldap_groups[] = $dn;
+  }
+  return $ldap_groups;
 }
 
 ?>
