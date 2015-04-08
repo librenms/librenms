@@ -6,3 +6,4 @@ class InfluxBadResponseException extends InfluxGeneralException
 {
 
 }
+

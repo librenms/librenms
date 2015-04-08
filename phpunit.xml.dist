@@ -12,6 +12,18 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <env name="UDP_PORT" value="5551"/>
+        <env name="UDP_DB" value="udp.test"/>
+
+        <env name="TCP_PORT" value="8086"/>
+        <env name="TCP_DB" value="tcp.test"/>
+        <env name="TCP_PROTOCOL" value="http"/>
+
+        <env name="HOST" value="localhost"/>
+        <env name="USERNAME" value="root"/>
+        <env name="PASSWORD" value="root"/>
+    </php>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>

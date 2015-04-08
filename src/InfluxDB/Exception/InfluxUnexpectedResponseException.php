@@ -6,3 +6,4 @@ class InfluxUnexpectedResponseException extends InfluxGeneralException
 {
 
 }
+
