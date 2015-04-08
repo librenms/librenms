@@ -13,8 +13,6 @@
  *
  */
 
-include("../includes/alerts.inc.php");
-
 function data_uri($file, $mime)
 {
   $contents = file_get_contents($file);
