@@ -90,14 +90,14 @@ This is a 32x32 png format image of the OS you are adding support for.
 
 Thanks for asking, sometimes it's not quite so obvious and everyone can contribute something different. So here are some ways you can help LibreNMS improve.
 
-- Code. This is a big thing. We want this community to grow by the software devloping and evolving to cater for users needs. The biggest area that people can help make this happen is providing code support. This doesn't necessarily mean by contributing code for discovering a new device:
+- Code. This is a big thing. We want this community to grow by the software devloping and evolving to cater for users needs. The biggest area that people can help make this happen is by providing code support. This doesn't necessarily mean contributing code for discovering a new device:
     - Web UI, a new look and feel has been adopted but we are not finished by any stretch of the imagination. Make suggestions, find and fix bugs, update the design / layout.
     - Poller / Discovery code. Improving it (we think a lot can be done to speed things up), adding new device support and updating old ones.
-    - The LibreNMS main website, this is hosted on Git Hub like main repo and we accept use contributions here as well :)
+    - The LibreNMS main website, this is hosted on Git Hub like the main repo and we accept use contributions here as well :)
 - Hardware. We don't physically need it but if we are to add device support, it's made a whole lot easier with access to the kit via snmp.
     - If you've got mibs, they are handy as well :)
     - If you know the vendor and can get permission to use logos that's also great.
-- Bugs. Found one? We want to know about it. Most bugs are fixed after being spotted and reported by someone, I'd love to say we are amazing developers and will fix all bugs before you spot them but that's just not trye.
+- Bugs. Found one? We want to know about it. Most bugs are fixed after being spotted and reported by someone, I'd love to say we are amazing developers and will fix all bugs before you spot them but that's just not true.
 - Feature requests. Can't code / won't code. No worries, chuck a feature request into Git Hub with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
 - Be nice, this is the foundation of this project. We expect everyone to be nice. People will fall out, people will disagree but please do it so in a respectable way.
 - Ask questions. Sometimes just by asking questions you prompt deeper conversations that can lead us to somewhere amazing so please never be afraid to ask a question.
