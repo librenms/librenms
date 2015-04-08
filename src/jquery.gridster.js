@@ -3251,8 +3251,7 @@
         /* generate CSS styles for rows */
         for(i = 1; i <= opts.rows + 1; i++) {
           styles += (opts.namespace + ' [data-row="' + i + '"] { top:' +
-          ((i * opts.widget_margins[1]) + ((i - 1) * opts.widget_base_dimensions[1]))
-          + 'px; }\n');
+          ((i * opts.widget_margins[1]) + ((i - 1) * opts.widget_base_dimensions[1])) + 'px; }\n');
         }
 
         for (var y = 1; y <= opts.rows; y++) {
@@ -3588,6 +3587,11 @@
     fn.destroy = function(remove) {
         this.$el.removeData('gridster');
 
+	       // remove coords from elements
+	       $.each(this.$widgets,function(){
+            $(this).removeData('coords');
+        });
+
         // remove bound callback on window resize
         $window.unbind('.gridster');
 
@@ -3597,7 +3601,7 @@
         if (this.resize_api) {
             this.resize_api.destroy();
         }
-        
+
         this.$widgets.each(function(i, el) { $(el).coords().destroy(); });
 
         if (this.resize_api) {
