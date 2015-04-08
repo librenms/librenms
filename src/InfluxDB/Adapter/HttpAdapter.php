@@ -196,3 +196,4 @@ class HttpAdapter implements AdapterInterface, QueryableInterface
         return $this->parseResponse($response);
     }
 }
+

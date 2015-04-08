@@ -6,3 +6,4 @@ class InfluxNoSeriesException extends InfluxGeneralException
 {
 
 }
+

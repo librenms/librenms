@@ -6,3 +6,4 @@ class InfluxAuthorizationException extends InfluxGeneralException
 {
 
 }
+
