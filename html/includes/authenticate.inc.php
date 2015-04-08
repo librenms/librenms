@@ -57,7 +57,7 @@ if (!isset($config['auth_mechanism']))
 
 if (file_exists('includes/authentication/' . $config['auth_mechanism'] . '.inc.php'))
 {
-  include('includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
+  include_once('includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
 }
 else
 {
