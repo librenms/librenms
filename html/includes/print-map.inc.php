@@ -20,15 +20,16 @@ if (!empty($device['hostname'])) {
     $sql = ' WHERE 1';
 }
 
-$sql .= ' AND `local_device_id` != 0 AND `remote_device_id` != 0';
+$sql .= ' AND `local_device_id` != 0';
 
 $tmp_ids = array();
+$tmp_host = array();
 foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_device_id`) AS `remote_device_id`, GREATEST(`remote_device_id`,`devices`.`device_id`) AS `local_device_id` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` $sql", $sql_array) as $link_devices) {
     if (!in_array($link_devices['local_device_id'], $tmp_ids)) {
         $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['local_device_id']));
         $tmp_devices[] = array('id'=>$link_devices['local_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     }
-    if (!in_array($link_devices['remote_device_id'], $tmp_ids)) {
+    if (!in_array($link_devices['remote_device_id'], $tmp_ids) && $link_devices['remote_device_id'] > 0) {
         $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['remote_device_id']));
         $tmp_devices[] = array('id'=>$link_devices['remote_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     }
@@ -37,18 +38,25 @@ foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_devic
 }
 
 $tmp_ids = implode(',',$tmp_ids);
+
+foreach (dbFetchRows("SELECT DISTINCT `remote_hostname` AS `hostname` FROM `links` WHERE `remote_device_id`= 0 AND `local_device_id` IN ($tmp_ids)") as $link_devices) {
+    $tmp_devices[] = array('id'=>md5($link_devices['hostname']),'label'=>$link_devices['hostname'],'title'=>$link_devices['hostname'],'group'=>'');
+    array_push($tmp_host,$link_devices['hostname']);
+}
+
+$tmp_host = "'".implode("','",$tmp_host)."'";
  
 $nodes = json_encode($tmp_devices);
  
 if (is_array($tmp_devices[0])) {
     $tmp_links = array();
-    foreach (dbFetchRows("SELECT local_device_id, remote_device_id, `remote_hostname`,`ports`.`ifName` AS `local_port`, `remote_port`,`ports`.`ifSpeed` AS ifSpeed FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` WHERE (`local_device_id` IN ($tmp_ids) AND `remote_device_id` IN ($tmp_ids))") as $link_devices) {
+    foreach (dbFetchRows("SELECT local_device_id, remote_device_id, `remote_hostname`,`ports`.`ifName` AS `local_port`, `remote_port`,`ports`.`ifSpeed` AS ifSpeed FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` WHERE (`local_device_id` IN ($tmp_ids) AND (`remote_device_id` IN ($tmp_ids) OR `remote_hostname` IN ($tmp_host)))") as $link_devices) {
         foreach ($tmp_devices as $k=>$v) {
             if ($v['id'] == $link_devices['local_device_id']) {
                 $from = $v['id'];
                 $port = shorten_interface_type($link_devices['local_port']);
             }
-            if ($v['id'] == $link_devices['remote_device_id']) {
+            if ($v['id'] == $link_devices['remote_device_id'] || $v['id'] == md5($link_devices['remote_hostname'])) {
                 $to = $v['id'];
                 $port .= ' > ' .shorten_interface_type($link_devices['remote_port']);
             }
