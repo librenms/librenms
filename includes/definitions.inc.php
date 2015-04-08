@@ -547,6 +547,17 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
+$os = "f5";
+$config['os'][$os]['text']              = "F5 Big IP";
+$config['os'][$os]['type']              = "loadbalancer";
+$config['os'][$os]['icon']              = "f5";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_ucd_memory";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 $os = "proxim";
 $config['os'][$os]['text']              = "Proxim";
 $config['os'][$os]['type']              = "network";
@@ -1015,6 +1026,12 @@ $os = "hikvision";
 $config['os'][$os]['text']              = "Hikvision";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "hikvision";
+
+// Canopy / Cambium support
+$os = "canopy";
+$config['os'][$os]['text']              = "Cambium";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "cambium";
 
 foreach ($config['os'] as $this_os => $blah)
 {
