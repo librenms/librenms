@@ -169,7 +169,7 @@
                 var area_coords = self.calculate_overlapped_area_coords(
                     player_coords, collider_coords);
                 var area = self.calculate_overlapped_area(area_coords);
-                if ( 0 != area ) {
+                if ( 0 !== area ) {
                     var collider_data = {
                         area: area,
                         area_coords : area_coords,

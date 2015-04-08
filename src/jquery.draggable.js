@@ -7,7 +7,7 @@
  */
 
 ;(function(root, factory) {
-
+ 'use strict';
     if (typeof define === 'function' && define.amd) {
         define('gridster-draggable', ['jquery'], factory);
     } else {
@@ -76,15 +76,17 @@
     * @constructor
     */
     function Draggable(el, options) {
-      this.options = $.extend({}, defaults, options);
-      this.$document = $(document);
-      this.$container = $(el);
-      this.$dragitems = $(this.options.items, this.$container);
-      this.is_dragging = false;
-      this.player_min_left = 0 + this.options.offset_left;
-      this.id = uniqId();
-      this.ns = '.gridster-draggable-' + this.id;
-      this.init();
+        this.options = $.extend({}, defaults, options);
+        this.$document = $(document);
+        this.$container = $(el);
+        this.$scroll_container = this.options.scroll_container == window ?
+            $(window) : this.$container.closest(this.options.scroll_container);
+        this.$dragitems = $(this.options.items, this.$container);
+        this.is_dragging = false;
+        this.player_min_left = 0 + this.options.offset_left;
+        this.id = uniqId();
+        this.ns = '.gridster-draggable-' + this.id;
+        this.init();
     }
 
     Draggable.defaults = defaults;
@@ -156,9 +158,13 @@
         var diff_y = Math.round(mouse_actual_pos.top - this.mouse_init_pos.top);
 
         var left = Math.round(this.el_init_offset.left +
-            diff_x - this.baseX + $window.scrollLeft() - this.win_offset_x);
+                              diff_x - this.baseX +
+                              this.$scroll_container.scrollLeft() -
+                              this.scroll_container_offset_x);
         var top = Math.round(this.el_init_offset.top +
-            diff_y - this.baseY + $window.scrollTop() - this.win_offset_y);
+                             diff_y - this.baseY +
+                             this.$scroll_container.scrollTop() -
+                             this.scroll_container_offset_y);
 
         if (this.options.limit) {
             if (left > this.player_max_left) {
@@ -176,8 +182,10 @@
             pointer: {
                 left: mouse_actual_pos.left,
                 top: mouse_actual_pos.top,
-                diff_left: diff_x + ($window.scrollLeft() - this.win_offset_x),
-                diff_top: diff_y + ($window.scrollTop() - this.win_offset_y)
+                diff_left: diff_x + (this.$scroll_container.scrollLeft() -
+                           this.scroll_container_offset_x),
+                diff_top: diff_y + (this.$scroll_container.scrollTop() -
+                          this.scroll_container_offset_y)
             }
         };
     };
@@ -208,28 +216,36 @@
 
         var area_size = 50;
         var scroll_inc = 30;
+        var scrollDir = 'scroll' + capitalize(dir_prop);
 
         var is_x = axis === 'x';
-        var window_size = is_x ? this.window_width : this.window_height;
-        var doc_size = is_x ? $(document).width() : $(document).height();
+        var scroller_size = is_x ? this.scroller_width : this.scroller_height;
+        var doc_size;
+        if (this.$scroll_container === window){
+            doc_size = is_x ? this.$scroll_container.width() :
+                              this.$scroll_container.height();
+        }else{
+            doc_size = is_x ? this.$scroll_container[0].scrollWidth :
+                              this.$scroll_container[0].scrollHeight;
+        }
         var player_size = is_x ? this.$player.width() : this.$player.height();
 
         var next_scroll;
-        var scroll_offset = $window['scroll' + capitalize(dir_prop)]();
-        var min_window_pos = scroll_offset;
-        var max_window_pos = min_window_pos + window_size;
+        var scroll_offset = this.$scroll_container[scrollDir]();
+        var min_scroll_pos = scroll_offset;
+        var max_scroll_pos = min_scroll_pos + scroller_size;
 
-        var mouse_next_zone = max_window_pos - area_size;  // down/right
-        var mouse_prev_zone = min_window_pos + area_size;  // up/left
+        var mouse_next_zone = max_scroll_pos - area_size;  // down/right
+        var mouse_prev_zone = min_scroll_pos + area_size;  // up/left
 
-        var abs_mouse_pos = min_window_pos + data.pointer[dir_prop];
+        var abs_mouse_pos = min_scroll_pos + data.pointer[dir_prop];
 
-        var max_player_pos = (doc_size - window_size + player_size);
+        var max_player_pos = (doc_size - scroller_size + player_size);
 
         if (abs_mouse_pos >= mouse_next_zone) {
             next_scroll = scroll_offset + scroll_inc;
             if (next_scroll < max_player_pos) {
-                $window['scroll' + capitalize(dir_prop)](next_scroll);
+                this.$scroll_container[scrollDir](next_scroll);
                 this['scroll_offset_' + axis] += scroll_inc;
             }
         }
@@ -237,7 +253,7 @@
         if (abs_mouse_pos <= mouse_prev_zone) {
             next_scroll = scroll_offset - scroll_inc;
             if (next_scroll > 0) {
-                $window['scroll' + capitalize(dir_prop)](next_scroll);
+                this.$scroll_container[scrollDir](next_scroll);
                 this['scroll_offset_' + axis] -= scroll_inc;
             }
         }
@@ -253,8 +269,8 @@
 
 
     fn.calculate_dimensions = function(e) {
-        this.window_height = $window.height();
-        this.window_width = $window.width();
+        this.scroller_height = this.$scroll_container.height();
+        this.scroller_width = this.$scroll_container.width();
     };
 
 
@@ -325,8 +341,8 @@
             this.helper = false;
         }
 
-        this.win_offset_y = $window.scrollTop();
-        this.win_offset_x = $window.scrollLeft();
+        this.scroll_container_offset_y = this.$scroll_container.scrollTop();
+        this.scroll_container_offset_x = this.$scroll_container.scrollLeft();
         this.scroll_offset_y = 0;
         this.scroll_offset_x = 0;
         this.el_init_offset = this.$player.offset();
