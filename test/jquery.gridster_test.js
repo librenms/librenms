@@ -30,9 +30,9 @@
     }
   });
 
-  // test('is chainable', 1, function() {
-  //   // Not a bad test to run on collection methods.
-  //   strictEqual(this.el, this.el.gridster(), 'should be chaninable');
-  // });
+   test('is chainable', function() {
+     // Not a bad test to run on collection methods.
+     strictEqual(this.el, this.el.gridster(), 'should be chaninable');
+   });
 
 }(jQuery));
