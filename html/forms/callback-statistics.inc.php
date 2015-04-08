@@ -20,4 +20,6 @@ if ($_POST['state'] == 'true') {
     $state = 0;
 }
 
-dbUpdate(array('value' => $state), 'callback', '`name` = "enabled"', array());
+if( dbUpdate(array('value' => $state), 'callback', '`name` = "enabled"', array()) == 0) {
+    dbInsert(array('value' => $state,'name' => 'enabled'), 'callback');
+}
