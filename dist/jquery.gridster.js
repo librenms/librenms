@@ -1363,8 +1363,11 @@
     * @return {HTMLElement} Returns instance of gridster Class.
     */
     fn.add_resize_handle = function($w) {
-        var append_to = this.options.resize.handle_append_to;
-        $(this.resize_handle_tpl).appendTo( append_to ? $(append_to, $w) : $w);
+        var $append_to = this.options.resize.handle_append_to ? $(this.options.resize.handle_append_to, $w) : $w;
+
+        if ( ($append_to.children("span[class~='" + this.resize_handle_class + "']")).length == 0 ) {
+            $(this.resize_handle_tpl).appendTo( $append_to );
+        }
 
         return this;
     };
