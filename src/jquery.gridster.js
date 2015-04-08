@@ -3352,26 +3352,28 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_faux_cell = function(row, col) {
-        var coords = $({
-                        left: this.baseX + ((col - 1) * this.min_widget_width),
-                        top: this.baseY + (row -1) * this.min_widget_height,
-                        width: this.min_widget_width,
-                        height: this.min_widget_height,
-                        col: col,
-                        row: row,
-                        original_col: col,
-                        original_row: row
-                    }).coords();
+		var coords = $({
+			left: this.baseX + ((col - 1) * this.min_widget_width),
+			top: this.baseY + (row - 1) * this.min_widget_height,
+			width: this.min_widget_width,
+			height: this.min_widget_height,
+			col: col,
+			row: row,
+			original_col: col,
+			original_row: row
+		}).coords();
 
-        if (!$.isArray(this.gridmap[col])) {
-            this.gridmap[col] = [];
-        }
+		if (!$.isArray(this.gridmap[col])) {
+			this.gridmap[col] = [];
+		}
 
-        this.gridmap[col][row] = false;
-        this.faux_grid.push(coords);
+		if (typeof this.gridmap[col][row] === undefined) {
+			this.gridmap[col][row] = false;
+		}
+		this.faux_grid.push(coords);
 
-        return this;
-    };
+		return this;
+	};
 
 
     /**
