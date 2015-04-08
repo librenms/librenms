@@ -10,8 +10,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/DecksterTeam/gridster.js.git"
+    "url": "git://github.com/dsmorse/gridster.js.git"
   },
+  "bugs": {
+    "url": "https://github.com/dsmorse/gridster.js/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/dsmorse/gridster.js/blob/master/LICENSE"
+    }
+  ],
   "keywords": [],
   "devDependencies": {
     "bower": "~0.9.2",
