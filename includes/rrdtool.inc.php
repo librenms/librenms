@@ -264,13 +264,4 @@ function rrdtool_escape($string, $maxlength = NULL)
   }
 }
 
-function shorten_interface_type($string) {
-
-    return str_ireplace(
-               array('FastEthernet','GigbitEthernet','TenGigabitEthernet','Port-Channel','Ethernet'),
-               array('Fa','Gi','Te','Po','Eth'),
-               $string
-           );
-}
-
 ?>

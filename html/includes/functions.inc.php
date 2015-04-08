@@ -737,4 +737,13 @@ function get_client_ip() {
     return $client_ip;
 }
 
+function shorten_interface_type($string) {
+
+    return str_ireplace(
+               array('FastEthernet','GigbitEthernet','TenGigabitEthernet','Port-Channel','Ethernet'),
+               array('Fa','Gi','Te','Po','Eth'),
+               $string
+           );
+}
+
 ?>
