@@ -539,7 +539,7 @@
         this.pointer_events = {
             start: this.nsEvent('touchstart') + ' ' + this.nsEvent('mousedown'),
             move: this.nsEvent('touchmove') + ' ' + this.nsEvent('mousemove'),
-            end: this.nsEvent('touchend') + ' ' + this.nsEvent('mouseup'),
+            end: this.nsEvent('touchend') + ' ' + this.nsEvent('mouseup')
         };
 
         this.$container.on(this.nsEvent('selectstart'),
