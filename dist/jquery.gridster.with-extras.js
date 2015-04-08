@@ -1,6 +1,6 @@
 /*! gridster.js - v0.6.5 - 2015-04-08
 * http://gridster.net/
-* Copyright (c) 2015 decksterteam; Licensed  */
+* Copyright (c) 2015 decksterteam; Licensed MIT */
 
 ;(function(root, factory) {
     if(typeof exports === 'object') {
