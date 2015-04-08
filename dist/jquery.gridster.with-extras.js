@@ -1014,6 +1014,28 @@
     Gridster.defaults = defaults;
     Gridster.generated_stylesheets = [];
 
+    /**
+     * Convert properties to Integer
+     *
+     * @param {Object}
+     * @return {Objct} Returns the converted object.
+     */
+    function convInt(obj) {
+      var props = ['col', 'row', 'size_x', 'size_y'];
+      var tmp = {};
+      for (var i=0, len=props.length; i<len; i++) {
+        var prop = props[i];
+        if (!(prop in obj)) {
+          throw new Error('Not exists property `'+ prop +'`');
+        }
+        var val = obj[prop];
+        if (!val || isNaN(val)) {
+          throw new Error('Invalid value of `'+ prop +'` property');
+        }
+        tmp[prop] = +val;
+      }
+      return tmp;
+    }
 
     /**
     * Sorts an Array of grid coords objects (representing the grid coords of
@@ -1030,6 +1052,8 @@
                 b = $(b).coords().grid;
             }
 
+            a = convInt(a);
+            b = convInt(b);
            if (a.row > b.row) {
                return 1;
            }
@@ -1050,6 +1074,8 @@
     */
     Gridster.sort_by_row_and_col_asc = function(widgets) {
         widgets = widgets.sort(function(a, b) {
+          a = convInt(a);
+          b = convInt(b);
            if (a.row > b.row || a.row === b.row && a.col > b.col) {
                return 1;
            }
@@ -1070,6 +1096,8 @@
     */
     Gridster.sort_by_col_asc = function(widgets) {
         widgets = widgets.sort(function(a, b) {
+          a = convInt(a);
+          b = convInt(b);
            if (a.col > b.col) {
                return 1;
            }
@@ -1090,6 +1118,8 @@
     */
     Gridster.sort_by_row_desc = function(widgets) {
         widgets = widgets.sort(function(a, b) {
+          a = convInt(a);
+          b = convInt(b);
             if (a.row + a.size_y < b.row + b.size_y) {
                 return 1;
             }
