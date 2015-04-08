@@ -4458,6 +4458,11 @@
     fn.destroy = function(remove) {
         this.$el.removeData('gridster');
 
+	       // remove coords from elements
+	       $.each(this.$widgets,function(){
+            $(this).removeData('coords');
+        });
+
         // remove bound callback on window resize
         $window.unbind('.gridster');
 
@@ -4467,7 +4472,7 @@
         if (this.resize_api) {
             this.resize_api.destroy();
         }
-        
+
         this.$widgets.each(function(i, el) { $(el).coords().destroy(); });
 
         if (this.resize_api) {
