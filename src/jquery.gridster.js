@@ -35,6 +35,7 @@
         auto_init: true,
         center_widgets: false,
         responsive_breakpoint: false,
+        scroll_container: window,
         serialize_params: function($w, wgd) {
             return {
                 col: wgd.col,
@@ -135,7 +136,12 @@
     */
     function Gridster(el, options) {
         this.options = $.extend(true, {}, defaults, options);
+        this.options.draggable = this.options.draggable || {};
+        this.options.draggable = $.extend(true, {}, this.options.draggable,
+                            {scroll_container: this.options.scroll_container});
         this.$el = $(el);
+        this.$scroll_container = this.options.scroll_container == window ? 
+                $(window) : this.$el.closest(this.options.scroll_container);
         this.$wrapper = this.$el.parent();
         this.$widgets = this.$el.children(
             this.options.widget_selector).addClass('gs-w');
@@ -1295,6 +1301,7 @@
             move_element: false,
             resize: true,
             limit: this.options.autogrow_cols ? false : true,
+            scroll_container: this.options.scroll_container,
             start: $.proxy(this.on_start_resize, this),
             stop: $.proxy(function(event, ui) {
                 delay($.proxy(function() {
@@ -3587,6 +3594,11 @@
         if (this.drag_api) {
             this.drag_api.destroy();
         }
+        if (this.resize_api) {
+            this.resize_api.destroy();
+        }
+        
+        this.$widgets.each(function(i, el) { $(el).coords().destroy(); });
 
         if (this.resize_api) {
             this.resize_api.destroy();
