@@ -3,8 +3,10 @@
 * Copyright (c) 2015 decksterteam; Licensed  */
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define('gridster-coords', ['jquery'], factory);
     } else {
        root.GridsterCoords = factory(root.$ || root.jQuery);
@@ -126,8 +128,10 @@
 }));
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define('gridster-collision', ['jquery', 'gridster-coords'], factory);
     } else {
         root.GridsterCollision = factory(root.$ || root.jQuery,
@@ -437,7 +441,10 @@
 
 ;(function(root, factory) {
  'use strict';
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define('gridster-draggable', ['jquery'], factory);
     } else {
         root.GridsterDraggable = factory(root.$ || root.jQuery);
@@ -877,8 +884,10 @@
 }));
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('./jquery.draggable.js'), require('./jquery.collision.js'), require('./jquery.coords.js'), require('./utils.js'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'gridster-draggable', 'gridster-collision'], factory);
     } else {
         root.Gridster = factory(root.$ || root.jQuery, root.GridsterDraggable,
@@ -4121,8 +4130,7 @@
         /* generate CSS styles for rows */
         for(i = 1; i <= opts.rows + 1; i++) {
           styles += (opts.namespace + ' [data-row="' + i + '"] { top:' +
-          ((i * opts.widget_margins[1]) + ((i - 1) * opts.widget_base_dimensions[1]))
-          + 'px; }\n');
+          ((i * opts.widget_margins[1]) + ((i - 1) * opts.widget_base_dimensions[1])) + 'px; }\n');
         }
 
         for (var y = 1; y <= opts.rows; y++) {
@@ -4502,8 +4510,10 @@
 }));
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('./jquery-gridster.js'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'gridster'], factory);
     } else {
         root.Gridster = factory(root.$ || root.jQuery, root.Gridster);
