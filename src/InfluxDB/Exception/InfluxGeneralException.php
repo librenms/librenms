@@ -6,3 +6,4 @@ class InfluxGeneralException extends \RuntimeException
 {
 
 }
+
