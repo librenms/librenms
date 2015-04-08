@@ -3382,7 +3382,7 @@
         rows = window.parseInt( rows, 10 );
 
         var actual_rows = this.rows;
-        var max_rows = actual_rows + (rows || 1);
+        var max_rows = actual_rows + parseInt(rows || 1);
 
         for (var r = max_rows; r > actual_rows; r--) {
             for (var c = this.cols; c >= 1; c--) {
@@ -3410,7 +3410,7 @@
         cols = window.parseInt( cols, 10 );
 
         var actual_cols = this.cols;
-        var max_cols = actual_cols + (cols || 1);
+        var max_cols = actual_cols + parseInt(cols || 1);
         max_cols = Math.min(max_cols, this.options.max_cols);
 
         for (var c = actual_cols + 1; c <= max_cols; c++) {
