@@ -3283,19 +3283,22 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_style_tag = function(css) {
-        var d = document;
+      var d = document;
+      if(!document.getElementById('gridster-stylesheet')){
         var tag = d.createElement('style');
+        tag.id = 'gridster-stylesheet';
 
         d.getElementsByTagName('head')[0].appendChild(tag);
         tag.setAttribute('type', 'text/css');
 
         if (tag.styleSheet) {
-            tag.styleSheet.cssText = css;
-        } else {
-            tag.appendChild(document.createTextNode(css));
+          tag.styleSheet.cssText = css;
+        }else{
+          tag.appendChild(document.createTextNode(css));
         }
 
         this.$style_tags = this.$style_tags.add(tag);
+      }
 
         return this;
     };
