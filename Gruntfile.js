@@ -174,7 +174,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['default']);
   grunt.registerTask('docs', ['yuidoc']);
 
-  grunt.registerTask('release', ['build', 'bump-only:patch', 'build', 'docs', 'changelog']);
+  grunt.registerTask('release:patch', ['build', 'bump-only:patch', 'build', 'docs', 'changelog']);
   grunt.registerTask('release:minor', ['build', 'bump-only:minor', 'build', 'docs', 'changelog']);
   grunt.registerTask('release:major', ['build', 'bump-only:major', 'build', 'docs', 'changelog']);
   grunt.registerTask('release:git', ['build', 'bump-only:git', 'build', 'docs', 'changelog', 'bump-commit']);
