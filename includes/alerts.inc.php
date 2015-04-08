@@ -22,8 +22,8 @@
  * @subpackage Alerts
  */
 
-include_once('includes/device-groups.inc.php');
-include_once('html/includes/authentication/'.$config['auth_mechanism'].'.inc.php');
+include_once($config['install_dir'].'/includes/device-groups.inc.php');
+include_once($config['install_dir'].'/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php');
 
 /**
  * Generate SQL from Rule
