@@ -46,11 +46,11 @@ if (is_array($tmp_devices[0])) {
         foreach ($tmp_devices as $k=>$v) {
             if ($v['id'] == $link_devices['local_device_id']) {
                 $from = $v['id'];
-                $port = $link_devices['local_port'];
+                $port = shorten_interface_type($link_devices['local_port']);
             }
             if ($v['id'] == $link_devices['remote_device_id']) {
                 $to = $v['id'];
-                $port .= ' > ' .$link_devices['remote_port'];
+                $port .= ' > ' .shorten_interface_type($link_devices['remote_port']);
             }
         }
         $speed = $link_devices['ifSpeed']/1000/1000;
