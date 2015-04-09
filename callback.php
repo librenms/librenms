@@ -49,7 +49,7 @@ if ($enabled == 1) {
                  'arch'=>'SELECT COUNT(`pkg_id`) AS `total`,`arch` FROM `packages` GROUP BY `arch`',
                  'pollers'=>'SELECT COUNT(`id`) AS `total` FROM `pollers`',
                  'port_type'=>'SELECT COUNT(`port_id`) AS `total`,`ifType` FROM `ports` GROUP BY `ifType`',
-                 'port_ifspeed'=>'SELECT COUNT(`ifSpeed`) AS `total`,`ifSpeed` FROM `ports` GROUP BY `ifSpeed`',
+                 'port_ifspeed'=>'SELECT COUNT(`ifSpeed`) AS `total`,ROUND(`ifSpeed`/1000/1000) FROM `ports` GROUP BY `ifSpeed`',
                  'port_vlans'=>'SELECT COUNT(`device_id`) AS `total`,`state` FROM `ports_vlans` GROUP BY `state`',
                  'processes'=>'SELECT COUNT(`device_id`) AS `total` FROM `processes`',
                  'processors'=>'SELECT COUNT(`processor_id`) AS `total`,`processor_type` FROM `processors` GROUP BY `processor_type`',
