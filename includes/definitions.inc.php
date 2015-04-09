@@ -128,6 +128,18 @@ $config['os'][$os]['over'][1]['text']   = "Processor Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+$os = "powercode";
+$onfig['os'][$os]['type']              = "server";
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['text']              = "Powercode BMU";
+$config['os'][$os]['icon']              = "powercode";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "Processor Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempool";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 // Other Unix-based OSes here please.
 
 $os = "freebsd";
