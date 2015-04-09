@@ -90,7 +90,7 @@ This is a 32x32 png format image of the OS you are adding support for.
 
 Thanks for asking, sometimes it's not quite so obvious and everyone can contribute something different. So here are some ways you can help LibreNMS improve.
 
-- Code. This is a big thing. We want this community to grow by the software devloping and evolving to cater for users needs. The biggest area that people can help make this happen is by providing code support. This doesn't necessarily mean contributing code for discovering a new device:
+- Code. This is a big thing. We want this community to grow by the software developing and evolving to cater for users needs. The biggest area that people can help make this happen is by providing code support. This doesn't necessarily mean contributing code for discovering a new device:
     - Web UI, a new look and feel has been adopted but we are not finished by any stretch of the imagination. Make suggestions, find and fix bugs, update the design / layout.
     - Poller / Discovery code. Improving it (we think a lot can be done to speed things up), adding new device support and updating old ones.
     - The LibreNMS main website, this is hosted on Git Hub like the main repo and we accept use contributions here as well :)
