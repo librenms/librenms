@@ -15,7 +15,7 @@
 //sysDescr.0 = STRING: Powercode BMU
 
 if (!$os) {
-    if (stristr($sysDescr, "Powercode MBU")) {
+    if (stristr($sysDescr, "Powercode BMU")) {
         $os = "powercode";
     }
 }
