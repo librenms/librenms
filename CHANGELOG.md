@@ -248,6 +248,14 @@
 
 dustmoo Modifications
 ===========
+Changelog 2013-04-3
+
+Fork now handles standard behavior properly with swap allowing larger widgets to shift down.
+
+Changelog 2013-04-2
+
+Added Demo to Repository.
+
 Changelog 2013-02-27
 
 Added "Static widget support" Static Items default to the "static" class.
