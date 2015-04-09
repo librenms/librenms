@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Gridster Grid Swapping Demo</title>
+        <meta name="description" content="">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="../dist/jquery.gridster.js"></script>
+        <link rel="stylesheet" href="../dist/jquery.gridster.min.css">
+
+        <script type="text/javascript">
+            var gridster = "";
+            $(document).ready(function () {
+                $(".gridster ul").gridster({
+                    widget_margins: [10, 10],
+                    widget_base_dimensions: [140, 140],
+                    shift_larger_widgets_down: false
+                });
+            });
+        </script>
+    </head>
+    <body>
+    <div class="content">
+        <p>This demo represents using the branch in swap mode. This works best with shift_larger_widgets_down set to "false". However, smaller widgets do not displace larger ones.</p>
+    </div>
+    <div class="gridster">
+          <ul style="height: 480px; position: relative; ">
+            <li data-row="1" data-col="1" data-sizex="2" data-sizey="1" class="gs_w"></li>
+            <li data-row="3" data-col="1" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+            <li data-row="3" data-col="2" data-sizex="2" data-sizey="1" class="gs_w"></li>
+            <li data-row="1" data-col="3" data-sizex="2" data-sizey="2" class="gs_w"></li>
+
+            <li class="try gs_w" data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
+            <li data-row="2" data-col="1" data-sizex="2" data-sizey="1" class="gs_w"></li>
+            <li data-row="3" data-col="4" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+            <li data-row="1" data-col="6" data-sizex="1" data-sizey="1" class="gs_w"></li>
+            <li data-row="3" data-col="5" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+            <li data-row="2" data-col="5" data-sizex="1" data-sizey="1" class="gs_w"></li>
+            <li data-row="2" data-col="6" data-sizex="1" data-sizey="2" class="gs_w"></li>
+          </ul>
+        </div>
+
+
+</body>
+</html>
