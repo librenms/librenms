@@ -3,7 +3,7 @@
 
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-## On the database server ##
+### On the DB Server ###
 
 This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
@@ -36,7 +36,7 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
     service mysql restart
 
-## On the network management server ##
+### On the NMS ###
 
 This host is where the web server and SNMP poller run.  It could be the same machine as your database server.
 
@@ -134,9 +134,13 @@ Change the values to the right of the equal sign for lines beginning with `$conf
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
 
+### Initialise the database ###
+
 Initiate the follow database with the following command:
 
     php build-base.php
+
+### Create admin user ###
 
 Create the admin user - priv should be 10
 
@@ -153,6 +157,8 @@ This assumes you haven't made community changes--if you have, replace `public` w
 Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
+
+### Create cronjob ###
 
 LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).  Just add a number after `poller-wrapper.py`, as in the example below:
 
