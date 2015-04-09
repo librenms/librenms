@@ -2,7 +2,7 @@ NOTE: What follows is a very rough list of commands.  This works on a fresh inst
 
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
-## On the DB Server ##
+### On the DB Server ###
 
     yum install net-snmp mysql-server
     service snmpd start
@@ -40,7 +40,7 @@ Change `<ip>` to the IP address that your MySQL server should listen on.  Restar
 
     service mysqld restart
 
-## On the NMS ##
+### On the NMS ###
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
 
@@ -143,9 +143,13 @@ Add the following line to the end of `config.php`:
 
     $config['fping'] = "/usr/sbin/fping";
 
+### Initialise the database ###
+
 Initiate the follow database with the following command:
 
     php build-base.php
+
+### Create admin user ###
 
 Create the admin user - priv should be 10
 
@@ -182,6 +186,8 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
+### Create cronjob ###
+
 The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in
 the public domain by its author.  By default, the LibreNMS cronjob runs `poller-
 wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 th
@@ -206,3 +212,7 @@ ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
 so that it looks like this:
 
     $config['update'] = 0;
+
+### Install complete ###
+
+That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
