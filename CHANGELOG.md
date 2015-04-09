@@ -248,6 +248,32 @@
 
 dustmoo Modifications
 ===========
+Changelog 2013-02-27
+
+Added "Static widget support" Static Items default to the "static" class.
+
+You can customize this class by using the code below:
+
+    $.gridster({
+        static_class: 'custom_class',
+        draggable: {
+            items: ".gs_w:not(.custom_class)"
+        }
+    });
+
+I have also added functions creating a much more thourough check of whether the player can occupy the space you are moving it too.
+This version is much more reliable in swapping space with widgets.
+
+There are also new options for Maximum Rows and Maximum Columns:
+
+    $.gridster({
+        max_rows: map_rows,
+        max_cols: map_cols,
+        shift_larger_widgets_down: false
+    });
+
+Setting the maximum amount of rows only completely works if you disable shifting larger widgets down at the moment.
+
 
 Changelog 11-26-2012
 
