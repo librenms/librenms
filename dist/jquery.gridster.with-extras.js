@@ -1,6 +1,6 @@
-/*! gridster.js - v0.6.6 - 2015-04-09
+/*! gridster.js - v0.6.6 - 2015-04-10
 * http://gridster.net/
-* Copyright (c) 2015 decksterteam; Licensed MIT */
+* Copyright (c) 2015 ducksboard; Licensed MIT */
 
 ;(function(root, factory) {
     if(typeof exports === 'object') {
@@ -366,76 +366,89 @@
 
 }));
 
-;(function(window, undefined) {
+(function (window, undefined) {
 
-    /* Delay, debounce and throttle functions taken from underscore.js
-     *
-     * Copyright (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and
-     * Investigative Reporters & Editors
-     *
-     * Permission is hereby granted, free of charge, to any person
-     * obtaining a copy of this software and associated documentation
-     * files (the "Software"), to deal in the Software without
-     * restriction, including without limitation the rights to use,
-     * copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the
-     * Software is furnished to do so, subject to the following
-     * conditions:
-     *
-     * The above copyright notice and this permission notice shall be
-     * included in all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-     * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-     * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-     * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-     * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-     * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-     * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-     * OTHER DEALINGS IN THE SOFTWARE.
-     */
+	/* Delay, debounce and throttle functions taken from underscore.js
+	 *
+	 * Copyright (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and
+	 * Investigative Reporters & Editors
+	 *
+	 * Permission is hereby granted, free of charge, to any person
+	 * obtaining a copy of this software and associated documentation
+	 * files (the "Software"), to deal in the Software without
+	 * restriction, including without limitation the rights to use,
+	 * copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the
+	 * Software is furnished to do so, subject to the following
+	 * conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be
+	 * included in all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+	 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	 * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+	 * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+	 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+	 * OTHER DEALINGS IN THE SOFTWARE.
+	 */
 
-    window.delay = function(func, wait) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        return setTimeout(function(){ return func.apply(null, args); }, wait);
-    };
+	window.delay = function (func, wait) {
+		var args = Array.prototype.slice.call(arguments, 2);
+		return setTimeout(function () {
+			return func.apply(null, args);
+		}, wait);
+	};
 
-    window.debounce = function(func, wait, immediate) {
-        var timeout;
-        return function() {
-          var context = this, args = arguments;
-          var later = function() {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-          };
-          if (immediate && !timeout) func.apply(context, args);
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
-    };
+	window.debounce = function (func, wait, immediate) {
+		var timeout;
+		return function () {
+			var context = this, args = arguments;
+			var later = function () {
+				timeout = null;
+				if (!immediate) {
+					func.apply(context, args);
+				}
+			};
+			if (immediate && !timeout) {
+				func.apply(context, args);
+			}
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+		};
+	};
 
-    window.throttle = function(func, wait) {
-        var context, args, timeout, throttling, more, result;
-        var whenDone = debounce(
-            function(){ more = throttling = false; }, wait);
-        return function() {
-          context = this; args = arguments;
-          var later = function() {
-            timeout = null;
-            if (more) func.apply(context, args);
-            whenDone();
-          };
-          if (!timeout) timeout = setTimeout(later, wait);
-          if (throttling) {
-            more = true;
-          } else {
-            result = func.apply(context, args);
-          }
-          whenDone();
-          throttling = true;
-          return result;
-        };
-    };
+	window.throttle = function (func, wait) {
+		var context, args, timeout, throttling, more, result;
+		var whenDone = debounce(
+				function () {
+					more = throttling = false;
+				}, wait);
+		return function () {
+			context = this;
+			args = arguments;
+			var later = function () {
+				timeout = null;
+				if (more) {
+					func.apply(context, args);
+				}
+				whenDone();
+			};
+			if (!timeout) {
+				timeout = setTimeout(later, wait);
+			}
+			if (throttling) {
+				more = true;
+			} else {
+				result = func.apply(context, args);
+			}
+			whenDone();
+			throttling = true;
+			return result;
+		};
+	};
 
 })(window);
 
@@ -515,9 +528,8 @@
         this.options = $.extend({}, defaults, options);
         this.$document = $(document);
         this.$container = $(el);
-        this.$scroll_container = this.options.scroll_container == window ?
+        this.$scroll_container = this.options.scroll_container === window ?
             $(window) : this.$container.closest(this.options.scroll_container);
-        this.$dragitems = $(this.options.items, this.$container);
         this.is_dragging = false;
         this.player_min_left = 0 + this.options.offset_left;
         this.id = uniqId();
@@ -537,7 +549,7 @@
         this.events();
 
         $window.bind(this.nsEvent('resize'),
-            throttle($.proxy(this.calculate_dimensions, this), 200));
+				throttle($.proxy(this.calculate_dimensions, this), 200));
     };
 
     fn.nsEvent = function(ev) {
@@ -568,8 +580,7 @@
     };
 
     fn.get_actual_pos = function($el) {
-        var pos = $el.position();
-        return pos;
+		return $el.position();
     };
 
 
@@ -704,14 +715,13 @@
     };
 
 
-    fn.calculate_dimensions = function(e) {
+    fn.calculate_dimensions = function() {
         this.scroller_height = this.$scroll_container.height();
         this.scroller_width = this.$scroll_container.width();
     };
 
 
     fn.drag_handler = function(e) {
-        var node = e.target.nodeName;
         // skip if drag is disabled, or click was not done with the mouse primary button
         if (this.disabled || e.which !== 1 && !isTouch) {
             return;
@@ -767,7 +777,6 @@
         var offset = this.$container.offset();
         this.baseX = Math.round(offset.left);
         this.baseY = Math.round(offset.top);
-        this.initial_container_width = this.options.container_width || this.$container.width();
 
         if (this.options.helper === 'clone') {
             this.$helper = this.$player.clone()
@@ -779,11 +788,8 @@
 
         this.scroll_container_offset_y = this.$scroll_container.scrollTop();
         this.scroll_container_offset_x = this.$scroll_container.scrollLeft();
-        this.scroll_offset_y = 0;
-        this.scroll_offset_x = 0;
         this.el_init_offset = this.$player.offset();
         this.player_width = this.$player.width();
-        this.player_height = this.$player.height();
 
         this.set_limits(this.options.container_width);
 
@@ -1030,7 +1036,7 @@
         this.options.draggable = $.extend(true, {}, this.options.draggable,
                             {scroll_container: this.options.scroll_container});
         this.$el = $(el);
-        this.$scroll_container = this.options.scroll_container == window ? 
+        this.$scroll_container = this.options.scroll_container === window ?
                 $(window) : this.$el.closest(this.options.scroll_container);
         this.$wrapper = this.$el.parent();
         this.$widgets = this.$el.children(
@@ -1316,7 +1322,7 @@
             }, this), 0);
         }
 
-        return $w.fadeIn({complete: function () { if(callback) callback.call(this); }});
+        return $w.fadeIn({complete: function () { if(callback) {callback.call(this);} }});
 
     };
 
@@ -1378,7 +1384,7 @@
     fn.add_resize_handle = function($w) {
         var $append_to = this.options.resize.handle_append_to ? $(this.options.resize.handle_append_to, $w) : $w;
 
-        if ( ($append_to.children("span[class~='" + this.resize_handle_class + "']")).length == 0 ) {
+        if ( ($append_to.children("span[class~='" + this.resize_handle_class + "']")).length === 0 ) {
             $(this.resize_handle_tpl).appendTo( $append_to );
         }
 
@@ -1832,7 +1838,9 @@
         $nexts.not($exclude).each($.proxy(function(i, w) {
             var $w = $( w ),
                 wgd = $w.coords().grid;
+			/*jshint -W018 */
             if ( !(wgd.row <= (row + size_y - 1))) { return; }
+			/*jshint +W018 */
             var diff =  (row + size_y) - wgd.row;
             this.move_widget_down($w, diff);
         }, this));
@@ -1925,7 +1933,7 @@
         if($w){
             this.remove_widget($w);
         }
-    }
+    };
 
 
     /**
@@ -2005,7 +2013,8 @@
         $widgets || ($widgets = this.$widgets);
         var result = [];
         $widgets.each($.proxy(function(i, widget) {
-            if(typeof($(widget).coords().grid) != "undefined"){
+			var $w = $(widget);
+			if(typeof($w.coords().grid) !== 'undefined'){
                 result.push(this.options.serialize_params($w, $w.coords().grid) );
             }
         }, this));
@@ -2615,12 +2624,12 @@
         size_x = Math.max(Math.min(size_x, max_size_x), min_size_x);
         size_x = Math.min(max_cols, size_x);
         width = (max_size_x * wbd_x) + ((size_x - 1) * margin_x );
-        max_width = Math.min(width, limit_width);
-        min_width = (min_size_x * wbd_x) + ((size_x - 1) * margin_x);
+        var max_width = Math.min(width, limit_width);
+        var min_width = (min_size_x * wbd_x) + ((size_x - 1) * margin_x);
 
         size_y = Math.max(Math.min(size_y, max_size_y), min_size_y);
-        max_height = (max_size_y * wbd_y) + ((size_y - 1) * margin_y);
-        min_height = (min_size_y * wbd_y) + ((size_y - 1) * margin_y);
+        var max_height = (max_size_y * wbd_y) + ((size_y - 1) * margin_y);
+        var min_height = (min_size_y * wbd_y) + ((size_y - 1) * margin_y);
 
         if (this.resize_dir.right) {
             size_y = this.resize_initial_sizey;
@@ -2858,10 +2867,10 @@
         //Move queued widgets
         if(swap && this.can_placeholder_be_set(to_col, to_row, player_size_x, player_size_y)){
             for(var key in this.w_queue){
-                var col = parseInt(key.split("_")[0]);
-                var row = parseInt(key.split("_")[1]);
-                if (this.w_queue[key] != "full"){
-                    this.new_move_widget_to(this.w_queue[key], col, row);
+                var _col = parseInt(key.split("_")[0]);
+                var _row = parseInt(key.split("_")[1]);
+                if (this.w_queue[key] !== "full"){
+                    this.new_move_widget_to(this.w_queue[key], _col, _row);
                 }
             }
             this.set_placeholder(to_col, to_row);
@@ -2898,12 +2907,12 @@
                 if(this.is_occupied(colc,rowc)){
                     occupied = true;
                 } else if(key in this.w_queue){
-                    if(this.w_queue[key] == "full"){
+                    if(this.w_queue[key] === 'full'){
                         occupied = true;
                         continue;
                     }
-                    $tw = this.w_queue[key];
-                    tgd = $tw.coords().grid;
+                    var $tw = this.w_queue[key];
+                    var tgd = $tw.coords().grid;
                     //remove queued items if no longer under player.
                     if(!this.is_widget_under_player(tgd.col,tgd.row)){
                         delete this.w_queue[key];
@@ -2922,7 +2931,7 @@
         }
         
         return occupied;
-    }
+    };
 
     fn.can_placeholder_be_set = function(col, row, player_size_x, player_size_y){
         var can_set = true;
@@ -2945,10 +2954,10 @@
             }
         }
         return can_set;
-    }
+    };
 
     fn.queue_widget = function(col, row, $widget){
-        var $w = $widget
+        var $w = $widget;
         var wgd = $w.coords().grid;
         var primary_key = col+"_"+row;
         if (primary_key in this.w_queue){
@@ -2962,7 +2971,7 @@
                 var colc = col + c;
                 var rowc = row + r;
                 var key = colc+"_"+rowc;
-                if (key == primary_key){
+                if (key === primary_key){
                     continue;
                 }
                 this.w_queue[key] = "full";
@@ -2970,7 +2979,7 @@
         }
 
         return true;
-    }
+    };
 
     fn.is_widget_queued_and_can_move = function($widget){
         var queued = false;
@@ -2979,10 +2988,10 @@
         }
 
         for(var key in this.w_queue){
-            if(this.w_queue[key] == "full"){
+            if(this.w_queue[key] === "full"){
                 continue;
             }
-            if(this.w_queue[key].attr("data-col") == $widget.attr("data-col") && this.w_queue[key].attr("data-row") == $widget.attr("data-row")){
+            if(this.w_queue[key].attr("data-col") === $widget.attr("data-col") && this.w_queue[key].attr("data-row") === $widget.attr("data-row")){
                 queued = true;
                 //test whole space
                 var $w = this.w_queue[key];
@@ -3004,24 +3013,24 @@
             }
         }
     
-        return queued
-    }
+        return queued;
+    };
 
     fn.is_in_queue = function(col,row, $widget){
         var queued = false;
         var key = col+"_"+row;
 
         if ((key in this.w_queue)){
-            if (this.w_queue[key] == "full"){
+            if (this.w_queue[key] === "full"){
                queued = true; 
             } else {
-                $tw = this.w_queue[key];
-                tgd = $tw.coords().grid;
+                var $tw = this.w_queue[key];
+                var tgd = $tw.coords().grid;
                 if(!this.is_widget_under_player(tgd.col,tgd.row)){
-                    delete this.w_queue[key]
+                    delete this.w_queue[key];
                     queued = false;
-                } else if(this.w_queue[key].attr("data-col") == $widget.attr("data-col") && this.w_queue[key].attr("data-row") == $widget.attr("data-row")) {
-                    delete this.w_queue[key]
+                } else if(this.w_queue[key].attr("data-col") === $widget.attr("data-col") && this.w_queue[key].attr("data-row") === $widget.attr("data-row")) {
+                    delete this.w_queue[key];
                     queued = false;
                 } else {
                     queued = true;
@@ -3030,7 +3039,7 @@
         } 
 
         return queued;
-    }
+    };
 
 
     /**
@@ -3107,7 +3116,7 @@
                     // overlaps player
                     var y = (to_row + this.player_grid_data.size_y) - wgd.row;
                     if (this.can_go_down($w)){
-                        console.log("In Move Down!")
+                        console.log("In Move Down!");
                         this.move_widget_down($w, y);
                         this.set_placeholder(to_col, to_row);
                     }
@@ -3351,8 +3360,8 @@
         if (moved_down || changed_column) {
             $nexts.each($.proxy(function(i, widget) {
                 //Make sure widget is at it's topmost position
-                $w = $(widget);
-                wgd = $w.coords().grid;
+                var $w = $(widget);
+                var wgd = $w.coords().grid;
 
                 var can_go_widget_up = this.can_go_widget_up(wgd);
 
@@ -3507,12 +3516,13 @@
 
         while (++r <= p_bottom_row ) {
             var common = true;
+			/*jshint -W083 */
             $.each(upper_rows, function(col, rows) {
                 if ($.isArray(rows) && $.inArray(r, rows) === -1) {
                     common = false;
                 }
             });
-
+			/*jshint +W083 */
             if (common === true) {
                 valid_rows.push(r);
                 if (valid_rows.length === size_y) {
@@ -3649,12 +3659,14 @@
         var self = this;
         var cols = this.cells_occupied_by_player.cols;
         if(this.options.shift_larger_widgets_down){
+			/*jshint -W083 */
             for (var c = 0, cl = cols.length; c < cl; c++) {
                 this.for_each_widget_below(cols[c], row, function(tcol, trow) {
                     console.log("from_on_stop_overlapping_row");
                     self.move_widget_up(this, self.player_grid_data.size_y);
                 });
             }
+			/*jshint +W083 */
         }
     };
 
@@ -3674,7 +3686,7 @@
         this.$changed = this.$changed.add($widget);
 
         return this;
-    }
+    };
 
 
     /**
@@ -4012,10 +4024,10 @@
             if ($(this).hasClass($gr.options.static_class)){
                 can_go_down = false;
             }
-        })
+        });
 
         return can_go_down;
-    }
+    };
 
 
     fn.can_go_up = function($el) {
@@ -4213,13 +4225,13 @@
     };
 
     fn.clean_up_changed = function(){
-        $gr = this;
+        var $gr = this;
         $gr.$changed.each(function(){
             if($gr.options.shift_larger_widgets_down){
                 $gr.move_widget_up($(this));
             }
         });
-    }
+    };
 
 
 
@@ -4514,8 +4526,8 @@
         /* generate CSS styles for cols */
         for(i = 1; i <= opts.cols + 1; i++) {
           styles += (opts.namespace + ' [data-col="' + i + '"] { left:' +
-          (full_width ?  this.options.widget_margins[0] : ((i * opts.widget_margins[0]) + ((i - 1) * opts.widget_base_dimensions[0])))
-          + 'px; }\n');
+          (full_width ?  this.options.widget_margins[0] :
+				  ((i * opts.widget_margins[0]) + ((i - 1) * opts.widget_base_dimensions[0]))) + 'px; }\n');
         }
 
         /* generate CSS styles for rows */
@@ -4531,7 +4543,8 @@
 
         for (var x = 1; x <= max_size_x; x++) {
             styles += (opts.namespace + ' [data-sizex="' + x + '"] { width:' +
-            (full_width ? ($(window).width() - this.options.widget_margins[0] * 2) : ((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
+            (full_width ? ($(window).width() - this.options.widget_margins[0] * 2) :
+					((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
         }
 
         this.remove_style_tags();
