@@ -16,7 +16,7 @@ $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'"
 if ($enabled == 1) {
 
     if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") == '') {
-        dbInsert(array('name'=>'uuid','value'=>guidv4()),'callback');
+        dbInsert(array('name'=>'uuid','value'=>guidv4(openssl_random_pseudo_bytes(16))),'callback');
     }
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
