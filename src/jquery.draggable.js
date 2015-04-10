@@ -82,9 +82,8 @@
         this.options = $.extend({}, defaults, options);
         this.$document = $(document);
         this.$container = $(el);
-        this.$scroll_container = this.options.scroll_container == window ?
+        this.$scroll_container = this.options.scroll_container === window ?
             $(window) : this.$container.closest(this.options.scroll_container);
-        this.$dragitems = $(this.options.items, this.$container);
         this.is_dragging = false;
         this.player_min_left = 0 + this.options.offset_left;
         this.id = uniqId();
@@ -104,7 +103,7 @@
         this.events();
 
         $window.bind(this.nsEvent('resize'),
-            throttle($.proxy(this.calculate_dimensions, this), 200));
+				throttle($.proxy(this.calculate_dimensions, this), 200));
     };
 
     fn.nsEvent = function(ev) {
@@ -135,8 +134,7 @@
     };
 
     fn.get_actual_pos = function($el) {
-        var pos = $el.position();
-        return pos;
+		return $el.position();
     };
 
 
@@ -271,14 +269,13 @@
     };
 
 
-    fn.calculate_dimensions = function(e) {
+    fn.calculate_dimensions = function() {
         this.scroller_height = this.$scroll_container.height();
         this.scroller_width = this.$scroll_container.width();
     };
 
 
     fn.drag_handler = function(e) {
-        var node = e.target.nodeName;
         // skip if drag is disabled, or click was not done with the mouse primary button
         if (this.disabled || e.which !== 1 && !isTouch) {
             return;
@@ -334,7 +331,6 @@
         var offset = this.$container.offset();
         this.baseX = Math.round(offset.left);
         this.baseY = Math.round(offset.top);
-        this.initial_container_width = this.options.container_width || this.$container.width();
 
         if (this.options.helper === 'clone') {
             this.$helper = this.$player.clone()
@@ -346,11 +342,8 @@
 
         this.scroll_container_offset_y = this.$scroll_container.scrollTop();
         this.scroll_container_offset_x = this.$scroll_container.scrollLeft();
-        this.scroll_offset_y = 0;
-        this.scroll_offset_x = 0;
         this.el_init_offset = this.$player.offset();
         this.player_width = this.$player.width();
-        this.player_height = this.$player.height();
 
         this.set_limits(this.options.container_width);
 
