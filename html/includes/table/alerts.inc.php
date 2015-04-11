@@ -44,9 +44,10 @@ foreach (dbFetchRows($sql,$param) as $alert) {
         $fault_detail = '';
         foreach ($tmp_alerts as $k=>$v) {
             if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
-                $fault_detail .= $k.' => '.$v."\n ";
+                $fault_detail .= $k.' => '.$v.", ";
             }
         }
+        $fault_detail = rtrim($fault_detail,", ");
         $fault_detail .= "\n";
     }
 
@@ -98,7 +99,7 @@ foreach (dbFetchRows($sql,$param) as $alert) {
 
     $response[] = array('id'=>"<i>#".$rulei++."</i>",
                         'rule'=>"<i title=\"".htmlentities($alert['rule'])."\">".htmlentities($alert['name'])."</i>",
-                        'hostname'=>"<a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."</i></a>",
+                        'hostname'=>"<a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."<br />$fault_detail</i></a>",
                         'timestamp'=>($alert['timestamp'] ? $alert['timestamp'] : "N/A"),
                         'severity'=>$severity,
                         'ack_col'=>$ack_col,
