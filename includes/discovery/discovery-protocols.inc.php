@@ -148,7 +148,7 @@ echo("OSPF Discovery: ");
 
 if ($config['autodiscovery']['ospf'] === TRUE) {
     echo "enabled\n";
-    foreach (dbFetchRow("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
+    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
         $ip = $nbr['ospfNbrIpAddr'];
         $device_id = $nbr['device_id'];
         if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
