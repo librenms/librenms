@@ -37,6 +37,16 @@ if (!empty($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] 
 if (!empty($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
 if (!empty($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
 if (!empty($vars['location'])) { $location_filter = $vars['location']; }
+if( !empty($vars['group']) ) {
+	require_once('../includes/device-groups.inc.php');
+	$where .= " AND ( ";
+	foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
+		$where .= "device_id = ? OR ";
+		$sql_param[] = $dev['device_id'];
+	}
+	$where = substr($where, 0, strlen($where)-3);
+	$where .= " )";
+}
 
 $pagetitle[] = "Devices";
 

@@ -12,7 +12,7 @@
  *
  */
 
-$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
+$_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
 
 function logErrors($errno, $errstr, $errfile, $errline) {
     global $php_debug;
@@ -164,9 +164,13 @@ if (empty($config['favicon'])) {
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
   <link href="css/mktree.css" rel="stylesheet" type="text/css" />
+  <link href="css/vis.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+  <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -179,6 +183,7 @@ if (empty($config['favicon'])) {
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
   <script src="js/mktree.js"></script>
+  <script src="js/jquery.bootgrid.min.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
@@ -208,18 +213,6 @@ if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
 ?>
 <br />
 <div class="container-fluid">
-<?php
-if ($_SESSION['authenticated'])
-{
-?>
-  <div class="row">
-    <div class="col-md-12">
-      &nbsp;<br /><br />
-    </div>
-  </div>
-<?php
-}
-?>
   <div class="row">
     <div class="col-md-12">
 <?php
@@ -313,22 +306,22 @@ if (isset($pagetitle) && is_array($pagetitle))
 <?php
 if($config['enable_footer'] == 1) {
 ?>
-<footer>
+<nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-bottom">
   <div class="container">
     <div class="row">
       <div class="col-md-12 text-center">
 <?php
-echo('<em>        Powered by <a href="/about/" target="_blank">' . $config['project_name'].'</a>.</em><br/>');
+echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" class="red">' . $config['project_name'].'</a>.</h5>');
 ?>
       </div>
     </div>
   </div>
-</footer>
+</nav>
 <?php
 }
 
 if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1",array()) > 0) {
-    $msg_box[] = array('type' => 'warning', 'message' => "It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)",'title' => 'Devices unpolled');
+    $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
 if(is_array($msg_box)) {
@@ -351,37 +344,33 @@ if (is_array($sql_debug) && is_array($php_debug)) {
 
 }
 
-?>
-</body>
-<?php
-
 if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
     $refresh = $config['page_refresh'] * 1000;
     echo('<script type="text/javascript">
         $(document).ready(function() {
 
-           $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+           $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
            var Countdown = {
                sec: '. $config['page_refresh'] .',
 
                Start: function() {
                    var cur = this;
                    this.interval = setInterval(function() {
-                       $("#countdown_timer_status").html("<img src=\"images/16/clock_pause.png\"> Pause");
+                       $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
                        cur.sec -= 1;
                        display_time = cur.sec;
                        if (display_time == 0) {
                            location.reload();
                        }
                        if (display_time % 1 === 0 && display_time <= 300) {
-                           $("#countdown_timer").html("<img src=\"images/16/clock.png\"> Refresh in " + display_time);
+                           $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw\"></i> Refresh in " + display_time);
                        }
                    }, 1000);
                },
 
                Pause: function() {
                    clearInterval(this.interval);
-                   $("#countdown_timer_status").html("<img src=\"images/16/clock_play.png\"> Resume");
+                   $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw\"></i> Resume");
                    delete this.interval;
                },
 
@@ -411,5 +400,5 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
 }
 
 ?>
-
+</body>
 </html>

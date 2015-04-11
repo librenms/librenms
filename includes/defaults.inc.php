@@ -102,8 +102,9 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 }
 
 $config['project_url']      = "https://github.com/librenms/";
+$config['project_home']     = 'http://www.librenms.org/';
 $config['project_issues']   = "https://github.com/librenms/librenms/issues";
-$config['title_image']      = "images/librenms_logo.png";
+$config['site_style']       = "light"; // Options are dark or light
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
 $config['favicon']          = "";
@@ -415,6 +416,7 @@ $config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
+$config['auth_ldap_groupmemberattr'] = "memberUid";
 
 // Sensors
 

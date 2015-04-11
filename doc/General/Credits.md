@@ -18,6 +18,18 @@ LibreNMS ships with the following software components:
   http://www.javascripttoolbox.com/lib/mktree/
   MIT and GPL License
 
+- Jquery Bootgrid
+  http://www.jquery-bootgrid.com/
+  MIT License
+
+- Font Awesome
+  http://fontawesome.io/
+  Varying licenses but GPL friendly
+
+- Code for UBNT Devices
+  Mark Gibbons <mgibbons@oemcomp.com>
+  Initial code base submited via PR721
+
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 

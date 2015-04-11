@@ -1,9 +1,31 @@
+### Apr 2015
+
+####Bug fixes
+  - Fixed ack of worse/better alerts (PR720)
+  - Fixed ORIG_PATH_INFO warnings (PR727)
+
+####Improvements
+  - New theme support added (light,dark and mono) (PR682,PR683,PR701)
+  - Tables being converted to Jquery Bootgrid (PR693,PR706,PR716)
+  - Detect Cisco ASA Hardware and OS Version (PR708)
+  - Update LDAP support (PR707)
+  - Updated APC powernet MIB (PR713)
+  - Update to Foritgate support (PR709)
+  - Added support for UBNT AirOS and AirFibre (PR721,PR730,PR731)
+  - Added support device groups + alerts to be mapped to devices or groups (PR722)
+
 ### Mar 2015
 
 ####Bug fixes
   - Updates to alert rules split (PR550)
   - Updated get_graphs() for API to resolve graph names (PR613)
   - Fixed use of REMOTE_ADDR to use X_FORWARDED_FOR if available (PR620)
+  - Added yocto support from entPhySensorScale (PR632)
+  - Eventlog search fixed (PR644)
+  - Added missing OS discovery to default list (PR660)
+  - Fixed logging issue when description of a port was removed (PR673)
+  - Fixed logging issue when ports changed status (PR675)
+  - Shortened interface names for graph display (PR676)
 
 ####Improvements
   - Visual updates to alert logs (PR541)
@@ -16,6 +38,17 @@
   - Added dynamic removal of device data when removing device (PR592)
   - Updated alerting to use fifo (PR607)
   - Added distributed poller support (PR609 and PR610)
+  - Added PowerConnect 55xx (PR635)
+  - Added inventory API endpoint (PR640)
+  - Added serial number detection for ASA firewalls (PR642)
+  - Added missing MKTree library for inventory support (PR646)
+  - Added support for exporting Alert logs to PDF (PR653)
+  - Added basic Ubiquiti support (PR659)
+  - Numerous docs update (PR662, PR663, PR677, PR694)
+  - Added Polling information page (PR664)
+  - Added HipChat notification support (PR669)
+  - Implemented Jquery Bootgrid support (PR671)
+  - Added new map to show xDP discovered links and devices (PR679 + PR680)
 
 ###Feb 2015
 

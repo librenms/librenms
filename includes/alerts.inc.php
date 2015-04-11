@@ -22,6 +22,9 @@
  * @subpackage Alerts
  */
 
+include_once($config['install_dir'].'/includes/device-groups.inc.php');
+include_once($config['install_dir'].'/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php');
+
 /**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
@@ -52,6 +55,21 @@ function GenSQL($rule) {
 	return $sql;
 }
 
+/**
+ * Get Alert-Rules for Devices
+ * @param int $device Device-ID
+ * @return array
+ */
+function GetRules($device) {
+	$groups = GetGroupsFromDevice($device);
+	$params = array($device,$device);
+	$where = "";
+	foreach( $groups as $group ) {
+		$where .= " || alert_map.target = ?";
+		$params[] = 'g'.$group;
+	}
+	return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || ( alert_map.target = ? '.$where.' )',$params);
+}
 
 /**
  * Run all rules for a device
@@ -64,7 +82,7 @@ function RunRules($device) {
 	if( $chk['id'] > 0 ) {
 		return false;
 	}
-	foreach( dbFetchRows("SELECT * FROM alert_rules WHERE alert_rules.disabled = 0 && ( alert_rules.device_id = -1 || alert_rules.device_id = ? ) ORDER BY device_id,id",array($device)) as $rule ) {
+	foreach( GetRules($device) as $rule ) {
 		echo " #".$rule['id'].":";
 		$inv = json_decode($rule['extra'],true);
 		if( isset($inv['invert']) ) {
@@ -127,6 +145,7 @@ function GetContacts($results) {
 	if( $config['alerts']['email']['default_only'] ) {
 		return array($config['alerts']['email']['default'] => 'NOC');
 	}
+	$users = get_userlist();
 	$contacts = array();
 	$uids = array();
 	foreach( $results as $result ) {
@@ -146,22 +165,19 @@ function GetContacts($results) {
 			}
 		}
 	}
-	if( $config["alert"]["globals"] ) {
-		$tmpa = dbFetchRows("SELECT realname,email FROM users WHERE level >= 5 AND level < 10");
-		foreach( $tmpa as $tmp ) {
-			$contacts[$tmp['email']] = $tmp['realname'];
+	foreach( $users as $user ) {
+		if( empty($user['email']) ) {
+			continue;
+		} elseif( empty($user['realname']) ) {
+			$user['realname'] = $user['username'];
 		}
-	}
-	if( $config["alert"]["admins"] ) {
-		$tmpa = dbFetchRows("SELECT realname,email FROM users WHERE level = 10");
-		foreach( $tmpa as $tmp ) {
-			$contacts[$tmp['email']] = $tmp['realname'];
-		}
-	}
-	if( is_array($uids) ) {
-		foreach( $uids as $uid ) {
-			$tmp = dbFetchRow("SELECT realname,email FROM users WHERE user_id = ?", array($uid));
-			$contacts[$tmp['email']] = $tmp['realname'];
+		$user['level'] = get_userlevel($user['username']);
+		if( $config["alert"]["globals"] && ( $user['level'] >= 5 && $user['level'] < 10 ) ) {
+			$contacts[$user['email']] = $user['realname'];
+		} elseif( $config["alert"]["admins"] && $user['level'] == 10 ) {
+			$contacts[$user['email']] = $user['realname'];
+		} elseif( in_array($user['user_id'],$uids) ) {
+			$contacts[$user['email']] = $user['realname'];
 		}
 	}
 	return $contacts;

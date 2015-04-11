@@ -13,8 +13,6 @@
  *
  */
 
-include("../includes/alerts.inc.php");
-
 function data_uri($file, $mime)
 {
   $contents = file_get_contents($file);
@@ -735,6 +733,15 @@ function get_client_ip() {
         $client_ip = $_SERVER['REMOTE_ADDR'];
     }
     return $client_ip;
+}
+
+function shorten_interface_type($string) {
+
+    return str_ireplace(
+               array('FastEthernet','GigbitEthernet','TenGigabitEthernet','Port-Channel','Ethernet'),
+               array('Fa','Gi','Te','Po','Eth'),
+               $string
+           );
 }
 
 ?>

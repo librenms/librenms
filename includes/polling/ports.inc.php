@@ -253,15 +253,18 @@ foreach ($ports as $port)
     // Update IF-MIB data
     foreach ($data_oids as $oid)
     {
-      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]) && $this_port['ifAdminStatus'] != 'down')
+      if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
-        $port['update'][$oid] = NULL;
+        $port['update'][$oid] = array('NULL');
         log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
-      } elseif ($port[$oid] != $this_port[$oid] && $this_port['ifAdminStatus'] != 'down') {
+      } elseif ($port[$oid] != $this_port[$oid]) {
         $port['update'][$oid] = $this_port[$oid];
         log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
+      }
+      if( ( $oid == 'ifOperStatus' || $oid == 'ifAdminStatus' ) && $this_port[$oid] == 'down' ) {
+        break;
       }
     }
 
@@ -277,8 +280,15 @@ foreach ($ports as $port)
         $attrib_key = "port_descr_".$attrib;
         if ($port_ifAlias[$attrib] != $port[$attrib_key])
         {
+          if (!isset($port_ifAlias[$attrib])) {
+              $port_ifAlias[$attrib] = array('NULL');
+              $log_port = 'NULL';
+          } else {
+              $log_port = $port_ifAlias[$attrib];
+          }
           $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['port_id']);
+          log_event($attrib . ": ".$port[$attrib_key]." -> " . $log_port, $device, 'interface', $port['port_id']);
+          unset($log_port);
         }
       }
     }

@@ -251,7 +251,9 @@ function rrdtool_escape($string, $maxlength = NULL)
   $result = str_replace('%','%%',$result);
 
   // FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
-  
+
+  $result = shorten_interface_type($result);
+
   if ($maxlength != NULL)
   {
     return substr(str_pad($result, $maxlength),0,$maxlength+(strlen($result)-strlen($string)));

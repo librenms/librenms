@@ -241,4 +241,80 @@ function poll_device($device, $options)
   }
 }
 
+function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs)
+{
+
+  global $config;
+
+  echo("This is mag_poll_mib_def Processing\n");
+  $mib      = NULL;
+  
+  list($mib,) = explode(":", $mib_name_table, 2);
+
+  //$mib_dirs = mib_dirs($mib_subdir);
+  
+  $rrd_file = strtolower(safename($mib)).'.rrd';
+
+  $rrdcreate  = '--step 300 ';
+  $oidglist   = array();
+  foreach ($mib_oids as $oid => $param)
+  {
+    $oidindex   = $param[0];
+    $oiddsname  = $param[1];
+    $oiddsdesc  = $param[2];
+    $oiddstype  = $param[3];
+    
+    if (strlen($oiddsname) > 19) { $oiddsname = truncate($oiddsname, 19, ''); }
+    $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':600:U:100000000000';
+
+    if ($oidindex != '')
+    {
+      $fulloid       = $oid.'.'.$oidindex;
+    } else {
+      $fulloid       = $oid;
+    }
+    
+    // Add to oid GET list
+    $oidglist[] = $fulloid;
+
+  }
+
+  // Implde for LibreNMS Version
+  $oidilist = implode(" ",$oidglist);
+  
+  $snmpdata = snmp_get_multi($device, $oidilist, "-OQUs", $mib);
+  if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0)
+  {
+    print_debug("  ERROR, bad snmp response");
+    return FALSE;
+  }
+
+  $rrdupdate = 'N';
+  foreach ($oidglist as $fulloid)
+  {
+    list($splitoid, $splitindex) = explode(".", $fulloid, 2);
+    if (is_numeric($snmpdata[$splitindex][$splitoid]))
+    {
+      $rrdupdate .= ':'.$snmpdata[$splitindex][$splitoid];
+    } else {
+      $rrdupdate .= ':U';
+    }
+  }
+
+  $rrdfilename = $config['rrd_dir']."/".$device['hostname']."/".$rrd_file; 
+
+  if (!is_file($rrdfilename))
+  {
+    rrdtool_create($rrdfilename, $rrdcreate." ".$config['rrd_rra']);
+  }
+  rrdtool_update($rrdfilename, $rrdupdate);
+
+  foreach ($mib_graphs as $graphtoenable)
+  {
+    $graphs[$graphtoenable] = TRUE;
+  }
+  
+  return TRUE;
+}
+
 ?>
