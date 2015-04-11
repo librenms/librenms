@@ -24,11 +24,11 @@ $sql .= ' AND `local_device_id` != 0 AND `remote_device_id` != 0';
 
 $tmp_ids = array();
 foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_device_id`) AS `remote_device_id`, GREATEST(`remote_device_id`,`devices`.`device_id`) AS `local_device_id` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` $sql", $sql_array) as $link_devices) {
-    if (!in_array($link_devices['local_device_id'], $tmp_ids)) {
+    if (!in_array($link_devices['local_device_id'], $tmp_ids) && device_permitted($link_devices['local_device_id'])) {
         $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['local_device_id']));
         $tmp_devices[] = array('id'=>$link_devices['local_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     }
-    if (!in_array($link_devices['remote_device_id'], $tmp_ids)) {
+    if (!in_array($link_devices['remote_device_id'], $tmp_ids) && device_permitted($link_devices['remote_device_id'])) {
         $link_dev = dbFetchRow("SELECT `hostname`,`location` FROM `devices` WHERE `device_id`=?",array($link_devices['remote_device_id']));
         $tmp_devices[] = array('id'=>$link_devices['remote_device_id'],'label'=>$link_dev['hostname'],'title'=>$link_dev['hostname'],'group'=>$link_dev['location']);
     }
