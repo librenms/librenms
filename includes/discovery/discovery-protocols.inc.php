@@ -144,6 +144,33 @@ if ($lldp_array)
   }
 }
 
+echo("OSPF Discovery: ");
+
+if ($config['autodiscovery']['ospf'] === TRUE) {
+    echo "enabled\n";
+    foreach (dbFetchRow("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
+        $ip = $nbr['ospfNbrIpAddr'];
+        $device_id = $nbr['device_id'];
+        if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+            echo("x");
+            continue;
+        }
+        if (!match_network($config['nets'], $ip)) {
+            echo("i");
+            continue;
+        }
+        $name = gethostbyaddr($ip);
+        $remote_device_id = discover_new_device($name);
+        if (isset($remote_device_id) && $remote_device_id > 0) {
+            log_event("Device $name ($ip) autodiscovered through OSPF", $remote_device_id, 'system');
+        } else {
+            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device_id, 'system');
+        }
+    }
+} else {
+   echo "disabled\n";
+}
+
 if ($debug) { print_r($link_exists); }
 
 $sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = '".$device['device_id']."'";
