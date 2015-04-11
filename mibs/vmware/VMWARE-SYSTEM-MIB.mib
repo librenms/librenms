@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2010 VMware, Inc.  All rights reserved. 
 -- **********************************************************
 
 VMWARE-SYSTEM-MIB DEFINITIONS ::= BEGIN
@@ -15,7 +15,7 @@ VMWARE-SYSTEM-MIB DEFINITIONS ::= BEGIN
    FROM VMWARE-ROOT-MIB;
 
     vmwSystemMIB MODULE-IDENTITY
-    LAST-UPDATED "200801120000Z"
+    LAST-UPDATED "201008020000Z"
     ORGANIZATION "VMware, Inc"
     CONTACT-INFO
     "VMware, Inc
@@ -27,6 +27,10 @@ VMWARE-SYSTEM-MIB DEFINITIONS ::= BEGIN
     "
 DESCRIPTION
     "This MIB module provides for System Software identification"
+
+REVISION      "201008020000Z"
+DESCRIPTION
+    "Add vmwProdPatch managed object to report patch level"
 
 REVISION      "200801120000Z"
 DESCRIPTION
@@ -73,6 +77,26 @@ vmwProdBuild OBJECT-TYPE
          https://esx.example.com/mob/?moid=ServiceInstance&doPath=content%2eabout"
     ::= { vmwSystem 4 }
 
+vmwProdUpdate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This identifier represents the update level applied to this system.
+         VIM Property: Advanced Options key: Misc.HostAgentUpdateLevel
+         https://esx.example.com/mob/?moid=ha%2dadv%2doptions"
+    ::= { vmwSystem 5 }
+
+vmwProdPatch OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This identifier represents the patch level applied to this system.
+         VIM Property: None. 
+         CLI: esxcli system version get"
+    ::= { vmwSystem 6 }
+
 -- conformance information
 vmwSystemMIBConformance
 OBJECT IDENTIFIER ::= { vmwSystemMIB 2 }
@@ -94,7 +118,9 @@ vmwSystemGroup OBJECT-GROUP
     OBJECTS { 
     vmwProdName,
     vmwProdVersion,
-    vmwProdBuild
+    vmwProdBuild,
+    vmwProdUpdate,
+    vmwProdPatch
     }
     STATUS  current
     DESCRIPTION
