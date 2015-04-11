@@ -37,24 +37,52 @@ DESCRIPTION
 VmwSubsystemTypes ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
-            "Define the various subsystems fond on hardware."
+            "Define the various hardware subsystems."
     SYNTAX   INTEGER { unknown(1), chassis(2), powerSupply(3), fan(4), cpu(5),
                        memory(6), battery(7), temperatureSensor(8),
                        raidController(9), voltage(10)
                      }
 
+VmwCIMAlertTypes ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Primary classifications for alert messages."
+    SYNTAX   INTEGER { other(1), communications(2), qos(3), processingError(4),
+                       deviceAlert(5), environmentalAlert(6), modelChange(7),
+                       securityAlert(8)
+                     }
+
+VmwCIMAlertFormat ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Indication of what the Alerting Managed Element property is."
+    SYNTAX  INTEGER { unknown(0), other(1), cimObjectPath(2) }
+
 VmwSubsystemStatus ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
-            "Define the state oof a given subsystem if known."
+            "Define the state of a given subsystem if known."
     SYNTAX  INTEGER { unknown(1), normal(2), marginal(3), critical(4), failed(5) }
+
+VmwCIMSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Recommendation.ITU|X733.Perceived severity possible values."
+    SYNTAX  INTEGER { unknown(0), other(1), information(2), warning(3), minor(4), major(5), critical(6), fatal(7) }
+
+VmwCimName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256a"
+    STATUS       current
+    DESCRIPTION
+            "Contains a name of no more than 256 characters."
+    SYNTAX  OCTET STRING (SIZE (0..256))
 
 VmwConnectedState ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "7a"
     STATUS       current
     DESCRIPTION
             "Can hold one of the following values: 'true' or 'false' or 'unknown'."
-    SYNTAX  OCTET STRING (SIZE (7))
+    SYNTAX  OCTET STRING (SIZE (4..7))
 
 VmwLongDisplayString ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1a"
@@ -151,3 +179,4 @@ VmwLongSnmpAdminString ::= TEXTUAL-CONVENTION
     SYNTAX       OCTET STRING
 
 END
+
