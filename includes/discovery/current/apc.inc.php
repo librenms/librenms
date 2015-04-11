@@ -172,6 +172,13 @@ if ($device['os'] == "apc")
   }
 
   unset($oids);
+
+    # UPS
+    $output_load = snmp_get($device, "upsAdvOutputLoad", "-Oqv", "PowerNet-MIB");
+    if (empty($output_load)) {
+        $output_load = snmp_get($device, "upsHighPrecOutputLoad", "-Oqv", "PowerNet-MIB");
+    }
+    discover_sensor($valid['sensor'], 'current', $device, "upsAdvOutputLoad", 1, 'apc', 'OutputLoad','10','1',NULL,NULL,NULL,NULL,$output_load);
 }
 
 ?>
