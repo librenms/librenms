@@ -15,6 +15,9 @@ $sql = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`de
 
 $count_sql = "SELECT COUNT(`alerts`.`id`) $sql";
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = 'timestamp DESC';

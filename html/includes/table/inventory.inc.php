@@ -43,6 +43,9 @@ if (isset($_POST['device']) && is_numeric($_POST['device'])) {
 
 $count_sql = "SELECT COUNT(`entPhysical_id`) $sql";
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` DESC';

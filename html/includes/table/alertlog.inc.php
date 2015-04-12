@@ -20,6 +20,9 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $count_sql = "SELECT COUNT(`E`.`id`) $sql";
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = 'time_logged DESC';
