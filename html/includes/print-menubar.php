@@ -56,6 +56,7 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
             <ul class="dropdown-menu scrollable-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Alerts</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Alert Log</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Alert Stats</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
