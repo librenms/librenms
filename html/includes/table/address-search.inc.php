@@ -28,6 +28,9 @@ if ($_POST['search_type'] == 'ipv4') {
      $count_sql = "SELECT COUNT(`port_id`) $sql";
 }
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` ASC';
