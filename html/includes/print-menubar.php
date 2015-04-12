@@ -197,12 +197,12 @@ if ($_SESSION['userlevel'] >= '10')
 <?php
 $ports = new ObjCache('ports');
 
-if (isset($ports['errored']))
+if ($ports['errored'] > 0)
 {
   echo('            <li><a href="ports/errors=1/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if (isset($ports['ignored']))
+if ($ports['ignored'] > 0)
 {
   echo('            <li><a href="ports/ignore=1/"><i class="fa fa-question-circle fa-fw fa-lg"></i> Ignored ('.$ports['ignored'].')</a></li>');
 }
