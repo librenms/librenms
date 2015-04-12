@@ -338,7 +338,7 @@ toastr.options.extendedTimeOut = 20;
   echo("</script>");
 }
 
-if (is_array($sql_debug) && is_array($php_debug)) {
+if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === TRUE) {
 
     include_once "includes/print-debug.php";
 
