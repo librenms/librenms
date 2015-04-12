@@ -22,11 +22,11 @@ function poll_sensor($device, $class, $unit)
           sleep(1); # Give the TME some time to reset
         }
       } else {
-        $tmp_mib = 'SNMPv2-MIB';
         if ($sensor['sensor_type'] == 'apc') {
-            $tmp_mib .= ':PowerNet-MIB';
+            $sensor_value = trim(str_replace("\"", "", snmp_walk($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB:PowerNet-MIB")));
+        } else {
+            $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
         }
-        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "$tmp_mib")));
       }
     } else if ($sensor['poller_type'] == "agent")
     {
