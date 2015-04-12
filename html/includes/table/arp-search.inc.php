@@ -20,6 +20,9 @@ if (is_numeric($_POST['device_id'])) {
 $count_sql = "SELECT COUNT(`M`.`port_id`) $sql";
 
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` ASC';
