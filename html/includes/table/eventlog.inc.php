@@ -27,6 +27,9 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $count_sql = "SELECT COUNT(datetime) $sql";
 $total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
+}
 
 if (!isset($sort) || empty($sort)) {
     $sort = 'datetime DESC';
