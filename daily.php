@@ -55,5 +55,8 @@ if ($options['f'] === 'perf_times') {
         }
     }
 }
+if ($options['f'] === 'callback') {
+    require_once "callback.php";
+}
 
 ?>
