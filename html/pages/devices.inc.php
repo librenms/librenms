@@ -4,50 +4,6 @@
 
 if(!isset($vars['format'])) { $vars['format'] = "list_detail"; }
 
-$sql_param = array();
-if(isset($vars['state']))
-{
-  if($vars['state'] == 'up')
-  {
-    $state = '1';
-  }
-    elseif($vars['state'] == 'down')
-  {
-    $state = '0';
-  }
-}
-
-if (!empty($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
-if (!empty($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
-if (!empty($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
-if (!empty($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
-if (!empty($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
-if (!empty($vars['type']))     {
-  if ($vars['type'] == 'generic') {
-    $where .= " AND ( type = ? OR type = '')";        $sql_param[] = $vars['type'];
-  } else {
-    $where .= " AND type = ?";        $sql_param[] = $vars['type'];
-  }
-}
-if (!empty($vars['state']))    {
-  $where .= " AND status= ?";       $sql_param[] = $state;
-  $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
-}
-if (!empty($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
-if (!empty($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
-if (!empty($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
-if (!empty($vars['location'])) { $location_filter = $vars['location']; }
-if( !empty($vars['group']) ) {
-	require_once('../includes/device-groups.inc.php');
-	$where .= " AND ( ";
-	foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
-		$where .= "device_id = ? OR ";
-		$sql_param[] = $dev['device_id'];
-	}
-	$where = substr($where, 0, strlen($where)-3);
-	$where .= " )";
-}
-
 $pagetitle[] = "Devices";
 
 print_optionbar_start();
@@ -125,139 +81,13 @@ foreach ($menu_options as $option => $text)
   } else {
     echo('<a href="'. generate_url($vars, array('bare' => 'yes')).'">Remove Header</a>');
   }
+
+print_optionbar_end();
 ?>
 
 </div>
 
 <?php
-
-print_optionbar_end();
-print_optionbar_start();
-
-if((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar']))
-{
-
-?>
-<form method="post" action="" class="form-inline" role="form">
-  <div class="form-group">
-    <input type="text" name="hostname" id="hostname" size="38" value="<?php echo($vars['hostname']); ?>" class="form-control input-sm" placeholder="Hostname"/>
-  </div>
-  <div class="form-group">
-    <select name='os' id='os' class="form-control input-sm">
-      <option value=''>All OSes</option>
-          <?php
-
-foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data)
-{
-  if ($data['os'])
-  {
-    echo("<option value='".$data['os']."'");
-    if ($data['os'] == $vars['os']) { echo(" selected"); }
-    echo(">".$config['os'][$data['os']]['text']."</option>");
-  }
-}
-          ?>
-    </select>
-    <select name='version' id='version' class="form-control input-sm">
-      <option value=''>All Versions</option>
-          <?php
-
-foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data)
-{
-  if ($data['version'])
-  {
-    echo("<option value='".$data['version']."'");
-    if ($data['version'] == $vars['version']) { echo(" selected"); }
-    echo(">".$data['version']."</option>");
-  }
-}
-          ?>
-    </select>
-  </div>
-  <div class="form-group">
-    <select name="hardware" id="hardware" class="form-control input-sm">
-      <option value="">All Platforms</option>
-          <?php
-foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data)
-{
-  if ($data['hardware'])
-  {
-    echo('<option value="'.$data['hardware'].'"');
-    if ($data['hardware'] == $vars['hardware']) { echo(" selected"); }
-    echo(">".$data['hardware']."</option>");
-  }
-}
-          ?>
-    </select>
-    <select name="features" id="features" class="form-control input-sm">
-      <option value="">All Featuresets</option>
-          <?php
-
-foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
-{
-  if ($data['features'])
-  {
-    echo('<option value="'.$data['features'].'"');
-    if ($data['features'] == $vars['features']) { echo(" selected"); }
-    echo(">".$data['features']."</option>");
-  }
-}
-          ?>
-    </select>
-  </div>
-  <div class="form-group">
-    <select name="location" id="location" class="form-control input-sm">
-      <option value="">All Locations</option>
-          <?php
-// fix me function?
-
-foreach (getlocations() as $location) // FIXME function name sucks maybe get_locations ?
-{
-  if ($location)
-  {
-    echo('<option value="'.$location.'"');
-    if ($location == $vars['location']) { echo(" selected"); }
-    echo(">".$location."</option>");
-  }
-}
-?>
-    </select>
-    <select name="type" id="type" class="form-control input-sm">
-      <option value="">All Device Types</option>
-          <?php
-
-foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $data)
-{
-  if ($data['type'])
-  {
-    echo("<option value='".$data['type']."'");
-    if ($data['type'] == $vars['type']) { echo(" selected"); }
-    echo(">".ucfirst($data['type'])."</option>");
-  }
-}
-          ?>
-    </select>
-    <button type="submit" class="btn btn-default input-sm">Search</button>
-  </div>
-  <div class="form-group">
-    <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> |
-    <a href="<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
-  </div>
-</form>
-
-<?php
-
-}
-
-print_optionbar_end();
-
-$query = "SELECT * FROM `devices` WHERE 1 ";
-
-if (isset($where)) {
-    $query .= $where;
-}
-
-$query .= " ORDER BY hostname";
 
 list($format, $subformat) = explode("_", $vars['format']);
 
@@ -291,44 +121,185 @@ if($format == "graph")
 
 } else {
 
-  echo('<div class="panel panel-default panel-condensed">
-          <div class="table-responsive">
-          <table class="table table-condensed">');
-                
-  if ($subformat == "detail" || $subformat == "basic")
-  {
-    echo('<tr>
-    <th></th>
-    <th></th>
-    <th>Device</th>
-    <th></th>
-    <th>Platform</th>
-    <th>Operating System</th>
-    <th>Uptime/Location</th>
-    <th>Actions</th>
-  </tr>');
-  }
+?>
 
-  foreach (dbFetchRows($query, $sql_param) as $device)
-  {
-    if (device_permitted($device['device_id']))
-    {
-      if (!isset($location_filter) || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
-        || $device['location'] == $location_filter))
-      {
-        $cell_click = 'onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;"';
-        if ($subformat == "detail")
-        {
-          include("includes/hostbox.inc.php");
-        } else {
-          include("includes/hostbox-basic.inc.php");
+<div class="panel panel-default panel-condensed">
+    <div class="table-responsive">
+        <table id="devices" class="table table-condensed">
+            <thead>
+                <tr>
+                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status"></th>
+                    <th data-column-id="icon" data-sortable="false" data-searchable="false"></th>
+                    <th data-column-id="hostname" data-order="asc">Device</th>
+                    <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>
+                    <th data-column-id="hardware">Platform</th>
+                    <th data-column-id="os">Operating System</th>
+                    <th data-column-id="uptime">Uptime/Location</th>
+                    <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script>
+
+var grid = $("#devices").bootgrid({
+    ajax: true,
+    rowCount: [50,100,250,-1],
+    columnSelection: false,
+    formatters: {
+        "status": function(column,row) {
+            return "<h4><span class='label label-"+row.extra+" 75pc-width'>" + row.msg + "</span></h4>";
         }
-      }
+    },
+    templates: {
+        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<span class=\"pull-left\"><div class=\"form-group\">"+
+                "<input type=\"text\" name=\"hostname\" id=\"hostname\" value=\"<?php echo($vars['hostname']); ?>\" class=\"form-control input-sm\" placeholder=\"Hostname\"/>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<select name='os' id='os' class=\"form-control input-sm\">"+
+                "<option value=''>All OSes</option>"+
+<?php
+
+foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data) {
+    if ($data['os']) {
+        echo('"<option value=\"'.$data['os'].'\""+');
+        if ($data['os'] == $vars['os']) {
+            echo('" selected "+');
+        }
+        echo('">'.$config['os'][$data['os']]['text'].'</option>"+');
     }
+}
+?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<select name='version' id='version' class=\"form-control input-sm\">"+
+                "<option value=''>All Versions</option>"+
+<?php
+
+foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data) {
+    if ($data['version']) {
+        echo('"<option value=\"'.$data['version'].'\""+');
+        if ($data['version'] == $vars['version']) {
+            echo('" selected "+');
+        }
+        echo('">'.$data['version'].'</option>"+');
   }
-  echo("</table>");
-  echo('</div>');
-  echo('</div>');
+}
+?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<select name=\"hardware\" id=\"hardware\" class=\"form-control input-sm\">"+
+                 "<option value=\"\">All Platforms</option>"+
+<?php
+
+foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data) {
+    if ($data['hardware']) {
+        echo('"<option value=\"'.$data['hardware'].'\""+');
+        if ($data['hardware'] == $vars['hardware']) {
+            echo('" selected"+');
+        }
+        echo('">'.$data['hardware'].'</option>"+');
+    }
+}
+
+?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<select name=\"features\" id=\"features\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Featuresets</option>"+
+<?php
+
+foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
+{
+  if ($data['features'])
+  {
+    echo('"<option value=\"'.$data['features'].'\""+');
+    if ($data['features'] == $vars['features']) {
+        echo('" selected"+');
+    }
+    echo('">'.$data['features'].'</option>"+');
+    }
+}
+
+?>
+                   "</select>"+
+                   "</div></span><span class=\"pull-left\">"+
+                   "<div class=\"form-group\">"+
+                   "<select name=\"location\" id=\"location\" class=\"form-control input-sm\">"+
+                   "<option value=\"\">All Locations</option>"+
+
+<?php
+// fix me function?
+
+foreach (getlocations() as $location) {
+    if ($location) {
+        echo('"<option value=\"'.$location.'\""+');
+        if ($location == $vars['location']) {
+            echo('" selected"+');
+        }
+        echo('">'.$location.'</option>"+');
+    }
+}
+?>
+                    "</select>"+
+                    "</div>"+
+                    "<div class=\"form-group\">"+
+                    "<select name=\"type\" id=\"type\" class=\"form-control input-sm\">"+
+                    "<option value=\"\">All Device Types</option>"+
+<?php
+
+foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $data) {
+    if ($data['type']) {
+        echo('"<option value=\"'.$data['type'].'\""+');
+        if ($data['type'] == $vars['type']) {
+            echo('" selected"+');
+        }
+        echo('">'.ucfirst($data['type']).'</option>"+');
+    }
+}
+
+?>
+                      "</select>"+
+                      "</div>"+
+                      "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
+                      "<div class=\"form-group\">"+
+                      "<a href=\"<?php echo(generate_url($vars)); ?>\" title=\"Update the browser URL to reflect the search criteria.\" >&nbsp;Update URL</a> |"+
+                      "<a href=\"<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>\" title=\"Reset critera to default.\" >&nbsp;Reset</a>"+
+                      "</div>"+
+                      "</form></span></div>"+
+                      "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+    },
+    post: function ()
+    {
+        return {
+            id: "devices",
+            format: '<?php echo mres($vars['format']); ?>',
+            hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
+            os: '<?php echo mres($vars['os']); ?>',
+            version: '<?php echo mres($vars['version']); ?>',
+            hardware: '<?php echo mres($vars['hardware']); ?>',
+            features: '<?php echo mres($vars['features']); ?>',
+            location: '<?php echo mres($vars['location']); ?>',
+            type: '<?php echo mres($vars['type']); ?>',
+            state: '<?php echo mres($vars['state']); ?>',
+            disabled: '<?php echo mres($vars['disabled']); ?>',
+            ignore: '<?php echo mres($vars['ignore']); ?>',
+            group: '<?php echo mres($vars['group']); ?>',
+        };
+    },
+    url: "/ajax_table.php"
+});
+
+</script>
+
+<?php
+
 }
 
 ?>
