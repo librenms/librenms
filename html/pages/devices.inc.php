@@ -149,7 +149,7 @@ var grid = $("#devices").bootgrid({
     columnSelection: false,
     formatters: {
         "status": function(column,row) {
-            return "<h4><span class='label label-"+row.extra+" 75pc-width'>" + row.msg + "</span></h4>";
+            return "<h4><span class='label label-"+row.extra+" threeqtr-width'>" + row.msg + "</span></h4>";
         }
     },
     templates: {
