@@ -26,7 +26,7 @@
   - Added visual graph of alert log (PR777)
   - Added Callback system to send anonymous stats (PR768)
   - More tables converted to use bootgrid (PR729, PR761)
-  - New Global Cache to store common queries add (PR780)
+  - New Global Cache to store common queries added (PR780)
 
 ### Mar 2015
 
