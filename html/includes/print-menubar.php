@@ -1,4 +1,5 @@
 <?php
+include($config['install_dir'].'/includes/object-cache.inc.php');
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
@@ -194,6 +195,7 @@ if ($_SESSION['userlevel'] >= '10')
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
 <?php
+$ports = new ObjCache('ports');
 
 if (isset($ports['errored']))
 {
