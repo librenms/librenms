@@ -19,10 +19,10 @@ function set_proxy($post)
 	$tmp = rtrim($_ENV['https_proxy'], "/");
 	$proxystr = str_replace(array("http://", "https://"), "", $tmp);
 	$config['callback_proxy'] = $proxystr;
-	printf("Setting proxy to %s (from https_proxy=%s)\n", $proxystr, $_ENV['https_proxy']);
+	echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
     }
     if (isset($config['callback_proxy'])) {
-	printf("Using %s as proxy\n", $config['callback_proxy']);
+	echo "Using ".$config['callback_proxy']." as proxy\n";
 	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
     }
 }
