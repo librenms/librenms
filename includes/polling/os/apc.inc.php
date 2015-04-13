@@ -27,6 +27,12 @@ if ($serial == "")
   $serial = trim(snmp_get($device, "PowerNet-MIB::airIRRCUnitIdentSerialNumber.0", "-OQv", "", ""),'"');
 }
 
+if ($serial == "")
+{
+  # InfraStruxure
+  $serial = trim(snmp_get($device, "PowerNet-MIB::isxModularPduIdentSerialNumber.0", "-OQv", "", ""),'"');
+}
+
 /////////////////////
 
 # PDU
@@ -61,6 +67,13 @@ if ($hardware == " ")
   $hardware .= ' ' . trim(snmp_get($device, "PowerNet-MIB::airIRRCUnitIdentHardwareRevision.0", "-OQv", "", ""),'"');
 }
 
+if ($hardware == " ")
+{
+  # InfraStruxure
+  $hardware = trim(snmp_get($device, "PowerNet-MIB::isxModularPduIdentModelNumber.0", "-OQv", "", ""),'"');
+  $hardware .= ' ' . trim(snmp_get($device, "PowerNet-MIB::isxModularPduIdentMonitorCardHardwareRev.0", "-OQv", "", ""),'"');
+}
+
 /////////////////////
 
 $AOSrev = trim(snmp_get($device, "1.3.6.1.4.1.318.1.4.2.4.1.4.1", "-OQv", "", ""),'"');
@@ -87,6 +100,12 @@ if ($AOSrev == '')
   {
     # InRow chiller
     $version = trim(snmp_get($device, "PowerNet-MIB::airIRRCUnitIdentFirmwareRevision.0", "-OQv", "", ""),'"');
+  }
+
+  if ($version == "")
+  {
+    # InfraStruxure
+    $version = trim(snmp_get($device, "PowerNet-MIB::isxModularPduIdentMonitorCardFirmwareAppRev.0", "-OQv", "", ""),'"');
   }
 }
 else
