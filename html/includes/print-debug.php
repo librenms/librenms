@@ -47,7 +47,7 @@ foreach ($sql_debug as $sql_error) {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">SQL Debug</h4>
+        <h4 class="modal-title" id="myModalLabel">PHP Debug</h4>
       </div>
       <div class="modal-body">
       <table class="table table-condensed table-hover">
