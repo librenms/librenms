@@ -858,10 +858,10 @@
         ) {
             $.extend(wgd, this.next_position(wgd.size_x, wgd.size_y));
             $el.attr({
-                'data-col': wgd.col,
-                'data-row': wgd.row,
-                'data-sizex': wgd.size_x,
-                'data-sizey': wgd.size_y
+                'data-col': parseInt(wgd.col, 10),
+                'data-row': parseInt(wgd.row, 10),
+                'data-sizex': parseInt(wgd.size_x, 10),
+                'data-sizey': parseInt(wgd.size_y, 10)
             });
             posChanged = true;
         }
