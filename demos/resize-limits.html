@@ -16,20 +16,20 @@
     <code>data-min-sizex</code> and <code>data-min-sizey</code> HTML attributes to limit widget dimensions when resizing.</p>
 
 <p>If a global max_size is specified through the config option, can be overwrited in specified widgets with HTML data-attributes or using <code>set_widget_max_size</code>
-    method.</p>
+    method. This page has a global max limit of 4x4</p>
 
 
 <div class="gridster">
     <ul>
-        <li data-row="1" data-col="1" data-sizex="2" data-sizey="2" data-max-sizex="2" data-max-sizey="6">
+        <li data-row="1" data-col="1" data-sizex="2" data-sizey="6" data-min-sizex="2" data-min-sizey="6" data-max-sizex="2" data-max-sizey="6">
             0
             <br>
-            <small>Overwrited to 2, 6</small>
+            <small>Overridden to 2, 6</small>
         </li>
         <li data-row="1" data-col="3" data-sizex="1" data-sizey="2" data-max-sizex="6" data-max-sizey="2">
             1
             <br>
-            <small>Overwrited max-size to 6, 2</small>
+            <small>Overridden max-size to 6, 2</small>
         </li>
         <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">2</li>
         <li data-row="3" data-col="2" data-sizex="3" data-sizey="1">3</li>
@@ -41,7 +41,7 @@
         <li data-row="1" data-col="5" data-sizex="3" data-sizey="3" data-min-sizex="3" data-min-sizey="3">
             9
             <br>
-            <small>Overwrited min-size to 3, 3</small>
+            <small>Overridden min-size to 3, 3</small>
         </li>
         <li data-row="5" data-col="1" data-sizex="1" data-sizey="2">10</li>
         <li data-row="4" data-col="3" data-sizex="1" data-sizey="2">11</li>
@@ -59,7 +59,7 @@
     $(function () {
 
         gridster = $(".gridster ul").gridster({
-            widget_base_dimensions: [100, 55],
+            widget_base_dimensions: [100, 100],
             widget_margins: [5, 5],
             helper: 'clone',
             resize: {
