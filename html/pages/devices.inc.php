@@ -218,11 +218,12 @@ var grid = $("#devices").bootgrid({
 
 foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data) {
     if ($data['os']) {
-        echo('"<option value=\"'.$data['os'].'\""+');
-        if ($data['os'] == $vars['os']) {
+        $tmp_os = clean_bootgrid($data['os']);
+        echo('"<option value=\"'.$tmp_os.'\""+');
+        if ($tmp_os == $vars['os']) {
             echo('" selected "+');
         }
-        echo('">'.$config['os'][$data['os']]['text'].'</option>"+');
+        echo('">'.$config['os'][$tmp_os]['text'].'</option>"+');
     }
 }
 ?>
@@ -235,7 +236,7 @@ foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY
 
 foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data) {
     if ($data['version']) {
-        $tmp_version = str_replace(array("\r","\n"), "", $data['version']);
+        $tmp_version = clean_bootgrid($data['version']);
         echo('"<option value=\"'.$tmp_version.'\""+');
         if ($tmp_version == $vars['version']) {
             echo('" selected "+');
@@ -253,11 +254,12 @@ foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version
 
 foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data) {
     if ($data['hardware']) {
-        echo('"<option value=\"'.$data['hardware'].'\""+');
-        if ($data['hardware'] == $vars['hardware']) {
+        $tmp_hardware = clean_bootgrid($data['hardware']);
+        echo('"<option value=\"'.$tmp_hardware.'\""+');
+        if ($tmp_hardware == $vars['hardware']) {
             echo('" selected"+');
         }
-        echo('">'.$data['hardware'].'</option>"+');
+        echo('">'.$tmp_hardware.'</option>"+');
     }
 }
 
@@ -273,11 +275,12 @@ foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `featur
 {
   if ($data['features'])
   {
-    echo('"<option value=\"'.$data['features'].'\""+');
-    if ($data['features'] == $vars['features']) {
+    $tmp_features = clean_bootgrid($data['features']);
+    echo('"<option value=\"'.$tmp_features.'\""+');
+    if ($tmp_features == $vars['features']) {
         echo('" selected"+');
     }
-    echo('">'.$data['features'].'</option>"+');
+    echo('">'.$tmp_features.'</option>"+');
     }
 }
 
@@ -293,6 +296,7 @@ foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `featur
 
 foreach (getlocations() as $location) {
     if ($location) {
+        $location = clean_bootgrid($location);
         echo('"<option value=\"'.$location.'\""+');
         if ($location == $vars['location']) {
             echo('" selected"+');
