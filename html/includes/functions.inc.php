@@ -744,4 +744,12 @@ function shorten_interface_type($string) {
            );
 }
 
+function clean_bootgrid($string) {
+
+    $output = str_replace(array("\r","\n"), "", $string);
+    $output = addslashes($output);
+    return $output;
+
+}
+
 ?>
