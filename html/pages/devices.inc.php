@@ -93,6 +93,59 @@ list($format, $subformat) = explode("_", $vars['format']);
 
 if($format == "graph")
 {
+$sql_param = array();
+
+if(isset($vars['state']))
+{
+  if($vars['state'] == 'up')
+  {
+    $state = '1';
+  }
+    elseif($vars['state'] == 'down')
+  {
+    $state = '0';
+  }
+}
+
+if (!empty($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
+if (!empty($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
+if (!empty($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
+if (!empty($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
+if (!empty($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
+if (!empty($vars['type']))     {
+  if ($vars['type'] == 'generic') {
+    $where .= " AND ( type = ? OR type = '')";        $sql_param[] = $vars['type'];
+  } else {
+    $where .= " AND type = ?";        $sql_param[] = $vars['type'];
+  }
+}
+if (!empty($vars['state']))    {
+  $where .= " AND status= ?";       $sql_param[] = $state;
+  $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
+}
+if (!empty($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
+if (!empty($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
+if (!empty($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
+if (!empty($vars['location'])) { $location_filter = $vars['location']; }
+if( !empty($vars['group']) ) {
+	require_once('../includes/device-groups.inc.php');
+	$where .= " AND ( ";
+	foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
+		$where .= "device_id = ? OR ";
+		$sql_param[] = $dev['device_id'];
+	}
+	$where = substr($where, 0, strlen($where)-3);
+	$where .= " )";
+}
+
+$query = "SELECT * FROM `devices` WHERE 1 ";
+
+if (isset($where)) {
+    $query .= $where;
+}
+
+$query .= " ORDER BY hostname";
+
   $row = 1;
   foreach (dbFetchRows($query, $sql_param) as $device)
   {
