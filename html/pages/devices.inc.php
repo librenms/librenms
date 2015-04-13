@@ -182,11 +182,12 @@ foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY
 
 foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data) {
     if ($data['version']) {
-        echo('"<option value=\"'.$data['version'].'\""+');
-        if ($data['version'] == $vars['version']) {
+        $tmp_version = str_replace(array("\r","\n"), "", $data['version']);
+        echo('"<option value=\"'.$tmp_version.'\""+');
+        if ($tmp_version == $vars['version']) {
             echo('" selected "+');
         }
-        echo('">'.$data['version'].'</option>"+');
+        echo('">'.$tmp_version.'</option>"+');
   }
 }
 ?>
