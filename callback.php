@@ -16,7 +16,7 @@ $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'"
 if ($enabled == 1) {
 
     if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") == '') {
-        dbInsert(array('name'=>'uuid','value'=>guidv4(openssl_random_pseudo_bytes(16))),'callback');
+        dbInsert(array('name'=>'uuid','value'=>guidv4(openssl_random_pseudo_bytes(16))), 'callback');
     }
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
@@ -72,12 +72,13 @@ if ($enabled == 1) {
     $submit = array('data'=>$data);
 
     $fields = '';
-    foreach($submit as $key => $value) { 
-        $fields .= $key . '=' . $value . '&'; 
+    foreach ($submit as $key => $value) {
+        $fields .= $key . '=' . $value . '&';
     }
     rtrim($fields, '&');
 
     $post = curl_init();
+    set_curl_proxy($post);
     curl_setopt($post, CURLOPT_URL, $config['callback_post']);
     curl_setopt($post, CURLOPT_POST, count($submit));
     curl_setopt($post, CURLOPT_POSTFIELDS, $fields);
@@ -89,12 +90,13 @@ if ($enabled == 1) {
     $fields = "uuid=$uuid";
 
     $clear = curl_init();
+    set_curl_proxy($clear);
     curl_setopt($clear, CURLOPT_URL, $config['callback_clear']);
     curl_setopt($clear, CURLOPT_POST, count($clear));
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);
     $result = curl_exec($clear);
-    dbDelete('callback','`name`="uuid"',array());
+    dbDelete('callback', '`name`="uuid"', array());
     dbUpdate(array('value' => '0'), 'callback', '`name` = "enabled"', array());
 }
 
