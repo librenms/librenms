@@ -184,7 +184,7 @@ foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version
     if ($data['version']) {
         $tmp_version = str_replace(array("\r","\n"), "", $data['version']);
         echo('"<option value=\"'.$tmp_version.'\""+');
-        if ($data['version'] == $tmp_version) {
+        if ($tmp_version == $vars['version']) {
             echo('" selected "+');
         }
         echo('">'.$tmp_version.'</option>"+');
