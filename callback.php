@@ -12,21 +12,6 @@
  * the source code distribution for details.
  */
 
-function set_proxy($post)
-{
-    global $config;
-    if (isset($_ENV['https_proxy'])) {
-	$tmp = rtrim($_ENV['https_proxy'], "/");
-	$proxystr = str_replace(array("http://", "https://"), "", $tmp);
-	$config['callback_proxy'] = $proxystr;
-	echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
-    }
-    if (isset($config['callback_proxy'])) {
-	echo "Using ".$config['callback_proxy']." as proxy\n";
-	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
-    }
-}
-
 $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
 if ($enabled == 1) {
 
@@ -93,7 +78,7 @@ if ($enabled == 1) {
     rtrim($fields, '&');
 
     $post = curl_init();
-    set_proxy($post);
+    set_curl_proxy($post);
     curl_setopt($post, CURLOPT_URL, $config['callback_post']);
     curl_setopt($post, CURLOPT_PROXY, count($submit));
     curl_setopt($post, CURLOPT_POST, count($submit));
@@ -106,7 +91,7 @@ if ($enabled == 1) {
     $fields = "uuid=$uuid";
 
     $clear = curl_init();
-    set_proxy($post);
+    set_curl_proxy($post);
     curl_setopt($clear, CURLOPT_URL, $config['callback_clear']);
     curl_setopt($clear, CURLOPT_POST, count($clear));
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);

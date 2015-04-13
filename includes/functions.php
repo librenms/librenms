@@ -1140,4 +1140,17 @@ function guidv4($data) {
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-?>
+function set_curl_proxy($post)
+{
+    global $config;
+    if (isset($_ENV['https_proxy'])) {
+	$tmp = rtrim($_ENV['https_proxy'], "/");
+	$proxystr = str_replace(array("http://", "https://"), "", $tmp);
+	$config['callback_proxy'] = $proxystr;
+	echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
+    }
+    if (isset($config['callback_proxy'])) {
+	echo "Using ".$config['callback_proxy']." as proxy\n";
+	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
+    }
+}
