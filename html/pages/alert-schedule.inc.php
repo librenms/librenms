@@ -13,6 +13,7 @@
  */
 
 $pagetitle[] = "Alert Schedule";
+$no_refresh = TRUE;
 
 ?>
 
@@ -34,19 +35,35 @@ $pagetitle[] = "Alert Schedule";
                         <label for='device' class='col-sm-4 control-label'>Maintenance for? </label>
                         <div class="col-sm-8">
                             <select id='device' name='device' class='form-control'>
+                                <option disabled>Devices</option>
+                                <option disabled>-------</option>
                                 <option value="-1">All devices</option>
+<?php
+
+foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `ignore`=0 AND `disabled`=0") as $device_row) {
+    echo '<option value="'.$device_row['device_id'].'">'.$device_row['hostname'].'</option>';
+}
+
+echo "<option disabled>Groups</option>";
+echo "<option disabled>------</option>";
+
+foreach (dbFetchRows("SELECT `id`,`name` FROM `device_groups`") as $device_group) {
+    echo '<option value="'.$device_group['id'].'">'.$device_group['name'].'</option>';
+}
+
+?>
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="start" class="col-sm-6 control-label">Start: </label>
-                        <label for="end" class="col-sm-6 control-label">End: </label>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-6">
+                        <label for="start" class="col-sm-4 control-label">Start: </label>
+                        <div class="col-sm-8">
                             <input type="text" class="form-control date" id="start" name="start" value="<?php echo date('Y-m-d H:i'); ?>" data-date-format="YYYY-MM-DD HH:mm">
                         </div>
-                        <div class="col-sm-6">
+                    </div>
+                    <div class="form-group">
+                        <label for="end" class="col-sm-4 control-label">End: </label>
+                        <div class="col-sm-8">
                             <input type="text" class="form-control date" id="end" name="end" value="<?php echo date('Y-m-d H:i',strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
                         </div>
                     </div>
@@ -61,6 +78,11 @@ $pagetitle[] = "Alert Schedule";
     </div>
 </div>
 
+<div class="row">
+    <div class="col-sm-12">
+        <span id="message"></span>
+    </div>
+</div>
 
 <div class="panel panel-default panel-condensed">
     <div class="table-responsive">
@@ -98,7 +120,27 @@ var grid = $("#alert-schedule").bootgrid({
 
 $('#sched-submit').click('', function(e) {
     e.preventDefault();
-    alert($('form.schedule-maintenance-form').serialize());
+    var device = $("#device").val();
+    var start = $("#start").val();
+    var end = $("#end").val();
+    $.ajax({
+        type: "POST",
+        url: "/ajax_form.php",
+        data: { type: "schedule-maintenance", subtype: "add", device: device, start: start, end: end },
+        dataType: "json",
+        success: function(data){
+            if(data.status == 'ok') {
+                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#schedule-maintenance").modal('hide');
+            } else {
+                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+            }
+        },
+        error: function(){
+            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+        }
+    });
+
 });
 
 $(function () {
