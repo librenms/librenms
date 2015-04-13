@@ -105,10 +105,10 @@ $(function () {
     $("#start").datetimepicker();
     $("#end").datetimepicker();
     $("#start").on("dp.change", function (e) {
-        $("#end").data("DateTimePicker").minDate(e.value);
+        $("#end").data("DateTimePicker").minDate(e.date);
     });
     $("#end").on("dp.change", function (e) {
-        $("#start").data("DateTimePicker").maxDate(e.value);
+        $("#start").data("DateTimePicker").maxDate(e.date);
     });
 });
 
