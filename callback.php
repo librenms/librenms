@@ -16,7 +16,7 @@ $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'"
 if ($enabled == 1) {
 
     if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") == '') {
-        dbInsert(array('name'=>'uuid','value'=>guidv4(openssl_random_pseudo_bytes(16))),'callback');
+        dbInsert(array('name'=>'uuid','value'=>guidv4(openssl_random_pseudo_bytes(16))), 'callback');
     }
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
@@ -72,8 +72,8 @@ if ($enabled == 1) {
     $submit = array('data'=>$data);
 
     $fields = '';
-    foreach($submit as $key => $value) { 
-        $fields .= $key . '=' . $value . '&'; 
+    foreach ($submit as $key => $value) {
+        $fields .= $key . '=' . $value . '&';
     }
     rtrim($fields, '&');
 
@@ -94,7 +94,7 @@ if ($enabled == 1) {
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);
     $result = curl_exec($clear);
-    dbDelete('callback','`name`="uuid"',array());
+    dbDelete('callback', '`name`="uuid"', array());
     dbUpdate(array('value' => '0'), 'callback', '`name` = "enabled"', array());
 }
 
