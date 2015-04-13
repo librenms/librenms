@@ -23,9 +23,13 @@
         limit: true,
         offset_left: 0,
         autoscroll: true,
+        scroll_ms: 10,
+        scroll_px: 4,
+        scroll_trigger_width: 40,
+        scroller: null,
         ignore_dragging: ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'], // or function
         handle: null,
-        container_width: 0,  // 0 == auto
+        container_width: null,  // null == auto
         move_element: true,
         helper: false,  // or 'clone'
         remove_helper: true
@@ -35,17 +39,46 @@
     };
 
     var $window = $(window);
-    var dir_map = { x : 'left', y : 'top' };
     var isTouch = !!('ontouchstart' in window);
 
-    var capitalize = function(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    };
+    var uniqId = (function() {
+        var idCounter = 0;
+        return function() {
+            return ++idCounter + '';
+        };
+    })();
 
-    var idCounter = 0;
-    var uniqId = function() {
-        return ++idCounter + '';
-    }
+    var scrollParent = (function() {
+        function parents(node, ps) {
+            if (node.parentNode === null) { return ps; }
+            return parents(node.parentNode, ps.concat([node]));
+        }
+
+        function overflow(node) {
+            var style = getComputedStyle(node, null);
+            return (style.getPropertyValue('overflow') +
+                    style.getPropertyValue('overflow-y') +
+                    style.getPropertyValue('overflow-x'));
+        }
+
+        function scroll(node) {
+            return (/(auto|scroll)/).test(overflow(node));
+        }
+
+        return function(node) {
+            if (! (node instanceof HTMLElement)) {
+                return;
+            }
+
+            var ps = parents(node.parentNode, []);
+
+            for (var i = 0; i < ps.length; i += 1) {
+                if (scroll(ps[i])) { return ps[i]; }
+            }
+
+            return window;
+        };
+    })();
 
     /**
     * Basic drag implementation for DOM elements inside a container.
@@ -63,11 +96,27 @@
     *     the mouse must move before dragging should start.
     *    @param {Boolean} [options.limit] Constrains dragging to the width of
     *     the container
-    *    @param {Object|Function} [options.ignore_dragging] Array of node names
+    *    @param {Number} [options.offset_left] Offset added to the item
+    *    @param {Boolean} [options.autoscroll] Autoscroll when dragging if necessary
+    *    @param {Number} [options.scroll_ms] Interval of time in ms during each scroll displacement
+    *    @param {Number} [options.scroll_px] Number of px to move the scroll
+    *    @param {Number} [options.scroll_trigger_width] Width of the hot areas on
+    *     the sides
+    *    @param {False|HTMLElement} [options.scroller] The element that contains the scroll.
+    *     If not specified is calculated automatically.
+    *    @param {Array|Function} [options.ignore_dragging] Array of node names
     *      that sould not trigger dragging, by default is `['INPUT', 'TEXTAREA',
     *      'SELECT', 'BUTTON']`. If a function is used return true to ignore dragging.
-    *    @param {offset_left} [options.offset_left] Offset added to the item
     *     that is being dragged.
+    *    @param {String} [options.handle] Specify a CSS selector to drag items
+    *     using specific elements as handlers.
+    *    @param {Null|Number} [options.container_width] If specified, force the width
+    *     of the container element.
+    *    @param {Boolean} [options.move_element] Move the HTML element when dragging
+    *    @param {False|'clone'} [options.helper] If set to 'clone', clone the element
+    *     and move the copy instead of the original
+    *    @param {False|'clone'} [options.remove_helper] Remove the helper from DOM
+    *     when the dragging stops. Only when using opts.helper = 'clone'.
     *    @param {Number} [options.drag] Executes a callback when the mouse is
     *     moved during the dragging.
     *    @param {Number} [options.start] Executes a callback when the drag
@@ -80,7 +129,6 @@
       this.options = $.extend({}, defaults, options);
       this.$document = $(document);
       this.$container = $(el);
-      this.$dragitems = $(this.options.items, this.$container);
       this.is_dragging = false;
       this.player_min_left = 0 + this.options.offset_left;
       this.id = uniqId();
@@ -94,13 +142,10 @@
 
     fn.init = function() {
         var pos = this.$container.css('position');
-        this.calculate_dimensions();
         this.$container.css('position', pos === 'static' ? 'relative' : pos);
         this.disabled = false;
         this.events();
-
-        $(window).bind(this.nsEvent('resize'),
-            throttle($.proxy(this.calculate_dimensions, this), 200));
+        this.setup_scroll();
     };
 
     fn.nsEvent = function(ev) {
@@ -111,7 +156,7 @@
         this.pointer_events = {
             start: this.nsEvent('touchstart') + ' ' + this.nsEvent('mousedown'),
             move: this.nsEvent('touchmove') + ' ' + this.nsEvent('mousemove'),
-            end: this.nsEvent('touchend') + ' ' + this.nsEvent('mouseup'),
+            end: this.nsEvent('touchend') + ' ' + this.nsEvent('mouseup')
         };
 
         this.$container.on(this.nsEvent('selectstart'),
@@ -128,6 +173,18 @@
                 this.on_dragstop(e);
             }
         }, this));
+    };
+
+    fn.setup_scroll = function() {
+        this.$scroller = $window;
+
+        if (!this.options.autoscroll) { return; }
+
+        this.$scroller = $(this.options.scroller ?
+            this.options.scroller : scrollParent(this.$container.get(0)));
+
+        $window.bind(this.nsEvent('resize'),
+            throttle($.proxy(this.on_resize, this), 200));
     };
 
     fn.get_actual_pos = function($el) {
@@ -151,15 +208,22 @@
 
     fn.get_offset = function(e) {
         e.preventDefault();
+
         var mouse_actual_pos = this.get_mouse_pos(e);
         var diff_x = Math.round(
             mouse_actual_pos.left - this.mouse_init_pos.left);
         var diff_y = Math.round(mouse_actual_pos.top - this.mouse_init_pos.top);
 
+        var scroll_el = this.$scroller.is($window) ? document.body : this.$scroller[0];
+        var player_el = this.helper ? this.$helper[0] : this.$player[0];
+        var scroller_contains_player = $.contains(scroll_el, player_el);
+        var scroll_diff_left = this.$scroller.scrollLeft() - this.init_scroll_left;
+        var scroll_diff_top = this.$scroller.scrollTop() - this.init_scroll_top;
+
         var left = Math.round(this.el_init_offset.left +
-            diff_x - this.baseX + $(window).scrollLeft() - this.win_offset_x);
+            diff_x - this.baseX + scroll_diff_left);
         var top = Math.round(this.el_init_offset.top +
-            diff_y - this.baseY + $(window).scrollTop() - this.win_offset_y);
+            diff_y - this.baseY + scroll_diff_top);
 
         if (this.options.limit) {
             if (left > this.player_max_left) {
@@ -174,11 +238,15 @@
                 left: left,
                 top: top
             },
+            player: {
+                left: scroller_contains_player ? left : left - scroll_diff_left,
+                top: scroller_contains_player ? top : top - scroll_diff_top
+            },
             pointer: {
                 left: mouse_actual_pos.left,
                 top: mouse_actual_pos.top,
-                diff_left: diff_x + ($(window).scrollLeft() - this.win_offset_x),
-                diff_top: diff_y + ($(window).scrollTop() - this.win_offset_y)
+                diff_left: diff_x + scroll_diff_left,
+                diff_top: diff_y + scroll_diff_top
             }
         };
     };
@@ -204,63 +272,110 @@
     };
 
 
-    fn.scroll_in = function(axis, data) {
-        var dir_prop = dir_map[axis];
-
-        var area_size = 50;
-        var scroll_inc = 30;
-
-        var is_x = axis === 'x';
-        var window_size = is_x ? this.window_width : this.window_height;
-        var doc_size = is_x ? $(document).width() : $(document).height();
-        var player_size = is_x ? this.$player.width() : this.$player.height();
-
-        var next_scroll;
-        var scroll_offset = $window['scroll' + capitalize(dir_prop)]();
-        var min_window_pos = scroll_offset;
-        var max_window_pos = min_window_pos + window_size;
-
-        var mouse_next_zone = max_window_pos - area_size;  // down/right
-        var mouse_prev_zone = min_window_pos + area_size;  // up/left
-
-        var abs_mouse_pos = min_window_pos + data.pointer[dir_prop];
-
-        var max_player_pos = (doc_size - window_size + player_size);
-
-        if (abs_mouse_pos >= mouse_next_zone) {
-            next_scroll = scroll_offset + scroll_inc;
-            if (next_scroll < max_player_pos) {
-                $window['scroll' + capitalize(dir_prop)](next_scroll);
-                this['scroll_offset_' + axis] += scroll_inc;
-            }
+    fn.manage_scroll = function(e) {
+        if (e.fakeEvent) {
+            return;
+        } else {
+            this.clear_scrolls();
         }
 
-        if (abs_mouse_pos <= mouse_prev_zone) {
-            next_scroll = scroll_offset - scroll_inc;
-            if (next_scroll > 0) {
-                $window['scroll' + capitalize(dir_prop)](next_scroll);
-                this['scroll_offset_' + axis] -= scroll_inc;
+        var mouse = this.get_mouse_pos(e);
+        var isWindow = this.$scroller[0] === window;
+        var mx = mouse.left;
+        var my = mouse.top;
+        var area_weight = this.options.scroll_trigger_width;
+        var scroller = this.scroller;
+        var side_to_scroll = {
+            left: 'Left',
+            right: 'Left',
+            top: 'Top',
+            bottom: 'Top'
+        };
+        var hot_areas = {
+            top: {
+                x: scroller.left,
+                y: scroller.top,
+                x1: scroller.left + scroller.width,
+                y1: scroller.top + area_weight
+            },
+            right: {
+                x: scroller.left + scroller.width - area_weight,
+                y: scroller.top,
+                x1: scroller.left + scroller.width,
+                y1: scroller.top + scroller.height
+            },
+            bottom: {
+                x: scroller.left,
+                y: scroller.top + scroller.height - area_weight,
+                x1: scroller.left + scroller.width,
+                y1: scroller.top + scroller.height
+            },
+            left: {
+                x: scroller.left,
+                y: scroller.top,
+                x1: scroller.left + area_weight,
+                y1: scroller.top + scroller.height
             }
+        };
+
+        if (! isWindow) {
+            mx += $window.scrollLeft();
+            my += $window.scrollTop();
         }
 
-        return this;
+        // store scroll intervals to later clear them
+        this.scroll_intervals || (this.scroll_intervals = {});
+
+        $.each(hot_areas, function(side, bounds) {
+            var interval = this.scroll_intervals[side];
+            var x_movement = (side === 'left' || side === 'right');
+            var y_movement = (side === 'top' || side === 'bottom');
+            var is_active = (mx >= bounds.x && mx <= bounds.x1 &&
+                             my >= bounds.y && my <= bounds.y1);
+
+            // clean current setIntervals for non hovered areas
+            if (!is_active) {
+                interval && clearInterval(interval);
+                this.scroll_intervals[side] = null;
+                return;
+            }
+
+            // if no setIntervals for hovered areas, set them
+            if (is_active && !interval) {
+                this.scroll_intervals[side] = setInterval(function() {
+                    var scroll_method = 'scroll' + side_to_scroll[side];
+                    var dir = (side === 'left' || side === 'top') ? -1 : 1;
+                    var offset = this.options.scroll_px * dir;
+
+                    // scroll view
+                    if (isWindow) {
+                        var scroll_by = x_movement ? [offset, 0] : [0, offset];
+                        this.$scroller[0].scrollBy.apply(this.$scroller[0], scroll_by);
+                    } else {
+                        this.$scroller[0][scroll_method] += offset;
+                    }
+
+                    // trigger mousemove event
+                    var mme = $.Event('mousemove');
+                    mme.clientX = mouse.left + (x_movement ? offset : 0);
+                    mme.clientY = mouse.top + (y_movement ? offset : 0);
+                    mme.fakeEvent = true;
+                    this.$document.trigger(mme);
+                }.bind(this), this.options.scroll_ms);
+            }
+        }.bind(this));
     };
 
-
-    fn.manage_scroll = function(data) {
-        this.scroll_in('x', data);
-        this.scroll_in('y', data);
-    };
-
-
-    fn.calculate_dimensions = function(e) {
-        this.window_height = $window.height();
-        this.window_width = $window.width();
+    fn.clear_scrolls = function() {
+        if (!this.scroll_intervals) { return; }
+        $.each(this.scroll_intervals, function(side) {
+            clearInterval(this.scroll_intervals[side]);
+            this.scroll_intervals[side] = null;
+        }.bind(this));
     };
 
 
     fn.drag_handler = function(e) {
-        var node = e.target.nodeName;
         // skip if drag is disabled, or click was not done with the mouse primary button
         if (this.disabled || e.which !== 1 && !isTouch) {
             return;
@@ -316,7 +431,10 @@
         var offset = this.$container.offset();
         this.baseX = Math.round(offset.left);
         this.baseY = Math.round(offset.top);
-        this.initial_container_width = this.options.container_width || this.$container.width();
+
+        if (this.options.autoscroll) {
+            this.calculate_scroll_dimensions();
+        }
 
         if (this.options.helper === 'clone') {
             this.$helper = this.$player.clone()
@@ -326,13 +444,10 @@
             this.helper = false;
         }
 
-        this.win_offset_y = $(window).scrollTop();
-        this.win_offset_x = $(window).scrollLeft();
-        this.scroll_offset_y = 0;
-        this.scroll_offset_x = 0;
+        this.init_scroll_top = this.$scroller.scrollTop();
+        this.init_scroll_left = this.$scroller.scrollLeft();
         this.el_init_offset = this.$player.offset();
         this.player_width = this.$player.width();
-        this.player_height = this.$player.height();
 
         this.set_limits(this.options.container_width);
 
@@ -346,13 +461,13 @@
     fn.on_dragmove = function(e) {
         var data = this.get_drag_data(e);
 
-        this.options.autoscroll && this.manage_scroll(data);
+        this.options.autoscroll && this.manage_scroll(e);
 
         if (this.options.move_element) {
             (this.helper ? this.$helper : this.$player).css({
                 'position': 'absolute',
-                'left' : data.position.left,
-                'top' : data.position.top
+                'left' : data.player.left,
+                'top' : data.player.top
             });
         }
 
@@ -371,6 +486,8 @@
     fn.on_dragstop = function(e) {
         var data = this.get_drag_data(e);
         this.drag_start = false;
+
+        this.clear_scrolls();
 
         if (this.options.stop) {
             this.options.stop.call(this.$player, e, data);
@@ -393,6 +510,21 @@
         return false;
     };
 
+
+    fn.calculate_scroll_dimensions = function() {
+        this.scroller = this.$scroller.is($window) ?
+                {top: 0, left: 0} : this.$scroller.offset();
+
+        this.scroller.width = this.$scroller.width();
+        this.scroller.height = this.$scroller.height();
+    };
+
+    fn.on_resize = function(e) {
+        if (this.options.autoscroll) {
+            this.calculate_scroll_dimensions();
+        }
+    };
+
     fn.enable = function() {
         this.disabled = false;
     };
@@ -406,7 +538,7 @@
 
         this.$container.off(this.ns);
         this.$document.off(this.ns);
-        $(window).off(this.ns);
+        $window.off(this.ns);
 
         $.removeData(this.$container, 'drag');
     };
