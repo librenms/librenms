@@ -28,8 +28,11 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
    *  ...
    */
 
-  $oids = trim(snmp_walk($device, "vmwVmUUID", "-Osq", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs"));
-  $oids = str_replace("vmwVmUUID.", "", $oids);
+  $oids = snmp_walk($device, "VMWARE-VMINFO-MIB::vmwVmVMID", "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+  if (empty($oids)) {
+      $oids = trim(snmp_walk($device, "vmwVmUUID", "-Osq", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs"));
+      $oids = str_replace("vmwVmUUID.", "", $oids);
+  }
   if ($oids != "")
   {
     $oids = explode("\n", $oids);

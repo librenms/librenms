@@ -14,6 +14,8 @@
 $data   = snmp_get_multi($device, "VMWARE-SYSTEM-MIB::vmwProdName.0 VMWARE-SYSTEM-MIB::vmwProdVersion.0 VMWARE-SYSTEM-MIB::vmwProdBuild.0", "-OQUs", "+VMWARE-ROOT-MIB:VMWARE-SYSTEM-MIB:VMWARE-VMINFO-MIB", "+" . $config['install_dir'] . "/mibs/vmware:".$config['mibdir']);
 $version  = preg_replace("/^VMware /", "", $data[0]["vmwProdName"]) . " " . $data[0]["vmwProdVersion"];
 $features = "build-" . $data[0]["vmwProdBuild"];
+$hardware = snmp_get($device, "entPhysicalDescr.1", "-OsvQU", "ENTITY-MIB");
+$serial = snmp_get($device, "entPhysicalSerialNum.1", "-OsvQU", "ENTITY-MIB");
 
 /*
  * CONSOLE: Start the VMware discovery process.
