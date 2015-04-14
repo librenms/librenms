@@ -3,6 +3,11 @@
 ####Bug fixes
   - Fixed ack of worse/better alerts (PR720)
   - Fixed ORIG_PATH_INFO warnings (PR727)
+  - Added missing CPU id for Cisco SB (PR744)
+  - Changed Processors table name to lower case in processors discovery (PR751)
+  - Fixed alerts path issue (PR756, PR760)
+  - Supress further port alerts when interface goes down (PR745)
+  - Fixed login so redirects via 303 when POST data sent (PR775)
 
 ####Improvements
   - New theme support added (light,dark and mono) (PR682,PR683,PR701)
@@ -13,6 +18,15 @@
   - Update to Foritgate support (PR709)
   - Added support for UBNT AirOS and AirFibre (PR721,PR730,PR731)
   - Added support device groups + alerts to be mapped to devices or groups (PR722)
+  - Added basic Cambium support (PR738)
+  - Added basic F5 support (PR670)
+  - Shorten interface names on map (PR752)
+  - Added PowerCode support (PR762)
+  - Added Autodiscovery via OSPF (PR772)
+  - Added visual graph of alert log (PR777)
+  - Added Callback system to send anonymous stats (PR768)
+  - More tables converted to use bootgrid (PR729, PR761)
+  - New Global Cache to store common queries added (PR780)
 
 ### Mar 2015
 

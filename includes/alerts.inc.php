@@ -68,7 +68,7 @@ function GetRules($device) {
 		$where .= " || alert_map.target = ?";
 		$params[] = 'g'.$group;
 	}
-	return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || ( alert_map.target = ? '.$where.' )',$params);
+	return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE alert_rules.disabled = 0 && ( (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || alert_map.target = ? '.$where.' )',$params);
 }
 
 /**

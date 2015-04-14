@@ -1605,3 +1605,8 @@ tr.search:nth-child(odd) {
     width: 90%;
     height: 600px;
 }
+
+.threeqtr-width {
+    display:block;
+    width: 75%;
+}

@@ -39,6 +39,7 @@ if (isset($_POST['sort']) && is_array($_POST['sort'])) {
 }
 $searchPhrase = mres($_POST['searchPhrase']);
 $id = mres($_POST['id']);
+$response = array();
 
 if (isset($id)) {
     if (file_exists("includes/table/$id.inc.php")) {
