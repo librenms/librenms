@@ -1,3 +1,11 @@
+<a name="v0.6.6"></a>
+### v0.6.6 (2015-04-14)
+
+
+#### Bug Fixes
+
+* **gridster:** preventing gridster from adding extra resize handles ([9d077da6](http://github.com/DecksterTeam/gridster.js/commit/9d077da676826606243c2552dc9997c492687203))
+
 <a name="v0.6.5"></a>
 ### v0.6.5 (2015-04-06)
 
