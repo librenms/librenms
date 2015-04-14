@@ -85,7 +85,7 @@ function discover_device($device, $options = NULL)
   }
 
   echo("\n");
- 
+
   // If we've specified a module, use that, else walk the modules array
   if ($options['m'])
   {
@@ -355,7 +355,7 @@ function sensor_limit($class, $current)
 function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 {
   $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ?", array($class, $device['device_id'], $poller_type));
- 
+
   if (count($entries))
   {
     foreach ($entries as $entry)
@@ -395,12 +395,12 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
 function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id)
 {
   global $config, $debug, $link_exists;
-  
+
   if ($debug) {
     echo("\n");
     var_dump($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version);
   }
- 
+
   if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?",
                   array($remote_hostname, $local_port_id, $protocol, $remote_port)) == "0")
   {
@@ -414,7 +414,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
       'remote_platform' => $remote_platform,
       'remote_version' => $remote_version
     );
-    
+
     if (!empty($remote_port_id)) {
         $insert_data['remote_port_id'] = $remote_port_id;
     }
@@ -439,7 +439,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         'local_device_id' => $local_device_id,
         'remote_device_id' => $remote_device_id
       );
-      
+
       if (!empty($remote_port_id)) {
         $update_data['remote_port_id'] = $remote_port_id;
       }
@@ -527,11 +527,11 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
-  
+
   if ($debug) {
       echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
   }
-  
+
    #FIXME implement the mempool_perc, mempool_used, etc.
   if ($descr)
   {
@@ -556,7 +556,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
       if (!empty($hrDeviceIndex)) {
         $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
       }
-     
+
       $inserted = dbInsert($insert_data, 'mempools');
       echo("+");
       log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', $inserted);
@@ -565,11 +565,11 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
     {
       echo(".");
       $update_data['mempool_descr'] = $descr;
-      
+
       if (!empty($entPhysicalIndex)) {
         $update_data['entPhysicalIndex'] = $entPhysicalIndex;
       }
- 
+
       if (!empty($hrDeviceIndex)) {
         $update_data['hrDeviceIndex'] = $hrDeviceIndex;
       }
