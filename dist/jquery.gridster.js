@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.5 - 2015-04-06
+/*! gridster.js - v0.6.5 - 2015-04-14
 * http://gridster.net/
 * Copyright (c) 2015 decksterteam; Licensed  */
 
@@ -1295,7 +1295,7 @@
     fn.add_resize_handle = function($w) {
         var append_to = this.options.resize.handle_append_to;
         $(this.resize_handle_tpl).appendTo( append_to ? $(append_to, $w) : $w);
-
+        $w.data('resizeEquipped', true);
         return this;
     };
 
@@ -1948,7 +1948,8 @@
 
         this.add_to_gridmap(wgd, $el);
 
-        this.options.resize.enabled && this.add_resize_handle($el);
+        if(this.options.resize.enabled && !$el.data('resizeEquipped'))
+            this.add_resize_handle($el);
 
         return posChanged;
     };
