@@ -1,4 +1,5 @@
 <?php
+include($config['install_dir'].'/includes/object-cache.inc.php');
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
@@ -56,6 +57,7 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
             <ul class="dropdown-menu scrollable-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Alerts</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Alert Log</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Alert Stats</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
@@ -193,13 +195,14 @@ if ($_SESSION['userlevel'] >= '10')
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
 <?php
+$ports = new ObjCache('ports');
 
-if (isset($ports['errored']))
+if ($ports['errored'] > 0)
 {
   echo('            <li><a href="ports/errors=1/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if (isset($ports['ignored']))
+if ($ports['ignored'] > 0)
 {
   echo('            <li><a href="ports/ignore=1/"><i class="fa fa-question-circle fa-fw fa-lg"></i> Ignored ('.$ports['ignored'].')</a></li>');
 }
