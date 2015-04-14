@@ -37,5 +37,13 @@
     "qunitjs": "~1.11.0",
     "grunt-bump": "0.0.11",
     "grunt-conventional-changelog": "~1.0.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "jquery": "global:$"
   }
 }
