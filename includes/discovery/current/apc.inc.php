@@ -174,11 +174,28 @@ if ($device['os'] == "apc")
   unset($oids);
 
     # UPS
-    $output_load = snmp_get($device, "upsAdvOutputLoad", "-Oqv", "PowerNet-MIB");
-    if (empty($output_load)) {
-        $output_load = snmp_get($device, "upsHighPrecOutputLoad", "-Oqv", "PowerNet-MIB");
+    $oids = snmp_get($device, "upsHighPrecOutputCurrent", "-OsqnU", "PowerNet-MIB");
+    if (empty($oids)) {
+        $oids = snmp_get($device, "upsAdvOutputCurrent", "-OsqnU", "PowerNet-MIB");
+        $current_oid = "upsAdvOutputCurrent";
+    } else {
+        $current_oid = "upsHighPrecOutputCurrent";
     }
-    discover_sensor($valid['sensor'], 'current', $device, "upsAdvOutputLoad", 1, 'apc', 'OutputLoad','10','1',NULL,NULL,NULL,NULL,$output_load);
+    if (!empty($oids)) {
+        $type = "apc";
+        if ($debug) {
+            print_r($oids);
+        }
+        $oids = trim($oids);
+        if ($oids) {
+            echo "APC PowerNet-MIB UPS";
+        }
+        $index = 1;
+        $descr = "Current Drawn";
+        $divisor = 10;
+        $current = $current_oid / $divisor;
+        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    }
 }
 
 ?>
