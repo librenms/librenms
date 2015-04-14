@@ -5,10 +5,10 @@ if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([\w\d]+)-\w\), Vers
   $features = $regexp_result[1];
   $version = $regexp_result[2];
 }
-elseif( false )
+elseif (preg_match('/^Cisco IOS Software, .+? Software([\,\w\d]*) \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
 {
-  # Placeholder
-  # Other regexp for other type of string
+  $features = $regexp_result[2];
+  $version = $regexp_result[3];
 }
 
 echo("\n".$poll_device['sysDescr']."\n");
