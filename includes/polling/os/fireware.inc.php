@@ -12,23 +12,4 @@
  * the source code distribution for details.
  */
 
-$oids = "entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 entPhysicalModelName.1001 entPhysicalContainedIn.1001 cardDescr.1 cardSlotNumber.1";
-
-  $data = snmp_get_multi($device, $oids, "-OQUs", "ENTITY-MIB:OLD-CISCO-CHASSIS-MIB");
-
-  if ($data[1]['entPhysicalContainedIn'] == "0")
-  {
-    if (!empty($data[1]['entPhysicalSoftwareRev']))
-    {
-     $version = $data[1]['entPhysicalSoftwareRev'];
-    }
-    if (!empty($data[1]['entPhysicalName']))
-    {
-      $hardware = $data[1]['entPhysicalName'];
-    }
-    if (!empty($data[1]['entPhysicalModelName']))
-    {
-      $hardware = $data[1]['entPhysicalModelName'];
-    }
-  }
-
+$hardware = $poll_device['sysDescr'];
