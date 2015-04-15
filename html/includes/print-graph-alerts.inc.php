@@ -19,11 +19,11 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
 }
 
 if ($_SESSION['userlevel'] >= '5') {
-    $query = "SELECT DATE_FORMAT(time_logged, '%Y-%m-%d %H:%i') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id $sql GROUP BY DATE_FORMAT(time_logged, '%Y-%m-%d %H:%i'),alert_rules.severity";
+    $query = "SELECT DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql GROUP BY DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."'),alert_rules.severity";
 }
 
 if ($_SESSION['userlevel'] < '5') {
-    $query = "SELECT DATE_FORMAT(time_logged, '%Y-%m-%d %H:%i') Date, COUNT(alert_log.device_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules,devices_perms WHERE alert_log.rule_id=alert_rules.id $sql AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . $_SESSION['user_id'] . " GROUP BY DATE_FORMAT(time_logged, '%Y-%m-%d %H:%i'),alert_rules.severity";
+    $query = "SELECT DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."') Date, COUNT(alert_log.device_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules,devices_perms WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . $_SESSION['user_id'] . " GROUP BY DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."'),alert_rules.severity";
 }
 
 ?>
@@ -86,7 +86,7 @@ echo $max_count; ?>
                 }
             }
         },
-        zoomMin: 2073600000, //24hrs
+        zoomMin: <?php echo 86400; ?>, //24hrs
         zoomMax: <?php
 $first_date = reset($data);
 $last_date = end($data);

@@ -603,4 +603,7 @@ $config['distributed_poller_memcached_port']             = '11211';
 $config['callback_post']                                 = 'https://stats.librenms.org/log.php';
 $config['callback_clear']                                = 'https://stats.librenms.org/clear.php';
 
+// Stat graphs
+$config['alert_graph_date_format']                       = '%Y-%m-%d %H:%i';
+
 ?>
