@@ -1,14 +1,14 @@
 <?php
 
-if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
+if (preg_match('/^Cisco IOS Software, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
 {
-  $features = $regexp_result[1];
-  $version = $regexp_result[2];
-}
-elseif (preg_match('/^Cisco IOS Software, .+? Software([\,\w\d]*) \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
-{
-  $features = $regexp_result[2];
-  $version = $regexp_result[3];
+  $features = $regexp_result[3];
+  $version = $regexp_result[4];
+  $hardware = $regexp_result[2];
+  $tmp = preg_split("/\\r\\n|\\r|\\n/",$version);
+  if (!empty($tmp[0])) {
+      $version = $tmp[0];
+  }
 }
 
 echo("\n".$poll_device['sysDescr']."\n");
@@ -24,7 +24,7 @@ if ($data[1]['entPhysicalContainedIn'] == "0")
     $version = $data[1]['entPhysicalSoftwareRev'];
   }
 
-  if (!empty($data[1]['entPhysicalName']))
+  if (!empty($data[1]['entPhysicalName']) && $data[1]['entPhysicalName'] != 'Switch System')
   {
     $hardware = $data[1]['entPhysicalName'];
   }
