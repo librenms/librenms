@@ -1045,6 +1045,11 @@ $config['os'][$os]['text']              = "Cambium";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "cambium";
 
+$os = "datacom";
+$config['os'][$os]['text']              = "Datacom";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "datacom";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
