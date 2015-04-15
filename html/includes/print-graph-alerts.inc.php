@@ -86,7 +86,7 @@ echo $max_count; ?>
                 }
             }
         },
-        zoomMin: <?php echo 86400; ?>, //24hrs
+        zoomMin: 86400, //24hrs
         zoomMax: <?php
 $first_date = reset($data);
 $last_date = end($data);
