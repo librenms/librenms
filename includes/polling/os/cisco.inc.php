@@ -24,7 +24,7 @@ if ($data[1]['entPhysicalContainedIn'] == "0")
     $version = $data[1]['entPhysicalSoftwareRev'];
   }
 
-  if (!empty($data[1]['entPhysicalName']))
+  if (!empty($data[1]['entPhysicalName']) && $data[1]['entPhysicalName'] != 'Switch System')
   {
     $hardware = $data[1]['entPhysicalName'];
   }
