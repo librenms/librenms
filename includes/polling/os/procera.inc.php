@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if (stristr($poll_device['sysObjectID'], "packetlogic") || strstr($poll_device['sysObjectId'], "enterprises.15397.2")) {
+if (stristr($poll_device['sysObjectID'], "packetlogic") || strstr($poll_device['sysObjectID'], "enterprises.15397.2") || strstr($poll_device['sysObjectID'], ".1.3.6.1.4.1.15397.2")) {
     $version = "PacketLogic";
     $hardware = "PacketLogic";
 }
