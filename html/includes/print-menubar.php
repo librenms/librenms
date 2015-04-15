@@ -433,7 +433,7 @@ Plugins::call('menu');
 
 if ($_SESSION['userlevel'] >= '10')
 {
-  if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'" > 0)) {
+  if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
     echo('
             <li role="presentation" class="divider"></li>
     ');
