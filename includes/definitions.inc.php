@@ -141,7 +141,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "procera";
-$onfig['os'][$os]['type']              = "server";
+$onfig['os'][$os]['type']              = "network";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "Procera Networks";
 $config['os'][$os]['icon']              = "linux";
