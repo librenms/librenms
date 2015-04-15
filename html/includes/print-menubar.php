@@ -433,12 +433,8 @@ Plugins::call('menu');
 
 if ($_SESSION['userlevel'] >= '10')
 {
-  if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'" > 0) {
-    echo('
+  echo(' 
             <li role="presentation" class="divider"></li>
-    ');
-  }
-  echo('
             <li><a href="plugin/view=admin"> <i class="fa fa-lock fa-fw fa-lg"></i>Plugin Admin</a></li>
   ');
 }
