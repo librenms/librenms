@@ -9,19 +9,19 @@
   $entity_array = array();
   echo(" jnxBoxAnatomy");
   $entity_array = snmpwalk_cache_oid($device, "jnxBoxAnatomy", $entity_array, "JUNIPER-MIB");
-  echo(" jnxContentsTable");
-  $entity_array = snmpwalk_cache_oid($device, "jnxContentsTable", $entity_array, "JUNIPER-MIB");
-  echo(" jnxFruTable");
-  $entity_array = snmpwalk_cache_oid($device, "jnxFruTable", $entity_array, "JUNIPER-MIB");
+  //echo(" jnxContentsTable");
+  //$entity_array = snmpwalk_cache_oid($device, "jnxContentsTable", $entity_array, "JUNIPER-MIB");
+  //echo(" jnxFruTable");
+  //$entity_array = snmpwalk_cache_oid($device, "jnxFruTable", $entity_array, "JUNIPER-MIB");
 
   foreach ($entity_array as $entPhysicalIndex => $entry) {
    // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
    // are made up here.
-    $entPhysicalDescr                = $entry['jnxBoxDescr'];
-    $entPhysicalContainedIn        = 0;
+    $entPhysicalDescr                = $entry['jnxContentsDescr'];
+    $entPhysicalContainedIn        = $entry['jnxContainersWithin'];
     $entPhysicalClass                = $entry['jnxBoxClass'];
     $entPhysicalName                = $entry['jnxFruName'];
-    $entPhysicalSerialNum        = $entry['jnxBoxSerialNo'];
+    $entPhysicalSerialNum        = $entry['jnxContentsSerialNo'];
     $entPhysicalModelName        = $entry['jnxFruName'];
     $entPhysicalMfgName                = 'Juniper';
     $entPhysicalVendorType        = 'Juniper';
@@ -117,7 +117,7 @@
     $id = $test['entPhysicalIndex'];
     if (!$valid[$id]) {
       echo("-");
-      dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
+      //dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
     }
   }
 
