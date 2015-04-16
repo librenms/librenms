@@ -1,3 +1,4 @@
+// jshint ignore:start
 ;(function(window, undefined) {
 
     /* Delay, debounce and throttle functions taken from underscore.js
