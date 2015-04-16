@@ -9,10 +9,6 @@
   $entity_array = array();
   echo(" jnxBoxAnatomy");
   $entity_array = snmpwalk_cache_oid($device, "jnxBoxAnatomy", $entity_array, "JUNIPER-MIB");
-  //echo(" jnxContentsTable");
-  //$entity_array = snmpwalk_cache_oid($device, "jnxContentsTable", $entity_array, "JUNIPER-MIB");
-  //echo(" jnxFruTable");
-  //$entity_array = snmpwalk_cache_oid($device, "jnxFruTable", $entity_array, "JUNIPER-MIB");
 
   foreach ($entity_array as $entPhysicalIndex => $entry) {
    // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
@@ -20,9 +16,9 @@
     $entPhysicalDescr                = $entry['jnxContentsDescr'];
     $entPhysicalContainedIn        = $entry['jnxContainersWithin'];
     $entPhysicalClass                = $entry['jnxBoxClass'];
-    $entPhysicalName                = $entry['jnxFruName'];
+    $entPhysicalName                = $entry['jnxOperatingDescr'];
     $entPhysicalSerialNum        = $entry['jnxContentsSerialNo'];
-    $entPhysicalModelName        = $entry['jnxFruName'];
+    $entPhysicalModelName        = $entry['jnxContentsPartNo'];
     $entPhysicalMfgName                = 'Juniper';
     $entPhysicalVendorType        = 'Juniper';
     $entPhysicalParentRelPos        = -1;
@@ -104,8 +100,13 @@
         dbInsert($insert_data, 'entPhysical');
         echo("+");
       }
-
-      $valid[$entPhysicalIndex] = 1;
+      //$entPhysicalIndex appears as a numeric OID fragment (string), so convert it
+      //to an "integer" for the validation step below since it is stored in the DB as
+      //an integer. This should be fixed.
+      list($first,$second) = explode(".",$entPhysicalIndex);
+      $entPhysicalIndexNoDots =  $first . $second;
+      print("** NEW: " + $entPhysicalIndexNoDots);
+      $valid[$entPhysicalIndexNoDots] = 1;
     }
   }
 
@@ -117,7 +118,7 @@
     $id = $test['entPhysicalIndex'];
     if (!$valid[$id]) {
       echo("-");
-      //dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
+      dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
     }
   }
 
