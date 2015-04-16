@@ -1,4 +1,5 @@
 ;(function(root, factory) {
+    // jshint strict: false
     if (typeof exports === 'object') {
         module.exports = factory(require('jquery'), require('./jquery.gridster.js'));
     } else if (typeof define === 'function' && define.amd) {
@@ -8,6 +9,8 @@
     }
 
 }(this, function($, Gridster) {
+
+    'use strict';
 
     var fn = Gridster.prototype;
 
@@ -37,8 +40,7 @@
 
 
     fn.widgets_in_range = function(col1, row1, col2, row2) {
-        var valid_cols = [];
-        var valid_rows = [];
+        // jshint maxdepth:false
         var $widgets = $([]);
         var c, r, $w, wgd;
 
@@ -49,8 +51,7 @@
                 if ($w !== false) {
                     wgd = $w.data('coords').grid;
                     if (wgd.col >= col1 && wgd.col <= col2 &&
-                        wgd.row >= row1 && wgd.row <= row2
-                       ) {
+                        wgd.row >= row1 && wgd.row <= row2) {
                         $widgets = $widgets.add($w);
                     }
                 }
@@ -91,6 +92,7 @@
 
 
     fn.for_each_cell = function(callback, gridmap) {
+        // jshint maxdepth:false
         gridmap || (gridmap = this.gridmap);
         var cols = gridmap.length;
         var rows = gridmap[1].length;
@@ -159,7 +161,6 @@
 
 
     fn.closest_to_left = function(col, row) {
-        var cols_l = this.gridmap.length - 1;
         if (!this.gridmap[col]) { return false; }
 
         for (var c = col; c >= 1; c--) {
