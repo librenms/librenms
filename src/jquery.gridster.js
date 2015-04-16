@@ -139,7 +139,6 @@
         this.$wrapper = this.$el.parent();
         this.$widgets = this.$el.children(
             this.options.widget_selector).addClass('gs-w');
-        this.widgets = [];
         this.$changed = $([]);
         this.wrapper_width = this.$wrapper.width();
         this.min_widget_width = (this.options.widget_margins[0] * 2) +
@@ -2938,9 +2937,7 @@
                         width: this.min_widget_width,
                         height: this.min_widget_height,
                         col: col,
-                        row: row,
-                        original_col: col,
-                        original_row: row
+                        row: row
                     }).coords();
 
         if (!$.isArray(this.gridmap[col])) {
