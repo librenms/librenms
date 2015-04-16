@@ -52,6 +52,7 @@ include("../config.php");
 include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
+include("includes/vars.inc.php");
 include('includes/plugins.inc.php');
 Plugins::start();
 
@@ -69,45 +70,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-foreach ($_GET as $key=>$get_var)
-{
-  if (strstr($key, "opt"))
-  {
-    list($name, $value) = explode("|", $get_var);
-    if (!isset($value)) { $value = "yes"; }
-    $vars[$name] = $value;
-  }
-}
-
-$segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-
-foreach ($segments as $pos => $segment)
-{
-  $segment = urldecode($segment);
-  if ($pos == "0")
-  {
-    $vars['page'] = $segment;
-  } else {
-    list($name, $value) = explode("=", $segment);
-    if ($value == "" || !isset($value))
-    {
-      $vars[$name] = yes;
-    } else {
-      $vars[$name] = $value;
-    }
-  }
-}
-
-foreach ($_GET as $name => $value)
-{
-  $vars[$name] = $value;
-}
-
-foreach ($_POST as $name => $value)
-{
-  $vars[$name] = $value;
-}
 
 include("includes/authenticate.inc.php");
 
