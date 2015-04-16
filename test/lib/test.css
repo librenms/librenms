@@ -1,0 +1,25 @@
+#mocha {
+    box-sizing: border-box;
+    float: left;
+    width: 50%;
+    margin: 0;
+    padding: 20px;
+}
+
+#mocha-stats {
+    position: static;
+}
+
+#fixture {
+    width: 50%;
+    float: right;
+}
+
+
+.gridster ul {
+    list-style: none;
+}
+
+.gridster li {
+    background-color: #DDD;
+}

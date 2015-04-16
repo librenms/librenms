@@ -156,6 +156,12 @@ module.exports = function(grunt) {
     watch: {
       files: ['libs/*.js', 'src/*.js', 'src/*.css', 'Gruntfile.js'],
       tasks: ['concat', 'uglify', 'cssmin']
+    },
+
+    karma: {
+      gridster: {
+        configFile: 'test/karma.conf.js'
+      }
     }
   });
 
@@ -168,6 +174,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-conventional-changelog');
+  grunt.loadNpmTasks('grunt-karma');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'cssmin']);
