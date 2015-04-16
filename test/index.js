@@ -349,15 +349,16 @@ describe('gridster.js', function() {
                 expect($el).to.have.length(1);
             });
 
-            it('should be positioned in the top/leftmost available space', function() {
-                this.gridster.remove_widget('[data-col=1][data-row=1]');
+            it('should be positioned in the top/leftmost available space', function(done) {
+                this.gridster.remove_widget('[data-col=1][data-row=1]').done(function() {
+                    this.gridster.add_widget('<li class="new">new</li>', 1, 1);
 
-                this.gridster.add_widget('<li class="new">new</li>', 1, 1);
-                var $el = this.gridster.$el.find('.new');
-
-                expect($el.attr('data-col')).to.equal('1');
-                expect($el.attr('data-row')).to.equal('1');
-                expect(this.gridster.gridmap[1][1][0]).to.equal($el[0]);
+                    var $el = this.gridster.$el.find('.new');
+                    expect($el.attr('data-col')).to.equal('1');
+                    expect($el.attr('data-row')).to.equal('1');
+                    expect(this.gridster.gridmap[1][1][0]).to.equal($el[0]);
+                    done();
+                }.bind(this));
             });
 
             it('should respect the specified dimensions and coords', function() {
@@ -384,7 +385,7 @@ describe('gridster.js', function() {
 
             it('should be removed from the grid', function(done) {
                 var $el = this.gridster.$el.find('[data-col=1][data-row=1]');
-                this.gridster.remove_widget($el, false, function() {
+                this.gridster.remove_widget($el, false).done(function() {
                     expect(this.gridmap[1][1]).to.be.false;
                     expect(document.contains($el[0])).to.be.false;
                     done();
@@ -396,8 +397,8 @@ describe('gridster.js', function() {
                 var $el2 = this.gridster.$el.find('[data-col=2][data-row=1]');
                 var $el3 = this.gridster.$el.find('[data-col=1][data-row=3]');
                 var silent = false;
-                this.gridster.remove_widget($el1, silent, function() {
-                    this.remove_widget($el2, silent, function() {
+                this.gridster.remove_widget($el1, silent).done(function() {
+                    this.remove_widget($el2, silent).done(function() {
                         expect($el3.attr('data-col')).to.equal('1');
                         expect($el3.attr('data-row')).to.equal('1');
                         done();
@@ -410,8 +411,8 @@ describe('gridster.js', function() {
                 var $el2 = this.gridster.$el.find('[data-col=2][data-row=1]');
                 var $el3 = this.gridster.$el.find('[data-col=1][data-row=3]');
                 var silent = true;
-                this.gridster.remove_widget($el1, silent, function() {
-                    this.remove_widget($el2, silent, function() {
+                this.gridster.remove_widget($el1, silent).done(function() {
+                    this.remove_widget($el2, silent).done(function() {
                         expect($el3.attr('data-col')).to.equal('1');
                         expect($el3.attr('data-row')).to.equal('3');
                         done();

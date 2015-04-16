@@ -35,6 +35,8 @@
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
         auto_init: true,
+        show_method: 'show',
+        hide_method: 'hide',
         serialize_params: function($w, wgd) {
             return {
                 col: wgd.col,
@@ -372,7 +374,7 @@
 
         this.drag_api.set_limits(this.cols * this.min_widget_width);
 
-        return $w.fadeIn();
+        return $w[this.options.show_method]();
     };
 
 
@@ -721,9 +723,10 @@
     * @param {Boolean|Function} silent If true, widgets below the removed one
     * will not move up. If a Function is passed it will be used as callback.
     * @param {Function} callback Function executed when the widget is removed.
-    * @return {Class} Returns the instance of the Gridster Class.
+    * @return {Promise} Returns a jQuery promise.
     */
     fn.remove_widget = function(el, silent, callback) {
+        var d = $.Deferred();
         var $el = el instanceof $ ? el : $(el);
         var wgd = $el.coords().grid;
 
@@ -740,23 +743,24 @@
 
         this.remove_from_gridmap(wgd);
 
-        $el.fadeOut($.proxy(function() {
-            $el.remove();
+        $el[this.options.hide_method]({
+            always: $.proxy(function() {
+                $el.remove();
 
-            if (!silent) {
-                $nexts.each($.proxy(function(i, widget) {
-                    this.move_widget_up( $(widget), wgd.size_y );
-                }, this));
-            }
+                if (!silent) {
+                    $nexts.each($.proxy(function(i, widget) {
+                        this.move_widget_up( $(widget), wgd.size_y );
+                    }, this));
+                }
 
-            this.set_dom_grid_height();
+                this.set_dom_grid_height();
 
-            if (callback) {
-                callback.call(this, el);
-            }
-        }, this));
+                callback && callback.call(this, el);
+                d.resolveWith(this);
+            }, this)
+        });
 
-        return this;
+        return d.promise();
     };
 
 
@@ -765,14 +769,21 @@
     *
     * @method remove_all_widgets
     * @param {Function} callback Function executed for each widget removed.
-    * @return {Class} Returns the instance of the Gridster Class.
+    * @return {Promise} Returns a jQuery promise.
     */
     fn.remove_all_widgets = function(callback) {
+        var d = $.Deferred();
+        var promises = [];
         this.$widgets.each($.proxy(function(i, el){
-              this.remove_widget(el, true, callback);
+              promises.push(this.remove_widget(el, true));
         }, this));
 
-        return this;
+        $.when.apply(null, promises).done($.proxy(function() {
+            callback && callback.call(this);
+            d.resolveWith(this);
+        }, this));
+
+        return d.promise();
     };
 
 
