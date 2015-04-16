@@ -328,8 +328,8 @@ describe('gridster.js', function() {
 
             it('should clean gridmap array', function() {
                 this.gridster.destroy();
-                expect(this.gridster.gridmap).to.be.empty;
-                expect(this.gridster.faux_grid).to.be.empty;
+                expect(this.gridster.gridmap).to.not.have.length;
+                expect(this.gridster.faux_grid).to.not.have.length;
             });
         });
 

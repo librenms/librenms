@@ -747,6 +747,7 @@
 
         $el[this.options.hide_method]({
             always: $.proxy(function() {
+                $el.coords().destroy();
                 $el.remove();
 
                 if (!silent) {
@@ -3123,6 +3124,11 @@
      */
     fn.destroy = function(remove) {
         this.$el.removeData('gridster');
+        this.$widgets.each($.proxy(function(i, el){
+            $(el).coords().destroy();
+        }, this));
+        this.gridmap = null;
+        this.faux_grid = null;
 
         // remove bound callback on window resize
         $(window).unbind('.gridster');
