@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>gridster.js tests</title>
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+
+    <link rel="stylesheet" href="../dist/jquery.gridster.css" />
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../dist/jquery.gridster.js"></script>
+
+
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script>mocha.setup('bdd');</script>
+    <link rel="stylesheet" href="lib/test.css" />
+    <script src="lib/test_utils.js"></script>
+    <script src="index.js"></script>
+    <script>
+        $(function() {
+            mocha.run();
+        });
+    </script>
+</head>
+<body>
+  <div id="mocha"></div>
+  <div id="fixture"></div>
+</body>
+</html>

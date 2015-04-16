@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>gridster.js tests</title>
+    <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+
+    <link rel="stylesheet" href="../../dist/jquery.gridster.css" />
+    <script src="../../node_modules/requirejs/require.js"></script>
+
+    <script src="../../node_modules/mocha/mocha.js"></script>
+    <script>mocha.setup('bdd');</script>
+
+    <script>
+        require.config({
+            baseUrl : '../../',
+
+            paths: {
+                mocha: 'node_modules/mocha/mocha',
+                chai: 'node_modules/chai/chai',
+                jquery: 'node_modules/jquery/dist/jquery',
+                gridster: 'dist/jquery.gridster'
+            }
+
+        });
+
+        require(['jquery'], function($) {
+            $.noConflict( true );
+
+            require(['test/amd/index'], function(Gridster) {
+                mocha.setup('bdd');
+            });
+        });
+    </script>
+</head>
+<body>
+  <div id="mocha"></div>
+  <div id="fixture"></div>
+</body>
+</html>
