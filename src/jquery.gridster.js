@@ -444,8 +444,8 @@
     * Change the size of a widget. Width is limited to the current grid width.
     *
     * @method resize_widget
-    * @param {HTMLElement} $widget The jQuery wrapped HTMLElement
-    *  representing the widget.
+    * * @param {HTMLElement|$HTMLElement} el The widget HTMLElement, jQuery
+    *    wrapped or not, you want to resize.
     * @param {Number} size_x The number of columns that will occupy the widget.
     *  By default <code>size_x</code> is limited to the space available from
     *  the column where the widget begins, until the last column to the right.
@@ -453,7 +453,8 @@
     * @param {Function} [callback] Function executed when the widget is removed.
     * @return {HTMLElement} Returns $widget.
     */
-    fn.resize_widget = function($widget, size_x, size_y, callback) {
+    fn.resize_widget = function(el, size_x, size_y, callback) {
+        var $widget = el instanceof $ ? el : $(el);
         var wgd = $widget.coords().grid;
         var col = wgd.col;
         var max_cols = this.options.max_cols;
@@ -719,7 +720,8 @@
     * Remove a widget from the grid.
     *
     * @method remove_widget
-    * @param {HTMLElement} el The jQuery wrapped HTMLElement you want to remove.
+    * @param {HTMLElement|$HTMLElement} el The widget HTMLElement, jQuery wrapped
+    *  or not, you want to remove.
     * @param {Boolean|Function} silent If true, widgets below the removed one
     * will not move up. If a Function is passed it will be used as callback.
     * @param {Function} callback Function executed when the widget is removed.
