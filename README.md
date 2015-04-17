@@ -72,7 +72,7 @@ Other options
 * **iconCreateFunction**: Function used to create the cluster icon [See default as example](https://github.com/Leaflet/Leaflet.markercluster/blob/15ed12654acdc54a4521789c498e4603fe4bf781/src/MarkerClusterGroup.js#L542).
 
 ## Events
-If you register for click, mouseover, etc events just related to Markers in the cluster.
+If you register for click, mouseover, etc events are just related to Markers in the cluster.
 To receive events for clusters listen to 'cluster' + 'eventIWant', ex: 'clusterclick', 'clustermouseover'.
 
 Set your callback up as follows to handle both cases:
