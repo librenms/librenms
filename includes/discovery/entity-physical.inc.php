@@ -1,36 +1,64 @@
 <?php
 
-if (!$device['os'] == 'junos') {
+if ($config['enable_inventory']) {
 
     echo("Physical Inventory : ");
 
-    if ($config['enable_inventory']) {
+    echo("\nCaching OIDs:");
 
-        echo("\nCaching OIDs:");
+    if ($device['os'] == 'junos') {
+
+        $entity_array = array();
+        echo(" jnxBoxAnatomy");
+        $entity_array = snmpwalk_cache_oid($device, "jnxBoxAnatomy", $entity_array, "JUNIPER-MIB");
+    } else {
 
         $entity_array = array();
         echo(" entPhysicalEntry");
         $entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", $entity_array, "ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB");
         echo(" entAliasMappingIdentifier");
         $entity_array = snmpwalk_cache_twopart_oid($device, "entAliasMappingIdentifier", $entity_array, "ENTITY-MIB:IF-MIB");
+    }
 
         foreach ($entity_array as $entPhysicalIndex => $entry) {
 
-            $entPhysicalDescr                = $entry['entPhysicalDescr'];
-            $entPhysicalContainedIn        = $entry['entPhysicalContainedIn'];
-            $entPhysicalClass                = $entry['entPhysicalClass'];
-            $entPhysicalName                = $entry['entPhysicalName'];
-            $entPhysicalSerialNum        = $entry['entPhysicalSerialNum'];
-            $entPhysicalModelName        = $entry['entPhysicalModelName'];
-            $entPhysicalMfgName                = $entry['entPhysicalMfgName'];
-            $entPhysicalVendorType        = $entry['entPhysicalVendorType'];
-            $entPhysicalParentRelPos        = $entry['entPhysicalParentRelPos'];
-            $entPhysicalHardwareRev         = $entry['entPhysicalHardwareRev'];
-            $entPhysicalFirmwareRev         = $entry['entPhysicalFirmwareRev'];
-            $entPhysicalSoftwareRev         = $entry['entPhysicalSoftwareRev'];
-            $entPhysicalIsFRU                 = $entry['entPhysicalIsFRU'];
-            $entPhysicalAlias             = $entry['entPhysicalAlias'];
-            $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
+            if ($device['os'] == 'junos') {
+
+                // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
+                // are made up here.
+                $entPhysicalDescr                = $entry['jnxContentsDescr'];
+                $entPhysicalContainedIn        = $entry['jnxContainersWithin'];
+                $entPhysicalClass                = $entry['jnxBoxClass'];
+                $entPhysicalName                = $entry['jnxOperatingDescr'];
+                $entPhysicalSerialNum        = $entry['jnxContentsSerialNo'];
+                $entPhysicalModelName        = $entry['jnxContentsPartNo'];
+                $entPhysicalMfgName                = 'Juniper';
+                $entPhysicalVendorType        = 'Juniper';
+                $entPhysicalParentRelPos        = -1; 
+                $entPhysicalHardwareRev         = $entry['jnxContentsRevision'];
+                $entPhysicalFirmwareRev         = $entry['entPhysicalFirmwareRev'];
+                $entPhysicalSoftwareRev         = $entry['entPhysicalSoftwareRev'];
+                $entPhysicalIsFRU                 = $entry['jnxFruType'];
+                $entPhysicalAlias             = $entry['entPhysicalAlias'];
+                $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
+            } else {
+
+                $entPhysicalDescr                = $entry['entPhysicalDescr'];
+                $entPhysicalContainedIn        = $entry['entPhysicalContainedIn'];
+                $entPhysicalClass                = $entry['entPhysicalClass'];
+                $entPhysicalName                = $entry['entPhysicalName'];
+                $entPhysicalSerialNum        = $entry['entPhysicalSerialNum'];
+                $entPhysicalModelName        = $entry['entPhysicalModelName'];
+                $entPhysicalMfgName                = $entry['entPhysicalMfgName'];
+                $entPhysicalVendorType        = $entry['entPhysicalVendorType'];
+                $entPhysicalParentRelPos        = $entry['entPhysicalParentRelPos'];
+                $entPhysicalHardwareRev         = $entry['entPhysicalHardwareRev'];
+                $entPhysicalFirmwareRev         = $entry['entPhysicalFirmwareRev'];
+                $entPhysicalSoftwareRev         = $entry['entPhysicalSoftwareRev'];
+                $entPhysicalIsFRU                 = $entry['entPhysicalIsFRU'];
+                $entPhysicalAlias             = $entry['entPhysicalAlias'];
+                $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
+            }
 
             if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
                 $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];
@@ -102,21 +130,31 @@ if (!$device['os'] == 'junos') {
                     echo("+");
                 }           
 
-                $valid[$entPhysicalIndex] = 1;
+                if ($device['os'] == 'junos') {
+
+                    // $entPhysicalIndex appears as a numeric OID fragment 
+                    // (string), so convert it to an "integer" for the 
+                    // validation step below since it is stored in the DB as
+                    // an integer. This should be fixed.
+                    list($first,$second) = explode(".",$entPhysicalIndex);
+                    $entPhysicalIndexNoDots =  $first . $second;
+                    $valid[$entPhysicalIndexNoDots] = 1;
+                } else {
+                    $valid[$entPhysicalIndex] = 1;
+                }
             }
         }
 
-    } else { echo("Disabled!"); }
+} else { echo("Disabled!"); }
 
-    $sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '".$device['device_id']."'";
-    foreach (dbFetchRows($sql) as $test) {
-        $id = $test['entPhysicalIndex'];
-        if (!$valid[$id]) {
-            echo("-");
-            dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
-        }
+$sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '".$device['device_id']."'";
+foreach (dbFetchRows($sql) as $test) {
+    $id = $test['entPhysicalIndex'];
+    if (!$valid[$id]) {
+        echo("-");
+        dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
     }
-
-    echo("\n");
 }
+
+echo("\n");
 ?>

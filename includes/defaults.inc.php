@@ -535,7 +535,6 @@ $config['poller_modules']['aruba-controller']             = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['applications']                 = 1;
 $config['poller_modules']['cisco-asa-firewall']           = 1;
-$config['poller_modules']['jnpr-entity-physical']           = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -573,7 +572,6 @@ $config['modules_compat']['rfc1628']['liebert']           = 1;
 $config['modules_compat']['rfc1628']['netmanplus']        = 1;
 $config['modules_compat']['rfc1628']['deltaups']          = 1;
 $config['modules_compat']['rfc1628']['poweralert']        = 1;
-$config['discovery_modules']['jnpr-entity-physical']           = 1;
 
 # Enable daily updates
 $config['update'] = 1;
