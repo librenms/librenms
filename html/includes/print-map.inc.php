@@ -14,8 +14,8 @@
 
 $tmp_devices = array();
 if (!empty($device['hostname'])) {
-    $sql = ' WHERE `devices`.`hostname`=? OR `remote_hostname`=?';
-    $sql_array = array($device['hostname'],$device['hostname']);
+    $sql = ' WHERE `devices`.`hostname`=?';
+    $sql_array = array($device['hostname']);
 } else {
     $sql = ' WHERE 1';
 }
