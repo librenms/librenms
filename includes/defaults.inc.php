@@ -253,7 +253,7 @@ $config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177',
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
 // Map colors
-$config['map_legend'] = array('0'=> '#ffffff', '10' => '#79847e', '20' => '#97ffca', '30' => '#a800ff', '40' => '#6c00ff', '50' => '#00d2ff', '60' => '#0090ff', '70' => '#ffe400', '80' => '#ffa200', '90' => '#ff6600', '100' => '#ff0000');
+$config['map_legend'] = array('0'=> '#aeaeae', '10' => '#79847e', '20' => '#97ffca', '30' => '#a800ff', '40' => '#6c00ff', '50' => '#00d2ff', '60' => '#0090ff', '70' => '#ffe400', '80' => '#ffa200', '90' => '#ff6600', '100' => '#ff0000');
 
 // Device page options
 
