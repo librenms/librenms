@@ -14,8 +14,8 @@
 
 $tmp_devices = array();
 if (!empty($device['hostname'])) {
-    $sql = ' WHERE `devices`.`hostname`=?';
-    $sql_array = array($device['hostname']);
+    $sql = ' WHERE `devices`.`hostname`=? OR `remote_hostname`=?';
+    $sql_array = array($device['hostname'],$device['hostname']);
 } else {
     $sql = ' WHERE 1';
 }
@@ -68,7 +68,20 @@ if (is_array($tmp_devices[0])) {
         } else {
             $width = 1;
         }
-        $tmp_links[] = array('from'=>$from,'to'=>$to,'label'=>$port,'title'=>generate_port_link($port_data, "<img src='graph.php?type=port_bits&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',1,1),'width'=>$width);
+        $link_in_used = ($link_devices['ifInOctets_rate'] * 8) / $link_devices['ifSpeed'] * 100;
+        $link_out_used = ($link_devices['ifOutOctets_rate'] * 8) / $link_devices['ifSpeed'] * 100;
+        if ($link_in_used > $link_out_used) {
+            $link_used = $link_in_used;
+        } else {
+            $link_used = $link_out_used;
+        }
+        $link_used = round($link_used, -1);
+        if ($link_used > 100) {
+            $link_used = 100;
+        }
+        $link_color = $config['map_legend'][$link_used];
+
+        $tmp_links[] = array('from'=>$from,'to'=>$to,'label'=>$port,'title'=>generate_port_link($port_data, "<img src='graph.php?type=port_bits&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',1,1),'width'=>$width,'color'=>$link_color);
     }
  
     $edges = json_encode($tmp_links);
@@ -98,9 +111,26 @@ echo $edges;
     var data = {
             nodes: nodes,
         edges: edges,
-        stabilize: true
+        stabilize: false
     };
-    var options = {physics: {barnesHut: {gravitationalConstant: -11900, centralGravity: 1.4, springLength: 203, springConstant: 0.05, damping: 0.3}}, smoothCurves: false};
+    var options = {
+       physics: {
+           barnesHut: {
+               gravitationalConstant: -80000, springConstant: 0.001, springLength: 200
+           }
+       },
+       tooltip: {
+           color: {
+               background: '#ffffff'
+           }
+       },
+       smoothCurves: {dynamic:false, type: "continuous"},
+       edges: {
+           color: {
+               color: '#000000'
+           }
+       }
+    };
     var network = new vis.Network(container, data, options);
     network.on("resize", function(params) {console.log(params.width,params.height)});
     network.on('click', function (properties) {
