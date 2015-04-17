@@ -12,7 +12,11 @@
  *
  */
 
-$_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
+    $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
+} else {
+    $_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+}
 
 function logErrors($errno, $errstr, $errfile, $errline) {
     global $php_debug;
