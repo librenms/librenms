@@ -25,7 +25,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
     $text_descr = str_replace("Sub-Module", "Module ", $text_descr);
     $text_descr = str_replace("DFC Card", "DFC", $text_descr);
 
-    $proc_url   = "device/".$device['device_id']."/health/processor/";
+    $proc_url   = "device/device=".$device['device_id']."/tab=health/metric=processor/";
 
     $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=f4f4f400";
 

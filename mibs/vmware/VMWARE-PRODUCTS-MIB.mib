@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2015 VMware, Inc.  All rights reserved. 
 -- **********************************************************
 
 VMWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
@@ -7,11 +7,11 @@ VMWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 IMPORTS
    MODULE-IDENTITY
         FROM SNMPv2-SMI
-    vmwOID, vmwProductSpecific
+   vmwOID, vmwProductSpecific
         FROM VMWARE-ROOT-MIB;
 
 vmwProducts MODULE-IDENTITY
-       LAST-UPDATED "200707300000Z"
+       LAST-UPDATED "201409190000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -26,6 +26,12 @@ vmwProducts MODULE-IDENTITY
                 which are returned from SNMPv2-MIB sysObjectId for 
                 agents in specific VMware products.
                "
+       REVISION      "201409190000Z"
+       DESCRIPTION
+               "Add vSphere appliance sysObjectIds."
+       REVISION      "201109290000Z"
+       DESCRIPTION
+               "Add vmwVCOps snmp agent's sysObjectId value."
        REVISION      "200707300000Z"
        DESCRIPTION
                "The initial revision."
@@ -43,7 +49,23 @@ vmwVC OBJECT IDENTIFIER
 vmwServer OBJECT IDENTIFIER
     ::= { vmwProductSpecific 4 }
 
+vmwVCOps OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 5 }
+
+vmwGenericAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 6 }
+
+vmwEmbeddedVirtualCenterAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 7 }
+
+vmwInfrastructureAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 8 }
+
+vmwManagementAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 9 }
+
 oidESX OBJECT IDENTIFIER
     ::= { vmwOID 1 }
 
 END -- end of module VMWARE-PRODUCTS-MIB.
+

@@ -1,4 +1,5 @@
 <?php
+include($config['install_dir'].'/includes/object-cache.inc.php');
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
@@ -194,13 +195,14 @@ if ($_SESSION['userlevel'] >= '10')
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
 <?php
+$ports = new ObjCache('ports');
 
-if (isset($ports['errored']))
+if ($ports['errored'] > 0)
 {
   echo('            <li><a href="ports/errors=1/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if (isset($ports['ignored']))
+if ($ports['ignored'] > 0)
 {
   echo('            <li><a href="ports/ignore=1/"><i class="fa fa-question-circle fa-fw fa-lg"></i> Ignored ('.$ports['ignored'].')</a></li>');
 }
@@ -431,8 +433,12 @@ Plugins::call('menu');
 
 if ($_SESSION['userlevel'] >= '10')
 {
-  echo(' 
+  if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
+    echo('
             <li role="presentation" class="divider"></li>
+    ');
+  }
+  echo('
             <li><a href="plugin/view=admin"> <i class="fa fa-lock fa-fw fa-lg"></i>Plugin Admin</a></li>
   ');
 }

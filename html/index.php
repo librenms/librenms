@@ -12,7 +12,11 @@
  *
  */
 
-$_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
+    $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
+} else {
+    $_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+}
 
 function logErrors($errno, $errstr, $errfile, $errline) {
     global $php_debug;
@@ -52,6 +56,7 @@ include("../config.php");
 include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
+include("includes/vars.inc.php");
 include('includes/plugins.inc.php');
 Plugins::start();
 
@@ -69,45 +74,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-foreach ($_GET as $key=>$get_var)
-{
-  if (strstr($key, "opt"))
-  {
-    list($name, $value) = explode("|", $get_var);
-    if (!isset($value)) { $value = "yes"; }
-    $vars[$name] = $value;
-  }
-}
-
-$segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-
-foreach ($segments as $pos => $segment)
-{
-  $segment = urldecode($segment);
-  if ($pos == "0")
-  {
-    $vars['page'] = $segment;
-  } else {
-    list($name, $value) = explode("=", $segment);
-    if ($value == "" || !isset($value))
-    {
-      $vars[$name] = yes;
-    } else {
-      $vars[$name] = $value;
-    }
-  }
-}
-
-foreach ($_GET as $name => $value)
-{
-  $vars[$name] = $value;
-}
-
-foreach ($_POST as $name => $value)
-{
-  $vars[$name] = $value;
-}
 
 include("includes/authenticate.inc.php");
 
@@ -338,7 +304,7 @@ toastr.options.extendedTimeOut = 20;
   echo("</script>");
 }
 
-if (is_array($sql_debug) && is_array($php_debug)) {
+if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === TRUE) {
 
     include_once "includes/print-debug.php";
 
