@@ -174,27 +174,34 @@ if ($device['os'] == "apc")
   unset($oids);
 
     # UPS
-    $oids = snmp_get($device, "upsHighPrecOutputCurrent", "-OsqnU", "PowerNet-MIB");
-    if (empty($oids)) {
-        $oids = snmp_get($device, "upsAdvOutputCurrent", "-OsqnU", "PowerNet-MIB");
-        $current_oid = "upsAdvOutputCurrent";
-    } else {
-        $current_oid = "upsHighPrecOutputCurrent";
-    }
-    if (!empty($oids)) {
-        $type = "apc";
-        if ($debug) {
-            print_r($oids);
+
+    $oid_array = array(
+                     array('HighPrecOid' => 'upsHighPrecOutputCurrent', 'AdvOid' => 'upsAdvOutputCurrent', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Drawn', 'divisor' => 10, 'mib' => 'PowerNet-MIB'),
+                     array('HighPrecOid' => 'upsHighPrecOutputLoad', 'AdvOid' => 'upsAdvOutputLoad', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Load', 'divisor' => 1, 'mib' => 'PowerNet-MIB'),
+                 );
+    foreach ($oid_array as $item) {
+        $low_limit = NULL;
+        $low_limit_warn = NULL;
+        $warn_limit = NULL;
+        $high_limit = NULL;
+        $oids = snmp_get($device, $item['HighPrecOid'], "-OsqnU", $item['mib']);
+        if (empty($oids)) {
+            $oids = snmp_get($device, $item['AdvOid'], "-OsqnU", $item['mib']);
+            $current_oid = $item['AdvOid'];
+        } else {
+            $current_oid = $item['HighPrecOid'];
         }
-        $oids = trim($oids);
-        if ($oids) {
-            echo "APC PowerNet-MIB UPS";
+        if (!empty($oids)) {
+            if ($debug) {
+                print_r($oids);
+            }
+            $oids = trim($oids);
+            if ($oids) {
+                echo $item['type'] . ' ' . $item['mib'] . ' UPS';
+            }
+            $current = $oids / $item['divisor'];
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
         }
-        $index = 1;
-        $descr = "Current Drawn";
-        $divisor = 10;
-        $current = $current_oid / $divisor;
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
 }
 
