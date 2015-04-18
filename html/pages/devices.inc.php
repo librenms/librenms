@@ -93,6 +93,59 @@ list($format, $subformat) = explode("_", $vars['format']);
 
 if($format == "graph")
 {
+$sql_param = array();
+
+if(isset($vars['state']))
+{
+  if($vars['state'] == 'up')
+  {
+    $state = '1';
+  }
+    elseif($vars['state'] == 'down')
+  {
+    $state = '0';
+  }
+}
+
+if (!empty($vars['hostname'])) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
+if (!empty($vars['os']))       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
+if (!empty($vars['version']))  { $where .= " AND version = ?";     $sql_param[] = $vars['version']; }
+if (!empty($vars['hardware'])) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
+if (!empty($vars['features'])) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
+if (!empty($vars['type']))     {
+  if ($vars['type'] == 'generic') {
+    $where .= " AND ( type = ? OR type = '')";        $sql_param[] = $vars['type'];
+  } else {
+    $where .= " AND type = ?";        $sql_param[] = $vars['type'];
+  }
+}
+if (!empty($vars['state']))    {
+  $where .= " AND status= ?";       $sql_param[] = $state;
+  $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
+}
+if (!empty($vars['disabled'])) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
+if (!empty($vars['ignore']))   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
+if (!empty($vars['location']) && $vars['location'] == "Unset") { $location_filter = ''; }
+if (!empty($vars['location'])) { $location_filter = $vars['location']; }
+if( !empty($vars['group']) ) {
+	require_once('../includes/device-groups.inc.php');
+	$where .= " AND ( ";
+	foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
+		$where .= "device_id = ? OR ";
+		$sql_param[] = $dev['device_id'];
+	}
+	$where = substr($where, 0, strlen($where)-3);
+	$where .= " )";
+}
+
+$query = "SELECT * FROM `devices` WHERE 1 ";
+
+if (isset($where)) {
+    $query .= $where;
+}
+
+$query .= " ORDER BY hostname";
+
   $row = 1;
   foreach (dbFetchRows($query, $sql_param) as $device)
   {
@@ -149,7 +202,7 @@ var grid = $("#devices").bootgrid({
     columnSelection: false,
     formatters: {
         "status": function(column,row) {
-            return "<h4><span class='label label-"+row.extra+" 75pc-width'>" + row.msg + "</span></h4>";
+            return "<h4><span class='label label-"+row.extra+" threeqtr-width'>" + row.msg + "</span></h4>";
         }
     },
     templates: {
@@ -165,11 +218,12 @@ var grid = $("#devices").bootgrid({
 
 foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data) {
     if ($data['os']) {
-        echo('"<option value=\"'.$data['os'].'\""+');
-        if ($data['os'] == $vars['os']) {
+        $tmp_os = clean_bootgrid($data['os']);
+        echo('"<option value=\"'.$tmp_os.'\""+');
+        if ($tmp_os == $vars['os']) {
             echo('" selected "+');
         }
-        echo('">'.$config['os'][$data['os']]['text'].'</option>"+');
+        echo('">'.$config['os'][$tmp_os]['text'].'</option>"+');
     }
 }
 ?>
@@ -182,11 +236,12 @@ foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY
 
 foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data) {
     if ($data['version']) {
-        echo('"<option value=\"'.$data['version'].'\""+');
-        if ($data['version'] == $vars['version']) {
+        $tmp_version = clean_bootgrid($data['version']);
+        echo('"<option value=\"'.$tmp_version.'\""+');
+        if ($tmp_version == $vars['version']) {
             echo('" selected "+');
         }
-        echo('">'.$data['version'].'</option>"+');
+        echo('">'.$tmp_version.'</option>"+');
   }
 }
 ?>
@@ -199,11 +254,12 @@ foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version
 
 foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data) {
     if ($data['hardware']) {
-        echo('"<option value=\"'.$data['hardware'].'\""+');
-        if ($data['hardware'] == $vars['hardware']) {
+        $tmp_hardware = clean_bootgrid($data['hardware']);
+        echo('"<option value=\"'.$tmp_hardware.'\""+');
+        if ($tmp_hardware == $vars['hardware']) {
             echo('" selected"+');
         }
-        echo('">'.$data['hardware'].'</option>"+');
+        echo('">'.$tmp_hardware.'</option>"+');
     }
 }
 
@@ -219,11 +275,12 @@ foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `featur
 {
   if ($data['features'])
   {
-    echo('"<option value=\"'.$data['features'].'\""+');
-    if ($data['features'] == $vars['features']) {
+    $tmp_features = clean_bootgrid($data['features']);
+    echo('"<option value=\"'.$tmp_features.'\""+');
+    if ($tmp_features == $vars['features']) {
         echo('" selected"+');
     }
-    echo('">'.$data['features'].'</option>"+');
+    echo('">'.$tmp_features.'</option>"+');
     }
 }
 
@@ -239,6 +296,7 @@ foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `featur
 
 foreach (getlocations() as $location) {
     if ($location) {
+        $location = clean_bootgrid($location);
         echo('"<option value=\"'.$location.'\""+');
         if ($location == $vars['location']) {
             echo('" selected"+');
