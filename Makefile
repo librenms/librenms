@@ -27,7 +27,7 @@ push-dev:
 push-personal pp:
 	$(GIT) push personal
 
-push-testing:
+push-testing pt:
 	$(GIT) push testing
 
 update-subtrees: datetime-subtree moment-subtree font-awesome vis
