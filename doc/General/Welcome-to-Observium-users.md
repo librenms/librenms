@@ -10,12 +10,12 @@ IT professionals.  See [README.md][2] and the references there for more
 information about the kind of community we're trying to promote.
 
 LibreNMS was forked from [the last GPL-licensed version of Observium][3].
-~~This means you won't be able to take an existing Observium installation
+<del>This means you won't be able to take an existing Observium installation
 later than r3250 and just change it to LibreNMS.  This would probably break
 (although if you were on a version between r3250 and the next database
 schema change, it might be feasible).  Upgrades from versions earlier than
 r3251 might work.  Please try it on an unimportant system and tell us your
-experiences!~~
+experiences!</del>
 
 Thanks to one of our users Dan Brown who has written a migration script to be able move your Observium install over to LibreNMS [Dan Brown][10]. This also takes care of moving from one cpu architect to another. Give it a try :)
 
@@ -28,7 +28,7 @@ How LibreNMS will be different from Observium:
 - Development decisions will be community-driven.  We want to make software
   that fulfills its users' needs.  See the [ROADMAP][4] for more thoughts
   on our current plans.
-- ~~Development will probably proceed at a slower pace, at least initially.~~
+- <del>Development will probably proceed at a slower pace, at least initially.</del>
 - There are no plans for a paid version, and we don't anticipate this ever
   changing.
 - There are no current plans for paid support, but this may be added later
@@ -40,7 +40,7 @@ Reasons why you might want to use Observium instead of LibreNMS:
 
 - You have a financial investment in Observium and aren't concerned about
   community contributions.
-- ~~You need functionality that has been added to Observium since r3250.~~ The beauty of LibreNMS is that you can contribute missing features.
+- <del>You need functionality that has been added to Observium since r3250.</del> The beauty of LibreNMS is that you can contribute missing features.
 - You don't like the [GNU General Public License, version 3][5] or the
   [philosophy of Free Software/copyleft][6] in general.
 
