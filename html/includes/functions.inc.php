@@ -122,7 +122,7 @@ function generate_device_url($device, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1, $no_overlib=0)
+function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1, $overlib=1)
 {
   global $config;
 
@@ -168,7 +168,7 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
   }
 
   if ($escape_text) { $text = htmlentities($text); }
-  if ($no_overlib == 1) {
+  if ($overlib == 0) {
       $link = $contents;
   } else {
       $link = overlib_link($url, $text, escape_quotes($contents), $class);
@@ -408,7 +408,7 @@ function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
 
 }
 
-function generate_port_link($port, $text = NULL, $type = NULL, $no_overlib = 0, $single_graph = 0)
+function generate_port_link($port, $text = NULL, $type = NULL, $overlib = 1, $single_graph = 0)
 {
   global $config;
 
@@ -445,7 +445,7 @@ function generate_port_link($port, $text = NULL, $type = NULL, $no_overlib = 0, 
 
   $url = generate_port_url($port);
 
-  if ($no_overlib == 1) {
+  if ($overlib == 0) {
     return $content;
   } elseif (port_permitted($port['port_id'], $port['device_id'])) {
     return overlib_link($url, $text, $content, $class);
