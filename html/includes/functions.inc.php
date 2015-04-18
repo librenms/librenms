@@ -122,7 +122,7 @@ function generate_device_url($device, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1)
+function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1, $overlib=1)
 {
   global $config;
 
@@ -168,7 +168,11 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
   }
 
   if ($escape_text) { $text = htmlentities($text); }
-  $link = overlib_link($url, $text, escape_quotes($contents), $class);
+  if ($overlib == 0) {
+      $link = $contents;
+  } else {
+      $link = overlib_link($url, $text, escape_quotes($contents), $class);
+  }
 
   if (device_permitted($device['device_id']))
   {
@@ -404,7 +408,7 @@ function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
 
 }
 
-function generate_port_link($port, $text = NULL, $type = NULL)
+function generate_port_link($port, $text = NULL, $type = NULL, $overlib = 1, $single_graph = 0)
 {
   global $config;
 
@@ -429,17 +433,21 @@ function generate_port_link($port, $text = NULL, $type = NULL)
   $graph_array['from']     = $config['time']['day'];
   $graph_array['id']       = $port['port_id'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['week'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['month'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['year'];
-  $content .= generate_graph_tag($graph_array);
+  if ($single_graph == 0) {
+      $graph_array['from']     = $config['time']['week'];
+      $content .= generate_graph_tag($graph_array);
+      $graph_array['from']     = $config['time']['month'];
+      $content .= generate_graph_tag($graph_array);
+      $graph_array['from']     = $config['time']['year'];
+      $content .= generate_graph_tag($graph_array);
+  }
   $content .= "</div>";
 
   $url = generate_port_url($port);
 
-  if (port_permitted($port['port_id'], $port['device_id'])) {
+  if ($overlib == 0) {
+    return $content;
+  } elseif (port_permitted($port['port_id'], $port['device_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);
