@@ -15,14 +15,14 @@
 $where = 1;
 
 if ($_SESSION['userlevel'] >= '5') {
-    $sql = " FROM `alert_schedule` AS S LEFT JOIN `devices` AS `D` ON `S`.`device_id`=`D`.`device_id` WHERE $where";
+    $sql = " FROM `alert_schedule` AS S WHERE $where";
 } else {
-    $sql = " FROM `alert_schedule` AS S, devices_perms AS P LEFT JOIN `devices` AS `D` WHERE $where AND `S`.`device_id` = `P`.`device_id` AND `P`.`user_id` = ?";
+    $sql = " FROM `alert_schedule` AS S WHERE $where";
     $param[] = $_SESSION['user_id'];
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`start` LIKE '%$searchPhrase%' OR `S`.`end` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`S`.`title` LIKE '%$searchPhrase%' OR `S`.`start` LIKE '%$searchPhrase%' OR `S`.`end` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(`id`) $sql";
@@ -32,7 +32,7 @@ if (empty($total)) {
 }
 
 if (!isset($sort) || empty($sort)) {
-    $sort = '`D`.`hostname` ASC ';
+    $sort = '`S`.`title` ASC ';
 }
 
 $sql .= " ORDER BY $sort";
@@ -46,18 +46,13 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT DATE_FORMAT(`S`.`start`, '%D %b %Y %T') AS `start`, DATE_FORMAT(`S`.`end`, '%D %b %Y %T') AS `end`, `D`.`hostname`, `S`.`device_id` $sql";
+$sql = "SELECT `S`.`schedule_id`, DATE_FORMAT(`S`.`start`, '%D %b %Y %T') AS `start`, DATE_FORMAT(`S`.`end`, '%D %b %Y %T') AS `end`, `S`.`title` $sql";
 
 foreach (dbFetchRows($sql,$param) as $schedule) {
-    if ($schedule['device_id'] == '-1') {
-        $host_link = 'All devices';
-    } else {
-        $dev = device_by_id_cache($schedule['device_id']);
-        $host_link = generate_device_link($dev, shorthost($dev['hostname']));
-    }
-    $response[] = array('hostname'=>$host_link,
+    $response[] = array('title'=>$schedule['title'],
                         'start'=>$schedule['start'],
-                        'end'=>$schedule['end']);
+                        'end'=>$schedule['end'],
+                        'id'=>$schedule['schedule_id']);
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);

@@ -14,6 +14,7 @@
 
 $pagetitle[] = "Alert Schedule";
 $no_refresh = TRUE;
+if(is_admin() !== false) {
 
 ?>
 
@@ -26,33 +27,24 @@ $no_refresh = TRUE;
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="sched-form" class="form-horizontal schedule-maintenance-form">
+                    <input type="hidden" name="schedule_id" id="schedule_id">
+                    <input type="hidden" name="type" id="type" value="schedule-maintenance">
+                    <input type="hidden" name="sub_type" id="sub_type" value="new-maintenance">
                     <div class="row">
                         <div class="col-md-12">
                             <span id="response"></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for='device' class='col-sm-4 control-label'>Maintenance for? </label>
+                        <label for="title" class="col-sm-4 control-label">Title: </label>
                         <div class="col-sm-8">
-                            <select id='device' name='device' class='form-control'>
-                                <option disabled>Devices</option>
-                                <option disabled>-------</option>
-                                <option value="-1">All devices</option>
-<?php
-
-foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `ignore`=0 AND `disabled`=0") as $device_row) {
-    echo '<option value="'.$device_row['device_id'].'">'.$device_row['hostname'].'</option>';
-}
-
-echo "<option disabled>Groups</option>";
-echo "<option disabled>------</option>";
-
-foreach (dbFetchRows("SELECT `id`,`name` FROM `device_groups`") as $device_group) {
-    echo '<option value="'.$device_group['id'].'">'.$device_group['name'].'</option>';
-}
-
-?>
-                            </select>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Maintenance title">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes" class="col-sm-4 control-label">Notes: </label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="notes" name="notes" placeholder="Maintenance notes"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -68,8 +60,22 @@ foreach (dbFetchRows("SELECT `id`,`name` FROM `device_groups`") as $device_group
                         </div>
                     </div>
                     <div class="form-group">
+                         <label for='map-stub' class='col-sm-4 control-label'>Map To: </label>
+                        <div class="col-sm-5">
+                            <input type='text' id='map-stub' name='map-stub' class='form-control'/>
+                        </div>
+                        <div class="col-sm-3">
+                            <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <span id="map-tags"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-3">
-                            <button class="btn btn-default btn-sm" type="submit" name="sched-submit" id="sched-submit" value="save">Save Rule</button>
+                            <button class="btn btn-success" type="submit" name="sched-submit" id="sched-submit" value="save">Add maintenance schedule</button>
                         </div>
                     </div>
                 </form>
@@ -89,9 +95,10 @@ foreach (dbFetchRows("SELECT `id`,`name` FROM `device_groups`") as $device_group
         <table id="alert-schedule" class="table table-condensed">
             <thead>
                 <tr>
-                    <th data-column-id="hostname" data-order="asc">Hostname</th>
+                    <th data-column-id="title" data-order="asc">Title</th>
                     <th data-column-id="start">Start</th>
                     <th data-column-id="end">End</th>
+                    <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
                 </tr>
             </thead>
         </table>
@@ -101,6 +108,13 @@ foreach (dbFetchRows("SELECT `id`,`name` FROM `device_groups`") as $device_group
 
 var grid = $("#alert-schedule").bootgrid({
     ajax: true,
+    formatters: {
+        "commands": function(column, row)
+        {
+            return "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " + 
+                "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+        }
+    },
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
@@ -116,22 +130,59 @@ var grid = $("#alert-schedule").bootgrid({
         };
     },
     url: "/ajax_table.php"
+}).on("loaded.rs.jquery.bootgrid", function()
+{
+    /* Executes after data is loaded and rendered */
+    grid.find(".command-edit").on("click", function(e)
+    {
+        $('#schedule_id').val($(this).data("schedule_id"));
+        $("#schedule-maintenance").modal('show');
+    }).end().find(".command-delete").on("click", function(e)
+    {
+        alert("You pressed delete on row: " + $(this).data("row-id"));
+    });
+});
+
+$('#schedule-maintenance').on('show.bs.modal', function (event) {
+    $('#tagmanager').tagmanager();
+    var schedule_id = $('#schedule_id').val();
+    $('#map-tags').tagmanager({
+           strategy: 'array',
+           tagFieldName: 'maps[]',
+           initialCap: false
+    });
+    if (schedule_id > 0) {
+        $.ajax({
+            type: "POST",
+            url: "/ajax_form.php",
+            data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
+            dataType: "json",
+            success: function(output) {
+                var arr = [];
+                $.each ( output['targets'], function( key ) {
+                    arr.push(key);
+                });
+                $('#response').data('tagmanager').populate(arr);
+                $('#severity').val(output['severity']).change;
+                var extra = $.parseJSON(output['extra']);
+                $('#count').val(extra['count']);
+            }
+        });
+    }
 });
 
 $('#sched-submit').click('', function(e) {
     e.preventDefault();
-    var device = $("#device").val();
-    var start = $("#start").val();
-    var end = $("#end").val();
     $.ajax({
         type: "POST",
         url: "/ajax_form.php",
-        data: { type: "schedule-maintenance", subtype: "add", device: device, start: start, end: end },
+        data: $('form.schedule-maintenance-form').serialize(),
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
                 $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
                 $("#schedule-maintenance").modal('hide');
+                $("#alert-schedule").bootgrid('reload');
             } else {
                 $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
             }
@@ -142,6 +193,30 @@ $('#sched-submit').click('', function(e) {
     });
 
 });
+
+$('#add-map').click('',function (event) {
+        $('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
+        $('#map-stub').val('');
+});
+
+$('#map-stub').typeahead([
+    {
+      name: 'map_devices',
+      remote : '/ajax_search.php?search=%QUERY&type=device&map=1',
+      header : '<h5><strong>&nbsp;Devices</strong></h5>',
+      template: '{{name}}',
+      valueKey:"name",
+      engine: Hogan
+    },
+    {
+      name: 'map_groups',
+      remote : '/ajax_search.php?search=%QUERY&type=group&map=1',
+      header : '<h5><strong>&nbsp;Groups</strong></h5>',
+      template: '{{name}}',
+      valueKey:"name",
+      engine: Hogan
+    }
+]);
 
 $(function () {
     $("#start").datetimepicker();
@@ -155,3 +230,9 @@ $(function () {
 });
 
 </script>
+
+<?php
+
+}
+
+?>
