@@ -32,7 +32,7 @@ if (empty($total)) {
 }
 
 if (!isset($sort) || empty($sort)) {
-    $sort = '`S`.`title` ASC ';
+    $sort = '`S`.`start` DESC ';
 }
 
 $sql .= " ORDER BY $sort";
@@ -49,10 +49,18 @@ if ($rowCount != -1) {
 $sql = "SELECT `S`.`schedule_id`, DATE_FORMAT(`S`.`start`, '%D %b %Y %T') AS `start`, DATE_FORMAT(`S`.`end`, '%D %b %Y %T') AS `end`, `S`.`title` $sql";
 
 foreach (dbFetchRows($sql,$param) as $schedule) {
+    $status = 0;
+    if ($schedule['end'] < date('dS M Y H:i::s')) {
+        $status = 1;
+    }
+    if (date('dS M Y H:i::s') >= $schedule['start'] && date('dS M Y H:i::s') < $schedule['end']) {
+        $status = 2;
+    }
     $response[] = array('title'=>$schedule['title'],
                         'start'=>$schedule['start'],
                         'end'=>$schedule['end'],
-                        'id'=>$schedule['schedule_id']);
+                        'id'=>$schedule['schedule_id'],
+                        'status'=>$status);
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);

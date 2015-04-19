@@ -1154,3 +1154,21 @@ function set_curl_proxy($post)
 	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
     }
 }
+
+function target_to_id($target) {
+    if( $target[0].$target[1] == "g:" ) {
+        $target = "g".dbFetchCell('SELECT id FROM device_groups WHERE name = ?',array(substr($target,2)));
+    } else {
+        $target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?',array($target));
+    }
+    return $target;
+}
+
+function id_to_target($id) {
+    if( $id[0] == "g" ) {
+        $id = 'g:'.dbFetchCell("SELECT name FROM device_groups WHERE id = ?",array(substr($id,1)));
+    } else {
+        $id = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?",array($id));
+    }
+    return $id;
+}
