@@ -487,6 +487,7 @@ Output:
  "count": 7,
  "alerts": [
   {
+   "hostname": "localhost",
    "id": "1",
    "device_id": "1",
    "rule_id": "1",
