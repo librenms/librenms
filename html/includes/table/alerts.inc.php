@@ -35,7 +35,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `alerts`.*, `devices`.`hostname` AS `hostname`,`alert_rules`.`rule` AS `rule`, `alert_rules`.`name` AS `name`, `alert_rules`.`severity` AS `severity` $sql";
 
-system("echo '$sql' >> /tmp/testing");
 $rulei = 0;
 $format = $_POST['format'];
 foreach (dbFetchRows($sql,$param) as $alert) {
