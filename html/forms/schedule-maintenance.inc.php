@@ -22,7 +22,12 @@ if ($sub_type == 'new-maintenance') {
 
     // Defaults
     $status = 'error';
+    $update = 0;
 
+    $schedule_id = mres($_POST['schedule_id']);
+    if ($schedule_id > 0) {
+        $update = 1;
+    }
     $title = mres($_POST['title']);
     $notes = mres($_POST['notes']);
     $start = mres($_POST['start']);
@@ -43,11 +48,21 @@ if ($sub_type == 'new-maintenance') {
     }
 
     if (empty($message)) {
-        $schedule_id = dbInsert(array('start'=>$start,'end'=>$end,'title'=>$title,'notes'=>$notes),'alert_schedule');
+        if (empty($schedule_id)) {
+            $schedule_id = dbInsert(array('start'=>$start,'end'=>$end,'title'=>$title,'notes'=>$notes),'alert_schedule');
+        } else {
+            dbUpdate(array('start'=>$start,'end'=>$end,'title'=>$title,'notes'=>$notes),'alert_schedule','`schedule_id`=?',array($schedule_id));
+        }
         if ($schedule_id > 0) {
             $items = array();
             $fail = 0;
+ 
+            if ($update == 1) {
+                dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
+            }
+
             foreach( $_POST['maps'] as $target ) {
+                $target = target_to_id($target);
                 $item = dbInsert(array('schedule_id'=>$schedule_id,'target'=>$target),'alert_schedule_items');
                 if ($item > 0) {
                      array_push($items,$item);
@@ -55,18 +70,18 @@ if ($sub_type == 'new-maintenance') {
                     $fail = 1;
                 }
             }
-            if ($fail == 1) {
+            if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
                     dbDelete('alert_schedule_items', '`item_id`=?', array($item));
                 }
                 dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
-                $message = 'Creating maintenance schedule failed'.$yeah;
+                $message = 'Issue scheduling maintenance';
             } else {
                 $status = 'ok';
-                $message = 'Created maintenance schedule';
+                $message = 'Scheduling maintenance ok';
             }
         } else {
-            $message = "Issue creating maintenance schedule";
+            $message = "Issue scheduling maintenance";
         }
     }
 
@@ -74,13 +89,21 @@ if ($sub_type == 'new-maintenance') {
 
 } elseif ($sub_type == 'parse-maintenance') {
 
-    $schedule_id = $_POST['schedule_id'];
+    $schedule_id = mres($_POST['schedule_id']);
     $schedule = dbFetchRow("SELECT * FROM `alert_schedule` WHERE `schedule_id`=?",array($schedule_id));
     $items = array();
     foreach (dbFetchRows("SELECT `target` FROM `alert_schedule_items` WHERE `schedule_id`=?",array($schedule_id)) as $targets) {
-        $items[] = $targets;
+        $targets = id_to_target($targets['target']);
+        array_push($items,$targets);
     }
     $response = array('start'=>$schedule['start'],'end'=>$schedule['end'],'title'=>$schedule['title'],'notes'=>$schedule['notes'],'targets'=>$items);
+} elseif ($sub_type == 'del-maintenance') {
+    $schedule_id = mres($_POST['del_schedule_id']);
+    dbDelete('alert_schedule_items','`schedule_id`=?',array($schedule_id));
+    dbDelete('alert_schedule','`schedule_id`=?', array($schedule_id));
+    $status = 'ok';
+    $message = 'Maintenance schedule has been removed';
+    $response = array('status'=>$status,'message'=>$message);
 }
 
 echo _json_encode($response);
