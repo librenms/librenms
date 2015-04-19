@@ -7,8 +7,7 @@ if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`timestamp` LIKE '%?%' OR `rule` LIKE '%?%' OR `name` LIKE '%?%' OR `hostname` LIKE '%?%')";
-    $param[] = array($searchPhrase,$searchPhrase,$searchPhrase,$serchPhrase);
+    $sql .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
 }
 
 $sql = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE $where AND `state` IN (1,2,3,4) $sql";
@@ -36,7 +35,9 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `alerts`.*, `devices`.`hostname` AS `hostname`,`alert_rules`.`rule` AS `rule`, `alert_rules`.`name` AS `name`, `alert_rules`.`severity` AS `severity` $sql";
 
+system("echo '$sql' >> /tmp/testing");
 $rulei = 0;
+$format = $_POST['format'];
 foreach (dbFetchRows($sql,$param) as $alert) {
     $log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
     $log_detail = json_decode(gzuncompress($log),true);
@@ -44,10 +45,16 @@ foreach (dbFetchRows($sql,$param) as $alert) {
         $fault_detail = '';
         foreach ($tmp_alerts as $k=>$v) {
             if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
-                $fault_detail .= $k.' => '.$v.", ";
+                if ($format == 'basic') {
+                    $fault_detail .= $k.' => '.$v."\n ";
+                } else {
+                    $fault_detail .= $k.' => '.$v.", ";
+                }
             }
         }
-        $fault_detail = rtrim($fault_detail,", ");
+        if ($format == 'detail') {
+            $fault_detail = rtrim($fault_detail,", ");
+        }
         $fault_detail .= "\n";
     }
 
@@ -96,10 +103,15 @@ foreach (dbFetchRows($sql,$param) as $alert) {
             $ack_col = 'danger';
         }
     }
+    if ($format == 'basic') {
+        $hostname = "<a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."</i></a>";
+    } else {
+        $hostname = "<a href=\"device/device=".$alert['device_id']."\"><i>".$alert['hostname']."<br />$fault_detail</i></a>";
+    }
 
     $response[] = array('id'=>"<i>#".$rulei++."</i>",
                         'rule'=>"<i title=\"".htmlentities($alert['rule'])."\">".htmlentities($alert['name'])."</i>",
-                        'hostname'=>"<a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."<br />$fault_detail</i></a>",
+                        'hostname'=>$hostname,
                         'timestamp'=>($alert['timestamp'] ? $alert['timestamp'] : "N/A"),
                         'severity'=>$severity,
                         'ack_col'=>$ack_col,
