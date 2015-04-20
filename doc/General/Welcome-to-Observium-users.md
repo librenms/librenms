@@ -10,14 +10,17 @@ IT professionals.  See [README.md][2] and the references there for more
 information about the kind of community we're trying to promote.
 
 LibreNMS was forked from [the last GPL-licensed version of Observium][3].
-This means you won't be able to take an existing Observium installation
+<del>This means you won't be able to take an existing Observium installation
 later than r3250 and just change it to LibreNMS.  This would probably break
 (although if you were on a version between r3250 and the next database
 schema change, it might be feasible).  Upgrades from versions earlier than
 r3251 might work.  Please try it on an unimportant system and tell us your
-experiences!
+experiences!</del>
+
+Thanks to one of our users Dan Brown who has written a migration script to be able move your Observium install over to LibreNMS [Dan Brown][10]. This also takes care of moving from one cpu architect to another. Give it a try :)
 
 How LibreNMS will be different from Observium:
+
 - We will have an inclusive community, where it's OK to ask stupid
   questions, and OK to ask for things that aren't on the roadmap.  If you'd
   like to see something added, add or comment on the relevant issue in our
@@ -25,7 +28,7 @@ How LibreNMS will be different from Observium:
 - Development decisions will be community-driven.  We want to make software
   that fulfills its users' needs.  See the [ROADMAP][4] for more thoughts
   on our current plans.
-- ~~Development will probably proceed at a slower pace, at least initially.~~
+- <del>Development will probably proceed at a slower pace, at least initially.</del>
 - There are no plans for a paid version, and we don't anticipate this ever
   changing.
 - There are no current plans for paid support, but this may be added later
@@ -34,13 +37,15 @@ How LibreNMS will be different from Observium:
   and painless as possible to create forked or private versions.
 
 Reasons why you might want to use Observium instead of LibreNMS:
+
 - You have a financial investment in Observium and aren't concerned about
   community contributions.
-- ~~You need functionality that has been added to Observium since r3250.~~ The beauty of LibreNMS is that you can contribute missing features.
+- <del>You need functionality that has been added to Observium since r3250.</del> The beauty of LibreNMS is that you can contribute missing features.
 - You don't like the [GNU General Public License, version 3][5] or the
   [philosophy of Free Software/copyleft][6] in general.
 
 Reasons why you might want to use LibreNMS instead of Observium:
+
 - You want to work with others on the project, knowing that [your
   investment of time and effort will not be wasted][7].
 - You want to add and experiment with features that are not a priority for
@@ -65,5 +70,6 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "Contribution guidelines"
 [9]: https://github.com/librenms/librenms/issues
 "LibreNMS issue database at GitHub"
-
+[10]: https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/
+"Migrating from Observium to LibreNMS"
 
