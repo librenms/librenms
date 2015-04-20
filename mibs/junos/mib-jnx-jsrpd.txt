@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper enterprise specific Chassis Cluster objects MIB.
 --
--- Copyright (c) 2008, Juniper Networks, Inc.
+-- Copyright (c) 2008-2011, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -23,7 +23,7 @@
 
 
     jnxJsChassisClusterMIB  MODULE-IDENTITY
-        LAST-UPDATED  "200905270000Z"
+        LAST-UPDATED  "201106280000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -39,6 +39,10 @@
              a cluster fails, the other chassis in the cluster takes over the function 
              of the failed chassis with minimal service interruption.
              This module defines the objects pertaining to Chassis Cluster."
+
+        REVISION      "201106280000Z"
+        DESCRIPTION   "Added trap jnxJsChClusterIntfTrap"
+
         REVISION      "200905270000Z"
         DESCRIPTION   "Added trap class for jnxJsChassisClusterSwitchover"
 
@@ -67,6 +71,22 @@
         DESCRIPTION
             "Notification to signal switchover/failover."
         ::= { jnxJsChassisClusterNotifications 1 }
+
+    -- ***************************************************************
+    -- definition of a trap that notifies changes in fabric
+    -- and control link status.
+    -- ***************************************************************
+
+    jnxJsChClusterIntfTrap  NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterSwitchoverInfoClusterId, 
+                  jnxJsChClusterIntfName,
+                  jnxJsChClusterIntfState,
+                  jnxJsChClusterIntfSeverity,
+                  jnxJsChClusterIntfStateReason }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal change in HA interface state."
+        ::= { jnxJsChassisClusterNotifications 2 }
 
 	jnxJsChClusterSwitchoverInfoRedundancyGroup OBJECT-TYPE
         SYNTAX      DisplayString
@@ -120,4 +140,41 @@
         DESCRIPTION
             "This object contains the cause for switchover."
         ::= { jnxJsChassisClusterTrapObjects 6 }
+
+    jnxJsChClusterIntfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the name of the link 
+             that changed its state."
+        ::= { jnxJsChassisClusterTrapObjects 7 }
+
+    jnxJsChClusterIntfState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the state of the link; 
+             whether it is UP or DOWN."
+        ::= { jnxJsChassisClusterTrapObjects 8 }
+
+    jnxJsChClusterIntfSeverity OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object reflects the severity; 
+             whether it is minor or major."
+        ::= { jnxJsChassisClusterTrapObjects 9 }
+
+    jnxJsChClusterIntfStateReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the reason why the link state 
+             changed."
+        ::= { jnxJsChassisClusterTrapObjects 10 }
+
 END

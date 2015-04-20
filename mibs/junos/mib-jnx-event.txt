@@ -75,7 +75,7 @@ jnxEvent MODULE-IDENTITY
       INDEX     { jnxEventAvIndex }
       ::= { jnxEventAvTable 1 }
 
-    JnxEventAvEntry::=
+    JnxEventAvEntry ::=
         SEQUENCE {
           jnxEventAvIndex       Unsigned32,
           jnxEventAvAttribute   DisplayString,

@@ -758,7 +758,11 @@ BFD-STD-MIB DEFINITIONS ::= BEGIN
 --                   the notifications contained in this group." 
 --    
       OBJECT       bfdSessAddrType 
-      SYNTAX       InetAddressType { unknown(0), ipv4(1), ipv6(2) } 
+      SYNTAX       InetAddressType {
+                                    unknown(0),
+                                    ipv4(1),
+                                    ipv6(2)
+                                    }
       DESCRIPTION "Only unknown(0), ipv4(1) and ipv6(2) support  
                    is required." 
     
