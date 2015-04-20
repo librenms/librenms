@@ -163,9 +163,9 @@ function RunAlerts() {
 			$updet = false;
 			$noacc = false;
 		}
-		if( IsMaintenance($device) > 0 ) {
+		if( IsMaintenance($alert['device_id']) > 0 ) {
 			$noiss = true;
-			$noacc = false;
+			$noacc = true;
 		}
 		if( $updet ) {
 			dbUpdate(array('details' => gzcompress(json_encode($alert['details']),9)),'alert_log','id = ?',array($alert['id']));
