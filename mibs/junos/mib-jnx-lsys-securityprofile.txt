@@ -1,0 +1,42 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYS-SECURITYPROFILE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      jnxLsysSecurityProfile	     FROM JUNIPER-JS-SMI;
+
+--
+-- Object identifier added as the basis for identifying other logical-system
+-- Security profile nodes.
+
+
+--
+-- next level object identifiers under jnxLsysSecurityProfile
+-- 
+jnxLsysSpZone               OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 1 }
+jnxLsysSpScheduler          OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 2 }
+jnxLsysSpPolicy             OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 3 }
+jnxLsysSpPolicywcnt         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 4 }
+jnxLsysSpFlowgate           OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 5 }
+jnxLsysSpFlowsess           OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 6 }
+jnxLsysSpAuthentry          OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 7 }
+jnxLsysSpNATsrcpool         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 8 }
+jnxLsysSpNATdstpool         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 9 }
+jnxLsysSpNATsrcpatad        OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 10 }
+jnxLsysSpNATsrcnopatad      OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 11 }
+jnxLsysSpNATsrcrule         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 12 }
+jnxLsysSpNATdstrule         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 13 }
+jnxLsysSpNATstaticrule      OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 14 }
+jnxLsysSpNATconebind        OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 15 }
+jnxLsysSpNATpoipnum         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 16 }
+jnxLsysSpNATRuleRefPfx      OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 17 }
+jnxLsysSpCPU                OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 18 }
+
+END

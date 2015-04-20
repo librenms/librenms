@@ -1,0 +1,656 @@
+--
+-- Juniper Mobile Gateway Subscriber Management IP pool objects MIB.
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILE-GATEWAY-SM-IP-POOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+Counter64, Unsigned32, Gauge32,
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    InetAddressType, InetAddress, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+
+    jnxMobileGatewayMibRoot	
+        FROM JUNIPER-SMI
+
+    jnxMbgGwIndex, jnxMbgGwName
+        FROM JUNIPER-MOBILE-GATEWAYS;
+
+jnxMobileGatewayPgwSMIPPoolMib MODULE-IDENTITY
+    LAST-UPDATED "201111151200Z" -- Nov 15, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge Subscriber
+         Management IP pool Services"
+    REVISION "201101131200Z" -- Jan 13, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    ::= { jnxMobileGatewayMibRoot 5 }
+
+jnxMbgSMIPPoolNotifications          OBJECT IDENTIFIER ::= 
+                                         { jnxMobileGatewayPgwSMIPPoolMib 0 }
+jnxMbgSMIPPoolObjects                OBJECT IDENTIFIER ::= 
+                                         { jnxMobileGatewayPgwSMIPPoolMib 1 }
+jnxMbgSMIPPoolNotificationVars       OBJECT IDENTIFIER ::= 
+                                         { jnxMbgSMIPPoolObjects 2 }
+
+--
+-- Subscriber Management Address Pool Object definitions
+--
+
+jnxMbgIPPoolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgIPPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The table exposes the local address pools attributes and
+        their statistics.
+
+        This table contains information about local address pools only."
+    ::= { jnxMbgSMIPPoolObjects 3 }
+
+jnxMbgIPPoolEntry OBJECT-TYPE
+    SYNTAX      JnxMbgIPPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a single address range or prefix entry 
+         in the pool. It is indexed by Pool Id."
+    INDEX       { jnxMbgIPPoolId }
+    ::= { jnxMbgIPPoolTable 1 }
+
+JnxMbgIPPoolEntry ::= SEQUENCE {
+    jnxMbgIPPoolId                Unsigned32,
+    jnxMbgIPPoolLogicalSystem     DisplayString,
+    jnxMbgIPPoolRoutingInstance   DisplayString,
+    jnxMbgIPPoolName              DisplayString,
+    jnxMbgIPPoolType              InetAddressType,
+    jnxMbgIPPoolFree              Gauge32,
+    jnxMbgIPPoolInUse             Gauge32,
+    jnxMbgIPPoolUtil              Gauge32 
+}
+
+jnxMbgIPPoolId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Pool Id which identifies a pool on the mobile-gateway."
+    ::= { jnxMbgIPPoolEntry 1 }
+
+jnxMbgIPPoolLogicalSystem OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A name which identifies the logical-system to which the address 
+         pool belongs on the mobile gateway."
+    ::= { jnxMbgIPPoolEntry 2 }
+
+jnxMbgIPPoolRoutingInstance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A name which identifies the routing instance to which the address 
+         pool belongs on the mobile gateway."
+    ::= { jnxMbgIPPoolEntry 3 }
+
+jnxMbgIPPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A name which identifies the pool on the mobile-gateway."
+    ::= { jnxMbgIPPoolEntry 4 }
+
+jnxMbgIPPoolType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type configured for this pool on the mobile gateway.
+         Types supported are Ipv4(1) or IPv6(2)."
+    ::= { jnxMbgIPPoolEntry 5 }
+
+jnxMbgIPPoolFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of free addresses in this pool."
+    ::= { jnxMbgIPPoolEntry 6 }
+
+jnxMbgIPPoolInUse OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of used addresses in this pool."
+    ::= { jnxMbgIPPoolEntry 7 }
+
+jnxMbgIPPoolUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage utilization for this pool."
+    ::= { jnxMbgIPPoolEntry 8 }
+
+jnxMbgIPPoolRangeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgIPPoolRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The table exposes the local address pool range's attributes and
+       their statistics.
+
+        This table contains information about local address pools only."
+    ::= { jnxMbgSMIPPoolObjects 4 }
+
+jnxMbgIPPoolRangeEntry OBJECT-TYPE
+    SYNTAX      JnxMbgIPPoolRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a address ranges in the pool. It is
+         indexed by the Gateway Index, Logical System Id,
+         Routing Instance Id, Pool Id and Range Id."
+    INDEX       { jnxMbgIPPoolId,
+                  jnxMbgIPPoolRangeName }
+    ::= { jnxMbgIPPoolRangeTable 1 }
+
+
+JnxMbgIPPoolRangeEntry ::= SEQUENCE {
+    jnxMbgIPPoolRangeName         DisplayString,
+    jnxMbgIPPoolRangeType         InetAddressType,
+    jnxMbgIPPoolRangeFree         Gauge32,
+    jnxMbgIPPoolRangeInUse        Gauge32,
+    jnxMbgIPPoolRangeUtil         Gauge32
+}
+
+jnxMbgIPPoolRangeName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the local IP address pool range"
+    ::= { jnxMbgIPPoolRangeEntry 1 }
+
+jnxMbgIPPoolRangeType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type configured for this range on the mobile gateway.
+         Types supported are Ipv4(1) or IPv6(2)."
+    ::= { jnxMbgIPPoolRangeEntry 2 }
+
+jnxMbgIPPoolRangeFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of free addresses in this range."
+    ::= { jnxMbgIPPoolRangeEntry 3 }
+
+jnxMbgIPPoolRangeInUse OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of used addresses in this range."
+    ::= { jnxMbgIPPoolRangeEntry 4 }
+
+jnxMbgIPPoolRangeUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage utilization for this range."
+    ::= { jnxMbgIPPoolRangeEntry 5 }
+
+--
+-- Deprecated OIDs
+--
+
+jnxMbgSMIPPoolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgSMIPPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The table lists local address pools and their statistics"
+    ::= { jnxMbgSMIPPoolObjects 1 }
+
+jnxMbgSMIPPoolEntry OBJECT-TYPE
+    SYNTAX      JnxMbgSMIPPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry representing a single address range or prefix entry 
+         in the pool"
+    INDEX       { jnxMbgSMIPPoolLogicalSystem, 
+                  jnxMbgSMIPPoolRoutingInstance,
+                  jnxMbgSMIPPoolName }
+    ::= { jnxMbgSMIPPoolTable 1 }
+
+JnxMbgSMIPPoolEntry ::= SEQUENCE {
+    jnxMbgSMIPPoolLogicalSystem     DisplayString,
+    jnxMbgSMIPPoolRoutingInstance   DisplayString,
+    jnxMbgSMIPPoolName              DisplayString,
+    jnxMbgSMIPPoolType              InetAddressType,
+    jnxMbgSMIPPoolFree              Unsigned32,
+    jnxMbgSMIPPoolInUse             Unsigned32,
+    jnxMbgSMIPPoolUtil              Unsigned32 
+}
+
+jnxMbgSMIPPoolLogicalSystem OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which identifies the logical-system to which the address 
+         pool belongs."
+    ::= { jnxMbgSMIPPoolEntry 2 }
+
+jnxMbgSMIPPoolRoutingInstance OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE (1..128))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which identifies the routing instance to which the address 
+         pool belongs."
+    ::= { jnxMbgSMIPPoolEntry 3 }
+
+jnxMbgSMIPPoolName OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which identifies this pool on the mobile-gateway."
+    ::= { jnxMbgSMIPPoolEntry 1 }
+
+jnxMbgSMIPPoolType OBJECT-TYPE 
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether this pool entry is of type ipv4 or ipv6."
+    ::= { jnxMbgSMIPPoolEntry 4 }
+
+jnxMbgSMIPPoolFree OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total number of free addresses in this pool entry."
+    ::= { jnxMbgSMIPPoolEntry 5 }
+
+jnxMbgSMIPPoolInUse OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total number of used addresses in this pool entry."
+    ::= { jnxMbgSMIPPoolEntry 6 }
+
+jnxMbgSMIPPoolUtil OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Percentage utilization for this pool entry."
+    ::= { jnxMbgSMIPPoolEntry 7 }
+
+--
+-- Objects used in Notifications
+--
+
+jnxMbgSMIPPoolThresholdPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool on the mobile-gateway
+         for which the threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 1 }
+
+jnxMbgSMIPPoolThresholdLSName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the logical-system on the mobile-gateway
+         in which the address pool threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 2 }
+
+jnxMbgSMIPPoolThresholdRIName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the routing instance on the mobile-gateway
+         in which the address pool threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 3 }
+
+jnxMbgSMIPPoolConfiguredThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+        "The threshold value configured for an address pool on the mobile 
+         gateway exceeding which a notification is generated."
+    ::= { jnxMbgSMIPPoolNotificationVars 4 }
+
+jnxMbgSMIPPoolCurrentThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+        "The current threshold value for an address pool on the mobile 
+         gateway. This can be equal to or greater than the configured
+         threshold value."
+    ::= { jnxMbgSMIPPoolNotificationVars 5 }
+
+jnxMbgSMIPPoolMMPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool on the mobile-gateway
+         which underwent a change in the maintenance-mode state."
+    ::= { jnxMbgSMIPPoolNotificationVars 6 }
+
+jnxMbgSMIPPoolMMLSName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the logical-system on the mobile-gateway
+         which underwent a change in the maintenance-mode state."
+    ::= { jnxMbgSMIPPoolNotificationVars 7 }
+
+jnxMbgSMIPPoolMMRIName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the routing instance on the mobile-gateway
+         which underwent a change in the maintenance-mode state."
+    ::= { jnxMbgSMIPPoolNotificationVars 8 }
+
+jnxMbgSMIPPoolPrevMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSMIPPoolNotificationVars 9 }
+
+jnxMbgSMIPPoolNewMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSMIPPoolNotificationVars 10 }
+
+jnxMbgSMIPRangeHiThresRangeName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool's range on the mobile-gateway
+         for which the threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 11 }
+
+jnxMbgSMIPRangeHiThresPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool on the mobile-gateway, whose
+         range threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 12 }
+
+jnxMbgSMIPRangeHiLSName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the logical-system on the mobile-gateway
+         in which the address range threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 13 }
+
+jnxMbgSMIPRangeHiRIName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the routing instance on the mobile-gateway
+         in which the address range threshold was exceeded."
+    ::= { jnxMbgSMIPPoolNotificationVars 14 }
+
+jnxMbgSMIPRangeHiCfgThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold value configured for an address pool range on the mobile 
+         gateway exceeding which a notification is generated."
+    ::= { jnxMbgSMIPPoolNotificationVars 15 }
+
+jnxMbgSMIPRangeHiCurrUtil OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current threshold value for an address pool range on the mobile 
+         gateway. This can be equal to or greater than the configured
+         threshold value."
+    ::= { jnxMbgSMIPPoolNotificationVars 16 }
+
+jnxMbgSMIPRangeLowThresRangeName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool's range on the mobile-gateway
+         for which the low threshold was reached."
+    ::= { jnxMbgSMIPPoolNotificationVars 17 }
+
+jnxMbgSMIPRangeLowThresPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the address pool on the mobile-gateway, whose
+         range low threshold was reached."
+    ::= { jnxMbgSMIPPoolNotificationVars 18 }
+
+jnxMbgSMIPRangeLowLSName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the logical-system on the mobile-gateway
+         in which the address range low threshold was reached."
+    ::= { jnxMbgSMIPPoolNotificationVars 19 }
+
+jnxMbgSMIPRangeLowRIName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the routing instance on the mobile-gateway
+         in which the address range low threshold was reached."
+    ::= { jnxMbgSMIPPoolNotificationVars 20 }
+
+jnxMbgSMIPRangeLowCfgThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold value configured for an address pool range on the mobile 
+         gateway reaching which a notification is generated."
+    ::= { jnxMbgSMIPPoolNotificationVars 21 }
+
+jnxMbgSMIPRangeLowCurrUtil OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current threshold value for an address pool range on the mobile 
+         gateway. This can be equal to or greater than the configured
+         threshold value."
+    ::= { jnxMbgSMIPPoolNotificationVars 22 }
+
+jnxMbgSMIPPoolHTCfgThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold value configured for an address pool on the mobile gateway 
+         exceeding which a notification is generated."
+    ::= { jnxMbgSMIPPoolNotificationVars 23 }
+
+jnxMbgSMIPPoolCurrUtil OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current utilization value for an address pool on the mobile 
+         gateway. This can be equal to or greater than the configured
+         threshold value."
+    ::= { jnxMbgSMIPPoolNotificationVars 24 }
+
+jnxMbgSMIPPoolLTCfgThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold value configured for an address pool on the mobile gateway
+         reaching which a notification is generated."
+    ::= { jnxMbgSMIPPoolNotificationVars 25 }
+
+--
+-- Notifications
+--
+
+jnxMbgSMIPPoolThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPPoolThresholdPoolName,
+                  jnxMbgSMIPPoolThresholdLSName,
+                  jnxMbgSMIPPoolThresholdRIName,
+                  jnxMbgSMIPPoolConfiguredThreshold,
+                  jnxMbgSMIPPoolCurrentThreshold }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that the number of addresses allocated
+         from a given address pool has exceeded a pre-configured threshold 
+         value."
+    ::= { jnxMbgSMIPPoolNotifications 1 }
+
+jnxMbgSMIPPoolMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPPoolMMPoolName,
+                  jnxMbgSMIPPoolMMLSName,
+                  jnxMbgSMIPPoolMMRIName,
+                  jnxMbgSMIPPoolPrevMMState,
+                  jnxMbgSMIPPoolNewMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the pool name indicated by  
+         LS-name, RI-name and pool-name undergoes a change in the
+         maintenance-mode state."
+    ::= { jnxMbgSMIPPoolNotifications 2 }
+
+jnxMbgSMIPRangeHighThresExcd NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPRangeHiThresRangeName,
+                  jnxMbgSMIPRangeHiThresPoolName,
+                  jnxMbgSMIPRangeHiLSName,
+                  jnxMbgSMIPRangeHiRIName,
+                  jnxMbgSMIPRangeHiCfgThres,
+                  jnxMbgSMIPRangeHiCurrUtil }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the range name that exceeded 
+         higher threshold."
+    ::= { jnxMbgSMIPPoolNotifications 3 }
+
+jnxMbgSMIPRangeLowThresRchd NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPRangeLowThresRangeName,
+                  jnxMbgSMIPRangeLowThresPoolName,
+                  jnxMbgSMIPRangeLowLSName,
+                  jnxMbgSMIPRangeLowRIName,
+                  jnxMbgSMIPRangeLowCfgThres,
+                  jnxMbgSMIPRangeLowCurrUtil }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the range name that reached  
+         lower threshold."
+    ::= { jnxMbgSMIPPoolNotifications 4 }
+
+jnxMbgSMIPPoolHighThresExcd NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPPoolThresholdPoolName,
+                  jnxMbgSMIPPoolThresholdLSName,
+                  jnxMbgSMIPPoolThresholdRIName,
+                  jnxMbgSMIPPoolHTCfgThres,
+                  jnxMbgSMIPPoolCurrUtil }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the number of addresses allocated
+         from a given address pool has exceeded a pre-configured threshold 
+         value."
+    ::= { jnxMbgSMIPPoolNotifications 5 }
+
+jnxMbgSMIPPoolLowThresRchd NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSMIPPoolThresholdPoolName,
+                  jnxMbgSMIPPoolThresholdLSName,
+                  jnxMbgSMIPPoolThresholdRIName,
+                  jnxMbgSMIPPoolLTCfgThres,
+                  jnxMbgSMIPPoolCurrUtil }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the number of addresses allocated
+         from a given address pool has reached the lower threshold value."
+    ::= { jnxMbgSMIPPoolNotifications 6 }
+
+jnxMbgIPPoolExhausted NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgIPPoolLogicalSystem,
+                  jnxMbgIPPoolRoutingInstance,
+                  jnxMbgIPPoolName}
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the given pool has exhausted all its
+         addresses and there are no free addresses left."
+
+    ::= { jnxMbgSMIPPoolNotifications 7 }
+
+END
