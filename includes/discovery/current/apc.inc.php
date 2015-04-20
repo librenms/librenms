@@ -176,8 +176,8 @@ if ($device['os'] == "apc")
     # UPS
 
     $oid_array = array(
-                     array('HighPrecOid' => 'upsHighPrecOutputCurrent', 'AdvOid' => 'upsAdvOutputCurrent', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Drawn', 'divisor' => 10, 'mib' => 'PowerNet-MIB'),
-                     array('HighPrecOid' => 'upsHighPrecOutputLoad', 'AdvOid' => 'upsAdvOutputLoad', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Load', 'divisor' => 1, 'mib' => 'PowerNet-MIB'),
+                     array('HighPrecOid' => 'upsHighPrecOutputCurrent', 'AdvOid' => 'upsAdvOutputCurrent', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Drawn', 'divisor' => 10, 'mib' => '+PowerNet-MIB'),
+                     array('HighPrecOid' => 'upsHighPrecOutputLoad', 'AdvOid' => 'upsAdvOutputLoad', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Load', 'divisor' => 1, 'mib' => '+PowerNet-MIB'),
                  );
     foreach ($oid_array as $item) {
         $low_limit = NULL;
