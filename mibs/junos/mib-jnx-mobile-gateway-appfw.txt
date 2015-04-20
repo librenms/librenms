@@ -1,0 +1,3695 @@
+-- ******************************************************************
+-- Juniper Mobile Gateway PGW Subscriber Manager objects MIB.
+--
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- ******************************************************************
+
+JUNIPER-MOBILE-GATEWAY-SM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE,
+    Counter64, Unsigned32, Gauge32 
+        FROM SNMPv2-SMI
+
+    CounterBasedGauge64
+        FROM HCNUM-TC  
+
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue                 
+        FROM SNMPv2-TC
+
+    EnabledStatus              
+        FROM JUNIPER-MIMSTP-MIB
+
+     jnxMbgGwIndex, jnxMbgGwName
+        FROM JUNIPER-MOBILE-GATEWAYS
+   
+    jnxMobileGatewayPgwGgsn    
+        FROM JUNIPER-MBG-SMI;
+
+jnxMbgPgwSubscriberManagerMib MODULE-IDENTITY
+    LAST-UPDATED "201102281200Z" -- Feb 28, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge"
+
+    REVISION "201101121200Z" -- Jan 12, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    REVISION "201102281200Z" -- Feb 28, 2011, 12:00:00
+    DESCRIPTION
+        "Added the following traps
+            jnxMbgPgwQosBearersThresholdStatus
+            jnxMbgPgwQosCPUThresholdStatus
+            jnxMbgPgwAPNQosBearersThreStatus
+            jnxMbgPgwQosMemThresholdStatutus"
+
+    REVISION "201102281200Z" -- Nov 19, 2011, 12:00:00
+    DESCRIPTION
+        "Deprecated Tables not supporting multiple gateways
+         Deprecated undefined traps. Added new traps with 
+         discrete levels. Added new tables with multiple
+         gateway support"
+
+    REVISION "201203191200Z" -- Mar 19, 2012, 12:00:00
+    DESCRIPTION
+        "Added counters to Gateway statistics table and 
+        also to Apn level Statistics Table "
+      
+
+    REVISION "201203221200Z" -- Mar 22, 2012, 12:00:00
+    DESCRIPTION
+        "Deprecated unsupported objects from jnxMbgPgwSMStatusTable.
+         Added objects to jnxMbgPgwApnSMStatsTable & jnxMbgPgwSMOperStatsTable.
+         Added tables jnxMbgPgwSMSpicStatusTable & jnxMbgPgwSMClRateStatsTable.
+         Updated description for Interface State Maintenance Mode Change Traps."
+
+    REVISION "201210121200Z" -- Oct 12, 2012, 12:00:00
+    DESCRIPTION
+        "Deprecated unsupported objects from jnxMbgPgwSMOperStatsTable
+        and jnxMbgPgwApnSMStatsTable and added new objects in them.
+         Added tables jnxMbgPgwApnSMClRateStatsTable."
+    ::= { jnxMobileGatewayPgwGgsn 1 }
+
+jnxMbgPgwSMNotifications OBJECT IDENTIFIER
+    ::= { jnxMbgPgwSubscriberManagerMib 0 }
+
+jnxMbgPgwSMObjects OBJECT IDENTIFIER
+    ::= { jnxMbgPgwSubscriberManagerMib 1 }
+
+--
+-- APN Table
+-- This table contains the attributes of mobile-gateway APN stats.
+--
+
+jnxMbgPgwAPNStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwAPNStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The table listing Mobile Gateway Application Program Name level stats.
+         Key is APN Name."
+    ::= { jnxMbgPgwSMObjects 1 }
+
+jnxMbgPgwAPNStatsTableEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwAPNStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry representing a Mobile Gateway APN Stats."
+    INDEX       { jnxMbgPgwAPNName }
+    ::= { jnxMbgPgwAPNStatsTable 1 }
+
+JnxMbgPgwAPNStatsEntry ::= SEQUENCE {
+    jnxMbgPgwAPNName                    DisplayString,
+    jnxMbgPgwSessnEstAttempts           Counter64,
+    jnxMbgPgwSuccSessnsEst              Counter64,
+    jnxMbgPgwSessnFailedServcUnaval     Counter64,
+    jnxMbgPgwSessnFailedSysFailure      Counter64,
+    jnxMbgPgwSessnFailedNoResource      Counter64,
+    jnxMbgPgwSessnFailedNoAddr          Counter64,
+    jnxMbgPgwSessnFailedServcDenied     Counter64,
+    jnxMbgPgwSessnFailedAuthFailed      Counter64,
+    jnxMbgPgwSessnFailedAccessDenied    Counter64,
+    jnxMbgPgwPeerInitSessnDeact         Counter64,
+    jnxMbgPgwSuccPeerInitSessnDeact     Counter64,
+    jnxMbgPgwGWInitSessnDeact           Counter64,
+    jnxMbgPgwSuccGWInitSessnDeact       Counter64
+}
+
+jnxMbgPgwAPNName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A string that uniquely identifies the APN."
+    ::= { jnxMbgPgwAPNStatsTableEntry 1 }
+
+jnxMbgPgwSessnEstAttempts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total Session establishment attempts made."
+    ::= { jnxMbgPgwAPNStatsTableEntry 2 }
+
+jnxMbgPgwSuccSessnsEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions established successfully."
+    ::= { jnxMbgPgwAPNStatsTableEntry 3 }
+
+jnxMbgPgwSessnFailedServcUnaval OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established due
+          to service unavailability."
+    ::= { jnxMbgPgwAPNStatsTableEntry 4 }
+
+jnxMbgPgwSessnFailedSysFailure OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+         due to system failure."
+    ::= { jnxMbgPgwAPNStatsTableEntry 5 }
+
+jnxMbgPgwSessnFailedNoResource OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+         due to lack of resource."
+    ::= { jnxMbgPgwAPNStatsTableEntry 6 }
+
+jnxMbgPgwSessnFailedNoAddr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+         due to lack of address. The address pool
+         assigned to this APN is exhausted"
+    ::= { jnxMbgPgwAPNStatsTableEntry 7 }
+
+jnxMbgPgwSessnFailedServcDenied OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+         due to service denial."
+    ::= { jnxMbgPgwAPNStatsTableEntry 8 }
+
+jnxMbgPgwSessnFailedAuthFailed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+          due to authentication failure."
+    ::= { jnxMbgPgwAPNStatsTableEntry 9 }
+
+jnxMbgPgwSessnFailedAccessDenied OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Sessions that could not be established
+          due to APN access denial."
+    ::= { jnxMbgPgwAPNStatsTableEntry 10 }
+
+jnxMbgPgwPeerInitSessnDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total Session deactivations initiated by the peer/MS."
+    ::= { jnxMbgPgwAPNStatsTableEntry 11 }
+
+jnxMbgPgwSuccPeerInitSessnDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Peer/MS initiated session
+         deactivations that succeeded."
+    ::= { jnxMbgPgwAPNStatsTableEntry 12 }
+
+jnxMbgPgwGWInitSessnDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total gateway initiated Session deactivations."
+    ::= { jnxMbgPgwAPNStatsTableEntry 13 }
+
+jnxMbgPgwSuccGWInitSessnDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Gateway initiated Session deactivations that suceeded."
+    ::= { jnxMbgPgwAPNStatsTableEntry 14 }
+
+--
+-- Statistics Table for PGW 
+--
+
+jnxMbgPgwSMOperStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwSMOperStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing Mobile Gateway level statistics for PDN Gateway.
+         Key is Gateway Id."
+    ::= { jnxMbgPgwSMObjects 4 }
+
+JnxMbgPgwSMOperStatsEntry ::= SEQUENCE {
+    jnxMbgPgwSessnEstAttmpts         Counter64,
+    jnxMbgPgwSuccSessnEst            Counter64,
+    jnxMbgPgwPeerInitDeactv          Counter64,    
+    jnxMbgPgwPeerInitSuccDeactv      Counter64,
+    jnxMbgPgwGwInitDeactv            Counter64,
+    jnxMbgPgwGwInitSuccDeactv        Counter64,
+    jnxMbgPgwGtpStatsGnS5S8InpPkt    Counter64,
+    jnxMbgPgwGtpStatsGnS5S8InpByt    Counter64,
+    jnxMbgPgwGtpStatsGnS5S8OutPkt    Counter64,
+    jnxMbgPgwGtpStatsGnS5S8OutByt    Counter64,
+    jnxMbgPgwGtpStatsGiInpPkt        Counter64,
+    jnxMbgPgwGtpStatsGiInpByt        Counter64,
+    jnxMbgPgwGtpStatsGiOutPkt        Counter64,
+    jnxMbgPgwGtpStatsGiOutByt        Counter64,
+    jnxMbgPgwGtpStatsS58DscrdPkts    Counter64,
+    jnxMbgPgwGtpStatsGiDiscrdPkts    Counter64,
+    jnxMbgPgwSrcAddrViolationPkts    Counter64,
+    jnxMbgPgwSrcAddrViolationByts    Counter64,
+    jnxMbgPgwPktsRcvdNonExstTeids    Counter64,
+    jnxMbgPgwGtpErrLenPkts           Counter64,
+    jnxMbgPgwNonExstUeAddrPkts       Counter64,
+    jnxMbgPgwSessEstDynPolAttempt    Counter64,
+    jnxMbgPgwSuccSessEstDynPol       Counter64,
+    jnxMbgPgwDedBrActAttempt         Counter64,
+    jnxMbgPgwSuccDedBrAct            Counter64,
+    jnxMbgPgwMsInitDedBrDeact        Counter64,
+    jnxMbgPgwGwInitDedBrDeact        Counter64,
+    jnxMbgPgwPcrfInitDedBrDeact      Counter64,
+    jnxMbgPgwMsInitModAttempt        Counter64,
+    jnxMbgPgwSuccMsInitMod           Counter64,
+    jnxMbgPgwGwInitModAttempt        Counter64,
+    jnxMbgPgwSuccGwInitMod           Counter64,
+    jnxMbgPgwMsInitDedBrActAttempt   Counter64,
+    jnxMbgPgwSuccMsInitDedBrAct      Counter64,
+    jnxMbgPgwNwInitDedBrActAttempt   Counter64,
+    jnxMbgPgwSuccNwInitDedBrAct      Counter64,
+    jnxMbgPgwMsInitDedBrModAttempt   Counter64,
+    jnxMbgPgwSuccMsInitDedBrMod      Counter64,
+    jnxMbgPgwNwInitDedBrModAttempt   Counter64,
+    jnxMbgPgwSuccNwInitDedBrMod      Counter64,
+    jnxMbgPgwInterRatHoAttempt       Counter64,
+    jnxMbgPgwInterRatHoSucc          Counter64,
+    jnxMbgPgwIntraRatHoAttempt       Counter64,
+    jnxMbgPgwIntraRatHoSucc          Counter64,
+    jnxMbgPgwCdrsAllocd              Counter64,
+    jnxMbgPgwPartialCdrsAllocd       Counter64,
+    jnxMbgPgwCdrsClosed              Counter64,
+    jnxMbgPgwCdrCntainrsClosed       Counter64,
+    jnxMbgPgwGySessEstAttempt        Counter64,
+    jnxMbgPgwGySuccSessEst           Counter64,
+    jnxMbgPgwGyReauthAttempt         Counter64,
+    jnxMbgPgwGySuccReauth            Counter64,
+    jnxMbgPgwGyAuthTimeout           Counter64,
+    jnxMbgPgwGyMsInitSessDeact       Counter64,
+    jnxMbgPgwGyOcsInitSessDeact      Counter64,
+    jnxMbgPgwGyGwInitSessDeact       Counter64,
+    jnxMbgPgwGxMsInitMod             Counter64, 
+    jnxMbgPgwGxSuccMsInitMod         Counter64,
+    jnxMbgPgwGxPcrfInitMod           Counter64,
+    jnxMbgPgwGxSuccPcrfInitMod       Counter64,
+    jnxMbgPgwGxMsInitSessTerm        Counter64,
+    jnxMbgPgwGxPcrfInitSessTerm      Counter64,
+    jnxMbgPgwGxGwInitSessTerm        Counter64
+}    
+
+jnxMbgPgwSMOperStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwSMOperStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Stats."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgPgwSMOperStatsTable 1 }
+
+jnxMbgPgwSessnEstAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Session establishment attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 1 }
+
+jnxMbgPgwSuccSessnEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Sessions established successfully."
+    ::= { jnxMbgPgwSMOperStatsEntry 2 }
+    
+jnxMbgPgwPeerInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MS/peer initiated session deactivation attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 3 }    
+    
+jnxMbgPgwPeerInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MS/peer initiated successful session deactivations."
+    ::= { jnxMbgPgwSMOperStatsEntry 4 }    
+
+jnxMbgPgwGwInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Gateway initiated session deactivation attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 5 }    
+
+jnxMbgPgwGwInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Gateway initiated successful session deactivations."
+    ::= { jnxMbgPgwSMOperStatsEntry 6 }    
+
+jnxMbgPgwGtpStatsGnS5S8InpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 7 }    
+
+jnxMbgPgwGtpStatsGnS5S8InpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input bytes."
+    ::= { jnxMbgPgwSMOperStatsEntry 8 } 
+
+jnxMbgPgwGtpStatsGnS5S8OutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 9 }    
+
+jnxMbgPgwGtpStatsGnS5S8OutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output bytes."
+    ::= { jnxMbgPgwSMOperStatsEntry 10 }     
+    
+jnxMbgPgwGtpStatsGiInpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Input packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 11 }    
+
+jnxMbgPgwGtpStatsGiInpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Input bytes."
+    ::= { jnxMbgPgwSMOperStatsEntry 12 } 
+
+jnxMbgPgwGtpStatsGiOutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Output packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 13 }    
+
+jnxMbgPgwGtpStatsGiOutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Output bytes."
+    ::= { jnxMbgPgwSMOperStatsEntry 14 }
+
+jnxMbgPgwGtpStatsS58DscrdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) discarded packets"
+    ::= { jnxMbgPgwSMOperStatsEntry 15 }
+
+jnxMbgPgwGtpStatsGiDiscrdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi discarded packets"
+    ::= { jnxMbgPgwSMOperStatsEntry 16 }
+
+jnxMbgPgwSrcAddrViolationPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Source address violation packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 17 }
+
+jnxMbgPgwSrcAddrViolationByts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Source address violation bytes."
+    ::= { jnxMbgPgwSMOperStatsEntry 18 }
+
+jnxMbgPgwPktsRcvdNonExstTeids OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total packets received with non-existent TEIDs."
+    ::= { jnxMbgPgwSMOperStatsEntry 19 }
+
+jnxMbgPgwGtpErrLenPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP packets received with erroneous length."
+    ::= { jnxMbgPgwSMOperStatsEntry 20 }
+
+jnxMbgPgwNonExstUeAddrPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Non-existent UE address packets."
+    ::= { jnxMbgPgwSMOperStatsEntry 21 }
+
+jnxMbgPgwSessEstDynPolAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session attempts 
+         using dynamic policy."
+    ::= { jnxMbgPgwSMOperStatsEntry 22 }
+   
+jnxMbgPgwSuccSessEstDynPol OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+        "Number of successful session
+        attempts using dynamic policy."
+    ::= { jnxMbgPgwSMOperStatsEntry 23 }
+
+jnxMbgPgwDedBrActAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "Number of dedicated bearer
+         activation attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 24 }
+
+jnxMbgPgwSuccDedBrAct OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful 
+        dedicated bearer creation."
+    ::= { jnxMbgPgwSMOperStatsEntry 25 }
+
+jnxMbgPgwMsInitDedBrDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS initiated Dedicated
+        bearer deactivation ."
+    ::= { jnxMbgPgwSMOperStatsEntry 26 }
+
+jnxMbgPgwGwInitDedBrDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of gateway initiated dedicated 
+        bearer deactivation."
+    ::= { jnxMbgPgwSMOperStatsEntry 27 }
+
+jnxMbgPgwPcrfInitDedBrDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Pcrf initiated dedicated
+        bearer deactivation ."
+    ::= { jnxMbgPgwSMOperStatsEntry 28 }
+   
+jnxMbgPgwMsInitModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS/Peer Initiated modification attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 29 }
+
+jnxMbgPgwSuccMsInitMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Successful MS/Peer Initiated modifications. "
+    ::= { jnxMbgPgwSMOperStatsEntry 30 }
+
+jnxMbgPgwGwInitModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of gateway initiated modification attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 31 }
+
+jnxMbgPgwSuccGwInitMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful gateway initiated modifications."
+    ::= { jnxMbgPgwSMOperStatsEntry 32 }
+
+jnxMbgPgwMsInitDedBrActAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Ms/Peer initiated activation attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 33 }
+
+jnxMbgPgwSuccMsInitDedBrAct OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS/Peer initiated activation."
+    ::= { jnxMbgPgwSMOperStatsEntry 34 }
+
+jnxMbgPgwNwInitDedBrActAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of network initiated dedicated
+        bearer activation attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 35 }
+
+jnxMbgPgwSuccNwInitDedBrAct OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful network initiated 
+        dedicated bearer activation."
+    ::= { jnxMbgPgwSMOperStatsEntry 36 }
+
+jnxMbgPgwMsInitDedBrModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS/Peer initiated modification attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 37 }
+
+jnxMbgPgwSuccMsInitDedBrMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS/Peer initiated modifications."
+    ::= { jnxMbgPgwSMOperStatsEntry 38 }
+
+jnxMbgPgwNwInitDedBrModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of  network initiated modification attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 39 }
+
+jnxMbgPgwSuccNwInitDedBrMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful network initiated modifications."
+    ::= { jnxMbgPgwSMOperStatsEntry 40 }
+
+jnxMbgPgwInterRatHoAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Inter RAT Handover attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 41 }
+    
+jnxMbgPgwInterRatHoSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Inter RAT Handovers."
+    ::= { jnxMbgPgwSMOperStatsEntry 42 }
+    
+jnxMbgPgwIntraRatHoAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Intra RAT Handover attempt."
+    ::= { jnxMbgPgwSMOperStatsEntry 43 }                        
+                
+jnxMbgPgwIntraRatHoSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Intra RAT Handover."
+    ::= { jnxMbgPgwSMOperStatsEntry 44 }
+          
+jnxMbgPgwCdrsAllocd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of CDRs allocated."
+    ::= { jnxMbgPgwSMOperStatsEntry 45 } 
+
+jnxMbgPgwPartialCdrsAllocd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of partial CDRs allocated."
+    ::= { jnxMbgPgwSMOperStatsEntry 46 } 
+
+jnxMbgPgwCdrsClosed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of CDRs closed."
+    ::= { jnxMbgPgwSMOperStatsEntry 47 }
+
+jnxMbgPgwCdrCntainrsClosed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Containers closed."
+    ::= { jnxMbgPgwSMOperStatsEntry 48 }
+
+jnxMbgPgwGySessEstAttempt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy session 
+        establishment attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 49 }
+
+jnxMbgPgwGySuccSessEst  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Successful Gy session 
+        establishments."
+    ::= { jnxMbgPgwSMOperStatsEntry 50 }
+
+jnxMbgPgwGyReauthAttempt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy reauthorization 
+        requests to OCS."
+    ::= { jnxMbgPgwSMOperStatsEntry 51 }
+
+jnxMbgPgwGySuccReauth  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Gy reauthorization."
+    ::= { jnxMbgPgwSMOperStatsEntry 52 }
+
+jnxMbgPgwGyAuthTimeout  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy authorization timeout."
+    ::= { jnxMbgPgwSMOperStatsEntry 53 }
+
+jnxMbgPgwGyMsInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy Ms/Peer initiated 
+        session deactivations."
+    ::= { jnxMbgPgwSMOperStatsEntry 54 }
+
+jnxMbgPgwGyOcsInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy OCS initiated 
+        session deactivations."
+    ::= { jnxMbgPgwSMOperStatsEntry 55 }
+
+jnxMbgPgwGyGwInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy gateway initiated 
+        session deactivations."
+    ::= { jnxMbgPgwSMOperStatsEntry 56 }
+
+jnxMbgPgwGxMsInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS/Peer initiated
+        session modification attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 57 }
+
+jnxMbgPgwGxSuccMsInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS/Peer initiated
+        session modification ."
+    ::= { jnxMbgPgwSMOperStatsEntry 58 }
+
+jnxMbgPgwGxPcrfInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PCRF initiated
+        session modification attempts."
+    ::= { jnxMbgPgwSMOperStatsEntry 59 }
+
+jnxMbgPgwGxSuccPcrfInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful PCRF initiated
+        session modification ."
+    ::= { jnxMbgPgwSMOperStatsEntry 60 }
+
+jnxMbgPgwGxMsInitSessTerm          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx Ms/Peer initiated session termination ."
+    ::= { jnxMbgPgwSMOperStatsEntry 61 }
+
+jnxMbgPgwGxPcrfInitSessTerm        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx PCRF initiated session termination ."
+    ::= { jnxMbgPgwSMOperStatsEntry 62 }
+
+jnxMbgPgwGxGwInitSessTerm          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx Gateway initiated session termination."
+    ::= { jnxMbgPgwSMOperStatsEntry 63 }
+
+--
+-- Statistics Table for PGW per APN
+-- To access APN based info we need to use BOTH Gateway Id and APN Name as keys
+--
+jnxMbgPgwApnSMStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwApnSMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing Mobile APN Level statistics for PDN Gateway.
+         Gateway ID and  APN Name are used as keys"
+    ::= { jnxMbgPgwSMObjects 6 }
+
+JnxMbgPgwApnSMStatsEntry ::= SEQUENCE {
+    jnxMbgPgwApnName                    DisplayString,
+    jnxMbgPgwApnSessnEstAttmpts         Counter64,
+    jnxMbgPgwApnSuccSessnEst            Counter64,
+    jnxMbgPgwApnPeerInitDeactv          Counter64,
+    jnxMbgPgwApnPeerInitSuccDeactv      Counter64,
+    jnxMbgPgwApnGwInitDeactv            Counter64,
+    jnxMbgPgwApnGwInitSuccDeactv        Counter64,
+    jnxMbgPgwApnGtpStatsGnS5S8InpPkt    Counter64,
+    jnxMbgPgwApnGtpStatsGnS5S8InpByt    Counter64,
+    jnxMbgPgwApnGtpStatsGnS5S8OutPkt    Counter64,
+    jnxMbgPgwApnGtpStatsGnS5S8OutByt    Counter64,
+    jnxMbgPgwApnGtpStatsGiInpPkt        Counter64,
+    jnxMbgPgwApnGtpStatsGiInpByt        Counter64,
+    jnxMbgPgwApnGtpStatsGiOutPkt        Counter64,
+    jnxMbgPgwApnGtpStatsGiOutByt        Counter64,
+    jnxMbgPgwApnSessnFailSrvcUnaval     Counter64,
+    jnxMbgPgwApnSessnFailSysFailure     Counter64,
+    jnxMbgPgwApnSessnFailNoResource     Counter64,
+    jnxMbgPgwApnSessnFailNoAddr         Counter64,
+    jnxMbgPgwApnSessnFailSrvcDenied     Counter64,
+    jnxMbgPgwApnSessnFailAuthFailed     Counter64,
+    jnxMbgPgwApnSessnFailAccsDenied     Counter64,
+    jnxMbgPgwApnMSInitModAttmpts        Counter64,
+    jnxMbgPgwApnSuccMSInitMod           Counter64,
+    jnxMbgPgwApnPgwGgsnInitMod          Counter64,
+    jnxMbgPgwApnSuccPgwGgsnInitMod      Counter64,
+    jnxMbgPgwApnUsrAuthAttmpts          Counter64,
+    jnxMbgPgwApnSuccUsrAuth             Counter64,
+    jnxMbgPgwApnFailUsrAuth             Counter64,
+    jnxMbgPgwApnDynIPAllocAttmpts       Counter64,
+    jnxMbgPgwApnSuccDynIPAlloc          Counter64, 
+    jnxMbgPgwApnCdrsAllocd              Counter64,
+    jnxMbgPgwApnPartialCdrsAllocd       Counter64,    
+    jnxMbgPgwApnCdrsClosed              Counter64,
+    jnxMbgPgwApnCdrCntainrsClosed       Counter64,
+    jnxMbgPgwApnPktsViolMIFAcl          Counter64,
+    jnxMbgPgwApnReDrctMblToMblPkts      Counter64,
+    jnxMbgPgwApnReDrctMblToMblByts      Counter64,
+    jnxMbgPgwApnIpv6RsRcvd              Counter64,
+    jnxMbgPgwApnIpv6RaTxd               Counter64,
+    jnxMbgPgwApnIpv6NsRcvd              Counter64,
+    jnxMbgPgwApnIpv6NaTxd               Counter64,
+    jnxMbgPgwApnSessnFailOther          Counter64,
+    jnxMbgPgwApnGtpStatsS58DscrdPkts    Counter64,
+    jnxMbgPgwApnGtpStatsGiDiscrdPkts    Counter64,
+    jnxMbgPgwApnSessEstDynPolAttempt    Counter64,
+    jnxMbgPgwApnSuccSessEstDynPol       Counter64,
+    jnxMbgPgwApnSessEstStaPolAttempt    Counter64,
+    jnxMbgPgwApnSuccSessEstStaPol       Counter64,
+    jnxMbgPgwApnMsInitAmbrModReq        Counter64,
+    jnxMbgPgwApnMsInitAmbrModSucc       Counter64,
+    jnxMbgPgwApnMsInitQoSModReq         Counter64,
+    jnxMbgPgwApnMsInitQoSModSucc        Counter64,
+    jnxMbgPgwApnPcrfInitSessTerm        Counter64,
+    jnxMbgPgwApnGwInitSessTerm          Counter64,
+    jnxMbgPgwApnMsInitSessTerm          Counter64,
+    jnxMbgPgwApnMsInitSessModTrgr       Counter64,
+    jnxMbgPgwApnMsInitSessModSucc       Counter64,
+    jnxMbgPgwApnPcrfInitSessModTrgr     Counter64,
+    jnxMbgPgwApnPcrfInitSessModSucc     Counter64,
+    jnxMbgPgwApnSessModTrgrQoSChg       Counter64,
+    jnxMbgPgwApnSessModTrgrRatChg       Counter64,
+    jnxMbgPgwApnSessModTrgrSgsnChg      Counter64,
+    jnxMbgPgwApnSessModTrgrSgwChg       Counter64,
+    jnxMbgPgwApnSessModTrgrPlmnChg      Counter64,
+    jnxMbgPgwApnSessModTrgrRaiChg       Counter64,
+    jnxMbgPgwApnSessModTrgrUliChg       Counter64,
+    jnxMbgPgwApnSessModTrgrIPCanChg     Counter64,
+    jnxMbgPgwApnMsInitSessModTftChg     Counter64,
+    jnxMbgPgwApnNwInitSessModTftChg     Counter64,
+    jnxMbgPgwApnSessModTrgrBrLoss       Counter64,
+    jnxMbgPgwApnSessModTrgrBrRecvry     Counter64,
+    jnxMbgPgwApnSessModTrgrRsrAlloc     Counter64,
+    jnxMbgPgwApnSessModTrgrRevldTO      Counter64,
+    jnxMbgPgwApnSessModQoSExceedAuth    Counter64,
+    jnxMbgPgwApnSessModTodProc          Counter64,
+    jnxMbgPgwApnSessModTrgrChgSubsc     Counter64,
+    jnxMbgPgwApnSessModAmbrChg          Counter64,
+    jnxMbgPgwApnSessModEcgiChg          Counter64,
+    jnxMbgPgwApnSessModTaiChg           Counter64,
+    jnxMbgPgwApnSessModMsTimezoneChg    Counter64,
+    jnxMbgPgwApnSessModDefQosChg        Counter64,
+    jnxMbgPgwApnMsDedBrActAttempt       Counter64,
+    jnxMbgPgwApnMsDedBrActSucc          Counter64,
+    jnxMbgPgwApnNwDedBrActAttempt       Counter64,
+    jnxMbgPgwApnNwDedBrActSucc          Counter64,
+    jnxMbgPgwApnMsDedBrModAttempt       Counter64,
+    jnxMbgPgwApnMsDedBrModSucc          Counter64,
+    jnxMbgPgwApnNwDedBrModAttempt       Counter64,
+    jnxMbgPgwApnNwDedBrModSucc          Counter64,
+    jnxMbgPgwApnMsDedBrDeactAttempt     Counter64,
+    jnxMbgPgwApnNwDedBrDeactAttempt     Counter64,
+    jnxMbgPgwApnGwDedBrDeactAttempt     Counter64,
+    jnxMbgPgwApnGbrDedBrCrtFailCAC      Counter64,
+    jnxMbgPgwApnNGbrDedBrCrtFailCAC     Counter64,
+    jnxMbgPgwApnSessTermUnreachPcrf     Counter64,
+    jnxMbgPgwApnSessTermPcrfRestart     Counter64,
+    jnxMbgPgwApnGxCcrISent              Counter64,
+    jnxMbgPgwApnGxCcaIRcvd              Counter64,
+    jnxMbgPgwApnGxCcrUSent              Counter64,
+    jnxMbgPgwApnGxCcaURcvd              Counter64,
+    jnxMbgPgwApnGxCcrTSent              Counter64,
+    jnxMbgPgwApnGxCcaTRcvd              Counter64,
+    jnxMbgPgwApnGxRarRcvd               Counter64,
+    jnxMbgPgwApnGxRaaSent               Counter64,
+    jnxMbgPgwApnGxRaaSentRsrFail        Counter64,
+    jnxMbgPgwApnGxCcrRejTransntFail     Counter64,
+    jnxMbgPgwApnGxCcrRejInitlParErr     Counter64,
+    jnxMbgPgwApnGxCcrRejPermFail        Counter64,
+    jnxMbgPgwApnGxCcrRejUknCode         Counter64,
+    jnxMbgPgwApnGxCcrRejUknSess         Counter64,
+    jnxMbgPgwApnPccActiveDynRules       Counter64,
+    jnxMbgPgwApnPccDynRuleDeact         Counter64,
+    jnxMbgPgwApnPccRuleStaticAct        Counter64,
+    jnxMbgPgwApnPccRuleStaticDeact      Counter64,
+    jnxMbgPgwApnPccRuleDynMod           Counter64,
+    jnxMbgPgwApnPccRuleValidnFail       Counter64,
+    jnxMbgPgwApnPccRuleEnforceFail      Counter64,
+    jnxMbgPgwApnPccActFailNoRsr         Counter64,
+    jnxMbgPgwApnPccRuleUpdProcFail      Counter64,
+    jnxMbgPgwApnInterRatHoAttempt       Counter64,
+    jnxMbgPgwApnInterRatHoSucc          Counter64,
+    jnxMbgPgwApnIntraRatHoAttempt       Counter64,
+    jnxMbgPgwApnIntraRatHoSucc          Counter64,
+    jnxMbgPgwApnOnlineAuthAttempt       Counter64,
+    jnxMbgPgwApnOnlineAuthSucc          Counter64,
+    jnxMbgPgwApnOnlineAuthTimeout       Counter64,
+    jnxMbgPgwApnOnlineQuotaThdUpdReq    Counter64,
+    jnxMbgPgwApnGyCcrISent              Counter64,
+    jnxMbgPgwApnGyCcaISucc              Counter64,
+    jnxMbgPgwApnGyCcrIFail              Counter64,
+    jnxMbgPgwApnGyCcrUSent              Counter64,
+    jnxMbgPgwApnGyCcaUSucc              Counter64,
+    jnxMbgPgwApnGyCcrUFail              Counter64,
+    jnxMbgPgwApnGyCcrTSent              Counter64,
+    jnxMbgPgwApnGyCcaTSucc              Counter64,
+    jnxMbgPgwApnGyCcrTFail              Counter64,
+    jnxMbgPgwApnGyRarRcvd               Counter64,
+    jnxMbgPgwApnGyRaaSent               Counter64,
+    jnxMbgPgwApnGyRaaFail               Counter64,
+    jnxMbgPgwApnGyAbortSessReqRcvd      Counter64,
+    jnxMbgPgwApnGyAbortSessAnsSent      Counter64,
+    jnxMbgPgwApnGyCcrRejTransntFail     Counter64,
+    jnxMbgPgwApnGyCcrRejInitlParErr     Counter64,
+    jnxMbgPgwApnGyCcrRejPermFail        Counter64,
+    jnxMbgPgwApnGyCcrRejUknCode         Counter64,
+    jnxMbgPgwApnGyCcrRejUknSess         Counter64,
+    jnxMbgPgwApnGwAttemptedRedirect     Counter64,
+    jnxMbgPgwApnSuccGwRedirect          Counter64,
+    jnxMbgPgwApnSuccApnRedirect         Counter64,
+    jnxMbgPgwApnSessnFailCtxNotFound    Counter64,
+    jnxMbgPgwApnGxMsInitModAttempt      Counter64,
+    jnxMbgPgwApnGxSuccMsInitMod         Counter64,
+    jnxMbgPgwApnGxPcrfInitMod           Counter64,
+    jnxMbgPgwApnGxSuccPcrfInitMod       Counter64,
+    jnxMbgPgwApnGxMsInitSessTerm        Counter64,
+    jnxMbgPgwApnGxPcrfInitSessTerm      Counter64,
+    jnxMbgPgwApnGxGwInitSessTerm        Counter64,
+    jnxMbgPgwApnGySessEstAttempt        Counter64,
+    jnxMbgPgwApnGySuccSessEst           Counter64,
+    jnxMbgPgwApnGyReauthAttempt         Counter64,
+    jnxMbgPgwApnGySuccReauth            Counter64,
+    jnxMbgPgwApnGyAuthTimeout           Counter64,
+    jnxMbgPgwApnGyMsInitSessDeact       Counter64,
+    jnxMbgPgwApnGyOcsInitSessDeact      Counter64,
+    jnxMbgPgwApnGyGwInitSessDeact       Counter64
+}    
+
+jnxMbgPgwApnSMStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwApnSMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Stats."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgPgwApnName }
+    ::= { jnxMbgPgwApnSMStatsTable 1 }
+
+jnxMbgPgwApnName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "A string that uniquely identifies the APN."
+    ::= { jnxMbgPgwApnSMStatsEntry 1 }
+
+
+jnxMbgPgwApnSessnEstAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Session establishment attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 2 }
+
+jnxMbgPgwApnSuccSessnEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Sessions established successfully."
+    ::= { jnxMbgPgwApnSMStatsEntry 3 }
+
+jnxMbgPgwApnPeerInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MS/peer initiated session deactivation attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 4 }    
+    
+jnxMbgPgwApnPeerInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MS/peer initiated successful session deactivations."
+    ::= { jnxMbgPgwApnSMStatsEntry 5 }    
+
+jnxMbgPgwApnGwInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Gateway initiated session deactivation attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 6 }    
+
+jnxMbgPgwApnGwInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Gateway initiated successful session deactivations."
+    ::= { jnxMbgPgwApnSMStatsEntry 7 }    
+
+jnxMbgPgwApnGtpStatsGnS5S8InpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 8 }    
+
+jnxMbgPgwApnGtpStatsGnS5S8InpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input bytes."
+    ::= { jnxMbgPgwApnSMStatsEntry 9 } 
+
+jnxMbgPgwApnGtpStatsGnS5S8OutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 10 }    
+
+jnxMbgPgwApnGtpStatsGnS5S8OutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output bytes."
+    ::= { jnxMbgPgwApnSMStatsEntry 11 }     
+    
+jnxMbgPgwApnGtpStatsGiInpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Input packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 12 }    
+
+jnxMbgPgwApnGtpStatsGiInpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Input bytes."
+    ::= { jnxMbgPgwApnSMStatsEntry 13 } 
+
+jnxMbgPgwApnGtpStatsGiOutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Output packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 14 }    
+
+jnxMbgPgwApnGtpStatsGiOutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi Output bytes."
+    ::= { jnxMbgPgwApnSMStatsEntry 15 }  
+
+jnxMbgPgwApnSessnFailSrvcUnaval OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established due
+          to service unavailability."
+    ::= { jnxMbgPgwApnSMStatsEntry 16 }
+
+jnxMbgPgwApnSessnFailSysFailure OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+         due to system failure."
+    ::= { jnxMbgPgwApnSMStatsEntry 17 }
+
+jnxMbgPgwApnSessnFailNoResource OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+         due to lack of resource."
+    ::= { jnxMbgPgwApnSMStatsEntry 18 }
+
+jnxMbgPgwApnSessnFailNoAddr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+         due to lack of address. The address pool
+         assigned to this APN is exhausted"
+    ::= { jnxMbgPgwApnSMStatsEntry 19 }
+
+jnxMbgPgwApnSessnFailSrvcDenied OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+         due to service denial."
+    ::= { jnxMbgPgwApnSMStatsEntry 20 }
+
+jnxMbgPgwApnSessnFailAuthFailed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+          due to authentication failure."
+    ::= { jnxMbgPgwApnSMStatsEntry 21 }
+
+jnxMbgPgwApnSessnFailAccsDenied OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+          due to APN access denial."
+    ::= { jnxMbgPgwApnSMStatsEntry 22 }
+
+jnxMbgPgwApnMSInitModAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MS initiated modification attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 23 }
+
+jnxMbgPgwApnSuccMSInitMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Successful MS initiated modifications."
+    ::= { jnxMbgPgwApnSMStatsEntry 24 }
+
+jnxMbgPgwApnPgwGgsnInitMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total PGW/GGSN initiated modification attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 25 }
+
+jnxMbgPgwApnSuccPgwGgsnInitMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total PGW/GGSN initiated modification attempts successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 26 }
+
+jnxMbgPgwApnUsrAuthAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total User Authentication attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 27 }
+
+jnxMbgPgwApnSuccUsrAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total User Authentication attempts successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 28 }
+
+jnxMbgPgwApnFailUsrAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total User Authentication attempts failed."
+    ::= { jnxMbgPgwApnSMStatsEntry 29 }
+
+jnxMbgPgwApnDynIPAllocAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dynamic IP address allocation attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 30 }
+
+jnxMbgPgwApnSuccDynIPAlloc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dynamic IP address allocations successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 31 }    
+    
+jnxMbgPgwApnCdrsAllocd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of CDRs allocated."
+    ::= { jnxMbgPgwApnSMStatsEntry 32 } 
+
+jnxMbgPgwApnPartialCdrsAllocd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of partial CDRs allocated."
+    ::= { jnxMbgPgwApnSMStatsEntry 33 } 
+
+jnxMbgPgwApnCdrsClosed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of CDRs closed."
+    ::= { jnxMbgPgwApnSMStatsEntry 34 }
+
+jnxMbgPgwApnCdrCntainrsClosed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of CDR containers closed."
+    ::= { jnxMbgPgwApnSMStatsEntry 35 }
+
+jnxMbgPgwApnPktsViolMIFAcl OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total packets violating MIF ACL."
+    ::= { jnxMbgPgwApnSMStatsEntry 36 }
+
+jnxMbgPgwApnReDrctMblToMblPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total redirected mobile-to-mobile packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 37 }
+
+jnxMbgPgwApnReDrctMblToMblByts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total redirected mobile-to-mobile bytes."
+    ::= { jnxMbgPgwApnSMStatsEntry 38 }
+    
+jnxMbgPgwApnIpv6RsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total IPv6 Router Solicitations received."
+    ::= { jnxMbgPgwApnSMStatsEntry 39 }
+
+jnxMbgPgwApnIpv6RaTxd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total IPv6 Router Advertisements transmitted."
+    ::= { jnxMbgPgwApnSMStatsEntry 40 }
+
+jnxMbgPgwApnIpv6NsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total IPv6 Neighbor Solicitations received."
+    ::= { jnxMbgPgwApnSMStatsEntry 41 }
+
+jnxMbgPgwApnIpv6NaTxd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total IPv6 Neighbor Advertisements transmitted."
+    ::= { jnxMbgPgwApnSMStatsEntry 42 }
+
+jnxMbgPgwApnSessnFailOther  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+         due to miscellaneous causes."
+    ::= { jnxMbgPgwApnSMStatsEntry 43 }
+
+jnxMbgPgwApnGtpStatsS58DscrdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) discarded packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 44 }
+
+jnxMbgPgwApnGtpStatsGiDiscrdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gi discarded packets."
+    ::= { jnxMbgPgwApnSMStatsEntry 45 }
+
+jnxMbgPgwApnSessEstDynPolAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session  establishment 
+        attempts using dynamic policy ."
+    ::= { jnxMbgPgwApnSMStatsEntry 46 }
+   
+jnxMbgPgwApnSuccSessEstDynPol OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful session 
+        establishment using dynamic policy."
+    ::= { jnxMbgPgwApnSMStatsEntry 47 }
+
+jnxMbgPgwApnSessEstStaPolAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of session establishment attempt 
+        using static policy."
+    ::= { jnxMbgPgwApnSMStatsEntry 48 }
+ 
+jnxMbgPgwApnSuccSessEstStaPol OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful session 
+        establishment using dynamic policy."
+    ::= { jnxMbgPgwApnSMStatsEntry 49 }
+       
+jnxMbgPgwApnMsInitAmbrModReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of MS initiated Apn Ambr 
+        modification request."
+    ::= { jnxMbgPgwApnSMStatsEntry 50 }
+
+ jnxMbgPgwApnMsInitAmbrModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful MS initiated
+        Apn Ambr modifications."
+    ::= { jnxMbgPgwApnSMStatsEntry 51 } 
+    
+jnxMbgPgwApnMsInitQoSModReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of MS initiated QOS 
+        modification request."
+    ::= { jnxMbgPgwApnSMStatsEntry 52 }
+    
+jnxMbgPgwApnMsInitQoSModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful MS initiated QOS 
+        modification."
+    ::= { jnxMbgPgwApnSMStatsEntry 53 }
+    
+jnxMbgPgwApnPcrfInitSessTerm OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of PCRF initiated 
+        sesssion termination trigger."
+    ::= { jnxMbgPgwApnSMStatsEntry 54 }
+    
+jnxMbgPgwApnGwInitSessTerm OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gateway initiated
+        session termination trigger."
+    ::= { jnxMbgPgwApnSMStatsEntry 55 }
+    
+jnxMbgPgwApnMsInitSessTerm OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of MS initiated 
+        session termination trigger."
+    ::= { jnxMbgPgwApnSMStatsEntry 56 }    
+
+jnxMbgPgwApnMsInitSessModTrgr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Ms initiated
+        session modification trigger."
+    ::= { jnxMbgPgwApnSMStatsEntry 57 }
+    
+jnxMbgPgwApnMsInitSessModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful MS initiated
+        session modification."
+    ::= { jnxMbgPgwApnSMStatsEntry 58 }
+    
+jnxMbgPgwApnPcrfInitSessModTrgr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of PCRF initiated
+        session modification trigger."
+    ::= { jnxMbgPgwApnSMStatsEntry 59 }
+    
+jnxMbgPgwApnPcrfInitSessModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of successful PCRF initiated
+        session modification."
+    ::= { jnxMbgPgwApnSMStatsEntry 60 }
+
+jnxMbgPgwApnSessModTrgrQoSChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to QOS change."
+    ::= { jnxMbgPgwApnSMStatsEntry 61 }
+                        
+jnxMbgPgwApnSessModTrgrRatChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to RAT change."
+    ::= { jnxMbgPgwApnSMStatsEntry 62 }
+
+jnxMbgPgwApnSessModTrgrSgsnChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to SGSN change."
+    ::= { jnxMbgPgwApnSMStatsEntry 63 }    
+
+jnxMbgPgwApnSessModTrgrSgwChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to SGW change."
+    ::= { jnxMbgPgwApnSMStatsEntry 64 }
+
+jnxMbgPgwApnSessModTrgrPlmnChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to PLMN change."
+    ::= { jnxMbgPgwApnSMStatsEntry 65 }
+
+jnxMbgPgwApnSessModTrgrRaiChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to RAI change."
+    ::= { jnxMbgPgwApnSMStatsEntry 66 }
+
+jnxMbgPgwApnSessModTrgrUliChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to ULI change."
+    ::= { jnxMbgPgwApnSMStatsEntry 67 } 
+    
+jnxMbgPgwApnSessModTrgrIPCanChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to IP CAN change."
+    ::= { jnxMbgPgwApnSMStatsEntry 68 }
+
+jnxMbgPgwApnMsInitSessModTftChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS session modification
+        trigger due to TFT change."
+    ::= { jnxMbgPgwApnSMStatsEntry 69 }
+
+jnxMbgPgwApnNwInitSessModTftChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Network session modification
+        trigger due to TFT change."
+    ::= { jnxMbgPgwApnSMStatsEntry 70 }
+
+jnxMbgPgwApnSessModTrgrBrLoss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to Bearer Loss."
+    ::= { jnxMbgPgwApnSMStatsEntry 71 }    
+
+jnxMbgPgwApnSessModTrgrBrRecvry OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to bearer recovery."
+    ::= { jnxMbgPgwApnSMStatsEntry 72 }
+
+jnxMbgPgwApnSessModTrgrRsrAlloc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to resource allocation."
+    ::= { jnxMbgPgwApnSMStatsEntry 73 }
+
+jnxMbgPgwApnSessModTrgrRevldTO OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to Revalidation Timeout."
+    ::= { jnxMbgPgwApnSMStatsEntry 74 }
+
+jnxMbgPgwApnSessModQoSExceedAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to QoS Exceed Auth."
+    ::= { jnxMbgPgwApnSMStatsEntry 75 }
+
+jnxMbgPgwApnSessModTodProc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to Time of day procedure."
+    ::= { jnxMbgPgwApnSMStatsEntry 76 }
+
+jnxMbgPgwApnSessModTrgrChgSubsc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to change of subscription."
+    ::= { jnxMbgPgwApnSMStatsEntry 77 }
+
+jnxMbgPgwApnSessModAmbrChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to AMBR change."
+    ::= { jnxMbgPgwApnSMStatsEntry 78 }
+
+jnxMbgPgwApnSessModEcgiChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to ECGI change."
+    ::= { jnxMbgPgwApnSMStatsEntry 79 }
+
+jnxMbgPgwApnSessModTaiChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to TAI change."
+    ::= { jnxMbgPgwApnSMStatsEntry 80 }
+
+jnxMbgPgwApnSessModMsTimezoneChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to MS timezone change."
+    ::= { jnxMbgPgwApnSMStatsEntry 81 }
+
+
+jnxMbgPgwApnSessModDefQosChg OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session modification
+        trigger due to Default QoS change."
+    ::= { jnxMbgPgwApnSMStatsEntry 82 }
+
+jnxMbgPgwApnMsDedBrActAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS initiated dedicated 
+        bearer activation attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 83 }  
+    
+jnxMbgPgwApnMsDedBrActSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS initiated 
+        dedicated bearer activation ."
+    ::= { jnxMbgPgwApnSMStatsEntry 84 }      
+
+jnxMbgPgwApnNwDedBrActAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of network initiated dedicated 
+        bearer activation attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 85 }
+
+jnxMbgPgwApnNwDedBrActSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Network initiated 
+        dedicated bearer activation."
+    ::= { jnxMbgPgwApnSMStatsEntry 86 }
+
+jnxMbgPgwApnMsDedBrModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS initiated dedicated 
+        bearer modification attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 87 }
+
+jnxMbgPgwApnMsDedBrModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS initiated 
+        dedicated bearer modification."
+    ::= { jnxMbgPgwApnSMStatsEntry 88 }
+    
+jnxMbgPgwApnNwDedBrModAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Network initiated dedicated 
+        bearer modification attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 89 }        
+
+jnxMbgPgwApnNwDedBrModSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Network initiated 
+        dedicated bearer modification."
+    ::= { jnxMbgPgwApnSMStatsEntry 90 }
+
+jnxMbgPgwApnMsDedBrDeactAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS initiated dedicated 
+        bearer deactivation attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 91 }
+
+jnxMbgPgwApnNwDedBrDeactAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Network initiated dedicated 
+        bearer deactivation attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 92 }
+
+jnxMbgPgwApnGwDedBrDeactAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gateway initiated dedicated 
+        bearer deactivation attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 93 }
+
+jnxMbgPgwApnGbrDedBrCrtFailCAC OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of GBR dedicated bearer 
+        creation failure due to CAC."
+    ::= { jnxMbgPgwApnSMStatsEntry 94 }
+
+jnxMbgPgwApnNGbrDedBrCrtFailCAC OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Non-GBR dedicated bearer 
+        creation failure due to CAC."
+    ::= { jnxMbgPgwApnSMStatsEntry 95 }
+    
+jnxMbgPgwApnSessTermUnreachPcrf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session termination 
+        due to unreachable PCRF."
+    ::= { jnxMbgPgwApnSMStatsEntry 96 }       
+
+jnxMbgPgwApnSessTermPcrfRestart OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session termination 
+        due to PCRF restart."
+    ::= { jnxMbgPgwApnSMStatsEntry 97 }
+    
+jnxMbgPgwApnGxCcrISent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR-I sent on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 98 }
+
+jnxMbgPgwApnGxCcaIRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCA-I received on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 99 } 
+    
+jnxMbgPgwApnGxCcrUSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR-U sent on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 100 }
+    
+jnxMbgPgwApnGxCcaURcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCA-U received on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 101 }
+
+jnxMbgPgwApnGxCcrTSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR-T sent on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 102 }
+    
+jnxMbgPgwApnGxCcaTRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCA-T receieved on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 103 }        
+
+jnxMbgPgwApnGxRarRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of RAR received on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 104 }
+    
+jnxMbgPgwApnGxRaaSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of RAA sent on Gx."
+    ::= { jnxMbgPgwApnSMStatsEntry 105 }  
+
+jnxMbgPgwApnGxRaaSentRsrFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of RAA sent on Gx due to 
+        resouce failure ."
+    ::= { jnxMbgPgwApnSMStatsEntry 106 }
+    
+jnxMbgPgwApnGxCcrRejTransntFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR rejects 
+        due to trancient failure ."
+    ::= { jnxMbgPgwApnSMStatsEntry 107 } 
+    
+jnxMbgPgwApnGxCcrRejInitlParErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR rejects 
+        due to Initial parameters error ."
+    ::= { jnxMbgPgwApnSMStatsEntry 108 }
+
+jnxMbgPgwApnGxCcrRejPermFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR rejects 
+        due to permanent failure ."
+    ::= { jnxMbgPgwApnSMStatsEntry 109 }
+    
+jnxMbgPgwApnGxCcrRejUknCode OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR rejects 
+        due to unknown code ."
+    ::= { jnxMbgPgwApnSMStatsEntry 110 }
+
+jnxMbgPgwApnGxCcrRejUknSess OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of CCR rejects 
+        due to unknown session ."
+    ::= { jnxMbgPgwApnSMStatsEntry 111 }    
+
+jnxMbgPgwApnPccActiveDynRules OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of active 
+        dynamic rules."
+    ::= { jnxMbgPgwApnSMStatsEntry 112 }
+
+jnxMbgPgwApnPccDynRuleDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dynamic rules
+        deactivation."
+    ::= { jnxMbgPgwApnSMStatsEntry 113 }
+    
+jnxMbgPgwApnPccRuleStaticAct OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of static  rule activation."
+    ::= { jnxMbgPgwApnSMStatsEntry 114 } 
+
+jnxMbgPgwApnPccRuleStaticDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Number of static  rule deactivation."
+    ::= { jnxMbgPgwApnSMStatsEntry 115 }    
+
+jnxMbgPgwApnPccRuleDynMod OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dynamic rule modifications."
+    ::= { jnxMbgPgwApnSMStatsEntry 116 }
+    
+jnxMbgPgwApnPccRuleValidnFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Pcc rule validation failure."
+    ::= { jnxMbgPgwApnSMStatsEntry 117 }
+
+jnxMbgPgwApnPccRuleEnforceFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of PCC rule enforcement failures."
+    ::= { jnxMbgPgwApnSMStatsEntry 118 }
+    
+jnxMbgPgwApnPccActFailNoRsr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PCC rule activation failure 
+        due to no resource."
+    ::= { jnxMbgPgwApnSMStatsEntry 119 }
+    
+jnxMbgPgwApnPccRuleUpdProcFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PCC rule  
+         update procedure failure."
+    ::= { jnxMbgPgwApnSMStatsEntry 120 }
+    
+jnxMbgPgwApnInterRatHoAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Inter RAT Handover attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 121 }
+    
+jnxMbgPgwApnInterRatHoSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Inter RAT Handovers."
+    ::= { jnxMbgPgwApnSMStatsEntry 122 }
+    
+jnxMbgPgwApnIntraRatHoAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Intra RAT Handover attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 123 }                        
+                
+jnxMbgPgwApnIntraRatHoSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Intra RAT Handover."
+    ::= { jnxMbgPgwApnSMStatsEntry 124 }
+          
+jnxMbgPgwApnOnlineAuthAttempt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of online authorization 
+        attempt."
+    ::= { jnxMbgPgwApnSMStatsEntry 125 }
+
+jnxMbgPgwApnOnlineAuthSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of online authorization
+        successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 126 }
+
+jnxMbgPgwApnOnlineAuthTimeout OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of online authorization
+        request timeout."
+    ::= { jnxMbgPgwApnSMStatsEntry 127 }
+
+jnxMbgPgwApnOnlineQuotaThdUpdReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of online Quota threshold
+        update request."
+    ::= { jnxMbgPgwApnSMStatsEntry 128 }
+
+jnxMbgPgwApnGyCcrISent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr-I sent."
+    ::= { jnxMbgPgwApnSMStatsEntry 129 }
+
+jnxMbgPgwApnGyCcaISucc  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-I Successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 130 } 
+    
+jnxMbgPgwApnGyCcrIFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-Send-Fail ."
+    ::= { jnxMbgPgwApnSMStatsEntry 131 }       
+
+jnxMbgPgwApnGyCcrUSent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr-U sent."
+    ::= { jnxMbgPgwApnSMStatsEntry 132 }
+
+jnxMbgPgwApnGyCcaUSucc  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-U Succssful."
+    ::= { jnxMbgPgwApnSMStatsEntry 133 }
+    
+jnxMbgPgwApnGyCcrUFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-U-Send-Fail ."
+    ::= { jnxMbgPgwApnSMStatsEntry 134 }        
+
+jnxMbgPgwApnGyCcrTSent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr-T Sent."
+    ::= { jnxMbgPgwApnSMStatsEntry 135 }
+
+jnxMbgPgwApnGyCcaTSucc  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-T Successful."
+    ::= { jnxMbgPgwApnSMStatsEntry 136 }
+
+jnxMbgPgwApnGyCcrTFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Cca-T-Send_Fail ."
+    ::= { jnxMbgPgwApnSMStatsEntry 137 }    
+
+jnxMbgPgwApnGyRarRcvd  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Rar Rcvd."
+    ::= { jnxMbgPgwApnSMStatsEntry 138 }
+
+jnxMbgPgwApnGyRaaSent   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Raa Sent."
+    ::= { jnxMbgPgwApnSMStatsEntry 139 }
+
+jnxMbgPgwApnGyRaaFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Raa-Send-Fail ."
+    ::= { jnxMbgPgwApnSMStatsEntry 140 }    
+
+jnxMbgPgwApnGyAbortSessReqRcvd  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy Abort Session Request 
+        received."
+    ::= { jnxMbgPgwApnSMStatsEntry 141 }
+
+jnxMbgPgwApnGyAbortSessAnsSent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy Abort Session Answer 
+        sent."
+    ::= { jnxMbgPgwApnSMStatsEntry 142 }    
+
+jnxMbgPgwApnGyCcrRejTransntFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Raa rejects
+        transcient failure."
+    ::= { jnxMbgPgwApnSMStatsEntry 143 }
+
+jnxMbgPgwApnGyCcrRejInitlParErr  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-ccr rejects 
+        initial paramater error."
+    ::= { jnxMbgPgwApnSMStatsEntry 144 }
+
+jnxMbgPgwApnGyCcrRejPermFail  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr rejects 
+        permanent fail."
+    ::= { jnxMbgPgwApnSMStatsEntry 145 }
+
+jnxMbgPgwApnGyCcrRejUknCode  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr rejects
+        Unknown Code."
+    ::= { jnxMbgPgwApnSMStatsEntry 146 }
+
+jnxMbgPgwApnGyCcrRejUknSess  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Gy-Ccr rejects
+        unknown session."
+    ::= { jnxMbgPgwApnSMStatsEntry 147 }
+
+jnxMbgPgwApnGwAttemptedRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gateway Attempted Redirects."
+    ::= { jnxMbgPgwApnSMStatsEntry 148 }
+
+jnxMbgPgwApnSuccGwRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful gateway redirects."
+    ::= { jnxMbgPgwApnSMStatsEntry 149 }
+
+jnxMbgPgwApnSuccApnRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful apn redirects."
+    ::= { jnxMbgPgwApnSMStatsEntry 150 }
+
+jnxMbgPgwApnSessnFailCtxNotFound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions that could not be established
+          due to Context Not Found."
+    ::= { jnxMbgPgwApnSMStatsEntry 151 }
+
+jnxMbgPgwApnGxMsInitModAttempt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MS/Peer initiated
+        session modification attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 152 }
+
+jnxMbgPgwApnGxSuccMsInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful MS/Peer initiated
+        session modification ."
+    ::= { jnxMbgPgwApnSMStatsEntry 153 }
+
+jnxMbgPgwApnGxPcrfInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PCRF initiated
+        session modification attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 154 }
+
+jnxMbgPgwApnGxSuccPcrfInitMod  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful PCRF initiated
+        session modification ."
+    ::= { jnxMbgPgwApnSMStatsEntry 155 }
+
+ jnxMbgPgwApnGxMsInitSessTerm          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx Ms/Peer initiated session termination ."
+    ::= { jnxMbgPgwApnSMStatsEntry 156 }
+
+ jnxMbgPgwApnGxPcrfInitSessTerm        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx PCRF initiated session termination ."
+    ::= { jnxMbgPgwApnSMStatsEntry 157 }
+
+ jnxMbgPgwApnGxGwInitSessTerm          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gx Gateway initiated session termination ."
+    ::= { jnxMbgPgwApnSMStatsEntry 158 }
+
+jnxMbgPgwApnGySessEstAttempt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy session 
+        establishment attempts."
+    ::= { jnxMbgPgwApnSMStatsEntry 159 }
+
+jnxMbgPgwApnGySuccSessEst  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Successful Gy session 
+        establishments."
+    ::= { jnxMbgPgwApnSMStatsEntry 160 }
+
+jnxMbgPgwApnGyReauthAttempt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy reauthorization 
+        requests to OCS."
+    ::= { jnxMbgPgwApnSMStatsEntry 161 }
+
+jnxMbgPgwApnGySuccReauth  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Gy reauthorization."
+    ::= { jnxMbgPgwApnSMStatsEntry 162 }
+
+jnxMbgPgwApnGyAuthTimeout  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy authorization timeout."
+    ::= { jnxMbgPgwApnSMStatsEntry 163 }
+
+jnxMbgPgwApnGyMsInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy Ms/Peer initiated 
+        session deactivations."
+    ::= { jnxMbgPgwApnSMStatsEntry 164 }
+
+jnxMbgPgwApnGyOcsInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy OCS initiated 
+        session deactivations."
+    ::= { jnxMbgPgwApnSMStatsEntry 165 }
+
+jnxMbgPgwApnGyGwInitSessDeact  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Gy gateway initiated 
+        session deactivations."
+    ::= { jnxMbgPgwApnSMStatsEntry 166 }
+
+--
+-- Status Table for PGW 
+--
+
+jnxMbgPgwSMStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing Mobile Gateway level Status for PDN Gateway.
+         Key is Gateway Name."
+    ::= { jnxMbgPgwSMObjects 5 }
+
+JnxMbgPgwSMStatusEntry ::= SEQUENCE {
+    jnxMbgPgwActvSubscribers        CounterBasedGauge64,
+    jnxMbgPgwActvSessions           CounterBasedGauge64,
+    jnxMbgPgwActvBearers            CounterBasedGauge64,
+    jnxMbgPgwIdleSubscribers        CounterBasedGauge64,
+    jnxMbgPgwIdleSessions           CounterBasedGauge64,
+    jnxMbgPgwIdleBearers            CounterBasedGauge64,
+    jnxMbgPgwSuspSubscribers        CounterBasedGauge64,
+    jnxMbgPgwSuspSessions           CounterBasedGauge64,
+    jnxMbgPgwSuspBearers            CounterBasedGauge64,
+    jnxMbgPgwCPUUtil                Gauge32,
+    jnxMbgPgwMemoryUtil             Gauge32,
+    jnxMbgPgwActvPrepaidBearers     CounterBasedGauge64,
+    jnxMbgPgwActvPostpaidBearers    CounterBasedGauge64,
+    jnxMbgPgwActvGbrBearers         CounterBasedGauge64,
+    jnxMbgPgwActvNonGbrBearers      CounterBasedGauge64
+}
+
+jnxMbgPgwSMStatusEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Status."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgPgwSMStatusTable 1 }
+
+jnxMbgPgwActvSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active subscribers."
+    ::= { jnxMbgPgwSMStatusEntry 1 }
+
+jnxMbgPgwActvSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active sessions."
+    ::= { jnxMbgPgwSMStatusEntry 2 }
+
+jnxMbgPgwActvBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active bearers."
+    ::= { jnxMbgPgwSMStatusEntry 3 }
+
+jnxMbgPgwIdleSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total idle subscribers. 
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 4 }
+
+jnxMbgPgwIdleSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total idle sessions.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 5 }
+
+jnxMbgPgwIdleBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total idle bearers.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 6 }
+
+jnxMbgPgwSuspSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total suspended subscribers.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 7 }
+
+jnxMbgPgwSuspSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total suspended sessions.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 8 }
+
+jnxMbgPgwSuspBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total suspended bearers.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgPgwSMStatusEntry 9 }
+    
+jnxMbgPgwCPUUtil OBJECT-TYPE
+    SYNTAX      Gauge32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU Utilizationization."
+    ::= { jnxMbgPgwSMStatusEntry 10 }
+
+jnxMbgPgwMemoryUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Memory Utilizationization."
+    ::= { jnxMbgPgwSMStatusEntry 11 }
+
+jnxMbgPgwActvPrepaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active prepaid bearers."
+    ::= { jnxMbgPgwSMStatusEntry 12 }
+ 
+jnxMbgPgwActvPostpaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active postpaid bearers."
+    ::= { jnxMbgPgwSMStatusEntry 13 }       
+
+jnxMbgPgwActvGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Gbr bearers."
+    ::= { jnxMbgPgwSMStatusEntry 14 }
+
+jnxMbgPgwActvNonGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Non-Gbr bearers."
+    ::= { jnxMbgPgwSMStatusEntry 15 }    
+
+jnxMbgPgwApnSMClRateStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwApnClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the call rate statistics for 
+         the most recent configured interval for APN .
+         Gateway ID plus Apn Name is used as a key."
+    ::= { jnxMbgPgwSMObjects 10 }
+
+JnxMbgPgwApnClRateEntry ::= SEQUENCE {
+    jnxMbgPgwApnCRName                  DisplayString,
+    jnxMbgPgwApnCRIntervalMin           Unsigned32,
+    jnxMbgPgwApnCRPrepaidBrAct          Counter64,
+    jnxMbgPgwApnCRPrepaidBrDeact        Counter64,
+    jnxMbgPgwApnCRPostpaidBrAct         Counter64,
+    jnxMbgPgwApnCRPostpaidBrDeact       Counter64,
+    jnxMbgPgwApnCROnlineAuthTimeout     Counter64,
+    jnxMbgPgwApnCRQuotaThdUpdReq        Counter64,
+    jnxMbgPgwApnCROnlineRarRcvd         Counter64,
+    jnxMbgPgwApnCROnlineRarSucc         Counter64
+}
+
+jnxMbgPgwApnSMClRateStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwApnClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Apn Call Rate Statistics."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgPgwApnCRName }
+    ::= { jnxMbgPgwApnSMClRateStatsTable 1 }
+
+jnxMbgPgwApnCRName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "A string that uniquely identifies the APN."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 1 }
+
+ jnxMbgPgwApnCRIntervalMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregation interval for call rate statisitcs in minutes."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 2 }
+    
+
+ jnxMbgPgwApnCRPrepaidBrAct          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of prepaid bearer activations."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 3 }
+    
+ jnxMbgPgwApnCRPrepaidBrDeact          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of prepaid bearer deactivations."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 4 }
+
+ jnxMbgPgwApnCRPostpaidBrAct         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of postpaid bearer activations."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 5 }
+
+jnxMbgPgwApnCRPostpaidBrDeact OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of postpaid bearer deactivations."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 6 }
+
+jnxMbgPgwApnCROnlineAuthTimeout OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of online authorization timeout."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 7 }
+               
+jnxMbgPgwApnCRQuotaThdUpdReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of quota threshold update request sent."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 8 }
+               
+jnxMbgPgwApnCROnlineRarRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of reauthrization received ."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 9 }
+               
+jnxMbgPgwApnCROnlineRarSucc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of successful reauthorization."
+    ::= { jnxMbgPgwApnSMClRateStatsEntry 10 }
+
+jnxMbgPgwSMClRateStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the call rate statistics for 
+         the most recent configured interval for PDN Gateway.
+         Gateway ID is used as a key."
+    ::= { jnxMbgPgwSMObjects 8 }
+
+JnxMbgPgwClRateEntry ::= SEQUENCE {
+    jnxMbgPgwClRateIntervalMin      Unsigned32,
+    jnxMbgPgwClRateSuccSessnEst     Counter64,
+    jnxMbgPgwClRateSuccSessnDel     Counter64,
+    jnxMbgPgwClRateStatsGnInpPkt    Counter64,
+    jnxMbgPgwClRateStatsGnOutPkt    Counter64,
+    jnxMbgPgwClRateStatsGnInpByt    Counter64,
+    jnxMbgPgwClRateStatsGnOutByt    Counter64
+}
+
+jnxMbgPgwSMClRateStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Call Rate Statistics."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgPgwSMClRateStatsTable 1 }
+
+jnxMbgPgwClRateIntervalMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregation interval for call rate statisitcs in minutes."
+    ::= { jnxMbgPgwSMClRateStatsEntry 1 }
+    
+
+jnxMbgPgwClRateSuccSessnEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions successfully established."
+    ::= { jnxMbgPgwSMClRateStatsEntry 2 }
+    
+jnxMbgPgwClRateSuccSessnDel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions successfully deleted."
+    ::= { jnxMbgPgwSMClRateStatsEntry 3 }
+
+jnxMbgPgwClRateStatsGnInpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Input packets."
+    ::= { jnxMbgPgwSMClRateStatsEntry 4 }
+
+jnxMbgPgwClRateStatsGnInpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Input bytes."
+    ::= { jnxMbgPgwSMClRateStatsEntry 5 }
+
+jnxMbgPgwClRateStatsGnOutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Output packets."
+    ::= { jnxMbgPgwSMClRateStatsEntry 6 }
+
+jnxMbgPgwClRateStatsGnOutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Output bytes."
+    ::= { jnxMbgPgwSMClRateStatsEntry 7 }
+               
+ 
+jnxMbgPgwSMSpicStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwSMSpicStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the Mobile Gateway SPIC level 
+         Status for PDN Gateway .
+         Gateway ID and SPIC Id - 
+         provided as FPC & PIC Id are used as keys."
+    ::= { jnxMbgPgwSMObjects 9 }
+
+JnxMbgPgwSMSpicStatusEntry ::= SEQUENCE {
+    jnxMbgGwFpc                         Unsigned32,
+    jnxMbgGwPic                         Unsigned32,
+    jnxMbgPgwSpicStatusName             DisplayString,
+    jnxMbgPgwSpicStatusState            INTEGER,
+    jnxMbgPgwSpicStatusType             INTEGER,
+    jnxMbgPgwSpicActvSubscribers        CounterBasedGauge64,
+    jnxMbgPgwSpicActvSessions           CounterBasedGauge64,
+    jnxMbgPgwSpicActvBearers            CounterBasedGauge64,
+    jnxMbgPgwSpicCPUUtil                Gauge32,
+    jnxMbgPgwSpicMemoryUtil             Gauge32,
+    jnxMbgPgwSpicActvPrepaidBearers     CounterBasedGauge64,
+    jnxMbgPgwSpicActvPostpaidBearers    CounterBasedGauge64,
+    jnxMbgPgwSpicActvGbrBearers         CounterBasedGauge64,
+    jnxMbgPgwSpicActvNonGbrBearers      CounterBasedGauge64
+}
+
+jnxMbgPgwSMSpicStatusEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwSMSpicStatusEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Status."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgGwFpc,
+                  jnxMbgGwPic
+                }
+    ::= { jnxMbgPgwSMSpicStatusTable 1 }
+
+jnxMbgGwFpc OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "An integer that uniquely identifies the FPC Slot."
+    ::= { jnxMbgPgwSMSpicStatusEntry 1 }
+
+jnxMbgGwPic OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "An integer that uniquely identifies the PIC Slot."
+    ::= { jnxMbgPgwSMSpicStatusEntry 2 }
+
+
+jnxMbgPgwSpicStatusName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+    "A string that uniquely identifies the SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 3 }
+
+jnxMbgPgwSpicStatusState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    invalid(0),
+                    standalone(1),
+                    active(2),
+                    backup(3)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+    "An integer that identifies the SPIC state."
+    ::= { jnxMbgPgwSMSpicStatusEntry 4 }
+
+jnxMbgPgwSpicStatusType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    sessionPic(1),
+                    servicePic(2),
+                    pfe(3)   
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+    "An integer that identifies the SPIC type."
+    ::= { jnxMbgPgwSMSpicStatusEntry 5 }
+
+jnxMbgPgwSpicActvSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active subscribers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 6 }
+
+jnxMbgPgwSpicActvSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active sessions per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 7 }
+    
+jnxMbgPgwSpicActvBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active bearers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 8 }
+   
+jnxMbgPgwSpicCPUUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU utilization per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 9 }
+
+jnxMbgPgwSpicMemoryUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Memory utilization per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 10 }
+
+jnxMbgPgwSpicActvPrepaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active prepaid bearers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 11 }
+    
+jnxMbgPgwSpicActvPostpaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active postpaid bearers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 12 }
+    
+jnxMbgPgwSpicActvGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Gbr bearers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 13 }
+
+jnxMbgPgwSpicActvNonGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Non-Gbr bearers per SPIC."
+    ::= { jnxMbgPgwSMSpicStatusEntry 14 }
+
+--
+-- Status Table for PGW for APN
+-- To access APN based info we need to use BOTH GwId and APN Name as keys
+--
+
+jnxMbgPgwApnSMStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgPgwApnSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing Mobile APN Level Status for PDN Gateway.
+         Gateway ID and  APN Name are used as keys"
+    ::= { jnxMbgPgwSMObjects 7 }
+
+JnxMbgPgwApnSMStatusEntry ::= SEQUENCE {
+    jnxMbgPgwApnActvSubscribers         CounterBasedGauge64,
+    jnxMbgPgwApnActvSessions            CounterBasedGauge64,
+    jnxMbgPgwApnActvBearers             CounterBasedGauge64,
+    jnxMbgPgwApnActvPrepaidBearers      CounterBasedGauge64,
+    jnxMbgPgwApnActvPostpaidBearers     CounterBasedGauge64,
+    jnxMbgPgwApnActvGbrBearers          CounterBasedGauge64,
+    jnxMbgPgwApnActvNonGbrBearers       CounterBasedGauge64
+}
+
+jnxMbgPgwApnSMStatusEntry OBJECT-TYPE
+    SYNTAX      JnxMbgPgwApnSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Status."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgPgwApnName 
+                }
+    ::= { jnxMbgPgwApnSMStatusTable 1 }
+
+jnxMbgPgwApnActvSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active subscribers."
+    ::= { jnxMbgPgwApnSMStatusEntry 1 }
+
+jnxMbgPgwApnActvSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active sessions."
+    ::= { jnxMbgPgwApnSMStatusEntry 2 }
+
+jnxMbgPgwApnActvBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active bearers."
+    ::= { jnxMbgPgwApnSMStatusEntry 3 }
+
+jnxMbgPgwApnActvPrepaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active prepaid bearers."
+    ::= { jnxMbgPgwApnSMStatusEntry 4 }
+    
+jnxMbgPgwApnActvPostpaidBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active postpaid bearers."
+    ::= { jnxMbgPgwApnSMStatusEntry 5 }
+
+jnxMbgPgwApnActvGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Gbr bearers."
+    ::= { jnxMbgPgwApnSMStatusEntry 6 }
+    
+jnxMbgPgwApnActvNonGbrBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active Non-GBr bearers."
+    ::= { jnxMbgPgwApnSMStatusEntry 7 }                
+
+--
+-- Global counters related to gateway Status
+--
+
+jnxMbgPgwStatus OBJECT IDENTIFIER
+    ::= { jnxMbgPgwSMObjects 2 }
+
+jnxMbgPgwActiveSubscribers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total active subscriber."
+    ::= { jnxMbgPgwStatus 1 }
+
+jnxMbgPgwActiveSessions OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total active sessions."
+    ::= { jnxMbgPgwStatus 2 }
+
+jnxMbgPgwActiveBearers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total active bearers."
+    ::= { jnxMbgPgwStatus 3 }
+
+jnxMbgPgwCPUUtilization OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Current CPU Utilization."
+    ::= { jnxMbgPgwStatus 4 }
+
+jnxMbgPgwMemoryUtilization OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Current Memory Utilization."
+    ::= { jnxMbgPgwStatus 5 }
+
+--------------------------------------------------
+-- Notifications Vars
+--------------------------------------------------
+
+jnxMbgPgwSMNotificationVars  OBJECT IDENTIFIER
+    ::= { jnxMbgPgwSMObjects 3 }
+
+jnxMbgPgwGatewayName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies the mobile edge gateway."
+    ::= { jnxMbgPgwSMNotificationVars 1 }
+
+jnxMbgPgwQosAPNName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies an APN ."
+    ::= { jnxMbgPgwSMNotificationVars 2 }
+
+jnxMbgPgwQosThreshold1Status OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "False - threshold not crossed
+         True  - threshold crossed"
+    ::= { jnxMbgPgwSMNotificationVars 3 }
+
+jnxMbgPgwQosThreshold2Status OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "False - threshold not crossed
+         True  - threshold crossed "
+    ::= { jnxMbgPgwSMNotificationVars 4 }
+
+jnxMbgPgwSMGTPEventType  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Subscriber Management GTP Event Type Value 
+         Supported Events :
+          PDP_CTXT_CREATE_REJECT - PDP Context Creation Failure"
+    ::= { jnxMbgPgwSMNotificationVars 5 }
+
+jnxMbgPgwSMGTPEventCause OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Subscriber Management GTP Event Cause Value
+         Supported Causes :
+          RESOURCE_ERR -Generic Resource Allocation Failure
+          SYS_ERR      -System Error"
+    ::= { jnxMbgPgwSMNotificationVars 6 }
+
+jnxMbgPgwSMAlarmThrshld OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current 
+    DESCRIPTION
+    "Alarm threshold::THRESHOLD_LOW/THRESHOLD_HIGH" 
+   ::= { jnxMbgPgwSMNotificationVars 7 }
+
+jnxMbgPgwSMAlarmState OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current 
+    DESCRIPTION
+    "Alarm state:: CLEARED/RAISED"
+   ::= { jnxMbgPgwSMNotificationVars 8 }
+
+jnxMbgPgwSMSPICName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+     "This identifies the session-pic"
+    ::= { jnxMbgPgwSMNotificationVars 9 }
+
+jnxMbgPgwSMTCName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+     "This identifies the traffic class (gtpv1)"
+    ::= { jnxMbgPgwSMNotificationVars 10 }
+
+jnxMbgPgwSMQCIName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+     "This identifies the QCI"
+    ::= { jnxMbgPgwSMNotificationVars 11 }
+
+jnxMbgPgwSMSessionEstFailReason OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+     "Reason for Session Establishment Failue"
+    ::= { jnxMbgPgwSMNotificationVars 12 }
+
+jnxMbgPgwMMGatewayName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies a Gateway ."
+    ::= { jnxMbgPgwSMNotificationVars 13 }
+
+jnxMbgPgwPrevGatewayMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgPgwSMNotificationVars 14 }
+
+jnxMbgPgwNewGatewayMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgPgwSMNotificationVars 15 }
+
+jnxMbgPgwAPNMMGatewayName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies a Gateway ."
+    ::= { jnxMbgPgwSMNotificationVars 16 }
+
+jnxMbgPgwAPNMMAPNName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies an APN ."
+    ::= { jnxMbgPgwSMNotificationVars 17 }
+
+jnxMbgPgwPrevAPNMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgPgwSMNotificationVars 18 }
+
+jnxMbgPgwNewAPNMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgPgwSMNotificationVars 19 }
+
+jnxMbgPgwTrapGwIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+        "Gateway Index."
+    ::= { jnxMbgPgwSMNotificationVars 20 }
+
+jnxMbgPgwTrapGwName   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+        "Gateway Name."
+    ::= { jnxMbgPgwSMNotificationVars 21 }
+
+jnxMbgPgwSpicName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This identifies the session-pic"
+    ::= { jnxMbgPgwSMNotificationVars 22 }
+
+jnxMbgPgwSMInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies PGW interface"
+    ::= { jnxMbgPgwSMNotificationVars 23 }
+
+--------------------------------------------------
+-- Notifications 
+--------------------------------------------------
+
+jnxMbgPgwQosBearersThresStatus NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwGatewayName,
+              jnxMbgPgwQosThreshold1Status,
+              jnxMbgPgwQosThreshold2Status 
+            }
+    STATUS     deprecated 
+    DESCRIPTION
+        "This notification signifies that the configured thresholds
+          for bearers at gateway level are reached. The gateway name
+          identifies the notifying gateway name and the next two
+          fields would indicate the Thresholds."
+    ::= { jnxMbgPgwSMNotifications 1 }
+
+jnxMbgPgwQosCPUThresholdStatus NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwGatewayName,
+              jnxMbgPgwQosThreshold1Status,
+              jnxMbgPgwQosThreshold2Status 
+            }
+    STATUS     deprecated 
+    DESCRIPTION
+        "This notification signifies that the configured thresholds
+         for CPU have been reached. The gateway name identifies the
+         notifying gateway and the next two fields would indicate
+         the Thresholds."
+    ::= { jnxMbgPgwSMNotifications 2 }
+
+jnxMbgPgwQosMemThresholdStatus NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwGatewayName,
+              jnxMbgPgwQosThreshold1Status,
+              jnxMbgPgwQosThreshold2Status 
+            }
+    STATUS     deprecated 
+    DESCRIPTION
+        "This notification indicates whether the configured thresholds
+         for Memory have been reached. The gateway name identifies the
+         notifying gateway name and the next two fields would indicate
+         the Thresholds."
+    ::= { jnxMbgPgwSMNotifications 3 }
+
+jnxMbgPgwAPNQosBearersThreStatus NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwQosAPNName,
+              jnxMbgPgwQosThreshold1Status,
+              jnxMbgPgwQosThreshold2Status 
+            }
+    STATUS     deprecated 
+    DESCRIPTION
+        "This notification signifies that the configured APN thresholds
+         for bearers have been reached. The APN Name identifies for
+         which APN the thresholds are being reported and the next two
+         fields would indicate the Thresholds."
+    ::= { jnxMbgPgwSMNotifications 4 }
+
+jnxMbgPgwSMGtpEventNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMGTPEventType,
+              jnxMbgPgwSMGTPEventCause 
+            }
+    STATUS     deprecated
+    DESCRIPTION
+        "Subscriber Management GTP Event Notify"      
+    ::= { jnxMbgPgwSMNotifications 5 } 
+
+jnxMbgPgwSMSubscribersThresGblNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState    
+            }
+    STATUS    deprecated
+    DESCRIPTION
+        "Subscriber Threshold Global."      
+    ::= { jnxMbgPgwSMNotifications 6 } 
+
+jnxMbgPgwSMSubscribersThresPerSPNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState,
+              jnxMbgPgwSMSPICName    
+            }
+    STATUS    deprecated 
+    DESCRIPTION
+        "Subscriber Threshold Per SPIC."      
+    ::= { jnxMbgPgwSMNotifications 7 } 
+
+jnxMbgPgwSMSessionEstFailThresPerSPNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState,
+              jnxMbgPgwSMSessionEstFailReason,
+              jnxMbgPgwSMSPICName    
+            }
+    STATUS    deprecated 
+    DESCRIPTION
+        "Session Establishment Failure Threshold."      
+    ::= { jnxMbgPgwSMNotifications 8 } 
+
+jnxMbgPgwSMSessionEstFailThresPerTCNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState,
+              jnxMbgPgwSMSessionEstFailReason,
+              jnxMbgPgwSMTCName     
+            }
+    STATUS    deprecated
+    DESCRIPTION
+        "Session Establishment Failure Threshold 
+         Per Traffic Class (GTPv1)."      
+    ::= { jnxMbgPgwSMNotifications 9 } 
+
+jnxMbgPgwSMSessionEstFailThresPerQCINotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState,
+              jnxMbgPgwSMSessionEstFailReason,
+              jnxMbgPgwSMQCIName     
+            }
+    STATUS    deprecated
+    DESCRIPTION
+        "Session Establishment Failure Threshold 
+         per QoS Class Identifier."      
+    ::= { jnxMbgPgwSMNotifications 10 } 
+
+jnxMbgPgwSMBearersThresGblNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState    
+            }
+    STATUS    deprecated
+    DESCRIPTION
+        "Bearer Threshold Global."      
+    ::= { jnxMbgPgwSMNotifications 11 } 
+
+jnxMbgPgwSMBearersThresPerSPNotif NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwSMAlarmThrshld,
+              jnxMbgPgwSMAlarmState,
+              jnxMbgPgwSMSPICName    
+            }
+    STATUS    deprecated
+    DESCRIPTION
+        "Bearer Threshold Per SPIC."      
+    ::= { jnxMbgPgwSMNotifications 12 } 
+
+jnxMbgPgwGatewayMMStateChange NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwMMGatewayName,
+              jnxMbgPgwPrevGatewayMMState,
+              jnxMbgPgwNewGatewayMMState 
+            }
+    STATUS    current
+    DESCRIPTION
+        "This notification indicates that the Gateway identified by
+         jnxMbgPgwGatewayName undergoes a change in the maintenance 
+         mode state."
+    ::= { jnxMbgPgwSMNotifications 13 }
+
+jnxMbgPgwAPNMMStateChange NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwAPNMMGatewayName,
+              jnxMbgPgwAPNMMAPNName,
+              jnxMbgPgwPrevAPNMMState,
+              jnxMbgPgwNewAPNMMState 
+            }
+    STATUS     current
+    DESCRIPTION
+        "This notification indicates that the APN identified by 
+         jnxMbgPgwAPNMMGatewayName and jnxMbgPgwAPNMMAPNName undergoes 
+         a change in the maintenance mode state."
+    ::= { jnxMbgPgwSMNotifications 14 }
+
+
+--------------------------------------------------
+-- PGW Notifications - Individual Levels 
+--------------------------------------------------
+
+jnxMbgPgwQosBrThreshStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold
+         for bearers at gateway level are reached. The gateway name and id
+         identifies the notifying gateway"
+    ::= { jnxMbgPgwSMNotifications 15 }
+
+jnxMbgPgwQosBrThreshStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold
+         for bearers at gateway level are reached. The gateway name and id
+         identifies the notifying gateway"
+    ::= { jnxMbgPgwSMNotifications 16 }
+
+jnxMbgPgwQosBrThreshStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the normal threshold 
+         for bearers at gateway level are reached. The gateway name and id
+         identifies the notifying gateway"
+    ::= { jnxMbgPgwSMNotifications 17 }
+
+
+jnxMbgPgwQosCPUThreshStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold
+         for CPU Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 18 }
+
+jnxMbgPgwQosCPUThreshStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold
+         for CPU Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 19 }
+
+jnxMbgPgwQosCPUThreshStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the normal threshold 
+         for CPU Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 20 }
+
+
+jnxMbgPgwQosMemThreshStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold
+         for Memory Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 21 }
+
+jnxMbgPgwQosMemThreshStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold
+         for Memory Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 22 }
+
+jnxMbgPgwQosMemThreshStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the normal threshold
+         for Memory Utilization has been reached. The gateway name and id identifies the
+         notifying gateway."
+    ::= { jnxMbgPgwSMNotifications 23 }
+
+jnxMbgPgwSMGtpEvntNotif NOTIFICATION-TYPE
+    OBJECTS {
+              jnxMbgPgwTrapGwIndex,
+              jnxMbgPgwTrapGwName,
+              jnxMbgPgwSMGTPEventType,
+              jnxMbgPgwSMGTPEventCause 
+            }
+    STATUS          current
+    DESCRIPTION
+        "Subscriber Management GTP Event Notify"      
+    ::= { jnxMbgPgwSMNotifications 24 } 
+
+jnxMbgPgwPFEMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgPgwTrapGwIndex,
+                  jnxMbgPgwAPNMMGatewayName,
+                  jnxMbgPgwSMInterfaceName,
+                  jnxMbgPgwPrevAPNMMState,
+                  jnxMbgPgwNewAPNMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates change in the maintenance mode state
+         for a PFE.  The gateway name, PFE interface name, interface previous state and 
+         new state information are included in the trap."
+    ::= { jnxMbgPgwSMNotifications 25 }
+
+jnxMbgPgwMSMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgPgwTrapGwIndex,
+                  jnxMbgPgwAPNMMGatewayName,
+                  jnxMbgPgwSMInterfaceName,
+                  jnxMbgPgwPrevAPNMMState,
+                  jnxMbgPgwNewAPNMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates change in the maintenance mode state
+         for a SPIC. The gateway name, interface name, interface 
+         previous state and new state information are included in the trap."
+    ::= { jnxMbgPgwSMNotifications 26 }
+
+jnxMbgPgwAPFEMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgPgwTrapGwIndex,
+                  jnxMbgPgwAPNMMGatewayName,
+                  jnxMbgPgwSMInterfaceName,
+                  jnxMbgPgwPrevAPNMMState,
+                  jnxMbgPgwNewAPNMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates a change in the maintenance mode state 
+         for an APFE. The gateway name, interface name, interface previous state 
+         and new state information are included in the trap."
+    ::= { jnxMbgPgwSMNotifications 27 }
+jnxMbgPgwAMSMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgPgwTrapGwIndex,
+                  jnxMbgPgwAPNMMGatewayName,
+                  jnxMbgPgwSMInterfaceName,
+                  jnxMbgPgwPrevAPNMMState,
+                  jnxMbgPgwNewAPNMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates a change in the maintenance mode state 
+         for an AMS. The gateway name, interface name, interface 
+         previous state and new state information are included in the trap."
+    ::= { jnxMbgPgwSMNotifications 28 }
+
+END

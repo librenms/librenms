@@ -20,7 +20,7 @@ IMPORTS
       FROM IF-MIB
 
    VPNId
-     FROM PPVPN-TC-MIB
+     FROM VPN-TC-STD-MIB                 -- RFC4265
 
    SnmpAdminString
       FROM SNMP-FRAMEWORK-MIB
@@ -33,7 +33,7 @@ IMPORTS
       FROM BGP4-MIB;
 
 mplsVpnMIB MODULE-IDENTITY
-   LAST-UPDATED "200102281200Z"  -- 28 February 2002 12:00:00 GMT
+   LAST-UPDATED "201103261200Z"  -- 26 March 2011 12:00:00 GMT
    ORGANIZATION "Provider Provisioned Virtual Private
                  Networks Working Group."
    CONTACT-INFO
@@ -68,6 +68,12 @@ mplsVpnMIB MODULE-IDENTITY
          RFC3031, January 2001."
 
   -- Revision history.
+   REVISION "201103261200Z"  -- 26 March 2011 12:00:00 GMT
+   DESCRIPTION
+        "Changed to import VPNId from VPN-TC-STD-MIB instead of
+         PPVPN-TC-MIB.
+        "
+
    REVISION "200102281200Z"  -- 28 February 2002 12:00:00 GMT
    DESCRIPTION
         "mplsVpnVrfRouteIfIndex changed to InterfaceIndexOrZero.
