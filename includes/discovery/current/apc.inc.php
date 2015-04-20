@@ -177,7 +177,7 @@ if ($device['os'] == "apc")
 
     $oid_array = array(
                      array('HighPrecOid' => 'upsHighPrecOutputCurrent', 'AdvOid' => 'upsAdvOutputCurrent', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Drawn', 'divisor' => 10, 'mib' => '+PowerNet-MIB'),
-                     array('HighPrecOid' => 'upsHighPrecOutputLoad', 'AdvOid' => 'upsAdvOutputLoad', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Load', 'divisor' => 1, 'mib' => '+PowerNet-MIB'),
+                     array('HighPrecOid' => 'upsHighPrecOutputLoad', 'AdvOid' => 'upsAdvOutputLoad', 'type' => 'apc', 'index' => 0, 'descr' => 'Current Load', 'divisor' => 10, 'mib' => '+PowerNet-MIB'),
                  );
     foreach ($oid_array as $item) {
         $low_limit = NULL;
@@ -199,8 +199,13 @@ if ($device['os'] == "apc")
             if ($oids) {
                 echo $item['type'] . ' ' . $item['mib'] . ' UPS';
             }
-            $current = $oids / $item['divisor'];
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
+            if (stristr($current_oid, "HighPrec")) {
+                $current = $oids / $item['divisor'];
+            } else {
+                $current = $oids;
+                $item['divisor'] = 1;
+            }
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid.'.'.$item['index'], $current_oid.'.'.$item['index'], $item['type'], $item['descr'], $item['divisor'], 1, $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
         }
     }
 }
