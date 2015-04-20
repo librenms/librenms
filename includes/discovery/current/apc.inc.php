@@ -184,9 +184,9 @@ if ($device['os'] == "apc")
         $low_limit_warn = NULL;
         $warn_limit = NULL;
         $high_limit = NULL;
-        $oids = snmp_get($device, $item['HighPrecOid'], "-OsqnU", $item['mib']);
+        $oids = snmp_get($device, $item['HighPrecOid'].'.'.$item['index'], "-OsqnU", $item['mib']);
         if (empty($oids)) {
-            $oids = snmp_get($device, $item['AdvOid'], "-OsqnU", $item['mib']);
+            $oids = snmp_get($device, $item['AdvOid'].'.'.$item['index'], "-OsqnU", $item['mib']);
             $current_oid = $item['AdvOid'];
         } else {
             $current_oid = $item['HighPrecOid'];
