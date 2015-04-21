@@ -40,13 +40,14 @@ $format = $_POST['format'];
 foreach (dbFetchRows($sql,$param) as $alert) {
     $log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
     $log_detail = json_decode(gzuncompress($log),true);
+    $fault_detail = '';
     foreach ( $log_detail['rule'] as $tmp_alerts ) {
-        $fault_detail = '';
         foreach ($tmp_alerts as $k=>$v) {
             if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
                 if ($format == 'basic') {
                     $fault_detail .= $k.' => '.$v."\n ";
                 } else {
+                    $v = truncate($v,30);
                     $fault_detail .= $k.' => '.$v.", ";
                 }
             }
