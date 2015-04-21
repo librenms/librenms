@@ -1,0 +1,2519 @@
+
+IEEE8021-Q-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+-- =============================================================
+-- MIB for IEEE 802.1Q Devices
+-- =============================================================
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32,
+    Counter64, Unsigned32, TimeTicks, Integer32
+        FROM SNMPv2-SMI
+    RowStatus, StorageType, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ieee8021BridgeBasePortComponentId, ieee8021BridgeBasePort,
+    ieee8021BridgeBasePortEntry
+        FROM IEEE8021-BRIDGE-MIB
+    ieee802dot1mibs, IEEE8021PbbComponentIdentifier,
+    IEEE8021BridgePortNumber, IEEE8021BridgePortNumberOrZero,
+    IEEE8021VlanIndex, IEEE8021VlanIndexOrWildcard,
+    IEEE8021PortAcceptableFrameTypes
+        FROM IEEE8021-TC-MIB
+    PortList, VlanId
+        FROM Q-BRIDGE-MIB
+    TimeFilter
+        FROM RMON2-MIB;
+
+ieee8021QBridgeMib MODULE-IDENTITY
+    LAST-UPDATED "201112120000Z" -- December 12, 2011
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+
+          Contact: David Levi 
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   P.O. Box 1331
+                   Piscataway
+                   NJ 08855-1331
+                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION
+        "The VLAN Bridge MIB module for managing Virtual Bridged
+        Local Area Networks, as defined by IEEE 802.1Q-2011.
+
+        This MIB module is derived from the IETF Q-BRIDGE-MIB
+        from RFC 4363.
+
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE 802.1Q-2010.
+
+        Copyright (C) IEEE.
+        This version of this MIB module is part of IEEE802.1Q;
+        see the draft itself for full legal notices."
+    REVISION     "201112120000Z" -- December 12, 2011
+    DESCRIPTION
+         "Addition of the VID Translation MIB Subtree for 802.1aq"
+
+    REVISION     "201102270000Z" -- February 27, 2011
+    DESCRIPTION
+         "Minor edits to contact information etc. as part of 
+          2011 revision of IEEE Std 802.1Q."
+                    
+    REVISION     "200810150000Z" -- October 15, 2008
+    DESCRIPTION
+         "Initial version, derived from RFC 4363."
+    ::= { ieee802dot1mibs 4 }
+
+ieee8021QBridgeMibObjects OBJECT IDENTIFIER ::= { ieee8021QBridgeMib 1 }
+
+-- =============================================================
+-- subtrees in the Q-BRIDGE MIB
+-- =============================================================
+
+ieee8021QBridgeBase      OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 1 }
+ieee8021QBridgeTp        OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 2 }
+ieee8021QBridgeStatic    OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 3 }
+ieee8021QBridgeVlan      OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 4 }
+ieee8021QBridgeProtocol  OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 5 }
+ieee8021QBridgeVIDX      OBJECT IDENTIFIER ::= { ieee8021QBridgeMibObjects 6 }
+
+-- =============================================================
+-- ieee8021QBridgeBase subtree
+-- =============================================================
+
+-- =============================================================
+-- ieee8021QBridgeTable - Table of VLAN bridges
+-- =============================================================
+
+ieee8021QBridgeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains generic information about every
+        VLAN bridge."
+    REFERENCE   "12.4"
+    ::= { ieee8021QBridgeBase 1 }
+
+ieee8021QBridgeEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing information for each VLAN bridge."
+    INDEX   { ieee8021QBridgeComponentId }
+    ::= { ieee8021QBridgeTable 1 }
+
+Ieee8021QBridgeEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeComponentId        IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeVlanVersionNumber  INTEGER,
+        ieee8021QBridgeMaxVlanId          VlanId,
+        ieee8021QBridgeMaxSupportedVlans  Unsigned32,
+        ieee8021QBridgeNumVlans           Gauge32,
+        ieee8021QBridgeMvrpEnabledStatus  TruthValue
+    }
+
+ieee8021QBridgeComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeEntry 1 }
+
+ieee8021QBridgeVlanVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1),
+                    version2(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of IEEE 802.1Q that this device
+        supports.  Reported as 1 by VLAN Bridges that support
+        only SST operation, and reported as 2 by VLAN Bridges
+        that support MST operation."
+    REFERENCE   "12.10.1.1"
+    ::= { ieee8021QBridgeEntry 2 }
+
+ieee8021QBridgeMaxVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum IEEE 802.1Q VLAN-ID that this device
+        supports."
+    REFERENCE   "9.6"
+    ::= { ieee8021QBridgeEntry 3 }
+
+ieee8021QBridgeMaxSupportedVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "vlans"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of IEEE 802.1Q VLANs that this
+        device supports."
+    REFERENCE   "12.10.1.1"
+    ::= { ieee8021QBridgeEntry 4 }
+
+ieee8021QBridgeNumVlans OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "vlans"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of IEEE 802.1Q VLANs that are
+        configured in this device."
+    REFERENCE   "12.7.1.1"
+    ::= { ieee8021QBridgeEntry 5 }
+
+ieee8021QBridgeMvrpEnabledStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative status requested by management for
+        MVRP.  The value true(1) indicates that MVRP should
+        be enabled on this device, on all ports for which it has
+        not been specifically disabled.  When false(2), MVRP
+        is disabled on all ports, and all MVRP packets will be
+        forwarded transparently.  This object affects all MVRP
+        Applicant and Registrar state machines.  A transition
+        from false(2) to true(1) will cause a reset of all
+        MVRP state machines on all ports.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    DEFVAL      { true }
+    ::= { ieee8021QBridgeEntry 6 }
+
+-- =============================================================
+-- ieee8021QBridgeCVlanPortTable - Table of C-VLAN ports
+-- =============================================================
+
+ieee8021QBridgeCVlanPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeCVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides the capability to create and delete
+        customer VLAN ports.  Entries in this table must be
+        persistent over power up restart/reboot."
+    REFERENCE   "12.16.1.1.3 h4), 12.16.2.1/2,
+                 12.13.1.1, 12.13.1.2, 12.15.2.1, 12.15.2.2"
+    ::= { ieee8021QBridgeBase 2 }
+
+ieee8021QBridgeCVlanPortEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeCVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing information for each VLAN bridge."
+    INDEX   { ieee8021QBridgeCVlanPortComponentId,
+              ieee8021QBridgeCVlanPortNumber }
+    ::= { ieee8021QBridgeCVlanPortTable 1 }
+
+Ieee8021QBridgeCVlanPortEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeCVlanPortComponentId  IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeCVlanPortNumber       IEEE8021BridgePortNumber,
+        ieee8021QBridgeCVlanPortRowStatus    RowStatus
+    }
+
+ieee8021QBridgeCVlanPortComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The componentcontaining the customer VLAN port represented
+        by this row."
+    ::= { ieee8021QBridgeCVlanPortEntry 1 }
+
+ieee8021QBridgeCVlanPortNumber OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The customer VLAN port number represented by this row."
+    ::= { ieee8021QBridgeCVlanPortEntry 2 }
+
+ieee8021QBridgeCVlanPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table.  Each entry in this table that
+        is valid will have a corresponding entry in the
+        ieee8021BridgeBasePortTable whose value for
+        ieee8021BridgeBasePortType is customerVlanPort(2).  The
+        corresponding value of ieee8021BridgeBasePortIfIndex must
+        be set at the time the value of this object transitions
+        to valid(1).
+
+        Entries in this table must be persistent across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeCVlanPortEntry 3 }
+
+-- =============================================================
+-- the ieee8021QBridgeTp subtree
+-- =============================================================
+
+-- =============================================================
+-- the current Filtering Database Table
+-- =============================================================
+
+ieee8021QBridgeFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains configuration and control
+        information for each Filtering Database currently
+        operating on this device.  Entries in this table appear
+        automatically when VLANs are assigned FDB IDs in the
+        ieee8021QBridgeVlanCurrentTable."
+    REFERENCE   "12.7.1"
+    ::= { ieee8021QBridgeTp 1 }
+
+ieee8021QBridgeFdbEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific Filtering Database."
+    INDEX   { ieee8021QBridgeFdbComponentId,
+              ieee8021QBridgeFdbId }
+    ::= { ieee8021QBridgeFdbTable 1 }
+
+Ieee8021QBridgeFdbEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeFdbComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeFdbId
+            Unsigned32,
+        ieee8021QBridgeFdbDynamicCount
+            Gauge32,
+        ieee8021QBridgeFdbLearnedEntryDiscards
+            Counter64,
+        ieee8021QBridgeFdbAgingTime
+            Integer32
+    }
+
+ieee8021QBridgeFdbComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeFdbEntry 1 }
+
+ieee8021QBridgeFdbId OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..4294967295)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The identity of this Filtering Database."
+    ::= { ieee8021QBridgeFdbEntry 2 }
+
+ieee8021QBridgeFdbDynamicCount OBJECT-TYPE
+    SYNTAX       Gauge32
+    UNITS        "database entries"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current number of dynamic entries in this
+        Filtering Database."
+    REFERENCE   "12.7.1.1.3"
+    ::= { ieee8021QBridgeFdbEntry 3 }
+
+ieee8021QBridgeFdbLearnedEntryDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "database entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Filtering Database entries that
+        have been or would have been learned, but have been
+        discarded due to a lack of storage space in the
+        Filtering Database.  If this counter is increasing, it
+        indicates that the Filtering Database is regularly
+        becoming full (a condition that has unpleasant
+        performance effects on the subnetwork).  If this counter
+        has a significant value but is not presently increasing,
+        it indicates that the problem has been occurring but is
+        not persistent.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system."
+    ::= { ieee8021QBridgeFdbEntry 4 }
+
+ieee8021QBridgeFdbAgingTime OBJECT-TYPE
+    SYNTAX      Integer32 (10..1000000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The timeout period in seconds for aging out
+        dynamically-learned forwarding information.
+        802.1D-1998 recommends a default of 300 seconds.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.7.1.2"
+    ::= { ieee8021QBridgeFdbEntry 5 }
+
+-- =============================================================
+-- Multiple Filtering Databases for 802.1Q Transparent Devices
+-- This table is an alternative to the ieee8021BridgeTpFdbTable,
+-- previously defined for 802.1D devices that only support a
+-- single Filtering Database.
+-- =============================================================
+
+ieee8021QBridgeTpFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeTpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about unicast entries
+        for which the device has forwarding and/or filtering
+        information.  This information is used by the
+        transparent bridging function in determining how to
+        propagate a received frame."
+    REFERENCE   "12.7.1"
+    ::= { ieee8021QBridgeTp 2 }
+
+ieee8021QBridgeTpFdbEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeTpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific unicast MAC address for
+        which the device has some forwarding and/or filtering
+        information."
+    INDEX   { ieee8021QBridgeFdbComponentId,
+              ieee8021QBridgeFdbId,
+              ieee8021QBridgeTpFdbAddress }
+    ::= { ieee8021QBridgeTpFdbTable 1 }
+
+Ieee8021QBridgeTpFdbEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeTpFdbAddress
+            MacAddress,
+        ieee8021QBridgeTpFdbPort
+            IEEE8021BridgePortNumberOrZero,
+        ieee8021QBridgeTpFdbStatus
+            INTEGER
+    }
+
+ieee8021QBridgeTpFdbAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unicast MAC address for which the device has
+        forwarding and/or filtering information."
+    ::= { ieee8021QBridgeTpFdbEntry 1 }
+
+ieee8021QBridgeTpFdbPort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Either the value '0', or the port number of the port on
+        which a frame having a source address equal to the value
+        of the corresponding instance of ieee8021QBridgeTpFdbAddress has
+        been seen.  A value of '0' indicates that the port
+        number has not been learned but that the device does
+        have some forwarding/filtering information about this
+        address (e.g., in the ieee8021QBridgeStaticUnicastTable).
+        Implementors are encouraged to assign the port value to
+        this object whenever it is learned, even for addresses
+        for which the corresponding value of ieee8021QBridgeTpFdbStatus is
+        not learned(3)."
+    ::= { ieee8021QBridgeTpFdbEntry 2 }
+
+ieee8021QBridgeTpFdbStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    learned(3),
+                    self(4),
+                    mgmt(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry.  The meanings of the values
+        are:
+            other(1) - none of the following.  This may include
+                the case where some other MIB object (not the
+                corresponding instance of ieee8021QBridgeTpFdbPort, nor an
+                entry in the ieee8021QBridgeStaticUnicastTable) is being
+                used to determine if and how frames addressed to
+                the value of the corresponding instance of
+                ieee8021QBridgeTpFdbAddress are being forwarded.
+            invalid(2) - this entry is no longer valid (e.g., it
+                was learned but has since aged out), but has not
+                yet been flushed from the table.
+            learned(3) - the value of the corresponding instance
+                of ieee8021QBridgeTpFdbPort was learned and is being used.
+            self(4) - the value of the corresponding instance of
+                ieee8021QBridgeTpFdbAddress represents one of the device's
+                addresses.  The corresponding instance of
+                ieee8021QBridgeTpFdbPort indicates which of the device's
+                ports has this address.
+            mgmt(5) - the value of the corresponding instance of
+                ieee8021QBridgeTpFdbAddress is also the value of an
+                existing instance of ieee8021QBridgeStaticUnicastAddress."
+    ::= { ieee8021QBridgeTpFdbEntry 3 }
+
+-- =============================================================
+-- Dynamic Group Registration Table
+-- =============================================================
+
+ieee8021QBridgeTpGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeTpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for VLANs
+        configured into the bridge by (local or network)
+        management, or learned dynamically, specifying the set of
+        ports to which frames received on a VLAN for this FDB
+        and containing a specific Group destination address are
+        allowed to be forwarded."
+    REFERENCE   "12.7.4"
+    ::= { ieee8021QBridgeTp 3 }
+
+ieee8021QBridgeTpGroupEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeTpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the bridge by
+        management, or learned dynamically, specifying the set of
+        ports to which frames received on a VLAN and containing
+        a specific Group destination address are allowed to be
+        forwarded.  The subset of these ports learned dynamically
+        is also provided."
+    INDEX   { ieee8021QBridgeVlanCurrentComponentId,
+              ieee8021QBridgeVlanIndex,
+              ieee8021QBridgeTpGroupAddress }
+    ::= { ieee8021QBridgeTpGroupTable 1 }
+
+Ieee8021QBridgeTpGroupEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeTpGroupAddress
+            MacAddress,
+        ieee8021QBridgeTpGroupEgressPorts
+            PortList,
+        ieee8021QBridgeTpGroupLearnt
+            PortList
+    }
+
+ieee8021QBridgeTpGroupAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination Group MAC address in a frame to which
+        this entry's filtering information applies."
+    ::= { ieee8021QBridgeTpGroupEntry 1 }
+
+ieee8021QBridgeTpGroupEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which
+        frames destined for this Group MAC address are currently
+        being explicitly forwarded.  This does not include ports
+        for which this address is only implicitly forwarded, in
+        the ieee8021QBridgeForwardAllPorts list."
+    ::= { ieee8021QBridgeTpGroupEntry 2 }
+
+ieee8021QBridgeTpGroupLearnt OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in ieee8021QBridgeTpGroupEgressPorts that
+        were learned by MMRP or some other dynamic mechanism, in
+        this Filtering database."
+    ::= { ieee8021QBridgeTpGroupEntry 3 }
+
+-- =============================================================
+-- Service Requirements subtree
+-- =============================================================
+
+ieee8021QBridgeForwardAllTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeForwardAllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing forwarding information for each
+        VLAN, specifying the set of ports to which forwarding of
+        all multicasts applies, configured statically by
+        management or dynamically by MMRP.  An entry appears in
+        this table for all VLANs that are currently
+        instantiated."
+    REFERENCE   "12.7.2, 12.7.7"
+    ::= { ieee8021QBridgeTp 4 }
+
+ieee8021QBridgeForwardAllEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeForwardAllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Forwarding information for a VLAN, specifying the set
+        of ports to which all multicasts should be forwarded,
+        configured statically by management or dynamically by
+        MMRP."
+    INDEX   { ieee8021QBridgeVlanCurrentComponentId,
+              ieee8021QBridgeForwardAllVlanIndex }
+    ::= { ieee8021QBridgeForwardAllTable 1 }
+
+Ieee8021QBridgeForwardAllEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeForwardAllVlanIndex
+            IEEE8021VlanIndexOrWildcard,
+        ieee8021QBridgeForwardAllPorts
+            PortList,
+        ieee8021QBridgeForwardAllStaticPorts
+            PortList,
+        ieee8021QBridgeForwardAllForbiddenPorts
+            PortList
+    }
+
+ieee8021QBridgeForwardAllVlanIndex OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndexOrWildcard
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier referring to this VLAN."
+    ::= { ieee8021QBridgeForwardAllEntry 1 }
+
+ieee8021QBridgeForwardAllPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports in this VLAN to which all
+        multicast group-addressed frames are to be forwarded.
+        This includes ports for which this need has been
+        determined dynamically by MMRP, or configured statically
+        by management."
+    ::= { ieee8021QBridgeForwardAllEntry 2 }
+
+ieee8021QBridgeForwardAllStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of ports configured by management in this VLAN
+        to which all multicast group-addressed frames are to be
+        forwarded.  Ports entered in this list will also appear
+        in the complete set shown by ieee8021QBridgeForwardAllPorts.  This
+        value will be restored after the device is reset.  This
+        only applies to ports that are members of the VLAN,
+        defined by ieee8021QBridgeVlanCurrentEgressPorts.  A port may not
+        be added in this set if it is already a member of the
+        set of ports in ieee8021QBridgeForwardAllForbiddenPorts.  The
+        default value is a string of ones of appropriate length,
+        to indicate the standard behaviour of using basic
+        filtering services, i.e., forward all multicasts to all
+        ports.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeForwardAllEntry 3 }
+
+ieee8021QBridgeForwardAllForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of ports configured by management in this VLAN
+        for which the Service Requirement attribute Forward All
+        Multicast Groups may not be dynamically registered by
+        MMRP.  This value will be restored after the device is
+        reset.  A port may not be added in this set if it is
+        already a member of the set of ports in
+        ieee8021QBridgeForwardAllStaticPorts.  The default value is a
+        string of zeros of appropriate length.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeForwardAllEntry 4 }
+
+ieee8021QBridgeForwardUnregisteredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeForwardUnregisteredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing forwarding information for each
+        VLAN, specifying the set of ports to which forwarding of
+        multicast group-addressed frames for which no
+        more specific forwarding information applies.  This is
+        configured statically by management and determined
+        dynamically by MMRP.  An entry appears in this table for
+        all VLANs that are currently instantiated."
+    REFERENCE   "12.7.2, 12.7.7"
+    ::= { ieee8021QBridgeTp 5 }
+
+ieee8021QBridgeForwardUnregisteredEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeForwardUnregisteredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Forwarding information for a VLAN, specifying the set
+        of ports to which all multicasts for which there is no
+        more specific forwarding information shall be forwarded.
+        This is configured statically by management or
+        dynamically by MMRP."
+    INDEX   { ieee8021QBridgeVlanCurrentComponentId,
+              ieee8021QBridgeForwardUnregisteredVlanIndex }
+    ::= { ieee8021QBridgeForwardUnregisteredTable 1 }
+
+Ieee8021QBridgeForwardUnregisteredEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeForwardUnregisteredVlanIndex
+            IEEE8021VlanIndexOrWildcard,
+        ieee8021QBridgeForwardUnregisteredPorts
+            PortList,
+        ieee8021QBridgeForwardUnregisteredStaticPorts
+            PortList,
+        ieee8021QBridgeForwardUnregisteredForbiddenPorts
+            PortList
+    }
+
+ieee8021QBridgeForwardUnregisteredVlanIndex OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndexOrWildcard
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier referring to this VLAN."
+    ::= { ieee8021QBridgeForwardUnregisteredEntry 1 }
+
+ieee8021QBridgeForwardUnregisteredPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports in this VLAN to which
+        multicast group-addressed frames for which there is no
+        more specific forwarding information will be forwarded.
+        This includes ports for which this need has been
+        determined dynamically by MMRP, or configured statically
+        by management."
+    ::= { ieee8021QBridgeForwardUnregisteredEntry 2 }
+
+ieee8021QBridgeForwardUnregisteredStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of ports configured by management, in this
+        VLAN, to which multicast group-addressed frames for
+        which there is no more specific forwarding information
+        are to be forwarded.  Ports entered in this list will
+        also appear in the complete set shown by
+        ieee8021QBridgeForwardUnregisteredPorts.  This value will be
+        restored after the device is reset.  A port may not be
+        added in this set if it is already a member of the set
+        of ports in ieee8021QBridgeForwardUnregisteredForbiddenPorts.  The
+        default value is a string of zeros of appropriate
+        length, although this has no effect with the default
+        value of ieee8021QBridgeForwardAllStaticPorts.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeForwardUnregisteredEntry 3 }
+
+ieee8021QBridgeForwardUnregisteredForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of ports configured by management in this VLAN
+        for which the Service Requirement attribute Forward
+        Unregistered Multicast Groups may not be dynamically
+        registered by MMRP.  This value will be restored after
+        the device is reset.  A port may not be added in this
+        set if it is already a member of the set of ports in
+        ieee8021QBridgeForwardUnregisteredStaticPorts.  The default value
+        is a string of zeros of appropriate length.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeForwardUnregisteredEntry 4 }
+
+-- =============================================================
+-- The Static (Destination-Address Filtering) Database
+-- =============================================================
+
+ieee8021QBridgeStaticUnicastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeStaticUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for Unicast
+        MAC addresses for each Filtering Database, configured
+        into the device by (local or network) management
+        specifying the set of ports to which frames received
+        from specific ports and containing specific unicast
+        destination addresses are allowed to be forwarded.  
+        Entries are valid for unicast addresses only.
+
+        Two modes of operation are supported by this table. When
+        the receive port index is non-zero, this table is
+        supporting an 802.1D filtering database as specified in
+        14.7.6.1.  If the receive port is zero, the
+        table is operating as specified in 802.1Q 
+        8.8.1 and 12.7.7.  An agent must at least 
+        support the 802.1Q mode of operation."
+    REFERENCE   "802.1D 7.9.1, 14.7.6.1; 
+                 802.1Q 12.7.7, 8.8.1"
+    ::= { ieee8021QBridgeStatic 1 }
+
+ieee8021QBridgeStaticUnicastEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeStaticUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device by
+        (local or network) management specifying the set of
+        ports to which frames received from a specific port and
+        containing a specific unicast destination address are
+        allowed to be forwarded."
+    INDEX   {
+        ieee8021QBridgeStaticUnicastComponentId,
+        ieee8021QBridgeStaticUnicastVlanIndex,
+        ieee8021QBridgeStaticUnicastAddress,
+        ieee8021QBridgeStaticUnicastReceivePort
+    }
+    ::= { ieee8021QBridgeStaticUnicastTable 1 }
+
+Ieee8021QBridgeStaticUnicastEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeStaticUnicastComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeStaticUnicastVlanIndex
+            IEEE8021VlanIndexOrWildcard,
+        ieee8021QBridgeStaticUnicastAddress
+            MacAddress,
+        ieee8021QBridgeStaticUnicastReceivePort
+            IEEE8021BridgePortNumberOrZero,
+        ieee8021QBridgeStaticUnicastStaticEgressPorts
+            PortList,
+        ieee8021QBridgeStaticUnicastForbiddenEgressPorts
+            PortList,
+        ieee8021QBridgeStaticUnicastStorageType
+            StorageType,
+        ieee8021QBridgeStaticUnicastRowStatus
+            RowStatus
+    }
+
+ieee8021QBridgeStaticUnicastComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeStaticUnicastEntry 1 }
+
+ieee8021QBridgeStaticUnicastVlanIndex OBJECT-TYPE
+    SYNTAX       IEEE8021VlanIndexOrWildcard
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The Vlan to which this entry applies."
+    ::= { ieee8021QBridgeStaticUnicastEntry 2 }
+
+ieee8021QBridgeStaticUnicastAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address in a frame to which this
+        entry's filtering information applies.  This object must
+        take the value of a unicast address."
+    ::= { ieee8021QBridgeStaticUnicastEntry 3 }
+
+ieee8021QBridgeStaticUnicastReceivePort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumberOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Either the value '0' or the port number of the port
+        from which a frame must be received in order for this
+        entry's filtering information to apply.  A value of zero
+        indicates that this entry applies on all ports of the
+        device for which there is no other applicable entry. An
+        implementation is required to support the '0' value and
+        may optionally support non-zero values for this column."
+    ::= { ieee8021QBridgeStaticUnicastEntry 4 }
+
+ieee8021QBridgeStaticUnicastStaticEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports to which frames received from a
+        specific port and destined for a specific unicast address
+        must be forwarded, regardless of
+        any dynamic information, e.g., from MMRP.  A port may not
+        be added in this set if it is already a member of the
+        set of ports in ieee8021QBridgeStaticUnicastForbiddenEgressPorts.
+        The default value of this object is a string of ones of
+        appropriate length."
+    DEFVAL      { ''H }
+    ::= { ieee8021QBridgeStaticUnicastEntry 5 }
+
+
+ieee8021QBridgeStaticUnicastForbiddenEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports to which frames received from a
+        specific port and destined for a specific unicast
+        MAC address must not be forwarded, regardless
+        of any dynamic information, e.g., from MMRP.  A port may
+        not be added in this set if it is already a member of the
+        set of ports in ieee8021QBridgeStaticUnicastStaticEgressPorts.
+        The default value of this object is a string of zeros of
+        appropriate length."
+    DEFVAL      { ''H }
+    ::= { ieee8021QBridgeStaticUnicastEntry 6 }
+
+ieee8021QBridgeStaticUnicastStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.  If this object
+        has a value of permanent(4), then no other objects are
+        required to be able to be modified."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021QBridgeStaticUnicastEntry 7 }
+
+ieee8021QBridgeStaticUnicastRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry, and is used
+        to create/delete entries in the table.
+
+        An entry of this table may be set to active without setting
+        any other columns of the table.  Also, other columns of this
+        table may be set while the value of this object is active(1)."
+    ::= { ieee8021QBridgeStaticUnicastEntry 8 }
+
+ieee8021QBridgeStaticMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeStaticMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for Multicast
+        and Broadcast MAC addresses for each VLAN, configured
+        into the device by (local or network) management
+        specifying the set of ports to which frames received
+        from specific ports and containing specific Multicast
+        and Broadcast destination addresses are allowed to be
+        forwarded.  A value of zero in this table (as the port
+        number from which frames with a specific destination
+        address are received) is used to specify all ports for
+        which there is no specific entry in this table for that
+        particular destination address.  Entries are valid for
+        Multicast and Broadcast addresses only."
+    REFERENCE   "12.7.7, 8.8.1"
+    ::= { ieee8021QBridgeStatic 2 }
+
+ieee8021QBridgeStaticMulticastEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeStaticMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device by
+        (local or network) management specifying the set of
+        ports to which frames received from this specific port
+        for this VLAN and containing this Multicast or Broadcast
+        destination address are allowed to be forwarded."
+    INDEX   {
+        ieee8021QBridgeVlanCurrentComponentId,
+        ieee8021QBridgeVlanIndex,
+        ieee8021QBridgeStaticMulticastAddress,
+        ieee8021QBridgeStaticMulticastReceivePort
+    }
+    ::= { ieee8021QBridgeStaticMulticastTable 1 }
+
+Ieee8021QBridgeStaticMulticastEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeStaticMulticastAddress
+            MacAddress,
+        ieee8021QBridgeStaticMulticastReceivePort
+            IEEE8021BridgePortNumberOrZero,
+        ieee8021QBridgeStaticMulticastStaticEgressPorts
+            PortList,
+        ieee8021QBridgeStaticMulticastForbiddenEgressPorts
+            PortList,
+        ieee8021QBridgeStaticMulticastStorageType
+            StorageType,
+        ieee8021QBridgeStaticMulticastRowStatus
+            RowStatus
+    }
+
+ieee8021QBridgeStaticMulticastAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address in a frame to which this
+        entry's filtering information applies.  This object must
+        take the value of a Multicast or Broadcast address."
+    ::= { ieee8021QBridgeStaticMulticastEntry 1 }
+
+ieee8021QBridgeStaticMulticastReceivePort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumberOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Either the value '0' or the port number of the port
+        from which a frame must be received in order for this
+        entry's filtering information to apply.  A value of zero
+        indicates that this entry applies on all ports of the
+        device for which there is no other applicable entry. An
+        implementation is required to support the '0' value and
+        may optionally support non-zero values for this column."
+    ::= { ieee8021QBridgeStaticMulticastEntry 2 }
+
+ieee8021QBridgeStaticMulticastStaticEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports to which frames received from a
+        specific port and destined for a specific Multicast or
+        Broadcast MAC address must be forwarded, regardless of
+        any dynamic information, e.g., from MMRP.  A port may not
+        be added in this set if it is already a member of the
+        set of ports in ieee8021QBridgeStaticMulticastForbiddenEgressPorts.
+        The default value of this object is a string of ones of
+        appropriate length."
+    DEFVAL      { ''H }
+    ::= { ieee8021QBridgeStaticMulticastEntry 3 }
+
+ieee8021QBridgeStaticMulticastForbiddenEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports to which frames received from a
+        specific port and destined for a specific Multicast or
+        Broadcast MAC address must not be forwarded, regardless
+        of any dynamic information, e.g., from MMRP.  A port may
+        not be added in this set if it is already a member of the
+        set of ports in ieee8021QBridgeStaticMulticastStaticEgressPorts.
+        The default value of this object is a string of zeros of
+        appropriate length."
+    DEFVAL      { ''H }
+    ::= { ieee8021QBridgeStaticMulticastEntry 4 }
+
+ieee8021QBridgeStaticMulticastStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.  If this object
+        has a value of permanent(4), then no other objects are
+        required to be able to be modified."
+    DEFVAL      { nonVolatile }
+    ::= { ieee8021QBridgeStaticMulticastEntry 5 }
+
+ieee8021QBridgeStaticMulticastRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry, and is used
+        to create/delete entries in the table.
+
+        An entry of this table may be set to active without setting
+        any other columns of the table.  Also, other columns of this
+        table may be set while the value of this object is active(1)."
+    ::= { ieee8021QBridgeStaticMulticastEntry 6 }
+
+-- =============================================================
+-- The Current VLAN Database
+-- =============================================================
+
+ieee8021QBridgeVlanNumDeletes OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "vlan deletions"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times a VLAN entry has been deleted from
+        the ieee8021QBridgeVlanCurrentTable (for any reason).
+        If an entry is deleted, then inserted, and then deleted,
+        this counter will be incremented by 2.  Discontinuities
+        in this value can only occur at a reboot."
+    ::= { ieee8021QBridgeVlan 1 }
+
+ieee8021QBridgeVlanCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing current configuration information
+        for each VLAN currently configured into the device by
+        (local or network) management, or dynamically created
+        as a result of MVRP requests received."
+    REFERENCE   "12.10.2"
+    ::= { ieee8021QBridgeVlan 2 }
+
+ieee8021QBridgeVlanCurrentEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a VLAN configured into the device by
+        (local or network) management, or dynamically created
+        as a result of MVRP requests received."
+    INDEX   { ieee8021QBridgeVlanTimeMark,
+              ieee8021QBridgeVlanCurrentComponentId,
+              ieee8021QBridgeVlanIndex }
+    ::= { ieee8021QBridgeVlanCurrentTable 1 }
+
+Ieee8021QBridgeVlanCurrentEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeVlanTimeMark
+            TimeFilter,       
+        ieee8021QBridgeVlanCurrentComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeVlanIndex
+            IEEE8021VlanIndex,
+        ieee8021QBridgeVlanFdbId
+            Unsigned32,
+        ieee8021QBridgeVlanCurrentEgressPorts
+            PortList,
+        ieee8021QBridgeVlanCurrentUntaggedPorts
+            PortList,
+        ieee8021QBridgeVlanStatus
+            INTEGER,
+        ieee8021QBridgeVlanCreationTime
+            TimeTicks
+    }
+
+ieee8021QBridgeVlanTimeMark OBJECT-TYPE
+    SYNTAX      TimeFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A TimeFilter for this entry.  See the TimeFilter
+        textual convention to see how this works."
+    ::= { ieee8021QBridgeVlanCurrentEntry 1 }
+
+ieee8021QBridgeVlanCurrentComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeVlanCurrentEntry 2 }
+
+ieee8021QBridgeVlanIndex OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier referring to this VLAN."
+    ::= { ieee8021QBridgeVlanCurrentEntry 3 }
+
+ieee8021QBridgeVlanFdbId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Filtering Database used by this VLAN.  This is one
+        of the ieee8021QBridgeFdbId values in the ieee8021QBridgeFdbTable.
+        This value is allocated automatically by the device whenever
+        the VLAN is created: either dynamically by MVRP, or by
+        management, in ieee8021QBridgeVlanStaticTable.  Allocation of this
+        value follows the learning constraints defined for this
+        VLAN in ieee8021QBridgeLearningConstraintsTable."
+    ::= { ieee8021QBridgeVlanCurrentEntry 4 }
+
+ieee8021QBridgeVlanCurrentEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports that are transmitting traffic for
+        this VLAN as either tagged or untagged frames."
+    REFERENCE   "12.10.2.1"
+    ::= { ieee8021QBridgeVlanCurrentEntry 5 }
+
+ieee8021QBridgeVlanCurrentUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports that are transmitting traffic for
+        this VLAN as untagged frames."
+    REFERENCE   "12.10.2.1"
+    ::= { ieee8021QBridgeVlanCurrentEntry 6 }
+
+ieee8021QBridgeVlanStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    permanent(2),
+                    dynamicMvrp(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry.
+            other(1) - this entry is currently in use, but the
+                conditions under which it will remain so differ
+                from the following values.
+            permanent(2) - this entry, corresponding to an entry
+                in ieee8021QBridgeVlanStaticTable, is currently in use and
+                will remain so after the next reset of the
+                device.  The port lists for this entry include
+                ports from the equivalent ieee8021QBridgeVlanStaticTable
+                entry and ports learned dynamically.
+            dynamicMvrp(3) - this entry is currently in use
+                and will remain so until removed by MVRP.  There
+                is no static entry for this VLAN, and it will be
+                removed when the last port leaves the VLAN."
+    ::= { ieee8021QBridgeVlanCurrentEntry 7 }
+
+ieee8021QBridgeVlanCreationTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this VLAN was created."
+    ::= { ieee8021QBridgeVlanCurrentEntry 8 }
+
+-- =============================================================
+-- The Static VLAN Database
+-- =============================================================
+
+ieee8021QBridgeVlanStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static configuration information for
+        each VLAN configured into the device by (local or
+        network) management.  All entries are persistent and will
+        be restored after the device is reset."
+    REFERENCE   "12.7.5"
+    ::= { ieee8021QBridgeVlan 3 }
+
+ieee8021QBridgeVlanStaticEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static information for a VLAN configured into the
+        device by (local or network) management."
+    INDEX   { ieee8021QBridgeVlanStaticComponentId,
+              ieee8021QBridgeVlanStaticVlanIndex }
+    ::= { ieee8021QBridgeVlanStaticTable 1 }
+
+Ieee8021QBridgeVlanStaticEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeVlanStaticComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeVlanStaticVlanIndex
+            IEEE8021VlanIndex,
+        ieee8021QBridgeVlanStaticName
+            SnmpAdminString,
+        ieee8021QBridgeVlanStaticEgressPorts
+            PortList,
+        ieee8021QBridgeVlanForbiddenEgressPorts
+            PortList,
+        ieee8021QBridgeVlanStaticUntaggedPorts
+            PortList,
+        ieee8021QBridgeVlanStaticRowStatus
+            RowStatus
+    }
+
+ieee8021QBridgeVlanStaticComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeVlanStaticEntry 1 }
+
+ieee8021QBridgeVlanStaticVlanIndex OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier referring to this VLAN."
+    ::= { ieee8021QBridgeVlanStaticEntry 2 }
+
+ieee8021QBridgeVlanStaticName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An administratively assigned string, which may be used
+        to identify the VLAN."
+    REFERENCE   "12.10.2.1"
+    ::= { ieee8021QBridgeVlanStaticEntry 3 }
+
+ieee8021QBridgeVlanStaticEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports that are permanently assigned to the
+        egress list for this VLAN by management.  Changes to a
+        bit in this object affect the per-port, per-VLAN
+        Registrar control for Registration Fixed for the
+        relevant MVRP state machine on each port.  A port may
+        not be added in this set if it is already a member of
+        the set of ports in ieee8021QBridgeVlanForbiddenEgressPorts.  The
+        default value of this object is a string of zeros of
+        appropriate length, indicating not fixed."
+    REFERENCE   "12.7.7.3, 11.2.3.2.3"
+    ::= { ieee8021QBridgeVlanStaticEntry 4 }
+
+ieee8021QBridgeVlanForbiddenEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports that are prohibited by management
+        from being included in the egress list for this VLAN.
+        Changes to this object that cause a port to be included
+        or excluded affect the per-port, per-VLAN Registrar
+        control for Registration Forbidden for the relevant MVRP
+        state machine on each port.  A port may not be added in
+        this set if it is already a member of the set of ports
+        in ieee8021QBridgeVlanStaticEgressPorts.  The default value of
+        this object is a string of zeros of appropriate length,
+        excluding all ports from the forbidden set."
+    REFERENCE   "12.7.7.3, 11.2.3.2.3"
+    ::= { ieee8021QBridgeVlanStaticEntry 5 }
+
+ieee8021QBridgeVlanStaticUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports that should transmit egress packets
+        for this VLAN as untagged.  The default value of this
+        object for the default VLAN (ieee8021QBridgeVlanIndex = 1) is a string
+        of appropriate length including all ports.  There is no
+        specified default for other VLANs.  If a device agent cannot
+        support the set of ports being set, then it will reject the
+        set operation with an error.  For example, a
+        manager might attempt to set more than one VLAN to be untagged
+        on egress where the device does not support this IEEE 802.1Q
+        option."
+    REFERENCE   "12.10.2.1"
+    ::= { ieee8021QBridgeVlanStaticEntry 6 }
+
+ieee8021QBridgeVlanStaticRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry, and is used
+        to create/delete entries.  Any object in an entry of this table
+        may be modified while the value of the corresponding instance
+        of this object is active(1)."
+    ::= { ieee8021QBridgeVlanStaticEntry 7 }
+
+ieee8021QBridgeNextFreeLocalVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeNextFreeLocalVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about the next free VLAN
+        value for a statically configured VLAN bridge."
+    ::= { ieee8021QBridgeVlan 4 }
+
+ieee8021QBridgeNextFreeLocalVlanEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeNextFreeLocalVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The next free VLAN value for a statically configured VLAN bridge"
+    INDEX   { ieee8021QBridgeNextFreeLocalVlanComponentId }
+    ::= { ieee8021QBridgeNextFreeLocalVlanTable 1 }
+
+Ieee8021QBridgeNextFreeLocalVlanEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeNextFreeLocalVlanComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeNextFreeLocalVlanIndex
+            Unsigned32
+    }
+
+ieee8021QBridgeNextFreeLocalVlanComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeNextFreeLocalVlanEntry 1 }
+
+ieee8021QBridgeNextFreeLocalVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|4096..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next available value for ieee8021QBridgeVlanIndex of a local
+        VLAN entry in ieee8021QBridgeVlanStaticTable.  This will report
+        values >=4096 if a new Local VLAN may be created or else
+        the value 0 if this is not possible.
+
+        A row creation operation in this table for an entry with a local
+        VlanIndex value may fail if the current value of this object
+        is not used as the index.  Even if the value read is used,
+        there is no guarantee that it will still be the valid index
+        when the create operation is attempted; another manager may
+        have already got in during the intervening time interval.
+        In this case, ieee8021QBridgeNextFreeLocalVlanIndex should be re-read
+        and the creation re-tried with the new value.
+
+        This value will automatically change when the current value is
+        used to create a new row."
+    ::= { ieee8021QBridgeNextFreeLocalVlanEntry 2 }
+
+-- =============================================================
+-- The VLAN Port Configuration Table
+-- =============================================================
+
+ieee8021QBridgePortVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgePortVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port control and status
+        information for VLAN configuration in the device."
+    REFERENCE   "12.10.1"
+    ::= { ieee8021QBridgeVlan 5 }
+
+ieee8021QBridgePortVlanEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgePortVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling VLAN configuration for a port
+        on the device.  This is indexed by ieee8021BridgeBasePort."
+    AUGMENTS { ieee8021BridgeBasePortEntry }
+    ::= { ieee8021QBridgePortVlanTable 1 }
+
+Ieee8021QBridgePortVlanEntry ::=
+    SEQUENCE {
+        ieee8021QBridgePvid
+            IEEE8021VlanIndex,
+        ieee8021QBridgePortAcceptableFrameTypes
+            IEEE8021PortAcceptableFrameTypes,
+        ieee8021QBridgePortIngressFiltering
+            TruthValue,
+        ieee8021QBridgePortMvrpEnabledStatus
+            TruthValue,
+        ieee8021QBridgePortMvrpFailedRegistrations
+            Counter64,
+        ieee8021QBridgePortMvrpLastPduOrigin
+            MacAddress,
+        ieee8021QBridgePortRestrictedVlanRegistration
+            TruthValue
+    }
+
+ieee8021QBridgePvid OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PVID, the VLAN-ID assigned to untagged frames or
+        Priority-Tagged frames received on this port.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.10.1.1"
+    DEFVAL      { 1 }
+    ::= { ieee8021QBridgePortVlanEntry 1 }
+
+ieee8021QBridgePortAcceptableFrameTypes OBJECT-TYPE
+    SYNTAX      IEEE8021PortAcceptableFrameTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this is admitTagged(3), the device will
+        discard untagged frames or Priority-Tagged frames
+        received on this port.  When admitAll(1), untagged
+        frames or Priority-Tagged frames received on this port
+        will be accepted and assigned to a VID based on the
+        PVID and VID Set for this port.
+
+        This control does not affect VLAN-independent Bridge
+        Protocol Data Unit (BPDU) frames, such as MVRP and
+        Spanning Tree Protocol (STP).  It does affect VLAN-
+        dependent BPDU frames, such as MMRP.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.10.1.3"
+    DEFVAL      { admitAll }
+    ::= { ieee8021QBridgePortVlanEntry 2 }
+
+ieee8021QBridgePortIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this is true(1), the device will discard incoming
+        frames for VLANs that do not include this Port in its
+        Member set.  When false(2), the port will accept all
+        incoming frames.
+
+        This control does not affect VLAN-independent BPDU
+        frames, such as MVRP and STP.  It does affect VLAN-
+        dependent BPDU frames, such as MMRP.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.10.1.4"
+    DEFVAL      { false }
+    ::= { ieee8021QBridgePortVlanEntry 3 }
+      
+ieee8021QBridgePortMvrpEnabledStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The state of MVRP operation on this port.  The value
+        true(1) indicates that MVRP is enabled on this port,
+        as long as ieee8021QBridgeMvrpEnabledStatus is also enabled
+        for this device.  When false(2) but
+        ieee8021QBridgeMvrpEnabledStatus is still
+        enabled for the device, MVRP is disabled on this port:
+        any MVRP packets received will be silently discarded, and
+        no MVRP registrations will be propagated from other
+        ports.  This object affects all MVRP Applicant and
+        Registrar state machines on this port.  A transition
+        from false(2) to true(1) will cause a reset of all
+        MVRP state machines on this port.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    DEFVAL      { true }
+    ::= { ieee8021QBridgePortVlanEntry 4 }
+
+ieee8021QBridgePortMvrpFailedRegistrations OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS      "failed MVRP registrations"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed MVRP registrations, for any
+        reason, on this port.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated
+        interface (if any)."
+    ::= { ieee8021QBridgePortVlanEntry 5 }
+
+ieee8021QBridgePortMvrpLastPduOrigin OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Source MAC Address of the last MVRP message
+        received on this port."
+    ::= { ieee8021QBridgePortVlanEntry 6 }
+
+ieee8021QBridgePortRestrictedVlanRegistration OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The state of Restricted VLAN Registration on this port.
+         If the value of this control is true(1), then creation
+         of a new dynamic VLAN entry is permitted only if there
+         is a Static VLAN Registration Entry for the VLAN concerned,
+         in which the Registrar Administrative Control value for
+         this port is Normal Registration.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "11.2.3.2.3, 12.10.1.7."
+    DEFVAL      { false }
+    ::= { ieee8021QBridgePortVlanEntry 7 }
+
+-- =============================================================
+-- Per port VLAN Statistics Table
+-- =============================================================
+
+ieee8021QBridgePortVlanStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgePortVlanStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port, per-VLAN statistics for
+        traffic received."
+    ::= { ieee8021QBridgeVlan 6 }
+
+ieee8021QBridgePortVlanStatisticsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgePortVlanStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Traffic statistics for a VLAN on an interface."
+    INDEX   { ieee8021BridgeBasePortComponentId,
+              ieee8021BridgeBasePort,
+              ieee8021QBridgeVlanIndex }
+    ::= { ieee8021QBridgePortVlanStatisticsTable 1 }
+
+Ieee8021QBridgePortVlanStatisticsEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeTpVlanPortInFrames
+            Counter64,
+        ieee8021QBridgeTpVlanPortOutFrames
+            Counter64,
+        ieee8021QBridgeTpVlanPortInDiscards
+            Counter64
+    }
+
+ieee8021QBridgeTpVlanPortInFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS      "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid frames received by this port from
+        its segment that were classified as belonging to this
+        VLAN.  Note that a frame received on this port is
+        counted by this object if and only if it is for a
+        protocol being processed by the local forwarding process
+        for this VLAN.  This object includes received bridge
+        management frames classified as belonging to this VLAN
+        (e.g., MMRP, but not MVRP or STP.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated
+        interface (if any)."
+    REFERENCE   "12.6.1.1.3(a)"
+    ::= { ieee8021QBridgePortVlanStatisticsEntry 1 }
+
+ieee8021QBridgeTpVlanPortOutFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS      "frames"
+    MAX-ACCESS  read-only     
+    STATUS      current
+    DESCRIPTION
+        "The number of valid frames transmitted by this port to
+        its segment from the local forwarding process for this
+        VLAN.  This includes bridge management frames originated
+        by this device that are classified as belonging to this
+        VLAN (e.g., MMRP, but not MVRP or STP).
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated
+        interface (if any)."
+    REFERENCE   "12.6.1.1.3(d)"
+    ::= { ieee8021QBridgePortVlanStatisticsEntry 2 }
+
+ieee8021QBridgeTpVlanPortInDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS      "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid frames received by this port from
+        its segment that were classified as belonging to this
+        VLAN and that were discarded due to VLAN-related reasons.
+        Specifically, the IEEE 802.1Q counters for Discard
+        Inbound and Discard on Ingress Filtering.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated
+        interface (if any)."
+    REFERENCE   "12.6.1.1.3"
+    ::= { ieee8021QBridgePortVlanStatisticsEntry 3 }
+
+-- =============================================================
+-- The VLAN Learning Constraints Table
+-- =============================================================
+
+ieee8021QBridgeLearningConstraintsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeLearningConstraintsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing learning constraints for sets of
+        Shared and Independent VLANs.  Entries in this table are
+        persistent and are preserved across reboots."
+    REFERENCE   "12.10.3.1"
+    ::= { ieee8021QBridgeVlan 8 }
+
+ieee8021QBridgeLearningConstraintsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeLearningConstraintsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A learning constraint defined for a VLAN."
+    INDEX   { ieee8021QBridgeLearningConstraintsComponentId,
+              ieee8021QBridgeLearningConstraintsVlan,
+              ieee8021QBridgeLearningConstraintsSet }
+    ::= { ieee8021QBridgeLearningConstraintsTable 1 }
+
+Ieee8021QBridgeLearningConstraintsEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeLearningConstraintsComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeLearningConstraintsVlan
+            IEEE8021VlanIndex,
+        ieee8021QBridgeLearningConstraintsSet
+            Integer32,
+        ieee8021QBridgeLearningConstraintsType
+            INTEGER,
+        ieee8021QBridgeLearningConstraintsStatus
+            RowStatus
+    }
+
+ieee8021QBridgeLearningConstraintsComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeLearningConstraintsEntry 1 }
+
+ieee8021QBridgeLearningConstraintsVlan OBJECT-TYPE
+    SYNTAX      IEEE8021VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the row in ieee8021QBridgeVlanCurrentTable for the
+        VLAN constrained by this entry."
+    ::= { ieee8021QBridgeLearningConstraintsEntry 2 }
+
+ieee8021QBridgeLearningConstraintsSet OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identity of the constraint set to which
+        ieee8021QBridgeLearningConstraintsVlan belongs.  These values may
+        be chosen by the management station."
+    ::= { ieee8021QBridgeLearningConstraintsEntry 3 }
+
+ieee8021QBridgeLearningConstraintsType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    independent(1),
+                    shared(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of constraint this entry defines.
+            independent(1) - the VLAN, ieee8021QBridgeLearningConstraintsVlan,
+                uses a filtering database independent from all
+                other VLANs in the same set, defined by
+                ieee8021QBridgeLearningConstraintsSet.
+            shared(2) - the VLAN, ieee8021QBridgeLearningConstraintsVlan,
+                shares the same filtering database as all other VLANs
+                in the same set, defined by
+                ieee8021QBridgeLearningConstraintsSet."
+    ::= { ieee8021QBridgeLearningConstraintsEntry 4 }
+
+ieee8021QBridgeLearningConstraintsStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry.  Any object in an entry of this table
+        may be modified while the value of the corresponding instance
+        of this object is active(1)."
+    ::= { ieee8021QBridgeLearningConstraintsEntry 5 }
+
+ieee8021QBridgeLearningConstraintDefaultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeLearningConstraintDefaultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing learning constraints for sets of
+        Shared and Independent VLANs."
+    REFERENCE   "12.10.3.1"
+    ::= { ieee8021QBridgeVlan 9 }
+
+ieee8021QBridgeLearningConstraintDefaultsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeLearningConstraintDefaultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A learning constraint defined for a VLAN."
+    INDEX   { ieee8021QBridgeLearningConstraintDefaultsComponentId }
+    ::= { ieee8021QBridgeLearningConstraintDefaultsTable 1 }
+
+Ieee8021QBridgeLearningConstraintDefaultsEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeLearningConstraintDefaultsComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeLearningConstraintDefaultsSet
+            Integer32,
+        ieee8021QBridgeLearningConstraintDefaultsType
+            INTEGER
+    }
+
+ieee8021QBridgeLearningConstraintDefaultsComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeLearningConstraintDefaultsEntry 1 }
+
+ieee8021QBridgeLearningConstraintDefaultsSet OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The identity of the constraint set to which a VLAN
+        belongs, if there is not an explicit entry for that VLAN
+        in ieee8021QBridgeLearningConstraintsTable.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeLearningConstraintDefaultsEntry 2 }
+
+ieee8021QBridgeLearningConstraintDefaultsType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    independent(1),
+                    shared(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of constraint set to which a VLAN belongs, if
+        there is not an explicit entry for that VLAN in
+        ieee8021QBridgeLearningConstraintsTable.  The types are as defined
+        for ieee8021QBridgeLearningConstraintsType.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    ::= { ieee8021QBridgeLearningConstraintDefaultsEntry 3 }
+
+-- =============================================================
+-- ieee8021QBridgeProtocol subtree
+-- =============================================================
+
+ieee8021QBridgeProtocolGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeProtocolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains mappings from Protocol
+         Templates to Protocol Group Identifiers used for
+         Port-and-Protocol-based VLAN Classification.
+
+         Entries in this table must be persistent over power
+         up restart/reboot."
+    REFERENCE   "12.10.1"
+    ::= { ieee8021QBridgeProtocol 1 }
+
+ieee8021QBridgeProtocolGroupEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeProtocolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping from a Protocol Template to a Protocol
+         Group Identifier."
+    REFERENCE   "12.10.1.1.3 d)"
+    INDEX       { ieee8021QBridgeProtocolGroupComponentId,
+                  ieee8021QBridgeProtocolTemplateFrameType,
+                  ieee8021QBridgeProtocolTemplateProtocolValue }
+    ::= { ieee8021QBridgeProtocolGroupTable 1 }     
+
+Ieee8021QBridgeProtocolGroupEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeProtocolGroupComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021QBridgeProtocolTemplateFrameType
+            INTEGER,
+        ieee8021QBridgeProtocolTemplateProtocolValue
+            OCTET STRING,
+        ieee8021QBridgeProtocolGroupId
+            Integer32,
+        ieee8021QBridgeProtocolGroupRowStatus
+            RowStatus
+    }
+
+ieee8021QBridgeProtocolGroupComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021QBridgeProtocolGroupEntry 1 }
+
+ieee8021QBridgeProtocolTemplateFrameType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  ethernet  (1),
+                  rfc1042   (2),
+                  snap8021H (3),
+                  snapOther (4),
+                  llcOther  (5)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The data-link encapsulation format or the
+         'detagged_frame_type' in a Protocol Template."
+    REFERENCE   "12.10.1.8"
+    ::= { ieee8021QBridgeProtocolGroupEntry 2 }
+
+ieee8021QBridgeProtocolTemplateProtocolValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (2 | 5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of the protocol above the data-link
+         layer in a Protocol Template.  Depending on the
+         frame type, the octet string will have one of the
+         following values:
+
+         For 'ethernet', 'rfc1042' and 'snap8021H',
+             this is the 16-bit (2-octet) IEEE 802.3 Type Field.
+         For 'snapOther',
+             this is the 40-bit (5-octet) PID.
+         For 'llcOther',
+             this is the 2-octet IEEE 802.2 Link Service Access
+             Point (LSAP) pair: first octet for Destination Service
+             Access Point (DSAP) and second octet for Source Service
+             Access Point (SSAP)."
+    REFERENCE   "12.10.1.8"
+    ::= { ieee8021QBridgeProtocolGroupEntry 3 }
+
+ieee8021QBridgeProtocolGroupId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents a group of protocols that are associated
+         together when assigning a VID to a frame."
+    REFERENCE   "12.10.1.8"
+    ::= { ieee8021QBridgeProtocolGroupEntry 4 }
+
+ieee8021QBridgeProtocolGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { ieee8021QBridgeProtocolGroupEntry 5 }
+
+ieee8021QBridgeProtocolPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeProtocolPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains VID sets used for
+         Port-and-Protocol-based VLAN Classification."
+    REFERENCE   "12.10.1"
+    ::= { ieee8021QBridgeProtocol 2 }
+
+ieee8021QBridgeProtocolPortEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeProtocolPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A VID set for a port."
+    REFERENCE   "12.10.1.1.3 c)"
+    INDEX       { ieee8021BridgeBasePortComponentId,
+                  ieee8021BridgeBasePort,
+                  ieee8021QBridgeProtocolPortGroupId }
+    ::= { ieee8021QBridgeProtocolPortTable 1 }
+
+Ieee8021QBridgeProtocolPortEntry ::=
+    SEQUENCE {
+        ieee8021QBridgeProtocolPortGroupId
+            Integer32,
+        ieee8021QBridgeProtocolPortGroupVid
+            VlanId,
+        ieee8021QBridgeProtocolPortRowStatus
+            RowStatus
+    }
+
+ieee8021QBridgeProtocolPortGroupId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Designates a group of protocols in the Protocol
+         Group Database."
+    REFERENCE   "12.10.1.2"
+    ::= { ieee8021QBridgeProtocolPortEntry 1 }
+
+ieee8021QBridgeProtocolPortGroupVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VID associated with a group of protocols for
+         each port."
+    REFERENCE   "12.10.1.2"
+    ::= { ieee8021QBridgeProtocolPortEntry 2 }
+
+ieee8021QBridgeProtocolPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { ieee8021QBridgeProtocolPortEntry 3 }
+
+-- =============================================================
+-- ieee8021QBridgeVIDX subtree
+-- 
+-- =============================================================
+
+ieee8021QBridgeVIDXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeVIDXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION       
+        "This table is used to configure the VID Translation
+        Table defined in 12.10.1.8 and 6.9.  The Bridge VID
+        Translation Table is used to implement a mapping between a
+        local VID, and a relay VID, used by the filtering and
+        forwarding process.  Each row in this table is indexed by
+        component, port, and local VID value and a value to be used
+        for the specified VID as specified in (6.9).  Entries in
+        this table must be persistent over power up restart/reboot."
+ REFERENCE   "12.10.1.8 "
+    ::= { ieee8021QBridgeVIDX 1 }
+
+ieee8021QBridgeVIDXEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeVIDXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for the S-VID translation table which includes 
+        both the Local and Relay S-VIDs."
+
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort,
+            ieee8021QBridgeVIDXLocalVid }
+    ::= { ieee8021QBridgeVIDXTable 1 }
+
+Ieee8021QBridgeVIDXEntry ::= 
+      SEQUENCE {
+          ieee8021QBridgeVIDXLocalVid VlanId,
+          ieee8021QBridgeVIDXRelayVid VlanId,
+          ieee8021QBridgeVIDXRowStatus RowStatus
+}
+
+ieee8021QBridgeVIDXLocalVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Local VID after translation received at the ISS or EISS."
+    REFERENCE   "12.10.1.8.1, 12.10.1.8.2 "
+    ::= { ieee8021QBridgeVIDXEntry 1 }
+
+ieee8021QBridgeVIDXRelayVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Relay VID received before translation received at ISS or EISS."
+    REFERENCE   "12.10.1.8.1, 12.10.1.8.2 "
+    ::= { ieee8021QBridgeVIDXEntry 2 }
+
+ieee8021QBridgeVIDXRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of an entry in this table,
+        and is used to create/delete entries. It is an 
+        implementation specific decision as to whether 
+        any column in this table may be set while the 
+        corresponding instance of this object is valid(1)."
+    REFERENCE   "12.10.1.8.1, 12.10.1.8.2 "
+    ::= { ieee8021QBridgeVIDXEntry 3 }
+
+-- ===========================================================
+-- ieee8021QBridgeEgressVidXTable:
+-- ===========================================================
+
+ieee8021QBridgeEgressVidXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeEgressVidXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure the VID Translation
+        Table defined in 12.10.1.9 and 6.9.  The Bridge VID
+        Egress Translation Table is used to implement a mapping between a
+        relay VID, and a local VID, used by the filtering and
+        forwarding process.  Each row in this table is indexed by
+        component, port, and relay VID value and a value to be used
+        for the specified local VID as specified in (6.9).  Entries in
+        this table must be persistent over power up restart/reboot."
+    REFERENCE   "12.10.1.9, 6.9"
+    ::= { ieee8021QBridgeVIDX 2 }
+
+ieee8021QBridgeEgressVidXEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeEgressVidXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for the Egress VID translation table which includes 
+        both the relay and local IDs between which the PNP or CNP
+        translates."
+       
+    INDEX { ieee8021BridgeBaseEgressPortComponentId,
+            ieee8021BridgeEgressBasePort,
+            ieee8021QBridgeEgressVidXRelayVid }
+    ::= { ieee8021QBridgeEgressVidXTable 1 }
+
+Ieee8021QBridgeEgressVidXEntry ::= 
+      SEQUENCE {
+          ieee8021QBridgeEgressVidXRelayVid VlanId,
+          ieee8021QBridgeEgressVidXLocalVid VlanId,
+          ieee8021QBridgeEgressVidXRowStatus RowStatus
+}
+
+ieee8021QBridgeEgressVidXRelayVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Relay VID after translation transmitted to the 
+         ISS or EISS."
+    REFERENCE   "12.10.1.9.1, 12.10.1.9.2 "
+     ::= { ieee8021QBridgeEgressVidXEntry 1 }
+
+ieee8021QBridgeEgressVidXLocalVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Local VID before translation transmitted to the 
+         ISS or EISS."
+    REFERENCE   "12.10.1.9.1, 12.10.1.9.2 "
+    ::= { ieee8021QBridgeEgressVidXEntry 2 }
+
+
+ieee8021QBridgeEgressVidXRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This indicates the status of an entry in this table,
+        and is used to create/delete entries. It is an 
+        implementation specific decision as to whether 
+        any column in this table may be set while the 
+        corresponding instance of this object is valid(1)."
+    REFERENCE   "12.10.1.9.1, 12.10.1.9.2 "
+   ::= { ieee8021QBridgeEgressVidXEntry 3 }
+
+-- =============================================================
+-- IEEE 802.1Q MIB - Conformance Information
+-- =============================================================
+
+ieee8021QBridgeConformance
+    OBJECT IDENTIFIER ::= { ieee8021QBridgeMib 2 }
+
+ieee8021QBridgeGroups
+    OBJECT IDENTIFIER ::= { ieee8021QBridgeConformance 1 }
+
+ieee8021QBridgeCompliances
+    OBJECT IDENTIFIER ::= { ieee8021QBridgeConformance 2 }
+
+-- =============================================================
+-- units of conformance
+-- =============================================================
+
+ieee8021QBridgeBaseGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeVlanVersionNumber,
+        ieee8021QBridgeMaxVlanId,
+        ieee8021QBridgeMaxSupportedVlans,
+        ieee8021QBridgeNumVlans,
+        ieee8021QBridgeMvrpEnabledStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device-level control
+        and status information for the Virtual LAN bridge
+        services."
+    ::= { ieee8021QBridgeGroups 1 }
+
+ieee8021QBridgeFdbUnicastGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeFdbDynamicCount,
+        ieee8021QBridgeFdbLearnedEntryDiscards,
+        ieee8021QBridgeFdbAgingTime,
+        ieee8021QBridgeTpFdbPort,
+        ieee8021QBridgeTpFdbStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about all
+        unicast addresses, learned dynamically or statically
+        configured by management, in each Filtering Database."
+    ::= { ieee8021QBridgeGroups 2 }
+
+ieee8021QBridgeFdbMulticastGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeTpGroupEgressPorts,
+        ieee8021QBridgeTpGroupLearnt
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about all
+        multicast addresses, learned dynamically or statically
+        configured by management, in each Filtering Database."
+    ::= { ieee8021QBridgeGroups 3 }
+
+ieee8021QBridgeServiceRequirementsGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeForwardAllPorts,
+        ieee8021QBridgeForwardAllStaticPorts,
+        ieee8021QBridgeForwardAllForbiddenPorts,
+        ieee8021QBridgeForwardUnregisteredPorts,
+        ieee8021QBridgeForwardUnregisteredStaticPorts,
+        ieee8021QBridgeForwardUnregisteredForbiddenPorts
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        service requirements, learned dynamically or statically
+        configured by management, in each Filtering Database."
+    ::= { ieee8021QBridgeGroups 4 }
+
+ieee8021QBridgeFdbStaticGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeStaticUnicastStaticEgressPorts,
+        ieee8021QBridgeStaticUnicastForbiddenEgressPorts,
+        ieee8021QBridgeStaticUnicastStorageType,
+        ieee8021QBridgeStaticUnicastRowStatus,
+        ieee8021QBridgeStaticMulticastStaticEgressPorts,
+        ieee8021QBridgeStaticMulticastForbiddenEgressPorts,
+        ieee8021QBridgeStaticMulticastStorageType,
+        ieee8021QBridgeStaticMulticastRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        unicast and multicast addresses statically configured by
+        management, in each Filtering Database or VLAN."
+    ::= { ieee8021QBridgeGroups 5 }
+
+ieee8021QBridgeVlanGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeVlanNumDeletes,
+        ieee8021QBridgeVlanFdbId,
+        ieee8021QBridgeVlanCurrentEgressPorts,
+        ieee8021QBridgeVlanCurrentUntaggedPorts,
+        ieee8021QBridgeVlanStatus,
+        ieee8021QBridgeVlanCreationTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        all VLANs currently configured on this device."
+    ::= { ieee8021QBridgeGroups 6 }
+
+ieee8021QBridgeVlanStaticGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeVlanStaticName,
+        ieee8021QBridgeVlanStaticEgressPorts,
+        ieee8021QBridgeVlanForbiddenEgressPorts,
+        ieee8021QBridgeVlanStaticUntaggedPorts,
+        ieee8021QBridgeVlanStaticRowStatus,
+        ieee8021QBridgeNextFreeLocalVlanIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        VLANs statically configured by management."
+    ::= { ieee8021QBridgeGroups 7 }
+
+ieee8021QBridgeVlanStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeTpVlanPortInFrames,
+        ieee8021QBridgeTpVlanPortOutFrames,
+        ieee8021QBridgeTpVlanPortInDiscards
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing per-port packet
+        statistics for all VLANs currently configured on this
+        device."
+    ::= { ieee8021QBridgeGroups 8 }
+
+ieee8021QBridgeLearningConstraintsGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeLearningConstraintsType,
+        ieee8021QBridgeLearningConstraintsStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the Filtering Database
+        constraints all VLANs have with each other."
+    ::= { ieee8021QBridgeGroups 9 }
+
+ieee8021QBridgeLearningConstraintDefaultGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeLearningConstraintDefaultsSet,
+        ieee8021QBridgeLearningConstraintDefaultsType
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the default Filtering
+        Database constraints for VLANs that have no specific
+        constraints defined."
+    ::= { ieee8021QBridgeGroups 10 }
+
+ieee8021QBridgeClassificationDeviceGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeProtocolGroupId,
+        ieee8021QBridgeProtocolGroupRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "VLAN classification information for the bridge."
+    ::= { ieee8021QBridgeGroups 11 }
+
+ieee8021QBridgeClassificationPortGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeProtocolPortGroupVid,
+        ieee8021QBridgeProtocolPortRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "VLAN classification information for individual ports."
+    ::= { ieee8021QBridgeGroups 12 }
+
+ieee8021QBridgePortGroup2 OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgePvid,
+        ieee8021QBridgePortAcceptableFrameTypes,
+        ieee8021QBridgePortIngressFiltering,
+        ieee8021QBridgePortMvrpEnabledStatus,
+        ieee8021QBridgePortMvrpFailedRegistrations,
+        ieee8021QBridgePortMvrpLastPduOrigin,
+        ieee8021QBridgePortRestrictedVlanRegistration
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing port-level VLAN
+        control and status information for all ports."
+    ::= { ieee8021QBridgeGroups 13 }
+
+ieee8021QBridgeCVlanPortGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeCVlanPortRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects used to create/delete customer VLAN ports."
+    ::= { ieee8021QBridgeGroups 14 }
+
+ieee8021QBridgeVIDXGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeVIDXRelayVid,
+        ieee8021QBridgeVIDXRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Ingress or Ingress/Egress VID translation for 
+        individual ports."
+    ::= { ieee8021QBridgeGroups 15 }
+
+ieee8021QBridgeEgressVIDXGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021QBridgeEgressVidXLocalVid,
+        ieee8021QBridgeEgressVidXRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Egress VID translation for individual ports."
+    ::= { ieee8021QBridgeGroups 16 }
+
+-- =============================================================
+-- compliance statements
+-- =============================================================
+
+ieee8021QBridgeCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of Virtual
+        LAN Bridge services."
+
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021QBridgeBaseGroup,
+            ieee8021QBridgeVlanGroup,
+            ieee8021QBridgeVlanStaticGroup,
+            ieee8021QBridgePortGroup2
+        }
+
+        GROUP       ieee8021QBridgeFdbUnicastGroup
+        DESCRIPTION
+            "This group is mandatory for bridges that implement
+            802.1Q transparent bridging."
+
+        GROUP       ieee8021QBridgeFdbMulticastGroup
+        DESCRIPTION
+            "This group is mandatory for bridges that implement
+            802.1Q transparent bridging."
+        GROUP       ieee8021QBridgeServiceRequirementsGroup
+        DESCRIPTION
+            "This group is mandatory for bridges that implement
+            extended filtering services.  All objects must be
+            read-write if extended-filtering services are
+            enabled."
+
+        GROUP       ieee8021QBridgeFdbStaticGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       ieee8021QBridgeVlanStatisticsGroup
+        DESCRIPTION
+            "This group is optional as there may be significant
+            implementation cost associated with its support."
+
+        GROUP       ieee8021QBridgeLearningConstraintsGroup
+        DESCRIPTION
+            "This group is mandatory for devices implementing
+             both Independent VLAN Learning (IVL) and Shared
+             VLAN Learning (SVL) modes of operation of the
+             filtering database, as defined by IEEE 802.1Q."
+
+        GROUP       ieee8021QBridgeLearningConstraintDefaultGroup
+        DESCRIPTION
+            "This group is mandatory for devices implementing
+             both Independent VLAN Learning (IVL) and Shared
+             VLAN Learning (SVL) modes of operation of the
+             filtering database, as defined by IEEE 802.1Q."
+
+        GROUP       ieee8021QBridgeClassificationDeviceGroup
+        DESCRIPTION
+            "This group is mandatory ONLY for devices implementing
+             VLAN Classification as specified in IEEE 802.1v."
+
+        GROUP       ieee8021QBridgeClassificationPortGroup
+        DESCRIPTION
+            "This group is mandatory ONLY for devices implementing
+             VLAN Classification as specified in IEEE 802.1v."
+
+        GROUP       ieee8021QBridgeCVlanPortGroup
+        DESCRIPTION
+            "This group is mandatory ONLY for devices supporting
+             creation/deletion of customer VLAN ports."
+        
+        GROUP       ieee8021QBridgeVIDXGroup
+        DESCRIPTION
+            "This group is mandatory ONLY for devices supporting
+             VID translation of customer and/or provider VLAN ports."
+
+        GROUP       ieee8021QBridgeEgressVIDXGroup
+        DESCRIPTION
+            "This group is mandatory ONLY for devices supporting
+             separate Ingress and Egress VID translation of 
+             of customer and provider VLAN ports."
+
+        OBJECT      ieee8021QBridgePortAcceptableFrameTypes
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1Q."
+
+        OBJECT      ieee8021QBridgePortIngressFiltering
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1Q."
+
+        OBJECT      ieee8021QBridgeLearningConstraintDefaultsSet
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1Q."
+
+        OBJECT      ieee8021QBridgeLearningConstraintDefaultsType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1Q."
+
+        OBJECT      ieee8021QBridgeProtocolGroupId
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1v."
+
+        OBJECT      ieee8021QBridgeProtocolGroupRowStatus
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required as this is an optional
+            capability in IEEE 802.1v."
+
+        ::= { ieee8021QBridgeCompliances 1 }
+
+END
+
