@@ -417,6 +417,14 @@ $config['os'][$os]['icon']              = "ruckus";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
+// Siklu Wireless
+$os = "siklu";
+$config['os'][$os]['text']              = "Siklu Wireless";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "siklu";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
 // Supermicro Switch
 
 $os = "supermicro-switch";
