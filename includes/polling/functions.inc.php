@@ -245,7 +245,7 @@ function poll_device($device, $options)
   }
 }
 
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs)
+function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_options)
 {
 
   global $config;
@@ -253,11 +253,14 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
   echo("This is mag_poll_mib_def Processing\n");
   $mib      = NULL;
   
-  list($mib,) = explode(":", $mib_name_table, 2);
-
-  //$mib_dirs = mib_dirs($mib_subdir);
-  
-  $rrd_file = strtolower(safename($mib)).'.rrd';
+  if (stristr($mib_name_table, "UBNT")) {
+      list($mib,) = explode(":", $mib_name_table, 2);
+      //$mib_dirs = mib_dirs($mib_subdir);
+      $rrd_file = strtolower(safename($mib)).'.rrd';
+  } else {
+      list($mib,$file) = explode(":", $mib_name_table, 2);
+      $rrd_file = strtolower(safename($file)).'.rrd';
+  }
 
   $rrdcreate  = '--step 300 ';
   $oidglist   = array();
@@ -267,9 +270,15 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     $oiddsname  = $param[1];
     $oiddsdesc  = $param[2];
     $oiddstype  = $param[3];
+    $oiddsopts  = $param[4];
     
     if (strlen($oiddsname) > 19) { $oiddsname = truncate($oiddsname, 19, ''); }
-    $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':600:U:100000000000';
+
+    if (empty($oiddsopts)) {
+        $rrd_options = "600:U:100000000000";
+    }
+
+    $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':'.$oiddsopts;
 
     if ($oidindex != '')
     {

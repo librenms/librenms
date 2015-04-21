@@ -11,7 +11,7 @@ if ($device['os'] == "siklu") {
         list(,$current) = explode(' ',$oids);
         $index = $oid;
         $descr = "System Temp";
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
 }
 

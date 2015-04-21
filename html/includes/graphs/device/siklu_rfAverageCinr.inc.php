@@ -2,7 +2,7 @@
 
 include("includes/graphs/common.inc.php");
 
-$rrdfilename  = $config['rrd_dir'] . "/".$device['hostname']."/siklu-mib.rrd";
+$rrdfilename  = $config['rrd_dir'] . "/".$device['hostname']."/siklu-wireless.rrd";
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'db                        Now    Min     Max\\n'";
