@@ -1366,6 +1366,41 @@ $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx'] = array(
   )
 );
 
+// Siklu support
+$config['graph_types']['device']['siklu_rfAverageRssi'] = array(
+    'section'   => 'wireless',
+    'order'     => '0',
+    'descr'     => 'Radio Average RSSI',
+    'file'      => 'siklu-mib.rrd',
+    'colours'   => 'blues',
+    'unit_text' => 'dBm',
+    'ds'        => array(
+        'WlStatRssi' => array('label' => 'RSSI', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+$config['graph_types']['device']['siklu_rfAverageCinr'] = array(
+    'section'   => 'wireless',
+    'order'     => '1',
+    'descr'     => 'Radio Average CINR',
+    'file'      => 'siklu-mib.rrd',
+    'colours'   => 'reds',
+    'unit_text' => 'dB',
+    'ds'        => array(
+        'WlStatRssi' => array('label' => 'CINR', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+$config['graph_types']['device']['siklu_rfModulationType'] = array(
+    'section'   => 'wireless',
+    'order'     => '2',
+    'descr'     => 'RF Modulation',
+    'file'      => 'siklu-mib.rrd',
+    'colours'   => 'greens',
+    'unit_text' => '',
+    'ds'        => array(
+        'WlStatRssi' => array('label' => 'RFM', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
 $config['graph_types']['device']['wifi_clients']['descr'] = 'Wireless Clients';
