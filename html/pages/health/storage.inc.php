@@ -60,14 +60,13 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
     $graph_array_zoom['width']  = "400";
     $link = "graphs/id=" . $graph_array['id'] . "/type=" . $graph_array['type'] . "/from=" . $graph_array['from'] . "/to=" . $graph_array['to'] . "/";
     $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
+    $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
 
     $background = get_percentage_colours($perc);
 
     echo("<tr class='health'><td>" . generate_device_link($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
          <td>$mini_graph</td>
-         <td>
-          <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right'])."</a>
-          </td><td>$perc"."%</td></tr>");
+         <td>$bar_link</td><td>$perc"."%</td></tr>");
 
     if ($vars['view'] == "graphs")
     {
