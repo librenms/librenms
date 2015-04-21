@@ -17,6 +17,8 @@
   - Fix links from /health/processor (PR810)
   - Hide divider if no plugins installed (PR811)
   - Added Nginx fix for using debug option (PR823)
+  - Bug fixes for device groups SQL (PR840)
+  - Fixed path issue when using rrdcached (PR839)
 
 ####Improvements
   - New theme support added (light,dark and mono) (PR682,PR683,PR701)
@@ -48,6 +50,7 @@
   - Sharpen graphs produced (PR826)
   - Updated map to show device overview graphs and port graphs (PR826)
   - Added hostname to API call for list_alerts (PR834)
+  - Added ability to schedule maintenance (PR835,PR841)
 
 ### Mar 2015
 
