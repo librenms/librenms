@@ -11,19 +11,23 @@ function poll_sensor($device, $class, $unit)
 
     if ($sensor['poller_type'] == "snmp")
     {
+      if ($device['os'] == 'siklu') {
+          $mib = ":RADIO-BRIDGE-MIB";
+      }
       if ($class == "temperature")
       {
         for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
         {
           if ($debug) echo("Attempt $i ");
-          $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+          $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
 
           if (is_numeric($sensor_value) && $sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
           sleep(1); # Give the TME some time to reset
         }
       } else {
-        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
       }
+      unset($mib);
     } else if ($sensor['poller_type'] == "agent")
     {
       if (isset($agent_sensors))
