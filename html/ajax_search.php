@@ -31,9 +31,9 @@ if (isset($_REQUEST['search']))
 
     if( $_REQUEST['type'] == 'group' ) {
       include_once('../includes/device-groups.inc.php');
-      foreach( dbFetchRows("SELECT name FROM device_groups WHERE name LIKE '%".$search."%'") as $group ) {
+      foreach( dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE '%".$search."%'") as $group ) {
         if( $_REQUEST['map'] ) {
-          $results[] = array('name'=>'g:'.$group['name']);
+          $results[] = array('name'=>'g:'.$group['name'],'group_id'=>$group['id']);
         } else {
           $results[] = array('name'=>$group['name']);
         }
@@ -74,6 +74,7 @@ if (isset($_REQUEST['search']))
           }
           $num_ports = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ?", array($result['device_id']));
           $device[]=array('name'=>$name,
+          'device_id'=>$result['device_id'],
           'url'=> generate_device_url($result),
           'colours'=>$highlight_colour,
           'device_ports'=>$num_ports,

@@ -156,8 +156,8 @@ if (!$auth)
     </form>
     <script type="text/javascript">
         $(function () {
-            $("#dtpickerfrom").datetimepicker({useSeconds: false, useCurrent: true, sideBySide: true, useStrict: false, showToday: true});
-            $("#dtpickerto").datetimepicker({useSeconds: false, useCurrent: true, sideBySide: true, useStrict: false, showToday: true});
+            $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+            $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
         });
     </script>
 
