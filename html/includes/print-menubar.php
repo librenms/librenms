@@ -61,7 +61,6 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
-<li role="presentation" class="dropdown-header"> Settings</li>
 <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
 <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
 <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
