@@ -1608,5 +1608,5 @@ tr.search:nth-child(odd) {
 
 .threeqtr-width {
     display:block;
-    width: 75%;
+    min-width: 75%;
 }
