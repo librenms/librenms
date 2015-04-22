@@ -13,9 +13,6 @@
  */
 
 if (preg_match("/^(XTM|FBX)/i", $sysDescr)) {
-    $product = snmp_get($device, "WATCHGUARD-PRODUCTS-MIB::wgProducts.0", "-Oqv", "");
-    if (!empty($product)) {
-        $os = "fireware";
-    }
+    $os = "fireware";
 }
 
