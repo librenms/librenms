@@ -536,7 +536,7 @@ function list_alerts() {
         $sql = "AND id=?";
         array_push($param,$alert_id);
     }
-    $alerts = dbFetchRows("SELECT * FROM `alerts` WHERE `state` IN (?) $sql",$param);
+    $alerts = dbFetchRows("SELECT `D`.`hostname`, `A`.* FROM `alerts` AS `A`, `devices` AS `D` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`state` IN (?) $sql",$param);
     $total_alerts = count($alerts);
     $output = array("status" => "ok", "err-msg" => '', "count" => $total_alerts, "alerts" => $alerts);
     $app->response->setStatus('200');
