@@ -93,16 +93,18 @@ if($format == "octets" || $format == "bytes")
 
 $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
 
-$rrd_options .= " AREA:in".$format."_max#aDEB7B:";
-$rrd_options .= " AREA:in".$format."#91B13C:'In '";
+$rrd_options .= " AREA:in".$format."_max#D7FFC7:";
+$rrd_options .= " AREA:in".$format."#90B040:";
+$rrd_options .= " LINE:in".$format."#608720:'In '";
 #$rrd_options .= " LINE1.25:in".$format."#006600:'In '";
 $rrd_options .= " GPRINT:in".$format.":LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:in".$format.":AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:in".$format."_max:MAX:%6.2lf%s";
 $rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
 
-$rrd_options .= " AREA:dout".$format."_max#a3b9FF:";
-$rrd_options .= " AREA:dout".$format."#8080BD:'Out'";
+$rrd_options .= " AREA:dout".$format."_max#E0E0FF:";
+$rrd_options .= " AREA:dout".$format."#8080C0:";
+$rrd_options .= " LINE:dout".$format."#606090:'Out'";
 #$rrd_options .= " LINE1.25:dout".$format."#000099:Out";
 $rrd_options .= " GPRINT:out".$format.":LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:out".$format.":AVERAGE:%6.2lf%s";
