@@ -56,11 +56,13 @@ foreach (dbFetchRows("SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
 <?php
 
 foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
-    echo('"<option value=\"'.$data['device_id'].'\""+');
-    if ($data['device_id'] == $_POST['device']) {
-        echo('" selected"+');
+    if (device_permitted($data['device_id'])) {
+        echo('"<option value=\"'.$data['device_id'].'\""+');
+        if ($data['device_id'] == $_POST['device']) {
+            echo('" selected"+');
+        }
+        echo('">'.$data['hostname'].'</option>"+');
     }
-    echo('">'.$data['hostname'].'</option>"+');
 }
 ?>
                  "</select>"+
