@@ -95,7 +95,13 @@ if ($_SESSION['userlevel'] >= '10') {
               <ul class="dropdown-menu scrollable-menu">
 <?php
 
-foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $devtype) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
+} else {
+    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetchRows($sql,$param) as $devtype) {
     if (empty($devtype['type'])) {
         $devtype['type'] = 'generic';
     }
