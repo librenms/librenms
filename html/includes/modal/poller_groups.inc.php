@@ -84,11 +84,10 @@ if(is_admin() === false) {
 $('#confirm-delete').on('show.bs.modal', function(e) {
     group_id = $(e.relatedTarget).data('group_id');
     $("#group_id").val(group_id);
-    event.preventDefault();
 });
 
 $('#group-removal').click('', function(e) {
-    event.preventDefault();
+    e.preventDefault();
     group_id = $("#group_id").val();
     $.ajax({
         type: "POST",
