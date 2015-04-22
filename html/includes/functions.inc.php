@@ -730,6 +730,15 @@ function is_admin() {
     return $allowed;
 }
 
+function is_read() {
+    if ($_SESSION['userlevel'] == '5') {
+        $allowed = true;
+    } else {
+        $allowed = false;
+    }
+    return $allowed;
+}
+
 function demo_account() {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 }
