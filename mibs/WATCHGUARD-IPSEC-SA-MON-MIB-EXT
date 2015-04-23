@@ -17,20 +17,19 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
        IpsecDoiSecProtocolId
                                        FROM IPSEC-ISAKMP-IKE-DOI-TC
        watchguard
-                                       FROM WATCHGUARD-MIB;
+                                       FROM WATCHGUARD-SMI;
 
     wgIpsecSaMonModule MODULE-IDENTITY
         LAST-UPDATED "200701251200Z"
         ORGANIZATION "WatchGuard Technologies, Inc."
         CONTACT-INFO
-                  "   Ella Yu
-                      WatchGuard Technologies, Inc.
-                      1841 Zanker Road
-                      San Jose, CA 95112
-                      USA
+                   "  WatchGuard Technologies, Inc.
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
 
-                      408-519-4888
-                      ella.yu@watchguard.com "
+                      +1.206.613.6600 "
 
         DESCRIPTION
             "The MIB module describes generic IPSec objects
@@ -124,7 +123,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
     WGIpsecSaEspInEntry ::= SEQUENCE {
 
     wgIpsecSaEspInAddress       IpAddress,
-    wgIpsecSaEspInSpi           Integer32,
+    wgIpsecSaEspInSpi           Unsigned32,
 
     wgIpsecSaEspInDestId        OCTET STRING,
     wgIpsecSaEspInDestIdType    IpsecDoiIdentType,
@@ -177,7 +176,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         ::= { wgIpsecSaEspInEntry 1 }
 
     wgIpsecSaEspInSpi OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Unsigned32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -387,8 +386,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to decryption
-            errors."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaEspInEntry 21 }
 
    wgIpsecSaEspInAuthErrors OBJECT-TYPE
@@ -414,9 +412,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to policy
-            errors. This includes packets where the next protocol is
-            invalid."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaEspInEntry 24 }
 
    wgIpsecSaEspInPadErrors OBJECT-TYPE
@@ -424,12 +420,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to pad value
-            errors.
-
-            Implementations that do not check this must not support this
-            object."
-        REFERENCE   "RFC 2406 section 2.4"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaEspInEntry 25 }
 
     wgIpsecSaEspInOtherReceiveErrors OBJECT-TYPE
@@ -437,11 +428,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to errors
-            other than decryption, authentication or replay errors. This
-            may include packets dropped due to a lack of receive
-            buffers, and may include packets dropped due to congestion
-            at the decryption element."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaEspInEntry 26 }
 
    -- the IPSec Inbound AH MIB-Group
@@ -733,9 +720,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to policy
-            errors. This includes packets where the next protocol is
-            invalid."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaAhInEntry 21 }
 
     wgIpsecSaAhInOtherReceiveErrors OBJECT-TYPE
@@ -743,11 +728,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to errors
-            other than decryption, authentication or replay errors. This
-            may include packets dropped due to a lack of receive
-            buffers, and may include packets dropped due to congestion
-            at the authentication element."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaAhInEntry 22 }
 
 
@@ -812,15 +793,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination address of the SA.
-
-            For implementations that do not support IPv6, this address
-            should appear as one of the IPv4-mapped IPv6 addresses as
-            defined in Section 2.5.4 of [IPV6AA].
-            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
-            used for IPv4 only nodes, while the prefix
-            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
-            nodes."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 1 }
 
     wgIpsecSaIpcompInCpi OBJECT-TYPE
@@ -828,9 +801,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The CPI of the SA. Since the lower values of CPIs are
-            reserved to be the same as the algorithm, the syntax for
-            this object is the same as the transform."
+            "Deprecated, currently unused."
         REFERENCE   "RFC 2393 Section 3.3"
         ::= { wgIpsecSaIpcompInEntry 2 }
 
@@ -839,13 +810,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination identifier of the SA, or 0 if unknown or if
-            the SA uses transport mode, or 0 if this SA is used with
-            multiple SAs in protection suites.
-
-            This value, if non-zero, is taken directly from the optional
-            ID payloads that are exchange during SA creation
-            negotiation."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 3 }
 
    wgIpsecSaIpcompInDestIdType OBJECT-TYPE
@@ -853,10 +818,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of identifier presented by
-            'wgIpsecSaIpcompInDestId', or 0 if unknown or if the SA uses
-            transport mode, or 0 if this SA is used with multiple SAs in
-            protection suites."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 4 }
 
     wgIpsecSaIpcompInSourceId OBJECT-TYPE
@@ -864,13 +826,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The source identifier of the SA, or 0 if unknown or if the
-            SA uses transport mode encapsulation, or 0 if this SA is
-            used with multiple SAs in protection suites.
-
-            This value, if non-zero, is taken directly from the optional
-            ID payloads that are exchange during SA creation
-            negotiation."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 5 }
 
     wgIpsecSaIpcompInSourceIdType OBJECT-TYPE
@@ -878,10 +834,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of identifier presented by
-            'wgIpsecSaIpcompInSourceId', or 0 if unknown or if the SA uses
-            transport mode encapsulation, or 0 if this SA is used with
-            multiple SAs in protection suites."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 6 }
 
    wgIpsecSaIpcompInProtocol OBJECT-TYPE
@@ -889,9 +842,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The transport-layer protocol number that this SA carries,
-            or 0 if it carries any protocol."
-        REFERENCE   "RFC2401 section 4.4.2"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 7 }
 
     wgIpsecSaIpcompInDestPort OBJECT-TYPE
@@ -899,9 +850,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination port number of the protocol that this SA
-            carries, or 0 if it carries any port number."
-        REFERENCE   "RFC2401 section 4.4.2"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 8 }
 
     wgIpsecSaIpcompInSourcePort OBJECT-TYPE
@@ -909,9 +858,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The source port number of the protocol that this SA
-            carries, or 0 if it carries any port number."
-        REFERENCE   "RFC2401 section 4.4.2"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 9 }
 
    wgIpsecSaIpcompInCreator OBJECT-TYPE
@@ -919,11 +866,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The creator of this SA.
-
-            This MIB makes no assumptions about how the SAs are created.
-            They may be created statically, or by a key exchange
-            protocol such as IKE, or by some other method."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 10 }
 
    wgIpsecSaIpcompInEncapsulation OBJECT-TYPE
@@ -931,7 +874,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of encapsulation used by this SA."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 11 }
 
    wgIpsecSaIpcompInDecompAlg OBJECT-TYPE
@@ -939,8 +882,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "A unique value representing the decompression algorithm
-            applied to traffic."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 12 }
 
    wgIpsecSaIpcompInSeconds OBJECT-TYPE
@@ -949,7 +891,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of seconds that the SA has existed."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 13 }
 
     wgIpsecSaIpcompInUserOctets OBJECT-TYPE
@@ -958,8 +900,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The amount of user level traffic measured in bytes handled
-            by the SA."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 14 }
 
     wgIpsecSaIpcompInPackets OBJECT-TYPE
@@ -967,7 +908,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets handled by the SA."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 15 }
 
     wgIpsecSaIpcompInDecompErrors OBJECT-TYPE
@@ -975,8 +916,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to
-            decompression errors."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 16 }
 
     wgIpsecSaIpcompInOtherReceiveErrors OBJECT-TYPE
@@ -984,10 +924,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to errors
-            other than decompression errors. This may include packets
-            dropped due to a lack of receive buffers, and packets
-            dropped due to congestion at the decompression element."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompInEntry 17 }
 
 
@@ -1025,7 +962,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
    WGIpsecSaEspOutEntry ::= SEQUENCE {
 
     wgIpsecSaEspOutAddress         IpAddress,
-    wgIpsecSaEspOutSpi             Integer32,
+    wgIpsecSaEspOutSpi             Unsigned32,
 
     wgIpsecSaEspOutSourceId        OCTET STRING,
     wgIpsecSaEspOutSourceIdType    IpsecDoiIdentType,
@@ -1072,7 +1009,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         ::= { wgIpsecSaEspOutEntry 1 }
 
     wgIpsecSaEspOutSpi OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Unsigned32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1283,8 +1220,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to any error.
-            This may include errors due to a lack of transmit buffers."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaEspOutEntry 21 }
 
 
@@ -1557,8 +1493,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded by the SA due to any error.
-            This may include errors due to a lack of transmit buffers."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaAhOutEntry 19 }
 
 
@@ -1572,12 +1507,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-            "The (conceptual) table containing information on IPSec
-            Outbound IPCOMP SAs.
-
-            There should be one row for every outbound IPCOMP (security)
-            association that exists in the entity. The maximum number of
-            rows is implementation dependent."
+            "Deprecated, currently unused."
         ::= { wgSaTables 6 }
 
     wgIpsecSaIpcompOutEntry OBJECT-TYPE
@@ -1585,11 +1515,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-            "An entry (conceptual row) containing the information on a
-            particular IPSec Outbound IPCOMP SA.
-
-            A row in this table cannot be created or deleted by SNMP
-            operations on columns of the table."
+            "Deprecated, currently unused."
         INDEX{ wgIpsecSaIpcompOutAddress, wgIpsecSaIpcompOutCpi }
         ::= { wgIpsecSaIpcompOutTable 1 }
 
@@ -1621,19 +1547,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination address of the SA.
-
-            If the IPCOMP SA is shared across multiple SAs in protection
-            suites, this value may be 0.
-
-            For implementations that do not support IPv6, this address
-            should appear as one of the IPv4-mapped IPv6 addresses as
-            defined in Section 2.5.4 of [IPV6AA].
-
-            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
-            used for IPv4 only nodes, while the prefix
-            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
-            nodes."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 1 }
 
     wgIpsecSaIpcompOutCpi OBJECT-TYPE
@@ -1641,10 +1555,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The CPI of the SA. Since the lower values of CPIs are
-            reserved to be the same as the algorithm, the syntax for
-            this object is the same as the transform."
-        REFERENCE "RFC 2393 Section 3.3"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 2 }
 
     wgIpsecSaIpcompOutSourceId OBJECT-TYPE
@@ -1652,12 +1563,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The source identifier of the SA, or 0 if unknown or if the
-            SA uses transport mode encapsulation, or 0 if this SA is
-            used with multiple SAs in protection suites.
-
-            This value, if non-zero, is taken directly from the optional
-            ID payloads that are exchange during phase 2 negotiations."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 3 }
 
     wgIpsecSaIpcompOutSourceIdType OBJECT-TYPE
@@ -1665,10 +1571,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of identifier presented by
-            'wgIpsecSaIpcompOutSourceId', or 0 if unknown or if the SA
-            uses transport mode encapsulation, or 0 if this SA is used
-            with multiple SAs in protection suites."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 4 }
 
     wgIpsecSaIpcompOutDestId OBJECT-TYPE
@@ -1676,12 +1579,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination identifier of the SA, or 0 if unknown or if
-            the SA uses transport mode encapsulation, or 0 if this SA is
-            used with multiple SAs in protection suites.
-
-            This value, if non-zero, is taken directly from the optional
-            ID payloads that are exchange during phase 2 negotiations."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 5 }
 
     wgIpsecSaIpcompOutDestIdType OBJECT-TYPE
@@ -1689,10 +1587,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of identifier presented by
-            'wgIpsecSaIpcompOutDestId', or 0 if unknown or if the SA uses
-            transport mode encapsulation, or 0 if this SA is used with
-            multiple SAs in protection suites."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 6 }
 
     wgIpsecSaIpcompOutProtocol OBJECT-TYPE
@@ -1710,9 +1605,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The source port number of the protocol that this SA
-            carries, or 0 if it carries any port number."
-        REFERENCE   "RFC2401 section 4.4.2"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 8 }
 
     wgIpsecSaIpcompOutDestPort OBJECT-TYPE
@@ -1720,9 +1613,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The destination port number of the protocol that this SA
-            carries, or 0 if it carries any port number."
-        REFERENCE   "RFC2401 section 4.4.2"
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 9 }
 
     wgIpsecSaIpcompOutCreator OBJECT-TYPE
@@ -1730,11 +1621,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The creator of this SA.
-
-            This MIB makes no assumptions about how the SAs are created.
-            They may be created statically, or by a key exchange
-            protocol such as IKE, or by some other method."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 10 }
 
     wgIpsecSaIpcompOutEncapsulation OBJECT-TYPE
@@ -1742,7 +1629,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The type of encapsulation used by this SA."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 11 }
 
     wgIpsecSaIpcompOutCompAlg OBJECT-TYPE
@@ -1750,8 +1637,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "A unique value representing the compression algorithm
-            applied to traffic."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 12 }
 
     wgIpsecSaIpcompOutSeconds OBJECT-TYPE
@@ -1760,7 +1646,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of seconds that the SA has existed."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 13 }
 
     wgIpsecSaIpcompOutUserOctets OBJECT-TYPE
@@ -1769,11 +1655,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The amount of user level traffic measured in bytes handled
-            by the SA.
-
-            This is not necessarily the same as the amount of traffic
-            applied against the traffic expiration limit."
+            "Deprecated, currently unused."
         ::= { wgIpsecSaIpcompOutEntry 14 }
 
     wgIpsecSaIpcompOutPackets OBJECT-TYPE
@@ -1801,8 +1683,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of inbound ESP SAs created in the entity
-            since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 2 }
 
     wgIpsecEspCurrentOutboundSAs OBJECT-TYPE
@@ -1818,8 +1699,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of outbound ESP SAs created in the entity
-            since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 4 }
 
     wgIpsecAhCurrentInboundSAs OBJECT-TYPE
@@ -1835,8 +1715,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of inbound AH SAs created in the entity
-            since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 6 }
 
     wgIpsecAhCurrentOutboundSAs OBJECT-TYPE
@@ -1852,8 +1731,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of outbound AH SAs created in the entity
-            since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 8 }
 
     wgIpsecIpcompCurrentInboundSAs OBJECT-TYPE
@@ -1861,7 +1739,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The current number of inbound IPCOMP SAs in the entity."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 9 }
 
     wgIpsecIpcompTotalInboundSAs OBJECT-TYPE
@@ -1869,8 +1747,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of inbound IPCOMP SAs created in the
-            entity since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 10 }
 
     wgIpsecIpcompCurrentOutboundSAs OBJECT-TYPE
@@ -1878,7 +1755,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The current number of outbound IPCOMP SAs in the entity."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 11 }
 
     wgIpsecIpcompTotalOutboundSAs OBJECT-TYPE
@@ -1886,8 +1763,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of outbound IPCOMP SAs created in the
-            entity since boot time."
+            "Deprecated, currently unused."
         ::= { wgSaStatistics 12 }
 
 
@@ -1900,8 +1776,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity in SAs
-            since boot time with decryption errors."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 1 }
 
     wgIpsecAuthenticationErrors OBJECT-TYPE
@@ -1909,11 +1784,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity in SAs
-            since boot time with authentication errors.
-
-            This includes all packets in which the hash value is
-            determined to be invalid, for both ESP and AH SAs."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 2 }
 
     wgIpsecReplayErrors OBJECT-TYPE
@@ -1921,8 +1792,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity in SAs
-            since boot time with replay errors."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 3 }
 
     wgIpsecPolicyErrors OBJECT-TYPE
@@ -1930,10 +1800,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity in SAs
-            since boot time and discarded due to policy errors. This
-            includes packets that had selectors that were invalid for
-            the SA that carried them."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 4 }
 
     wgIpsecOtherReceiveErrors OBJECT-TYPE
@@ -1941,9 +1808,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity in SAs
-            since boot time and discarded due to errors not due to
-            decryption, authentication, replay or policy."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 5 }
 
     wgIpsecSendErrors OBJECT-TYPE
@@ -1951,8 +1816,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets to be sent by the entity in SAs
-            since boot time and discarded due to errors."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 6 }
 
     wgIpsecUnknownSpiErrors OBJECT-TYPE
@@ -1960,8 +1824,7 @@ WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets received by the entity since
-            boot time with SPIs or CPIs that were not valid."
+            "Deprecated, currently unused."
         ::= { wgSaErrors 7 }
 
 END
