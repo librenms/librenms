@@ -26,11 +26,12 @@ print_optionbar_start();
         <?php
           foreach (get_all_devices() as $hostname)
           {
-            echo("<option value='".getidbyname($hostname)."'");
-
-            if (getidbyname($hostname) == $_POST['device']) { echo("selected"); }
-
-            echo(">".$hostname."</option>");
+              $device_id = getidbyname($hostname);
+              if (device_permitted($device_id)) {
+                  echo("<option value='".$device_id."'");
+                  if ($device_id == $_POST['device']) { echo("selected"); }
+                  echo(">".$hostname."</option>");
+              }
           }
         ?>
       </select>
