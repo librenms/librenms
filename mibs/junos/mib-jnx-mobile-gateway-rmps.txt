@@ -1,0 +1,141 @@
+--
+-- Juniper Mobile Gateway Resource Manager MIB.
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILE-GATEWAY-RMPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter64, Integer32,
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    InetAddressType, InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+
+    jnxMbgGwName                   FROM JUNIPER-MOBILE-GATEWAYS
+
+    jnxMobileGatewayMibRoot	
+        FROM JUNIPER-SMI;
+
+jnxMbgRMPSMib MODULE-IDENTITY
+    LAST-UPDATED "201103231200Z" -- March 23, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge Resource Manager"
+    REVISION "201103231200Z" -- March 23, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    ::= { jnxMobileGatewayMibRoot 7 }
+
+jnxMbgRMPSNotifications OBJECT IDENTIFIER ::= 
+                                                { jnxMbgRMPSMib 0 }
+jnxMbgRMPSObjects       OBJECT IDENTIFIER ::= 
+                                                { jnxMbgRMPSMib 1 }
+
+jnxMbgRMPSNotificationVars  OBJECT IDENTIFIER ::= 
+                                            { jnxMbgRMPSObjects 5 }
+
+--
+-- Objects used in Notifications
+--
+
+jnxMbgRMPSClientIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This identifies the Resource Manager client, in the form 
+        ms-a/b/c or pfe-a/b/c, where <a> is the fpc slot, <b> is pic slot,
+        and <c> is the port."        
+    ::= { jnxMbgRMPSNotificationVars 1 }
+
+jnxMbgRMPSClientStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inService(0),
+        outOfService(1)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This specifies the status of a client registered with the Resource
+        Manager server."
+    ::= { jnxMbgRMPSNotificationVars 2 }
+
+jnxMbgRMPSServiceStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        up(0),
+        down(1)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+    "This specifies the status of the Resource Manager server."
+   ::= { jnxMbgRMPSNotificationVars 3 }
+
+jnxMbgRMPSClientRedundancyRole OBJECT-TYPE
+    SYNTAX        INTEGER {
+        invalid(0),
+        primary(1),
+        secondary(2),
+        standalone(3)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+    "This specifies the redundancy role of the Resource Manager client"
+   ::= { jnxMbgRMPSNotificationVars 4 }
+
+--
+-- Notifications
+--
+
+jnxMbgRMPSServiceStatusChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgRMPSServiceStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that status of the Resource Manager
+        service changed."
+    ::= { jnxMbgRMPSNotifications 1 }
+
+jnxMbgRMPSClientStatusChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgRMPSClientIdentifier, jnxMbgRMPSClientStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that status of a Resource Manager  
+        client changed."
+    ::= { jnxMbgRMPSNotifications 2 }
+
+jnxMbgRMPSClientInfo NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgRMPSClientIdentifier, jnxMbgRMPSClientStatus,
+                  jnxMbgRMPSClientRedundancyRole }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies a change in status or redundancy role
+        of the specified Resource Manager client."
+    ::= { jnxMbgRMPSNotifications 3 }
+
+jnxMbgRMPSClientStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwName,
+                  jnxMbgRMPSClientIdentifier, jnxMbgRMPSClientRedundancyRole,
+                  jnxMbgRMPSClientStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies a change in status or redundancy role
+        of the specified Resource Manager client."
+    ::= { jnxMbgRMPSNotifications 4 }
+
+END

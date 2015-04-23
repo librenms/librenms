@@ -5,13 +5,13 @@ IMPORTS
 
     OBJECT-TYPE, MODULE-IDENTITY,
     NOTIFICATION-TYPE FROM SNMPv2-SMI
-    TruthValue  FROM SNMPv2-TC
-    ifIndex  FROM IF-MIB
+    DisplayString, TruthValue  FROM SNMPv2-TC
+    InterfaceIndex, ifIndex  FROM IF-MIB
     dot1dStpPort, dot1dStpPortEntry  FROM BRIDGE-MIB
     jnxL2cpMibRoot FROM JUNIPER-SMI;
 
 jnxL2cpFeaturesMIB MODULE-IDENTITY
-    LAST-UPDATED "200712170000Z"
+    LAST-UPDATED "201206250000Z"
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
@@ -22,6 +22,16 @@ jnxL2cpFeaturesMIB MODULE-IDENTITY
     DESCRIPTION
         "This mib module is for Juniper Networks Proprietory
          Layer 2 control protocol (L2CP) features"
+
+    REVISION     "201206250000Z"    -- June 25, 2012
+    DESCRIPTION  "Modifying max access for LacpTimeOut trap objects."
+
+    REVISION     "201208150000Z"    -- Aug 15, 2012
+    DESCRIPTION  "Added new mib jnxLacpAggTimeout."
+
+    REVISION     "201006110000Z"    -- June 11, 2010
+    DESCRIPTION  "Added new trap jnxLacpTimeOut."
+
     ::= { jnxL2cpMibRoot 1 }
 
 
@@ -200,5 +210,165 @@ jnxPortBpduErrorStatusChangeTrap NOTIFICATION-TYPE
         "Generated when the ports BPDU error state (no-error or detected) 
          changes."
    ::= { jnxL2cpProtectTraps 3 }
+
+    -- ***************************************************************
+    --  Lacp Traps / Notifications Section
+    -- ***************************************************************
+
+    -- Lacp Notification Variables/Objects
+
+    jnxLacpNotifyVars OBJECT IDENTIFIER ::=  { jnxL2cpObjects 3 }
+
+    jnxLacpAggTimeout OBJECT IDENTIFIER ::=  { jnxL2cpObjects 4 }
+
+    jnxLacpNotificationsPrefix OBJECT IDENTIFIER ::= { jnxL2cpNotifications 1 }
+
+LacpState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Actor and Partner State values from the LACPDU."
+    SYNTAX      BITS {
+                    lacpActivity(0),
+                    lacpTimeout(1),
+                    aggregation(2),
+                    synchronization(3),
+                    collecting(4),
+                    distributing(5),
+                    defaulted(6),
+                    expired(7)
+                }
+
+    jnxLacpInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Lacp member interface."
+        ::= { jnxLacpNotifyVars 1 }
+
+    jnxLacpifIndex  OBJECT-TYPE 
+        SYNTAX      InterfaceIndex 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current 
+        DESCRIPTION 
+            "Snmp ifIndex of member interface." 
+        ::= { jnxLacpNotifyVars 2 } 
+
+    jnxLacpAggregateInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Lacp Aggregate interface."
+        ::= { jnxLacpNotifyVars 3 }
+
+    jnxLacpAggregateifIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Snmp ifIndex of Aggregator."
+        ::= { jnxLacpNotifyVars 4 } 
+
+    jnxLacpAggPortActorOperState OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "Port actor operational state."
+        ::= { jnxLacpNotifyVars 5 }
+
+    jnxLacpTimeOut NOTIFICATION-TYPE
+        OBJECTS         { jnxLacpInterfaceName,
+                          jnxLacpifIndex,
+                          jnxLacpAggregateInterfaceName,
+                          jnxLacpAggregateifIndex,
+                          jnxLacpAggPortActorOperState
+                        }
+        STATUS          current
+        DESCRIPTION
+            "Lacp times out"
+        ::= { jnxLacpNotificationsPrefix  1 }
+
+dot3adAggPortTimeoutTable OBJECT-TYPE  
+    SYNTAX      SEQUENCE OF Dot3adAggPortTimeoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Link Aggregation Timeout information
+        about a port that is associated with this device.
+        A row appears in this table for each physical port."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { jnxLacpAggTimeout 1 }
+
+dot3adAggPortTimeoutEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortTimeoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Link Aggregation Control Protocol timeout information
+        for a port on this device."
+    INDEX { ifIndex }
+    ::= { dot3adAggPortTimeoutTable 1 }
+    
+Dot3adAggPortTimeoutEntry ::=
+    SEQUENCE {
+        dot3adInterfaceName
+            DisplayString,
+        dot3adOperState
+            LacpState,
+        dot3adAggname
+            DisplayString,
+        dot3adInterfaceTimeout
+            TimeTicks
+    }
+
+dot3adInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString 
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Physical port that is associated with
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 1 }
+
+dot3adOperState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the current
+        operational values of Actor_State as transmitted by the
+        Actor in LACPDUs. The bit allocations are as defined in
+        30.7.2.1.20. This attribute value is read-only."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.2.1.21"
+    ::= { dot3adAggPortTimeoutEntry 2 }
+
+dot3adAggname OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Aggregation Port where Physical port 
+        is associated with. This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 3 }
+
+dot3adInterfaceTimeout OBJECT-TYPE
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object represents the time elapsed in seconds
+         since lacp experienced timeout.
+         This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 4 }
 
 END

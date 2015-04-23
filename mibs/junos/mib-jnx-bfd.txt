@@ -7,6 +7,9 @@ JUNIPER-BFD-MIB DEFINITIONS ::= BEGIN
       bfdSessIndex 
          FROM BFD-STD-MIB                       -- [jnx-bfd-exp]
 
+      DisplayString, TimeStamp, TruthValue
+         FROM SNMPv2-TC
+
       jnxBfdMibRoot                             -- [jnx-smi] 
          FROM JUNIPER-SMI
    ; 
@@ -37,6 +40,8 @@ JUNIPER-BFD-MIB DEFINITIONS ::= BEGIN
 
    jnxBfdObjects       OBJECT IDENTIFIER ::= { jnxBfdMib 1 }
 
+   jnxBfdNotifyObjects OBJECT IDENTIFIER ::= { jnxBfdMib 2 }
+
    --  BFD Session Extn Table
    --  This table is a juniper extn to jnxSessTable
 
@@ -64,7 +69,8 @@ JUNIPER-BFD-MIB DEFINITIONS ::= BEGIN
          jnxBfdSessThreshTxInterval        Unsigned32,
          jnxBfdSessCurrTxInterval          Unsigned32,
          jnxBfdSessThreshDectTime          Unsigned32,
-         jnxBfdSessCurrDectTime            Unsigned32
+         jnxBfdSessCurrDectTime            Unsigned32,
+         jnxBfdSessIntfName                DisplayString
       }
 
    jnxBfdSessThreshTxInterval OBJECT-TYPE
@@ -108,6 +114,28 @@ JUNIPER-BFD-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
           "The actual value of detection time for the session."
       ::= { jnxBfdSessEntry 4} 
+
+   jnxBfdSessIntfName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "This object specifies the interface associated with 
+         the bfd session"
+      ::= { jnxBfdSessEntry 5}
+
+      -- Notification Objects 
+
+   jnxBfdSessifName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  accessible-for-notify
+      STATUS      current
+      DESCRIPTION
+         "This object gives the Interface Name in the bfdSessUp and 
+	  bfdSessDown trap. Even though this object doesnt appear in 
+	  the OBJECTS list of these traps, but the agent relay this 
+	  information as an extra parameter in the trap."
+      ::= { jnxBfdNotifyObjects 1}
 
    -- Notification Configuration
   
