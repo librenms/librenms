@@ -32,7 +32,7 @@ rdware for remote pollers. Here's a diagram of how you can scale LibreNMS out:
 How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.
 
 ####Web / API Layer
-This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. Their is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.
+This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. There is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.
 
 It is advisable to run RRDCached within this setup so that you don't need to share the rrd folder via a remote file share such as NFS. The web service can then generate rrd graphs via RRDCached. If RRDCached isn't an option then you can mount the rrd directory to read the RRD files directly.
 
