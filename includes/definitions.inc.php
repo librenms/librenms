@@ -1026,6 +1026,15 @@ $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['icon']              = "watchguard";
 
+$os = "fireware";
+$config['os'][$os]['text']              = "Watchguard Fireware";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['icon']              = "watchguard";
+
 $os = "panos";
 $config['os'][$os]['text']              = "PanOS";
 $config['os'][$os]['type']              = "firewall";
