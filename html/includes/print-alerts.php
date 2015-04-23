@@ -1,3 +1,6 @@
+<?php
+if(!isset($vars['format'])) { $vars['format'] = "basic"; }
+?>
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
@@ -31,7 +34,8 @@ var grid = $("#alerts").bootgrid({
     {
         return {
             id: "alerts",
-            device_id: '<?php echo $device['device_id']; ?>'
+            device_id: '<?php echo $device['device_id']; ?>',
+            format: '<?php echo $vars['format']; ?>'
         };
     },
     url: "/ajax_table.php",
@@ -42,6 +46,35 @@ var grid = $("#alerts").bootgrid({
         "ack": function(column,row) {
             return "<button type='button' class='btn btn-"+row.ack_col+" btn-sm command-ack-alert' data-target='#ack-alert' data-state='"+row.state+"' data-alert_id='"+row.alert_id+"' name='ack-alert' id='ack-alert' data-extra='"+row.extra+"'><span class='glyphicon glyphicon-"+row.ack_ico+"'aria-hidden='true'></span></button>";
         }
+    },
+    templates: {
+        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
+<?php
+
+echo('"<span style=\"font-weight: bold;\">Alerts</span> &#187; "+');
+
+$menu_options = array('basic'      => 'Basic',
+                      'detail'     => 'Detail');
+
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo("\"$sep\"+");
+  if ($vars['format'] == $option)
+  {
+    echo("\"<span class='pagemenu-selected'>\"+");
+  }
+  echo('"<a href=\"' . generate_url($vars, array('format' => $option)) . '\">' . $text . '</a>"+');
+  if ($vars['format'] == $option)
+  {
+    echo("\"</span>\"+");
+  }
+  $sep = " | ";
+}
+?>
+                "</span></div>"+
+                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     }
 }).on("loaded.rs.jquery.bootgrid", function() {
     grid.find(".command-ack-alert").on("click", function(e) {
