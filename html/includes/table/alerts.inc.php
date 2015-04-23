@@ -47,14 +47,9 @@ foreach (dbFetchRows($sql,$param) as $alert) {
       if( substr($tmp,-5,1) != ">" ) {
         $fault_detail .= $tmp;
       } else {
-        $tmp = generate_entity_link($tmp_alerts);
-        if( !empty($tmp) ) {
-          $fault_detail .= $tmp;
-        } else {
-          foreach ($tmp_alerts as $k=>$v) {
-            if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
-              $fault_detail .= "$k => '$v', ";
-            }
+        foreach ($tmp_alerts as $k=>$v) {
+          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
+            $fault_detail .= "$k => '$v', ";
           }
           $fault_detail = rtrim($fault_detail,", ");
         }
