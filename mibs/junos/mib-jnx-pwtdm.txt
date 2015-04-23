@@ -31,13 +31,6 @@
      jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex
         FROM JUNIPER-VPN-MIB
 
-     -- jnxPwCfgIndexOrzero
-        -- FROM PW-TC-STD-MIB
-
-      -- jnxPwCfgIndexOrzero
-      -- FROM JUNIPER-PW-TC-MIB
-
-
     jnxPwTdmMibRoot
         FROM JUNIPER-SMI;
 

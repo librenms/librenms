@@ -1,7 +1,7 @@
 --
 -- Juniper Networks: SNMP Experimental MIB Registry
 -- 
--- Copyright (c) 2003, 2005-2008, Juniper Networks, Inc.
+-- Copyright (c) 2003-2010, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -97,5 +97,25 @@ jnxInternalMibRoot OBJECT-IDENTITY
         "This branch is reserved for internal use."
     ::= { jnxExperiment 6 }
 
+jnxP2mpExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+         for the P2MP MIB."
+    ::= { jnxExperiment 7 }
+
+jnxL2L3VpnMcastExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch anchors the experimental IETF draft for L2L3VpnMcast 
+         MIB."
+    ::= { jnxExperiment 11 }
+
+jnxMvpnExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch anchors the experimental IETF draft for Multicast
+         VPN MIB."
+    ::= { jnxExperiment 12 }
 
 END

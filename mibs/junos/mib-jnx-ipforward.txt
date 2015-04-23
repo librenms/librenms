@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: ipForward
 -- 
--- Copyright (c) 2006, Juniper Networks, Inc.
+-- Copyright (c) 2006-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -16,11 +16,13 @@ IMPORTS
 	FROM SNMP-FRAMEWORK-MIB      -- RFC2571 
     ipCidrRouteEntry
 	FROM IP-FORWARD-MIB          -- RFC2096
+    inetCidrRouteEntry
+        FROM IP-FORWARD-MIB          -- RFC4292
     jnxMibs
         FROM JUNIPER-SMI;
 
 jnxIpForwardMIB MODULE-IDENTITY
-    LAST-UPDATED "200608210000Z" -- Aug 21 00:00:00 2006 UTC
+    LAST-UPDATED "201111130000Z" -- Nov 13 00:00:00 2011 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -35,9 +37,9 @@ jnxIpForwardMIB MODULE-IDENTITY
 	     has directly related entries in mib-2,  ipForward MIB."
 
     -- revision history
-    REVISION "200505010000Z" -- May 1 00:00:00 2005 UTC
+    REVISION "201111130000Z" -- Nov 13 00:00:00 2011 UTC
     DESCRIPTION
-            "Initial implementation."
+            "jnxInetCidrRouteTunnelName deprecates jnxIpCidrRouteTunnelName."
     ::= { jnxMibs 38 }
 
 
@@ -49,7 +51,7 @@ jnxIpForwardMIB MODULE-IDENTITY
 jnxIpCidrRouteTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF JnxIpCidrRouteEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Augments the ipCidrRouteTable with additional data."
    ::= { jnxIpForwardMIB 1 }
@@ -57,7 +59,7 @@ jnxIpCidrRouteTable OBJECT-TYPE
 jnxIpCidrRouteEntry OBJECT-TYPE
     SYNTAX      JnxIpCidrRouteEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Each entry provides additional CIDR forwarding information."
     AUGMENTS { ipCidrRouteEntry }
@@ -72,12 +74,45 @@ jnxIpCidrRouteTunnelName OBJECT-TYPE
      SYNTAX        SnmpAdminString
      -- MAX-ACCESS    read-create
      MAX-ACCESS    read-only
-     STATUS        current
+     STATUS        deprecated
      DESCRIPTION
            "The canonical name assigned to the tunnel. The router
 	    will forward traffic bound for the destination defined
 	    by the INDEX through this tunnel." 
       DEFVAL {""}
       ::= { jnxIpCidrRouteEntry 1 }
+
+jnxInetCidrRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxInetCidrRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Augments the inetCidrRouteTable with additional data."
+   ::= { jnxIpForwardMIB 2 }
+
+jnxInetCidrRouteEntry OBJECT-TYPE
+    SYNTAX      JnxInetCidrRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides additional CIDR forwarding information."
+    AUGMENTS { inetCidrRouteEntry }
+    ::= { jnxInetCidrRouteTable 1 }
+
+JnxInetCidrRouteEntry ::=
+    SEQUENCE {
+        jnxInetCidrRouteTunnelName        SnmpAdminString
+     }
+
+jnxInetCidrRouteTunnelName OBJECT-TYPE
+     SYNTAX        SnmpAdminString
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+           "The canonical name assigned to the tunnel. The router
+            will forward traffic bound for the destination defined
+            by the INDEX through this tunnel."
+      DEFVAL {""}
+      ::= { jnxInetCidrRouteEntry 1 }
 
 END
