@@ -47,7 +47,11 @@ if (isset($_REQUEST['search']))
     } elseif($_REQUEST['type'] == 'device') {
 
       // Device search
-      $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%" . $search . "%' OR `location` LIKE '%" . $search . "%' ORDER BY hostname LIMIT 8");
+      if (is_admin() === TRUE || is_read() === TRUE) {
+          $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%" . $search . "%' OR `location` LIKE '%" . $search . "%' ORDER BY hostname LIMIT 8");
+      } else {
+          $results = dbFetchRows("SELECT * FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND (`hostname` LIKE '%" . $search . "%' OR `location` LIKE '%" . $search . "%') ORDER BY hostname LIMIT 8", array($_SESSION['user_id']));
+      }
       if (count($results))
       {
         $found = 1;
@@ -72,7 +76,11 @@ if (isset($_REQUEST['search']))
           {
             $highlight_colour = '#008000';
           }
-          $num_ports = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ?", array($result['device_id']));
+          if (is_admin() === TRUE || is_read() === TRUE) {
+              $num_ports = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ?", array($result['device_id']));
+          } else {
+              $num_ports = dbFetchCell("SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND device_id = ?", array($_SESSION['user_id'],$result['device_id']));
+          }
           $device[]=array('name'=>$name,
           'device_id'=>$result['device_id'],
           'url'=> generate_device_url($result),
@@ -91,7 +99,11 @@ if (isset($_REQUEST['search']))
     
     } elseif($_REQUEST['type'] == 'ports') {
       // Search ports
-      $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%" . $search . "%' OR `ifDescr` LIKE '%" . $search . "%' ORDER BY ifDescr LIMIT 8");
+      if (is_admin() === TRUE || is_read() === TRUE) {
+          $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%" . $search . "%' OR `ifDescr` LIKE '%" . $search . "%' ORDER BY ifDescr LIMIT 8");
+      } else {
+          $results = dbFetchRows("SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE '%" . $search . "%' OR `ifDescr` LIKE '%" . $search . "%') ORDER BY ifDescr LIMIT 8", array($_SESSION['user_id'],$_SESSION['user_id']));
+      }
 
       if (count($results))
       {
@@ -144,7 +156,11 @@ if (isset($_REQUEST['search']))
 
     } elseif($_REQUEST['type'] == 'bgp') {
       // Search bgp peers
-      $results = dbFetchRows("SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%' ORDER BY `astext` LIMIT 8");
+      if (is_admin() === TRUE || is_read() === TRUE) {
+          $results = dbFetchRows("SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%' ORDER BY `astext` LIMIT 8");
+      } else {
+          $results = dbFetchRows("SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%') ORDER BY `astext` LIMIT 8", array($_SESSION['user_id']));
+      }
       if (count($results))
       {
         $found = 1;

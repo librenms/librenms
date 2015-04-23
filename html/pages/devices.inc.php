@@ -216,7 +216,13 @@ var grid = $("#devices").bootgrid({
                 "<option value=''>All OSes</option>"+
 <?php
 
-foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";
+} else {
+    $sql = "SELECT `os` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `os` ORDER BY `os`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql,$param) as $data) {
     if ($data['os']) {
         $tmp_os = clean_bootgrid($data['os']);
         echo('"<option value=\"'.$tmp_os.'\""+');
@@ -234,7 +240,13 @@ foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY
                 "<option value=''>All Versions</option>"+
 <?php
 
-foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
+} else {
+    $sql = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql,$param) as $data) {
     if ($data['version']) {
         $tmp_version = clean_bootgrid($data['version']);
         echo('"<option value=\"'.$tmp_version.'\""+');
@@ -252,7 +264,13 @@ foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version
                  "<option value=\"\">All Platforms</option>"+
 <?php
 
-foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
+} else {
+    $sql = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql,$param) as $data) {
     if ($data['hardware']) {
         $tmp_hardware = clean_bootgrid($data['hardware']);
         echo('"<option value=\"'.$tmp_hardware.'\""+');
@@ -271,7 +289,13 @@ foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardwa
                 "<option value=\"\">All Featuresets</option>"+
 <?php
 
-foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
+} else {
+    $sql = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql,$param) as $data)
 {
   if ($data['features'])
   {
@@ -312,7 +336,13 @@ foreach (getlocations() as $location) {
                     "<option value=\"\">All Device Types</option>"+
 <?php
 
-foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $data) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
+} else {
+    $sql = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql,$param) as $data) {
     if ($data['type']) {
         echo('"<option value=\"'.$data['type'].'\""+');
         if ($data['type'] == $vars['type']) {
