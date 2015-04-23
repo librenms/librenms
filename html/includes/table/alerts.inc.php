@@ -41,21 +41,25 @@ foreach (dbFetchRows($sql,$param) as $alert) {
     $log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
     $log_detail = json_decode(gzuncompress($log),true);
     $fault_detail = '';
-    foreach ( $log_detail['rule'] as $tmp_alerts ) {
-        foreach ($tmp_alerts as $k=>$v) {
+    foreach ( $log_detail['rule'] as $o=>$tmp_alerts ) {
+      $fault_detail .= "#".($o+1).":&nbsp;";
+      $tmp = generate_port_link($tmp_alerts);
+      if( substr($tmp,-5,1) != ">" ) {
+        $fault_detail .= $tmp;
+      } else {
+        $tmp = generate_entity_link($tmp_alerts);
+        if( !empty($tmp) ) {
+          $fault_detail .= $tmp;
+        } else {
+          foreach ($tmp_alerts as $k=>$v) {
             if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
-                if ($format == 'basic') {
-                    $fault_detail .= $k.' => '.$v."\n ";
-                } else {
-                    $v = truncate($v,30);
-                    $fault_detail .= $k.' => '.$v.", ";
-                }
+              $fault_detail .= "$k => '$v', ";
             }
+          }
+          $fault_detail = rtrim($fault_detail,", ");
         }
-        if ($format == 'detail') {
-            $fault_detail = rtrim($fault_detail,", ");
-        }
-        $fault_detail .= "\n";
+      }
+      $fault_detail .= "<br>";
     }
 
     $ico = "ok";
@@ -103,14 +107,16 @@ foreach (dbFetchRows($sql,$param) as $alert) {
             $ack_col = 'danger';
         }
     }
-    if ($format == 'basic') {
-        $hostname = "<a href=\"device/device=".$alert['device_id']."\"><i title='".htmlentities($fault_detail)."'>".$alert['hostname']."</i></a>";
-    } else {
-        $hostname = "<a href=\"device/device=".$alert['device_id']."\"><i>".$alert['hostname']."<br />$fault_detail</i></a>";
-    }
 
-    $response[] = array('id'=>"<i>#".$rulei++."</i>",
+    $hostname = '
+     <div class="incident">
+       '.generate_device_link($alert).'
+       <div id="incident'.($rulei+1).'" class="collapse">'.$fault_detail.'</div>
+     </div>';
+
+    $response[] = array('id'=>$rulei++,
                         'rule'=>"<i title=\"".htmlentities($alert['rule'])."\">".htmlentities($alert['name'])."</i>",
+                        'details'=>'<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
                         'hostname'=>$hostname,
                         'timestamp'=>($alert['timestamp'] ? $alert['timestamp'] : "N/A"),
                         'severity'=>$severity,
