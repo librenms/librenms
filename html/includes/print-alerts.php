@@ -40,22 +40,26 @@ var grid = $("#alerts").bootgrid({
     templates: {
     }
 }).on("loaded.rs.jquery.bootgrid", function() {
+    grid.find(".incident-toggle").each( function() {
+      $(this).parent().addClass('incident-toggle-td');
+    }).on("click", function(e) {
+      var target = $(this).data("target");
+      $(target).collapse('toggle');
+      $(this).toggleClass('glyphicon-plus glyphicon-minus');
+    });
     grid.find(".incident").each( function() {
       $(this).parent().addClass('col-md-12 col-sm-12 col-xs-12');
       $(this).parent().parent().on("mouseenter", function() {
         $(this).find(".incident-toggle").fadeIn(200);
       }).on("mouseleave", function() {
         $(this).find(".incident-toggle").fadeOut(200);
-      }).on("click", function() {
-        var target = $(this).find(".incident-toggle").data("target");
-        $(this).find(".incident-toggle").toggleClass('glyphicon-plus glyphicon-minus');
-        $(target).collapse('toggle');
+      }).on("click", "td:not(.incident-toggle-td)", function() {
+        var target = $(this).parent().find(".incident-toggle").data("target");
+        if( $(this).parent().find(".incident-toggle").hasClass('glyphicon-plus') ) {
+          $(this).parent().find(".incident-toggle").toggleClass('glyphicon-plus glyphicon-minus');
+          $(target).collapse('toggle');
+        }
       });
-    });
-    grid.find(".incident-toggle").on("click", function(e) {
-      var target = $(this).data("target");
-      $(this).toggleClass('glyphicon-plus glyphicon-minus');
-      $(target).collapse('toggle');
     });
     grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
