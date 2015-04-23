@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Structure of Management Information
 -- 
--- Copyright (c) 2002-2007, Juniper Networks, Inc.
+-- Copyright (c) 2002-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -22,7 +22,7 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
     ;
     
     jnxl2aldMib MODULE-IDENTITY
-       LAST-UPDATED "200702151000Z" -- Thursday February 15 10:00:00 2007 UTC
+       LAST-UPDATED "201208081000Z" -- Wednesday August 08 10:00:00 2012 UTC
        ORGANIZATION "Juniper Networks, Inc."
        CONTACT-INFO
               "        Juniper Technical Assistance Center
@@ -32,6 +32,15 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
                        E-mail: support@juniper.net"
        DESCRIPTION
               "The MIB modules for L2ALD traps"
+
+    -- Revision history
+    REVISION "201208081000Z" -- Wednesday August 08 10:00:00 2012 UTC
+    DESCRIPTION
+            "Added new notification jnxl2aldMacMoveThreshold"
+
+    REVISION "200702151000Z" -- Thursday February 15 10:00:00 2007 UTC
+    DESCRIPTION
+            "Initial Version"
     ::= { jnxl2aldMibRoot 1 }
 
     jnxl2aldNotification OBJECT IDENTIFIER ::= { jnxl2aldMib 0 }
@@ -141,6 +150,14 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
               "The mac limit count for the system."
     ::= { jnxl2aldObjects 6 }
 
+     jnxl2aldMacAdress OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION
+             "The offending mac causing mac move threshold trap."
+    ::= { jnxl2aldObjects 7 }
+
 -- Trap definitions
 
     jnxl2aldRoutingInstMacLimit NOTIFICATION-TYPE
@@ -179,6 +196,21 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
                   the entire system is reached.
                   This trap is send only once we exceed the limit value."
      ::= { jnxl2aldNotification 3 }
+
+    jnxl2aldMacMoveThreshold NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldIntfLogicalRouter,
+                     jnxl2aldIntfRoutingInst,
+                     jnxl2aldIntfBridgeDomain,
+                     ifDescr,
+                     jnxl2aldMacAdress
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when a mac move reaches threshold.
+                  The given interface (ifDescr) will be blocked for the Bridge
+                  Domain(jnxl2aldIntfBridgeDomain). This trap is send only once when
+                  mac move count exceeds the threshold for the Mac(jnxl2aldMacAdress)."
+    ::= { jnxl2aldNotification 4 }
 
 END
 

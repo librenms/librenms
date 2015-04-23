@@ -1,0 +1,2194 @@
+--
+-- Juniper Mobile Gateway AAA objects MIB.
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILE-GATEWAY-AAA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter64, Counter32, Integer32, Unsigned32, Gauge32,
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    InetAddressType, InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+
+    EnabledStatus
+        FROM JUNIPER-MIMSTP-MIB
+
+    jnxMobileGatewayMibRoot	
+        FROM JUNIPER-SMI
+
+    jnxMbgGwIndex, jnxMbgGwName
+        FROM JUNIPER-MOBILE-GATEWAYS;
+
+jnxMobileGatewayPgwAAAMib MODULE-IDENTITY
+    LAST-UPDATED "201111151200Z" -- Nov 15, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge AAA Services"
+    REVISION "201101031200Z" -- Jan 03, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    ::= { jnxMobileGatewayMibRoot 3 }
+
+jnxMbgAAANotifications OBJECT IDENTIFIER ::= 
+                                                { jnxMobileGatewayPgwAAAMib 0 }
+jnxMbgAAAObjects       OBJECT IDENTIFIER ::= 
+                                                { jnxMobileGatewayPgwAAAMib 1 }
+
+jnxMbgAAAGlobalAuthStats   OBJECT IDENTIFIER ::= 
+                                            { jnxMbgAAAObjects 1 }
+jnxMbgAAAGlobalAcctStats   OBJECT IDENTIFIER ::= 
+                                            { jnxMbgAAAObjects 2 }
+jnxMbgAAAGlobalDynAuthStats OBJECT IDENTIFIER ::= 
+                                            { jnxMbgAAAObjects 3 }
+jnxMbgAAANotificationVars  OBJECT IDENTIFIER ::= 
+                                            { jnxMbgAAAObjects 7 }
+
+JnxMbgAAAServerStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Server status - dead or active."
+    SYNTAX  INTEGER {
+                        unknown   (0),
+                        active    (1),
+                        dead      (2)
+                    }
+
+JnxMbgQueueWaterMarkType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of a queue threshold  - high or low."
+    SYNTAX  INTEGER {
+                        unknown   (0),
+                        high      (1),
+                        low       (2)
+                    }
+
+
+--
+-- Global RADIUS Authentication counters Table
+-- 
+
+jnxMbgAAAAuthStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgAAAAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists authentication counters."
+    ::= { jnxMbgAAAObjects 8 }
+
+jnxMbgAAAAuthStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgAAAAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing global radius authentication counters."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgAAAAuthStatsTable 1 }
+
+JnxMbgAAAAuthStatsEntry ::= SEQUENCE {
+    jnxMbgTtlAuthRequests              Counter64,
+    jnxMbgTtlAuthAccepts               Counter64,
+    jnxMbgTtlAuthRejects               Counter64,
+    jnxMbgTtlAuthChallenges            Counter64,
+    jnxMbgTtlAuthRequestTimeouts       Counter64,
+    jnxMbgTtlAuthRequestTxErrors       Counter64,
+    jnxMbgTtlAuthResponseErrors        Counter64,
+    jnxMbgTtlAuthPendingRequests       Counter64
+}
+
+jnxMbgTtlAuthRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication requests made."
+    ::= { jnxMbgAAAAuthStatsEntry 1 }
+
+jnxMbgTtlAuthAccepts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication requests that were accepted."
+    ::= { jnxMbgAAAAuthStatsEntry 2 }
+
+jnxMbgTtlAuthRejects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication requests that were rejected."
+    ::= { jnxMbgAAAAuthStatsEntry 3 }
+
+jnxMbgTtlAuthChallenges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication challenges received."
+    ::= { jnxMbgAAAAuthStatsEntry 4 }
+
+jnxMbgTtlAuthRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication requests that timed out."
+    ::= { jnxMbgAAAAuthStatsEntry 5 }
+
+jnxMbgTtlAuthRequestTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication requests transmit errors."
+    ::= { jnxMbgAAAAuthStatsEntry 6 }
+
+jnxMbgTtlAuthResponseErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total authentication response errors."
+    ::= { jnxMbgAAAAuthStatsEntry 7 }
+
+jnxMbgTtlAuthPendingRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total pending authentication requests."
+    ::= { jnxMbgAAAAuthStatsEntry 8 }
+
+--
+-- Global counters related to Accounting
+--
+
+jnxMbgAAAAcctStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgAAAAcctStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists accounting counters."
+    ::= { jnxMbgAAAObjects 9 }
+
+jnxMbgAAAAcctStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgAAAAcctStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing global radius accounting counters."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgAAAAcctStatsTable 1 }
+
+JnxMbgAAAAcctStatsEntry ::= SEQUENCE {
+    jnxMbgTtlAcctRequests               Counter64,
+    jnxMbgTtlAcctResp               Counter64,
+    jnxMbgTtlAcctRequestTimeouts    Counter64,
+    jnxMbgTtlAcctRequestTxErrors    Counter64,
+    jnxMbgTtlAcctResponseErrors     Counter64,
+    jnxMbgTtlAcctPendingRequests        Counter64
+}
+jnxMbgTtlAcctRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total accounting requests made."
+    ::= { jnxMbgAAAAcctStatsEntry 1 }
+
+jnxMbgTtlAcctResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total accounting Resp that were received."
+    ::= { jnxMbgAAAAcctStatsEntry 2 }
+
+jnxMbgTtlAcctRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total accounting requests that timed out."
+    ::= { jnxMbgAAAAcctStatsEntry 3 }
+
+jnxMbgTtlAcctRequestTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total accounting requests transmit errors."
+    ::= { jnxMbgAAAAcctStatsEntry 4 }
+
+jnxMbgTtlAcctResponseErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total accounting response errors."
+    ::= { jnxMbgAAAAcctStatsEntry 5 }
+
+jnxMbgTtlAcctPendingRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total pending accounting requests."
+    ::= { jnxMbgAAAAcctStatsEntry 6 }
+
+--
+-- Global Dynamic requests Statistics
+--
+
+jnxMbgAAADynAuthStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgAAADynAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists dynamic request statistics counters."
+    ::= { jnxMbgAAAObjects 10 }
+
+jnxMbgAAADynAuthStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgAAADynAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing global request statistics counters."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgAAADynAuthStatsTable 1 }
+
+JnxMbgAAADynAuthStatsEntry ::= SEQUENCE {
+    jnxMbgTtlDynAuthReceived       Counter64,
+    jnxMbgTtlDynAuthCoaReceived    Counter64,
+    jnxMbgTtlDynAuthDmReceived     Counter64,
+    jnxMbgTtlDynAuthCoaAckSent     Counter64,
+    jnxMbgTtlDynAuthCoaNackSent    Counter64,
+    jnxMbgTtlDynAuthDmAckSent      Counter64,
+    jnxMbgTtlDynAuthDmNackSent     Counter64,
+    jnxMbgTtlDynAuthDropped        Counter64,
+    jnxMbgTtlDynAuthDuplicate      Counter64,
+    jnxMbgTtlDynAuthForwarded      Counter64,
+    jnxMbgTtlDynAuthTimeouts       Counter64,
+    jnxMbgTtlDynAuthDelivered      Counter64,
+    jnxMbgTtlDynAuthErrors         Counter64,
+    jnxMbgTtlDynAuthUnknownClnts   Counter64,
+    jnxMbgTtlDynAuthInvalidCode    Counter64,
+    jnxMbgTtlDynAuthInvalidAuth    Counter64,
+    jnxMbgTtlDynAuthInvalidChId    Counter64,
+    jnxMbgTtlDynAuthMapErrors      Counter64,
+    jnxMbgTtlDynAuthInvalidTrId    Counter64
+}
+
+jnxMbgTtlDynAuthReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req received."
+    ::= { jnxMbgAAADynAuthStatsEntry 1 }
+
+jnxMbgTtlDynAuthCoaReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total CoA received."
+    ::= { jnxMbgAAADynAuthStatsEntry 2 }
+
+jnxMbgTtlDynAuthDmReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DM received."
+    ::= { jnxMbgAAADynAuthStatsEntry 3 }
+
+jnxMbgTtlDynAuthCoaAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total CoA Ack sent."
+    ::= { jnxMbgAAADynAuthStatsEntry 4 }
+
+jnxMbgTtlDynAuthCoaNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total CoA Nack sent."
+    ::= { jnxMbgAAADynAuthStatsEntry 5 }
+
+jnxMbgTtlDynAuthDmAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DM Ack sent."
+    ::= { jnxMbgAAADynAuthStatsEntry 6 }
+
+jnxMbgTtlDynAuthDmNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DM Nack sent."
+    ::= { jnxMbgAAADynAuthStatsEntry 7 }
+
+jnxMbgTtlDynAuthDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req that were dropped."
+    ::= { jnxMbgAAADynAuthStatsEntry 8 }
+
+jnxMbgTtlDynAuthDuplicate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total duplicate dyn-req detected."
+    ::= { jnxMbgAAADynAuthStatsEntry 9 }
+
+jnxMbgTtlDynAuthForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req forwarded to anchor instance."
+    ::= { jnxMbgAAADynAuthStatsEntry 10 }
+
+jnxMbgTtlDynAuthTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req timed out."
+    ::= { jnxMbgAAADynAuthStatsEntry 11 }
+
+jnxMbgTtlDynAuthDelivered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req that were delivered to application."
+    ::= { jnxMbgAAADynAuthStatsEntry 12 }
+
+jnxMbgTtlDynAuthErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req that had errors during processing."
+    ::= { jnxMbgAAADynAuthStatsEntry 13 }
+
+jnxMbgTtlDynAuthUnknownClnts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req received from unknown clients."
+    ::= { jnxMbgAAADynAuthStatsEntry 14 }
+
+jnxMbgTtlDynAuthInvalidCode OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req received with invalid RADIUS code."
+    ::= { jnxMbgAAADynAuthStatsEntry 15 }
+
+jnxMbgTtlDynAuthInvalidAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req received with invalid RADIUS authenticator."
+    ::= { jnxMbgAAADynAuthStatsEntry 16 }
+
+jnxMbgTtlDynAuthInvalidChId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req received with invalid or missing Charging Id."
+    ::= { jnxMbgAAADynAuthStatsEntry 17 }
+
+jnxMbgTtlDynAuthMapErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req that had session mapping errors during processing."
+    ::= { jnxMbgAAADynAuthStatsEntry 18 }
+
+jnxMbgTtlDynAuthInvalidTrId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dyn-req with invalid transaction id during processing."
+    ::= { jnxMbgAAADynAuthStatsEntry 19 }
+
+
+--
+-- RADIUS Authentication Servers Table
+-- This table contains the status and stats related to RADIUS Authentication
+-- Servers
+
+jnxMbgRadiusAuthSrvrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgRadiusAuthSrvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists RADIUS servers used for authentication."
+    ::= { jnxMbgAAAObjects 11 }
+
+jnxMbgRadiusAuthSrvrEntry OBJECT-TYPE
+    SYNTAX      JnxMbgRadiusAuthSrvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a RADIUS server used for authentication."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgRadiusAuthSrvrName}
+    ::= { jnxMbgRadiusAuthSrvrTable 1 }
+
+JnxMbgRadiusAuthSrvrEntry ::= SEQUENCE {
+    jnxMbgRadiusAuthSrvrName                DisplayString,
+    jnxMbgRadiusAuthSrvrInetAddrType        InetAddressType,
+    jnxMbgRadiusAuthSrvrInetAddress         InetAddress,
+    jnxMbgRadiusAuthSrvrInetPort            InetPortNumber,
+    jnxMbgRadiusAuthSrvrRtngInstance        DisplayString,
+    jnxMbgRadiusAuthSrvrStatus              JnxMbgAAAServerStatus,
+    jnxMbgRadiusAuthSrvrRequests            Counter64,
+    jnxMbgRadiusAuthSrvrRetrans            Counter64,
+    jnxMbgRadiusAuthSrvrAccepts             Counter64,
+    jnxMbgRadiusAuthSrvrRejects             Counter64,
+    jnxMbgRadiusAuthSrvrChallenges          Counter64,
+    jnxMbgRadiusAuthSrvrMalformResp         Counter64,
+    jnxMbgRadiusAuthSrvrBadAuthen           Counter64,
+    jnxMbgRadiusAuthSrvrPendingRqsts        Counter64,
+    jnxMbgRadiusAuthSrvrTimeouts            Counter64,
+    jnxMbgRadiusAuthSrvrUnknownTypes        Counter64,
+    jnxMbgRadiusAuthSrvrPacketsDrop         Counter64,
+    jnxMbgRadiusAuthSrvrRTTAvg              Gauge32,
+    jnxMbgRadiusAuthSrvrRTTMin              Gauge32,
+    jnxMbgRadiusAuthSrvrRTTMax              Gauge32
+}
+
+jnxMbgRadiusAuthSrvrName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A name which uniquely identifies this server on the mobile-gateway."
+    ::= { jnxMbgRadiusAuthSrvrEntry 1 }
+
+jnxMbgRadiusAuthSrvrInetAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of IP address used for this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 2 }
+
+jnxMbgRadiusAuthSrvrInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address used for this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 3 }
+
+jnxMbgRadiusAuthSrvrInetPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UDP port number on the server to which authentication
+        requests are sent."
+    ::= { jnxMbgRadiusAuthSrvrEntry 4 }
+
+jnxMbgRadiusAuthSrvrRtngInstance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The routing-instance used while contacting this server.
+        If not configured, the default routing-instance will be
+        used."
+    ::= { jnxMbgRadiusAuthSrvrEntry 5 }
+
+jnxMbgRadiusAuthSrvrStatus OBJECT-TYPE
+    SYNTAX      JnxMbgAAAServerStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 6 }
+
+jnxMbgRadiusAuthSrvrRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Access-requests that have been sent to
+        this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 7 }
+
+jnxMbgRadiusAuthSrvrRetrans OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Access-requests that have been retransmitted
+        this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 8 }
+
+jnxMbgRadiusAuthSrvrAccepts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Access-Accepts that have been received from
+        this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 9 }
+
+jnxMbgRadiusAuthSrvrRejects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Access-Rejects that have been received from
+        this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 10 }
+
+jnxMbgRadiusAuthSrvrChallenges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Access-Challenges that have been received from
+        this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 11 }
+
+jnxMbgRadiusAuthSrvrMalformResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Malformed Resp have been received from
+        this server. A response could either accept, reject or challenge."
+    ::= { jnxMbgRadiusAuthSrvrEntry 12 }
+
+jnxMbgRadiusAuthSrvrBadAuthen OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp with invalid authenticators received from
+        this server. A response could either accept, reject or challenge."
+    ::= { jnxMbgRadiusAuthSrvrEntry 13 }
+
+jnxMbgRadiusAuthSrvrPendingRqsts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests to this server pending authentication."
+    ::= { jnxMbgRadiusAuthSrvrEntry 14 }
+
+jnxMbgRadiusAuthSrvrTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests to this server that timed out."
+    ::= { jnxMbgRadiusAuthSrvrEntry 15 }
+
+jnxMbgRadiusAuthSrvrUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp received from this RADIUS server with
+        unknown types."
+    ::= { jnxMbgRadiusAuthSrvrEntry 16 }
+
+jnxMbgRadiusAuthSrvrPacketsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp received from this RADIUS server 
+        that were dropped for some other reason."
+    ::= { jnxMbgRadiusAuthSrvrEntry 17 }
+
+jnxMbgRadiusAuthSrvrRTTAvg OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average round-trip time (in ms) for this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 18 }
+
+jnxMbgRadiusAuthSrvrRTTMin OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 19 }
+
+jnxMbgRadiusAuthSrvrRTTMax OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAuthSrvrEntry 20 }
+
+--
+-- RADIUS Accounting Servers Table
+-- This table contains the status and stats related to RADIUS Accounting
+-- Servers
+
+jnxMbgRadiusAcctSrvrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgRadiusAcctSrvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists RADIUS servers used for accounting."
+    ::= { jnxMbgAAAObjects 12 }
+
+jnxMbgRadiusAcctSrvrEntry OBJECT-TYPE
+    SYNTAX      JnxMbgRadiusAcctSrvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a RADIUS server used for accounting."
+
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgRadiusAcctSrvrName}
+    ::= { jnxMbgRadiusAcctSrvrTable 1 }
+
+JnxMbgRadiusAcctSrvrEntry ::= SEQUENCE {
+    jnxMbgRadiusAcctSrvrName             DisplayString,
+    jnxMbgRadiusAcctSrvrInetAddrType     InetAddressType,
+    jnxMbgRadiusAcctSrvrInetAddress      InetAddress,
+    jnxMbgRadiusAcctSrvrInetPort         InetPortNumber,
+    jnxMbgRadiusAcctSrvrRtngInstance     DisplayString,
+    jnxMbgRadiusAcctSrvrStatus           JnxMbgAAAServerStatus,
+    jnxMbgRadiusAcctSrvrRequests         Counter64,
+    jnxMbgRadiusAcctSrvrRetrans         Counter64,
+    jnxMbgRadiusAcctSrvrResp             Counter64,
+    jnxMbgRadiusAcctSrvrMalformResp      Counter64,
+    jnxMbgRadiusAcctSrvrBadAuthen        Counter64,
+    jnxMbgRadiusAcctSrvrPendingRqsts     Counter64,
+    jnxMbgRadiusAcctSrvrTimeouts         Counter64,
+    jnxMbgRadiusAcctSrvrUnknownTypes     Counter64,
+    jnxMbgRadiusAcctSrvrPacketsDrop      Counter64,
+    jnxMbgRadiusAcctSrvrRTTAvg           Gauge32,
+    jnxMbgRadiusAcctSrvrRTTMin           Gauge32,
+    jnxMbgRadiusAcctSrvrRTTMax           Gauge32
+}
+
+jnxMbgRadiusAcctSrvrName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A name which uniquely identifies this server on the mobile-gateway."
+    ::= { jnxMbgRadiusAcctSrvrEntry 1 }
+
+jnxMbgRadiusAcctSrvrInetAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of IP address used for this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 2 }
+
+jnxMbgRadiusAcctSrvrInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address used for this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 3 }
+
+jnxMbgRadiusAcctSrvrInetPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UDP port number on the server to which accounting
+        requests are sent."
+    ::= { jnxMbgRadiusAcctSrvrEntry 4 }
+
+jnxMbgRadiusAcctSrvrRtngInstance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The routing-instance used while contacting this server.
+        If not configured, the default routing-instance will be
+        used."
+    ::= { jnxMbgRadiusAcctSrvrEntry 5 }
+
+jnxMbgRadiusAcctSrvrStatus OBJECT-TYPE
+    SYNTAX      JnxMbgAAAServerStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 6 }
+
+jnxMbgRadiusAcctSrvrRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Accounting-requests that have been sent to
+        this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 7 }
+
+jnxMbgRadiusAcctSrvrRetrans OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Accounting-requests that have been retransmitted
+        this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 8 }
+
+jnxMbgRadiusAcctSrvrResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Accounting-Resp that have been received from
+        this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 9 }
+
+jnxMbgRadiusAcctSrvrMalformResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Malformed Resp have been received from
+        this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 10 }
+
+jnxMbgRadiusAcctSrvrBadAuthen OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp with invalid authenticators received from
+        this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 11 }
+
+jnxMbgRadiusAcctSrvrPendingRqsts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests to this server which are yet to be sent or
+        waiting for response."
+    ::= { jnxMbgRadiusAcctSrvrEntry 12 }
+
+jnxMbgRadiusAcctSrvrTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests to this server that timed out."
+    ::= { jnxMbgRadiusAcctSrvrEntry 13 }
+
+jnxMbgRadiusAcctSrvrUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp received from this RADIUS server with
+        unknown types."
+    ::= { jnxMbgRadiusAcctSrvrEntry 14 }
+
+jnxMbgRadiusAcctSrvrPacketsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resp received from this RADIUS server 
+        that were dropped for some other reason."
+    ::= { jnxMbgRadiusAcctSrvrEntry 15 }
+
+jnxMbgRadiusAcctSrvrRTTAvg OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average round-trip time (in ms) for this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 16 }
+
+jnxMbgRadiusAcctSrvrRTTMin OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 17 }
+
+jnxMbgRadiusAcctSrvrRTTMax OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAcctSrvrEntry 18 }
+
+--
+-- RADIUS Dyn Auth Clients Table
+-- This table contains the status and stats related to RADIUS Dyn Auth
+-- Servers
+
+jnxMbgDynAuthClntTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgDynAuthClntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists RADIUS clients sending Dynamic Authorization requests."
+    ::= { jnxMbgAAAObjects 13 }
+
+jnxMbgDynAuthClntEntry OBJECT-TYPE
+    SYNTAX      JnxMbgDynAuthClntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a RADIUS client sending Dynamic Authorization requests."
+    INDEX       { jnxMbgGwIndex,
+                  jnxMbgDynAuthClntName }
+    ::= { jnxMbgDynAuthClntTable 1 }
+
+JnxMbgDynAuthClntEntry ::= SEQUENCE {
+    jnxMbgDynAuthClntName                  DisplayString,
+    jnxMbgDynAuthClntInAddrType            InetAddressType,
+    jnxMbgDynAuthClntInetAddress           InetAddress,
+
+    jnxMbgDynAuthClntCoaReceived           Counter64,
+    jnxMbgDynAuthClntDmReceived            Counter64,
+    jnxMbgDynAuthClntCoaAckSent            Counter64,
+    jnxMbgDynAuthClntCoaNackSent           Counter64,
+    jnxMbgDynAuthClntDmAckSent             Counter64,
+    jnxMbgDynAuthClntDmNackSent            Counter64,
+    jnxMbgDynAuthClntDropped               Counter64,
+    jnxMbgDynAuthClntDuplicate             Counter64,
+    jnxMbgDynAuthClntForwarded             Counter64,
+    jnxMbgDynAuthClntTimeouts              Counter64,
+    jnxMbgDynAuthClntDelivered             Counter64,
+    jnxMbgDynAuthClntErrors                Counter64,
+    jnxMbgDynAuthClntInvalidAuth           Counter64,
+    jnxMbgDynAuthClntInvalidCode           Counter64,
+    jnxMbgDynAuthClntInvalidChId           Counter64,
+    jnxMbgDynAuthClntMapErrors             Counter64
+}
+
+jnxMbgDynAuthClntName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A name which uniquely identifies this client on the mobile-gateway."
+    ::= { jnxMbgDynAuthClntEntry 1 }
+
+jnxMbgDynAuthClntInAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of IP address used for this client."
+    ::= { jnxMbgDynAuthClntEntry 2 }
+
+jnxMbgDynAuthClntInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of this client."
+    ::= { jnxMbgDynAuthClntEntry 3 }
+
+jnxMbgDynAuthClntCoaReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CoA requests received from this client."
+    ::= { jnxMbgDynAuthClntEntry 4 }
+
+jnxMbgDynAuthClntDmReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DM requests received from this client."
+    ::= { jnxMbgDynAuthClntEntry 5 }
+
+jnxMbgDynAuthClntCoaAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CoA Ack Resp sent to this client."
+    ::= { jnxMbgDynAuthClntEntry 6 }
+
+jnxMbgDynAuthClntCoaNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CoA Nack Resp sent to this client."
+    ::= { jnxMbgDynAuthClntEntry 7 }
+
+jnxMbgDynAuthClntDmAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DM Ack Resp sent to this client."
+    ::= { jnxMbgDynAuthClntEntry 8 }
+
+jnxMbgDynAuthClntDmNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DM Nack Resp sent to this client."
+    ::= { jnxMbgDynAuthClntEntry 9 }
+
+jnxMbgDynAuthClntDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this server that were dropped."
+    ::= { jnxMbgDynAuthClntEntry 10 }
+
+jnxMbgDynAuthClntDuplicate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Duplicate requests received from this client."
+    ::= { jnxMbgDynAuthClntEntry 11 }
+
+jnxMbgDynAuthClntForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client that were forwarded to anchor instance."
+    ::= { jnxMbgDynAuthClntEntry 12 }
+
+jnxMbgDynAuthClntTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client that timed out."
+    ::= { jnxMbgDynAuthClntEntry 13 }
+
+jnxMbgDynAuthClntDelivered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client that were delivered to application."
+    ::= { jnxMbgDynAuthClntEntry 14 }
+
+jnxMbgDynAuthClntErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client that had errors during processing."
+    ::= { jnxMbgDynAuthClntEntry 15 }
+
+jnxMbgDynAuthClntInvalidAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client with invalid RADIUS authenticator."
+    ::= { jnxMbgDynAuthClntEntry 16 }
+
+jnxMbgDynAuthClntInvalidCode OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client with invalid RADIUS code."
+    ::= { jnxMbgDynAuthClntEntry 17 }
+
+jnxMbgDynAuthClntInvalidChId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client with invalid or missing Charging Id."
+    ::= { jnxMbgDynAuthClntEntry 18 }
+
+jnxMbgDynAuthClntMapErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "requests received from this client that had session mapping errors during processing."
+    ::= { jnxMbgDynAuthClntEntry 19 }
+
+
+--
+-- Deprecated OIDs
+--
+
+--
+-- Global counters related to Authentication
+--
+
+jnxMbgTotalAuthRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication requests made."
+    ::= { jnxMbgAAAGlobalAuthStats 1 }
+
+jnxMbgTotalAuthAccepts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication requests that were accepted."
+    ::= { jnxMbgAAAGlobalAuthStats 2 }
+
+jnxMbgTotalAuthRejects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication requests that were rejected."
+    ::= { jnxMbgAAAGlobalAuthStats 3 }
+
+jnxMbgTotalAuthChallenges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication challenges received."
+    ::= { jnxMbgAAAGlobalAuthStats 4 }
+
+jnxMbgTotalAuthRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication requests that timed out."
+    ::= { jnxMbgAAAGlobalAuthStats 5 }
+
+jnxMbgTotalAuthRequestTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication requests transmit errors."
+    ::= { jnxMbgAAAGlobalAuthStats 6 }
+
+jnxMbgTotalAuthResponseErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total authentication response errors."
+    ::= { jnxMbgAAAGlobalAuthStats 7 }
+
+jnxMbgTotalAuthPendingRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total pending authentication requests."
+    ::= { jnxMbgAAAGlobalAuthStats 8 }
+
+--
+-- Global counters related to Accounting
+--
+
+jnxMbgTotalAcctRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total accounting requests made."
+    ::= { jnxMbgAAAGlobalAcctStats 1 }
+
+jnxMbgTotalAcctResponses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total accounting responses that were received."
+    ::= { jnxMbgAAAGlobalAcctStats 2 }
+
+jnxMbgTotalAcctRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total accounting requests that timed out."
+    ::= { jnxMbgAAAGlobalAcctStats 3 }
+
+jnxMbgTotalAcctRequestTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total accounting requests transmit errors."
+    ::= { jnxMbgAAAGlobalAcctStats 4 }
+
+jnxMbgTotalAcctResponseErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total accounting response errors."
+    ::= { jnxMbgAAAGlobalAcctStats 5 }
+
+jnxMbgTotalAcctPendingRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total pending accounting requests."
+    ::= { jnxMbgAAAGlobalAcctStats 6 }
+
+--
+-- Global Dynamic Requests Statistics
+--
+
+jnxMbgTotalDynAuthReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req received."
+    ::= { jnxMbgAAAGlobalDynAuthStats 1 }
+
+jnxMbgTotalDynAuthCoaReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total CoA received."
+    ::= { jnxMbgAAAGlobalDynAuthStats 2 }
+
+jnxMbgTotalDynAuthDmReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total DM received."
+    ::= { jnxMbgAAAGlobalDynAuthStats 3 }
+    
+jnxMbgTotalDynAuthCoaAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total CoA Ack sent."
+    ::= { jnxMbgAAAGlobalDynAuthStats 4 }
+
+jnxMbgTotalDynAuthCoaNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total CoA Nack sent."
+    ::= { jnxMbgAAAGlobalDynAuthStats 5 }
+
+jnxMbgTotalDynAuthDmAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total DM Ack sent."
+    ::= { jnxMbgAAAGlobalDynAuthStats 6 }
+
+jnxMbgTotalDynAuthDmNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total DM Nack sent."
+    ::= { jnxMbgAAAGlobalDynAuthStats 7 }
+
+jnxMbgTotalDynAuthDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req that were dropped."
+    ::= { jnxMbgAAAGlobalDynAuthStats 8 }
+    
+jnxMbgTotalDynAuthDuplicate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total duplicate dyn-req detected."
+    ::= { jnxMbgAAAGlobalDynAuthStats 9 }
+
+jnxMbgTotalDynAuthForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req forwarded to anchor instance."
+    ::= { jnxMbgAAAGlobalDynAuthStats 10 }
+    
+jnxMbgTotalDynAuthTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req timed out."
+    ::= { jnxMbgAAAGlobalDynAuthStats 11 }
+
+jnxMbgTotalDynAuthDelivered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req that were delivered to application."
+    ::= { jnxMbgAAAGlobalDynAuthStats 12 }    
+
+jnxMbgTotalDynAuthErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req that had errors during processing."
+    ::= { jnxMbgAAAGlobalDynAuthStats 13 }    
+    
+jnxMbgTotalDynAuthUnknownClnts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req received from unknown clients."
+    ::= { jnxMbgAAAGlobalDynAuthStats 14 }
+    
+jnxMbgTotalDynAuthInvalidCode OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req received with invalid RADIUS code."
+    ::= { jnxMbgAAAGlobalDynAuthStats 15 }
+    
+jnxMbgTotalDynAuthInvalidAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req received with invalid RADIUS authenticator."
+    ::= { jnxMbgAAAGlobalDynAuthStats 16 }
+    
+jnxMbgTotalDynAuthInvalidChId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req received with invalid or missing Charging Id."
+    ::= { jnxMbgAAAGlobalDynAuthStats 17 }
+    
+jnxMbgTotalDynAuthMapErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req that had session mapping errors during processing."
+    ::= { jnxMbgAAAGlobalDynAuthStats 18 }    
+
+jnxMbgTotalDynAuthInvalidTrId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total dyn-req with invalid transaction id during processing."
+    ::= { jnxMbgAAAGlobalDynAuthStats 19 }
+
+--
+-- RADIUS Authentication Servers Table
+-- This table contains the status and stats related to RADIUS Authentication
+-- Servers
+
+jnxMbgRadiusAuthServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgRadiusAuthServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The table lists RADIUS servers used for authentication."
+    ::= { jnxMbgAAAObjects 4 }
+
+jnxMbgRadiusAuthServerEntry OBJECT-TYPE
+    SYNTAX      JnxMbgRadiusAuthServerEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry representing a RADIUS server used for authentication."
+    INDEX       { jnxMbgRadiusAuthServerName }
+    ::= { jnxMbgRadiusAuthServerTable 1 }
+
+JnxMbgRadiusAuthServerEntry ::= SEQUENCE {
+    jnxMbgRadiusAuthServerName                DisplayString,
+    jnxMbgRadiusAuthServerInetAddressType     InetAddressType,
+    jnxMbgRadiusAuthServerInetAddress         InetAddress,
+    jnxMbgRadiusAuthServerInetPort            InetPortNumber,
+    jnxMbgRadiusAuthServerRoutingInstance     DisplayString,
+    jnxMbgRadiusAuthServerStatus
+                                    JnxMbgAAAServerStatus,
+    jnxMbgRadiusAuthServerRequests            Counter64,
+    jnxMbgRadiusAuthServersRetransmissions    Counter64,
+    jnxMbgRadiusAuthServerAccepts             Counter64,
+    jnxMbgRadiusAuthServerRejects             Counter64,
+    jnxMbgRadiusAuthServerChallenges          Counter64,
+    jnxMbgRadiusAuthServerMalformedResponses  Counter64,
+    jnxMbgRadiusAuthServerBadAuthenticators   Counter64,
+    jnxMbgRadiusAuthServerPendingRequests     Counter64,
+    jnxMbgRadiusAuthServerTimeouts            Counter64,
+    jnxMbgRadiusAuthServerUnknownTypes        Counter64,
+    jnxMbgRadiusAuthServerPacketsDropped      Counter64,
+    jnxMbgRadiusAuthServerRTTAvg              Integer32,
+    jnxMbgRadiusAuthServerRTTMin              Integer32,
+    jnxMbgRadiusAuthServerRTTMax              Integer32
+}
+ 
+jnxMbgRadiusAuthServerName OBJECT-TYPE 
+    SYNTAX      DisplayString  (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which uniquely identifies this server on the mobile-gateway."
+    ::= { jnxMbgRadiusAuthServerEntry 1 }
+
+jnxMbgRadiusAuthServerInetAddressType OBJECT-TYPE 
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of IP address used for this server."
+    ::= { jnxMbgRadiusAuthServerEntry 2 }
+
+jnxMbgRadiusAuthServerInetAddress OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address used for this server."
+    ::= { jnxMbgRadiusAuthServerEntry 3 }
+
+jnxMbgRadiusAuthServerInetPort OBJECT-TYPE 
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The UDP port number on the server to which authentication
+        requests are sent."
+    ::= { jnxMbgRadiusAuthServerEntry 4 }
+
+jnxMbgRadiusAuthServerRoutingInstance OBJECT-TYPE 
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The routing-instance used while contacting this server.
+        If not configured, the default routing-instance will be
+        used."
+    ::= { jnxMbgRadiusAuthServerEntry 5 }
+
+jnxMbgRadiusAuthServerStatus OBJECT-TYPE 
+    SYNTAX      JnxMbgAAAServerStatus
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The deprecated status of the server."
+    ::= { jnxMbgRadiusAuthServerEntry 6 }
+
+jnxMbgRadiusAuthServerRequests OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Access-Requests that have been sent to
+        this server." 
+    ::= { jnxMbgRadiusAuthServerEntry 7 }
+
+jnxMbgRadiusAuthServersRetransmissions OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Access-Requests that have been retransmitted
+        this server." 
+    ::= { jnxMbgRadiusAuthServerEntry 8 }
+
+jnxMbgRadiusAuthServerAccepts OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Access-Accepts that have been received from
+        this server." 
+    ::= { jnxMbgRadiusAuthServerEntry 9 }
+
+jnxMbgRadiusAuthServerRejects OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Access-Rejects that have been received from
+        this server." 
+    ::= { jnxMbgRadiusAuthServerEntry 10 }
+
+jnxMbgRadiusAuthServerChallenges OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Access-Challenges that have been received from
+        this server." 
+    ::= { jnxMbgRadiusAuthServerEntry 11 }
+
+jnxMbgRadiusAuthServerMalformedResponses OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Malformed Responses have been received from
+        this server. A response could either accept, reject or challenge." 
+    ::= { jnxMbgRadiusAuthServerEntry 12 }
+
+jnxMbgRadiusAuthServerBadAuthenticators OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses with invalid authenticators received from
+        this server. A response could either accept, reject or challenge." 
+    ::= { jnxMbgRadiusAuthServerEntry 13 }
+
+jnxMbgRadiusAuthServerPendingRequests OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of requests to this server pending authentication."
+    ::= { jnxMbgRadiusAuthServerEntry 14 }
+
+jnxMbgRadiusAuthServerTimeouts OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of requests to this server that timed out."
+    ::= { jnxMbgRadiusAuthServerEntry 15 }
+
+jnxMbgRadiusAuthServerUnknownTypes OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses received from this RADIUS server with
+        unknown types."
+    ::= { jnxMbgRadiusAuthServerEntry 16 }
+
+jnxMbgRadiusAuthServerPacketsDropped OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses received from this RADIUS server 
+        that were dropped for some other reason."
+    ::= { jnxMbgRadiusAuthServerEntry 17 }
+
+jnxMbgRadiusAuthServerRTTAvg OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Average round-trip time (in ms) for this server."
+    ::= { jnxMbgRadiusAuthServerEntry 18 }
+
+jnxMbgRadiusAuthServerRTTMin OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAuthServerEntry 19 }
+
+jnxMbgRadiusAuthServerRTTMax OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAuthServerEntry 20 }
+
+--
+-- RADIUS Accounting Servers Table
+-- This table contains the status and stats related to RADIUS Accounting
+-- Servers
+
+jnxMbgRadiusAcctServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgRadiusAcctServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The table lists RADIUS servers used for accounting."
+    ::= { jnxMbgAAAObjects 5 }
+
+jnxMbgRadiusAcctServerEntry OBJECT-TYPE
+    SYNTAX      JnxMbgRadiusAcctServerEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry representing a RADIUS server used for accounting."
+    INDEX       { jnxMbgRadiusAcctServerName }
+    ::= { jnxMbgRadiusAcctServerTable 1 }
+
+JnxMbgRadiusAcctServerEntry ::= SEQUENCE {
+    jnxMbgRadiusAcctServerName                DisplayString,
+    jnxMbgRadiusAcctServerInetAddressType     InetAddressType,
+    jnxMbgRadiusAcctServerInetAddress         InetAddress,
+    jnxMbgRadiusAcctServerInetPort            InetPortNumber,
+    jnxMbgRadiusAcctServerRoutingInstance     DisplayString,
+    jnxMbgRadiusAcctServerStatus
+                                    JnxMbgAAAServerStatus,
+    jnxMbgRadiusAcctServerRequests            Counter64,
+    jnxMbgRadiusAcctServersRetransmissions    Counter64,
+    jnxMbgRadiusAcctServerResponses           Counter64,
+    jnxMbgRadiusAcctServerMalformedResponses  Counter64,
+    jnxMbgRadiusAcctServerBadAuthenticators   Counter64,
+    jnxMbgRadiusAcctServerPendingRequests     Counter64,
+    jnxMbgRadiusAcctServerTimeouts            Counter64,
+    jnxMbgRadiusAcctServerUnknownTypes        Counter64,
+    jnxMbgRadiusAcctServerPacketsDropped      Counter64,
+    jnxMbgRadiusAcctServerRTTAvg              Integer32,
+    jnxMbgRadiusAcctServerRTTMin              Integer32,
+    jnxMbgRadiusAcctServerRTTMax              Integer32
+}
+ 
+jnxMbgRadiusAcctServerName OBJECT-TYPE 
+    SYNTAX      DisplayString  (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which uniquely identifies this server on the mobile-gateway."
+    ::= { jnxMbgRadiusAcctServerEntry 1 }
+
+jnxMbgRadiusAcctServerInetAddressType OBJECT-TYPE 
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of IP address used for this server."
+    ::= { jnxMbgRadiusAcctServerEntry 2 }
+
+jnxMbgRadiusAcctServerInetAddress OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address used for this server."
+    ::= { jnxMbgRadiusAcctServerEntry 3 }
+
+jnxMbgRadiusAcctServerInetPort OBJECT-TYPE 
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The UDP port number on the server to which accounting
+        requests are sent."
+    ::= { jnxMbgRadiusAcctServerEntry 4 }
+
+jnxMbgRadiusAcctServerRoutingInstance OBJECT-TYPE 
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The routing-instance used while contacting this server.
+        If not configured, the default routing-instance will be
+        used."
+    ::= { jnxMbgRadiusAcctServerEntry 5 }
+
+jnxMbgRadiusAcctServerStatus OBJECT-TYPE 
+    SYNTAX      JnxMbgAAAServerStatus
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The deprecated status of the server."
+    ::= { jnxMbgRadiusAcctServerEntry 6 }
+
+jnxMbgRadiusAcctServerRequests OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Accounting-Requests that have been sent to
+        this server." 
+    ::= { jnxMbgRadiusAcctServerEntry 7 }
+
+jnxMbgRadiusAcctServersRetransmissions OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Accounting-Requests that have been retransmitted
+        this server." 
+    ::= { jnxMbgRadiusAcctServerEntry 8 }
+
+jnxMbgRadiusAcctServerResponses OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Accounting-Responses that have been received from
+        this server." 
+    ::= { jnxMbgRadiusAcctServerEntry 9 }
+
+jnxMbgRadiusAcctServerMalformedResponses OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of Malformed Responses have been received from
+        this server." 
+    ::= { jnxMbgRadiusAcctServerEntry 10 }
+
+jnxMbgRadiusAcctServerBadAuthenticators OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses with invalid authenticators received from
+        this server."
+    ::= { jnxMbgRadiusAcctServerEntry 11 }
+
+jnxMbgRadiusAcctServerPendingRequests OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of requests to this server which are yet to be sent or
+        waiting for response."
+    ::= { jnxMbgRadiusAcctServerEntry 12 }
+
+jnxMbgRadiusAcctServerTimeouts OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of requests to this server that timed out."
+    ::= { jnxMbgRadiusAcctServerEntry 13 }
+
+jnxMbgRadiusAcctServerUnknownTypes OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses received from this RADIUS server with
+        unknown types."
+    ::= { jnxMbgRadiusAcctServerEntry 14 }
+
+jnxMbgRadiusAcctServerPacketsDropped OBJECT-TYPE 
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of responses received from this RADIUS server 
+        that were dropped for some other reason."
+    ::= { jnxMbgRadiusAcctServerEntry 15 }
+
+jnxMbgRadiusAcctServerRTTAvg OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Average round-trip time (in ms) for this server."
+    ::= { jnxMbgRadiusAcctServerEntry 16 }
+
+jnxMbgRadiusAcctServerRTTMin OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAcctServerEntry 17 }
+
+jnxMbgRadiusAcctServerRTTMax OBJECT-TYPE 
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum round-trip time (in ms) seen for this server."
+    ::= { jnxMbgRadiusAcctServerEntry 18 }
+
+--
+-- RADIUS Dyn Auth Clients Table
+-- This table contains the status and stats related to RADIUS Dyn Auth
+-- Servers
+
+jnxMbgDynAuthClientTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgDynAuthClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The table lists RADIUS clients sending Dynamic Authorization requests."
+    ::= { jnxMbgAAAObjects 6 }
+
+jnxMbgDynAuthClientEntry OBJECT-TYPE
+    SYNTAX      JnxMbgDynAuthClientEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry representing a RADIUS client sending Dynamic Authorization requests."
+    INDEX       { jnxMbgRadiusAcctServerName }
+    ::= { jnxMbgDynAuthClientTable 1 }
+
+JnxMbgDynAuthClientEntry ::= SEQUENCE {
+    jnxMbgDynAuthClientName                  DisplayString,
+    jnxMbgDynAuthClientInAddrType            InetAddressType,
+    jnxMbgDynAuthClientInetAddress           InetAddress,
+
+    jnxMbgDynAuthClientCoaReceived           Counter64,
+    jnxMbgDynAuthClientDmReceived            Counter64,
+    jnxMbgDynAuthClientCoaAckSent            Counter64,
+    jnxMbgDynAuthClientCoaNackSent           Counter64,
+    jnxMbgDynAuthClientDmAckSent             Counter64,
+    jnxMbgDynAuthClientDmNackSent            Counter64,
+    jnxMbgDynAuthClientDropped               Counter64,
+    jnxMbgDynAuthClientDuplicate             Counter64,
+    jnxMbgDynAuthClientForwarded             Counter64,
+    jnxMbgDynAuthClientTimeouts              Counter64,
+    jnxMbgDynAuthClientDelivered             Counter64,
+    jnxMbgDynAuthClientErrors                Counter64,
+    jnxMbgDynAuthClientInvalidAuth           Counter64,
+    jnxMbgDynAuthClientInvalidCode           Counter64,
+    jnxMbgDynAuthClientInvalidChId           Counter64,
+    jnxMbgDynAuthClientMapErrors             Counter64
+}
+ 
+jnxMbgDynAuthClientName OBJECT-TYPE 
+    SYNTAX      DisplayString  (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A name which uniquely identifies this client on the mobile-gateway."
+    ::= { jnxMbgDynAuthClientEntry 1 }
+
+jnxMbgDynAuthClientInAddrType OBJECT-TYPE 
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of IP address used for this client."
+    ::= { jnxMbgDynAuthClientEntry 2 }
+
+jnxMbgDynAuthClientInetAddress OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address of this client."
+    ::= { jnxMbgDynAuthClientEntry 3 }
+
+jnxMbgDynAuthClientCoaReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "CoA requests received from this client."
+    ::= { jnxMbgDynAuthClientEntry 4 }
+
+jnxMbgDynAuthClientDmReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "DM requests received from this client."
+    ::= { jnxMbgDynAuthClientEntry 5 }
+    
+jnxMbgDynAuthClientCoaAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "CoA Ack responses sent to this client."
+    ::= { jnxMbgDynAuthClientEntry 6 }
+
+jnxMbgDynAuthClientCoaNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "CoA Nack responses sent to this client."
+    ::= { jnxMbgDynAuthClientEntry 7 }
+
+jnxMbgDynAuthClientDmAckSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "DM Ack responses sent to this client."
+    ::= { jnxMbgDynAuthClientEntry 8 }
+
+jnxMbgDynAuthClientDmNackSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "DM Nack responses sent to this client."
+    ::= { jnxMbgDynAuthClientEntry 9 }
+
+jnxMbgDynAuthClientDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this server that were dropped."
+    ::= { jnxMbgDynAuthClientEntry 10 }
+    
+jnxMbgDynAuthClientDuplicate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Duplicate requests received from this client."
+    ::= { jnxMbgDynAuthClientEntry 11 }
+
+jnxMbgDynAuthClientForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client that were forwarded to anchor instance."
+    ::= { jnxMbgDynAuthClientEntry 12 }
+    
+jnxMbgDynAuthClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client that timed out."
+    ::= { jnxMbgDynAuthClientEntry 13 }
+
+jnxMbgDynAuthClientDelivered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client that were delivered to application."
+    ::= { jnxMbgDynAuthClientEntry 14 }    
+
+jnxMbgDynAuthClientErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client that had errors during processing."
+    ::= { jnxMbgDynAuthClientEntry 15 }    
+    
+jnxMbgDynAuthClientInvalidAuth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client with invalid RADIUS authenticator."
+    ::= { jnxMbgDynAuthClientEntry 17 }
+
+jnxMbgDynAuthClientInvalidCode OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client with invalid RADIUS code."
+    ::= { jnxMbgDynAuthClientEntry 18 }
+    
+jnxMbgDynAuthClientInvalidChId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client with invalid or missing Charging Id."
+    ::= { jnxMbgDynAuthClientEntry 19 }
+    
+jnxMbgDynAuthClientMapErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Requests received from this client that had session mapping errors during processing."
+    ::= { jnxMbgDynAuthClientEntry 20 }    
+
+   
+--
+-- Objects used in Notifications
+--
+
+jnxMbgAAAServerName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which uniquely identifies the server on the mobile-gateway."
+    ::= { jnxMbgAAANotificationVars 1 }
+
+jnxMbgSPIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This identifies the session-pic, in the for sp-a/b/0, where
+        <a> is the slot and <b> could be either 0 or 1."        
+    ::= { jnxMbgAAANotificationVars 2 }
+
+jnxMbgAAANetworkElementName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which uniquely identifies a AAA Network Element on 
+         the mobile-gateway."
+    ::= { jnxMbgAAANotificationVars 3 }
+
+jnxMbgPendQWaterMarkType OBJECT-TYPE
+    SYNTAX      JnxMbgQueueWaterMarkType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the pending queue water mark crossed - High or Low."
+    ::= { jnxMbgAAANotificationVars 4 }
+
+jnxMbgPendQWaterMarkValue OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The water mark value for the pending queue."
+    ::= { jnxMbgAAANotificationVars 5 }
+
+jnxMbgPendQLength OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The size of the pending queue."
+    ::= { jnxMbgAAANotificationVars 6 }
+
+
+--
+-- Notifications
+--
+
+jnxMbgAAAServerUp NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAAServerName, 
+                  jnxMbgSPIdentifier }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked active again. This could be because the server started to
+        respond again. The ServerName identifies the server and the 
+        SPIdentfier identifies the session-pic which originated this
+        notification."
+    ::= { jnxMbgAAANotifications 1 }
+
+jnxMbgAAAServerDown NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAAServerName, 
+                  jnxMbgSPIdentifier }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked dead. The ServerName identifies the server and the 
+        SPIdentfier identifies the session-pic which originated this
+        notification." 
+    ::= { jnxMbgAAANotifications 2 }
+
+jnxMbgAAANetworkElementUp NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that the specified Network Element
+        has been marked UP. This could be because atleast one server in 
+        the network element is active. SPIdentfier identifies the session-pic 
+        which originated this notification."
+    ::= { jnxMbgAAANotifications 3 }
+
+jnxMbgAAANetworkElementDown NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification signifies that the specified Network Element has 
+        been marked DOWN. This could be because none of the servers  in the 
+        network element is active.  SPIdentfier identifies the session-pic 
+        which originated this notification."
+    ::= { jnxMbgAAANotifications 4 }
+
+jnxMbgAAANEPendAuthQStatus NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAANetworkElementName, 
+                  jnxMbgSPIdentifier, 
+                  jnxMbgPendQWaterMarkType,
+                  jnxMbgPendQWaterMarkValue,
+                  jnxMbgPendQLength }
+    STATUS      deprecated
+    DESCRIPTION
+       "This notification signifies the crossing-over of a  watermark 
+       (High or Low) of the pending authentication queue length of network 
+       element. The NetworkElementName identifies the network element and 
+       SPIdentfier identifies the session-pic which originated this notification.
+       jnxMbgPendQWaterMarkType identifies the water mark type (High/Low). 
+       jnxMbgPendQWaterMarkValue is the value that has been crossed over.
+       jnxMbgPendQLength is the size of the queue after crossing over." 
+    ::= { jnxMbgAAANotifications 5 }
+
+jnxMbgAAANEPendAcctQStatus NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgAAANetworkElementName, 
+                  jnxMbgSPIdentifier, 
+                  jnxMbgPendQWaterMarkType,
+                  jnxMbgPendQWaterMarkValue,
+                  jnxMbgPendQLength }
+    STATUS      deprecated
+    DESCRIPTION
+       "This notification signifies the crossing-over of a  watermark 
+       (High or Low) of the pending accounting queue length of network 
+       element. The NetworkElementName identifies the network element and 
+       SPIdentfier identifies the session-pic which originated this notification.
+       jnxMbgPendQWaterMarkType identifies the water mark type (High/Low). 
+       jnxMbgPendQWaterMarkValue is the value that has been crossed over.
+       jnxMbgPendQLength is the size of the queue after crossing over." 
+    ::= { jnxMbgAAANotifications 6 }
+
+jnxMbgAAARadiusServerUp NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAAServerName,
+                  jnxMbgSPIdentifier }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked active again. This could be because the server started to
+        respond again. The ServerName identifies the server and the 
+        SPIdentfier identifies the session-pic which originated this
+        notification."
+    ::= { jnxMbgAAANotifications 7 }
+
+jnxMbgAAARadiusServerDown NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAAServerName,
+                  jnxMbgSPIdentifier }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked dead. The ServerName identifies the server and the 
+        SPIdentfier identifies the session-pic which originated this
+        notification."
+    ::= { jnxMbgAAANotifications 8 }
+
+jnxMbgAAARadiusNetworkElementUp NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the specified Network Element
+        has been marked UP. This could be because atleast one server in 
+        the network element is active. SPIdentfier identifies the session-pic 
+        which originated this notification."
+    ::= { jnxMbgAAANotifications 9 }
+
+jnxMbgAAARadiusNetworkElementDown NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the specified Network Element has 
+        been marked DOWN. This could be because none of the servers  in the 
+        network element is active.  SPIdentfier identifies the session-pic 
+        which originated this notification."
+    ::= { jnxMbgAAANotifications 10 }
+
+jnxMbgAAARadiusNEPendAuthQStatus NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier,
+                  jnxMbgPendQWaterMarkType,
+                  jnxMbgPendQWaterMarkValue,
+                  jnxMbgPendQLength }
+    STATUS      current
+    DESCRIPTION
+       "This notification signifies the crossing-over of a  watermark 
+       (High or Low) of the pending authentication queue length of network 
+       element. The NetworkElementName identifies the network element and 
+       SPIdentfier identifies the session-pic which originated this notification.
+       jnxMbgPendQWaterMarkType identifies the water mark type (High/Low). 
+       jnxMbgPendQWaterMarkValue is the value that has been crossed over.
+       jnxMbgPendQLength is the size of the queue after crossing over."
+    ::= { jnxMbgAAANotifications 11 }
+
+
+jnxMbgAAARadiusNEPendAcctQStatus NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwIndex,
+                  jnxMbgGwName,
+                  jnxMbgAAANetworkElementName,
+                  jnxMbgSPIdentifier,
+                  jnxMbgPendQWaterMarkType,
+                  jnxMbgPendQWaterMarkValue,
+                  jnxMbgPendQLength }
+    STATUS      current
+    DESCRIPTION
+       "This notification signifies the crossing-over of a  watermark 
+       (High or Low) of the pending accounting queue length of network 
+       element. The NetworkElementName identifies the network element and 
+       SPIdentfier identifies the session-pic which originated this notification.
+       jnxMbgPendQWaterMarkType identifies the water mark type (High/Low). 
+       jnxMbgPendQWaterMarkValue is the value that has been crossed over.
+       jnxMbgPendQLength is the size of the queue after crossing over."
+    ::= { jnxMbgAAANotifications 12 }
+
+END

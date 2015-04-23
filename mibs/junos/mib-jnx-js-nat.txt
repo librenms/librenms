@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper enterprise Network Address Translation (NAT) MIB.
 --
--- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- Copyright (c) 2001-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -12,6 +12,7 @@
 	IMPORTS
 
         Gauge32, Integer32,
+        Counter32,
         NOTIFICATION-TYPE,
     	MODULE-IDENTITY, OBJECT-TYPE	FROM SNMPv2-SMI
 
@@ -27,7 +28,7 @@
 
 
 	jnxJsNatMIB  	MODULE-IDENTITY
-    	LAST-UPDATED  "200910152022Z" -- October 15, 2009
+    	LAST-UPDATED  "201203011122Z" -- March 01, 2012
     	ORGANIZATION  "Juniper Networks, Inc."
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
@@ -43,6 +44,11 @@
 
         REVISION        "200704132022Z" -- April 13, 2007
     	DESCRIPTION 	"Creation Date"
+
+        REVISION        "201203011122Z" -- March 01, 2012
+        DESCRIPTION     "Deprecated jnxJsNatRuleTransHits and
+                         jnxJsNatPoolTransHits, added
+                         jnxJsNatRuleHits and jnxJsNatPoolHits."
 
     ::= { jnxJsNAT 1 }   
 
@@ -431,7 +437,8 @@
     {
         jnxJsNatRuleName                     DisplayString,
         jnxJsNatRuleType                     INTEGER,
-        jnxJsNatRuleTransHits                INTEGER
+        jnxJsNatRuleTransHits                INTEGER,
+        jnxJsNatRuleHits                     Counter32
     }
 
     jnxJsNatRuleName OBJECT-TYPE
@@ -457,10 +464,20 @@
     jnxJsNatRuleTransHits OBJECT-TYPE
         SYNTAX        INTEGER
         MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+        	"The number of hits on this NAT rule,
+             Deprecated to avoid negative value."
+    ::= { jnxJsNatRuleEntry 3 }
+
+    jnxJsNatRuleHits OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-        	"The number of hits on this NAT rule"
-    ::= { jnxJsNatRuleEntry 3 }
+            "The number of hits on this NAT rule to 
+             deprecate jnxJsNatRuleTransHits"
+    ::= { jnxJsNatRuleEntry 4 }
 
     -- ***************************************************************
     --  NAT Pool Hit Table
@@ -487,7 +504,8 @@
     {
         jnxJsNatPoolName                     DisplayString,
         jnxJsNatPoolType                     INTEGER,
-        jnxJsNatPoolTransHits                INTEGER
+        jnxJsNatPoolTransHits                INTEGER,
+        jnxJsNatPoolHits                     Counter32
     }
 
     jnxJsNatPoolName OBJECT-TYPE
@@ -513,10 +531,20 @@
     jnxJsNatPoolTransHits OBJECT-TYPE
         SYNTAX        INTEGER
         MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+        	"The number of hits on this NAT Pool,
+             Deprecated to avoid negative value."
+    ::= { jnxJsNatPoolEntry 3 }
+
+    jnxJsNatPoolHits OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-        	"The number of hits on this NAT Pool"
-    ::= { jnxJsNatPoolEntry 3 }
+            "The number of hits on this NAT Pool
+             to deprecate jnxJsNatPoolTransHits."
+    ::= { jnxJsNatPoolEntry 4 }
 
     -- ***************************************************************
     --  NAT Trap definition
