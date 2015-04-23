@@ -4,20 +4,20 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MODULE-IDENTITY, OBJECT-TYPE,  Unsigned32, Gauge32,
         OBJECT-IDENTITY, enterprises,
         IpAddress                       FROM SNMPv2-SMI
-        watchguard                      FROM WATCHGUARD-MIB;
+        watchguard                      FROM WATCHGUARD-SMI;
 
     wgIpsecEndpointPairModule MODULE-IDENTITY
         LAST-UPDATED "200701251200Z"
         ORGANIZATION "WatchGuard Technologies, Inc."
         CONTACT-INFO
-                  "   Ella Yu
-                      WatchGuard Technologies, Inc.
-                      1841 Zanker Road
-                      San Jose, CA 95112
-                      USA
+                   "  WatchGuard Technologies, Inc.
+                   
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
 
-                      408-519-4888
-                      ella.yu@watchguard.com "
+                      +1.206.613.6600 "
 
         DESCRIPTION
             "The MIB module describes generic Ipsec Endpoint Pair information
@@ -149,7 +149,10 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
             "The number of inbound IPSEC SA's within this
-             IPSec endpoint pair."
+             IPSec endpoint pair.If IKE rekeys and no data 
+             stream to activate new SA, the SA statistics       
+             may be include the old SA, then the total number 
+             is the double of the active SA"
         ::= { wgIpsecEndpointPairEntry 4 }
 
     wgIpsecEndpointPairOutSAs OBJECT-TYPE
@@ -158,7 +161,10 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
             "The number of outbound IPSEC SA's within this
-             IPSec endpoint pair."
+             IPSec endpoint pair.If IKE rekeys and no data 
+             stream to activate new SA, the SA statistics       
+             may be include the old SA, then the total number 
+             is the double of the active SA"
         ::= { wgIpsecEndpointPairEntry 5 }
 
     wgIpsecEndpointPairInAccKbytes  OBJECT-TYPE
@@ -204,8 +210,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Total number of packets discarded due to decryption
-            error since the establish of this connection."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairEntry 10 }
 
     wgIpsecEndpointPairAuthErrors  OBJECT-TYPE
@@ -231,8 +236,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Total number of packets discarded due to policy
-            error since the establish of this connection."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairEntry 13 }
 
     wgIpsecEndpointPairPadErrors  OBJECT-TYPE
@@ -240,8 +244,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Total number of packets discarded due to pad value
-            error since the establish of this connection."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairEntry 14 }
 
     wgIpsecEndpointPairOtherReceiveErrors  OBJECT-TYPE
@@ -249,11 +252,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded due to errors
-            other than decryption, authentication or replay errors. This
-            may include packets dropped due to a lack of receive
-            buffers, and may include packets dropped due to congestion
-            at the decryption element."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairEntry 15 }
 
     wgIpsecEndpointPairSendErrors  OBJECT-TYPE
@@ -261,8 +260,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of packets discarded due to any error.
-            This may include errors due to a lack of transmit buffers."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairEntry 16 }
 
 
@@ -324,8 +322,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-           "Total number of packets on this entity discarded due to encryption
-           error."
+           "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairStatistics 7 }
 
     wgIpsecEndpointPairTotalAuthErrors  OBJECT-TYPE
@@ -351,8 +348,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-           "Total number of packets discarded due to policy
-           errors on this entity."
+           "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairStatistics 10 }
 
     wgIpsecEndpointPairTotalPadErrors  OBJECT-TYPE
@@ -360,8 +356,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-           "Total number of packets on this entity discarded due to pad value
-           error."
+           "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairStatistics 11 }
 
     wgIpsecEndpointPairTotalOtherReceiveErrors  OBJECT-TYPE
@@ -369,11 +364,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets on this entity discarded due to errors
-            other than decryption, authentication or replay errors. This
-            may include packets dropped due to a lack of receive
-            buffers, and may include packets dropped due to congestion
-            at the decryption element."
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairStatistics 12 }
 
     wgIpsecEndpointPairTotalSendErrors  OBJECT-TYPE
@@ -381,9 +372,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of packets discarded due to any error on
-            this entity."
-
+            "Deprecated, currently unused."
         ::= { wgIpsecEndpointPairStatistics 13 }
 
     wgIpsecEndpointPairPeerIPToTunnel OBJECT-IDENTITY
@@ -425,7 +414,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
     WGIpsecEndpointPairPeerIPToTunnelEntry ::= SEQUENCE {
 
         wgIpsecEndpointPairPeerIPToTunnelPeerIP      IpAddress,
-        wgIpsecEndpointPairPeerIPToTunnelTunnelID    Integer32
+        wgIpsecEndpointPairPeerIPToTunnelTunnelID    Unsigned32
     }
     
     wgIpsecEndpointPairPeerIPToTunnelPeerIP  OBJECT-TYPE
@@ -437,7 +426,7 @@ WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
         ::= {wgIpsecEndpointPairPeerIPToTunnelEntry 1}
             
     wgIpsecEndpointPairPeerIPToTunnelTunnelID  OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Unsigned32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
