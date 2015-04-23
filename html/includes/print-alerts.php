@@ -1,22 +1,15 @@
-<?php
-if(!isset($vars['format'])) { $vars['format'] = "basic"; }
-?>
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
     </div>
 </div>
-<?php
-require_once('includes/modal/new_alert_rule.inc.php');
-?>
-
 <div class="table-responsive">
     <table id="alerts" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
                 <th data-column-id="status" data-formatter="status" data-sortable="false">Status</th>
-                <th data-column-id="id" data-sortable="false">#</th>
                 <th data-column-id="rule">Rule</th>
+                <th data-column-id="details" data-sortable="false">&nbsp;</th>
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="timestamp">Timestamp</th>
                 <th data-column-id="severity">Severity</th>
@@ -25,17 +18,14 @@ require_once('includes/modal/new_alert_rule.inc.php');
         </thead>
     </table>
 </div>
-
 <script>
-
 var grid = $("#alerts").bootgrid({
     ajax: true,
     post: function ()
     {
         return {
             id: "alerts",
-            device_id: '<?php echo $device['device_id']; ?>',
-            format: '<?php echo $vars['format']; ?>'
+            device_id: '<?php echo $device['device_id']; ?>'
         };
     },
     url: "/ajax_table.php",
@@ -48,35 +38,25 @@ var grid = $("#alerts").bootgrid({
         }
     },
     templates: {
-        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
-<?php
-
-echo('"<span style=\"font-weight: bold;\">Alerts</span> &#187; "+');
-
-$menu_options = array('basic'      => 'Basic',
-                      'detail'     => 'Detail');
-
-$sep = "";
-foreach ($menu_options as $option => $text)
-{
-  echo("\"$sep\"+");
-  if ($vars['format'] == $option)
-  {
-    echo("\"<span class='pagemenu-selected'>\"+");
-  }
-  echo('"<a href=\"' . generate_url($vars, array('format' => $option)) . '\">' . $text . '</a>"+');
-  if ($vars['format'] == $option)
-  {
-    echo("\"</span>\"+");
-  }
-  $sep = " | ";
-}
-?>
-                "</span></div>"+
-                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     }
 }).on("loaded.rs.jquery.bootgrid", function() {
+    grid.find(".incident").each( function() {
+      $(this).parent().addClass('col-md-12 col-sm-12 col-xs-12');
+      $(this).parent().parent().on("mouseenter", function() {
+        $(this).find(".incident-toggle").fadeIn(200);
+      }).on("mouseleave", function() {
+        $(this).find(".incident-toggle").fadeOut(200);
+      }).on("click", function() {
+        var target = $(this).find(".incident-toggle").data("target");
+        $(this).find(".incident-toggle").toggleClass('glyphicon-plus glyphicon-minus');
+        $(target).collapse('toggle');
+      });
+    });
+    grid.find(".incident-toggle").on("click", function(e) {
+      var target = $(this).data("target");
+      $(this).toggleClass('glyphicon-plus glyphicon-minus');
+      $(target).collapse('toggle');
+    });
     grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
         var alert_id = $(this).data("alert_id");
@@ -97,5 +77,4 @@ foreach ($menu_options as $option => $text)
         });
     });
 });
-
 </script>
