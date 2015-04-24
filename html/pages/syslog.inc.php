@@ -1,108 +1,102 @@
 <?php
 
-if ($_vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10') { dbFetchCell("TRUNCATE TABLE `syslog`"); }
+$no_refresh = TRUE;
 
-print_optionbar_start('25');
+$param = array();
+
+if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
+{
+  dbQuery("TRUNCATE TABLE `syslog`");
+  print_message("syslog truncated");
+}
 
 $pagetitle[] = "Syslog";
 
+print_optionbar_start();
+
 ?>
-
-<form method="post" action="">
-  <span style="font-weight: bold;">Syslog</span> &#187;
-  <label><strong>Search</strong>
-    <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" />
-  </label>
-  <label>
-    <strong>Program</strong>
-    <select name="program" id="program">
-      <option value="">All Programs</option>
-      <?php
-        foreach (dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data)
-        {
-          echo("<option value='".$data['program']."'");
-          if ($data['program'] == $_POST['program']) { echo("selected"); }
-          echo(">".$data['program']."</option>");
-        }
-      ?>
-    </select>
-  </label>
-  <label>
-    <strong>Device</strong>
-    <select name="device" id="device">
-      <option value="">All Devices</option>
-      <?php
-        foreach (get_all_devices() as $hostname)
-        {
-          echo("<option value='".getidbyname($hostname)."'");
-
-          if (getidbyname($hostname) == $_POST['device']) { echo("selected"); }
-
-          echo(">".$hostname."</option>");
-        }
-      ?>
-    </select>
-  </label>
-  <input type=submit class=submit value=Search>
-
+<form method="post" action="" class="form-inline" role="form" id="result_form">
+    <div class="form-group">
+      <label>
+        <strong>Program</strong>
+      </label>
+      <select name="program" id="program" class="form-control input-sm">
+        <option value="">All Programs</option>
+        <?php
+          foreach( dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data ) {
+            echo("<option value='".$data['program']."'");
+            if ($data['program'] == $vars['program']) { echo("selected"); }
+            echo(">".$data['program']."</option>");
+          }
+        ?>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>
+        <strong>Device</strong>
+      </label>
+      <select name="device" id="device" class="form-control input-sm">
+        <option value="">All Devices</option>
+        <?php
+          foreach (get_all_devices() as $hostname)
+          {
+              $device_id = getidbyname($hostname);
+              if (device_permitted($device_id)) {
+                  echo("<option value='".$device_id."'");
+                  if ($device_id == $vars['device']) { echo("selected"); }
+                  echo(">".$hostname."</option>");
+              }
+          }
+        ?>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="dtpickerfrom">From</label>
+      <input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="Any" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <div class="form-group">
+      <label for="dtpickerto">To</label>
+      <input name="to" type="text" class="form-control" id="dtpickerto" maxlength=16 value="<?php echo $vars['to']; ?>" placeholder="Any" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <button type="submit" class="btn btn-default input-sm">Filter</button>
 </form>
 
 <?php
 
 print_optionbar_end();
 
-if ($_POST['string'])
-{
-  $where = " AND S.msg LIKE ?";
-  $array[] = "%".$_POST['string']."%";
-}
-
-if ($_POST['program'])
-{
-  $where .= " AND S.program = ?";
-  $array[] = $_POST['program'];
-}
-
-if (is_numeric($_POST['device']))
-{
-  $where .= " AND S.device_id = ?";
-  $array[] = $_POST['device'];
-}
-
-if ($_SESSION['userlevel'] >= '5')
-{
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S";
-  if (count($array))
-  {
-    $sql .= " WHERE 1 ".$where;
-  }
-  $sql .= " ORDER BY timestamp DESC LIMIT 1000";
-} else {
-  $sql  = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S, devices_perms AS P";
-  $sql .= "WHERE S.device_id = P.device_id AND P.user_id = ?";
-  if (count($array))
-  {
-    $sql .= " WHERE 1 ".$where;
-  }
-  $sql .= " ORDER BY timestamp DESC LIMIT 1000";
-
-  $array = array_merge(array($_SESSION['user_id']), $array);
-}
-
-echo('<div class="panel panel-default panel-condensed">
-              <div class="panel-heading">
-                <strong>Eventlog entries</strong>
-              </div>
-              <table class="table table-hover table-condensed table-striped">');
-
-foreach (dbFetchRows($sql, $array) as $entry)
-{
-  $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
-
-  include("includes/print-syslog.inc.php");
-}
-
-echo("</table>
-</div>");
-
 ?>
+<div class="table-responsive">
+<table id="syslog" class="table table-hover table-condensed table-striped">
+    <thead>
+        <tr>
+            <th data-column-id="timestamp" data-order="desc">Datetime</th>
+            <th data-column-id="device_id">Hostname</th>
+            <th data-column-id="program">Program</th>
+            <th data-column-id="msg">Message</th>
+        </tr>
+    </thead>
+</table>
+</div>
+<script>
+
+var grid = $("#syslog").bootgrid({
+    ajax: true,
+    post: function ()
+    {
+        return {
+            id: "syslog",
+            device: '<?php echo htmlspecialchars($vars['device']); ?>',
+            program: '<?php echo htmlspecialchars($vars['program']); ?>',
+            to: '<?php echo htmlspecialchars($vars['to']); ?>',
+            from: '<?php echo htmlspecialchars($vars['from']); ?>',
+        };
+    },
+    url: "/ajax_table.php"
+});
+
+$(function () {
+	$("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+	$("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+});
+</script>
