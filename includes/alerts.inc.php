@@ -31,6 +31,7 @@ include_once($config['install_dir'].'/html/includes/authentication/'.$config['au
  * @return string
  */
 function GenSQL($rule) {
+	$rule = RunMacros($rule);
 	$tmp = explode(" ",$rule);
 	$tables = array();
 	foreach( $tmp as $opt ) {
@@ -53,6 +54,29 @@ function GenSQL($rule) {
 	}
 	$sql = "SELECT * FROM ".implode(",",$tables)." WHERE (".$join."".str_replace("(","",$tables[0]).".device_id = ?) && (".str_replace(array("%","@","!~","~"),array("","%","NOT LIKE","LIKE"),$rule).")";
 	return $sql;
+}
+
+/**
+ * Process Macros
+ * @param string $rule Rule to process
+ * @return string
+ */
+function RunMacros($rule,$x=1) {
+	global $config;
+	krsort($config['alert']['macros']['rule']);
+	foreach( $config['alert']['macros']['rule'] as $macro=>$value ) {
+		if( !strstr($macro," ") ) {
+			$rule = str_replace('%macros.'.$macro,$value,$rule);
+		}
+	}
+	if( strstr($rule,"%macros") ) {
+		if( ++$x < 30 ) {
+			$rule = RunMacros($rule,$x);
+		} else {
+			return false;
+		}
+	}
+	return $rule;
 }
 
 /**
@@ -158,8 +182,8 @@ function GetContacts($results) {
 	if( sizeof($results) == 0 ) {
 		return array();
 	}
-	if( $config['alerts']['email']['default_only'] ) {
-		return array($config['alerts']['email']['default'] => 'NOC');
+	if( $config['alert']['default_only'] == true || $config['alerts']['email']['default_only'] == true ) {
+		return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => 'NOC');
 	}
 	$users = get_userlist();
 	$contacts = array();
