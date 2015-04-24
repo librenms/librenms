@@ -201,6 +201,44 @@ $config['email_smtp_password']        = NULL;                 // Password for SM
 
 // Alerting Settings
 
+$config['alert'] = array(
+	'macros' => array(                    //Macros:
+		'rule' => array(                    //  For Rules
+			//Time Macros
+			'now'      => 'NOW()',
+			'past_5m'  => 'DATE_SUB(NOW(),INTERVAL 5 MINUTE)',
+			'past_10m' => 'DATE_SUB(NOW(),INTERVAL 10 MINUTE)',
+			'past_15m' => 'DATE_SUB(NOW(),INTERVAL 15 MINUTE)',
+			'past_30m' => 'DATE_SUB(NOW(),INTERVAL 30 MINUTE)',
+			'past_60m' => 'DATE_SUB(NOW(),INTERVAL 60 MINUTE)',
+
+			//Device Macros
+			'device' => '(%devices.disabled = "0" && %devices.ignore = "0")',
+			'device_up' => '(%devices.status = "1" && %macros.device)',
+			'device_down' => '(%devices.status = "0" && %macros.device)',
+
+			//Port Macros
+			'port' => '(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")',
+			'port_up' => '(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)',
+			'port_down' => '(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)',
+			'port_usage_perc' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100',
+
+			//Misc Macros
+		),
+	),
+	'transports' => array(                //Transports:
+		'dummy' => false,                   //  Dummy alerting (debug)
+		'mail'  => false,                   //  E-Mail alerting
+		'irc'   => false,                   //  IRC Alerting
+	),
+	'globals' => false,                   //Issue to global-read users
+	'admins' => false,                    //Issue to administrators
+	'default_only' => false,              //Only issue to default
+	'default_mail' => '',                 //Default email
+);
+
+//Legacy options
+
 $config['alerts']['email']['default']      = NULL;    // Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   // Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    // Enable email alerts
