@@ -107,6 +107,8 @@ function rrdtool_graph($graph_file, $options)
 
     if ($config['rrdcached'])
     {
+      $options = str_replace($config['rrd_dir']."/","",$options);
+      $options = str_replace($config['rrd_dir']    ,"",$options);
       fwrite($rrd_pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
     } else {
       fwrite($rrd_pipes[0], "graph $graph_file $options");
@@ -152,12 +154,8 @@ function rrdtool($command, $filename, $options)
 
   if ($command != "create" && $config['rrdcached'])
   {
-    $filename = str_replace($config['install_dir'],"",$filename);
-    //Some people tend to end paths with '/', let's tolerate that
-    if( $filename[0] == "/" ) {
-      $filename = substr($filename,1);
-    }
-    $filename = str_replace("rrd/","",$filename); //Make sure you use -b /opt/librenms/rrd on your rrdcached!
+    $filename = str_replace($config['rrd_dir']."/","",$filename);
+    $filename = str_replace($config['rrd_dir']    ,"",$filename);
     $cmd = "$command $filename $options --daemon " . $config['rrdcached'];
   } else {
     $cmd = "$command $filename $options";
