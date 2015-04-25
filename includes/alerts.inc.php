@@ -28,10 +28,13 @@ include_once($config['install_dir'].'/html/includes/authentication/'.$config['au
 /**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
- * @return string
+ * @return string|boolean
  */
 function GenSQL($rule) {
 	$rule = RunMacros($rule);
+	if( empty($rule) ) {
+		return false;
+	}
 	$tmp = explode(" ",$rule);
 	$tables = array();
 	foreach( $tmp as $opt ) {
@@ -59,7 +62,7 @@ function GenSQL($rule) {
 /**
  * Process Macros
  * @param string $rule Rule to process
- * @return string
+ * @return string|boolean
  */
 function RunMacros($rule,$x=1) {
 	global $config;
