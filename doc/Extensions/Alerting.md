@@ -416,13 +416,13 @@ Description: Alias of MySQL's NOW()
 
 Source: `NOW()`
 
-### <a name="macros-last-Nm">Past N Minutes</a> (Datetime)
+### <a name="macros-time-past-Nm">Past N Minutes</a> (Datetime)
 
-Entity: `%macros.last_$m`
+Entity: `%macros.past_$m`
 
 Description: Returns a MySQL Timestamp dated `$` Minutes in the past. `$` can only be a supported Resolution.
 
-Example: `%macros.last_5m` is Last 5 Minutes.
+Example: `%macros.past_5m` is Last 5 Minutes.
 
 Resolution: 5,10,15,30,60
 
