@@ -150,17 +150,10 @@ function rrdtool($command, $filename, $options)
 {
   global $config, $debug, $rrd_pipes, $console_color;
 
+  $cmd = "$command $filename $options";
   if ($command != "create" && $config['rrdcached'])
   {
-    $filename = str_replace($config['install_dir'],"",$filename);
-    //Some people tend to end paths with '/', let's tolerate that
-    if( $filename[0] == "/" ) {
-      $filename = substr($filename,1);
-    }
-    $filename = str_replace("rrd/","",$filename); //Make sure you use -b /opt/librenms/rrd on your rrdcached!
-    $cmd = "$command $filename $options --daemon " . $config['rrdcached'];
-  } else {
-    $cmd = "$command $filename $options";
+    $cmd .= " --daemon " . $config['rrdcached'];
   }
 
   if ($config['norrd'])
