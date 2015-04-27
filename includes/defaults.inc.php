@@ -85,6 +85,7 @@ $config['rrd_rra'] .= " RRA:LAST:0.5:1:1440 ";
 // RRDCacheD - Make sure it can write to your RRD dir!
 
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+$config['rrdcached_dir'] = FALSE;// Set this if you are using tcp connections to rrdcached
 
 // Web Interface Settings
 
