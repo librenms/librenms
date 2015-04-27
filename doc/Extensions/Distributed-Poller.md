@@ -81,3 +81,10 @@ RRDCached:
  - You will need to tune RRDCached to suite your environment.
  - The following is used in this example setup "-l 0:42217 -j /var/lib/rrdcached/journal/ -F -b /opt/librenms/rrd -B -w 1800 -z 900 -p /var/run/rrdcached.pid"
 
+```php
+$config['rrdcached']    = "127.0.0.1:42217";
+$config['rrd_dir']      = "/opt/librenms/rrd";
+$config['rrdcached_dir'] = "";
+```
+
+$config['rrdcached_dir'] Is only needed if you are using tcp connections for rrd cached and needs only to be set if you want to store rrd files within a sub directory of your rrdcached base directory.
