@@ -48,11 +48,11 @@ foreach (dbFetchRows($sql,$param) as $alert) {
         $fault_detail .= $tmp;
       } else {
         foreach ($tmp_alerts as $k=>$v) {
-          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1) {
+          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1) {
             $fault_detail .= "$k => '$v', ";
           }
-          $fault_detail = rtrim($fault_detail,", ");
         }
+        $fault_detail = rtrim($fault_detail,", ");
       }
       $fault_detail .= "<br>";
     }
@@ -97,7 +97,7 @@ foreach (dbFetchRows($sql,$param) as $alert) {
     if ($_SESSION['userlevel'] >= '10') {
         $ack_ico = 'volume-up';
         $ack_col = 'success';
-        if(in_array($alert['state'],array(2,3,4))) {
+        if($alert['state'] == 2) {
             $ack_ico = 'volume-off';
             $ack_col = 'danger';
         }
