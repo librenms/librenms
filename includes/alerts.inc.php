@@ -35,6 +35,9 @@ function GenSQL($rule) {
 	if( empty($rule) ) {
 		return false;
 	}
+	//Pretty-print rule to dissect easier
+	$pretty = array('*'  => ' * ', '('  => ' ( ', ')'  => ' ) ', '/'  => ' / ', '&&' => ' && ', '||' => ' || ');
+	$rule = str_replace(array_keys($pretty),$pretty,$rule);
 	$tmp = explode(" ",$rule);
 	$tables = array();
 	foreach( $tmp as $opt ) {
