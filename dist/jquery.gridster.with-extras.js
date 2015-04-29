@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.7 - 2015-04-28
+/*! gridster.js - v0.6.8 - 2015-04-28
 * http://gridster.net/
 * Copyright (c) 2015 ducksboard; Licensed MIT */
 
@@ -4617,13 +4617,14 @@
 
 		for (var y = 1; y <= opts.rows; y++) {
 			styles += (opts.namespace + ' [data-sizey="' + y + '"] { height:' +
-			(full_width ? 'auto' : ((y * opts.widget_base_dimensions[1]) + ((y - 1) * opts.widget_margins[1]))) + 'px; }\n');
+			(full_width ? 'auto' : ((y * opts.widget_base_dimensions[1]) + ((y - 1) * opts.widget_margins[1]))) + (full_width ? '' : 'px') + '; }\n');
+
 		}
 
 		for (var x = 1; x <= opts.cols; x++) {
 			styles += (opts.namespace + ' [data-sizex="' + x + '"] { width:' +
-			(full_width ? ($(window).width() - this.options.widget_margins[0] * 2) :
-					((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
+			(full_width ? (this.$wrapper.width() - this.options.widget_margins[0] * 2) : ((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
+
 		}
 
 		this.remove_style_tags();
