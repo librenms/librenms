@@ -128,7 +128,6 @@ if (empty($config['favicon'])) {
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
@@ -145,11 +144,12 @@ if (empty($config['favicon'])) {
   <script src="js/jquery.cycle2.min.js"></script>
   <script src="js/moment.min.js"></script>
   <script src="js/bootstrap-datetimepicker.min.js"></script>
-  <script src="js/typeahead.min.js"></script>
+  <script src="js/typeahead.bundle.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
   <script src="js/mktree.js"></script>
   <script src="js/jquery.bootgrid.min.js"></script>
+  <script src="js/handlebars.min.js"></script>
   <script type="text/javascript">
 
     <!-- Begin

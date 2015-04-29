@@ -463,9 +463,9 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 ?>
 
     </ul>
-     <form role="search" class="navbar-form navbar-right">
+     <form role="search" class="navbar-form navbar-right global-search">
          <div class="form-group">
-             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+             <input class="form-control typeahead" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
          </div>
      </form>
     <ul class="nav navbar-nav navbar-right">
@@ -552,30 +552,111 @@ if ($_SESSION['authenticated'])
  </div>
 </nav>
 <script>
-  $('#gsearch').typeahead([
-    {
-      name: 'devices',
-      remote : 'ajax_search.php?search=%QUERY&type=device',
-      header : '<h5><strong>&nbsp;Devices</strong></h5>',
-      template: '<a href="{{url}}"><p><img src="{{device_image}}" border="0" class="img_left"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></p></a>',
-      valueKey:"name",
-      engine: Hogan
-    },
-    {
-      name: 'ports',
-      remote : 'ajax_search.php?search=%QUERY&type=ports',
-      header : '<h5><strong>&nbsp;Ports</strong></h5>',
-      template: '<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></p></a>',
-      valueKey: "name",
-      engine: Hogan
-    },
-    {
-      name: 'bgp',
-      remote : 'ajax_search.php?search=%QUERY&type=bgp',
-      header : '<h5><strong>&nbsp;BGP</strong></h5>',
-      template: '<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0" class="img_left">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>',
-      valueKey: "name",
-      engine: Hogan
+var devices = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('device_id'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=device",
+        filter: function (devices) {
+            return $.map(devices, function (device) {
+                return {
+                    device_id: device.device_id,
+                    device_image: device.device_image,
+                    url: device.url,
+                    name: device.name,
+                    device_os: device.device_os,
+                    version: device.version,
+                    device_hardware: device.device_hardware,
+                    device_ports: device.device_ports,
+                    location: device.location
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var ports = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=ports",
+        filter: function (ports) {
+            return $.map(ports, function (port) {
+                return {
+                    count: port.count,
+                    url: port.url,
+                    name: port.name,
+                    description: port.description,
+                    colours: port.colours,
+                    hostname: port.hostname
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var bgp = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=bgp",
+        filter: function (bgp_sessions) {
+            return $.map(bgp_sessions, function (bgp) {
+                return {
+                    count: bgp.count,
+                    url: bgp.url,
+                    name: bgp.name,
+                    description: bgp.description,
+                    localas: bgp.localas,
+                    bgp_image: bgp.bgp_image,
+                    remoteas: bgp.remoteas,
+                    colours: bgp.colours,
+                    hostname: bgp.hostname
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+
+devices.initialize();
+ports.initialize();
+$('#gsearch').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+},
+{
+  source: devices.ttAdapter(),
+  async: true,
+  disaply: name,
+  limit: 8,
+    templates: {
+        header: '<h5><strong>&nbsp;Devices</strong></h5>',
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><img src="{{device_image}}" border="0" class="img_left"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></a></p>')
     }
-  ]);
+},
+{
+  source: ports.ttAdapter(),
+  async: true,
+  disaply: name,
+  limit: 8,
+    templates: {
+        header: '<h5><strong>&nbsp;Ports</strong></h5>',
+        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></p></a>')
+    }
+},
+{
+  source: bgp.ttAdapter(),
+  async: true,
+  disaply: name,
+  limit: 8,
+    templates: {
+        header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
+        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0" class="img_left">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>')
+    }
+});
+$('#gsearch').bind('typeahead:open', function(ev, suggestion) {
+    $('#gsearch').addClass('search-box');
+});
 </script>
