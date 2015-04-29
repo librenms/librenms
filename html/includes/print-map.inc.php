@@ -88,6 +88,10 @@ if (is_array($tmp_devices[0])) {
  
 ?>
  
+<script>
+var height = $(window).height() - 100;
+$('#visualization').css('height', height + 'px');
+</script>
 <div id="visualization"></div>
 <script src="js/vis.min.js"></script>
 <script type="text/javascript">
