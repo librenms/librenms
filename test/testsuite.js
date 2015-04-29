@@ -1,12 +1,11 @@
-/* global require */
-"use strict";
+'use strict';
 define([
     'QUnit',
     'jquery',
     'gridster'
 ], function(QUnit, $, gridster) {
 
-        QUnit.module("Gridster AMD", {
+        QUnit.module('Gridster AMD', {
             setup: function () {
             },
             teardown: function () {
@@ -21,8 +20,8 @@ define([
 
         QUnit.test('gridster should be initialized.', function() {
             $('.wrapper ul').gridster();
-            equal($(".wrapper").hasClass('ready'), true, 'Gridster should initialized wrapper.');
-            equal($(".wrapper ul li").length, $(".gs-w").length, 'grid elements get a .gs-w class');
+            equal($('.wrapper').hasClass('ready'), true, 'Gridster should initialized wrapper.');
+            equal($('.wrapper ul li').length, $('.gs-w').length, 'grid elements get a .gs-w class');
         });
     }
 );

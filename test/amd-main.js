@@ -1,6 +1,6 @@
 //Based on https://github.com/jonnyreeves/qunit-require
-/* global require */
-"use strict";
+/* global require, QUnit*/
+'use strict';
 require.config({
     //set the baseUrl to the src dir so that gridster
     //AMD modules can be found.

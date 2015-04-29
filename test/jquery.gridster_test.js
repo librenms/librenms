@@ -1,8 +1,9 @@
-/*global QUnit:false, module:false, test:false, asyncTest:false, expect:false*/
-/*global start:false, stop:false ok:false, equal:false, notEqual:false, deepEqual:false*/
-/*global notDeepEqual:false, strictEqual:false, notStrictEqual:false, raises:false*/
+//jshint quotmark:false
+/*global module:false, test:false */
+/*global ok:false, equal:false, notEqual:false, deepEqual:false*/
+/*global notDeepEqual:false */
 (function ($) {
-
+'use strict';
 	/*
 	 ======== A Handy Little QUnit Reference ========
 	 http://docs.jquery.com/QUnit
@@ -117,13 +118,11 @@
 	});
 
 	test('get_highest_occupied_cell', 1, function () {
-		var input = {col: 2, row: 3, size_x: 3, size_y: 1};
 		var grid = this.el.gridster().data('gridster');
 		deepEqual(grid.get_min_col(), 1);
 	});
 
 	test('get_highest_occupied_cell', 1, function () {
-		var input = {col: 2, row: 3, size_x: 3, size_y: 1};
 		var grid = this.el.gridster().data('gridster');
 		deepEqual(grid.get_highest_occupied_cell(), {col: 3, row: 2});
 	});
@@ -172,7 +171,7 @@
 			grid.add_widget('<li />', this.size_x, this.size_y, this.col, this.row);
 		});
 		equal(grid.get_num_widgets(), numBefore + this.resizeGrid.length, 'Loading the widgets to prepare for tests');
-		var row, col;
+
 		//check for widgets in the space it will occupy
 		var widgets = grid.get_widgets_in_range(1,1,2,2);
 		var numberInSpaceBefore = widgets.length;

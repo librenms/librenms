@@ -1,5 +1,5 @@
 (function (window, undefined) {
-
+	'use strict';
 	/* Delay, debounce and throttle functions taken from underscore.js
 	 *
 	 * Copyright (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and

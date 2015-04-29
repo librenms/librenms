@@ -1,6 +1,7 @@
 /*global module:false*/
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
+    'use strict';
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -60,7 +61,7 @@ module.exports = function (grunt) {
 					banner: '<%= meta.minibanner %>'
 				},
 				files: {
-					"dist/jquery.<%= pkg.name %>.min.css": ["dist/jquery.<%= pkg.name %>.css"]
+					'dist/jquery.<%= pkg.name %>.min.css': ['dist/jquery.<%= pkg.name %>.css']
 				}
 			}
 		},
@@ -74,14 +75,14 @@ module.exports = function (grunt) {
 		},
 		yuidoc: {
 			compile: {
-				"name": 'gridster.js',
-				"description": 'gridster.js, a drag-and-drop multi-column jQuery grid plugin',
-				"version": 'v<%= pkg.version %>',
-				"url": 'http://gridster.net/',
-				"logo": 'https://ducksboard.com/static/images/svg/logo-ducksboard-black-small.svg',
+				'name': 'gridster.js',
+				'description': 'gridster.js, a drag-and-drop multi-column jQuery grid plugin',
+				'version': 'v<%= pkg.version %>',
+				'url': 'http://gridster.net/',
+				'logo': 'https://ducksboard.com/static/images/svg/logo-ducksboard-black-small.svg',
 				options: {
-					paths: "src/",
-					outdir: "gh-pages/docs/"
+					paths: 'src/',
+					outdir: 'gh-pages/docs/'
 				}
 			}
 		},
