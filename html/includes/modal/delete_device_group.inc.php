@@ -41,7 +41,6 @@ if(is_admin() === false) {
 
 <script>
 $('#confirm-delete').on('show.bs.modal', function(e) {
-    event.preventDefault();
     group_id = $(e.relatedTarget).data('group_id');
     $("#group_id").val(group_id);
 });
