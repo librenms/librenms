@@ -18,7 +18,7 @@
     }
 
 }(this, function($) {
-
+	'use strict';
     var defaults = {
         items: 'li',
         distance: 1,

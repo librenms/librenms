@@ -7,6 +7,7 @@
  */
 
 ;(function(root, factory) {
+	'use strict';
     if(typeof exports === 'object') {
         module.exports = factory(require('jquery'));
     }
@@ -17,6 +18,7 @@
     }
 
 }(this, function($) {
+	'use strict';
     /**
     * Creates objects with coordinates (x1, y1, x2, y2, cx, cy, width, height)
     * to simulate DOM elements on the screen.
