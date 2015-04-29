@@ -1560,20 +1560,6 @@ tr.search:nth-child(odd) {
     overflow-x: hidden;
 }
 
-.tt-dropdown-menu
-{
-    min-width: 500px;
-    left: -400px !important;
-}
-
-.twitter-typeahead .tt-hint {
-    display: block;
-    height: 34px;
-    padding: 8px 12px;
-    font-size: 14px;
-    line-height: 1.428571429;
-    border: 1px solid transparent;
-}
 
 .ui-autocomplete {
     max-height: 100px;
@@ -1609,4 +1595,43 @@ tr.search:nth-child(odd) {
 .threeqtr-width {
     display:block;
     min-width: 75%;
+}
+
+.tt-menu {
+  position: absolute;
+  top: 95%;
+  left: 2.5%;
+  z-index: 100;
+  display: none;
+  min-width: 400px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #fff;
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+          box-shadow: 0px 0px 0px 1px green;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-open {
+  position: absolute;
+  top: 95%;
+  left: 2.5%;
+  z-index: 100;
+  display: none;
+  min-width: 400px;
+  left: -400px !important;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #fff;
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+          box-shadow: 0px 0px 0px 1px green;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
