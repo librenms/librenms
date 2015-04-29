@@ -619,17 +619,27 @@ var bgp = new Bloodhound({
   }
 });
 
+if ($(window).width() < 768) {
+    var cssMenu = 'typeahead-left';
+} else {
+    var cssMenu = '';
+}
+
 devices.initialize();
 ports.initialize();
+bgp.initialize();
 $('#gsearch').typeahead({
     hint: true,
     highlight: true,
-    minLength: 1
+    minLength: 1,
+    classNames: {
+        menu: cssMenu
+    }
 },
 {
   source: devices.ttAdapter(),
   async: true,
-  disaply: name,
+  display: name,
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;Devices</strong></h5>',
@@ -639,7 +649,7 @@ $('#gsearch').typeahead({
 {
   source: ports.ttAdapter(),
   async: true,
-  disaply: name,
+  display: name,
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;Ports</strong></h5>',
@@ -649,7 +659,7 @@ $('#gsearch').typeahead({
 {
   source: bgp.ttAdapter(),
   async: true,
-  disaply: name,
+  display: name,
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
