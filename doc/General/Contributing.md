@@ -96,12 +96,17 @@ project.
   libraries):
     - Include its name, source URL, copyright notice, and license in
       doc/General/Credits.md
-    - preferred locations are html/js, html/lib, and lib
+    - Where possible please include libraries in the lib/ folder.
     - Add it in a separate commit into its own directory, using
-      'git subtree --squash' if it is available via git.
+      git subtree if it is available via git:
+      git subtree add --squash --prefix=lib/<library name> <library git url> <library branch name>
+      I.e:
+      ```ssh
+      git subtree add --squash --prefix=lib/jquery-bootgrid https://github.com/rstaib/jquery-bootgrid.git master
+      ```
     - Add the code to integrate it in a separate commit.  Include:
         - code to update it in Makefile
-	- Scrutinizer exclusions to .scrutinizer.yml
+	- Scrutinizer exclusions to .scrutinizer.yml (not needed if added to lib/ folder).
 	- symlinks where necessary to maintain sensible paths
 
 - Don't submit code whose license conflicts with the GPLv3.  If you're not
@@ -167,6 +172,7 @@ Workflow:
   the issue number you created.
 ```
 git push origin master:issue-####
+git checkout issue-####
 ```
 - Make and test your changes in the issue branch as needed - this might take
   a few days or weeks.

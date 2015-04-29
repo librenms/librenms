@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Vlan
 --
--- Copyright (c) 2007-2008, Juniper Networks, Inc.
+-- Copyright (c) 2007-2011, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -49,6 +49,11 @@ jnxVlanMIBObjects  MODULE-IDENTITY
     DESCRIPTION
         "Added new Object jnxExVlanTag to represent Vlan Tag information
          for each Vlan."
+    REVISION
+        "201009070000Z" -- Tue Sep 7 00:00:00 2010 UTC
+    DESCRIPTION
+        "Added new Objects jnxExVlanPortTagness and jnxExVlanPortAccessMode as
+        part of jnxExVlanPortGroupTable."
 
     ::= { jnxExVlan 1 }
 
@@ -561,7 +566,9 @@ JnxExVlanPortGroupEntry ::=
     SEQUENCE {
         jnxExVlanPortGroupIndex      Integer32,
         jnxExVlanPort                Integer32,
-        jnxExVlanPortStatus          INTEGER
+        jnxExVlanPortStatus          INTEGER,
+        jnxExVlanPortTagness         INTEGER,
+        jnxExVlanPortAccessMode      INTEGER
     }
 
 jnxExVlanPortGroupIndex OBJECT-TYPE
@@ -616,6 +623,28 @@ jnxExVlanPortStatus OBJECT-TYPE
                          associated with any VLAN."
     DEFVAL { allowed }
     ::= { jnxExVlanPortGroupEntry 3 }
+
+jnxExVlanPortTagness  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tagged   (1),
+        untagged (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VlanPortTaqness gives whether the Port is tagged or untagged."
+    ::= { jnxExVlanPortGroupEntry 4 }
+
+jnxExVlanPortAccessMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        access   (1),
+        trunk   (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VlanPortAccessMode gives whether the Port is Access or Trunk."
+    ::= { jnxExVlanPortGroupEntry 5 }
 
 END
 

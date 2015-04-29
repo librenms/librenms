@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>jQuery.Bootgrid</id>
+        <version>$version$</version>
+        <title>jQuery Bootgrid</title>
+        <authors>Rafael Staib</authors>
+        <owners>r_staib</owners>
+        <licenseUrl>https://github.com/rstaib/jquery-bootgrid/blob/master/LICENSE.txt</licenseUrl>
+        <projectUrl>http://www.jquery-bootgrid.com</projectUrl>
+		<iconUrl>http://www.jquery-bootgrid.com/icon.png</iconUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>Nice, sleek and intuitive. A grid control especially designed for bootstrap.</description>
+        <summary>Nice, sleek and intuitive. A grid control especially designed for bootstrap.</summary>
+        <copyright>� Copyright 2014, Rafael Staib</copyright>
+        <tags>jQuery, Grid, Table, Bootstrap, Accessibility, HTML5, Sorting, Filtering, UI</tags>
+        <dependencies>
+            <dependency id="jQuery" version="1.11.1" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="dist\*.js" target="Content\Scripts" />
+        <file src="dist\*.css" target="Content\Content" />
+    </files>
+</package>

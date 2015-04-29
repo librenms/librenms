@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-SCHEDULER-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpScheduler                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpSchedulerMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- July 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the scheduler-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security scheduler resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpScheduler 1 }
+
+    jnxLsysSpSchedulerObjects        OBJECT IDENTIFIER ::= { jnxLsysSpSchedulerMIB 1 }
+    jnxLsysSpSchedulerSummary        OBJECT IDENTIFIER ::= { jnxLsysSpSchedulerMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular scheduler resource information objects per LSYS:
+--   Below are scheduler resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- scheduler resource table per LSYS
+
+    jnxLsysSpSchedulerTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpSchedulerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE scheduler objects for scheduler resource consumption per LSYS."  
+    ::= { jnxLsysSpSchedulerObjects 1 }
+    
+    jnxLsysSpSchedulerEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpSchedulerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in scheduler resource table."
+    INDEX { IMPLIED jnxLsysSpSchedulerLsysName }          
+    ::= { jnxLsysSpSchedulerTable 1 }          
+
+    JnxLsysSpSchedulerEntry ::= 
+       SEQUENCE {
+          jnxLsysSpSchedulerLsysName    DisplayString,
+          jnxLsysSpSchedulerProfileName DisplayString,
+          jnxLsysSpSchedulerUsage       Unsigned32,
+          jnxLsysSpSchedulerReserved    Unsigned32,
+          jnxLsysSpSchedulerMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the scheduler resource table
+ 
+    jnxLsysSpSchedulerLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which scheduler resource information is retrieved. "
+        ::= { jnxLsysSpSchedulerEntry 1 }
+
+    jnxLsysSpSchedulerProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpSchedulerEntry 2 }
+
+    jnxLsysSpSchedulerUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpSchedulerEntry 3 }
+    
+    jnxLsysSpSchedulerReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpSchedulerEntry 4 } 
+
+    jnxLsysSpSchedulerMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpSchedulerEntry 5 }
+
+
+-- **********************************************************************
+-- scheduler resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpSchedulerUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The scheduler resource consumption over all LSYS."
+    ::= { jnxLsysSpSchedulerSummary 1 }          
+
+    jnxLsysSpSchedulerMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The scheduler resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpSchedulerSummary 2 }
+    
+    jnxLsysSpSchedulerAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The scheduler resource available in the whole device."
+    ::= { jnxLsysSpSchedulerSummary 3 }
+    
+    jnxLsysSpSchedulerHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of scheduler resource consumed of a LSYS."
+    ::= { jnxLsysSpSchedulerSummary 4 }
+    
+    jnxLsysSpSchedulerHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most scheduler resource."
+    ::= { jnxLsysSpSchedulerSummary 5 }
+    
+    jnxLsysSpSchedulerLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of scheduler resource consumed of a LSYS."
+    ::= { jnxLsysSpSchedulerSummary 6 }
+    
+    jnxLsysSpSchedulerLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least scheduler resource."
+    ::= { jnxLsysSpSchedulerSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of scheduler resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

@@ -1,0 +1,50 @@
+{
+  "name": "vis",
+  "version": "3.11.0",
+  "description": "A dynamic, browser-based visualization library.",
+  "homepage": "http://visjs.org/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/almende/vis.git"
+  },
+  "keywords": [
+    "vis",
+    "visualization",
+    "web based",
+    "browser based",
+    "javascript",
+    "chart",
+    "linechart",
+    "timeline",
+    "graph",
+    "network",
+    "browser"
+  ],
+  "main": "./index",
+  "scripts": {
+    "test": "mocha",
+    "build": "gulp",
+    "watch": "gulp watch",
+    "watch-dev": "gulp watch --bundle"
+  },
+  "dependencies": {
+    "emitter-component": "^1.1.1",
+    "hammerjs": "^1.1.0",
+    "moment": "^2.9.0",
+    "keycharm": "^0.2.0"
+  },
+  "devDependencies": {
+    "clean-css": "latest",
+    "gulp": "^3.8.11",
+    "gulp-concat": "^2.4.3",
+    "gulp-minify-css": "^0.4.5",
+    "gulp-rename": "^1.2.0",
+    "gulp-util": "^3.0.3",
+    "merge-stream": "^0.1.5",
+    "mocha": "^2.1.0",
+    "rimraf": "^2.2.8",
+    "uglify-js": "^2.4.16",
+    "webpack": "^1.5.3",
+    "yargs": "^2.3.0"
+  }
+}

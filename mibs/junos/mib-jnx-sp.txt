@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Service PIC MIB
 -- 
--- Copyright (c) 2003, 2005-2006, Juniper Networks, Inc.
+-- Copyright (c) 2003-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -17,7 +17,9 @@ IMPORTS
         FROM SNMPv2-TC
     ifIndex, InterfaceIndex
         FROM IF-MIB
-    jnxMibs, jnxSpNotifications
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    jnxMibs
         FROM JUNIPER-SMI;
 
 jnxSpMIB  MODULE-IDENTITY
@@ -39,7 +41,9 @@ jnxSpMIB  MODULE-IDENTITY
             "Initial revision."
     ::= { jnxMibs 32 }
 
-
+    jnxSpNotifications    OBJECT IDENTIFIER ::= { jnxSpMIB 0 }
+    jnxFlowLimitTrapVars  OBJECT IDENTIFIER ::= { jnxSpMIB 2 }
+    
 --
 -- Per Service Set information
 --
@@ -224,7 +228,8 @@ jnxSpMIB  MODULE-IDENTITY
             jnxSpSvcSetSvcTypeSvcSets           Gauge32,
             jnxSpSvcSetSvcTypeMemoryUsage       Gauge32,
             jnxSpSvcSetSvcTypePctMemoryUsage    Gauge32,
-            jnxSpSvcSetSvcTypeCpuUtil           Gauge32
+            jnxSpSvcSetSvcTypeCpuUtil           Gauge32,
+            jnxSpSvcSetSvcTypeMemoryUsage64     CounterBasedGauge64
         }
 
     jnxSpSvcSetSvcTypeIndex OBJECT-TYPE
@@ -294,6 +299,16 @@ jnxSpMIB  MODULE-IDENTITY
             percentage of the total."
         ::= { jnxSpSvcSetSvcTypeEntry 7 }
 
+    jnxSpSvcSetSvcTypeMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Type, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetSvcTypeEntry 8 }
+
 --
 -- Per Interface information
 --
@@ -326,7 +341,9 @@ jnxSpMIB  MODULE-IDENTITY
             jnxSpSvcSetIfPolMemoryUsage    Gauge32,
             jnxSpSvcSetIfPctPolMemoryUsage Gauge32,
             jnxSpSvcSetIfMemoryZone        INTEGER,
-            jnxSpSvcSetIfCpuUtil           Gauge32
+            jnxSpSvcSetIfCpuUtil           Gauge32,
+            jnxSpSvcSetIfMemoryUsage64     CounterBasedGauge64,
+            jnxSpSvcSetIfPolMemoryUsage64  CounterBasedGauge64
         }
 
     jnxSpSvcSetIfTableName OBJECT-TYPE
@@ -418,6 +435,26 @@ jnxSpMIB  MODULE-IDENTITY
             percentage of the total."
         ::= { jnxSpSvcSetIfEntry 8 }
 
+    jnxSpSvcSetIfMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service PIC, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetIfEntry 9 }
+
+    jnxSpSvcSetIfPolMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of policy memory used by this Service PIC, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetIfEntry 10 }
+
 --
 -- Service PIC Notification definitions
 --
@@ -465,5 +502,31 @@ jnxSpMIB  MODULE-IDENTITY
             "This indicates a Service Pic has crossed below its internal 
             threshold for CPU utilization (85%)."
         ::= { jnxSpNotificationPrefix 4 }
+      
+    jnxSpSvcSetFlowLimitUtil OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        MAX-ACCESS  accessible-for-notify
+       STATUS      current
+        DESCRIPTION
+            "The Total no of flows present in this Service Set, expressed as a
+            percentage of the total maximum flows."
+        ::= { jnxFlowLimitTrapVars 1 }
+
+   jnxSpSvcSetNameUtil OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..96))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The Service Set name."
+        ::= { jnxFlowLimitTrapVars 2 }
+
+   jnxSpSvcSetFlowLimitUtilized NOTIFICATION-TYPE
+        OBJECTS {jnxSpSvcSetFlowLimitUtil,
+                 jnxSpSvcSetNameUtil}
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Set has reached its upper limit of flows
+            threshold of a maximun flows allowed for a service set."
+        ::= { jnxSpNotifications 1 }
 
 END

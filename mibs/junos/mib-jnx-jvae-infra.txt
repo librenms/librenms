@@ -1,0 +1,300 @@
+--
+-- Juniper JunosV App Engine Infrastructure MIB
+--
+-- Copyright (c) 2012 Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-JVAE-INFRA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InetAddressIPv4, InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+
+    jnxJVAEMibRoot
+        FROM JUNIPER-SMI;
+
+jnxJVAEInfraMIB MODULE-IDENTITY
+    LAST-UPDATED "201208010000Z" -- Aug 01 00:00:00 2012 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+        "The MIB module for JunosV App Engine Infrastructure."
+    REVISION    "201208010000Z" -- Aug 01 00:00:00 2012 UTC
+    DESCRIPTION
+            "Initial version of JVAE Infrastructure MIB."
+
+    ::= { jnxJVAEMibRoot 1 }
+
+
+jnxJVAEInfraNotifications  OBJECT IDENTIFIER ::= { jnxJVAEInfraMIB 0 }
+jnxJVAEInfraObjects        OBJECT IDENTIFIER ::= { jnxJVAEInfraMIB 1 }
+jnxJVAEInfraTables         OBJECT IDENTIFIER ::= { jnxJVAEInfraObjects 1 }
+
+
+   -- 
+   -- JVAE Infrstructure Objects
+   --
+
+   --
+   -- Compute Node Table
+   --
+
+jnxJVAECNTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Compute Nodes."
+    ::= { jnxJVAEInfraTables 1 }
+
+jnxJVAECNEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Compute Node."
+    INDEX { jnxJVAECNId }
+    ::= { jnxJVAECNTable 1 }
+
+JnxJVAECNEntry ::= SEQUENCE {
+    jnxJVAECNId                 DisplayString,
+    jnxJVAECNName               DisplayString,
+    jnxJVAECCName               DisplayString,
+    jnxJVAECNState              INTEGER,
+    jnxJVAECNLastStateChange    DisplayString,
+    jnxJVAECNRouterIPv4         InetAddressIPv4,
+    jnxJVAECNRouterIPv6         InetAddressIPv6,
+    jnxJVAECNMgmtIPv4           InetAddressIPv4,
+    jnxJVAECNMgmtIPv6           InetAddressIPv6,
+    jnxJVAECNSWVersion          DisplayString
+}
+
+jnxJVAECNId OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(1..32))
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+         "Id of the Compute Node."
+    ::= { jnxJVAECNEntry 1 }
+
+jnxJVAECNName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the Compute Node."
+    ::= { jnxJVAECNEntry 2 }
+
+jnxJVAECCName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the Compute Cluster, to which this Compute Node belongs."
+    ::= { jnxJVAECNEntry 3 }
+
+jnxJVAECNState OBJECT-TYPE
+    SYNTAX      INTEGER { offline(0), online(1), error(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of Compute Node as seen by the VE platform Manager."
+    ::= { jnxJVAECNEntry 4 }
+
+jnxJVAECNLastStateChange OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(26..30))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The date and time when last state change was observed for this
+         Compute Node."
+    ::= { jnxJVAECNEntry 5 }
+
+jnxJVAECNRouterIPv4  OBJECT-TYPE
+    SYNTAX       InetAddressIPv4
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+         "Network address on the router side, which used for all management
+          between the router and Compute Node."
+    ::= { jnxJVAECNEntry 6 }
+
+jnxJVAECNRouterIPv6  OBJECT-TYPE
+    SYNTAX       InetAddressIPv6
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+         "Network address on the router side, which used for all management
+          between the router and Compute Node."
+    ::= { jnxJVAECNEntry 7 }
+
+jnxJVAECNMgmtIPv4 OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Network address on the compute node side, which used for all management
+          between the router and Compute Node."
+    ::= { jnxJVAECNEntry 8 }
+
+jnxJVAECNMgmtIPv6 OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Network address on the compute node side, which used for all management
+          between the router and Compute Node."
+    ::= { jnxJVAECNEntry 9 }
+
+jnxJVAECNSWVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Compute Node software version."
+    ::= { jnxJVAECNEntry 10 }
+
+   --
+   -- Virtual Machine Instances Table
+   --
+
+jnxJVAEVMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAEVMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of virutal machine instances."
+    ::= { jnxJVAEInfraTables 2 }
+
+jnxJVAEVMEntry OBJECT-TYPE
+    SYNTAX      JnxJVAEVMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A virutal machine instance."
+    INDEX { jnxJVAEVMId }
+    ::= { jnxJVAEVMTable 1 }
+
+JnxJVAEVMEntry ::= SEQUENCE {
+    jnxJVAEVMId               OCTET STRING,
+    jnxJVAEVMName             DisplayString,
+    jnxJVAEVMCCName           DisplayString,
+    jnxJVAEVMCNName           DisplayString,
+    jnxJVAEVMCNId             DisplayString,
+    jnxJVAEVMUuid             OCTET STRING,
+    jnxJVAEVMPkg              DisplayString,
+    jnxJVAEVMStatus           INTEGER
+}
+
+jnxJVAEVMId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An unique identifier for this virtual machine instance. This
+	 identifier is not retained across restart of the subsytem."
+    ::= { jnxJVAEVMEntry 1 }
+
+jnxJVAEVMName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the virtual machine instance."
+    ::= { jnxJVAEVMEntry 2 }
+
+jnxJVAEVMCCName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the compute cluster which the compute node belongs."
+    ::= { jnxJVAEVMEntry 3 }
+
+jnxJVAEVMCNName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the compute node on which the virtual machine runs."
+    ::= { jnxJVAEVMEntry 4 }
+
+jnxJVAEVMCNId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Id of the compute node on which the virtual machine runs."
+    ::= { jnxJVAEVMEntry 5 }
+
+jnxJVAEVMUuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..60))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UUID of the virtual machine."
+    ::= { jnxJVAEVMEntry 6 }
+
+jnxJVAEVMPkg OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of package installed on the router holding the imgage for
+	 this virtual machine."
+    ::= { jnxJVAEVMEntry 7 }
+
+jnxJVAEVMStatus OBJECT-TYPE
+    SYNTAX      INTEGER { offline(0), online(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the virtual machine instance."
+    ::= { jnxJVAEVMEntry 8 }
+
+
+   --
+   -- JVAE Infrastructure Notifications
+   --
+
+jnxJVAECNStateChange NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNId,
+         jnxJVAECNName,
+         jnxJVAECCName,
+         jnxJVAECNState,
+         jnxJVAECNLastStateChange
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever compute node state changes."
+    ::= { jnxJVAEInfraNotifications  1 }
+
+jnxJVAEVMStateChange NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAEVMId,
+         jnxJVAEVMName,
+         jnxJVAEVMCNId,
+         jnxJVAEVMUuid,
+         jnxJVAEVMStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification whenever the virutal machine status changes."
+    ::= { jnxJVAEInfraNotifications  2 }
+
+END

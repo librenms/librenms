@@ -72,7 +72,7 @@
         INDEX {ifIndex}
         ::= {jnxJsIfMonTable 1}
 
-    JnxJsIfMonEntry::= SEQUENCE
+    JnxJsIfMonEntry ::= SEQUENCE
     {
         jnxJsIfMonInIcmp            Counter32,
         jnxJsIfMonInSelf            Counter32,

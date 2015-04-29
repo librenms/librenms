@@ -113,7 +113,7 @@ JnxSyslogFacility  ::= TEXTUAL-CONVENTION
       INDEX     { jnxSyslogId }
       ::= { jnxSyslogTable 1 }
 
-    JnxSyslogEntry::=
+    JnxSyslogEntry ::=
         SEQUENCE {
           jnxSyslogId             Unsigned32,
           jnxSyslogEventName      DisplayString,

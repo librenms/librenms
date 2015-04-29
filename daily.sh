@@ -11,3 +11,4 @@ php daily.php -f syslog
 php daily.php -f eventlog
 php daily.php -f authlog
 php daily.php -f perf_times 
+php daily.php -f callback

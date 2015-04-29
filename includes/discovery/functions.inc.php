@@ -392,7 +392,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
   $valid[$port_id][$vp_id] = 1;
 }
 
-function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
+function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id)
 {
   global $config, $debug, $link_exists;
   
@@ -406,8 +406,10 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
   {
     $insert_data = array(
       'local_port_id'   => $local_port_id,
+      'local_device_id' => $local_device_id,
       'protocol'        => $protocol,
       'remote_hostname' => $remote_hostname,
+      'remote_device_id'=> $remote_device_id,
       'remote_port'     => $remote_port,
       'remote_platform' => $remote_platform,
       'remote_version' => $remote_version
@@ -424,7 +426,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
   else
   {
     $data = dbFetchRow("SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?", array($remote_hostname, $local_port_id, $protocol, $remote_port));
-    if ($data['remote_port_id'] == $remote_port_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
+    if ($data['remote_port_id'] == $remote_port_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version && $data['local_device_id'] > 0 && $data['remote_device_id'] > 0)
     {
       echo(".");
     }
@@ -432,7 +434,10 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
     {
       $update_data = array(
         'remote_platform' => $remote_platform,
-        'remote_version' => $remote_version
+        'remote_version' => $remote_version,
+        'remote_version' => $remote_version,
+        'local_device_id' => $local_device_id,
+        'remote_device_id' => $remote_device_id
       );
       
       if (!empty($remote_port_id)) {

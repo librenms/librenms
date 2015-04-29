@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper enterprise specific Packet Mirror MIB.
 --
--- Copyright (c) 2001-2010, Juniper Networks, Inc.
+-- Copyright (c) 2001-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -19,10 +19,13 @@
             FROM SNMPv2-TC 
 
         jnxJsPacketMirror 
-            FROM JUNIPER-JS-SMI;
+            FROM JUNIPER-JS-SMI
+
+        Ipv6AddressPrefix
+            FROM IPV6-TC;
 
     jnxJsPacketMirrorMIB  MODULE-IDENTITY
-        LAST-UPDATED  "200910290000Z"   -- October 29, 2009
+        LAST-UPDATED  "201111230000Z"    -- November 23, 2011
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -34,13 +37,29 @@
              HTTP://www.juniper.net"
         DESCRIPTION
             "The packet mirror MIB for the Juniper Networks enterprise."
-    	REVISION      "200910290000Z"   -- October 29, 2009
+        REVISION      "200910290000Z"   -- October 29, 2009
     	DESCRIPTION   "Creation Date"
 
-    	REVISION      "201002250000Z"   -- February 25, 2010
-    	DESCRIPTION   "Added analyzer address to the LI Service Activated trap."
-    	::= { jnxJsPacketMirror 1 }   
+        REVISION     "201002250000Z"    -- February 25, 2010
+        DESCRIPTION  "Added analyzer address to the LI Service Activated trap."
 
+        REVISION     "201012160000Z"    -- December 16, 2010
+        DESCRIPTION  "Added Target Ipv6 Address address to traps."
+
+        REVISION     "201103160000Z"    -- March 16, 2011
+        DESCRIPTION  "Added Target Ipv6 Prefix Length to traps."
+
+        REVISION     "201103230000Z"    -- March 23, 2011
+        DESCRIPTION  "Add missing Ipv6 Prefix Length to traps. Use SYNTAX 
+                      Counter64 for tranmitted and received Octets."
+
+        REVISION     "201106070000Z"    -- June 7, 2011
+        DESCRIPTION  "Change SYNTAX of Mirror Identifier."
+
+
+        REVISION     "201111230000Z"    -- November 23, 2011
+        DESCRIPTION  "Add jnxJsPacketMirrorTriggerType circuitId."
+      	::= { jnxJsPacketMirror 1 }
 
     jnxJsPacketMirrorNotifications OBJECT IDENTIFIER ::= { jnxJsPacketMirrorMIB 0 }
     jnxJsPacketMirrorObjects       OBJECT IDENTIFIER ::= { jnxJsPacketMirrorMIB 1 }
@@ -57,12 +76,11 @@
         -- ********************************************************************
 
         jnxJsPacketMirrorIdentifier OBJECT-TYPE
-            SYNTAX      DisplayString (SIZE(1..8))
+            SYNTAX      Unsigned32
             MAX-ACCESS  accessible-for-notify
             STATUS      current
             DESCRIPTION
-                "The mirror identifier. A string which contains the 
-                 Version, Mirror ID and Session ID."
+                "The mirror identifier."
             ::= { jnxJsPacketMirrorTrapVars 1 }
 
         jnxJsPacketMirrorSessionIdentifier OBJECT-TYPE
@@ -88,7 +106,10 @@
                             nasPortId(2),
                             username(3),
                             callingStationId(4),
-                            acctSessionId(5) }
+                            acctSessionId(5),
+                            option82(6),
+                            remoteId(7),
+                            circuitId(8) }
             MAX-ACCESS  accessible-for-notify
             STATUS      current
             DESCRIPTION
@@ -232,6 +253,54 @@
                  interpret as an access or packet session event."
             ::= { jnxJsPacketMirrorTrapVars 15 }
 
+        jnxPacketMirrorCallingStationIdentifier  OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE(1..64))
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "The calling station id of the subscriber who's traffic is being monitored."
+            ::= { jnxJsPacketMirrorTrapVars 16 }
+
+        jnxPacketMirrorNasIdentifier   OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE(1..64))
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "The Nas identification where the traffic is being monitored."
+            ::= { jnxJsPacketMirrorTrapVars 17 }
+
+        jnxJsPacketMirrorOctetsReceived OBJECT-TYPE
+            SYNTAX      Counter64
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "The subscriber octet count received."
+            ::= { jnxJsPacketMirrorTrapVars 18 }
+
+        jnxJsPacketMirrorOctetsTransmitted OBJECT-TYPE
+            SYNTAX      Counter64
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "The subscriber octet count transmitted."
+            ::= { jnxJsPacketMirrorTrapVars 19 }
+
+        jnxJsPacketMirrorTargetIpv6Address OBJECT-TYPE
+            SYNTAX      Ipv6AddressPrefix
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "IPv6 address of the mirrored interface."
+            ::= { jnxJsPacketMirrorTrapVars 20 }
+
+        jnxJsPacketMirrorTrgtIpv6PfxLen OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "IPv6 prefix length of the mirrored interface."
+            ::= { jnxJsPacketMirrorTrapVars 21 }
+
     -- ***************************************************************
     -- definition of packet mirroring traps
     -- ***************************************************************
@@ -273,7 +342,11 @@
             jnxJsPacketMirrorSessionIdentifier,
             jnxJsPacketMirrorDirection,
             jnxJsPacketMirrorTargetIpAddress,
-            jnxJsPacketMirrorAnalyzerAddress }
+            jnxJsPacketMirrorAnalyzerAddress,
+            jnxPacketMirrorNasIdentifier,
+            jnxPacketMirrorCallingStationIdentifier,
+            jnxJsPacketMirrorTargetIpv6Address,
+            jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
         "The jnxJsPacketMirrorLiSubscriberLoggedIn Trap indicates that 
@@ -296,7 +369,10 @@
              jnxJsPacketMirrorTargetIpAddress,
              jnxJsPacketMirrorAnalyzerAddress,
              jnxJsPacketMirrorErrorCause,
-             jnxJsPacketMirrorErrorString }
+             jnxJsPacketMirrorErrorString,
+             jnxPacketMirrorCallingStationIdentifier,
+             jnxJsPacketMirrorTargetIpv6Address,
+             jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
             "The jnxJsPacketMirrorLiSubscriberLogInFailed Trap indicates that 
@@ -319,7 +395,11 @@
             jnxJsPacketMirrorDirection,
             jnxJsPacketMirrorTargetIpAddress,
             jnxJsPacketMirrorAnalyzerAddress,
-            jnxJsPacketMirrorTerminationReason }
+            jnxJsPacketMirrorTerminationReason,
+            jnxJsPacketMirrorOctetsReceived,
+            jnxJsPacketMirrorOctetsTransmitted,
+            jnxJsPacketMirrorTargetIpv6Address,
+            jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
             "The jnxJsPacketMirrorLiSubscriberLoggedOut Trap indicates that 
@@ -341,7 +421,11 @@
             jnxJsPacketMirrorSessionIdentifier,
             jnxJsPacketMirrorDirection,
             jnxJsPacketMirrorTargetIpAddress,
-            jnxJsPacketMirrorAnalyzerAddress }
+            jnxPacketMirrorNasIdentifier,
+            jnxPacketMirrorCallingStationIdentifier,
+            jnxJsPacketMirrorAnalyzerAddress,
+            jnxJsPacketMirrorTargetIpv6Address,
+            jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
             "The jnxJsPacketMirrorLiServiceActivated Trap indicates that 
@@ -364,7 +448,10 @@
             jnxJsPacketMirrorTargetIpAddress,
             jnxJsPacketMirrorAnalyzerAddress,
             jnxJsPacketMirrorErrorCause,
-            jnxJsPacketMirrorErrorString }
+            jnxJsPacketMirrorErrorString,
+            jnxPacketMirrorCallingStationIdentifier,
+            jnxJsPacketMirrorTargetIpv6Address,
+            jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
             "The jnxJsPacketMirrorLiServiceActivationFailed Trap indicates  
@@ -387,7 +474,9 @@
             jnxJsPacketMirrorDirection,
             jnxJsPacketMirrorTargetIpAddress,
             jnxJsPacketMirrorAnalyzerAddress,
-            jnxJsPacketMirrorTerminationReason }
+            jnxJsPacketMirrorTerminationReason,
+            jnxJsPacketMirrorTargetIpv6Address,
+            jnxJsPacketMirrorTrgtIpv6PfxLen }
         STATUS       current
         DESCRIPTION
             "The jnxJsPacketMirrorLiServiceDeactivated Trap indicates that 

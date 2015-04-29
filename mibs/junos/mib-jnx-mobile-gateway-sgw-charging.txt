@@ -1,0 +1,923 @@
+-- JUNIPER-MOBILITY-CHARGING-MIB 
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- This file contains the SGW (MIURA) charging mib information. 
+--The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILITY-SGW-CHARGING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+     Counter32,  Counter64, Gauge32, Integer32,Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    jnxMbgGwIndex, jnxMbgGwName
+        FROM JUNIPER-MOBILE-GATEWAYS
+    jnxMobileGatewaySgw
+        FROM JUNIPER-MBG-SMI;
+
+
+jnxMbgSgwChargingMib MODULE-IDENTITY
+    LAST-UPDATED        "201106271430Z" -- Tue Jun 27 14:30:00 2011 UTC
+    ORGANIZATION        "Juniper Networks, Inc."
+    CONTACT-INFO
+                        "Juniper Technical Assistance Center
+                        Juniper Networks, Inc.
+                        1194 N. Mathilda Avenue
+                        Sunnyvale, CA 94089
+                        E-mail: support@juniper.net"
+
+    DESCRIPTION
+         "This is Juniper Networks implementation of Mobility Charging MIB for 
+    SGW (Serving Gateway ) in 3GPP LTE network."
+
+    REVISION "201110101430Z"    -- 10 Oct, 2011
+    DESCRIPTION
+                "CGF group and CGF tables index keys has changed to 
+                gateway id and profile id. Gateway id and gateway name has 
+                added to all the traps."
+    
+    REVISION "201203161430Z"    -- 16 March, 2012
+    DESCRIPTION
+                "SGW Charging global statistics table has added."
+    ::= { jnxMobileGatewaySgw 3 }
+
+jnxMbgSgwCgNotifications      OBJECT IDENTIFIER ::= { jnxMbgSgwChargingMib 0 }
+jnxMbgSgwChargingObjects      OBJECT IDENTIFIER ::= { jnxMbgSgwChargingMib 1 }
+
+jnxMbgSgwCgLpsStatsTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF  JnxMbgSgwCgLpsStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+       "A table listing the stats for all Local persistent storage stats 
+        configured on the SGW."
+   ::= { jnxMbgSgwChargingObjects 1 }
+
+jnxMbgSgwCgCgfGroupsStatsTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF JnxMbgSgwCgCgfGrpStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+       "A table listing the stats for all (Charging Gateway Function) CGF 
+        Groups configured on the SGW."
+   ::= { jnxMbgSgwChargingObjects 2 }
+
+jnxMbgSgwCgNotificationVars   OBJECT IDENTIFIER ::= { 
+                                             jnxMbgSgwChargingObjects 3 }
+
+jnxMbgSgwCgCgfStatsTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF JnxMbgSgwCgCgfStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A table listing the statistics for all CGF configured on the SGW."
+   ::= { jnxMbgSgwChargingObjects 4 }
+
+jnxMbgSgwCgGlobalStatsTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF JnxMbgSgwCgGlobalStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+         "A table listing the charging global statistics of the SGW."
+   ::= { jnxMbgSgwChargingObjects 5 }
+--
+-- CG LPS Stats
+--
+jnxMbgSgwCgLpsStatsEntry OBJECT-TYPE
+   SYNTAX        JnxMbgSgwCgLpsStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A conceptual row listing the statistics for each
+          LPS configured on the SGW."
+   INDEX         {jnxMbgGwIndex }
+   ::= { jnxMbgSgwCgLpsStatsTable 1 }
+
+JnxMbgSgwCgLpsStatsEntry ::= SEQUENCE {
+   jnxMbgSgwCgFilesOnLcStorage        Gauge32,
+   jnxMbgSgwCgLcStorageAvailSpace     Gauge32
+}
+
+jnxMbgSgwCgFilesOnLcStorage OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+         "The number of Files containing Charging Data Records (CDRs) present 
+          on the Local Storage Device.Incremented when a file containing CDRs 
+          is closed on the Local storage device Decremented when sftp is done 
+          and a file is removed from the Local storage device"
+   ::= { jnxMbgSgwCgLpsStatsEntry 1 }
+
+jnxMbgSgwCgLcStorageAvailSpace OBJECT-TYPE
+   SYNTAX        Gauge32 
+   UNITS         "MBytes"
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+         "The space available on the Local Storage Device in MB."
+   ::= { jnxMbgSgwCgLpsStatsEntry 2 }
+
+--
+-- CGF Group Stats
+--
+jnxMbgSgwCgCgfGroupStatsEntry OBJECT-TYPE
+   SYNTAX        JnxMbgSgwCgCgfGrpStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A conceptual row listing the statistics for each
+          CGF Server configured on the SGW."
+   INDEX         { jnxMbgGwIndex, jnxMbgSgwCgCgfGrpProfId }
+   ::= { jnxMbgSgwCgCgfGroupsStatsTable 1 }
+
+JnxMbgSgwCgCgfGrpStatsEntry ::= SEQUENCE {
+   jnxMbgSgwCgCgfGrpProfId            Unsigned32,
+   jnxMbgSgwCgCgfGrpDRTReqTx          Counter32,
+   jnxMbgSgwCgCgfGrpDRTReqRx          Counter32,
+   jnxMbgSgwCgCgfGrpDRTReqTmout       Counter32,
+   jnxMbgSgwCgCgfGrpDRTSucRspRx       Counter32,
+   jnxMbgSgwCgCgfGrpDRTErrRspRx       Counter32,
+   jnxMbgSgwCgCgfGrpRediReqRx         Counter32,
+   jnxMbgSgwCgCgfGrpRediRspTx         Counter32,
+   jnxMbgSgwCgCgfGrpSwitchovers       Counter32,
+   jnxMbgSgwCgCgfGrpBatchReqTx        Counter32,
+   jnxMbgSgwCgCgfGrpBatchRspErrors    Counter32,
+   jnxMbgSgwCgCgfGrpBatchCDRsTx       Counter32,
+   jnxMbgSgwCgCgfGroupTotalWFA        Counter32,
+   jnxMbgSgwCgCgfGroupProfName        DisplayString
+}
+
+jnxMbgSgwCgCgfGrpProfId OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "This will identify the CGF Group profile id uniquely and used as 
+         secondary key for CGF group table"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 1 }
+
+jnxMbgSgwCgCgfGrpDRTReqTx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Total number of the DRT (Detailed Record Time) request transmitted 
+         for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 2 }
+
+jnxMbgSgwCgCgfGrpDRTReqRx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION
+        "Total number of the DRT request received for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 3 }
+
+jnxMbgSgwCgCgfGrpDRTReqTmout OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Total number of the DRT request timeouts happend for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 4 }
+
+jnxMbgSgwCgCgfGrpDRTSucRspRx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   
+        " Total number of the DRT success responses received"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 5 }
+
+jnxMbgSgwCgCgfGrpDRTErrRspRx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Total number of the DRT error responses received for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 6 }
+
+jnxMbgSgwCgCgfGrpRediReqRx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   
+        "Total number of the redirection responses received for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 7 }
+
+jnxMbgSgwCgCgfGrpRediRspTx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Total number of the redirection reqests transmitted for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 8 }
+
+jnxMbgSgwCgCgfGrpSwitchovers OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        " Total number of the switch overs on the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 9 }
+
+jnxMbgSgwCgCgfGrpBatchReqTx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        " Total number of the batch req transmitted for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 10 }
+
+jnxMbgSgwCgCgfGrpBatchRspErrors OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        " Tatal number of the batch response errors for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 11 }
+
+jnxMbgSgwCgCgfGrpBatchCDRsTx OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   
+        " Total number of the batch CDRs transmitted for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 12 }
+
+jnxMbgSgwCgCgfGroupTotalWFA OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   
+        " Total WFA available for the CGF group"
+   ::= { jnxMbgSgwCgCgfGroupStatsEntry 13 }
+
+jnxMbgSgwCgCgfGroupProfName OBJECT-TYPE
+    SYNTAX      DisplayString   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies the TSP Profile."
+    ::= { jnxMbgSgwCgCgfGroupStatsEntry 14 }
+--
+-- CGF Stats
+--
+
+jnxMbgSgwCgCgfStatsEntry OBJECT-TYPE
+   SYNTAX        JnxMbgSgwCgCgfStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A conceptual row listing the statistics for each
+          CGF Server configured on the SGW."
+   INDEX         {jnxMbgGwIndex, jnxMbgSgwCgCgfIndex }
+   ::= { jnxMbgSgwCgCgfStatsTable 1 }
+
+JnxMbgSgwCgCgfStatsEntry ::= SEQUENCE {
+   jnxMbgSgwCgCgfIndex             Unsigned32,
+   jnxMbgSgwCgCgfIpAddress         IpAddress,
+   jnxMbgSgwCgCgfStatus            INTEGER,
+   jnxMbgSgwCgCgfUpDuration        Counter64,
+   jnxMbgSgwCgCgfDownDuration      Counter64,
+   jnxMbgSgwCgCgfEchoReqTx         Counter64, 
+   jnxMbgSgwCgCgfEchoReqRx         Counter64,
+   jnxMbgSgwCgCgfEchoReqTmout      Counter64, 
+   jnxMbgSgwCgCgfEchoRespTx        Counter64,
+   jnxMbgSgwCgCgfEchoRespRx        Counter64,
+   jnxMbgSgwCgCgfVerUnsuppTx       Counter64,
+   jnxMbgSgwCgCgfVerUnsuppRx       Counter64,
+   jnxMbgSgwCgCgfNodeAliveReqTx    Counter64,
+   jnxMbgSgwCgCgfNodeAliveReqRx    Counter64,
+   jnxMbgSgwCgCgfNodeAliveReqTmout Counter64,
+   jnxMbgSgwCgCgfNodeAliveRespTx   Counter64,
+   jnxMbgSgwCgCgfNodeAliveRespRx   Counter64,
+   jnxMbgSgwCgCgfRedirectReqRx     Counter64,
+   jnxMbgSgwCgCgfRedirectRespTx    Counter64, 
+   jnxMbgSgwCgCgfDRTReqTx          Counter64,
+   jnxMbgSgwCgCgfDRTReqTmout       Counter64,
+   jnxMbgSgwCgCgfDRTSuccRespRx     Counter64,
+   jnxMbgSgwCgCgfDRTErrRespRx      Counter64,
+   jnxMbgSgwCgCgfCdrTx             Counter64,
+   jnxMbgSgwCgCgfDRTRTTMean        Counter64,
+   jnxMbgSgwCgCgfDRTRTTMin         Counter64,
+   jnxMbgSgwCgCgfDRTRTTMax         Counter64,
+   jnxMbgSgwCgCgfTransToDownState  Counter64,
+   jnxMbgSgwCgCgfContainers        Counter64,
+   jnxMbgSgwCgCgfProfileName       DisplayString
+}
+
+jnxMbgSgwCgCgfIndex OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A number representing each CGF Server whose statistics
+          is being generated."
+    ::= { jnxMbgSgwCgCgfStatsEntry 1 }
+
+jnxMbgSgwCgCgfIpAddress OBJECT-TYPE
+   SYNTAX        IpAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "CGF Server IP-address."
+   ::= { jnxMbgSgwCgCgfStatsEntry 2 }
+
+jnxMbgSgwCgCgfStatus OBJECT-TYPE
+   SYNTAX        INTEGER {
+        up(1),     -- server is up
+        down(2)     -- server is not reachable or unconfigured
+   }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION 
+         "This indicates the state of the CGF Server i.e UP or DOWN."
+   ::= { jnxMbgSgwCgCgfStatsEntry 3 }
+
+jnxMbgSgwCgCgfUpDuration OBJECT-TYPE
+   SYNTAX        Counter64
+   UNITS         "minutes"
+   MAX-ACCESS    not-accessible
+   STATUS         obsolete
+   DESCRIPTION   "Total duration in minutes for which the CGF Server
+                  was in UP State."
+   ::= { jnxMbgSgwCgCgfStatsEntry 4 }
+
+jnxMbgSgwCgCgfDownDuration OBJECT-TYPE
+   SYNTAX        Counter64
+   UNITS         "minutes"
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total duration in minutes for which the CGF Server 
+                  was in DOWN State."
+   ::= { jnxMbgSgwCgCgfStatsEntry 5 }
+
+jnxMbgSgwCgCgfEchoReqTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Echo Requests transmitted to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 6 }
+
+jnxMbgSgwCgCgfEchoReqRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Echo Requests received from the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 7 }
+
+jnxMbgSgwCgCgfEchoReqTmout OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Echo Requests to the CGF Server that 
+                  timed out."
+   ::= { jnxMbgSgwCgCgfStatsEntry 8 }
+
+jnxMbgSgwCgCgfEchoRespTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Echo Responses transmitted to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 9 }
+
+jnxMbgSgwCgCgfEchoRespRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Echo Responses received from the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 10 }
+
+jnxMbgSgwCgCgfVerUnsuppTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Version Unsupported messages transmitted to 
+                 the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 11 }
+
+jnxMbgSgwCgCgfVerUnsuppRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Version Unsupported messages received 
+                 from the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 12 }
+
+jnxMbgSgwCgCgfNodeAliveReqTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of Node Alive Requests transmitted to the
+                  CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 13 }
+
+jnxMbgSgwCgCgfNodeAliveReqRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Node Alive Requests received from 
+                  the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 14 }
+
+jnxMbgSgwCgCgfNodeAliveReqTmout OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of Node Alive Requests to the CGF Server 
+                  that timed out."
+   ::= { jnxMbgSgwCgCgfStatsEntry 15 }
+
+jnxMbgSgwCgCgfNodeAliveRespTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Node Alive Responses transmitted 
+                  to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 16 }
+
+jnxMbgSgwCgCgfNodeAliveRespRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of Node Alive Responses received from 
+                  the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 17 }
+
+jnxMbgSgwCgCgfRedirectReqRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Redirect Requests received from 
+                  the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 18 }
+
+jnxMbgSgwCgCgfRedirectRespTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Redirect Responses transmitted 
+                  to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 19 }
+
+jnxMbgSgwCgCgfDRTReqTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Data Record Transfer Requests transmitted to 
+                  the CGF Server.This includes the retransmission counts also."
+   ::= { jnxMbgSgwCgCgfStatsEntry 20 }
+
+jnxMbgSgwCgCgfDRTReqTmout OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of Data Record Transfer Requests to the CGF  
+                 Server that timed out after the configured number of retries."
+   ::= { jnxMbgSgwCgCgfStatsEntry 21 }
+
+jnxMbgSgwCgCgfDRTSuccRespRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Data Record Transfer Responses indicating 
+                  success received from the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 22 }
+
+jnxMbgSgwCgCgfDRTErrRespRx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of Data Record Transfer Responses indicating 
+                  error received from the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 23 }
+
+
+jnxMbgSgwCgCgfCdrTx OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of Call Data Records (CDRs) transmitted 
+                  to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 24 }
+
+jnxMbgSgwCgCgfDRTRTTMean OBJECT-TYPE
+   SYNTAX        Counter64
+   UNITS         "seconds"
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION
+        "Mean Round Trip Time of the Data Record Transfer Request and Response 
+         to and from the CGF Server in seconds. This is calculated from the 
+         average of the minimum and maximum round trip times of the Data Record 
+         Transfer Request. This is applicable for CGF Servers which are 
+         connected via UDP protocol."
+   ::= { jnxMbgSgwCgCgfStatsEntry 25 }
+
+jnxMbgSgwCgCgfDRTRTTMin OBJECT-TYPE
+   SYNTAX        Counter64
+   UNITS         "seconds"
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION
+        "Minimum Round Trip Time of the Data Record Transfer Request and 
+        Response to and from the CGF Server in seconds. This is 
+        applicable for CGF Servers which are connected via UDP protocol."
+   ::= { jnxMbgSgwCgCgfStatsEntry 26 }
+
+jnxMbgSgwCgCgfDRTRTTMax OBJECT-TYPE
+   SYNTAX        Counter64
+   UNITS         "seconds"
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION
+        "Maximum Round Trip Time of the Data Record Transfer Request and 
+         Response to and from the CGF Server in seconds.This is 
+         applicable for CGF Servers which are connected via UDP protocol."
+   ::= { jnxMbgSgwCgCgfStatsEntry 27 }
+
+jnxMbgSgwCgCgfTransToDownState OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of transitions of the CGF Server to 
+                  the DOWN state."
+   ::= { jnxMbgSgwCgCgfStatsEntry 28 }
+
+jnxMbgSgwCgCgfContainers OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    not-accessible
+   STATUS        obsolete
+   DESCRIPTION   "Total number of closed containers to the CGF Server."
+   ::= { jnxMbgSgwCgCgfStatsEntry 29 }
+jnxMbgSgwCgCgfProfileName OBJECT-TYPE
+    SYNTAX      DisplayString  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies the CGF Peer Profile."
+    ::= { jnxMbgSgwCgCgfStatsEntry 30 }
+
+ jnxMbgSgwCgGlobalStatsEntry OBJECT-TYPE
+   SYNTAX       JnxMbgSgwCgGlobalStatsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION 
+         "A conceptual row listing the statistics for each SGW charging
+          global statistics."
+   INDEX         { jnxMbgGwIndex }
+   ::= { jnxMbgSgwCgGlobalStatsTable 1 }
+
+JnxMbgSgwCgGlobalStatsEntry ::= SEQUENCE {
+   jnxMbgSgwCgCdrSendErrors           Counter64,
+   jnxMbgSgwCgCdrEncodeErrors         Counter64,
+   jnxMbgSgwCgCdrAllocFailures        Counter64,
+   jnxMbgSgwCgContFailures            Counter64,
+   jnxMbgSgwCgCmBearersCreated        Counter64,
+   jnxMbgSgwCgCmBearersDeleted        Counter64
+}
+
+-- Charging Global Stats
+jnxMbgSgwCgCdrSendErrors OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of CDR send errors to charging module."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 1 }
+
+jnxMbgSgwCgCdrEncodeErrors OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of CDR (charging data record) encoding errors."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 2 }
+
+jnxMbgSgwCgCdrAllocFailures OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of CDR memory allocation failures."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 3 }
+
+jnxMbgSgwCgContFailures OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of container failures."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 4 }
+
+jnxMbgSgwCgCmBearersCreated OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number bearers created."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 5 }
+
+jnxMbgSgwCgCmBearersDeleted OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Total number of bearers destroyed."
+   ::= { jnxMbgSgwCgGlobalStatsEntry 6 }
+
+jnxMbgSgwCgServerName OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE (0..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "A string that uniquely identifies the CGF server name." 
+   ::= { jnxMbgSgwCgNotificationVars 1 }
+
+jnxMbgSgwCgServicePicName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "This identifies the session-pic, in the form ms-a/b/0, 
+     where <a> is the slot and <b> could be either 0 or 1."
+   ::= { jnxMbgSgwCgNotificationVars 2 }
+jnxMbgSgwCgCDRDest OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      cdrcgf       (1),    
+                      cdrbackup    (2),    
+                      cdrnobackup  (3) }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION 
+"This indicates any transisitions in the state of the CGF.
+Value 1 indicates one of the CGF for the Group came up. Redirecting CDRs to the Active CGF.
+Value 2 indicates last active CGF for the Group went down. CDRs being written to backup Local storage device.
+Value 3 indicates last active CGF for the Group went down. Backup Local storage device not configured."
+   ::= { jnxMbgSgwCgNotificationVars 3 }
+
+jnxMbgSgwCgTSPName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31)) 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies the Transport Profile."
+    ::= { jnxMbgSgwCgNotificationVars 4 }
+
+jnxMbgSgwCgMemLimit OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      memfulldisconnectnew          (1),
+                      memfulldisconnectnewrslvd     (2),
+                      memfulldisconnectexistnew     (3),
+                      memfulldisconnectexistnewrslvd(4)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION 
+"This indicates any transisitions in the state of the CGF.
+Value 1 indicates System has reached Level 1 critical memory threshold. 
+Action - Check the CGF server connections. If local storage is enabled,
+         please ftp the charging records immediately.
+         If local storage is not enabled, please enable it so the
+         charging records can be stored in local persistent storage. 
+Risk -  No new sessions will be allowed.
+Value 2 indicates System reaching Level 1 critical memory threshold
+        condition has been resolved.
+Value 3 indicates System has reached Level 2 critical memory threshold.
+Action - Check the CGF server connections. If local storage is enabled,
+         please ftp the charging records immediately.
+         If local storage is not enabled, please enable it so the
+         charging records can be stored in local persistent storage.
+Risk -  New and existing sessions will be not be allowed.
+Value 4 indicates System reaching Level 2 critical memory threshold
+        condition has been resolved."
+    ::= { jnxMbgSgwCgNotificationVars 5 }
+
+jnxMbgSgwCgLcsSpace OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      localstoragememlevel1     (1),
+                      localstoragememlevel2     (2),
+                      localstoragememlevel3     (3)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current 
+    DESCRIPTION
+    "Water marking for the local storage levels in charged of RE."
+   ::= { jnxMbgSgwCgNotificationVars 6 }
+
+jnxMbgSgwCgLcsUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the total of Local Storage
+         Space by one the Charged on RE"
+        ::= { jnxMbgSgwCgNotificationVars 7 }
+
+jnxMbgSgwCgAlarmStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      raised	    (1),
+                      cleared	    (2)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current 
+    DESCRIPTION
+    "Value 1 indicates that the Alarm for a particular condition is present.
+    Value 2 indicates that the Alarm for a particular condition is absent."
+   ::= { jnxMbgSgwCgNotificationVars 8 }
+
+jnxMbgSgwCgProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that identifies a charging profile ."
+    ::= { jnxMbgSgwCgNotificationVars 9 }
+
+jnxMbgSgwCgPrevMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSgwCgNotificationVars 10 }
+
+jnxMbgSgwCgNewMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSgwCgNotificationVars 11 }
+
+jnxMbgSgwCgTProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that identifies a charging profile ."
+    ::= { jnxMbgSgwCgNotificationVars 12 }
+
+jnxMbgSgwCgTPrevMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSgwCgNotificationVars 13 }
+
+jnxMbgSgwCgTNewMMState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode state ."
+    ::= { jnxMbgSgwCgNotificationVars 14 }
+
+jnxMbgSgwCgSGwName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the gateway name"
+    ::= { jnxMbgSgwCgNotificationVars 15 }
+
+jnxMbgSgwCgCgfProfName OBJECT-TYPE
+  SYNTAX      DisplayString 
+  MAX-ACCESS   accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+    "A string that uniquely identifies the CGF Profile."
+  ::= { jnxMbgSgwCgNotificationVars 16 }
+
+jnxMbgSgwCgGtpGWUpNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgServerName, 
+                   jnxMbgSgwCgServicePicName }
+     STATUS        current
+     DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked alive.  The ServerName identifies the server and the
+        SPIdentfier identifies the session-pic which originated this
+        notification."
+    ::= { jnxMbgSgwCgNotifications 1 }
+
+jnxMbgSgwCgGtpGWDownNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgServerName, 
+                   jnxMbgSgwCgServicePicName }
+    STATUS         current
+    DESCRIPTION
+        "This notification signifies that the specified server has been
+        marked dead.  The ServerName identifies the server and the
+        SPIdentfier identifies the session-pic which originated this
+        notification."
+    ::= { jnxMbgSgwCgNotifications 2 }
+
+jnxMbgSgwCgCDRDestNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgCDRDest,
+                   jnxMbgSgwCgTSPName,
+                   jnxMbgSgwCgCgfIpAddress }
+    STATUS         current
+    DESCRIPTION
+          "This signifies change in the destination of the CDRs 
+           (Charging Data Record)"
+::= { jnxMbgSgwCgNotifications 3 } 
+
+jnxMbgSgwCgServiceUpNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgServicePicName } 
+    STATUS         current
+    DESCRIPTION
+        "This signifies the Charging daemon is UP on the SP."
+::= { jnxMbgSgwCgNotifications 4 } 
+
+jnxMbgSgwCgMMStateChangeNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgProfileName,
+                   jnxMbgSgwCgPrevMMState,
+                   jnxMbgSgwCgNewMMState }
+    STATUS         current
+    DESCRIPTION
+        "This indicates that the given charging profile underwent a change
+         in the maintenance-mode."
+    ::= { jnxMbgSgwCgNotifications 5 }
+
+jnxMbgSgwCgTMMStateChangeNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgTProfileName,
+                   jnxMbgSgwCgTPrevMMState,
+                   jnxMbgSgwCgTNewMMState }
+    STATUS         current
+    DESCRIPTION
+        "This indicates that the given transport profile underwent a change
+         in the maintenance-mode."
+    ::= { jnxMbgSgwCgNotifications 6 }
+
+jnxMbgSgwCgMemHighThresNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgTSPName,
+                   jnxMbgSgwCgServicePicName,
+                   jnxMbgSgwCgMemLimit,
+                   jnxMbgSgwCgAlarmStatus }
+    STATUS         current 
+    DESCRIPTION
+          "This trap indicates the alarm status on the node associated with the utilization of inernal memory space for charging records. This alarm is sent outwhen the utilization exceeds or falls below configured high threshold value. Thealarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+      ::= { jnxMbgSgwCgNotifications 7 } 
+
+jnxMbgSgwCgMemMediumThresNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgTSPName,
+                   jnxMbgSgwCgServicePicName,
+                   jnxMbgSgwCgMemLimit,
+                   jnxMbgSgwCgAlarmStatus }
+    STATUS         current
+    DESCRIPTION
+         "This trap indicates the alarm status on the node associated with the  utilization of inernal memory space for charging records. This alarm is sent outwhen the utilization exceeds or falls below configured medium threshold value. The alarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+      ::= { jnxMbgSgwCgNotifications 8 } 
+
+jnxMbgSgwCgMemLowThresNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgTSPName,
+                   jnxMbgSgwCgServicePicName,
+                   jnxMbgSgwCgMemLimit,
+                   jnxMbgSgwCgAlarmStatus }
+    STATUS          current
+    DESCRIPTION
+          "This trap indicates the alarm status on the node associated with the utilization of inernal memory space for charging records. This alarm is sent outwhen the utilization exceeds or falls below configured low threshold value. The alarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+      ::= { jnxMbgSgwCgNotifications 9 }
+
+jnxMbgSgwCgLcsThresHighNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgAlarmStatus,
+                   jnxMbgSgwCgLcsUtil }
+    STATUS         current
+    DESCRIPTION
+          "This trap indicates the alarm status on the node associated with the utilization of local storage space for charging records. This alarm is sent out when the utilization exceeds or falls below configured high threshold of available disk space. The alarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+    ::= { jnxMbgSgwCgNotifications 10 }
+
+jnxMbgSgwCgLcsThresMediumNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgAlarmStatus,
+                   jnxMbgSgwCgLcsUtil }
+    STATUS         current
+    DESCRIPTION
+          "This trap indicates the alarm status on the node associated with the utilization of local storage space for charging records. This alarm is sent outwhen the utilization exceeds or falls below configured medium threshold of available disk space. The alarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+    ::= { jnxMbgSgwCgNotifications 11 }
+
+jnxMbgSgwCgLcsThresLowNotify NOTIFICATION-TYPE
+    OBJECTS      { jnxMbgGwName,
+                   jnxMbgSgwCgAlarmStatus,  
+                   jnxMbgSgwCgLcsUtil }
+    STATUS         current
+    DESCRIPTION
+          "This trap indicates the alarm status on the node associated with the utilization of local storage space for charging records. This alarm is sent out when the utilization exceeds or falls below configured low threshold of available disk space. The alarm status (Active/Clear)is indicated by the jnxMbgSgwCgAlarmStatus variable."
+    ::= { jnxMbgSgwCgNotifications 12 }
+
+END
+
