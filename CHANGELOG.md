@@ -1,3 +1,29 @@
+<a name="v0.6.8"></a>
+### v0.6.8 (2015-04-28)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * responsive width now resizes based off wrapper not window ([e69c3e8f](http://github.com/dsmorse/gridster.js/commit/e69c3e8f64aa4557ef032e4d0d8185e83b1aed21))
+  * ensure coords instances are destroyed on widgets ([576b5ae3](http://github.com/dsmorse/gridster.js/commit/576b5ae3f0461b048d8ff9463509b860ffa8b194))
+  * `resize_widget` also accepts HTMLElements ([cda560f4](http://github.com/dsmorse/gridster.js/commit/cda560f4f3ca616d03d1e3230cd2ef4e69876d9c))
+  * changed "instanceof jQuery" to "instanceof $" ([c6226306](http://github.com/dsmorse/gridster.js/commit/c6226306c2ce9aa7d45d774d7de19088acba0c66))
+  * wrong addition solved in add_faux_rows/cols by adding parseInt ([d9471752](http://github.com/dsmorse/gridster.js/commit/d947175257d686801154a403016fd2ec7e6d40c2), closes [#426](http://github.com/dsmorse/gridster.js/issues/426), [#425](http://github.com/dsmorse/gridster.js/issues/425))
+  * preventing gridster from adding extra resize handles ([9d077da6](http://github.com/dsmorse/gridster.js/commit/9d077da676826606243c2552dc9997c492687203))
+  * destroy resize_api ([b1629326](http://github.com/dsmorse/gridster.js/commit/b16293268c6aa4be2ba0c8fb1b9806e590227606), closes [#473](http://github.com/dsmorse/gridster.js/issues/473))
+  * ensure widget dimensions and coords are always ints ([595a94f1](http://github.com/dsmorse/gridster.js/commit/595a94f1bdfaa4905ff51d9044e74105c81e6ff3))
+
+
+#### Features
+
+* **draggable:** autoscrolling ([d3f25f3f](http://github.com/dsmorse/gridster.js/commit/d3f25f3fbbcc738d8b3702d122533e64f37acd29))
+* **gridster:**
+  * add config to set custom show/hide widget methods ([7de5bbab](http://github.com/dsmorse/gridster.js/commit/7de5bbabc0a01e8188a56881782dc74d6bf111d3))
+  * browserify compatibility ([43148b87](http://github.com/dsmorse/gridster.js/commit/43148b87e523352a7f9d01479c6fed3e87f46ba0))
+  * Common.js support ([446852a2](http://github.com/dsmorse/gridster.js/commit/446852a260aab2e7caf772a62fbde8b518c38816), closes [#434](http://github.com/dsmorse/gridster.js/issues/434))
+* **gridster.css:** remove possible default pading ([2002c455](http://github.com/dsmorse/gridster.js/commit/2002c455957016cb441a317dbbb6e5f6662cb35a))
+
 <a name="v0.6.7"></a>
 ### v0.6.7 (2015-04-16)
 
