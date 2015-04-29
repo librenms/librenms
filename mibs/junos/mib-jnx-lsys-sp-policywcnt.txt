@@ -1,0 +1,199 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-POLICYWCNT-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpPolicywcnt                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpPolicywcntMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- May 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the policy-with-count-specific MIB for 
+             Juniper Enterprise Logical-System (LSYS) security profiles.  
+             Juniper documentation is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security policy-with-count resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpPolicywcnt 1 }
+
+    jnxLsysSpPolicywcntObjects  OBJECT IDENTIFIER ::= { jnxLsysSpPolicywcntMIB 1 }
+    jnxLsysSpPolicywcntSummary  OBJECT IDENTIFIER ::= { jnxLsysSpPolicywcntMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular policy-with-count resource information objects per LSYS:
+--   Below are policy-with-count resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- The policy-with-count resource table per LSYS
+
+    jnxLsysSpPolicywcntTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpPolicywcntEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE policy-with-count objects for policy-with-count 
+             resource consumption per LSYS."  
+    ::= { jnxLsysSpPolicywcntObjects 1 }
+    
+    jnxLsysSpPolicywcntEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpPolicywcntEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in policy-with-count resource table."
+    INDEX { IMPLIED jnxLsysSpPolicywcntLsysName }          
+    ::= { jnxLsysSpPolicywcntTable 1 }          
+
+    JnxLsysSpPolicywcntEntry ::= 
+       SEQUENCE {
+          jnxLsysSpPolicywcntLsysName    DisplayString,
+          jnxLsysSpPolicywcntProfileName DisplayString,
+          jnxLsysSpPolicywcntUsage       Unsigned32,
+          jnxLsysSpPolicywcntReserved    Unsigned32,
+          jnxLsysSpPolicywcntMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the policy-with-count resource table
+ 
+    jnxLsysSpPolicywcntLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which policy-with-count 
+             resource information is retrieved. "
+        ::= { jnxLsysSpPolicywcntEntry 1 }
+
+    jnxLsysSpPolicywcntProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpPolicywcntEntry 2 }
+
+    jnxLsysSpPolicywcntUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpPolicywcntEntry 3 }
+    
+    jnxLsysSpPolicywcntReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpPolicywcntEntry 4 } 
+
+    jnxLsysSpPolicywcntMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpPolicywcntEntry 5 }
+
+
+-- **********************************************************************
+-- The policy-with-count resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpPolicywcntUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The policy-with-count resource consumption over all LSYS."
+    ::= { jnxLsysSpPolicywcntSummary 1 }          
+
+    jnxLsysSpPolicywcntMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The policy-with-count resource maximum quota for the whole 
+            device for all LSYS."
+    ::= { jnxLsysSpPolicywcntSummary 2 }
+    
+    jnxLsysSpPolicywcntAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The policy-with-count resource available in the whole device."
+    ::= { jnxLsysSpPolicywcntSummary 3 }
+    
+    jnxLsysSpPolicywcntHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of policy-with-count resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpPolicywcntSummary 4 }
+    
+    jnxLsysSpPolicywcntHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most policy-with-count resource."
+    ::= { jnxLsysSpPolicywcntSummary 5 }
+    
+    jnxLsysSpPolicywcntLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of policy-with-count resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpPolicywcntSummary 6 }
+    
+    jnxLsysSpPolicywcntLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least policy-with-count resource."
+    ::= { jnxLsysSpPolicywcntSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of policy-with-count resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

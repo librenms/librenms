@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Virtual Chassis
 --
--- Copyright (c) 2007-2008, Juniper Networks, Inc.
+-- Copyright (c) 2007-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -10,17 +10,17 @@
 JUNIPER-VIRTUALCHASSIS-MIB  DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI 
-    OBJECT-IDENTITY                 FROM SNMPv2-SMI
-    NOTIFICATION-TYPE               FROM SNMPv2-SMI
-    MacAddress,DisplayString        FROM SNMPv2-TC
-    JnxChassisId                    FROM JUNIPER-MIB
-    jnxVccpNotifications            FROM JUNIPER-SMI
-    jnxExVirtualChassis             FROM JUNIPER-EX-SMI;
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64     FROM SNMPv2-SMI 
+    OBJECT-IDENTITY                             FROM SNMPv2-SMI
+    NOTIFICATION-TYPE                           FROM SNMPv2-SMI
+    MacAddress,DisplayString                    FROM SNMPv2-TC
+    JnxChassisId                                FROM JUNIPER-MIB
+    jnxVccpNotifications                        FROM JUNIPER-SMI
+    jnxExVirtualChassis                         FROM JUNIPER-EX-SMI;
     
     jnxVirtualChassisMemberMIB MODULE-IDENTITY
                                       
-    LAST-UPDATED "200806170000Z" -- 17 June, 2008
+    LAST-UPDATED "201403180000Z" -- 18 March, 2014
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
          "Juniper Technical Assistance Center
@@ -31,15 +31,33 @@ IMPORTS
 
     DESCRIPTION
             "The MIB modules for Virtual Chassis Member.Virtual Chassis Member feature allows a set of
-             EX-Series switches to be connected together to form a Virtual Chassis. A virtual chassis
+             Juniper switches to be connected together to form a Virtual Chassis. A virtual chassis
              will give all the features of a real chassis, potentially at a much lower cost points.
              A virtual chassis will be managed as a single box and will appear as a single network
-             element to other switches and routers in the network. Some EX-Series switches will have
+             element to other switches and routers in the network. Some Juniper switches will have
              the special high speed stacking ports which are used to connect to each other to form a 
-             stack. The EX-Series switches can also be connected by the 10GE (or 1GE) network ports to
-             form a stack. These can be used by EX-Series switches that don't have dedicated stacking ports.
-             Up to a maximum of 10 boxes can be stacked together."
+             stack. The Juniper switches can also be connected by the network ports to form a stack.
+             These can be used by Juniper switches that don't have dedicated stacking ports."
 
+    REVISION
+        "201007130000Z" -- 13 July, 2010
+
+    DESCRIPTION
+        "Added jnxVccpMemberUp and jnxVccpMemberDown Traps."
+
+    REVISION
+        "201010140000Z" -- 14 October, 2010
+
+    DESCRIPTION
+        "Modified the range for jnxVirtualChassisMemberPriority from 0 to 255."
+
+    REVISION
+        "201403180000Z" -- 18 March, 2014
+
+    DESCRIPTION
+        "Generalize the MIB description for other Juniper platforms and update 
+         the jnxVirtualChassisMemberId from 9 to 31."
+ 
        ::= { jnxExVirtualChassis 1 }
 
 --
@@ -71,11 +89,13 @@ IMPORTS
         jnxVirtualChassisMemberMacAddBase                 MacAddress,
         jnxVirtualChassisMemberSWVersion                  DisplayString ,
         jnxVirtualChassisMemberPriority                   INTEGER,
-        jnxVirtualChassisMemberUptime                     INTEGER
+        jnxVirtualChassisMemberUptime                     INTEGER,
+        jnxVirtualChassisMemberModel                      DisplayString,
+        jnxVirtualChassisMemberLocation                   DisplayString
     }
 
     jnxVirtualChassisMemberId OBJECT-TYPE
-    SYNTAX      INTEGER (0..9)
+    SYNTAX      INTEGER (0..31)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -122,12 +142,12 @@ IMPORTS
     ::= {  jnxVirtualChassisMemberEntry 5 }
 
     jnxVirtualChassisMemberPriority OBJECT-TYPE
-    SYNTAX      INTEGER (1..255)
+    SYNTAX      INTEGER (0..255)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "This specifies the priority of the virtual-chassis member which can
-        vary from 1 to 255."
+        vary from 0 to 255."
     ::= {  jnxVirtualChassisMemberEntry 6 }
 
     jnxVirtualChassisMemberUptime OBJECT-TYPE
@@ -137,6 +157,22 @@ IMPORTS
     DESCRIPTION
         "Specifies the virtual-chassis member uptime. "
     ::= {  jnxVirtualChassisMemberEntry 7 }
+
+    jnxVirtualChassisMemberModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the virtual-chassis member model. "
+    ::= {  jnxVirtualChassisMemberEntry 8 }
+
+    jnxVirtualChassisMemberLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the virtual-chassis member location. "
+    ::= {  jnxVirtualChassisMemberEntry 9 }
 
 
    -- jnxVirtualChassisPortTable holds the vccp port's admin/operation status
@@ -164,7 +200,21 @@ IMPORTS
         jnxVirtualChassisFpcId                          INTEGER,
         jnxVirtualChassisPortName                       DisplayString,
         jnxVirtualChassisPortAdminStatus                INTEGER,
-        jnxVirtualChassisPortOperStatus                 INTEGER
+        jnxVirtualChassisPortOperStatus                 INTEGER,
+        jnxVirtualChassisPortInPkts                     Counter64,
+        jnxVirtualChassisPortOutPkts                    Counter64,
+        jnxVirtualChassisPortInOctets                   Counter64,
+        jnxVirtualChassisPortOutOctets                  Counter64,
+        jnxVirtualChassisPortInMcasts                   Counter64,
+        jnxVirtualChassisPortOutMcasts                  Counter64,
+        jnxVirtualChassisPortInPkts1secRate             Counter64,
+        jnxVirtualChassisPortOutPkts1secRate            Counter64,
+        jnxVirtualChassisPortInOctets1secRate           Counter64,
+        jnxVirtualChassisPortOutOctets1secRate          Counter64,
+        jnxVirtualChassisPortCarrierTrans               Counter64,
+        jnxVirtualChassisPortInCRCAlignErrors           Counter64,
+        jnxVirtualChassisPortUndersizePkts              Counter64,
+        jnxVirtualChassisPortCollisions                 Counter64
     }
     
    jnxVirtualChassisFpcId OBJECT-TYPE
@@ -216,6 +266,146 @@ IMPORTS
             this port."
       ::= { jnxVirtualChassisPortEntry 4 }
   
+   jnxVirtualChassisPortInPkts OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of packets received on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInPkts"
+      ::= { jnxVirtualChassisPortEntry 5 }
+  
+   jnxVirtualChassisPortOutPkts OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of packets sent from the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortOutPkts"
+      ::= { jnxVirtualChassisPortEntry 6 }
+  
+   jnxVirtualChassisPortInOctets OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of octets received on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInOctets"
+      ::= { jnxVirtualChassisPortEntry 7 }
+  
+   jnxVirtualChassisPortOutOctets OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of octets sent on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortOutOctets"
+      ::= { jnxVirtualChassisPortEntry 8 }
+  
+   jnxVirtualChassisPortInMcasts OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of multicast packets received on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInMcasts"
+      ::= { jnxVirtualChassisPortEntry 9 }
+  
+   jnxVirtualChassisPortOutMcasts OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of multicast packets sent from the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortOutMcasts"
+      ::= { jnxVirtualChassisPortEntry 10 }
+  
+   jnxVirtualChassisPortInPkts1secRate OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of packets received per second on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInPkts1secRate"
+      ::= { jnxVirtualChassisPortEntry 11 }
+  
+   jnxVirtualChassisPortOutPkts1secRate OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of packets sent per second from the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortOutPkts1secRate"
+      ::= { jnxVirtualChassisPortEntry 12 }
+  
+   jnxVirtualChassisPortInOctets1secRate OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of octets received per secondon the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInOctets1secRate"
+      ::= { jnxVirtualChassisPortEntry 13 }
+  
+   jnxVirtualChassisPortOutOctets1secRate OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of octets sent per second on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortOutOctets1secRate"
+      ::= { jnxVirtualChassisPortEntry 14 }
+  
+   jnxVirtualChassisPortCarrierTrans OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of Carrier errors on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortCarrierTrans"
+      ::= { jnxVirtualChassisPortEntry 15 }
+  
+   jnxVirtualChassisPortInCRCAlignErrors OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of Input CRC Alignment errors on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortInCRCAlignErrors"
+      ::= { jnxVirtualChassisPortEntry 16 }
+  
+   jnxVirtualChassisPortUndersizePkts OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of Undersize Packets on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortUndersizePkts"
+      ::= { jnxVirtualChassisPortEntry 17 }
+  
+   jnxVirtualChassisPortCollisions OBJECT-TYPE
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the total number of Collisions on the 
+           virtual-chassis port. This object is a 64-bit version of 
+           jnxVirtualChassisPortCollisions"
+      ::= { jnxVirtualChassisPortEntry 18 }
+  
   jnxVccpNotificationsPrefix OBJECT-IDENTITY
       STATUS current
       DESCRIPTION 
@@ -231,10 +421,12 @@ IMPORTS
 
 jnxVccpPortUp NOTIFICATION-TYPE
     OBJECTS { jnxVirtualChassisPortAdminStatus, 
-              jnxVirtualChassisPortOperStatus }
+              jnxVirtualChassisPortOperStatus,
+              jnxVirtualChassisMemberModel,
+              jnxVirtualChassisMemberLocation }
     STATUS  current
     DESCRIPTION
-            "A MemberUp trap signifies that the SNMP entity, acting in an
+            "A PortUp trap signifies that the SNMP entity, acting in an
             agent role, has detected that the jnxVirtualChassisPortOperStatus 
             object for one of its communication links left the  down state
             and transitioned into some other state (but not into the
@@ -244,15 +436,45 @@ jnxVccpPortUp NOTIFICATION-TYPE
 
 jnxVccpPortDown NOTIFICATION-TYPE
     OBJECTS { jnxVirtualChassisPortAdminStatus, 
-              jnxVirtualChassisPortOperStatus }
+              jnxVirtualChassisPortOperStatus,
+              jnxVirtualChassisMemberModel,
+              jnxVirtualChassisMemberLocation }
     STATUS  current
     DESCRIPTION
-            "A MemberDown trap signifies that the SNMP entity, acting in an
+            "A PortDown trap signifies that the SNMP entity, acting in an
             agent role, has detected that the jnxVirtualChassisPortOperStatus
-            object for one of its communication links left the  down state
-            and transitioned into some other state (but not into the
+            object for one of its communication links is about to enter the
+            down state from some other state (but not into the
             notPresent state).  This other state is indicated by the
             included value of jnxVirtualChassisPortOperStatus."
     ::= { jnxVccpNotificationsPrefix 2 }
+
+jnxVccpMemberUp NOTIFICATION-TYPE
+    OBJECTS { jnxVirtualChassisMemberSerialnumber,
+              jnxVirtualChassisMemberRole,
+              jnxVirtualChassisMemberModel,
+              jnxVirtualChassisMemberLocation }
+    STATUS  current
+    DESCRIPTION
+            "A MemberUp trap signifies that the SNMP entity, acting in an
+            agent role, has detected that the Member present at the location
+            jnxVirtualChassisMemberLocation on one of the Virtual
+            Chassis left the down state and transitioned into some other
+            state (but not into the notPresent state)."
+    ::= { jnxVccpNotificationsPrefix 3 }
+
+jnxVccpMemberDown NOTIFICATION-TYPE
+    OBJECTS { jnxVirtualChassisMemberSerialnumber,
+              jnxVirtualChassisMemberRole,
+              jnxVirtualChassisMemberModel,
+              jnxVirtualChassisMemberLocation }
+    STATUS  current
+    DESCRIPTION
+            "A MemberDown trap signifies that the SNMP entity, acting in an
+            agent role, has detected that the Member present at the location
+            jnxVirtualChassisMemberLocation on one of the Virtual
+            Chassis is about to enter the down state (but not into the notPresent
+            state)."
+    ::= { jnxVccpNotificationsPrefix 4 }
 
 END

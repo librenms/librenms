@@ -1,4 +1,5 @@
 GIT=git
+GIT_SUBTREE=$(GIT) subtree pull --squash
 SYNC=rsync -rtvx --cvs-exclude --exclude '.*.swp'
 
 default:
@@ -26,9 +27,19 @@ push-dev:
 push-personal pp:
 	$(GIT) push personal
 
-push-testing:
+push-testing pt:
 	$(GIT) push testing
 
-update-subtrees:
-	$(GIT) subtree pull --squash --prefix=html/js/datetime https://github.com/Eonasdan/bootstrap-datetimepicker master
-	$(GIT) subtree pull --squash --prefix=html/js/moment   https://github.com/moment/moment master
+update-subtrees: datetime-subtree moment-subtree font-awesome vis
+
+datetime-subtree:
+	$(GIT_SUBTREE) --prefix=html/js/datetime https://github.com/Eonasdan/bootstrap-datetimepicker master
+
+moment-subtree:
+	$(GIT_SUBTREE) --prefix=html/js/moment   https://github.com/moment/moment master
+
+font-awesome:
+	$(GIT_SUBTREE) --prefix=lib/Font-Awesome https://github.com/FortAwesome/Font-Awesome.git master
+
+vis:
+	$(GIT_SUBTREE) --prefix=lib/vis https://github.com/almende/vis.git master

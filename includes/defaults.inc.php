@@ -85,6 +85,7 @@ $config['rrd_rra'] .= " RRA:LAST:0.5:1:1440 ";
 // RRDCacheD - Make sure it can write to your RRD dir!
 
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+$config['rrdcached_dir'] = FALSE;// Set this if you are using tcp connections to rrdcached
 
 // Web Interface Settings
 
@@ -102,8 +103,9 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 }
 
 $config['project_url']      = "https://github.com/librenms/";
+$config['project_home']     = 'http://www.librenms.org/';
 $config['project_issues']   = "https://github.com/librenms/librenms/issues";
-$config['title_image']      = "images/librenms_logo.png";
+$config['site_style']       = "light"; // Options are dark or light
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
 $config['favicon']          = "";
@@ -200,6 +202,44 @@ $config['email_smtp_password']        = NULL;                 // Password for SM
 
 // Alerting Settings
 
+$config['alert'] = array(
+	'macros' => array(                    //Macros:
+		'rule' => array(                    //  For Rules
+			//Time Macros
+			'now'      => 'NOW()',
+			'past_5m'  => 'DATE_SUB(NOW(),INTERVAL 5 MINUTE)',
+			'past_10m' => 'DATE_SUB(NOW(),INTERVAL 10 MINUTE)',
+			'past_15m' => 'DATE_SUB(NOW(),INTERVAL 15 MINUTE)',
+			'past_30m' => 'DATE_SUB(NOW(),INTERVAL 30 MINUTE)',
+			'past_60m' => 'DATE_SUB(NOW(),INTERVAL 60 MINUTE)',
+
+			//Device Macros
+			'device' => '(%devices.disabled = "0" && %devices.ignore = "0")',
+			'device_up' => '(%devices.status = "1" && %macros.device)',
+			'device_down' => '(%devices.status = "0" && %macros.device)',
+
+			//Port Macros
+			'port' => '(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")',
+			'port_up' => '(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)',
+			'port_down' => '(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)',
+			'port_usage_perc' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100',
+
+			//Misc Macros
+		),
+	),
+	'transports' => array(                //Transports:
+		'dummy' => false,                   //  Dummy alerting (debug)
+		'mail'  => false,                   //  E-Mail alerting
+		'irc'   => false,                   //  IRC Alerting
+	),
+	'globals' => false,                   //Issue to global-read users
+	'admins' => false,                    //Issue to administrators
+	'default_only' => false,              //Only issue to default
+	'default_mail' => '',                 //Default email
+);
+
+//Legacy options
+
 $config['alerts']['email']['default']      = NULL;    // Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   // Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    // Enable email alerts
@@ -219,6 +259,7 @@ $config['rrdgraph_def_text']  = "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#E
 $config['rrdgraph_def_text'] .= " -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal";
 $config['rrdgraph_real_95th'] = FALSE; # Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
 $config['overlib_defaults']   = ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'";
+$config['web_mouseover']      = TRUE;// Set this to false if you want to disable the mouseover popup graphs
 
 $list_colour_a = "#ffffff";
 $list_colour_b = "#eeeeee";
@@ -250,6 +291,9 @@ $config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38',
 $config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');
 $config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
+
+// Map colors
+$config['map_legend'] = array('0'=> '#aeaeae', '10' => '#79847e', '20' => '#97ffca', '30' => '#a800ff', '40' => '#6c00ff', '50' => '#00d2ff', '60' => '#0090ff', '70' => '#ffe400', '80' => '#ffa200', '90' => '#ff6600', '100' => '#ff0000');
 
 // Device page options
 
@@ -415,6 +459,7 @@ $config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
+$config['auth_ldap_groupmemberattr'] = "memberUid";
 
 // Sensors
 
@@ -537,6 +582,7 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
 
+$config['discovery_modules']['os']                        = 1;
 $config['discovery_modules']['ports']                     = 1;
 $config['discovery_modules']['ports-stack']               = 1;
 $config['discovery_modules']['entity-physical']           = 1;
@@ -595,5 +641,12 @@ $config['distributed_poller_name']                       = file_get_contents('/p
 $config['distributed_poller_group']                      = 0;
 $config['distributed_poller_memcached_host']             = 'example.net';
 $config['distributed_poller_memcached_port']             = '11211';
+
+// Stats callback system
+$config['callback_post']                                 = 'https://stats.librenms.org/log.php';
+$config['callback_clear']                                = 'https://stats.librenms.org/clear.php';
+
+// Stat graphs
+$config['alert_graph_date_format']                       = '%Y-%m-%d %H:%i';
 
 ?>

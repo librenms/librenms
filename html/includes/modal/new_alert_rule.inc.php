@@ -108,6 +108,22 @@ if(is_admin() !== false) {
                 <input type='text' id='name' name='name' class='form-control' maxlength='200'>
             </div>
         </div>
+        <div id="preseed-maps">
+            <div class="form-group">
+                <label for='map-stub' class='col-sm-3 control-label'>Map To: </label>
+                <div class="col-sm-5">
+                        <input type='text' id='map-stub' name='map-stub' class='form-control'/>
+                </div>
+                <div class="col-sm-3">
+                        <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span id="map-tags"></span>
+                </div>
+            </div>
+        </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
                         <button class="btn btn-default btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
@@ -126,6 +142,12 @@ $("[name='invert']").bootstrapSwitch('offColor','danger');
 
 $('#create-alert').on('hide.bs.modal', function (event) {
     $('#response').data('tagmanager').empty();
+    $('#map-tags').data('tagmanager').empty();
+});
+
+$('#add-map').click('',function (event) {
+	$('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
+	$('#map-stub').val('');
 });
 
 $('#create-alert').on('show.bs.modal', function (event) {
@@ -140,6 +162,16 @@ $('#create-alert').on('show.bs.modal', function (event) {
            strategy: 'array',
            tagFieldName: 'rules[]'
     });
+    $('#map-tags').tagmanager({
+           strategy: 'array',
+           tagFieldName: 'maps[]',
+           initialCap: false
+    });
+    if( $('#alert_id').val() == '' ) {
+        $('#preseed-maps').show();
+    } else {
+        $('#preseed-maps').hide();
+    }
     $.ajax({
         type: "POST",
         url: "/ajax_form.php",
@@ -147,9 +179,9 @@ $('#create-alert').on('show.bs.modal', function (event) {
         dataType: "json",
         success: function(output) {
             var arr = [];
-            for (elem in output['rules']) {
-                arr.push(output['rules'][elem]);
-            }
+            $.each ( output['rules'], function( key, value ) {
+                arr.push(value);
+            });
             $('#response').data('tagmanager').populate(arr);
             $('#severity').val(output['severity']).change;
             var extra = $.parseJSON(output['extra']);
@@ -183,6 +215,24 @@ $('#suggest').typeahead([
       engine: Hogan
     }
 ]);
+$('#map-stub').typeahead([
+    {
+      name: 'map_devices',
+      remote : '/ajax_search.php?search=%QUERY&type=device&map=1',
+      header : '<h5><strong>&nbsp;Devices</strong></h5>',
+      template: '{{name}}',
+      valueKey:"name",
+      engine: Hogan
+    },
+    {
+      name: 'map_groups',
+      remote : '/ajax_search.php?search=%QUERY&type=group&map=1',
+      header : '<h5><strong>&nbsp;Groups</strong></h5>',
+      template: '{{name}}',
+      valueKey:"name",
+      engine: Hogan
+    }
+]);
 
 $('#and, #or').click('', function(e) {
     e.preventDefault();
@@ -195,11 +245,13 @@ $('#and, #or').click('', function(e) {
            strategy: 'array',
            tagFieldName: 'rules[]'
         });
-        if(entity.indexOf("%") >= 0) {
-            $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
-        } else {
-            $('#response').data('tagmanager').populate([ '%'+entity+' '+condition+' "'+value+'" '+glue ]);
+        if(value.indexOf("%") < 0) {
+          value = '"'+value+'"';
         }
+        if(entity.indexOf("%") < 0) {
+          entity = '%'+entity;
+        }
+        $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
     }
 });
 

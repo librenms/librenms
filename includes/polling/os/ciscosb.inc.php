@@ -9,8 +9,8 @@
 * option) any later version.  Please see LICENSE.txt at the top level of
 * the source code distribution for details.
 */
-$version = trim(snmp_get($device, "SNMPv2-SMI::enterprises.9.6.1.101.2.4.0", "-Ovq") , '" ');
-$hardware = trim(snmp_get($device, "SNMPv2-SMI::enterprises.9.6.1.101.53.14.1.11.1", "-Ovq") , '" ');
-$serial = trim(snmp_get($device, "SNMPv2-SMI::enterprises.9.6.1.101.53.14.1.5.1", "-Ovq") , '" ');
-$features = trim(snmp_get($device, "SNMPv2-SMI::enterprises.9.6.1.101.53.14.1.7.1", "-Ovq") , '" ');
+$version = snmp_get($device, "CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1", "-Ovq");
+$hardware = str_replace(' ', '', snmp_get($device, "CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1", "-Ovq"));
+$serial = snmp_get($device, "CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1", "-Ovq");
+$features = snmp_get($device, "CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamServiceTag.1", "-Ovq");
 ?>

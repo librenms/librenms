@@ -28,7 +28,7 @@
            FROM SNMPv2-CONF;
 
    snmpTargetMIB MODULE-IDENTITY
-       LAST-UPDATED "200210140000Z"
+       LAST-UPDATED "201211270000Z"
        ORGANIZATION "IETF SNMPv3 Working Group"
        CONTACT-INFO
            "WG-email:   snmpv3@lists.tislabs.com
@@ -77,6 +77,9 @@
             version of this MIB module is part of RFC 3413;
             see the RFC itself for full legal notices.
            "
+       REVISION    "201211270000Z"             -- 27 November 2012
+       DESCRIPTION "Juniper Change - Fixed hex value of LF characters.
+                   These were not fixed in rev. 200210140000Z"
        REVISION    "200210140000Z"             -- 14 October 2002
        DESCRIPTION "Fixed DISPLAY-HINTS for UTF-8 strings, fixed hex
                     value of LF characters, clarified meaning of zero
@@ -139,7 +142,8 @@
 
                 -  An ASCII carriage return (CR) character (0x0D).
 
-                -  An ASCII line feed (LF) character (0x0B).
+                -  An ASCII line feed (LF) character (0x0A).
+
 
             Delimiter characters are used to separate tag values
             in a tag list.  An object of this type may only
@@ -199,7 +203,7 @@
 
                 -  An ASCII carriage return (CR) character (0x0D).
 
-                -  An ASCII line feed (LF) character (0x0B).
+                -  An ASCII line feed (LF) character (0x0A).
 
             Delimiter characters are used to separate tag values
             in a tag list.  Only a single delimiter character may

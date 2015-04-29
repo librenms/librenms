@@ -2,6 +2,8 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0px;
   padding: 0px;
+  padding-bottom: 50px;
+  padding-top: 50px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   font-size: 10pt;
@@ -67,17 +69,6 @@ ul ul ul { list-style: square outside; }
 }
 .submit#hover {
  border-color: #000;
-}
-
-input,select {
-  background: #FFFFFF url('/images/textbg.png') repeat-x scroll 0 0;
-  font-size: 1em;
-  border: 1px solid #B2B2B2;
-  border-color: #B2B2B2 #d2d2d2 #d2d2d2 #B2B2B2;
-  border-style: solid;
-  border-width: 1px;
-  margin: 1px;
-  padding: 1px;
 }
 
 .rounded {
@@ -1608,4 +1599,14 @@ tr.search:nth-child(odd) {
 .navbar-brand {
   padding-left: 15px !important;
   padding-top: 8px !important;
+}
+
+#visualization {
+    width: 90%;
+    height: 600px;
+}
+
+.threeqtr-width {
+    display:block;
+    min-width: 75%;
 }
