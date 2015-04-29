@@ -147,24 +147,64 @@ $('#add-map').click('',function (event) {
         $('#map-stub').val('');
 });
 
-$('#map-stub').typeahead([
-    {
-      name: 'map_devices',
-      remote : '/ajax_search.php?search=%QUERY&type=device&map=1',
-      header : '<h5><strong>&nbsp;Devices</strong></h5>',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
-    },
-    {
-      name: 'map_groups',
-      remote : '/ajax_search.php?search=%QUERY&type=group&map=1',
-      header : '<h5><strong>&nbsp;Groups</strong></h5>',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
+var map_devices = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=device&map=1",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var map_groups = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=group&map=1",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+map_devices.initialize();
+map_groups.initialize();
+$('#map-stub').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: 'typeahead-left'
     }
-]);
+},
+{
+  source: map_devices.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+},
+{
+  source: map_groups.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+});
 
 $(function () {
     $("#start").datetimepicker({
