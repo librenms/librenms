@@ -67,10 +67,30 @@ $stat_pw = dbFetchCell("SELECT COUNT(pseudowire_id) FROM `pseudowires`");
 $stat_vrf = dbFetchCell("SELECT COUNT(vrf_id) FROM `vrfs`");
 $stat_vlans = dbFetchCell("SELECT COUNT(vlan_id) FROM `vlans`");
 
+$callback_status = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
+if ($callback_status == 1) {
+     $stats_checked = 'checked';
+} else {
+     $stats_checked = '';
+}
+$callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
+
 echo("
 <div class='table-responsive'>
     <table class='table table-condensed'>
       <tr>
+        <td colspan='4'><span class='bg-danger'>$callback</span></td>
+      <tr>");
+
+if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' && $callback_status != 2) {
+    echo("
+      <tr>
+        <td colspan='4'><button class='btn btn-danger btn-xs' type='submit' name='clear-stats' id='clear-stats'>Clear remote stats</button></td>
+      </tr>
+    ");
+}
+
+echo("
         <td><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
         <td><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
       </tr>
@@ -175,3 +195,35 @@ echo("
 
   </div>
 </div>
+
+<script>
+    $("[name='statistics']").bootstrapSwitch('offColor','danger','size','mini');
+    $('input[name="statistics"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: { type: "callback-statistics", state: state},
+            dataType: "html",
+            success: function(data){
+             },
+             error:function(){
+                 return $("#switch-state").bootstrapSwitch("toggle");
+             }
+        });
+    });
+    $('#clear-stats').click(function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: { type: "callback-clear"},
+            dataType: "html",
+            success: function(data){
+                location.reload(true);
+             },
+             error:function(){
+             }
+        });
+    });
+</script>

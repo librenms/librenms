@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-FLOWSESS-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpFlowsess                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpFlowsessMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- July 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the flow-session-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security flow-session resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpFlowsess 1 }
+
+    jnxLsysSpFlowsessObjects        OBJECT IDENTIFIER ::= { jnxLsysSpFlowsessMIB 1 }
+    jnxLsysSpFlowsessSummary        OBJECT IDENTIFIER ::= { jnxLsysSpFlowsessMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular flowsess resource information objects per LSYS:
+--   Below are flowsess resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- Flowsess resource table per LSYS
+
+    jnxLsysSpFlowsessTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpFlowsessEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE flow-session objects for flow-session resource consumption per LSYS."  
+    ::= { jnxLsysSpFlowsessObjects 1 }
+    
+    jnxLsysSpFlowsessEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpFlowsessEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in flow-session resource table."
+    INDEX { IMPLIED jnxLsysSpFlowsessLsysName }          
+    ::= { jnxLsysSpFlowsessTable 1 }          
+
+    JnxLsysSpFlowsessEntry ::= 
+       SEQUENCE {
+          jnxLsysSpFlowsessLsysName    DisplayString,
+          jnxLsysSpFlowsessProfileName DisplayString,
+          jnxLsysSpFlowsessUsage       Unsigned32,
+          jnxLsysSpFlowsessReserved    Unsigned32,
+          jnxLsysSpFlowsessMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the flow-session resource table
+ 
+    jnxLsysSpFlowsessLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which flow-session resource information is retrieved. "
+        ::= { jnxLsysSpFlowsessEntry 1 }
+
+    jnxLsysSpFlowsessProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpFlowsessEntry 2 }
+
+    jnxLsysSpFlowsessUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpFlowsessEntry 3 }
+    
+    jnxLsysSpFlowsessReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpFlowsessEntry 4 } 
+
+    jnxLsysSpFlowsessMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpFlowsessEntry 5 }
+
+
+-- **********************************************************************
+-- Flow-session resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpFlowsessUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The flow-session resource consumption over all LSYS."
+    ::= { jnxLsysSpFlowsessSummary 1 }          
+
+    jnxLsysSpFlowsessMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The flow-session resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpFlowsessSummary 2 }
+    
+    jnxLsysSpFlowsessAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The flow-session resource available in the whole device."
+    ::= { jnxLsysSpFlowsessSummary 3 }
+    
+    jnxLsysSpFlowsessHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of flow-session resource consumed of a LSYS."
+    ::= { jnxLsysSpFlowsessSummary 4 }
+    
+    jnxLsysSpFlowsessHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most flow-session resource."
+    ::= { jnxLsysSpFlowsessSummary 5 }
+    
+    jnxLsysSpFlowsessLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of flow-session resource consumed of a LSYS."
+    ::= { jnxLsysSpFlowsessSummary 6 }
+    
+    jnxLsysSpFlowsessLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least flow-session resource."
+    ::= { jnxLsysSpFlowsessSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of flow-session resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

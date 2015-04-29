@@ -38,7 +38,7 @@ if ($device['os'] == "ironware")
           $remote_port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?",array($if,$if,$remote_device_id));
         } else { $remote_port_id = "0"; }
 
-        discover_link($interface['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
+          discover_link($interface['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion'],$device['device_id'], $remote_device_id);
       }
     }
   }
@@ -79,7 +79,7 @@ if ($cdp_array)
 
         if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
         {
-          discover_link($interface['port_id'], 'cdp', $remote_port_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
+          discover_link($interface['port_id'], 'cdp', $remote_port_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion'], $device['device_id'], $remote_device_id);
         }
       }
       else
@@ -137,11 +137,38 @@ if ($lldp_array)
 
         if (is_numeric($interface['port_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId']))
         {
-          discover_link($interface['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
+          discover_link($interface['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc'], $device['device_id'], $remote_device_id);
         }
       }
     }
   }
+}
+
+echo("OSPF Discovery: ");
+
+if ($config['autodiscovery']['ospf'] === TRUE) {
+    echo "enabled\n";
+    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
+        $ip = $nbr['ospfNbrIpAddr'];
+        $device_id = $nbr['device_id'];
+        if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+            echo("x");
+            continue;
+        }
+        if (!match_network($config['nets'], $ip)) {
+            echo("i");
+            continue;
+        }
+        $name = gethostbyaddr($ip);
+        $remote_device_id = discover_new_device($name);
+        if (isset($remote_device_id) && $remote_device_id > 0) {
+            log_event("Device $name ($ip) autodiscovered through OSPF", $remote_device_id, 'system');
+        } else {
+            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device_id, 'system');
+        }
+    }
+} else {
+   echo "disabled\n";
 }
 
 if ($debug) { print_r($link_exists); }

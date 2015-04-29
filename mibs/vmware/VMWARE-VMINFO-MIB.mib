@@ -19,7 +19,7 @@ VMWARE-VMINFO-MIB DEFINITIONS ::= BEGIN
         FROM VMWARE-ROOT-MIB;
 
     vmwVmInfoMIB MODULE-IDENTITY
-    LAST-UPDATED "200810230000Z"
+    LAST-UPDATED "201109170000Z"
     ORGANIZATION "VMware, Inc"
     CONTACT-INFO
     "VMware, Inc
@@ -35,6 +35,16 @@ DESCRIPTION
       this host system.  This MIB module also provides a mapping beween SMI
       managed objects defined here and their corresponding VMware Virtual
       Infrastructure Management (VIM) API properties."
+
+REVISION      "201109170000Z"
+DESCRIPTION
+    "Remove vmwVmID as it duplicates vmwVmID."
+
+REVISION      "201006220000Z"
+DESCRIPTION
+    "Add managed object vmwVmUUID to vmTable to allow management applications 
+     to identify a VM uniquely over a set of ESX systems. This value is useful when 
+     VMs may move between systems."
       
 REVISION      "200810230000Z"
 DESCRIPTION
@@ -86,7 +96,8 @@ DESCRIPTION
         vmwVmState         DisplayString,
         vmwVmVMID          Integer32,
         vmwVmGuestState    DisplayString,
-        vmwVmCpus          Integer32
+        vmwVmCpus          Integer32,
+        vmwVmUUID          OCTET STRING
         }
 
         vmwVmIdx OBJECT-TYPE
@@ -165,10 +176,10 @@ DESCRIPTION
         vmwVmVMID OBJECT-TYPE
             SYNTAX      Integer32
             MAX-ACCESS  read-only
-            STATUS      current
+            STATUS      obsolete
             DESCRIPTION 
-                "Same value as vmwVmIdx, note that indexes in SMIv2 are not accessible.
-                https://esx.example.com/mob/?moid=vmwVmIdx"
+                "No longer provided, use vmwVmIdx. See vmwVmUUID for cross system, 
+                 unique, persistent identifier."
             ::= { vmwVmEntry 7 }
 
         vmwVmGuestState OBJECT-TYPE
@@ -196,6 +207,18 @@ DESCRIPTION
                 VIM Property: numCPU 
                 MOB: https://esx.example.com/mob/?moid=vmwVmIdx&doPath=config%2ehardware"
             ::= { vmwVmEntry 9 }
+
+        vmwVmUUID OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE(36..72))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION 
+                "A unique identifier for this VM. Must be unique across a set of ESX systems
+	         managed by an instance of vSphere Center. 
+                 Example value: 564d95d4-bff7-31fd-f20f-db2d808a8b32
+                 VIM Property: uuid 
+                 MOB: https://esx.example.com/mob/?moid=vmwVmIdx&doPath=config"
+            ::= { vmwVmEntry 10 }
 
 -- Host Bus Adapters
 
@@ -631,7 +654,6 @@ vmwVmInfoGroup OBJECT-GROUP
     vmwVmGuestOS,
     vmwVmMemSize,
     vmwVmState,
-    vmwVmVMID,
     vmwVmGuestState,
     vmwHbaNum,
     vmwHbaVirtDev,
@@ -646,7 +668,8 @@ vmwVmInfoGroup OBJECT-GROUP
     vmwCdromConnected,
     vmwVmID,
     vmwVmConfigFilePath,
-    vmwVmCpus
+    vmwVmCpus,
+    vmwVmUUID
     }
     STATUS  current
     DESCRIPTION
@@ -669,6 +692,7 @@ vmwVmInfoNotificationGroup NOTIFICATION-GROUP
 -- Obsolete details
 vmwVmObsoleteGroup OBJECT-GROUP
     OBJECTS {
+    vmwVmVMID,
     vmwVmNetConnType
     }
     STATUS  obsolete
@@ -678,3 +702,4 @@ vmwVmObsoleteGroup OBJECT-GROUP
 
 
 END -- end of module VMWARE-VMINFO-MIB.
+

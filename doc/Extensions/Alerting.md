@@ -13,6 +13,7 @@ Table of Content:
     - [Nagios-Compatible](#transports-nagios)
     - [IRC](#transports-irc)
     - [Slack](#transports-slack)
+    - [HipChat](#transports-hipchat)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -21,6 +22,11 @@ Table of Content:
     - [Ports](#entity-ports)
     - [Processors](#entity-processors)
     - [Storage](#entity-storage)
+- [Macros](#macros)
+    - [Device](#macros-device)
+    - [Port](#macros-port)
+    - [Time](#macros-time)
+
 
 # <a name="about">About</a>
 
@@ -191,6 +197,51 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 
 ```
 
+## <a name="transports-hipchat">HipChat</a>
+
+The HipChat transport requires the following:
+
+__room_id__ = HipChat Room ID
+
+__url__ = HipChat API URL+API Key
+
+__from__ = The name that will be displayed
+
+The HipChat transport makes the following optional:
+
+__color__ = Any of HipChat's supported message colors
+
+__message_format__ = Any of HipChat's supported message formats
+
+__notify__ = 0 or 1
+
+See the HipChat API Documentation for
+[rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
+for details on acceptable values.
+
+> You may notice that the link points at the "deprecated" v1 API.  This is
+> because the v2 API is still in beta.
+
+Below are two examples of sending messages to a HipChat room.
+
+```php
+$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=9109jawregoaih",
+                                                    "room_id" => "1234567",
+                                                    "from" => "LibreNMS");
+
+$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj",
+                                                    "room_id" => "7654321",
+                                                    "from" => "LibreNMS",
+                                                    "color" => "red",
+                                                    "notify" => 1,
+                                                    "message_format" => "text");
+```
+
+> Note: The default message format for HipChat messages is HTML.  It is
+> recommended that you specify the `text` message format to prevent unexpected
+> results, such as HipChat attempting to interpret angled brackets (`<` and
+> `>`).
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are ensure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
@@ -270,3 +321,109 @@ __processors.processor_descr__ = The description of the processor.
 __storage.storage_descr__ = The description of the storage.
 
 __storage.storage_perc__ = The usage of the storage as a percentage.
+
+# <a name="macros">Macros</a>
+
+Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.
+You can define your own macros in your `config.php`.
+
+Example macro-implementation of Debian-Devices
+```php
+$config['alert']['macros']['rule']['is_debian'] = '%devices.features ~ "@debian@"';
+```
+And in the Rule:
+```
+...  && %macros.is_debian = "1" && ...
+```
+
+This Example-macro is a Boolean-macro, it applies a form of filter to the set of results defined by the rule.
+All macros that are not unary should return Boolean.
+
+You can only apply _Equal_ or _Not-Equal_ Operations on Bollean-macros where `True` is represented by `"1"` and `False` by `"0"`.
+
+
+## <a name="macros-device">Device</a> (Boolean)
+
+Entity: `%macros.device`
+
+Description: Only select devices that aren't deleted, ignored or disabled.
+
+Source: `(%devices.disabled = "0" && %devices.ignore = "0")`
+
+### <a name="macros-device-up">Device is up</a> (Boolean)
+
+Entity: `%macros.device_up`
+
+Description: Only select devices that are up.
+
+Implies: %macros.device
+
+Source: `(%devices.status = "1" && %macros.device)`
+
+### <a name="macros-device-down">Device is down</a> (Boolean)
+
+Entity: `%macros.device_down`
+
+Description: Only select devices that are down.
+
+Implies: %macros.device
+
+Source: `(%devices.status = "0" && %macros.device)`
+
+## <a name="macros-port">Port</a> (Boolean)
+
+Entity: `%macros.port`
+
+Description: Only select ports that aren't deleted, ignored or disabled.
+
+Source: `(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")`
+
+### <a name="macros-port-up">Port is up</a> (Boolean)
+
+Entity: `%macros.port_up`
+
+Description: Only select ports that are up and also should be up.
+
+Implies: %macros.port
+
+Source: `(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)`
+
+### <a name="macros-port-down">Port is down</a> (Boolean)
+
+Entity: `%macros.port_down`
+
+Description: Only select ports that are down.
+
+Implies: %macros.port
+
+Source: `(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)`
+
+### <a name="macros-port-usage-perc">Port-Usage in Percent</a> (Decimal)
+
+Entity: `%macros.port_usage_perc`
+
+Description: Return port-usage in percent.
+
+Source: `((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100`
+
+## <a name="macros-time">Time</a>
+
+### <a name="macros-time-now">Now</a> (Datetime)
+
+Entity: `%macros.now`
+
+Description: Alias of MySQL's NOW()
+
+Source: `NOW()`
+
+### <a name="macros-time-past-Nm">Past N Minutes</a> (Datetime)
+
+Entity: `%macros.past_$m`
+
+Description: Returns a MySQL Timestamp dated `$` Minutes in the past. `$` can only be a supported Resolution.
+
+Example: `%macros.past_5m` is Last 5 Minutes.
+
+Resolution: 5,10,15,30,60
+
+Source: `DATE_SUB(NOW(),INTERVAL $ MINUTE)`

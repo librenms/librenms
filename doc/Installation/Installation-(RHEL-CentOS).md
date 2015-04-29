@@ -2,7 +2,7 @@ NOTE: What follows is a very rough list of commands.  This works on a fresh inst
 
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
-## On the DB Server ##
+### On the DB Server ###
 
     yum install net-snmp mysql-server
     service snmpd start
@@ -40,14 +40,14 @@ Change `<ip>` to the IP address that your MySQL server should listen on.  Restar
 
     service mysqld restart
 
-## On the NMS ##
+### On the NMS ###
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-    yum install php php-cli php-gd php-mysql php-snmp php-pear httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
 
@@ -143,9 +143,13 @@ Add the following line to the end of `config.php`:
 
     $config['fping'] = "/usr/sbin/fping";
 
+### Initialise the database ###
+
 Initiate the follow database with the following command:
 
     php build-base.php
+
+### Create admin user ###
 
 Create the admin user - priv should be 10
 
@@ -182,14 +186,15 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
+### Create cronjob ###
+
 The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in
 the public domain by its author.  By default, the LibreNMS cronjob runs `poller-
 wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 th
 reads per core.  The default if no thread count is `16 threads`.
 
-If the thread count needs to be changed, you can do so by editing `librenms.cron
-` before copying (or by editing `/etc/cron.d/librenms` if you've already copied the cron file).  Just add a number after `poller-wrapper.py`, as in the below ex
-ample:
+If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).
+ Just add a number after `poller-wrapper.py`, as in the below example:
 
     /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
 
@@ -207,3 +212,9 @@ ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
 so that it looks like this:
 
     $config['update'] = 0;
+
+### Install complete ###
+
+That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+
+It would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.

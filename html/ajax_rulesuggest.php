@@ -67,10 +67,16 @@ if( isset($_GET['term'],$_GET['device_id']) ) {
 			$chk = $memcache->get('rule-suggest_'.$term[0]);
 		}
 		if( !(sizeof($chk) > 0) || $chk === false ) {
-			$tmp = dbFetchRows('SHOW COLUMNS FROM '.$term[0]);
-			foreach( $tmp as $tst ) {
-				if( isset($tst['Field']) ) {
-					$chk[] = $term[0].'.'.$tst['Field'];
+			if( $term[0] == "macros" ) {
+				foreach( $config['alert']['macros']['rule'] as $macro=>$v ) {
+					$chk[] = "macros.".$macro;
+				}
+			} else {
+				$tmp = dbFetchRows('SHOW COLUMNS FROM '.$term[0]);
+				foreach( $tmp as $tst ) {
+					if( isset($tst['Field']) ) {
+						$chk[] = $term[0].'.'.$tst['Field'];
+					}
 				}
 			}
 		}
@@ -84,6 +90,7 @@ if( isset($_GET['term'],$_GET['device_id']) ) {
 			foreach( $tmp as $tst ) {
 				$chk[] = $tst['TABLE_NAME'].'.';
 			}
+			$chk[] = 'macros.';
 		}
 	}
 	if( sizeof($chk) > 0 ) {

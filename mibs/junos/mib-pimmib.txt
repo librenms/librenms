@@ -40,6 +40,8 @@ pimMIB MODULE-IDENTITY
 
 pimMIBObjects OBJECT IDENTIFIER ::= { pimMIB 1 }
 
+pimTraps      OBJECT IDENTIFIER ::= { pimMIBObjects 0 }
+
 pim           OBJECT IDENTIFIER ::= { pimMIBObjects 1 }
 
 pimJoinPruneInterval OBJECT-TYPE
@@ -760,6 +762,20 @@ pimComponentStatus OBJECT-TYPE
             protocol instance."
     ::= { pimComponentEntry 5 }
 
+-- PIM Traps
+
+pimNeighborLoss NOTIFICATION-TYPE
+    OBJECTS {
+       pimNeighborIfIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            "A pimNeighborLoss trap signifies the loss of an adjacency
+            with a neighbor.  This trap should be generated when the
+            neighbor timer expires, and the router has no other
+            neighbors on the same interface with a lower IP address than
+            itself."
+    ::= { pimTraps 1 }
 
 -- conformance information
 

@@ -32,7 +32,7 @@ rdware for remote pollers. Here's a diagram of how you can scale LibreNMS out:
 How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.
 
 ####Web / API Layer
-This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. Their is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.
+This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. There is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.
 
 It is advisable to run RRDCached within this setup so that you don't need to share the rrd folder via a remote file share such as NFS. The web service can then generate rrd graphs via RRDCached. If RRDCached isn't an option then you can mount the rrd directory to read the RRD files directly.
 
@@ -81,3 +81,10 @@ RRDCached:
  - You will need to tune RRDCached to suite your environment.
  - The following is used in this example setup "-l 0:42217 -j /var/lib/rrdcached/journal/ -F -b /opt/librenms/rrd -B -w 1800 -z 900 -p /var/run/rrdcached.pid"
 
+```php
+$config['rrdcached']    = "127.0.0.1:42217";
+$config['rrd_dir']      = "/opt/librenms/rrd";
+$config['rrdcached_dir'] = "";
+```
+
+$config['rrdcached_dir'] Is only needed if you are using tcp connections for rrd cached and needs only to be set if you want to store rrd files within a sub directory of your rrdcached base directory.
