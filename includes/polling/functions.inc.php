@@ -245,7 +245,7 @@ function poll_device($device, $options)
   }
 }
 
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_options)
+function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs)
 {
 
   global $config;
@@ -275,7 +275,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     if (strlen($oiddsname) > 19) { $oiddsname = truncate($oiddsname, 19, ''); }
 
     if (empty($oiddsopts)) {
-        $rrd_options = "600:U:100000000000";
+        $oiddsopts = "600:U:100000000000";
     }
 
     $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':'.$oiddsopts;

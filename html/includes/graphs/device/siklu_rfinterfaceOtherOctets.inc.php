@@ -18,11 +18,11 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= " GPRINT:rfInErroredOctets:LAST:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfInErroredOctets:MIN:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfInErroredOctets:MAX:%0.2lf%s\\\l ";
-    $rrd_options .= " LINE1:rfInIdleOctets#0022FF:'Lost Octets         ' ";
+    $rrd_options .= " LINE1:rfInIdleOctets#0022FF:'In Idle Octets         ' ";
     $rrd_options .= " GPRINT:rfInIdleOctets:LAST:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfInIdleOctets:MIN:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfInIdleOctets:MAX:%0.2lf%s\\\l ";
-    $rrd_options .= " LINE1:rfOutIdleOctets#DD9CFB:'Lost Octets         ' ";
+    $rrd_options .= " LINE1:rfOutIdleOctets#DD9CFB:'Out Idle Octets         ' ";
     $rrd_options .= " GPRINT:rfOutIdleOctets:LAST:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfOutIdleOctets:MIN:%0.2lf%s ";
     $rrd_options .= " GPRINT:rfOutIdleOctets:MAX:%0.2lf%s\\\l ";
