@@ -21,7 +21,9 @@ $supported_sensors = array('current' => 'A',
                            'voltage' => 'V',
                            'temperature' => 'C',
                            'dbm' => 'dBm',
-                           'charge' => '%');
+                           'charge' => '%',
+                           'load' => '%'
+    );
 
 foreach ($supported_sensors as $sensor_type => $sensor_unit)
 {
