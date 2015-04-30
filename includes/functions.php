@@ -284,17 +284,17 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         {
           // Try SNMPv2c
           $snmpver = 'v2c';
-          $ret = addHost($host, $snmpver);
+          $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
           if (!$ret)
           {
             //Try SNMPv3
             $snmpver = 'v3';
-            $ret = addHost($host, $snmpver);
+            $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             if (!$ret)
             {
               // Try SNMPv1
               $snmpver = 'v1';
-              return addHost($host, $snmpver);
+              return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             } else {
               return $ret;
             }
