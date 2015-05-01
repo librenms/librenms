@@ -4,10 +4,10 @@ if ($device['os'] == "siklu") {
     $oid = "rbSysVoltage.0";
     $oids = snmp_walk($device, "$oid", "-OsqnU", "RADIO-BRIDGE-MIB");
     if ($debug) { echo($oids."\n"); }
-    if ($oids) echo("Siklu Voltage ");
+    if (!empty($oids)) echo("Siklu Voltage ");
     $divisor = 1;
     $type = "siklu";
-    if ($oids) {
+    if (!empty($oids)) {
         list(,$current) = explode(' ',$oids);
         $index = $oid;
         $descr = "System voltage";
