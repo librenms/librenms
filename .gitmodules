@@ -1,0 +1,3 @@
+[submodule "submodules/pace"]
+	path = submodules/pace
+	url = https://github.com/HubSpot/pace.git
