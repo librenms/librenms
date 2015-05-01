@@ -22,8 +22,8 @@ if(!is_numeric($alert_id)) {
     exit;
 } else {
     if($state == 2) {
-        $state = 1;
-    } elseif($state == 1) {
+        $state = dbFetchCell('SELECT alerted FROM alerts WHERE id = ?',array($alert_id));
+    } elseif($state >= 1) {
         $state = 2;
     }
     if(dbUpdate(array('state' => $state), 'alerts', 'id=?',array($alert_id)) >= 0) {

@@ -1,0 +1,32 @@
+{
+  "current": 1,
+  "rowCount": 5,
+  "rows": [
+    {
+      "id": "a0e3a286-4343-4240-8d6d-e79fa2e94b4c",
+      "sender": "test@test.de",
+      "received": "2014-04-17 15:08:03Z"
+    },
+    {
+      "id": "dd9f2d42-9442-404c-8d2a-dd3bd2156c03",
+      "sender": "test@test.de",
+      "received": "2014-04-16 15:19:31Z"
+    },
+    {
+      "id": "e9b8ede5-c1bf-4d90-b724-e7379b25f7b3",
+      "sender": "test@test.de",
+      "received": "2014-04-16 15:17:05Z"
+    },
+    {
+      "id": "153d3acb-efe7-4b5f-a3a9-e8ac18bdec30",
+      "sender": "test@test.de",
+      "received": "2014-04-16 15:17:05Z"
+    },
+    {
+      "id": "49bad60a-bbf7-42bf-b040-d901805ccbf1",
+      "sender": "test@test.de",
+      "received": "2014-04-15 11:23:06Z"
+    }
+  ],
+  "total": 5
+}

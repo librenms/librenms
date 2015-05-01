@@ -1,8 +1,24 @@
 <?php
 
-if ($device['type'] == 'network' || $device['type'] == 'firewall')
+if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['type'] == 'wireless')
 {
-  echo("Wireless: ");
+  echo("Wireless: MAG\n");
+
+  if ($device['os'] == 'airos')
+  {
+    
+    echo("It Is Airos\n");
+    include("includes/polling/mib/ubnt-airmax-mib.inc.php");
+
+  }
+
+  if ($device['os'] == 'airos-af')
+  {
+    
+    echo("It Is AirFIBER\n");
+    include("includes/polling/mib/ubnt-airfiber-mib.inc.php");
+
+  }
 
   ///# GENERIC FRAMEWORK, FILLING VARIABLES
   if ($device['os'] == 'airport')

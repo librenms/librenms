@@ -21,7 +21,7 @@ philosophy][13], including [guidelines for running an IRC channel][6] and
 Documentation
 -------------
 
-Documentation can be found in the [doc directory][5], including instructions
+Documentation can be found in the [doc directory][5] or [docs.librenms.org][16], including instructions
 for installing and contributing.
 
 
@@ -40,11 +40,11 @@ You can participate in the project by:
 Try It
 ------
 
-You can try LibreNMS by downloading a VM image.  Currently, a Debian-based
-image is supplied and has been tested with [VMware Fusion 5][8].
+You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
+image is supplied and has been tested with [VirtualBox][8].
 
-Download the [VMware Fusion 5 image][11] at open it, and log in as `root`
-with the password `root`.  Enter the following commands:
+Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
+Enter the following commands:
 
     cd /opt/librenms
     git pull
@@ -57,9 +57,16 @@ also edit your `/etc/hosts` file with the following line:
 
     $ip librenms.example.com
 
-where `$ip` is the IP of your VM.  From there, just point your web browser
-to `http://librenms.example.com/` and login with username `librenms` and
-password `librenms`.
+where `$ip` is the IP of your VM.
+
+Add a new user by entering:
+
+    ./adduser.php <username> <password> 10 <email>
+
+replace <username>, <password> and <email> with a username, password and your email address.
+
+From there, just point your web browser
+to `http://librenms.example.com/` and login with your new username and password.
 
 
 License
@@ -101,7 +108,7 @@ exception):
   - html/includes/collectd/: GPLv2 only
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
   - scripts/*/mysql: GPLv2 only
-  - check_mk (scripts/observium_agent*): GPLv2
+  - check_mk (scripts/check_mk*): GPLv2
 
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
@@ -110,12 +117,12 @@ exception):
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
-[8]: http://www.vmware.com/products/fusion/ "VMware Fusion"
+[8]: https://www.virtualbox.org/ "VirtualBox"
 [9]: http://observium.org/ "Observium web site"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
-[11]: ftp://librenms.label-switched.net/pub/librenms_vm.zip
+[11]: http://www.librenms.org/#downloads
 [12]: https://github.com/librenms/librenms/tree/master/doc/Observium_Welcome.md
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
-[15]: https://github.com/librenms/librenms/tree/master/doc/CONTRIBUTING.md
-
+[15]: http://docs.librenms.org/General/Contributing/
+[16]: http://docs.librenms.org/

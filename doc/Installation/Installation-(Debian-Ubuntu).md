@@ -3,9 +3,9 @@
 
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-## On the database server ##
+### On the DB Server ###
 
-This host is where the MySQL database runs.  It could be the same machine as your network management server (this is hte most common initial deployment scenario).
+This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
     apt-get install mysql-server mysql-client
     mysql -uroot -p
@@ -36,13 +36,13 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
     service mysql restart
 
-## On the network management server ##
+### On the NMS ###
 
 This host is where the web server and SNMP poller run.  It could be the same machine as your database server.
 
 Install the required software:
 
-    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool git
+    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool git
 
 The packages listed above are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04/14.04.
 
@@ -134,9 +134,13 @@ Change the values to the right of the equal sign for lines beginning with `$conf
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
 
+### Initialise the database ###
+
 Initiate the follow database with the following command:
 
     php build-base.php
+
+### Create admin user ###
 
 Create the admin user - priv should be 10
 
@@ -154,13 +158,15 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
-LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing `librenms.cron` before copying (or by editing `/etc/cron.d/librenms` if you've already copied the cron file).  Just add a number after `poller-wrapper.py`, as in the example below:
+### Create cronjob ###
+
+LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).  Just add a number after `poller-wrapper.py`, as in the example below:
 
     /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
 
 Create the cronjob
 
-    ln -s $PWD/librenms.cron /etc/cron.d/librenms
+    cp librenms.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 
@@ -175,6 +181,8 @@ so that it looks like this:
 ### Install complete ###
 
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+
+It would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
 
 [1]: https://github.com/Atrato/observium-poller-wrapper
 [2]: http://git-scm.com/book

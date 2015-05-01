@@ -266,12 +266,14 @@ MPLS-TC-STD-MIB DEFINITIONS ::= BEGIN
           SYNTAX  OCTET STRING (SIZE (6))
 
        MplsLsrIdentifier ::= TEXTUAL-CONVENTION
+          DISPLAY-HINT "1d.1d.1d.1d"
           STATUS      current
           DESCRIPTION
              "The Label Switching Router (LSR) identifier is the
               first 4 bytes of the Label Distribution Protocol
               (LDP) identifier."
           SYNTAX  OCTET STRING (SIZE (4))
+
        MplsLdpLabelType ::= TEXTUAL-CONVENTION
           STATUS      current
           DESCRIPTION

@@ -284,17 +284,17 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         {
           // Try SNMPv2c
           $snmpver = 'v2c';
-          $ret = addHost($host, $snmpver);
+          $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
           if (!$ret)
           {
             //Try SNMPv3
             $snmpver = 'v3';
-            $ret = addHost($host, $snmpver);
+            $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             if (!$ret)
             {
               // Try SNMPv1
               $snmpver = 'v1';
-              return addHost($host, $snmpver);
+              return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             } else {
               return $ret;
             }
@@ -1129,4 +1129,46 @@ function convert_delay($delay) {
     return($delay_sec);
 }
 
-?>
+function guidv4($data) {
+    // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
+    // From: Jack http://stackoverflow.com/users/1338292/ja%CD%A2ck
+    assert(strlen($data) == 16);
+
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+function set_curl_proxy($post)
+{
+    global $config;
+    if (isset($_ENV['https_proxy'])) {
+	$tmp = rtrim($_ENV['https_proxy'], "/");
+	$proxystr = str_replace(array("http://", "https://"), "", $tmp);
+	$config['callback_proxy'] = $proxystr;
+	echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
+    }
+    if (isset($config['callback_proxy'])) {
+	echo "Using ".$config['callback_proxy']." as proxy\n";
+	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
+    }
+}
+
+function target_to_id($target) {
+    if( $target[0].$target[1] == "g:" ) {
+        $target = "g".dbFetchCell('SELECT id FROM device_groups WHERE name = ?',array(substr($target,2)));
+    } else {
+        $target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?',array($target));
+    }
+    return $target;
+}
+
+function id_to_target($id) {
+    if( $id[0] == "g" ) {
+        $id = 'g:'.dbFetchCell("SELECT name FROM device_groups WHERE id = ?",array(substr($id,1)));
+    } else {
+        $id = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?",array($id));
+    }
+    return $id;
+}

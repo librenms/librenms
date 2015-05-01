@@ -57,7 +57,7 @@ if (!isset($config['auth_mechanism']))
 
 if (file_exists('includes/authentication/' . $config['auth_mechanism'] . '.inc.php'))
 {
-  include('includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
+  include_once('includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
 }
 else
 {
@@ -108,6 +108,10 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
       setcookie("auth", $_COOKIE['auth'], time()+60*60*24*$config['auth_remember'], "/", null, false, true);
     }
     $permissions = permissions_cache($_SESSION['user_id']);
+    if (isset($_POST['username'])) {
+        header('Location: '.$_SERVER['REQUEST_URI'],TRUE,303);
+        exit;
+    }
   }
   elseif (isset($_SESSION['username']))
   {

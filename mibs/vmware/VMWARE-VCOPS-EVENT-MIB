@@ -1,0 +1,1395 @@
+-- **********************************************************
+-- Copyright 2013 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VCOPS-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    vmwVCOps
+       FROM VMWARE-PRODUCTS-MIB;
+
+     -- 1.3.6.1.4.1.6876.4.5.1
+     vmwVcopsMIB MODULE-IDENTITY
+     LAST-UPDATED "201302010000Z"
+     ORGANIZATION "VMware, Inc"
+     CONTACT-INFO
+     "VMware, Inc
+     3401 Hillview Ave
+     Palo Alto, CA 94304
+     Tel: 1-877-486-9273 or 650-427-5000
+     Fax: 650-427-5001
+     Web: http://communities.vmware.com/community/developer/forums/managementapi
+     "
+DESCRIPTION
+     "This MIB file contains the information that the receiving party needs in order to
+      interpret the SNMP traps sent by vCenter Operations Manager."
+REVISION     "201302010000Z"
+DESCRIPTION
+     "Corrected vmwVCOps oid assignments."
+REVISION      "201110190000Z"
+DESCRIPTION "Re-named Integrien-Mib to VMWARE-VCOPS-MIB"
+REVISION      "200901260000Z"
+DESCRIPTION
+     "Rewrite Integrien MIB for Alive v7.0 aka 'Carbon'"
+   ::= { vmwVCOps 1 }
+
+--
+-- Top-level MIB groups
+--
+
+-- Group 0: Alerts sent as traps
+-- 1.3.6.1.4.1.6876.4.5.1.0
+vmwareAlertTrap OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+         "This group is actually the prefix one uses when creating
+          enterprise-specific trap OID's for an SNMPv2 trap.  It is
+          used in the VMware MIB when defining traps."
+        ::= { vmwVcopsMIB 0 }
+
+
+--
+-- Group 2: Generic data sent in All Alerts
+-- Generic data, in var-binds, that is associated with EVERY Alert
+--
+-- 1.3.6.1.4.1.6876.4.5.1.2
+vmwareGenericAlertData OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+         "This members of this group are the OIDs for VarBinds
+     that contain data for ALL Alerts."
+        ::= { vmwVcopsMIB 2 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.1
+vmwareAlertAliveServerName OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The name of the VCOPs server that generated this alert."
+   ::= { vmwareGenericAlertData 1 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.2
+vmwareAlertEntityName OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The Entity name about which this alert was generated."
+   ::= { vmwareGenericAlertData 2 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.3
+vmwareAlertEntityType OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The Entity type about which this alert was generated."
+   ::= { vmwareGenericAlertData 3 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.4
+vmwareAlertTimestamp OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The timestamp of the alert in UTC format."
+   ::= { vmwareGenericAlertData 4 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.5
+vmwareAlertCriticality OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "A text string describing the alert criticality level."
+   ::= { vmwareGenericAlertData 5 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.6
+vmwareAlertRootCause OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "A text string describing the root-cause of the alert that was generated."
+   ::= { vmwareGenericAlertData 6 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.7
+vmwareAlertURL OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The URL of the 'Alert Summary' page of the alert that was generated."
+   ::= { vmwareGenericAlertData 7 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.8
+vmwareAlertID OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The unique VCOPs identifier of the alert that was generated."
+   ::= { vmwareGenericAlertData 8 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.9
+vmwareAlertMessage OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The info message of the alert that was generated."
+   ::= { vmwareGenericAlertData 9 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.10
+vmwareAlertType OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The textual type description of the alert that was generated."
+   ::= { vmwareGenericAlertData 10 }
+
+
+-- 1.3.6.1.4.1.6876.4.5.1.2.11
+vmwareAlertSubtype OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The textual subtype description of the alert that was generated."
+   ::= { vmwareGenericAlertData 11 }
+
+
+
+--
+-- Trap types that correspond to the different types of SmartAlerts
+-- that can be generated. The data sent in these traps will be a
+-- combination of generic data and trap-specific data, depending
+-- on the trap type.
+-- These are the enterprise-specific trap codes currently in-use in
+-- VMware's software. The final sub-OID of each objects is the code
+-- sent in the "specific-trap" field of an SNMPv1 Trap-PDU.
+--
+-- The definition of these objects mimics the SNMPv2 convention for
+-- sending traps:
+-- Take the enterprise OID, append 0, then append the trap code.
+-- Trap number usage:
+-- Trap code 0 is reserved (by SNMP)
+-- Trap codes 1-9 are used for Smart Alerts
+-- Trap codes 10-18 are used for Classic Alerts
+-- Trap codes 19-27 are used for Badge Health Alerts
+-- Trap codes 28-36 are used for Badge Risk Alerts
+-- Trap codes 37-42 are used for Badge Efficiency Alerts
+-- Trap codes 60-62 are used for Consolidated Alerts
+-- Trap codes 101-199 are used for Administrative Alerts
+-- Trap code 200 is used for functionality testing
+--
+-- 1.3.6.1.4.1.6876.4.5.1.0.1
+vmwareTrapKPIBreachActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that indicates a KPI Breach condition
+    became active."
+   ::= { vmwareAlertTrap 1 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.2
+vmwareTrapKPIBreachClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that indicates a KPI Breach condition
+    became inactive."
+   ::= { vmwareAlertTrap 2 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.3
+vmwareTrapKPIBreachChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that indicates a KPI Breach condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 3 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.4
+vmwareTrapKPIPredictionActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that predicts a KPI Breach condition
+    (also know as 'Fingerprint') became active."
+   ::= { vmwareAlertTrap 4 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.5
+vmwareTrapKPIPredictionClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that predicts a KPI Breach condition
+    (also know as 'Fingerprint') became inactive."
+   ::= { vmwareAlertTrap 5 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.6
+vmwareTrapKPIPredictionChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that predicts a KPI Breach condition
+    (also know as 'Fingerprint') that experiences a change in one or more
+    of the following values:
+    - Prediction probability
+    - Prediction projected time
+    - Prediction reason."
+   ::= { vmwareAlertTrap 6 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.7
+vmwareTrapAggregateAnomalyActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that indicates an Aggregate Anomaly condition
+    became active."
+   ::= { vmwareAlertTrap 7 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.8
+vmwareTrapAggregateAnomalyClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Smart Alert that indicates an Aggregate Anomaly condition
+    became inactive."
+   ::= { vmwareAlertTrap 8 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.10
+vmwareTrapKPIHTBreachActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a KPI HT Breach condition
+    became active."
+   ::= { vmwareAlertTrap 10 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.11
+vmwareTrapKPIHTBreachClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a KPI HT Breach condition
+    became inactive."
+   ::= { vmwareAlertTrap 11 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.12
+vmwareTrapKPIHTBreachChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a KPI HT Breach condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 12 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.13
+vmwareTrapNotificationActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Notification condition
+    became active."
+   ::= { vmwareAlertTrap 13 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.14
+vmwareTrapNotificationClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Notification condition
+    became inactive."
+   ::= { vmwareAlertTrap 14 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.15
+vmwareTrapNotificationChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Notification condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 15 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.16
+vmwareTrapAbnormalityActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Abnormality condition
+    became active."
+   ::= { vmwareAlertTrap 16 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.17
+vmwareTrapAbnormalityClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Abnormality condition
+    became inactive."
+   ::= { vmwareAlertTrap 17 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.18
+vmwareTrapAbnormalityChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Classic Alert that indicates a Abnormality condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 18 }
+
+ -- 1.3.6.1.4.1.6876.4.5.1.0.19
+vmwareTrapWorkloadActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Workload condition
+    became active."
+   ::= { vmwareAlertTrap 19 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.20
+vmwareTrapWorkloadClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Workload condition
+    became inactive."
+   ::= { vmwareAlertTrap 20 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.21
+vmwareTrapWorkloadChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Workload condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 21 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.22
+vmwareTrapAnomalyActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates an Anomaly condition
+    became active."
+   ::= { vmwareAlertTrap 22 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.23
+vmwareTrapAnomalyClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates an Anomaly condition
+    became inactive."
+   ::= { vmwareAlertTrap 23 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.24
+vmwareTrapAnomalyChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates an Anomaly condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 24 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.25
+vmwareTrapFaultActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Fault condition
+    became active."
+   ::= { vmwareAlertTrap 25 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.26
+vmwareTrapFaultClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Fault condition
+    became inactive."
+   ::= { vmwareAlertTrap 26 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.27
+vmwareTrapFaultChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Health Alert that indicates a Fault condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 27 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.28
+vmwareTrapTimeRemainingActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Time Remaining condition
+    became active."
+   ::= { vmwareAlertTrap 28 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.29
+vmwareTrapTimeRemainingClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Time Remaining condition
+    became inactive."
+   ::= { vmwareAlertTrap 29 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.30
+vmwareTrapTimeRemainingChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Time Remaining condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 30 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.31
+vmwareTrapCapacityRemainingActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Capacity Remaining condition
+    became active."
+   ::= { vmwareAlertTrap 31 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.32
+vmwareTrapCapacityRemainingClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Capacity Remaining condition
+    became inactive."
+   ::= { vmwareAlertTrap 32 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.33
+vmwareTrapCapacityRemainingChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Capacity Remaining condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 33 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.34
+vmwareTrapStressActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Stress condition
+    became active."
+   ::= { vmwareAlertTrap 34 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.35
+vmwareTrapStressClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Stress condition
+    became inactive."
+   ::= { vmwareAlertTrap 35 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.36
+vmwareTrapStressChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Stress condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 36 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.37
+vmwareTrapWasteActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Waste condition
+    became active."
+   ::= { vmwareAlertTrap 37 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.38
+vmwareTrapWasteClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Waste condition
+    became inactive."
+   ::= { vmwareAlertTrap 38 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.39
+vmwareTrapWasteChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Waste condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 39 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.40
+vmwareTrapDensityActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Density condition
+    became active."
+   ::= { vmwareAlertTrap 40 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.41
+vmwareTrapDensityClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Density condition
+    became inactive."
+   ::= { vmwareAlertTrap 41 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.42
+vmwareTrapDensityChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Efficiency Alert that indicates a Density condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 42 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.43
+vmwareTrapComplianceActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Compliance condition
+    became active."
+   ::= { vmwareAlertTrap 43 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.44
+vmwareTrapComplianceClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Compliance condition
+    became inactive."
+   ::= { vmwareAlertTrap 44 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.45
+vmwareTrapComplianceChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Risk Alert that indicates a Compliance condition
+    has changed one of its parameters' value."
+   ::= { vmwareAlertTrap 45 }
+
+--
+-- Trap types that correspond to the different types of Administrative
+-- Alerts that can be generated. The data in the Admin. Alerts will be
+-- only the generic data. Entity names and types will need to reflect
+-- the VCOPs/Collector/Data Source components the alert pertains to.
+--
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.101
+vmwareTrapAliveComponentFailureActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing an Administrative Alert that indicates an VCOPs Component failure
+    became active."
+   ::= { vmwareAlertTrap 101 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.102
+vmwareTrapAliveComponentFailureClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing an Administrative Alert that indicates an VCOPs Component failure
+    became inactive."
+   ::= { vmwareAlertTrap 102 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.103
+vmwareTrapResourceDisconnectedActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing an Administrative Alert that indicates a resource has disconnected
+    from VCOPs."
+   ::= { vmwareAlertTrap 103 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.104
+vmwareTrapResourceDisconnectedClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing an Administrative Alert that indicates that a disconnected
+    resource has re-connected to VCOPs."
+   ::= { vmwareAlertTrap 104 }
+
+-- Traps for Consolidated Alerts
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.60
+vmwareTrapConsolidatedAlertActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Consolidated Alert that aggregates similar alerts
+    has become active"
+   ::= { vmwareAlertTrap 60 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.61
+vmwareTrapConsolidatedAlertClear NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Consolidated Alert that aggregates similar alerts
+    has become inactive"
+   ::= { vmwareAlertTrap 61 }
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.62
+vmwareTrapConsolidatedAlertChange NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Consolidated Alert that aggregates similar alerts
+    has changed one of its parameters"
+   ::= { vmwareAlertTrap 62 }
+
+
+-- Trap for functional testing.
+--
+
+-- 1.3.6.1.4.1.6876.4.5.1.0.200
+vmwareTrapTest NOTIFICATION-TYPE
+   OBJECTS {
+      vmwareAlertAliveServerName,
+      vmwareAlertEntityName,
+      vmwareAlertEntityType,
+      vmwareAlertTimestamp,
+      vmwareAlertCriticality,
+      vmwareAlertRootCause,
+      vmwareAlertURL,
+      vmwareAlertID,
+      vmwareAlertMessage,
+      vmwareAlertType,
+      vmwareAlertSubtype
+   }
+   STATUS current
+   DESCRIPTION
+   "Trap for testing purposes."
+   ::= { vmwareAlertTrap 200 }
+
+
+-- conformance information
+vmwVCOPSMIBConformance OBJECT IDENTIFIER ::= { vmwVcopsMIB 99 }
+vmwVCOPSMIBCompliances OBJECT IDENTIFIER ::= { vmwVCOPSMIBConformance 1 }
+vmwVCOPSMIBGroups OBJECT IDENTIFIER ::= { vmwVCOPSMIBConformance 2 }
+
+-- compliance statements
+vmwVCOPSMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement VMWARE-VCOPS-EVENT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwVCOPSNotificationInfoGroup1, vmwVCOPSNotificationGroup1 }
+    ::= { vmwVCOPSMIBCompliances 3 }
+
+vmwVCOPSNotificationInfoGroup1 OBJECT-GROUP
+    OBJECTS {
+       vmwareAlertAliveServerName,
+       vmwareAlertEntityName,
+       vmwareAlertEntityType,
+       vmwareAlertTimestamp,
+       vmwareAlertCriticality,
+       vmwareAlertRootCause,
+       vmwareAlertURL,
+       vmwareAlertID,
+       vmwareAlertMessage,
+       vmwareAlertType,
+       vmwareAlertSubtype
+    }
+    STATUS current
+    DESCRIPTION
+	"These objects provide details in VCOPS notifications."
+    ::= { vmwVCOPSMIBGroups 2 }
+
+vmwVCOPSNotificationGroup1 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwareTrapComplianceActive,
+       vmwareTrapComplianceClear,
+       vmwareTrapComplianceChange,
+       vmwareTrapConsolidatedAlertActive,
+       vmwareTrapConsolidatedAlertClear,
+       vmwareTrapConsolidatedAlertChange,
+       vmwareTrapTest,
+       vmwareTrapKPIBreachActive,
+       vmwareTrapKPIBreachClear,
+       vmwareTrapKPIBreachChange,
+       vmwareTrapKPIPredictionActive,
+       vmwareTrapKPIPredictionClear,
+       vmwareTrapKPIPredictionChange,
+       vmwareTrapAggregateAnomalyActive,
+       vmwareTrapAggregateAnomalyClear,
+       vmwareTrapKPIHTBreachActive,
+       vmwareTrapKPIHTBreachClear,
+       vmwareTrapKPIHTBreachChange,
+       vmwareTrapNotificationActive,
+       vmwareTrapNotificationClear,
+       vmwareTrapNotificationChange,
+       vmwareTrapAbnormalityActive,
+       vmwareTrapAbnormalityClear,
+       vmwareTrapAbnormalityChange,
+       vmwareTrapWorkloadActive,
+       vmwareTrapWorkloadClear,
+       vmwareTrapWorkloadChange,
+       vmwareTrapAnomalyActive,
+       vmwareTrapAnomalyClear,
+       vmwareTrapAnomalyChange,
+       vmwareTrapFaultActive,
+       vmwareTrapFaultClear,
+       vmwareTrapFaultChange,
+       vmwareTrapTimeRemainingActive,
+       vmwareTrapTimeRemainingClear,
+       vmwareTrapTimeRemainingChange,
+       vmwareTrapCapacityRemainingActive,
+       vmwareTrapCapacityRemainingClear,
+       vmwareTrapCapacityRemainingChange,
+       vmwareTrapStressActive,
+       vmwareTrapStressClear,
+       vmwareTrapStressChange,
+       vmwareTrapWasteActive,
+       vmwareTrapWasteClear,
+       vmwareTrapWasteChange,
+       vmwareTrapDensityActive,
+       vmwareTrapDensityClear,
+       vmwareTrapDensityChange,
+       vmwareTrapAliveComponentFailureActive,
+       vmwareTrapAliveComponentFailureClear,
+       vmwareTrapResourceDisconnectedActive,
+       vmwareTrapResourceDisconnectedClear
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwVCOPSMIBGroups 3 }
+
+END
+

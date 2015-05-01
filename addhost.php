@@ -22,7 +22,6 @@ include("includes/functions.php");
 
 $options = getopt("g:f::");
 
-echo $options['g'];
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
     array_shift($argv);
