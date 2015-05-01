@@ -4,10 +4,10 @@ if ($device['os'] == "siklu") {
     $oid = "rbSysTemperature.0";
     $oids = snmp_get($device, "$oid", "-OsqnU", "RADIO-BRIDGE-MIB");
     if ($debug) { echo($oids."\n"); }
-    if ($oids) echo("Siklu Temperature ");
+    if (!empty($oids)) echo("Siklu Temperature ");
     $divisor = 1;
     $type = "siklu";
-    if ($oids) {
+    if (!empty($oids)) {
         list(,$current) = explode(' ',$oids);
         $index = $oid;
         $descr = "System Temp";

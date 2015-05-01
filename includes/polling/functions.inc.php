@@ -13,6 +13,8 @@ function poll_sensor($device, $class, $unit)
     {
       if ($device['os'] == 'siklu') {
           $mib = ":RADIO-BRIDGE-MIB";
+      } else {
+          $mib = '';
       }
       if ($class == "temperature")
       {

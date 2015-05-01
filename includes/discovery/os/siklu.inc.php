@@ -18,4 +18,3 @@ if ($entPhysicalMfgName == 'Siklu') {
     $os = 'siklu';
 }
 
-?>
