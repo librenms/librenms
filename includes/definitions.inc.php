@@ -210,6 +210,11 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "OpenIndiana";
 
+$os = "ilo4";
+$config['os'][$os]['type']              = "other";
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['text']              = "Integrated Lights-Out 4";
+
 // Alcatel
 
 $os = "aos";
