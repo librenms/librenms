@@ -127,12 +127,14 @@ If this is the only site you are hosting on this server (it should be :)) then y
 
 At this stage you can either launch the web installer by going to http://librenms.example.com/install.php, follow the onscreen instructions then skip to the 'Add localhost' section. Alternatively if you want to continue the setup manually then just keep following these instructions.
 
-    cp config.php.default config.php
+    cp cp.default config.php
     vim config.php
 
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
+
+Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php>` blocks. Your graphs will break otherwise.
 
 ### Initialise the database ###
 
