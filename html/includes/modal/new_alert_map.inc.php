@@ -147,6 +147,7 @@ $('#target').typeahead({
   displayKey: 'name',
   valueKey: name,
     templates: {
+        header: '<h5><strong>&nbsp;Devices</strong></h5>',
         suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
     }
 },
@@ -156,6 +157,7 @@ $('#target').typeahead({
   displayKey: 'name',
   valueKey: name,
     templates: {
+        header: '<h5><strong>&nbsp;Groups</strong></h5>',
         suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
     }
 });
