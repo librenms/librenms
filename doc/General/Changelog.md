@@ -1,3 +1,17 @@
+### May 2015
+
+#### Bug fixes
+  - Updated nested addHosts to use variables passed (PR889)
+
+#### Improvements
+  - Added loading bar to top nav (PR893)
+  - Added load and current for APC units (PR888)
+  - Improved web installer (PR887)
+  - Updated alerts status box (PR875)
+  - Updated syslog page (PR862)
+  - Added temperature polling for IBM Flexsystem (PR894)
+  - Updated typeahead libraries and relevant forms (PR882)
+
 ### Apr 2015
 
 ####Bug fixes
@@ -19,6 +33,11 @@
   - Added Nginx fix for using debug option (PR823)
   - Bug fixes for device groups SQL (PR840)
   - Fixed path issue when using rrdcached (PR839)
+  - Fixed JS issues when deleting alert maps / poller groups / device groups (PR846,PR848,PR877)
+  - Fixed links and popover for /health/metric=storage/ (PR847)
+  - Fixed lots of user permission issues (PR855)
+  - Fixed search ip / arp / mac pages (PR845)
+  - Added missing charge icon (PR878)
 
 ####Improvements
   - New theme support added (light,dark and mono) (PR682,PR683,PR701)
@@ -51,6 +70,16 @@
   - Updated map to show device overview graphs and port graphs (PR826)
   - Added hostname to API call for list_alerts (PR834)
   - Added ability to schedule maintenance (PR835,PR841)
+  - Added ability to expand alert triggers for more details (PR857)
+  - Added support for XTM/FBX Watchguard devices (PR849)
+  - Updated Juniper MIBS and hardware rewrite (PR838)
+  - Updated OpenBSD detection (PR860)
+  - Added Macro support for alerting system (PR863)
+  - Added support for tcp connections on rrdcached (PR866)
+  - Added config option to enable / disable mouseover graphs (PR873)
+  - General cleanup of files / folders permissions (PR874)
+  - Added window size detection for map (PR884)
+  - Added text to let users know refresh is disabled (PR883)
 
 ### Mar 2015
 
