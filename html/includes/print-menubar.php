@@ -653,7 +653,7 @@ $('#gsearch').typeahead({
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;Ports</strong></h5>',
-        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></p></a>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
     }
 },
 {
@@ -663,7 +663,7 @@ $('#gsearch').typeahead({
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
     }
 });
 $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
