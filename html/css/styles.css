@@ -1626,6 +1626,7 @@ tr.search:nth-child(odd) {
   left: -400px !important;
   margin-bottom: 20px;
   overflow: hidden;
+  padding: 5px;
   background-color: #fff;
   -webkit-border-radius: 8px;
      -moz-border-radius: 8px;
