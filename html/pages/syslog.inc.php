@@ -11,61 +11,8 @@ if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
 }
 
 $pagetitle[] = "Syslog";
-
-print_optionbar_start();
-
 ?>
-<form method="post" action="" class="form-inline" role="form" id="result_form">
-    <div class="form-group">
-      <label>
-        <strong>Program</strong>
-      </label>
-      <select name="program" id="program" class="form-control input-sm">
-        <option value="">All Programs</option>
-        <?php
-          foreach( dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data ) {
-            echo("<option value='".$data['program']."'");
-            if ($data['program'] == $vars['program']) { echo("selected"); }
-            echo(">".$data['program']."</option>");
-          }
-        ?>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>
-        <strong>Device</strong>
-      </label>
-      <select name="device" id="device" class="form-control input-sm">
-        <option value="">All Devices</option>
-        <?php
-          foreach (get_all_devices() as $hostname)
-          {
-              $device_id = getidbyname($hostname);
-              if (device_permitted($device_id)) {
-                  echo("<option value='".$device_id."'");
-                  if ($device_id == $vars['device']) { echo("selected"); }
-                  echo(">".$hostname."</option>");
-              }
-          }
-        ?>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="dtpickerfrom">From</label>
-      <input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="Any" data-date-format="YYYY-MM-DD HH:mm">
-    </div>
-    <div class="form-group">
-      <label for="dtpickerto">To</label>
-      <input name="to" type="text" class="form-control" id="dtpickerto" maxlength=16 value="<?php echo $vars['to']; ?>" placeholder="Any" data-date-format="YYYY-MM-DD HH:mm">
-    </div>
-    <button type="submit" class="btn btn-default input-sm">Filter</button>
-</form>
 
-<?php
-
-print_optionbar_end();
-
-?>
 <div class="table-responsive">
 <table id="syslog" class="table table-hover table-condensed table-striped">
     <thead>
@@ -78,10 +25,53 @@ print_optionbar_end();
     </thead>
 </table>
 </div>
+
 <script>
 
 var grid = $("#syslog").bootgrid({
     ajax: true,
+    templates: {
+        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
+                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\" id=\"result_form\">"+
+                "<div class=\"form-group\">"+
+                "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Devices</option>"+
+                <?php
+                 foreach( get_all_devices() as $hostname ) {
+                  $device_id = getidbyname($hostname);
+                  if (device_permitted($device_id)) {
+                   echo('"<option value=\"'.$device_id.'\"');
+                   if ($device_id == $vars['device']) { echo(' selected'); }
+                   echo('>'.$hostname.'</option>"+');
+                  }
+                 }
+                ?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<select name=\"program\" id=\"program\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Programs</option>"+
+                <?php
+                 foreach( dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data ) {
+                  echo('"<option value=\"'.$data['program'].'\"');
+                  if ($data['program'] == $vars['program']) { echo(' selected'); }
+                  echo('>'.$data['program'].'</option>"+');
+                 }
+                ?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<input name=\"from\" type=\"text\" class=\"form-control\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"<?php echo $vars['from']; ?>\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
+                "</div>"+
+                "<div class=\"form-group\">"+
+                "<input name=\"to\" type=\"text\" class=\"form-control\" id=\"dtpickerto\" maxlength=\"16\" value=\"<?php echo $vars['to']; ?>\" placeholder=\"To\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
+                "</div>"+
+                "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
+                "</form></span></div>"+
+                "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+
+    },
     post: function ()
     {
         return {
@@ -96,7 +86,21 @@ var grid = $("#syslog").bootgrid({
 });
 
 $(function () {
-	$("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-	$("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+    $("#dtpickerfrom").datetimepicker();
+    $("#dtpickerfrom").on("dp.change", function (e) {
+        $("#dtpickerto").data("DateTimePicker").minDate(e.date);
+    });
+    $("#dtpickerto").datetimepicker();
+    $("#dtpickerto").on("dp.change", function (e) {
+        $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
+    });
+    if( $("#dtpickerfrom").val() != "" ) {
+        $("#dtpickerto").data("DateTimePicker").minDate($("#dtpickerfrom").val());
+    }
+    if( $("#dtpickerto").val() != "" ) {
+        $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
+    } else {
+        $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo date('Y-m-d H:i'); ?>');
+    }
 });
 </script>
