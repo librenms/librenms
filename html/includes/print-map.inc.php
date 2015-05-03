@@ -139,6 +139,10 @@ echo $edges;
         }
     });
 </script>
+<script>
+var height = $(window).height() - 100;
+$('#visualization').height(height + 'px');
+</script>
 
 <?php
 
