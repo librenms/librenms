@@ -1639,3 +1639,8 @@ tr.search:nth-child(odd) {
 .typeahead-left {
     left: 0px !important;
 }
+
+.tt-selectable {
+  cursor: pointer;
+  cursor: hand;
+}
