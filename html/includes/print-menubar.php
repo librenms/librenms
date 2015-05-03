@@ -553,7 +553,7 @@ if ($_SESSION['authenticated'])
 </nav>
 <script>
 var devices = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('device_id'),
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   remote: {
       url: "ajax_search.php?search=%QUERY&type=device",
@@ -639,7 +639,8 @@ $('#gsearch').typeahead({
 {
   source: devices.ttAdapter(),
   async: true,
-  display: name,
+  display: 'name',
+  valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;Devices</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><img src="{{device_image}}" border="0"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></a></p>')
@@ -648,7 +649,8 @@ $('#gsearch').typeahead({
 {
   source: ports.ttAdapter(),
   async: true,
-  display: name,
+  display: 'name',
+  valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;Ports</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
@@ -657,7 +659,8 @@ $('#gsearch').typeahead({
 {
   source: bgp.ttAdapter(),
   async: true,
-  display: name,
+  display: 'name',
+  valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
