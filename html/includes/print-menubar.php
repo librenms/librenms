@@ -643,7 +643,7 @@ $('#gsearch').typeahead({
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;Devices</strong></h5>',
-        suggestion: Handlebars.compile('<p><a href="{{url}}"><img src="{{device_image}}" border="0" class="img_left"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></a></p>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><img src="{{device_image}}" border="0"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></a></p>')
     }
 },
 {
@@ -663,7 +663,7 @@ $('#gsearch').typeahead({
   limit: 8,
     templates: {
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0" class="img_left">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>')
+        suggestion: Handlebars.compile('<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>')
     }
 });
 $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
