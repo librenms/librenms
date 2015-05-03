@@ -1642,10 +1642,14 @@ tr.search:nth-child(odd) {
 
 .tt-selectable {
   cursor: pointer;
-  cursor: hand;
+}
+
+.tt-suggestion:hover a {
+     color: #ffffff !important;
 }
 
 .tt-suggestion:hover {
 	background-color: #0097CF;
 	color: #FFFFFF;
 }
+
