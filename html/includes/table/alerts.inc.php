@@ -65,22 +65,22 @@ foreach (dbFetchRows($sql,$param) as $alert) {
         $ico = "ok";
         $col = "green";
         $extra = "success";
-        $msg = "OK";
+        $msg = "ok";
     } elseif ( (int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
         $ico = "volume-up";
         $col = "red";
         $extra = "danger";
-        $msg = "ALERT";
+        $msg = "alert";
         if ( (int) $alert['state'] === 3) {
-            $msg = "WORSE";
+            $msg = "worse";
         } elseif ( (int) $alert['state'] === 4) {
-            $msg = "BETTER";
+            $msg = "better";
         }
     } elseif ( (int) $alert['state'] === 2) {
         $ico = "volume-off";
         $col = "#800080";
         $extra = "warning";
-        $msg = "MUTED";
+        $msg = "muted";
     }
     $alert_checked = '';
     $orig_ico = $ico;
