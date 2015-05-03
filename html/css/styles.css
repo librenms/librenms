@@ -1644,3 +1644,8 @@ tr.search:nth-child(odd) {
   cursor: pointer;
   cursor: hand;
 }
+
+.tt-suggestion:hover {
+	background-color: #0097CF;
+	color: #FFFFFF;
+}
