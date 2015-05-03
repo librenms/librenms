@@ -1589,7 +1589,7 @@ tr.search:nth-child(odd) {
 
 #visualization {
     width: 90%;
-    height: 600px;
+    min-height: 600px;
 }
 
 .threeqtr-width {
