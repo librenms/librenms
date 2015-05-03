@@ -50,6 +50,13 @@ if (strpos($_SERVER['PATH_INFO'], "debug"))
 
 // Set variables
 $msg_box = array();
+// Check for install.inc.php
+if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
+{
+  // no config.php does so let's redirect to the install
+  header('Location: /install.php');
+  exit;
+}
 
 include("../includes/defaults.inc.php");
 include("../config.php");
@@ -59,14 +66,6 @@ include("includes/functions.inc.php");
 include("includes/vars.inc.php");
 include('includes/plugins.inc.php');
 Plugins::start();
-
-// Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
-{
-  // no config.php does so let's redirect to the install
-  header('Location: /install.php');
-  exit;
-}
 
 $runtime_start = utime();
 

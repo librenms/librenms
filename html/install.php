@@ -48,10 +48,10 @@ include("includes/functions.inc.php");
 if($stage == 2)
 {
   $test_db = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname);
-  if(mysqli_connect_errno($test_db))
+  if(mysqli_connect_error())
   {
     $stage = 1;
-    $msg = "Couldn't connect to the database, please check your details";
+    $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
   }
   else
   {
@@ -404,7 +404,6 @@ $config_file = <<<"EOD"
 \$config\['poller-wrapper'\]\['alerter'\] = FALSE;
 # Uncomment the next line to disable daily updates
 #\$config\['update'\] = 0;
-?>
 EOD;
 
   if(!file_exists("../config.php"))
