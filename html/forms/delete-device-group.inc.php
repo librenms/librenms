@@ -21,6 +21,12 @@ if(!is_numeric($_POST['group_id'])) {
     exit;
 } else {
     if(dbDelete('device_groups', "`id` =  ?", array($_POST['group_id']))) {
+      if( dbFetchCell('SELECT COUNT(id) FROM alert_map WHERE target = ?',array('g'.$_POST['group_id'])) >= 1 ) {
+        foreach( dbFetchRows('SELECT id FROM alert_map WHERE target = ?',array('g'.$_POST['group_id'])) as $map ) {
+          $_POST['map_id'] = $map['id'];
+          include('forms/delete-alert-map.inc.php');
+        }
+      }
       echo('group has been deleted.');
       exit;
     } else {

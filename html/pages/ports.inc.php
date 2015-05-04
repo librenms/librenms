@@ -140,7 +140,14 @@ foreach ($results as $data)
       <select name="ifSpeed" id="ifSpeed" class="form-control input-sm">
         <option value="">All Speeds</option>
 <?php
-foreach (dbFetchRows("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`") as $data)
+
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
+} else {
+    $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
+    $param[] = array($_SESSION['user_id'],$_SESSION['user_id']);
+}
+foreach (dbFetchRows($sql,$param) as $data)
 {
   if ($data['ifSpeed'])
   {
@@ -156,7 +163,14 @@ foreach (dbFetchRows("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY 
       <select name="ifType" id="ifType" class="form-control input-sm">
         <option value="">All Media</option>
 <?php
-foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`") as $data)
+
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
+} else {
+    $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
+    $param[] = array($_SESSION['user_id'],$_SESSION['user_id']);
+}
+foreach (dbFetchRows($sql,$param) as $data)
 {
   if ($data['ifType'])
   {
@@ -170,9 +184,14 @@ foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `i
       <select name="port_descr_type" id="port_descr_type" class="form-control input-sm">
         <option value="">All Port Types</option>
 <?php
-$ports = dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`");
-$total = count($ports);
-echo("Total: $total");
+
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
+} else {
+    $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
+    $param[] = array($_SESSION['user_id'],$_SESSION['user_id']);
+}
+$ports = dbFetchRows($sql,$param);
 foreach ($ports as $data)
 {
   if ($data['port_descr_type'])

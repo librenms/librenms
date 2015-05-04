@@ -5,20 +5,20 @@ WATCHGUARD-CLIENT-MIB DEFINITIONS ::= BEGIN
         OBJECT-IDENTITY, enterprises, 
         IpAddress, Unsigned32, TimeTicks   FROM SNMPv2-SMI
         DateAndTime                        FROM SNMPv2-TC
-        watchguard                         FROM WATCHGUARD-MIB;
+        watchguard                         FROM WATCHGUARD-SMI;
         
     wgInfoModule MODULE-IDENTITY
         LAST-UPDATED "200701251200Z"
         ORGANIZATION "WatchGuard Technologies, Inc."
         CONTACT-INFO
-                  "   Ella Yu
-                      WatchGuard Technologies, Inc.
-                      1841 Zanker Road
-                      San Jose, CA 95112
-                      USA
-
-                      408-519-4888
-                      ella.yu@watchguard.com "
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+                     
+                     +1.206.613.6600 "
 
         DESCRIPTION
             "The MIB module describes client information

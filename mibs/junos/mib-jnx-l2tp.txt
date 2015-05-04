@@ -20,7 +20,7 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                FROM JUNIPER-SMI;
 
    jnxL2tp    MODULE-IDENTITY
-           LAST-UPDATED    "200701110000Z" -- 11 January 2007
+           LAST-UPDATED    "201311210000Z" -- 21 November 2013
            ORGANIZATION    "Juniper Networks Inc."
            CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -37,11 +37,24 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                and l2tpSessionStatsTable."
 
            -- revision log
-
            REVISION        "200701110000Z" -- 11 January 2007
            DESCRIPTION
-              "Initial revision."
+           "Initial revision."
 
+           REVISION    "201206080000Z"  -- 08-Jun-12 03:12 PM EST  - JUNOS 12.1 
+           DESCRIPTION 
+           "Changes are done to change all Data packet/octet counters from 
+           32 to 64 bit counter. 32 bit counters were too small for data 
+           packets/octects and were consumed too early. All old counters are 
+           deprecated and new counters are added." 
+           
+           REVISION    "201309190000Z"  -- 19-Sept-13 03:12 PM EST - JUNOS 13.1 
+           DESCRIPTION 
+           "Updated the revision history and LAST-UPDATED field." 
+           
+           REVISION    "201311210000Z"  -- 21-Nov-13 03:12 PM EST - JUNOS 13.1 
+           DESCRIPTION 
+           "Corrected order of revision history" 
            ::= { jnxL2tpMibRoot 1 }
 
    --
@@ -130,13 +143,14 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpStatsPayloadRxOctets OBJECT-TYPE
            SYNTAX          Gauge32
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object returns the number of payload channel
                octets that were received on the exisiting tunnels. This is 
                an instantaneously accumulated value which can increase
                or decrease depending on number of tunnels established
-               at the time of querying."
+               at the time of querying. This is deprecated and replaced
+               by jnxL2tpStatsPayloadRxOctets64"
            ::= { jnxL2tpStats 7 }
 
    jnxL2tpStatsPayloadRxPkts OBJECT-TYPE
@@ -198,6 +212,18 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                or decrease depending on number of tunnels established
                at the time of querying."
            ::= { jnxL2tpStats 12 }
+
+   jnxL2tpStatsPayloadRxOctets64 OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current 
+           DESCRIPTION
+              "This object returns the number of payload channel
+               octets that were received on the exisiting tunnels. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 13 }
 
    --
    --      The L2TP Tunnel Group Status and Statistics Table
@@ -385,7 +411,15 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                jnxL2tpTunnelStatsErrorTxPkts
                    Counter32,
                jnxL2tpTunnelStatsErrorRxPkts
-                   Counter32
+                   Counter32,
+               jnxL2tpTunnelStatsControlTxBytes32
+                   Counter32,
+               jnxL2tpTunnelStatsControlRxBytes32
+                   Counter32,
+               jnxL2tpTunnelStatsDataTxPkts64
+                   Counter64,
+               jnxL2tpTunnelStatsDataRxPkts64
+                   Counter64
            }
 
    jnxL2tpTunnelStatsLocalTID OBJECT-TYPE
@@ -631,11 +665,12 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpTunnelStatsControlTxBytes OBJECT-TYPE
            SYNTAX          Counter64
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of control
                bytes that were transmitted to the tunnel
-               peer."
+               peer. This is deprecated and replaced by 
+               jnxL2tpTunnelStatsControlTxBytes32"
            ::= { jnxL2tpTunnelStatsEntry 23 }
 
    jnxL2tpTunnelStatsControlRxPkts OBJECT-TYPE
@@ -650,20 +685,22 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpTunnelStatsControlRxBytes OBJECT-TYPE
            SYNTAX          Counter64
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of control
                bytes that were received from the tunnel
-               peer."
+               peer. This has been deprecated and replaced 
+               by jnxL2tpTunnelStatsControlRxBytes32"
            ::= { jnxL2tpTunnelStatsEntry 25 }
 
    jnxL2tpTunnelStatsDataTxPkts OBJECT-TYPE
            SYNTAX          Counter32
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of data packets
-               transmitted to the tunnel."
+               transmitted to the tunnel. This has been deprecated
+               and replaced by jnxL2tpTunnelStatsDataTxPkts64"
            ::= { jnxL2tpTunnelStatsEntry 26 }
 
    jnxL2tpTunnelStatsDataTxBytes OBJECT-TYPE
@@ -679,10 +716,11 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpTunnelStatsDataRxPkts OBJECT-TYPE
            SYNTAX          Counter32
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of data packets
-               received from this tunnel."
+               received from this tunnel. This is deprecated and
+               replaced by jnxL2tpTunnelStatsDataRxPkts64"
            ::= { jnxL2tpTunnelStatsEntry 28 }
 
    jnxL2tpTunnelStatsDataRxBytes OBJECT-TYPE
@@ -712,6 +750,44 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
               "This object contains the number of error
                receive packets on the tunnel."
            ::= { jnxL2tpTunnelStatsEntry 31 }
+
+   jnxL2tpTunnelStatsControlTxBytes32 OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were transmitted to the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 32 }
+
+   jnxL2tpTunnelStatsControlRxBytes32 OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were received from the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 33 }
+
+   jnxL2tpTunnelStatsDataTxPkts64 OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               transmitted to the tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 34 }
+
+   jnxL2tpTunnelStatsDataRxPkts64 OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               received from this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 35 }
 
    --
    --      The L2TP Session Status and Statistics Table
@@ -864,7 +940,15 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                jnxL2tpSessionStatsErrorTxPkts
                    Counter32,
                jnxL2tpSessionStatsErrorRxPkts
-                   Counter32
+                   Counter32,
+               jnxL2tpSessionStatsControlTxBytes32
+                   Counter32,
+               jnxL2tpSessionStatsControlRxBytes32
+                   Counter32,
+               jnxL2tpSessionStatsDataTxPkts64
+                   Counter64,
+               jnxL2tpSessionStatsDataRxPkts64
+                   Counter64
            }
 
    jnxL2tpSessionStatsLocalTID OBJECT-TYPE
@@ -1495,11 +1579,12 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpSessionStatsControlTxBytes OBJECT-TYPE
            SYNTAX          Counter64
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of control
                bytes that were transmitted to the session
-               peer."
+               peer. This is deprecated and replaced by 
+               jnxL2tpSessionStatsControlTxBytes32"
            ::= { jnxL2tpSessionStatsEntry 55 }
 
    jnxL2tpSessionStatsControlRxPkts OBJECT-TYPE
@@ -1514,20 +1599,22 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpSessionStatsControlRxBytes OBJECT-TYPE
            SYNTAX          Counter64
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of control
                bytes that were received from the session
-               peer."
+               peer. This is deprecated and replaced by 
+               jnxL2tpSessionStatsControlRxBytes32"
            ::= { jnxL2tpSessionStatsEntry 57 }
 
    jnxL2tpSessionStatsDataTxPkts OBJECT-TYPE
            SYNTAX          Counter32
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of data packets
-               transmitted to the remote session peer."
+               transmitted to the remote session peer. This is 
+               deprecated and replaced by jnxL2tpSessionStatsDataTxPkts64"
            ::= { jnxL2tpSessionStatsEntry 58 }
 
    jnxL2tpSessionStatsDataTxBytes OBJECT-TYPE
@@ -1543,10 +1630,11 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
    jnxL2tpSessionStatsDataRxPkts OBJECT-TYPE
            SYNTAX          Counter32
            MAX-ACCESS      read-only
-           STATUS          current
+           STATUS          deprecated
            DESCRIPTION
               "This object contains the number of data packets
-               received on this session."
+               received on this session. This is deprecated and
+               replaced by jnxL2tpSessionStatsDataRxPkts64"
            ::= { jnxL2tpSessionStatsEntry 60 }
 
    jnxL2tpSessionStatsDataRxBytes OBJECT-TYPE
@@ -1577,6 +1665,44 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                receive packets on the session."
            ::= { jnxL2tpSessionStatsEntry 63 }
 
+
+   jnxL2tpSessionStatsControlTxBytes32 OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were transmitted to the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 64 }
+
+   jnxL2tpSessionStatsControlRxBytes32 OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were received from the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 65 }
+
+   jnxL2tpSessionStatsDataTxPkts64 OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               transmitted to the remote session peer."
+           ::= { jnxL2tpSessionStatsEntry 66 }
+
+   jnxL2tpSessionStatsDataRxPkts64 OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               received on this session."
+           ::= { jnxL2tpSessionStatsEntry 67 }
 
    --
    --      The L2TP Multilink PPP bundle statistics table

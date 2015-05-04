@@ -11,6 +11,7 @@
 */
 $pagetitle[] = "Alert Stats";
 
+$sql = "";
 if (isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = " AND alert_log.device_id=?";
     $param = array(

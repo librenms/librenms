@@ -1,0 +1,476 @@
+-- *****************************************************************
+-- Juniper Enterprise Specific MIB: JUNIPER-POWER-MANAGEMENT
+--
+-- Copyright (c) 2009-2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *****************************************************************
+
+JUNIPER-POWER-SUPPLY-UNIT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, TruthValue
+                FROM SNMPv2-TC
+        jnxContentsContainerIndex, jnxContentsL1Index,
+        jnxContentsL2Index, jnxContentsL3Index
+                FROM JUNIPER-MIB
+        jnxPsuMIBRoot
+                FROM JUNIPER-SMI;
+
+jnxPsuMIB MODULE-IDENTITY
+    LAST-UPDATED "201010270000Z" -- Oct 27 00:00:00 2010 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The Juniper Supply Unit MIB definitions for enabling
+             power monitoring and management of a juniper device."
+
+    -- revision history
+    REVISION  "201001270000Z" -- January 27 00:00:00 2010 UTC
+    DESCRIPTION
+            "Initial revision."
+    REVISION  "201005130000Z" -- May 13 00:00:00 2010 UTC
+    DESCRIPTION
+            "Added new OIDs for power budget statistics which gives details of
+            Power reserved for Chassis and the Total power allocated to Chassis
+            including for each FPC. 
+            Added new Table jnxPsuFpcPowerTable which gives the Priority
+            assigned and Power allocated to each FPC."
+    REVISION  "201010270000Z" -- Oct 27 00:00:00 2010 UTC
+    DESCRIPTION
+            "Added new OIDs for power budget statistics which gives details of
+            Power reserved for System dynamically."
+
+    ::= { jnxPsuMIBRoot 1 }
+
+jnxPsuNotifications     OBJECT IDENTIFIER ::= { jnxPsuMIB 1 }
+jnxPsuObjects           OBJECT IDENTIFIER ::= { jnxPsuMIB 2 }
+
+--**********************************************************************
+-- PSU Scalar Objects 
+--**********************************************************************
+
+jnxPsuScalars           OBJECT IDENTIFIER ::= { jnxPsuObjects 1 }
+
+jnxPsuAvailableDeviceCount OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Gives the number of PSU units available online in the System."
+    ::= { jnxPsuScalars 1 }
+
+jnxPsuAvailableAveragePowerSupply OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Gives the total average power that the System can supply from the
+        available online units in Watts."
+    ::= { jnxPsuScalars 2 }
+
+jnxPsuAvailableMaxPowerSupply OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Gives the total maximum power that the System can supply from the 
+        available online units in Watts."
+    ::= { jnxPsuScalars 3 }
+
+jnxPsuRedundancy  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                  nPlusNRedundancy(1),
+                  nPlusOneRedundancy(2),
+                  none(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "PSU power redundancy configuration."
+    ::= { jnxPsuScalars 4 }
+
+jnxPsuChassisPowerReserved OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Power reserved for Chassis in Watts."
+    ::= { jnxPsuScalars 5 }
+
+jnxPsuChassisPowerAllocated OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total power allocated for chassis and all the FPCs in Watts."
+    ::= { jnxPsuScalars 6 }
+
+jnxPsuRedundantPowerAvailable OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Power(in Watts) that is still available for allocation
+        even while supporting redundancy with the present usage."
+    ::= { jnxPsuScalars 7 }
+
+jnxPsuTotalPowerAvailable OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Power(in Watts) which could be made available for further
+        allocation without supporting any redundancy with the present usage."
+::= { jnxPsuScalars 8 }
+
+jnxPsuChassisPowerConsumed OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total power consumed by the entire system rounded to the nearest integer.
+         This is calculated using the PowerFactor, Current and Voltage values 
+         of each PSU that is online and connected to the System."
+    ::= { jnxPsuScalars 9 }
+
+jnxPsuTemperatureInflow OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Average inflow temperature calculated from all 
+        the available input sensors on the master RE."
+
+    ::= { jnxPsuScalars 10 }
+
+jnxPsuTemperatureOutflow OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Average outflow temperature calculated from all 
+        the available output sensors on the master RE."
+    ::= { jnxPsuScalars 11 }
+
+jnxPsuTemperatureInflowSamples OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of samples being taken while calculating
+        jnxPsuTemperatureInflow."
+
+    ::= { jnxPsuScalars 12 }
+
+jnxPsuTemperatureOutflowSamples OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of samples being taken while calculating
+        jnxPsuTemperatureOutflow."
+
+    ::= { jnxPsuScalars 13 }
+
+--**********************************************************************
+-- Device POWER
+--**********************************************************************
+
+jnxPsuTable  OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPsuEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A list of power entries for each PSU component."
+    ::= { jnxPsuObjects 2 }
+
+jnxPsuEntry    OBJECT-TYPE
+    SYNTAX        JnxPsuEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Defines an entry in jnxPsuTable. "
+    INDEX         { jnxContentsContainerIndex,
+                    jnxContentsL1Index,
+                    jnxContentsL2Index,
+                    jnxContentsL3Index }
+
+    ::= { jnxPsuTable 1 }
+
+JnxPsuEntry ::= 
+    SEQUENCE { 
+        jnxPsuAvgPower    INTEGER,
+        jnxPsuMaxPower    INTEGER,
+        jnxPsuMode        INTEGER,
+        jnxPsuOutletCount INTEGER
+    }
+
+jnxPsuAvgPower   	OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Buffer that contains the average power used, in Watts 
+                  for each component."
+    ::= { jnxPsuEntry 1 }
+                 
+jnxPsuMaxPower   	OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Buffer that contains the max power available, in Watts 
+                  for each component."
+    ::= { jnxPsuEntry 2 }
+
+jnxPsuMode   OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      single(1),
+                      three(3)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Mode for each PSU component."
+    ::= { jnxPsuEntry 3 }
+
+jnxPsuOutletCount OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The number of outlets (regardless of their current state)
+                  present on this psu component, default is 0."
+    DEFVAL        { 0 }
+    ::= { jnxPsuEntry 4 }
+
+--**********************************************************************
+-- Environment
+--**********************************************************************
+
+jnxPsuEnvironmentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPsuEnvironmentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A list of PSU Environment entries."
+    ::= { jnxPsuObjects 3 }
+
+jnxPsuEnvironmentEntry OBJECT-TYPE
+    SYNTAX       JnxPsuEnvironmentEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Defines an entry in jnxPsuEnvironmentTable."
+    INDEX        { jnxContentsContainerIndex,
+                   jnxContentsL1Index,
+                   jnxContentsL2Index,
+                   jnxContentsL3Index }
+    ::= { jnxPsuEnvironmentTable 1 }
+
+JnxPsuEnvironmentEntry ::=
+    SEQUENCE {
+        jnxPsuThermalValue    INTEGER,
+        jnxPsuHumidityValue   INTEGER
+    }
+
+jnxPsuThermalValue  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Temparature at each component in degrees Celsius rounded to
+                  the nearest integer."
+    ::= { jnxPsuEnvironmentEntry 1 }
+
+jnxPsuHumidityValue  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Humidity at each component in percentage."
+    ::= { jnxPsuEnvironmentEntry 2 }
+
+--**********************************************************************
+-- OUTLETS
+--**********************************************************************
+
+jnxPsuOutletTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPsuOutletEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Gives details of each Power outlet`s state,
+                   capacity to supply power, and other details."
+    ::= { jnxPsuObjects 4 }
+
+jnxPsuOutletEntry OBJECT-TYPE
+    SYNTAX       JnxPsuOutletEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "A value contained within the OutletEntry"
+    INDEX        { jnxContentsContainerIndex,
+                   jnxContentsL1Index,
+                   jnxContentsL2Index,
+                   jnxContentsL3Index }
+     ::= { jnxPsuOutletTable 1 }
+
+JnxPsuOutletEntry ::= 
+    SEQUENCE {
+	jnxPsuOutletName                     DisplayString,
+	jnxPsuOutletDescription              DisplayString,
+	jnxPsuOutletAvgPower                 INTEGER,
+	jnxPsuOutletMaxPower                 INTEGER,
+	jnxPsuOutletCurrent                  INTEGER,
+	jnxPsuOutletStatus                   INTEGER,
+	jnxPsuOutletVoltage                  INTEGER,
+	jnxPsuOutletPowerFactorValue         INTEGER,
+	jnxPsuOutletPowerConsumed            INTEGER
+    }
+
+jnxPsuOutletName  OBJECT-TYPE
+    SYNTAX        DisplayString(SIZE (0..15))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Outlet name associated to the power supply unit for 
+                   each PSU Component."
+    ::= { jnxPsuOutletEntry 1 }
+
+jnxPsuOutletDescription	OBJECT-TYPE
+    SYNTAX        DisplayString(SIZE (0..63))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Outlet description associated to the power supply unit for 
+                   each PSU Component."
+    ::= { jnxPsuOutletEntry 2 }
+
+jnxPsuOutletAvgPower OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Buffer that contains the average power used, in Watts for each component."
+    ::= { jnxPsuOutletEntry 3 }
+		 
+jnxPsuOutletMaxPower OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Buffer that contains the maximum power available, in Watts for each component."
+    ::= { jnxPsuOutletEntry 4 }
+		 
+jnxPsuOutletCurrent OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "PSU output current in milliamps rounded to the nearest
+                  integer."
+    ::= { jnxPsuOutletEntry 5 }
+                  
+jnxPsuOutletStatus  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      off(0),
+                      on(1)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The value of the operational status for the given outlet.
+                   This can also be used to set the outlet state"
+    ::= { jnxPsuOutletEntry 8 }
+
+jnxPsuOutletVoltage OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Output voltage in Volts rounded to the nearest integer."
+    ::= { jnxPsuOutletEntry 9 }
+
+--
+-- NOTE: jnxPsuOutletPowerFactorValue does NOT return the traditional
+-- "power factor", defined as real power in watts divided by apparent 
+-- power in volt-amperes.  Instead it returns "efficiency" which is  
+-- defined as power output divided by power input.
+--
+jnxPsuOutletPowerFactorValue OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Power factor percentage of each PSU (2k/3k).
+
+                  Algorithm for calculation of Power Factor is below.
+                  For PowerOut values that fall in between 618.93W and 915.24W,
+                  say 700W, the appropriate PF ranges from 0.910191 & 
+                  0.917994. Following linear equation could help deduce a
+                  fairly accurate input power value.
+ 
+                  Linear equation y = mx + b (where m is the slope and b is 
+                  the Y intercept)
+
+                  Slope m = (y2 - y1) / (x2 - x1)
+                  Y intercept  b = y - mx
+ 
+                  Plugging it all together for our example:
+ 
+                  m = (915.24 - 618.93) / (0.917994 - 0.910191) = 37973.86
+                  b = 915.24 - (37973.86 * 0.917994) = -33944.5
+ 
+                  for 700W (y), our efficiency (x) would then be:
+ 
+                  x = (700 - (-33944.5)) / 37973.86 = 0.912326 = 91%
+
+                  PowerIn = 700W /0.912326 = 767.26W "
+
+    ::= { jnxPsuOutletEntry 10 }
+
+jnxPsuOutletPowerConsumed OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Power Consumed by each outlet units in Watts."
+    ::= { jnxPsuOutletEntry 11 }
+
+                  
+--**********************************************************************
+-- FPC Power allocated information 
+--**********************************************************************
+
+jnxPsuFpcPowerTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPsuFpcPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A list of entries for each FPC(Flexible PIC Concentrator)
+                   giving it's assigned priority and power being allocated. 
+                   More information on FPCs can be found in JUNIPER-MIB."
+    ::= { jnxPsuObjects 5 }
+
+jnxPsuFpcPowerEntry OBJECT-TYPE
+    SYNTAX       JnxPsuFpcPowerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "A value contained within the FpcPowerEntry"
+    INDEX        { jnxContentsContainerIndex,
+                   jnxContentsL1Index,
+                   jnxContentsL2Index,
+                   jnxContentsL3Index }
+     ::= { jnxPsuFpcPowerTable 1 }
+
+JnxPsuFpcPowerEntry ::=
+    SEQUENCE {
+            jnxPsuFpcPowerPriority               INTEGER,
+            jnxPsuFpcPowerAllocated              INTEGER
+          }
+      
+jnxPsuFpcPowerPriority OBJECT-TYPE
+     SYNTAX         INTEGER
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "The Power budget priority assigned to the FPC.
+                     Lower number means higher priority."
+     ::= { jnxPsuFpcPowerEntry 1 }
+
+jnxPsuFpcPowerAllocated OBJECT-TYPE
+    SYNTAX         INTEGER
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The Power allocated to the FPC in Watts."
+    ::= { jnxPsuFpcPowerEntry 2 }
+
+END
