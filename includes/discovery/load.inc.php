@@ -8,7 +8,7 @@ include("includes/include-dir.inc.php");
 
 if ($debug) { print_r($valid['sensor']['load']); }
 
-check_valid_sensors($device, 'current', $valid['load']);
+check_valid_sensors($device, 'load', $valid['load']);
 
 echo("\n");
 
