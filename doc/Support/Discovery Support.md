@@ -69,32 +69,59 @@ $config['discovery_modules']['charge']                    = 1;
 #### Discovery modules
 
 `os`: Os detection. This module will pick up the OS of the device.
+
 `ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+
 `ports-stack`: Same as ports except for stacks.
+
 `entity-physical`: Module to pick up the devices hardware support.
+
 `processors`: Processor support for devices.
+
 `mempools`: Memory detection support for devices.
+
 `ipv4-addresses`: IPv4 Address detection
+
 `ipv6-addresses`: IPv6 Address detection
+
 `sensors`: Sensor detection such as Temperature, Humidity, Voltages + More
+
 `storage`: Storage detection for hard disks
+
 `hr-device`: Processor and Memory support via HOST-RESOURCES-MIB.
+
 `discovery-protocols`: Auto discovery module for xDP, OSPF and BGP.
+
 `arp-table`: Detection of the ARP table for the device.
+
 `discovery-arp`: Auto discovery via ARP.
+
 `junose-atm-vp`: Juniper ATM support.
+
 `bgp-peers`: BGP detection and support.
+
 `vlans`: VLAN detection and support.
+
 `cisco-mac-accounting`: MAC Address account support.
+
 `cisco-pw`: Pseudowires wires detection and support.
+
 `cisco-vrf`: VRF detection and support.
+
 `cisco-cef`: CEF detection and support.
+
 `cisco-sla`: SLA detection and support.
+
 `vmware-vminfo`: Detection of vmware guests on an ESXi host
+
 `libvirt-vminfo`: Detection of libvirt guests.
+
 `toner`: Toner levels support.
+
 `ucd-diskio`: Disk I/O support.
+
 `services`: *Nix services support.
+
 `charge`: APC Charge detection and support.
 
 #### Running
