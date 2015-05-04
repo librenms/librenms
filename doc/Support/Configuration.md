@@ -228,11 +228,11 @@ The varying options after that are to support the different transports.
 
 #### Alerting
 
-Please see (Alerting)[http://docs.librenms.org/Extensions/Alerting/] section of the docs for configuration options.
+Please see [Alerting](http://docs.librenms.org/Extensions/Alerting/) section of the docs for configuration options.
 
 #### Billing
 
-Please see (Billing)[http://docs.librenms.org/Extensions/Billing-Module/] section of the docs for setup and configuration options.
+Please see [Billing](http://docs.librenms.org/Extensions/Billing-Module/) section of the docs for setup and configuration options.
 
 #### Global module support
 
@@ -347,7 +347,7 @@ Mounted storage / mount points to ignore in discovery and polling.
 
 #### IRC Bot
 
-Please see (IRC Bot)[http://docs.librenms.org/Extensions/IRC-Bot/] section of the docs for configuration options.
+Please see [IRC Bot](http://docs.librenms.org/Extensions/IRC-Bot/) section of the docs for configuration options.
 
 #### Authentication
 
@@ -367,7 +367,7 @@ $config['allow_unauth_graphs']      = 0;
 $config['allow_unauth_graphs_cidr'] = array();
 ```
 This option will enable unauthenticated access to the graphs from `allow_unauth_graphs_cidr` ranges that you allow. Use 
- of this option is highly discouraged in favour of the (API)[http://docs.librenms.org/API/API-Docs/] that is now available.
+ of this option is highly discouraged in favour of the [API](http://docs.librenms.org/API/API-Docs/) that is now available.
  
 ```php
 $config['auth_ldap_version'] = 3; # v2 or v3
@@ -428,4 +428,4 @@ By default, LibreNMS will auto update itself every 24 hours. You can stop this f
 
 #### Distributed poller settings
 
-Please see (Distributed Poller)[http://docs.librenms.org/Extensions/Distributed-Poller/] section of the docs for setup and configuration options.
+Please see [Distributed Poller](http://docs.librenms.org/Extensions/Distributed-Poller/) section of the docs for setup and configuration options.
