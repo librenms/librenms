@@ -17,20 +17,27 @@ rows = cursor.fetchall()
 
 data = {}
 
-innodb_transactions_counter = 0
+currently_counting_transactions = 0
+current_transactions = 0
 
 for row in rows:
     for line in row[2].split("\n"):
         history_list = re.match(r"^History\slist\slength\s(\d+)$", line)
+        trx_id_counter = re.match(r"^Trx\sid\scounter\s(\d+)$", line)
         transaction_id = re.match(r"^---TRANSACTION\s\d+.+$", line)
+        section_header = re.match(r"^--------$", line)
 
-
-        if history_list:
+        if (currently_counting_transactions and section_header):
+            currently_counting_transactions = 0
+            data['a7'] = current_transactions
+        elif (currently_counting_transactions and transaction_id):
+            current_transactions += 1
+        elif history_list:
             data['a4'] = history_list.group(1)
-        elif transaction_id:
-            innodb_transactions_counter += 1
+        elif trx_id_counter:
+            currently_counting_transactions = 1
     
 
 for key in data:
     if data[key]:
-        print key + ":" + data[key]
+        print key + ":", data[key]
