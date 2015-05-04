@@ -62,7 +62,7 @@ if ($_POST['interface'] == "Vlan%") {
                "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
 <?php
 
-echo($_POST['address']);
+echo('"'.$_POST['address'].'"+');
 ?>
 
                "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+

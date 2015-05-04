@@ -1,4 +1,4 @@
-<?php
+	<?php
 
 function poll_sensor($device, $class, $unit)
 {
@@ -22,12 +22,20 @@ function poll_sensor($device, $class, $unit)
         {
           if ($debug) echo("Attempt $i ");
           $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
+          preg_match("/[\d\.]+/",$sensor_value,$temp_response);
+          if (!empty($temp_response[0])) {
+              $sensor_value = $temp_response[0];
+          }
 
           if (is_numeric($sensor_value) && $sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
           sleep(1); # Give the TME some time to reset
         }
       } else {
-        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
+        if ($sensor['sensor_type'] == 'apc') {
+            $sensor_value = trim(str_replace("\"", "", snmp_walk($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB:PowerNet-MIB$mib")));
+        } else {
+            $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
+        }
       }
       unset($mib);
     } else if ($sensor['poller_type'] == "agent")

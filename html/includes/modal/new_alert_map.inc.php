@@ -67,34 +67,100 @@ $('#create-map').on('show.bs.modal', function (event) {
     });
 });
 var cache = {};
-$('#rule').typeahead([
-    {
-      name: 'map_rules',
-      remote : '/ajax_search.php?search=%QUERY&type=alert-rules',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
+var alert_rules = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=alert-rules",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+alert_rules.initialize();
+$('#rule').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: 'typeahead-left'
     }
-]);
+},
+{
+  source: alert_rules.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        alert_rules: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+});
 
-$('#target').typeahead([
-    {
-      name: 'map_devices',
-      remote : '/ajax_search.php?search=%QUERY&type=device&map=1',
-      header : '<h5><strong>&nbsp;Devices</strong></h5>',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
-    },
-    {
-      name: 'map_groups',
-      remote : '/ajax_search.php?search=%QUERY&type=group&map=1',
-      header : '<h5><strong>&nbsp;Groups</strong></h5>',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
+var map_devices = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=device&map=1",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var map_groups = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=group&map=1",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+map_devices.initialize();
+map_groups.initialize();
+$('#target').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: 'typeahead-left'
     }
-]);
+},
+{
+  source: map_devices.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        header: '<h5><strong>&nbsp;Devices</strong></h5>',
+        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+},
+{
+  source: map_groups.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        header: '<h5><strong>&nbsp;Groups</strong></h5>',
+        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+});
 
 $('#map-submit').click('', function(e) {
     e.preventDefault();

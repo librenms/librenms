@@ -25,9 +25,10 @@
 /**
  * Generate SQL from Group-Pattern
  * @param string $pattern Pattern to generate SQL for
+ * @param string $search What to searchid for
  * @return string
  */
-function GenGroupSQL($pattern) {
+function GenGroupSQL($pattern,$search='') {
 	$tmp = explode(" ",$pattern);
 	$tables = array();
 	foreach( $tmp as $opt ) {
@@ -48,7 +49,10 @@ function GenGroupSQL($pattern) {
 		}
 		$i++;
 	}
-	$sql = "SELECT ".str_replace("(","",$tables[0]).".device_id FROM ".implode(",",$tables)." WHERE (".str_replace(array("%","@","!~","~"),array("","%","NOT LIKE","LIKE"),$pattern).")";
+	if( !empty($search) ) {
+		$search .= " &&";
+	}
+	$sql = "SELECT DISTINCT(".str_replace("(","",$tables[0]).".device_id) FROM ".implode(",",$tables)." WHERE ".$search." (".str_replace(array("%","@","!~","~"),array("","%","NOT LIKE","LIKE"),$pattern).")";
 	return $sql;
 }
 
@@ -81,13 +85,8 @@ function GetDeviceGroups() {
 function GetGroupsFromDevice($device) {
 	$ret = array();
 	foreach( GetDeviceGroups() as $group ) {
-		foreach( GetDevicesFromGroup($group['id']) as $dev ) {
-			if( $dev['device_id'] == $device ) {
-				if( !in_array($group['id'],$ret) ) {
-					$ret[] = $group['id'];
-				}
-				continue 2;
-			}
+		if( dbFetchCell(GenGroupSQL($group['pattern'],'device_id=?').' LIMIT 1',array($device)) == $device ){
+			$ret[] = $group['id'];
 		}
 	}
 	return $ret;

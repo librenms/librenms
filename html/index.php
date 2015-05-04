@@ -50,6 +50,13 @@ if (strpos($_SERVER['PATH_INFO'], "debug"))
 
 // Set variables
 $msg_box = array();
+// Check for install.inc.php
+if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
+{
+  // no config.php does so let's redirect to the install
+  header('Location: /install.php');
+  exit;
+}
 
 include("../includes/defaults.inc.php");
 include("../config.php");
@@ -59,14 +66,6 @@ include("includes/functions.inc.php");
 include("includes/vars.inc.php");
 include('includes/plugins.inc.php');
 Plugins::start();
-
-// Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
-{
-  // no config.php does so let's redirect to the install
-  header('Location: /install.php');
-  exit;
-}
 
 $runtime_start = utime();
 
@@ -128,7 +127,6 @@ if (empty($config['favicon'])) {
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
@@ -145,11 +143,13 @@ if (empty($config['favicon'])) {
   <script src="js/jquery.cycle2.min.js"></script>
   <script src="js/moment.min.js"></script>
   <script src="js/bootstrap-datetimepicker.min.js"></script>
-  <script src="js/typeahead.min.js"></script>
+  <script src="js/typeahead.bundle.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
   <script src="js/mktree.js"></script>
   <script src="js/jquery.bootgrid.min.js"></script>
+  <script src="js/handlebars.min.js"></script>
+  <script src="js/pace.min.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
@@ -362,6 +362,18 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
 
         });
     </script>');
+
+} else {
+
+echo('<script type="text/javascript">
+    $(document).ready(function() {
+        $("#countdown_timer").html("Refresh disabled");
+        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i>");
+        $("#countdown_timer_status").click("", function(event) {
+            event.preventDefault();
+        });
+     });
+</script>');
 
 }
 

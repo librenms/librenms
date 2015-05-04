@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-NATSRCPOOL-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpNATsrcpool                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpNATsrcpoolMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- July 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the NAT-src-pool-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security NAT-src-pool resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpNATsrcpool 1 }
+
+    jnxLsysSpNATsrcpoolObjects        OBJECT IDENTIFIER ::= { jnxLsysSpNATsrcpoolMIB 1 }
+    jnxLsysSpNATsrcpoolSummary        OBJECT IDENTIFIER ::= { jnxLsysSpNATsrcpoolMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular NAT-src-pool resource information objects per LSYS:
+--   Below are NAT-src-pool resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- NAT-src-pool resource table per LSYS
+
+    jnxLsysSpNATsrcpoolTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSppNATsrcpoolEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE NAT-src-pool objects for NAT-src-pool resource consumption per LSYS."  
+    ::= { jnxLsysSpNATsrcpoolObjects 1 }
+    
+    jnxLsysSpNATsrcpoolEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSppNATsrcpoolEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in NAT-src-pool resource table."
+    INDEX { IMPLIED jnxLsysSpNATsrcpoolLsysName }          
+    ::= { jnxLsysSpNATsrcpoolTable 1 }          
+
+    JnxLsysSppNATsrcpoolEntry ::= 
+       SEQUENCE {
+          jnxLsysSpNATsrcpoolLsysName    DisplayString,
+          jnxLsysSpNATsrcpoolProfileName DisplayString,
+          jnxLsysSpNATsrcpoolUsage       Unsigned32,
+          jnxLsysSpNATsrcpoolReserved    Unsigned32,
+          jnxLsysSpNATsrcpoolMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the NAT-src-pool resource table
+ 
+    jnxLsysSpNATsrcpoolLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which NAT-src-pool resource information is retrieved. "
+        ::= { jnxLsysSpNATsrcpoolEntry 1 }
+
+    jnxLsysSpNATsrcpoolProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpNATsrcpoolEntry 2 }
+
+    jnxLsysSpNATsrcpoolUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpNATsrcpoolEntry 3 }
+    
+    jnxLsysSpNATsrcpoolReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpNATsrcpoolEntry 4 } 
+
+    jnxLsysSpNATsrcpoolMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpNATsrcpoolEntry 5 }
+
+
+-- **********************************************************************
+-- NAT-src-pool resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpNATsrcpoolUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The NAT-src-pool resource consumption over all LSYS."
+    ::= { jnxLsysSpNATsrcpoolSummary 1 }          
+
+    jnxLsysSpNATsrcpoolMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-src-pool resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpNATsrcpoolSummary 2 }
+    
+    jnxLsysSpNATsrcpoolAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-src-pool resource available in the whole device."
+    ::= { jnxLsysSpNATsrcpoolSummary 3 }
+    
+    jnxLsysSpNATsrcpoolHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of NAT-src-pool resource consumed of a LSYS."
+    ::= { jnxLsysSpNATsrcpoolSummary 4 }
+    
+    jnxLsysSpNATsrcpoolHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most NAT-src-pool resource."
+    ::= { jnxLsysSpNATsrcpoolSummary 5 }
+    
+    jnxLsysSpNATsrcpoolLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of NAT-src-pool resource consumed of a LSYS."
+    ::= { jnxLsysSpNATsrcpoolSummary 6 }
+    
+    jnxLsysSpNATsrcpoolLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least NAT-src-pool resource."
+    ::= { jnxLsysSpNATsrcpoolSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of NAT-src-pool resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

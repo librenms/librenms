@@ -163,6 +163,10 @@ function RunAlerts() {
 			$updet = false;
 			$noacc = false;
 		}
+		if( IsMaintenance($alert['device_id']) > 0 ) {
+			$noiss = true;
+			$noacc = true;
+		}
 		if( $updet ) {
 			dbUpdate(array('details' => gzcompress(json_encode($alert['details']),9)),'alert_log','id = ?',array($alert['id']));
 		}
@@ -204,7 +208,7 @@ function ExtTransports($obj) {
 	global $config;
 	$tmp = false; //To keep scrutinizer from naging because it doesnt understand eval
 	foreach( $config['alert']['transports'] as $transport=>$opts ) {
-		if( file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
+		if( ($opts === true || !empty($opts)) && file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
 			echo $transport." => ";
 			eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir']."/includes/alerts/transport.".$transport.".php").' };');
 			$tmp = $tmp($obj,$opts);
@@ -288,7 +292,7 @@ function DescribeAlert($alert) {
 			$i++;
 			$obj['faults'][$i] = $incident;
 			foreach( $incident as $k=>$v ) {
-				if( !empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc')) && substr_count($k,'_') <= 1 ) {
+				if( !empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1 ) {
 					$obj['faults'][$i]['string'] .= $k.' => '.$v."; ";
 				}
 			}

@@ -5,20 +5,20 @@ WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
         OBJECT-IDENTITY, enterprises, 
         IpAddress, TimeTicks               FROM SNMPv2-SMI
         DateAndTime                        FROM SNMPv2-TC
-        watchguard                         FROM WATCHGUARD-MIB;
+        watchguard                         FROM WATCHGUARD-SMI;
         
     wgPolicyMIB MODULE-IDENTITY
         LAST-UPDATED "200701251200Z"
         ORGANIZATION "WatchGuard Technologies, Inc."
         CONTACT-INFO
-                  "   Ella Yu
-                      WatchGuard Technologies, Inc.
-                      1841 Zanker Road
-                      San Jose, CA 95112
-                      USA
-
-                      408-519-4888
-                      ella.yu@watchguard.com "
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+                     
+                     +1.206.613.6600 " 
 
           DESCRIPTION
                "The MIB module describes various policy objects
@@ -145,7 +145,7 @@ WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
         wgPolicyDisc               Counter64,
         wgPolicyNumTunl            Counter64,
         wgPolicySingleCntrNum      Counter64,
-        wgPolicyLogging            INTEGER,
+        wgPolicyLogging            Unsigned32,
         wgPolicyCurrActiveConns    Counter64
     }
     
@@ -166,12 +166,12 @@ WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
             "The policy name of this policy"
         ::= {wgPolicyEntry 2}
 
-    wgPolicyBytes OBJECT-TYPE
+    wgPolicyL3PackageBytes OBJECT-TYPE
         SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Total traffic in bytes since setting up this policy."
+            "Total traffic in bytes (counted from L3 head) since setting up this policy."
         ::= {wgPolicyEntry 3}
 
     wgPolicyPackets OBJECT-TYPE
@@ -291,7 +291,7 @@ WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
         ::= {wgPolicyEntry 16}
 
     wgPolicyLogging OBJECT-TYPE
-        SYNTAX      INTEGER {
+        SYNTAX      Unsigned32 {
                         disabled(0),
                         enabled(1)
                     }
@@ -308,5 +308,13 @@ WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Total number of currently active connections for this policy."
         ::= {wgPolicyEntry 18}
+
+    wgPolicyL2PackageBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Total traffic in bytes(counted from L2 head) since setting up this policy."
+        ::= {wgPolicyEntry 19}
 
 END

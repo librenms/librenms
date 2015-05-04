@@ -1,0 +1,900 @@
+-------------------------------------------------------------------------------
+-- Juniper Enterprise Specific MIB: Timing feature defect/event notification MIB
+-- 
+-- Copyright (c) 2001-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-------------------------------------------------------------------------------
+
+JUNIPER-TIMING-NOTFNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Gauge32,
+    TimeTicks, Counter32, Counter64,
+    IpAddress
+        FROM SNMPv2-SMI -- [RFC2578]
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC  -- [RFC2579]
+    InterfaceIndex, ifOperStatus
+        FROM IF-MIB     -- [RFC2863a]
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    jnxTimingNotfnsMIBRoot
+        FROM JUNIPER-SMI;
+
+
+jnxTimingNotfnsMIB MODULE-IDENTITY
+    LAST-UPDATED "201304220930Z"  -- Mon Apr 22 09:30 2013 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+             specific MIB for alarms from the router chassis box."
+    --  Revision history
+    REVISION     "201303151541Z" -- Fri Mar 15 15:41 2013 UTC
+    DESCRIPTION  "Initial Version"
+
+    ::= { jnxTimingNotfnsMIBRoot 1 }
+
+
+jnxTimingFaults          OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 1 }
+jnxTimingEvents           OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 2 }
+jnxTimingNotfObjects      OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 3 }
+jnxTimingConformance      OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 4 }
+
+
+-------------------------------------------------------------------------------
+-- Textual Conventions
+-------------------------------------------------------------------------------
+JnxPtpClockIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+            "Clock Identifier."
+    SYNTAX       OCTET STRING (SIZE (8))
+
+JnxPtpPhaseOffsetTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-9"
+    STATUS       current
+    DESCRIPTION
+            "Phase Offset."
+    SYNTAX       Integer32 (0..1000)
+
+
+-------------------------------------------------------------------------------
+-- Objects 
+-------------------------------------------------------------------------------
+jnxClksyncState OBJECT-TYPE
+    SYNTAX      INTEGER { clear(0), set(1) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Fault status."
+    ::= { jnxTimingNotfObjects 1 }
+
+jnxClksyncIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Snmp ifIndex of member interface."
+        ::= { jnxTimingNotfObjects 2 }
+
+jnxClksyncIntfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Interface name."
+        ::= { jnxTimingNotfObjects 3 }
+
+jnxAcbFpgaRevMajor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Major version information."
+    ::= { jnxTimingNotfObjects 4 }
+
+jnxAcbFpgaRevMinor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Minor version information."
+    ::= { jnxTimingNotfObjects 5 }
+
+jnxBootCpldFpgaRevMajor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Major version information."
+    ::= { jnxTimingNotfObjects 6 }
+
+jnxBootCpldFpgaRevMinor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Minor version information."
+    ::= { jnxTimingNotfObjects 7 }
+
+jnxClksyncQualityCode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        --eec1
+        prc(0),
+        ssu-a(1),
+        ssu-b(2),
+        sec(3),
+        dnu(4),
+        --eec2
+        stu(10),
+        prs(11),
+        tnc(13),
+        st2(14),
+        st3e(15),
+        st3(16),
+        smc(17),
+        st4(18),
+        dus(19)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "SSM/ESMC quality levels."
+    ::= { jnxTimingNotfObjects 8 }
+
+jnxClksyncDpllState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown(-1),
+        lock-acq(0),
+        locked(1),
+        holder(2),
+        freerun(3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "BITS/SyncE DPLL states."
+    ::= { jnxTimingNotfObjects 9 }
+
+jnxPtpServoState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        init(0),
+        free-run(1),
+        holdover(2),
+        acquiring(3),
+        freq-locked(4),
+        phase-aligned(5)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP servo states."
+    ::= { jnxTimingNotfObjects 10 }
+
+jnxPtpClass OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP clock status."
+    ::= { jnxTimingNotfObjects 11 }
+
+jnxPtpAccuracy OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP clock accuracy."
+    ::= { jnxTimingNotfObjects 12 }
+
+jnxPtpGmId OBJECT-TYPE
+    SYNTAX      JnxPtpClockIdTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP Grand Master clock-id."
+    ::= { jnxTimingNotfObjects 13 }
+
+jnxPtpGmIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP Grand Master stream ip-address."
+    ::= { jnxTimingNotfObjects 14 }
+
+jnxClkStreamHandle OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP clock accuracy."
+    ::= { jnxTimingNotfObjects 15 }
+
+jnxRemoteIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "PTP clock stream's remote ip-address."
+    ::= { jnxTimingNotfObjects 16 }
+
+jnxClksyncHybridState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        init(0),
+        freq-acq(1),
+        freqLck-phaseAcq1(2),
+        freqLck-phaseAcq2(3),
+        freqLck-phaseAcq3(4),
+        freq-phase-lck(5)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "hybrid states."
+    ::= { jnxTimingNotfObjects 17 }
+
+jnxPtpPhaseOffset OBJECT-TYPE
+    SYNTAX      JnxPtpPhaseOffsetTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Phase Offset."
+    ::= { jnxTimingNotfObjects 18 }
+
+jnxClksyncQualityCodeStr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "SSM/ESMC quality levels in string format."
+        ::= { jnxTimingNotfObjects 19 }
+
+jnxClksyncDpllStateStr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Dpll state in string format."
+        ::= { jnxTimingNotfObjects 20 }
+
+jnxPtpServoStateStr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "PTP servo states in string format."
+        ::= { jnxTimingNotfObjects 21 }
+
+jnxClksyncHybridStateStr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "hybrid states in string format."
+        ::= { jnxTimingNotfObjects 22 }
+
+jnxClksyncColorStr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Color of the LED unit."
+        ::= { jnxTimingNotfObjects 23 }
+
+
+-------------------------------------------------------------------------------
+-- Faults
+-------------------------------------------------------------------------------
+    jnxTimingFaultLOSSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that Loss Of Signal has been detected.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 1 }
+
+    jnxTimingFaultLOSClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that Loss Of Signal has been cleared.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 2 }
+
+    jnxTimingFaultEFDSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Exceeded frequency deviation.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 3 }
+
+    jnxTimingFaultEFDClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Exceeded frequency deviation cleared.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 4 }
+
+    jnxTimingFaultLOESMCSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Loss of ESMC.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 5 }
+
+    jnxTimingFaultLOESMCClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Loss of ESMC.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 6 }
+
+    jnxTimingFaultQLFailSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies ESMC/SSM Quality Level failed.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 7 }
+
+    jnxTimingFaultQLFailClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies ESMC/SSM Quality Level failed.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 8 }
+
+    jnxTimingFaultLTISet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Loss of timing information.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 9 }
+
+    jnxTimingFaultLTIClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Loss of timing information.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 10 }
+
+    jnxTimingFaultAcbcFpgaVerNotCompatible NOTIFICATION-TYPE
+        OBJECTS {
+                jnxAcbFpgaRevMajor,
+                jnxAcbFpgaRevMinor
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies ACBC FPGA version is not compatible.
+
+             jnxBootCpldFpgaRevMajor indicates the current ACBC FPGA Major revision
+             jnxBootCpldFpgaRevMinor indicates the current ACBC FPGA Minor revision."
+    ::= { jnxTimingFaults 11 }
+
+    jnxTimingFaultBootCpldVerNotCompatible NOTIFICATION-TYPE
+        OBJECTS {
+                jnxBootCpldFpgaRevMajor,
+                jnxBootCpldFpgaRevMinor
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Boot-cpld version is not compatible.
+
+             jnxClksyncVersion indicates the current Boot-cpld version."
+    ::= { jnxTimingFaults 12 }
+
+    jnxTimingFaultPriSrcFailed NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Primary source failed
+             (Whenever PFM/CFM/SCM error occurs).
+
+             jnxClksyncIfIndex is the Primary source interface index
+             jnxClksyncIntfName is the Primary source interface name."
+    ::= { jnxTimingFaults 13 }
+
+    jnxTimingFaultSecSrcFailed NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Secondary source failed
+             (Whenever PFM/CFM/SCM error occurs).
+
+             jnxClksyncIfIndex is the Secondary source interface index
+             jnxClksyncIntfName is the Secondary source interface name."
+    ::= { jnxTimingFaults 14 }
+
+    jnxTimingFaultPtpUniNegRateRejectSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClkStreamHandle,
+                jnxRemoteIpAddr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies: 
+             When acting as MASTER - Failing/rejecting clients for signaling messages
+             When acting as SLAVE - Failing or receiving rejection for signaling messages
+
+             jnxClkStreamHandle is the clock stream handle
+             jnxRemoteIpAddr is the clock stream's remote ip-address."
+    ::= { jnxTimingFaults  15 }
+
+    jnxTimingFaultPtpUniNegRateRejectClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClkStreamHandle,
+                jnxRemoteIpAddr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies: 
+             When acting as MASTER - Failing/rejecting clients for signaling messages
+             When acting as SLAVE - Failing or receiving rejection for signaling messages
+
+             jnxClkStreamHandle is the clock stream handle
+             jnxRemoteIpAddr is the clock stream's remote ip-address."
+    ::= { jnxTimingFaults  16 }
+
+
+-------------------------------------------------------------------------------
+-- Events
+-------------------------------------------------------------------------------
+    jnxTimingEventPriSrcRecovered NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Primary source recovered.
+
+             jnxClksyncIfIndex is the Primary source interface index
+             jnxClksyncIntfName is the Primary source interface name."
+    ::= { jnxTimingEvents 1 }
+
+    jnxTimingEventSecSrcRecovered NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Secondary source recovered.
+
+             jnxClksyncIfIndex is the Secondary source interface index
+             jnxClksyncIntfName is the Secondary source interface name."
+    ::= { jnxTimingEvents 2 }
+
+    jnxTimingEventPriRefChanged NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,  -- new ref ifIndex
+                jnxClksyncIntfName  -- new ref interface name
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Primary reference changed
+             (Ifd name change or change from synce to BITS/external interface etc).
+
+             jnxClksyncIfIndex is the Primary reference interface index
+             jnxClksyncIntfName is the Primary reference interface name."
+    ::= { jnxTimingEvents 3 }
+
+    jnxTimingEventSecRefChanged NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,  -- new ref ifIndex
+                jnxClksyncIntfName  -- new ref interface name
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Secondary reference changed
+             (Ifd name change or change from synce to BITS/external interface etc).
+
+             jnxClksyncIfIndex is the Secondary reference interface index
+             jnxClksyncIntfName is the Secondary reference interface name."
+    ::= { jnxTimingEvents 4 }
+
+    jnxTimingEventQLChangedRx NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName,
+                jnxClksyncQualityCode, -- new quality code
+                jnxClksyncQualityCodeStr -- new quality code string
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies RX SSM/ESMC quality level changed.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name
+             jnxClksyncQualityCode is the SSM/ESMC quality level 
+             jnxClksyncQualityCodeStr is the SSM/ESMC quality level in string format."
+    ::= { jnxTimingEvents 5 }
+
+    jnxTimingEventQLChangedTx NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName,
+                jnxClksyncQualityCode, -- new quality code
+                jnxClksyncQualityCodeStr -- new quality code string
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies TX SSM/ESMC quality level changed.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name
+             jnxClksyncQualityCode is the SSM/ESMC quality level 
+             jnxClksyncQualityCodeStr is the SSM/ESMC quality level in string format."
+    ::= { jnxTimingEvents 6 }
+
+    jnxTimingEventSynceHldovrToLck NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies SyncE Holdover to Locked EEC state.
+
+             jnxClksyncIfIndex is the SyncE interface index
+             jnxClksyncIntfName is the SyncE interface name."
+    ::= { jnxTimingEvents 7 }
+
+    jnxTimingEventSynceLckToHldovr NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies SyncE Locked to Holdover EEC state.
+
+             jnxClksyncIfIndex is the SyncE interface index
+             jnxClksyncIntfName is the SyncE interface name."
+    ::= { jnxTimingEvents 8 }
+
+    jnxTimingEventDpllStatus NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncDpllState,
+                jnxClksyncDpllStateStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that DPLL state change
+             (unknown, lock_acq, locked, holder, freerun).
+
+             jnxClksyncDpllState indicates the Dpll status
+             jnxClksyncDpllStateStr indicates the Dpll status in string format."
+    ::= { jnxTimingEvents 9 }
+
+    jnxTimingEventSynceDpllStatus NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName,
+                jnxClksyncDpllState,
+                jnxClksyncDpllStateStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that Synce DPLL state change
+             (unknown, lock_acq, locked, holder, freerun).
+
+             jnxClksyncIfIndex is the interface index from which Frequency is derived
+             jnxClksyncIntfName is the interface name from which Frequency is derived
+             jnxClksyncDpllState indicates the Dpll status
+             jnxClksyncDpllStateStr indicates the Dpll status in string format."
+    ::= { jnxTimingEvents 10 }
+
+    jnxTimingEventBitsDpllStatus NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName,
+                jnxClksyncDpllState,
+                jnxClksyncDpllStateStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that Synce DPLL state change
+             (unknown, lock_acq, locked, holder, freerun).
+
+             jnxClksyncIfIndex is the interface index from which Frequency is derived
+             jnxClksyncIntfName is the interface name from which Frequency is derived
+             jnxClksyncDpllState indicates the Dpll status
+             jnxClksyncDpllStateStr indicates the Dpll status in string format."
+    ::= { jnxTimingEvents 11 }
+
+    jnxTimingEventPtpServoStatus NOTIFICATION-TYPE
+        OBJECTS {
+                jnxPtpServoState,
+                jnxPtpServoStateStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that PTP servo state
+             (Init, Acquiring, PhaseAligned, FreeRun, Holdover). 
+
+             jnxPtpServoState indicates the ptp servo status
+             jnxPtpServoStateStr indicates the ptp servo status in string format."
+    ::= { jnxTimingEvents 12 }
+
+    jnxTimingEventPtpGMClockClassChange NOTIFICATION-TYPE
+        OBJECTS {
+                jnxPtpGmId,
+                jnxPtpClass
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies PTP clock class changes.
+
+             jnxPtpGmId indicates the ptp Grand Master clock-id
+             jnxPtpClass indicates the ptp Grand Master clock status."
+    ::= { jnxTimingEvents 13 }
+
+    jnxTimingEventPtpGMClockAccuracyChange NOTIFICATION-TYPE
+        OBJECTS {
+                jnxPtpGmId,
+                jnxPtpAccuracy
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies PTP clock accuracy changes.
+
+             jnxPtpGmId indicates the ptp Grand Master clock-id
+             jnxPtpAccuracy indicates the ptp Grand Master clock accuracy."
+    ::= { jnxTimingEvents 14 }
+
+    jnxTimingEventPtpGMChange NOTIFICATION-TYPE
+        OBJECTS {
+                jnxPtpGmId
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies PTP Grand Master changes.
+
+             jnxPtpGmId indicates the ptp Grand Master clock-id."
+    ::= { jnxTimingEvents 15 }
+
+    jnxTimingEventHybridStatus NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncHybridState,
+                jnxClksyncHybridStateStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that Hybrid state
+             (Init, FreqAcq, FreqLckPhaseAcq, FreqPhaseLck). 
+
+             jnxClksyncHybridState indicates the hybrid status
+             jnxClksyncHybridStateStr indicates the hybrid status in string format."
+    ::= { jnxTimingEvents 16 }
+
+    jnxTimingEventSquelchSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that interface status changed to squelched.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 17 }
+
+    jnxTimingEventSquelchClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that interface status changed to active.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name."
+    ::= { jnxTimingFaults 18 }
+
+    jnxTimingEventLedColorChange NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncIfIndex,
+                jnxClksyncIntfName,
+                jnxClksyncColorStr -- new LED color
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies TX SSM/ESMC quality level changed.
+
+             jnxClksyncIfIndex is the interface index
+             jnxClksyncIntfName is the interface name
+             jnxClksyncColorStr is the color of the LED unit."
+    ::= { jnxTimingEvents 19 }
+
+
+-------------------------------------------------------------------------------
+-- Conformance
+-------------------------------------------------------------------------------
+jnxTimingCompliances      OBJECT IDENTIFIER ::= { jnxTimingConformance 1 }
+jnxTimingGroups           OBJECT IDENTIFIER ::= { jnxTimingConformance 2 }
+
+jnxTimingCompliance MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+"The compliance statement for systems supporting
+ the Timing Notification MIB."
+MODULE -- this module
+-- MANDATORY-GROUPS {
+-- any mandatory groups should be mentioned here
+-- }
+GROUP       jnxTimingObjectsGroup
+DESCRIPTION
+"This group is optional."
+GROUP       jnxTimingNotfnFaultsGroup
+DESCRIPTION
+"This group is optional."
+GROUP       jnxTimingNotfnEventsGroup
+DESCRIPTION
+"This group is optional."
+::= { jnxTimingCompliances 1 }
+
+jnxTimingObjectsGroup OBJECT-GROUP
+OBJECTS {
+        jnxClksyncState,
+        jnxClksyncIfIndex,
+        jnxClksyncIntfName,
+        jnxAcbFpgaRevMajor,
+        jnxAcbFpgaRevMinor,
+        jnxBootCpldFpgaRevMajor,
+        jnxBootCpldFpgaRevMinor,
+        jnxClksyncQualityCode,
+        jnxClksyncDpllState,
+        jnxPtpServoState,
+        jnxPtpClass,
+        jnxPtpAccuracy,
+        jnxPtpGmId,
+        jnxPtpGmIpAddr,
+        jnxClkStreamHandle,
+        jnxRemoteIpAddr,
+        jnxClksyncHybridState,
+        jnxPtpPhaseOffset,
+        jnxClksyncQualityCodeStr,
+        jnxClksyncDpllStateStr,
+        jnxPtpServoStateStr,
+        jnxClksyncHybridStateStr,
+        jnxClksyncColorStr
+}
+STATUS current
+DESCRIPTION
+"Timing objects group."
+::= { jnxTimingGroups 1 }
+
+jnxTimingNotfnFaultsGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+        jnxTimingFaultLOSSet,
+        jnxTimingFaultLOSClear,
+        jnxTimingFaultEFDSet,
+        jnxTimingFaultEFDClear,
+        jnxTimingFaultLOESMCSet,
+        jnxTimingFaultLOESMCClear,
+        jnxTimingFaultQLFailSet,
+        jnxTimingFaultQLFailClear,
+        jnxTimingFaultLTISet,
+        jnxTimingFaultLTIClear,
+        jnxTimingFaultAcbcFpgaVerNotCompatible,
+        jnxTimingFaultBootCpldVerNotCompatible,
+        jnxTimingFaultPriSrcFailed,
+        jnxTimingFaultSecSrcFailed,
+        jnxTimingFaultPtpUniNegRateRejectSet,
+        jnxTimingFaultPtpUniNegRateRejectClear
+}
+STATUS current
+DESCRIPTION
+"Timing defects notification group."
+::= { jnxTimingGroups 2 }
+
+jnxTimingNotfnEventsGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+        jnxTimingEventPriSrcRecovered,
+        jnxTimingEventSecSrcRecovered,
+        jnxTimingEventPriRefChanged,
+        jnxTimingEventSecRefChanged,
+        jnxTimingEventQLChangedRx,
+        jnxTimingEventQLChangedTx,
+        jnxTimingEventSynceHldovrToLck,
+        jnxTimingEventSynceLckToHldovr,
+        jnxTimingEventDpllStatus,
+        jnxTimingEventSynceDpllStatus,
+        jnxTimingEventBitsDpllStatus,
+        jnxTimingEventPtpServoStatus,
+        jnxTimingEventPtpGMClockClassChange,
+        jnxTimingEventPtpGMClockAccuracyChange,
+        jnxTimingEventPtpGMChange,
+        jnxTimingEventHybridStatus,
+        jnxTimingEventSquelchSet,
+        jnxTimingEventSquelchClear,
+        jnxTimingEventLedColorChange
+}
+
+STATUS current
+DESCRIPTION
+"Timing events notification group."
+::= { jnxTimingGroups 3 }
+
+END
+
