@@ -1,3 +1,17 @@
+### May 2015
+
+#### Bug fixes
+  - Updated nested addHosts to use variables passed (PR889)
+
+#### Improvements
+  - Added loading bar to top nav (PR893)
+  - Added load and current for APC units (PR888)
+  - Improved web installer (PR887)
+  - Updated alerts status box (PR875)
+  - Updated syslog page (PR862)
+  - Added temperature polling for IBM Flexsystem (PR894)
+  - Updated typeahead libraries and relevant forms (PR882)
+
 ### Apr 2015
 
 ####Bug fixes
@@ -8,6 +22,22 @@
   - Fixed alerts path issue (PR756, PR760)
   - Supress further port alerts when interface goes down (PR745)
   - Fixed login so redirects via 303 when POST data sent (PR775)
+  - Fixed missing link to errored or ignored ports (PR787)
+  - Updated alert log query for performance improvements (PR783)
+  - Honour alert_rules.disabled field (PR784)
+  - Stop page debug if user not logged in (PR785)
+  - Added text filtering for new tables (PR797)
+  - Fixed VMWare VM detection + hardware / serial support (PR799)
+  - Fix links from /health/processor (PR810)
+  - Hide divider if no plugins installed (PR811)
+  - Added Nginx fix for using debug option (PR823)
+  - Bug fixes for device groups SQL (PR840)
+  - Fixed path issue when using rrdcached (PR839)
+  - Fixed JS issues when deleting alert maps / poller groups / device groups (PR846,PR848,PR877)
+  - Fixed links and popover for /health/metric=storage/ (PR847)
+  - Fixed lots of user permission issues (PR855)
+  - Fixed search ip / arp / mac pages (PR845)
+  - Added missing charge icon (PR878)
 
 ####Improvements
   - New theme support added (light,dark and mono) (PR682,PR683,PR701)
@@ -23,10 +53,33 @@
   - Shorten interface names on map (PR752)
   - Added PowerCode support (PR762)
   - Added Autodiscovery via OSPF (PR772)
-  - Added visual graph of alert log (PR777)
+  - Added visual graph of alert log (PR777, PR809)
   - Added Callback system to send anonymous stats (PR768)
   - More tables converted to use bootgrid (PR729, PR761)
   - New Global Cache to store common queries added (PR780)
+  - Added proxy support for submitting stats (PR791)
+  - Minor APC Polling change (PR800)
+  - Updated to HP switch detection (PR802)
+  - Added Datacom basic detection (PR816)
+  - Updated Cisco detection (PR815)
+  - Added CSV export system + ability to export ports (PR818)
+  - Added basic detection for PacketLogic devices (PR773)
+  - Added fallback support for IBM switches for Serial / Version (PR822)
+  - Added Juniper Inventory support (PR825)
+  - Sharpen graphs produced (PR826)
+  - Updated map to show device overview graphs and port graphs (PR826)
+  - Added hostname to API call for list_alerts (PR834)
+  - Added ability to schedule maintenance (PR835,PR841)
+  - Added ability to expand alert triggers for more details (PR857)
+  - Added support for XTM/FBX Watchguard devices (PR849)
+  - Updated Juniper MIBS and hardware rewrite (PR838)
+  - Updated OpenBSD detection (PR860)
+  - Added Macro support for alerting system (PR863)
+  - Added support for tcp connections on rrdcached (PR866)
+  - Added config option to enable / disable mouseover graphs (PR873)
+  - General cleanup of files / folders permissions (PR874)
+  - Added window size detection for map (PR884)
+  - Added text to let users know refresh is disabled (PR883)
 
 ### Mar 2015
 

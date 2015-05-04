@@ -188,7 +188,11 @@ function overlib_link($url, $text, $contents, $class)
 
   $contents = str_replace("\"", "\'", $contents);
   $output = '<a class="'.$class.'" href="'.$url.'"';
-  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
+  if ($config['web_mouseover'] === FALSE) {
+      $output .= ">";
+  } else {
+      $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
+  }
   $output .= $text."</a>";
 
   return $output;
@@ -723,6 +727,15 @@ function generate_pagination($count,$limit,$page,$links = 2) {
 
 function is_admin() {
     if ($_SESSION['userlevel'] >= '10') {
+        $allowed = true;
+    } else {
+        $allowed = false;
+    }
+    return $allowed;
+}
+
+function is_read() {
+    if ($_SESSION['userlevel'] == '5') {
         $allowed = true;
     } else {
         $allowed = false;

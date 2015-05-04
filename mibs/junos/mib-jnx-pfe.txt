@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: PFE MIB
 -- 
--- Copyright (c) 2006, Juniper Networks, Inc.
+-- Copyright (c) 2006-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -10,7 +10,8 @@
 JUNIPER-PFE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    Counter32, Counter64, Integer32
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
@@ -18,7 +19,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxPfeMib MODULE-IDENTITY
-    LAST-UPDATED "201002070000Z" -- Sun Feb 07 00:00:00 2010 UTC
+    LAST-UPDATED "201109220000Z" -- Thu Sept 22 00:00:00 2011 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -30,9 +31,19 @@ jnxPfeMib MODULE-IDENTITY
     DESCRIPTION
             "The MIB provides PFE specific data."
 
+    REVISION      "201109090000Z"
+    DESCRIPTION
+               "Added new Table jnxPfeMemoryErrorsTable which gives parity and
+                ecc errors.
+                Added new Trap pfeMemoryErrors"
     REVISION      "201002070000Z"
     DESCRIPTION
                "Added new notification types."
+    REVISION      "201403120000Z"
+    DESCRIPTION 
+               "Added new Table jnxPfeNotifyGlParAccSec which counts
+                notifications for the packets parsed/processed by
+                access-security." 
     --REVISION      "201001070000Z"
     --DESCRIPTION
     --         "Added new notification types."
@@ -89,7 +100,8 @@ jnxPfeMib MODULE-IDENTITY
             jnxPfeNotifyGlPktGetFails   Counter32,
             jnxPfeNotifyGlDmaFails      Counter32,
             jnxPfeNotifyGlDmaTotals     Counter32,
-            jnxPfeNotifyGlUnknowns      Counter32
+            jnxPfeNotifyGlUnknowns      Counter32,
+            jnxPfeNotifyGlParAccSec     Counter32
 	}
 
     jnxPfeNotifyGlSlot OBJECT-TYPE
@@ -272,6 +284,15 @@ jnxPfeMib MODULE-IDENTITY
                 only."
         ::= { jnxPfeNotifyGlEntry 19 }
 
+    jnxPfeNotifyGlParAccSec OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications for the packets parsed/processed by
+                access-security."
+        ::= { jnxPfeNotifyGlEntry 20 }       
+
     --
     -- This table provides Type specific PFE notification stats for each PFE 
     -- slot, exposing the data provided by the 'show pfe statistics 
@@ -404,5 +425,81 @@ jnxPfeMib MODULE-IDENTITY
                 "Count of notifications where the notification type in the 
                 message does not match any of the valid types."
         ::= { jnxPfeNotifyTypeEntry 6 }
+
+    --
+    -- This table provides error counters for each PFE
+    --
+    jnxPfeMemoryErrorsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxPfeMemoryErrorsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This provides PFE memory errors"
+    ::= { jnxPfeNotification 3 }
+
+    jnxPfeMemoryErrorsEntry OBJECT-TYPE
+    SYNTAX          JnxPfeMemoryErrorsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        ""
+        INDEX { jnxPfeFpcSlot, jnxPfeSlot }
+    ::= { jnxPfeMemoryErrorsTable 1 }
+
+    JnxPfeMemoryErrorsEntry ::=
+    SEQUENCE {
+            jnxPfeFpcSlot         Integer32,
+            jnxPfeSlot            Integer32,  
+            jnxPfeParityErrors    Counter64,
+            jnxPfeEccErrors       Counter64
+    }
+
+     jnxPfeFpcSlot OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The FPC slot number for this set of PFE notification"
+        ::= { jnxPfeMemoryErrorsEntry 1 }
+
+    jnxPfeSlot OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The pfe slot number for this set of errors"
+        ::= { jnxPfeMemoryErrorsEntry 2 }
+
+    jnxPfeParityErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The parity error count"
+        ::= { jnxPfeMemoryErrorsEntry 3 }
+
+    jnxPfeEccErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The ECC error count"
+        ::= { jnxPfeMemoryErrorsEntry 4 }
+     
+
+pfeMemoryErrorsNotificationPrefix OBJECT IDENTIFIER ::= { jnxPfeNotification 0 }
+
+pfeMemoryErrors NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeParityErrors,
+        jnxPfeEccErrors
+    }
+    STATUS current
+    DESCRIPTION
+        "A pfeMemoryErrors notification is sent when the value
+        of jnxPfeParityErrors or jnxPfeEccErrors increases." 
+
+    ::= { pfeMemoryErrorsNotificationPrefix 1 }
+
 
 END

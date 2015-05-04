@@ -284,17 +284,17 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         {
           // Try SNMPv2c
           $snmpver = 'v2c';
-          $ret = addHost($host, $snmpver);
+          $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
           if (!$ret)
           {
             //Try SNMPv3
             $snmpver = 'v3';
-            $ret = addHost($host, $snmpver);
+            $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             if (!$ret)
             {
               // Try SNMPv1
               $snmpver = 'v1';
-              return addHost($host, $snmpver);
+              return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
             } else {
               return $ret;
             }
@@ -1153,4 +1153,22 @@ function set_curl_proxy($post)
 	echo "Using ".$config['callback_proxy']." as proxy\n";
 	curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
     }
+}
+
+function target_to_id($target) {
+    if( $target[0].$target[1] == "g:" ) {
+        $target = "g".dbFetchCell('SELECT id FROM device_groups WHERE name = ?',array(substr($target,2)));
+    } else {
+        $target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?',array($target));
+    }
+    return $target;
+}
+
+function id_to_target($id) {
+    if( $id[0] == "g" ) {
+        $id = 'g:'.dbFetchCell("SELECT name FROM device_groups WHERE id = ?",array(substr($id,1)));
+    } else {
+        $id = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?",array($id));
+    }
+    return $id;
 }

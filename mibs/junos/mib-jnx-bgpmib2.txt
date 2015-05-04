@@ -2,7 +2,7 @@
 -- draft-ietf-idr-bgp4-mibv2-03.txt
 --
 -- Copyright (c) 2002 The Internet Society.
--- Copyright (c) 2003, 2006, Juniper Networks, Inc.
+-- Copyright (c) 2003-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- Juniper Networks edits to this MIB:                               *** JNX ***
@@ -11,6 +11,11 @@
 --             Added bgpM2PeerRoutingInstance to bgpM2PeerTable.
 --             Added REVISION clause to MODULE-IDENTITY.
 --             Fixed conformance clauses.
+--   12/12/17  Redefines the value for jnxBgpM2PrefixesInPrefixesRejected
+--             so that it conforms to the definition.
+--             Add a new counter in the same sequence to return the number
+--             of activeprefixes received from the peer
+--             jnxBgpM2PrefixInPrefixesActive.
 -- *****************************************************************************
 
 BGP4-V2-MIB-JUNIPER DEFINITIONS ::= BEGIN
@@ -51,6 +56,14 @@ BGP4-V2-MIB-JUNIPER DEFINITIONS ::= BEGIN
         DESCRIPTION
             "This MIB module defines management objects for
              the Border Gateway Protocol, Version 4."
+        REVISION    "201212170000Z"                               -- *** JNX ***
+        DESCRIPTION                                               -- *** JNX ***
+            "This change redefines the value returned for the     -- *** JNX ***
+            variable jnxBgpM2PrefixesInPrefixesRejected so that   -- *** JNX ***
+            it conforms to the definition.                        -- *** JNX ***
+            It also adds a new counter in the same sequence to    -- *** JNX ***
+            return the number of active prefixes received from    -- *** JNX ***
+            the peer:  jnxBgpM2PrefixInPrefixesActive"            -- *** JNX ***
         REVISION    "200309091508Z"  -- 09-Sep-03 11:08 AM EDT       *** JNX ***
         DESCRIPTION                                               -- *** JNX ***
             "This is a proprietary implementation of the          -- *** JNX ***
@@ -1688,6 +1701,8 @@ BGP4-V2-MIB-JUNIPER DEFINITIONS ::= BEGIN
         jnxBgpM2PrefixInPrefixesRejected
             Gauge32,
         jnxBgpM2PrefixOutPrefixes
+            Gauge32,
+        jnxBgpM2PrefixInPrefixesActive
             Gauge32
     }
 
@@ -1741,6 +1756,7 @@ BGP4-V2-MIB-JUNIPER DEFINITIONS ::= BEGIN
              in the Adj-Ribs-In and are NOT eligible to become active
              in the Loc-Rib."
         ::= { jnxBgpM2PrefixCountersEntry 9 }
+
     jnxBgpM2PrefixOutPrefixes OBJECT-TYPE
         SYNTAX     Gauge32
         MAX-ACCESS read-only
@@ -1750,6 +1766,15 @@ BGP4-V2-MIB-JUNIPER DEFINITIONS ::= BEGIN
              in that peers Adj-Ribs-Out."
         ::= { jnxBgpM2PrefixCountersEntry 10 }
 
+    jnxBgpM2PrefixInPrefixesActive OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in the Adj-Ribs-In and are the active route
+             in the Loc-Rib."
+        ::= { jnxBgpM2PrefixCountersEntry 11 }
 
 
     jnxBgpM2PeerExtensions

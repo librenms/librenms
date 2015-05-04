@@ -4,20 +4,20 @@ WATCHGUARD-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
         MODULE-IDENTITY, OBJECT-TYPE,  Counter64, 
         OBJECT-IDENTITY, enterprises, 
         IpAddress, TimeTicks       FROM SNMPv2-SMI
-        watchguard                 FROM WATCHGUARD-MIB;
+        watchguard                 FROM WATCHGUARD-SMI;
         
     wgInfoModule MODULE-IDENTITY
         LAST-UPDATED  "200701251200Z"
         ORGANIZATION  "WatchGuard Technologies, Inc."
         CONTACT-INFO
-                  "   Ella Yu
-                      WatchGuard Technologies, Inc.
-                      1841 Zanker Road 
-                      San Jose, CA 95112
-                      USA
+                   "  WatchGuard Technologies, Inc.
 
-                      408-519-4888
-                      ella.yu@watchguard.com "
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
+
+                      +1.206.613.6600 " 
 
 
         DESCRIPTION
@@ -38,14 +38,20 @@ WATCHGUARD-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
              statistical counters."
     ::= { wgInfoModule 3 }
 
+    wgSoftwareVersion OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Software version of sysA and sysB"
+        ::= { wgSystemStatisticsMIB 1 }
+
     wgSystemCpuUtil OBJECT-TYPE
         SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "CPU utilization of the system in last 5 seconds. The value
-             is measured in 0.01%.  For example, if the value is 234, 
-             then CPU utilization is 2.34%."
+            "Deprecated, currently unused."
         ::= { wgSystemStatisticsMIB 4 }
             
     wgSystemTotalSendBytes OBJECT-TYPE
@@ -89,7 +95,7 @@ WATCHGUARD-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of the connection requests since system is up."
+            "Deprecated, currently unused."
         ::= { wgSystemStatisticsMIB 30 }
  
     wgSystemStreamReqDrop OBJECT-TYPE
@@ -97,7 +103,7 @@ WATCHGUARD-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The total number of the connection requests being dropped since system is up."
+            "Deprecated, currently unused."
         ::= { wgSystemStatisticsMIB 34 }
      
     wgSystemCpuUtil1 OBJECT-TYPE
