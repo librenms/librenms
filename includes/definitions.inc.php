@@ -417,6 +417,14 @@ $config['os'][$os]['icon']              = "ruckus";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
+// Siklu Wireless
+$os = "siklu";
+$config['os'][$os]['text']              = "Siklu Wireless";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "siklu";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
 // Supermicro Switch
 
 $os = "supermicro-switch";
@@ -1365,6 +1373,88 @@ $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx'] = array(
   'ds'        => array(
     'rxpktsAll' => array('label' => 'Packets', 'draw' => 'AREA', 'line' => TRUE)
   )
+);
+
+// Siklu support
+$config['graph_types']['device']['siklu_rfAverageRssi'] = array(
+    'section'   => 'wireless',
+    'order'     => '0',
+    'descr'     => 'Radio Average RSSI',
+    'file'      => 'siklu-wireless.rrd',
+    'colours'   => 'blues',
+    'unit_text' => 'dBm',
+    'ds'        => array(
+        'rfAverageRssi' => array('label' => 'RSSI', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+$config['graph_types']['device']['siklu_rfAverageCinr'] = array(
+    'section'   => 'wireless',
+    'order'     => '1',
+    'descr'     => 'Radio Average CINR',
+    'file'      => 'siklu-wireless.rrd',
+    'colours'   => 'reds',
+    'unit_text' => 'dB',
+    'ds'        => array(
+        'rfAverageCinr' => array('label' => 'CINR', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+$config['graph_types']['device']['siklu_rfOperationalFrequency'] = array(
+    'section'   => 'wireless',
+    'order'     => '2',
+    'descr'     => 'Operational Frequency',
+    'file'      => 'siklu-wireless.rrd',
+    'colours'   => 'reds',
+    'unit_text' => 'GHz',
+    'ds'        => array(
+        'rfOperFreq' => array('label' => 'Hz', 'draw' => 'AREA', 'line' => TRUE)
+    )
+);
+$config['graph_types']['device']['siklu_rfinterfacePkts'] = array(
+    'section'   => 'wireless',
+    'order'     => '3',
+    'descr'     => 'Packets',
+    'file'      => 'siklu-interface.rrd',
+    'unit_text' => 'pps',
+    'ds'        => array(
+        'rfIPkts' => array('label' => 'In bps', 'draw' => 'LINE', 'line' => TRUE),
+        'rfOutPkts' => array('label' => 'Out bps', 'draw' => 'LINE', 'line' => TRUE),
+    )
+);
+$config['graph_types']['device']['siklu_rfinterfaceOtherPkts'] = array(
+    'section'   => 'wireless',
+    'order'     => '4',
+    'descr'     => 'Other Packets',
+    'file'      => 'siklu-interface.rrd',
+    'unit_text' => 'pps',
+    'ds'        => array(
+        'rfInGoodPkts' => array('label' => 'Good Pkts', 'draw' => 'LINE', 'line' => TRUE),
+        'rfInErroredPkts' => array('label' => 'Errored Pkts', 'draw' => 'LINE', 'line' => TRUE),
+        'rfInLostPkts' => array('label' => 'Lost Pkts', 'draw' => 'LINE', 'line' => TRUE),
+    )
+);
+$config['graph_types']['device']['siklu_rfinterfaceOctets'] = array(
+    'section'   => 'wireless',
+    'order'     => '5',
+    'descr'     => 'Traffic',
+    'file'      => 'siklu-interface.rrd',
+    'unit_text' => 'bps',
+    'ds'        => array(
+        'rfInOctets' => array('label' => 'In bps', 'draw' => 'LINE', 'line' => TRUE),
+        'rfOutOctets' => array('label' => 'Out bps', 'draw' => 'LINE', 'line' => TRUE),
+    )
+);
+$config['graph_types']['device']['siklu_rfinterfaceOtherOctets'] = array(
+    'section'   => 'wireless',
+    'order'     => '6',
+    'descr'     => 'Other Octets',
+    'file'      => 'siklu-interface.rrd',
+    'unit_text' => 'bps',
+    'ds'        => array(
+        'rfInIdleOctets' => array('label' => 'In Idle', 'draw' => 'LINE', 'line' => TRUE),
+        'rfOutIdleOctets' => array('label' => 'Out Idle', 'draw' => 'LINE', 'line' => TRUE),
+        'rfInGoodOctets' => array('label' => 'Good Octets', 'draw' => 'LINE', 'line' => TRUE),
+        'rfInErroredOctetts' => array('label' => 'Errored Octets', 'draw' => 'LINE', 'line' => TRUE),
+    )
 );
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
