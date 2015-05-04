@@ -75,36 +75,67 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 #### Poller modules
 
 `unix-agent`: Enable the check_mk agent for external support for applications.
+
 `system`: Provides information on some common items like uptime, sysDescr and sysContact.
+
 `os`: Os detection. This module will pick up the OS of the device.
+
 `ipmi`: Enables support for IPMI if login details have been provided for IPMI.
+
 `sensors`: Sensor detection such as Temperature, Humidity, Voltages + More.
+
 `processors`: Processor support for devices.
+
 `mempools`: Memory detection support for devices.
+
 `storage`: Storage detection for hard disks
+
 `netstats`: Statistics for IP, TCP, UDP, ICMP and SNMP.
+
 `hr-mib`: Host resource support.
+
 `ucd-mib`: Support for CPU, Memory and Load.
+
 `ipSystemStats`: IP statistics for device.
+
 `ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+
 `bgp-peers`: BGP detection and support.
+
 `junose-atm-vp`: Juniper ATM support.
+
 `toner`: Toner levels support.
+
 `ucd-diskio`: Disk I/O support.
+
 `wifi`: WiFi Support for those devices with support.
+
 `ospf`: OSPF Support.
+
 `cisco-ipsec-flow-monitor': IPSec statistics support.
+
 `cisco-remote-access-monitor`: Cisco remote access support.
+
 `cisco-cef`: CEF detection and support.
+
 `cisco-sla`: SLA detection and support.
+
 `cisco-mac-accounting`: MAC Address account support.
+
 `cipsec-tunnels`: IPSec tunnel support.
+
 `cisco-ace-loadbalancer`: Cisco ACE Support.
+
 `cisco-ace-serverfarms`: Cisco ACE Support.
+
 `netscaler-vsvr`: Netscaler support.
-`aruba-controller`: Arube wireless controller support. 
+
+`aruba-controller`: Arube wireless controller support.
+ 
 `entity-physical`: Module to pick up the devices hardware support.
+
 `applications`: Device application support.
+
 `cisco-asa-firewall`: Cisco ASA firewall support.
 
 #### Running
