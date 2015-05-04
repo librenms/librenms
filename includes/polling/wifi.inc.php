@@ -20,6 +20,13 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
   }
 
+  if ($device['os'] == 'siklu') {
+
+      echo("It is Siklu\n");
+      include "includes/polling/mib/siklu-mib.inc.php";
+
+  }
+
   ///# GENERIC FRAMEWORK, FILLING VARIABLES
   if ($device['os'] == 'airport')
   {
