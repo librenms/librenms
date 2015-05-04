@@ -7,11 +7,15 @@
 
 ### Support
  - [Why do I get blank pages sometimes in the WebUI?](#faq6)
+ - [Why do I not see any graphs?](#faq10)
  - [How do I debug pages not loading correctly?](#faq7)
+ - [How do I debug the discovery process?](#faq11)
+ - [How do I debug the poller process?](#faq12)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What can I do to help?](#faq9)
+ - [How can I test another users branch?](#faq13)
 
 #### <a name="faq1"> How do I install LibreNMS?</a>
 
@@ -63,6 +67,11 @@ The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/
 
 If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in php.ini and then your web service reloaded.
 
+#### <a name="faq10"> Why do I not see any graphs?</a>
+
+This is usually due to there being blank spaces outside of the `<?php ?>` php tags within config.php. Remove these and retry. 
+It's also worth removing the final `?>` at the end of config.php as this is not required. 
+
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
 A debug system is in place which enables you to see the output from php errors, warnings and notices along with the MySQL queries that have been run for that page.
@@ -70,6 +79,14 @@ A debug system is in place which enables you to see the output from php errors, 
 To enable the debug option, add /debug=yes/ to the end of any URI (I.e /devices/debug=yes/) or ?debug=yes if you are debugging a graph directly.
 
 You will then have a two options in the footer of the website - Show SQL Debug and Show PHP Debug. These will both popup that pages debug window for you to view. If the page itself has generated a fatal error then this will be displayed directly on the page.
+
+#### <a name="faq11"> How do I debug the discovery process?</a>
+
+Please see the (Discovery Support)[http://docs.librenms.org/Support/Discovery Support] document for further details.
+
+#### <a name="faq12"> How do I debug the poller process?</a>
+
+Please see the (Poller Support)[http://docs.librenms.org/Support/Poller Support] document for further details.
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
@@ -101,3 +118,39 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
 - Feature requests. Can't code / won't code. No worries, chuck a feature request into Git Hub with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
 - Be nice, this is the foundation of this project. We expect everyone to be nice. People will fall out, people will disagree but please do it so in a respectable way.
 - Ask questions. Sometimes just by asking questions you prompt deeper conversations that can lead us to somewhere amazing so please never be afraid to ask a question.
+
+#### <a name="faq13"> How can I test another users branch?</a>
+
+LibreNMS can and is developed by anyone, this means someone may be working on a new feature or support for a device that you want. 
+It can be helpful for others to test these new features, using Git, this is made easy.
+
+```bash
+cd /opt/librenms
+```
+
+Firstly ensure that your current branch is in good state:
+```bash
+git status
+```
+
+If you see `nothing to commit, working directory clean` then let's go for it :)
+
+Let's say that you want to test a users (f0o) new development branch (issue-1337) then you can do the following:
+ 
+```bash
+git remote add f0o https://github.com/librenms/librenms.git
+git remote update f0o
+git checkout issue-1337
+```
+
+Once you are done testing, you can easily switch back to the master branch:
+
+```bash
+git checkout master
+```
+
+If you want to pull any new updates provided by f0o's branch then whilst you are still in it, do the following:
+
+```bash
+git pull f0o issue-1337
+```
