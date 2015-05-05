@@ -3,7 +3,7 @@ import urllib2
 import re
 
 
-data = urllib2.urlopen('http://localhost/nginx-status').read()
+data = urllib2.urlopen('http://127.0.0.1/nginx-status').read()
 
 params = {}
 
