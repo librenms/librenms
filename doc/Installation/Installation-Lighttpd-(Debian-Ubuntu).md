@@ -58,6 +58,8 @@ Change the values to the right of the equal sign for lines beginning with `$conf
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
 
+** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php>` blocks. Your graphs will break otherwise. **
+
 ### Initialise the database ###
 
 Initiate the follow database with the following command:

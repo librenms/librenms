@@ -143,6 +143,8 @@ Add the following line to the end of `config.php`:
 
     $config['fping'] = "/usr/sbin/fping";
 
+** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php>` blocks. Your graphs will break otherwise. **
+
 ### Initialise the database ###
 
 Initiate the follow database with the following command:
