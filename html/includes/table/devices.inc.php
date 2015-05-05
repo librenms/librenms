@@ -44,7 +44,7 @@ if( !empty($_POST['group']) ) {
     require_once('../includes/device-groups.inc.php');
     $sql .= " AND ( ";
     foreach( GetDevicesFromGroup($_POST['group']) as $dev ) {
-        $sql .= "device_id = ? OR ";
+        $sql .= "`devices`.`device_id` = ? OR ";
         $param[] = $dev['device_id'];
     }
     $sql = substr($sql, 0, strlen($sql)-3);
