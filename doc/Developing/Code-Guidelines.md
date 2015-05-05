@@ -49,4 +49,4 @@ Ensure you use <?php rather than the shorthand version <?.
 <?php
 ```
 
-The `?>` tag isn't required for included php files. For instance anything in includes/ or html/includes don't need the tag along with config.pgp. If the php file is standalone then you still need the tag. If you are unsure, add it in :)
+The `?>` tag isn't required for included php files. For instance anything in includes/ or html/includes don't need the tag along with config.php. If the php file is standalone then you still need the tag. If you are unsure, add it in :)
