@@ -37,7 +37,7 @@ if (!empty($_POST['disabled'])) { $sql .= " AND disabled= ?";     $param[] = $_P
 if (!empty($_POST['ignore']))   { $sql .= " AND `ignore`= ?";       $param[] = $_POST['ignore']; }
 if (!empty($_POST['location']) && $_POST['location'] == "Unset") { $location_filter = ''; }
 if (!empty($_POST['location'])) {
-    $sql .= " AND (((`DA`.`attrib_type`='override_sysLocation_string' AND `DA`.`attrib_value` = ?)) OR `location` = ?)";
+    $sql .= " AND (((`DB`.`attrib_value`='1' AND `DA`.`attrib_type`='override_sysLocation_string' AND `DA`.`attrib_value` = ?)) OR `location` = ?)";
     $param = array(mres($_POST['location']),mres($_POST['location']));
 }
 if( !empty($_POST['group']) ) {
@@ -73,7 +73,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `devices`.* $sql";
+$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
 
 if (!isset($_POST['format'])) {
     $_POST['format'] = "list_detail";
