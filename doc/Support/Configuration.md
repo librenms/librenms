@@ -355,7 +355,8 @@ Please see [IRC Bot](http://docs.librenms.org/Extensions/IRC-Bot/) section of th
 $config['auth_mechanism']           = "mysql";
 ```
 This is the authentication type to use for the WebUI. MySQL is the default and configured when following the installation 
-instructions. ldap and http-auth are also valid options.
+instructions. ldap and http-auth are also valid options. For instructions on the different authentication modules please 
+see [Authentication](http://doc.librenms.org/Extensions/Authentication/).
 
 ```php
 $config['auth_remember']            = '30';
@@ -368,21 +369,6 @@ $config['allow_unauth_graphs_cidr'] = array();
 ```
 This option will enable unauthenticated access to the graphs from `allow_unauth_graphs_cidr` ranges that you allow. Use 
  of this option is highly discouraged in favour of the [API](http://docs.librenms.org/API/API-Docs/) that is now available.
- 
-```php
-$config['auth_ldap_version'] = 3; # v2 or v3
-$config['auth_ldap_server'] = "ldap.example.com";
-$config['auth_ldap_port']   = 389;
-$config['auth_ldap_prefix'] = "uid=";
-$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
-$config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
-$config['auth_ldap_groups']['admin']['level'] = 10;
-$config['auth_ldap_groups']['pfy']['level'] = 7;
-$config['auth_ldap_groups']['support']['level'] = 1;
-$config['auth_ldap_groupmemberattr'] = "memberUid";
-```
-These configuration options will enable you to integrate your LDAP service into LibreNMS and allow authentication.
 
 #### Cleanup options
 
