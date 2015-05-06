@@ -3,7 +3,19 @@
 $where = 1;
 $param = array();
 
-$sql = " FROM `devices` WHERE $where ";
+$sql = " FROM `devices`";
+
+if (!empty($_POST['location'])) {
+
+    if (is_admin() === FALSE && is_read() === FALSE) {
+        $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id`=`DP`.`device_id` AND `DP`.`user_id`=?";
+        $param[] = $_SESSION['user_id'];
+    }
+
+    $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
+}
+
+$sql .= " WHERE $where ";
 
 if (!empty($_POST['hostname'])) { $sql .= " AND hostname LIKE ?"; $param[] = "%".$_POST['hostname']."%"; }
 if (!empty($_POST['os']))       { $sql .= " AND os = ?";          $param[] = $_POST['os']; }
@@ -24,19 +36,22 @@ if (!empty($_POST['state'])) {
 if (!empty($_POST['disabled'])) { $sql .= " AND disabled= ?";     $param[] = $_POST['disabled']; }
 if (!empty($_POST['ignore']))   { $sql .= " AND `ignore`= ?";       $param[] = $_POST['ignore']; }
 if (!empty($_POST['location']) && $_POST['location'] == "Unset") { $location_filter = ''; }
-if (!empty($_POST['location'])) { $location_filter = $_POST['location']; }
+if (!empty($_POST['location'])) {
+    $sql .= " AND (((`DB`.`attrib_value`='1' AND `DA`.`attrib_type`='override_sysLocation_string' AND `DA`.`attrib_value` = ?)) OR `location` = ?)";
+    $param = array(mres($_POST['location']),mres($_POST['location']));
+}
 if( !empty($_POST['group']) ) {
     require_once('../includes/device-groups.inc.php');
     $sql .= " AND ( ";
     foreach( GetDevicesFromGroup($_POST['group']) as $dev ) {
-        $sql .= "device_id = ? OR ";
+        $sql .= "`devices`.`device_id` = ? OR ";
         $param[] = $dev['device_id'];
     }
     $sql = substr($sql, 0, strlen($sql)-3);
     $sql .= " )";
 }
 
-$count_sql = "SELECT COUNT(`device_id`) $sql";
+$count_sql = "SELECT COUNT(`devices`.`device_id`) $sql";
 
 $total = dbFetchCell($count_sql,$param);
 if (empty($total)) {
@@ -58,7 +73,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT * $sql";
+$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
 
 if (!isset($_POST['format'])) {
     $_POST['format'] = "list_detail";
@@ -66,10 +81,6 @@ if (!isset($_POST['format'])) {
 list($format, $subformat) = explode("_", $_POST['format']);
 
 foreach (dbFetchRows($sql, $param) as $device) {
-    if (device_permitted($device['device_id'])) {
-        if (!isset($location_filter) || ((get_dev_attrib($device,'override_sysLocation_bool') &&
-            get_dev_attrib($device,'override_sysLocation_string') == $location_filter) || $device['location'] == $location_filter)) {
-
             if (isset($bg) && $bg == $list_colour_b) {
                 $bg = $list_colour_a;
             } else {
@@ -152,8 +163,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
             }
             $response[] = array('extra'=>$extra,'msg'=>$msg,'icon'=>$image,'hostname'=>$hostname,'ports'=>$col_port,'hardware'=>$platform,'os'=>$os,'uptime'=>$uptime,'actions'=>$actions);
-        }
-    }
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
