@@ -343,6 +343,8 @@ $config['billing']['base']              = 1000; # Set the base to divider bytes 
 $config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 #$config['smokeping']['dir']             = "/var/lib/smokeping/";
+//$config['oxidized']['enabled']         = FALSE;//Set to TRUE
+//$config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
 
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;
