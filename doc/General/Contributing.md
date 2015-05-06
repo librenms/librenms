@@ -147,54 +147,8 @@ project.
 Proposed workflow for submitting pull requests
 ----------------------------------------------
 
-The basic rule is: don't create merge conflicts in master.  Merges should be
-simple fast-forwards from current master.
-
-Following is a proposed workflow designed to minimise the scope of merge
-conflicts when submitting pull requests.  It's not mandatory, but seems to
-work well enough.
-
-We don't recommend git flow because we don't want to maintain separate
-development and master branches, but if it works better for you, feel free
-to do that, as long as you follow the golden rule of not creating merge
-conflicts in master.
-
-Workflow:
-
-- Ensure you have auto rebase switched on in your gitconfig.
-```
-[branch]
-        autosetuprebase = always
-```
-- Fork the [LibreNMS repo master branch][2] in your own GitHub account.
-- Create an [issue][3] explaining what work you plan to do.
-- Create a branch in your copy of the repo called issue-####, where #### is
-  the issue number you created.
-```
-git push origin master:issue-####
-git checkout issue-####
-```
-- Make and test your changes in the issue branch as needed - this might take
-  a few days or weeks.
-- When you are happy with your issue branch's changes and ready to submit
-  your patch, update your copy of the master branch to the current revision;
-  this should just result in a fast forward of your copy of master:
-```
-git checkout master
-git pull
-```
-- Rebase your issue branch from your clone of master; fix any conflicts at
-  this stage:
-````
-git checkout issue-####
-git pull
-````
-- Push your changes to your remote git hub branch so you can submit a pull
-  from your issue-#### branch:
-````
-git push origin issue-####
-````
-- Submit a pull request for your patch from your issue-#### branch.
+Please see the new [Using Git](http://doc.librenms.org/Developing/Using-Git/) document which gives you step-by-step 
+instructions on using git to submit a pull request.
 
 [1]: http://www.gnu.org/licenses/license-list.html
 "Free Software Foundation's license list"
