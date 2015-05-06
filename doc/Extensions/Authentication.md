@@ -9,11 +9,11 @@ Here we will provide configuration details for these modules.
 
 - LDAP: ldap
 
-- HTTP Auth: http-auth
+ HTTP Auth: http-auth
 
 #### User levels
 
-- 1: Normal User. You will need assign device / port permissions for users at this level.
+- 1: Normal User. You will need to assign device / port permissions for users at this level.
 
 - 5: Global Read.
 
