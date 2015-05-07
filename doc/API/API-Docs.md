@@ -17,6 +17,7 @@
         - [`get_graph_by_port_hostname`](#api-route-9)
         - [`list_devices`](#api-route-10)
         - [`add_device`](#api-route-11)
+        - [`list_oxidized`](#api-route-21)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
     - [`switching`](#api-switching)
@@ -393,6 +394,36 @@ Output:
     "status": "ok",
     "message": "Device localhost.localdomain has been added successfully"
 }
+```
+
+### <a name="api-route-21">Function: `list_oxidized`</a> [`top`](#top)
+
+List devices for use with Oxidized.
+
+Route: /api/v0/oxidized
+
+Input (JSON):
+
+ - 
+ 
+Examples:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
+```
+
+Output:
+
+```text
+[
+    {
+        "hostname": "localhost",
+        "os": "linux"
+    },
+    {
+        "hostname": "otherserver",
+        "os": "linux"
+    }
+]
 ```
 
 ## <a name="api-routing">`Routing`</a> [`top`](#top)

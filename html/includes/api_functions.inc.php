@@ -699,3 +699,17 @@ function get_inventory() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function list_oxidized() {
+  // return details of a single device
+  $app = \Slim\Slim::getInstance();
+  $app->response->headers->set('Content-Type', 'application/json');
+
+  $devices = array();
+  foreach (dbFetchRows("SELECT hostname,os FROM `devices` WHERE `status`='1'") as $device) {
+    $devices[] = $device;
+  }
+  $app->response->headers->set('Content-Type', 'application/json');
+  echo _json_encode($devices);
+
+}
