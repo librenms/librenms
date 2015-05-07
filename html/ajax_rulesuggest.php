@@ -91,6 +91,7 @@ if( isset($_GET['term'],$_GET['device_id']) ) {
 				$chk[] = $tst['TABLE_NAME'].'.';
 			}
 			$chk[] = 'macros.';
+			$chk[] = 'bills.';
 		}
 	}
 	if( sizeof($chk) > 0 ) {

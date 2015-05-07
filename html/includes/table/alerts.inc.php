@@ -42,11 +42,17 @@ foreach (dbFetchRows($sql,$param) as $alert) {
     $log_detail = json_decode(gzuncompress($log),true);
     $fault_detail = '';
     foreach ( $log_detail['rule'] as $o=>$tmp_alerts ) {
+      $fallback = true;
       $fault_detail .= "#".($o+1).":&nbsp;";
-      $tmp = generate_port_link($tmp_alerts);
-      if( substr($tmp,-5,1) != ">" ) {
-        $fault_detail .= $tmp;
-      } else {
+      if( $tmp_alerts['bill_id'] ) {
+        $fault_detail .= '<a href="'.generate_bill_url($tmp_alerts).'">'.$tmp_alerts['bill_name'].'</a>;&nbsp;';
+        $fallback = false;
+      }
+      if( $tmp_alerts['port_id'] ) {
+        $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
+        $fallback = false;
+      }
+      if( $fallback === true ) {
         foreach ($tmp_alerts as $k=>$v) {
           if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1) {
             $fault_detail .= "$k => '$v', ";
