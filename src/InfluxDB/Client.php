@@ -16,31 +16,6 @@ class Client
     private $adapter;
 
     /**
-     * @var \InfluxDB\Filter\FilterInterface
-     */
-    private $filter;
-
-    /**
-     * Set filter
-     * @param Filter\FilterInterface $filter
-     * @return Client
-     */
-    public function setFilter(Filter\FilterInterface $filter)
-    {
-        $this->filter = $filter;
-        return $this;
-    }
-
-    /**
-     * Get filter
-     * @return Filter\FilterInterface
-     */
-    public function getFilter()
-    {
-        return $this->filter;
-    }
-
-    /**
      * Set InfluxDB adapter
      * @param Adapter\AdapterInterface
      * @return Client
@@ -95,10 +70,6 @@ class Client
         $timePrecision = $this->clearTimePrecision($timePrecision);
 
         $return = $this->getAdapter()->query($query, $timePrecision);
-
-        if ($this->getFilter() instanceOf FilterInterface) {
-            $return = $this->getFilter()->filter($return);
-        }
 
         return $return;
     }
