@@ -69,8 +69,10 @@ function GenSQL($rule) {
 					//Cannot resolve glue-chain. Rule is invalid.
 					return false;
 				}
+				$last = "";
+				$qry = "";
 				foreach( $gtmp as $glue ) {
-					if( !$last ) {
+					if( empty($last) ) {
 						list($tmp,$last) = explode('.',$glue);
 						$qry .= $glue.' = ';
 					} else {
