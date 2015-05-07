@@ -275,6 +275,14 @@ Rancid configuration, `rancid_configs` is an array containing all of the locatio
 Setting `rancid_ignorecomments` will disable showing lines that start with #
 
 ```php
+$config['oxidized']['enabled']         = FALSE;
+$config['oxidized']['url']             = 'http://127.0.0.1:8888';
+```
+To enable Oxidized support set enabled to `TRUE`. URL needs to be configured to point to the REST API for Oxidized. This 
+is then used to retrieve the config for devices.
+
+
+```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
 Specify the location of the collectd rrd files.
