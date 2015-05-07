@@ -468,6 +468,10 @@ function generate_peer_url($peer, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
 }
 
+function generate_bill_url($bill, $vars=array()) {
+	return generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']), $vars);
+}
+
 function generate_port_image($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
