@@ -33,6 +33,7 @@ include_once($config['install_dir'].'/html/includes/authentication/'.$config['au
 function GenSQL($rule) {
 	$rule = RunMacros($rule);
 	if( empty($rule) ) {
+		//Cannot resolve Macros due to recursion. Rule is invalid.
 		return false;
 	}
 	//Pretty-print rule to dissect easier
@@ -49,12 +50,40 @@ function GenSQL($rule) {
 		}
 	}
 	$tables = array_keys(array_flip($tables));
-	$x = sizeof($tables);
+	if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[0],'device_id')) != 1 ) {
+		//Our first table has no valid glue, append the 'devices' table to it!
+		array_unshift($tables, 'devices');
+	}
+	$x = sizeof($tables)-1;
 	$i = 0;
 	$join = "";
 	while( $i < $x ) {
 		if( isset($tables[$i+1]) ) {
-			$join .= $tables[$i].".device_id = ".$tables[$i+1].".device_id && ";
+			if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[$i+1],'device_id')) == 1 ) {
+				//Found valid glue in definition.
+				$join .= $tables[$i].".device_id = ".$tables[$i+1].".device_id && ";
+			} else {
+				//No valid glue, Resolve a glue-chain.
+				$gtmp = ResolveGlues(array($tables[$i+1]),'device_id');
+				if( $gtmp === false ) {
+					//Cannot resolve glue-chain. Rule is invalid.
+					return false;
+				}
+				foreach( $gtmp as $glue ) {
+					if( !$last ) {
+						list($tmp,$last) = explode('.',$glue);
+						$qry .= $glue.' = ';
+					} else {
+						list($tmp,$new) = explode('.',$glue);
+						$qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
+						$last = $new;
+					}
+					if( !in_array($tmp, $tables) ) {
+						$tables[] = $tmp;
+					}
+				}
+				$join .= "( ".$qry.$tables[0].".device_id ) && ";
+			}
 		}
 		$i++;
 	}
@@ -63,8 +92,67 @@ function GenSQL($rule) {
 }
 
 /**
+ * Create a glue-chain
+ * @param array $tables Initial Tables to construct glue-chain
+ * @param string $target Glue to find (usual device_id)
+ * @param int $x Recursion Anchor
+ * @param array $hist History of processed tables
+ * @param array $last Glues on the fringe
+ * @return string|boolean
+ */
+function ResolveGlues($tables,$target,$x=0,$hist=array(),$last=array()) {
+	if( sizeof($tables) == 1 && $x != 0 ) {
+		if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[0],$target)) == 1 ) {
+			return array_merge($last,array($tables[0].'.'.$target));
+		} else {
+			return false;
+		}
+	} else {
+		$x++;
+		if( $x > 30 ) {
+			//Too much recursion. Abort.
+			return false;
+		}
+		foreach( $tables as $table ) {
+			$glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"',array($table));
+			if( sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target ) {
+				//Search for new candidates to expand
+				$tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
+				$ntables = array();
+				foreach( $tmp as $expand ) {
+					$ntables[] = $expand['TABLE_NAME'];
+				}
+				$tmp = ResolveGlues($ntables,$target,$x++,array_merge($tables,$ntables),array_merge($last,array($table.'.'.$glues[0]['COLUMN_NAME'])));
+				if( is_array($tmp) ) {
+					return $tmp;
+				}
+			} else {
+				foreach( $glues as $glue ) {
+					if( $glue['COLUMN_NAME'] == $target ) {
+						return array_merge($last,array($table.'.'.$target));
+					} else {
+						list($tmp) = explode('_',$glue['COLUMN_NAME']);
+						$tmp .= 's';
+						if( !in_array($tmp,$tables) && !in_array($tmp,$hist) ) {
+							//Expand table
+							$tmp = ResolveGlues(array($tmp),$target,$x++,array_merge($tables,array($tmp)),array_merge($last,array($table.'.'.$glue['COLUMN_NAME'])));
+							if( is_array($tmp) ) {
+								return $tmp;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//You should never get here.
+	return false;
+}
+
+/**
  * Process Macros
  * @param string $rule Rule to process
+ * @param int $x Recursion-Anchor
  * @return string|boolean
  */
 function RunMacros($rule,$x=1) {
@@ -196,6 +284,12 @@ function GetContacts($results) {
 	$uids = array();
 	foreach( $results as $result ) {
 		$tmp  = NULL;
+		if( is_numeric($result["bill_id"]) ) {
+			$tmpa = dbFetchRows("SELECT user_id FROM bill_perms WHERE bill_id = ?",array($result["bill_id"]));
+			foreach( $tmpa as $tmp ) {
+				$uids[$tmp['user_id']] = $tmp['user_id'];
+			}
+		}
 		if( is_numeric($result["port_id"]) ) {
 			$tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE access_level >= 0 AND port_id = ?",array($result["port_id"]));
 			foreach( $tmpa as $tmp ) {
