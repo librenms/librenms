@@ -29,6 +29,7 @@ $app->setName('api');
 $app->group('/api', function() use ($app) {
   $app->group('/v0', function() use ($app) {
     $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');//api/v0/bgp
+    $app->get('/oxidized', 'authToken', 'list_oxidized')->name('list_oxidized');
     $app->group('/devices', function() use ($app) {
       $app->delete('/:hostname', 'authToken', 'del_device')->name('del_device');//api/v0/devices/$hostname
       $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');//api/v0/devices/$hostname
