@@ -108,8 +108,8 @@ function rrdtool_graph($graph_file, $options)
     if ($config['rrdcached'])
     {
       if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
-          $options = str_replace($config['rrd_dir']."/",$config['rrdcached_dir']."/",$options);
-          $options = str_replace($config['rrd_dir']    ,$config['rrdcached_dir']."/",$options);
+          $options = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$options);
+          $options = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$options);
       }
       fwrite($rrd_pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
     } else {
@@ -157,8 +157,8 @@ function rrdtool($command, $filename, $options)
   if ($command != "create" && $config['rrdcached'])
   {
       if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
-          $filename = str_replace($config['rrd_dir']."/",$config['rrdcached_dir']."/",$filename);
-          $filename = str_replace($config['rrd_dir']    ,$config['rrdcached_dir']."/",$filename);
+          $filename = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$filename);
+          $filename = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$filename);
       }
       $cmd = "$command $filename $options --daemon " . $config['rrdcached'];
   } else {
