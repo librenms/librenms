@@ -434,6 +434,15 @@ $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "supermicro";
 $config['os'][$os]['ifname']            = 1;
 
+// Netgear ProSafe switches
+$os = "netgear";
+$config['os'][$os]['text']              = "Netgear ProSafe";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['bad_if'][]          = "cpu";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 # Juniper
 
 $os = "junos";
