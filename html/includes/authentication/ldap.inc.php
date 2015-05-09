@@ -159,6 +159,7 @@ function get_userlist()
       $username = $entry['uid'][0];
       $realname = $entry['cn'][0];
       $user_id  = $entry['uidnumber'][0];
+      $email    = $entry[$config['auth_ldap_emailattr']][0];
       $ldap_groups = get_group_list();
       foreach($ldap_groups as $ldap_group) {
         $ldap_comparison = ldap_compare($ds,
@@ -166,7 +167,7 @@ function get_userlist()
                                         $config['auth_ldap_groupmemberattr'],
                                         get_membername($username));
         if (!isset($config['auth_ldap_group']) || $ldap_comparison === true) {
-          $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
+          $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id, 'email' => $email);
         }
       }
     }

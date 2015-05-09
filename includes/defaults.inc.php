@@ -462,6 +462,7 @@ $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
 $config['auth_ldap_groupmemberattr'] = "memberUid";
+$config['auth_ldap_emailattr'] = "mail";
 
 // Sensors
 
