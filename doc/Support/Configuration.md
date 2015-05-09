@@ -322,6 +322,16 @@ by continuing the array.
 `bad_iftype` is matched against the ifType value.
 `bad_if_regexp` is matched against the ifDescr value as a regular expression.
 
+#### Interfaces to be rewritten
+
+```php
+$config['rewrite_if']['cpu'] = 'Management Interface';
+$config['rewrite_if_regexp']['/cpu /'] = 'Management ';
+```
+Entries defined in `rewrite_if` are being replaced completely.
+Entries defined in `rewrite_if_regexp` only replace the match.
+Matches are compared case-insensitive.
+
 #### Storage configuration
 
 ```php
