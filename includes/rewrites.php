@@ -82,6 +82,22 @@ function ifLabel($interface, $device = NULL)
     list($interface['label']) = explode("thomson", $interface['label']);
   }
 
+  if( is_array($config['rewrite_if']) ) {
+    foreach( $config['rewrite_if'] as $src => $val ) {
+      if( stristr($interface['label'], $src) ) {
+        $interface['label'] = $val;
+      }
+    }
+  }
+
+  if( is_array($config['rewrite_if_regexp']) ) {
+    foreach( $config['rewrite_if_regexp'] as $reg => $val ) {
+      if( preg_match($reg."i", $interface['label']) ) {
+        $interface['label'] = preg_replace($reg."i",$val,$interface['label']);
+      }
+    }
+  }
+
   return $interface;
 }
 
