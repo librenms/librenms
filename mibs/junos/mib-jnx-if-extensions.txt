@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Interface MIB Extension
 -- 
--- Copyright (c) 1999-2003, 2007, Juniper Networks, Inc.
+-- Copyright (c) 1999-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -10,7 +10,8 @@
 JUNIPER-IF-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32, Counter64, Counter32
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    Gauge32, Integer32, Counter64, Counter32
         FROM SNMPv2-SMI
     CounterBasedGauge64
         FROM HCNUM-TC
@@ -22,7 +23,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 ifJnx MODULE-IDENTITY
-    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:51 2003 UTC
+    LAST-UPDATED "201109221523Z" -- Thu Sept 22 15:23:51 2011 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -33,7 +34,14 @@ ifJnx MODULE-IDENTITY
 
     DESCRIPTION
             "The MIB modules extends the ifTable as
-             defined in IF-MIB."     
+             defined in IF-MIB." 
+    REVISION     "201105100000Z"       -- 10 May, 2011
+    DESCRIPTION
+            "New Layer2 Policer Counters Added to ifJnxTable for MX Series only"     
+    REVISION      "201109220000Z"
+    DESCRIPTION
+               "Added new OIDs Crc and Fcs Erros.
+                Added new Trap ifJnxErrors"
     REVISION     "200706050000Z"       -- 05 June, 2007
     DESCRIPTION
             "New Time Domain Reflectometery Added" 
@@ -112,7 +120,9 @@ ifJnx MODULE-IDENTITY
         ifJnxOutAgedErrors     Counter64,
         ifJnxOutFifoErrors     Counter32,
         ifJnxOutHslFifoUnderFlows Counter64,
-        ifJnxOutHslCrcErrors   Counter32
+        ifJnxOutHslCrcErrors   Counter32,
+        ifJnxCrcErrors         Counter64,
+        ifJnxFcsErrors         Counter64
 	}
 
     ifIn1SecRate OBJECT-TYPE
@@ -402,6 +412,23 @@ ifJnx MODULE-IDENTITY
                 the router interfaces while transmitting packets."
     ::= { ifJnxEntry 31 }
 
+    ifJnxCrcErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "CRC Errors: The number of CRC errors" 
+    ::= { ifJnxEntry 32 }
+
+    ifJnxFcsErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "FCS Errors: The number of FCS errors" 
+    ::= { ifJnxEntry 33 }
+    
+
 
 
 --
@@ -545,6 +572,352 @@ ifJnx MODULE-IDENTITY
 		real and physical PIC cards.  Otherwise, it returns 
 		an octet string	of four zeros '0.0.0.0.'"
 	::= { ifChassisEntry 6 }
+
+    --
+    -- This branch contains all Interface Level PFE Notifications data.
+    --
+    ifJnxNotification   OBJECT IDENTIFIER ::= { ifJnx 3 }
+
+    ifJnxNotificationPrefix OBJECT IDENTIFIER ::= { ifJnxNotification 0}
+
+    ifJnxErrors NOTIFICATION-TYPE
+    OBJECTS {
+         ifJnxCrcErrors,
+         ifJnxFcsErrors
+    }
+    STATUS current
+    DESCRIPTION
+         "A ifJnxErrors notification is sent when the value
+         of ifJnxCrcErrors or ifJnxFcsErrors increases."
+
+    ::= { ifJnxNotificationPrefix 1 } 
       
+--
+-- This table augments ifTable
+--
+    ifJnxPolTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IfJnxPolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A list of Juniper's extension to the interface entries.
+                The number of entries is given by the value of ifNumber.
+                This table contains additional objects for the interface
+                table."
+
+
+        ::= { ifJnx 4 }
+
+    ifJnxPolEntry      OBJECT-TYPE
+        SYNTAX      IfJnxPolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry containing additional management information
+                applicable to a particular interface."
+        INDEX  { ifIndex }
+        ::= { ifJnxPolTable 1 }
+
+    IfJnxPolEntry ::=
+        SEQUENCE {
+
+        ifJnxInPolLowOctets         Counter64,
+        ifJnxInPolLowPkts           Counter64,
+        ifJnxInPolLow1SecRate       Counter64,
+        ifJnxInPolMLowOctets        Counter64,
+        ifJnxInPolMLowPkts          Counter64,
+        ifJnxInPolMLow1SecRate      Counter64,
+        ifJnxInPolMHighOctets       Counter64,
+        ifJnxInPolMHighPkts         Counter64,
+        ifJnxInPolMHigh1SecRate     Counter64,
+        ifJnxInPolHighOctets        Counter64,
+        ifJnxInPolHighPkts          Counter64,
+        ifJnxInPolHigh1SecRate      Counter64,
+        ifJnxInPolDropOctets        Counter64,
+        ifJnxInPolDropPkts          Counter64,
+        ifJnxInPolDrop1SecRate      Counter64,
+        ifJnxOutPolLowOctets        Counter64,
+        ifJnxOutPolLowPkts          Counter64,
+        ifJnxOutPolLow1SecRate      Counter64,
+        ifJnxOutPolMLowOctets       Counter64,
+        ifJnxOutPolMLowPkts         Counter64,
+        ifJnxOutPolMLow1SecRate     Counter64,
+        ifJnxOutPolMHighOctets      Counter64,
+        ifJnxOutPolMHighPkts        Counter64,
+        ifJnxOutPolMHigh1SecRate    Counter64,
+        ifJnxOutPolHighOctets       Counter64,
+        ifJnxOutPolHighPkts         Counter64,
+        ifJnxOutPolHigh1SecRate     Counter64,
+        ifJnxOutPolDropOctets       Counter64,
+        ifJnxOutPolDropPkts         Counter64,
+        ifJnxOutPolDrop1SecRate     Counter64
+
+        }
+
+    ifJnxInPolLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low Bytes"
+    ::= { ifJnxPolEntry 1 }
+
+
+    ifJnxInPolLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low Pkts"
+    ::= { ifJnxPolEntry 2 }
+
+
+    ifJnxInPolLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 3 }
+
+
+    ifJnxInPolMLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Bytes"
+    ::= { ifJnxPolEntry 4 }
+
+
+    ifJnxInPolMLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Pkts"
+    ::= { ifJnxPolEntry 5 }
+
+
+    ifJnxInPolMLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 6 }
+
+
+    ifJnxInPolMHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High Bytes"
+    ::= { ifJnxPolEntry 7 }
+
+
+    ifJnxInPolMHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High Pkts"
+    ::= { ifJnxPolEntry 8 }
+
+
+    ifJnxInPolMHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High 1 Sec Rate"
+    ::= { ifJnxPolEntry 9 }
+
+
+    ifJnxInPolHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High Bytes"
+    ::= { ifJnxPolEntry 10 }
+
+
+    ifJnxInPolHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High Pkts"
+    ::= { ifJnxPolEntry 11 }
+
+
+    ifJnxInPolHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High 1 Sec Rate"
+    ::= { ifJnxPolEntry 12 }
+
+    ifJnxInPolDropOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop Bytes"
+    ::= { ifJnxPolEntry 13 }
+
+
+    ifJnxInPolDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop Pkts"
+    ::= { ifJnxPolEntry 14 }
+
+
+    ifJnxInPolDrop1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop 1 Sec Rate"
+    ::= { ifJnxPolEntry 15 }
+
+    ifJnxOutPolLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low Bytes"
+    ::= { ifJnxPolEntry 16 }
+
+
+    ifJnxOutPolLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low Pkts"
+    ::= { ifJnxPolEntry 17 }
+
+
+    ifJnxOutPolLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 18 }
+
+
+    ifJnxOutPolMLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium Low Bytes"
+    ::= { ifJnxPolEntry 19 }
+
+
+    ifJnxOutPolMLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Pkts"
+    ::= { ifJnxPolEntry 20 }
+
+
+    ifJnxOutPolMLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 21 }
+
+
+    ifJnxOutPolMHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High Bytes"
+    ::= { ifJnxPolEntry 22 }
+
+
+    ifJnxOutPolMHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High Pkts"
+    ::= { ifJnxPolEntry 23 }
+
+
+    ifJnxOutPolMHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High 1 Sec Rate"
+    ::= { ifJnxPolEntry 24 }
+
+
+    ifJnxOutPolHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High Bytes"
+    ::= { ifJnxPolEntry 25 }
+
+
+    ifJnxOutPolHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High Pkts"
+    ::= { ifJnxPolEntry 26 }
+
+
+    ifJnxOutPolHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High 1 Sec Rate"
+    ::= { ifJnxPolEntry 27 }
+
+
+    ifJnxOutPolDropOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop Bytes"
+    ::= { ifJnxPolEntry 28 }
+
+    ifJnxOutPolDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop Pkts"
+    ::= { ifJnxPolEntry 29 }
+
+
+    ifJnxOutPolDrop1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop 1 Sec Rate"
+    ::= { ifJnxPolEntry 30 }
 
 END

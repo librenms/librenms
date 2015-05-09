@@ -128,15 +128,39 @@ $('#create-group').on('show.bs.modal', function (event) {
     });
 });
 var cache = {};
-$('#suggest').typeahead([
-    {
-      name: 'suggestion',
-      remote : '/ajax_rulesuggest.php?device_id=-1&term=%QUERY',
-      template: '{{name}}',
-      valueKey:"name",
-      engine: Hogan
+var suggestions = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_rulesuggest.php?device_id=-1&term=%QUERY",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name: item.name,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+suggestions.initialize();
+$('#suggest').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: 'typeahead-left'
     }
-]);
+},
+{
+  source: suggestions.ttAdapter(),
+  async: true,
+  displayKey: 'name',
+  valueKey: name,
+    templates: {
+        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+    }
+});
 
 $('#and, #or').click('', function(e) {
     e.preventDefault();

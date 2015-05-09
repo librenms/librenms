@@ -27,7 +27,7 @@ push-dev:
 push-personal pp:
 	$(GIT) push personal
 
-push-testing:
+push-testing pt:
 	$(GIT) push testing
 
 update-subtrees: datetime-subtree moment-subtree font-awesome vis
@@ -43,3 +43,6 @@ font-awesome:
 
 vis:
 	$(GIT_SUBTREE) --prefix=lib/vis https://github.com/almende/vis.git master
+
+typeahead:
+	$(GIT_SUBTREE) -- prefix=lib/typeahead https://github.com/twitter/typeahead.js.git master

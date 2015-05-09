@@ -1,0 +1,406 @@
+--
+-- Juniper Enterprise Specific MIB: XFP Digital Optical Monitor MIB
+-- 
+-- Copyright (c) 2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-DOM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    jnxDomMibRoot, jnxDomNotifications
+        FROM JUNIPER-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB;
+
+-- DOM Alarm and Warning Type
+
+jnxDomMib MODULE-IDENTITY
+    LAST-UPDATED "200912230931Z" -- Wed Dec 23 09:30:00 2009 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module defines objects used for Digital Optical 
+             Monitor on XFP interface of Juniper products."
+    REVISION      "200912230000Z" 
+    DESCRIPTION
+            "Initial revision."
+    ::= { jnxDomMibRoot 1 }
+
+JnxDomAlarmId ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Identifies specific DOM alarms that may exist on an
+             interface."
+    SYNTAX     BITS {
+        domRxLossSignalAlarm(0),               -- Input Loss of signal
+        domRxCDRLossLockAlarm(1),              -- Input Loss of Lock
+        domRxNotReadyAlarm(2),                 -- Input rx path
+        domRxLaserPowerHighAlarm(3),           -- Input laser power
+        domRxLaserPowerLowAlarm(4),            -- Input laser power
+        domTxLaserBiasCurrentHighAlarm(5),     -- Output laser bias current
+        domTxLaserBiasCurrentLowAlarm(6),      -- Output laser bias current
+        domTxLaserOutputPowerHighAlarm(7),     -- Output laser power
+        domTxLaserOutputPowerLowAlarm(8),      -- Output laser power
+        domTxDataNotReadyAlarm(9),             -- Output A/D data not ready
+        domTxNotReadyAlarm(10),                -- Output tx path
+        domTxLaserFaultAlarm(11),              -- Output laser safety
+        domTxCDRLossLockAlarm(12),             -- Output CDR
+        domModuleTemperatureHighAlarm(13),     -- Module temperature
+        domModuleTemperatureLowAlarm(14),      -- Module temperature
+        domModuleNotReadyAlarm(15),            -- Module MOD_NR
+        domModulePowerDownAlarm(16),           -- Module P_DOWN
+        domLinkDownAlarm(17),                  -- Wire Unplugged or Down
+        domModuleRemovedAlarm(18)              -- Module Unplugged or Down
+    }
+
+JnxDomWarningId ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Identifies specific DOM warnings that may exist on an
+             interface."
+    SYNTAX     BITS {
+        domRxLaserPowerHighWarning(0),         -- Input laser power
+        domRxLaserPowerLowWarning(1),          -- Input laser power
+        domTxLaserBiasCurrentHighWarning(2),   -- Output laser bias current
+        domTxLaserBiasCurrentLowWarning(3),    -- Output laser bias current
+        domTxLaserOutputPowerHighWarning(4),   -- Output laser power
+        domTxLaserOutputPowerLowWarning(5),    -- Output laser power
+        domModuleTemperatureHighWarning(6),    -- Module temperature
+        domModuleTemperatureLowWarning(7)      -- Module temperature
+    }
+
+-- 
+-- Current DOM Statistics
+-- 
+
+jnxDomDigitalMonitoring OBJECT IDENTIFIER ::= { jnxDomMib 1 }
+
+jnxDomCurrentTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxDomCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Information about Digital Optical Monitoring for this
+             interfaces on this router."
+    ::= { jnxDomDigitalMonitoring 1 }
+
+jnxDomCurrentEntry OBJECT-TYPE
+    SYNTAX     JnxDomCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Information about Digital Optical Monitoring 
+             for this interfaces on this router."
+    INDEX    { ifIndex }
+    ::= { jnxDomCurrentTable 1 }
+
+JnxDomCurrentEntry ::=
+    SEQUENCE {
+        jnxDomCurrentAlarms
+              JnxDomAlarmId,
+        jnxDomCurrentAlarmDate
+              DateAndTime,
+        jnxDomLastAlarms
+              JnxDomAlarmId,
+        jnxDomCurrentWarnings
+              JnxDomWarningId,
+        jnxDomCurrentRxLaserPower
+              Integer32,
+        jnxDomCurrentTxLaserBiasCurrent
+              Integer32,
+        jnxDomCurrentTxLaserOutputPower
+              Integer32,
+        jnxDomCurrentModuleTemperature
+              Integer32,
+        jnxDomCurrentRxLaserPowerHighAlarmThreshold
+              Integer32,
+        jnxDomCurrentRxLaserPowerLowAlarmThreshold
+              Integer32,
+        jnxDomCurrentRxLaserPowerHighWarningThreshold
+              Integer32,
+        jnxDomCurrentRxLaserPowerLowWarningThreshold
+              Integer32,
+        jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold
+              Integer32,
+        jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold
+              Integer32,
+        jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold
+              Integer32,
+        jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold
+              Integer32,
+        jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold
+              Integer32,
+        jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold
+              Integer32,
+        jnxDomCurrentTxLaserOutputPowerHighWarningThreshold
+              Integer32,
+        jnxDomCurrentTxLaserOutputPowerLowWarningThreshold
+              Integer32,
+        jnxDomCurrentModuleTemperatureHighAlarmThreshold
+              Integer32,
+        jnxDomCurrentModuleTemperatureLowAlarmThreshold
+              Integer32,
+        jnxDomCurrentModuleTemperatureHighWarningThreshold
+              Integer32,
+        jnxDomCurrentModuleTemperatureLowWarningThreshold
+              Integer32
+    }
+
+    jnxDomCurrentAlarms OBJECT-TYPE
+        SYNTAX      JnxDomAlarmId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies all the active DOM alarms 
+                 on a XFP physical interface on this router."
+        ::= { jnxDomCurrentEntry 1 }
+
+    jnxDomCurrentAlarmDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The system date and time when the management subsystem learned
+                 of the current alarm event."
+        ::= { jnxDomCurrentEntry 2 }
+
+    jnxDomLastAlarms OBJECT-TYPE
+        SYNTAX      JnxDomAlarmId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies a copy of jnxDomCurrentAlarms 
+                 before last set or clear."
+        ::= { jnxDomCurrentEntry 3 }
+
+    jnxDomCurrentWarnings OBJECT-TYPE
+        SYNTAX      JnxDomWarningId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies all the active DOM warnings
+                 on a XFP physical interface on this router."
+        ::= { jnxDomCurrentEntry 4 }
+
+    jnxDomCurrentRxLaserPower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser power."
+        ::= { jnxDomCurrentEntry 5 }
+
+    jnxDomCurrentTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser bias current."
+        ::= { jnxDomCurrentEntry 6 }
+
+
+    jnxDomCurrentTxLaserOutputPower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser output power."
+        ::= { jnxDomCurrentEntry 7 }
+
+    jnxDomCurrentModuleTemperature OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS  "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module temperature."
+        ::= { jnxDomCurrentEntry 8 }
+
+    jnxDomCurrentRxLaserPowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser power high alarm threshold."
+        ::= { jnxDomCurrentEntry 9 }
+
+    jnxDomCurrentRxLaserPowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser power low alarm threshold."
+        ::= { jnxDomCurrentEntry 10 }
+
+    jnxDomCurrentRxLaserPowerHighWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser power high warning threshold."
+        ::= { jnxDomCurrentEntry 11 }
+
+    jnxDomCurrentRxLaserPowerLowWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Receiver laser power low warning threshold."
+        ::= { jnxDomCurrentEntry 12 }
+
+    jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser bias current high alarm threshold."
+        ::= { jnxDomCurrentEntry 13 }
+
+    jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser bias current low alarm threshold."
+        ::= { jnxDomCurrentEntry 14 }
+
+    jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser bias current high warning threshold."
+        ::= { jnxDomCurrentEntry 15 }
+
+    jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser bias current low warning threshold."
+        ::= { jnxDomCurrentEntry 16 }
+
+    jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser power high alarm threshold."
+        ::= { jnxDomCurrentEntry 17 }
+
+    jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser power low alarm threshold."
+        ::= { jnxDomCurrentEntry 18 }
+
+    jnxDomCurrentTxLaserOutputPowerHighWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser power high warning threshold."
+        ::= { jnxDomCurrentEntry 19 }
+
+    jnxDomCurrentTxLaserOutputPowerLowWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Transmitter laser power low warning threshold."
+        ::= { jnxDomCurrentEntry 20 }
+
+    jnxDomCurrentModuleTemperatureHighAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module temperature high alarm threshold."
+        ::= { jnxDomCurrentEntry 21 }
+
+    jnxDomCurrentModuleTemperatureLowAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module temperature low alarm threshold."
+        ::= { jnxDomCurrentEntry 22 }
+
+    jnxDomCurrentModuleTemperatureHighWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module temperature high warning threshold."
+        ::= { jnxDomCurrentEntry 23 }
+
+    jnxDomCurrentModuleTemperatureLowWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module temperature low warning threshold."
+        ::= { jnxDomCurrentEntry 24 }
+
+--
+-- Configuration Management Notifications
+--
+
+jnxDomNotificationPrefix   OBJECT IDENTIFIER ::= { jnxDomNotifications 0 }
+
+    jnxDomAlarmSet NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxDomLastAlarms,
+                  jnxDomCurrentAlarms,
+                  jnxDomCurrentAlarmDate }
+        STATUS  current
+        DESCRIPTION
+                "Notification of a recently set Dom alarm."
+        ::= { jnxDomNotificationPrefix 1 }
+
+    jnxDomAlarmCleared NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxDomLastAlarms,
+                  jnxDomCurrentAlarms,
+                  jnxDomCurrentAlarmDate }
+        STATUS  current
+        DESCRIPTION
+                "Notification of a recently cleared Dom alarm."
+        ::= { jnxDomNotificationPrefix 2 }
+
+END
+

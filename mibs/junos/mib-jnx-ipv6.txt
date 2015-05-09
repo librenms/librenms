@@ -2,7 +2,7 @@
 -- $Id: jnx-ipv6.mib,v 1.3 2003-07-18 22:57:37 dchuang Exp $
 -- Juniper Enterprise Specific MIB: ipv6 MIB Extension
 -- 
--- Copyright (c) 2001-2003, Juniper Networks, Inc.
+-- Copyright (c) 2001-2011, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -13,6 +13,8 @@ JUNIPER-IPv6-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Counter64
         FROM SNMPv2-SMI
+   ipv6IfEntry 
+        FROM IPV6-MIB
     jnxMibs
         FROM JUNIPER-SMI;
 
@@ -42,6 +44,7 @@ jnxIpv6 MODULE-IDENTITY
 jnxIpv6Stats         OBJECT IDENTIFIER ::= { jnxIpv6 1 }
 jnxIpv6GlobalStats   OBJECT IDENTIFIER ::= { jnxIpv6Stats 1 }
 jnxIcmpv6GlobalStats OBJECT IDENTIFIER ::= { jnxIpv6Stats 2 }
+jnxIpv6IfStats       OBJECT IDENTIFIER ::= { jnxIpv6Stats 3 }
 
 --
 -- Ipv6 Global Stats
@@ -944,5 +947,46 @@ jnxIcmpv6GlobalStats OBJECT IDENTIFIER ::= { jnxIpv6Stats 2 }
          DESCRIPTION
             "The total number of Node Information Report messages transmitted."
          ::= { jnxIcmpv6GlobalStats 56 }
+
+    jnxIpv6IfStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxIpv6IfStatsEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The (conceptual) table containing 
+                 IPv6 statistics of an interface"
+        ::= { jnxIpv6IfStats 1 }
+
+    jnxIpv6IfStatsEntry OBJECT-TYPE
+        SYNTAX      JnxIpv6IfStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry (conceptual row) containing 
+                 IPv6 statistics entry of an interface"
+        AUGMENTS      { ipv6IfEntry }
+        ::= { jnxIpv6IfStatsTable 1 }
+
+    JnxIpv6IfStatsEntry ::= SEQUENCE {
+            jnxIpv6IfInOctets   Counter64,
+            jnxIpv6IfOutOctets  Counter64
+        }
+
+    jnxIpv6IfInOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The total number of octets received on the interface"
+        ::= { jnxIpv6IfStatsEntry 1 }
+
+    jnxIpv6IfOutOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The total number of octets transmitted out of the
+                 interface"
+        ::= { jnxIpv6IfStatsEntry 2 }
 
 END

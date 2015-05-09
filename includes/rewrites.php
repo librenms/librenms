@@ -204,6 +204,7 @@ $rewrite_junos_hardware = array(
   'jnxProductNameIBM4274E08J08E' => 'IBM4274E08J08E', # ?
   'jnxProductNameIBM4274E16J16E' => 'IBM4274E16J16E', # ?
   'jnxProductNameMX80' => 'MX80',
+  'jnxProductName' => '',
 );
 
 $rewrite_cisco_hardware = array(

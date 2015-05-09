@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper enterprise specific Class-Of-Service (COS) MIB. 
 --
--- Copyright (c) 2001-2006, Juniper Networks, Inc.
+-- Copyright (c) 2001-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -21,7 +21,7 @@
 
 
     jnxCos MODULE-IDENTITY
-        LAST-UPDATED "200912040000Z" -- Fri Dec 04 00:00:00 2009 UTC
+        LAST-UPDATED "201305200000Z" -- Mon May 20 00:00:00 2013 UTC
         ORGANIZATION "Juniper Networks, Inc."
         CONTACT-INFO
                 "Juniper Technical Assistance Center
@@ -40,6 +40,10 @@
                      RED  - Random Early Detection
                      PLP  - Packet Loss Priority
                      DSCP - Differential Service Code Point. "
+
+	REVISION     "201305200000Z"    -- May 20, 2013
+    	DESCRIPTION
+        "Modified the max range for JnxCosFcIdentifier from 7 to 15."
 
         REVISION     "200904310000Z"    -- Dec 04, 2009
         DESCRIPTION  "Added Rate Limit stats"
@@ -84,7 +88,7 @@
     JnxCosFcIdentifier ::= TEXTUAL-CONVENTION
         STATUS      current
         DESCRIPTION "A number identifying the forwarding class."
-        SYNTAX      Integer32(0..7)
+        SYNTAX      Integer32(0..15)
 
 
 
@@ -708,7 +712,13 @@
 
             -- Rate Limit dropped byte stats
             jnxCosQstatRateLimitDropBytes           Counter64,
-            jnxCosQstatRateLimitDropByteRate        CounterBasedGauge64
+            jnxCosQstatRateLimitDropByteRate        CounterBasedGauge64,
+         
+            -- Total drop packet/byte stats
+            jnxCosQstatTotalDropPkts               Counter64,       
+            jnxCosQstatTotalDropPktRate            CounterBasedGauge64,
+            jnxCosQstatTotalDropBytes              Counter64,
+            jnxCosQstatTotalDropByteRate           CounterBasedGauge64
     }
 
     jnxCosQstatIfIndex OBJECT-TYPE 
@@ -1185,6 +1195,40 @@
         "The rate (expressed in bytes per second) at which bytes
         are rate-limit dropped at the output on the given interface."
         ::= { jnxCosQstatEntry 52 }
+     
+    -- Total Drop packet/byte stats
+    jnxCosQstatTotalDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total Number of packets dropped on the queue."    
+        ::= { jnxCosQstatEntry 53 }
+
+    jnxCosQstatTotalDropPktRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The output queue's packet total drop rate, expressed in
+            packets per second."
+        ::= { jnxCosQstatEntry 54 }
+            
+    jnxCosQstatTotalDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total Number of bytes dropped on the queue."      
+        ::= { jnxCosQstatEntry 55 }
+
+    jnxCosQstatTotalDropByteRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The queue's current total drop rate in bytes per second."
+        ::= { jnxCosQstatEntry 56 }
 
         -- ***************************************************************
         --  Per interface cos stats flags

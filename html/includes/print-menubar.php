@@ -1,4 +1,5 @@
 <?php
+include($config['install_dir'].'/includes/object-cache.inc.php');
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
@@ -54,14 +55,16 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
           <li class="dropdown-submenu">
             <a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Alerts</a>
             <ul class="dropdown-menu scrollable-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Alerts</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Alert Log</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Alert Rules</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Alert Map</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Alert Templates</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
 <?php
 }
 ?>
@@ -92,7 +95,13 @@ if ($_SESSION['userlevel'] >= '10') {
               <ul class="dropdown-menu scrollable-menu">
 <?php
 
-foreach (dbFetchRows('SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $devtype) {
+if (is_admin() === TRUE || is_read() === TRUE) {
+    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
+} else {
+    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetchRows($sql,$param) as $devtype) {
     if (empty($devtype['type'])) {
         $devtype['type'] = 'generic';
     }
@@ -193,13 +202,14 @@ if ($_SESSION['userlevel'] >= '10')
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
 <?php
+$ports = new ObjCache('ports');
 
-if (isset($ports['errored']))
+if ($ports['errored'] > 0)
 {
   echo('            <li><a href="ports/errors=1/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if (isset($ports['ignored']))
+if ($ports['ignored'] > 0)
 {
   echo('            <li><a href="ports/ignore=1/"><i class="fa fa-question-circle fa-fw fa-lg"></i> Ignored ('.$ports['ignored'].')</a></li>');
 }
@@ -281,7 +291,7 @@ if ($menu_sensors)
   echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt');
+$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square');
 foreach (array('fanspeed','humidity','temperature') as $item)
 {
   if (isset($menu_sensors[$item]))
@@ -416,7 +426,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
 ?>
         <li>
-          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg"></i> Packages</a>
+          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg fa-nav-icons"></i> Packages</a>
         </li>
 <?php
 } # if ($packages)
@@ -430,8 +440,12 @@ Plugins::call('menu');
 
 if ($_SESSION['userlevel'] >= '10')
 {
-  echo(' 
+  if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
+    echo('
             <li role="presentation" class="divider"></li>
+    ');
+  }
+  echo('
             <li><a href="plugin/view=admin"> <i class="fa fa-lock fa-fw fa-lg"></i>Plugin Admin</a></li>
   ');
 }
@@ -449,9 +463,9 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 ?>
 
     </ul>
-     <form role="search" class="navbar-form navbar-right">
+     <form role="search" class="navbar-form navbar-right global-search">
          <div class="form-group">
-             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+             <input class="form-control typeahead" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
          </div>
      </form>
     <ul class="nav navbar-nav navbar-right">
@@ -538,30 +552,121 @@ if ($_SESSION['authenticated'])
  </div>
 </nav>
 <script>
-  $('#gsearch').typeahead([
-    {
-      name: 'devices',
-      remote : 'ajax_search.php?search=%QUERY&type=device',
-      header : '<h5><strong>&nbsp;Devices</strong></h5>',
-      template: '<a href="{{url}}"><p><img src="{{device_image}}" border="0" class="img_left"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></p></a>',
-      valueKey:"name",
-      engine: Hogan
-    },
-    {
-      name: 'ports',
-      remote : 'ajax_search.php?search=%QUERY&type=ports',
-      header : '<h5><strong>&nbsp;Ports</strong></h5>',
-      template: '<a href="{{url}}"><p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></p></a>',
-      valueKey: "name",
-      engine: Hogan
-    },
-    {
-      name: 'bgp',
-      remote : 'ajax_search.php?search=%QUERY&type=bgp',
-      header : '<h5><strong>&nbsp;BGP</strong></h5>',
-      template: '<a href="{{url}}"><p><small><img src="{{bgp_image}}" border="0" class="img_left">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></p></a>',
-      valueKey: "name",
-      engine: Hogan
+var devices = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=device",
+        filter: function (devices) {
+            return $.map(devices, function (device) {
+                return {
+                    device_id: device.device_id,
+                    device_image: device.device_image,
+                    url: device.url,
+                    name: device.name,
+                    device_os: device.device_os,
+                    version: device.version,
+                    device_hardware: device.device_hardware,
+                    device_ports: device.device_ports,
+                    location: device.location
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var ports = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=ports",
+        filter: function (ports) {
+            return $.map(ports, function (port) {
+                return {
+                    count: port.count,
+                    url: port.url,
+                    name: port.name,
+                    description: port.description,
+                    colours: port.colours,
+                    hostname: port.hostname
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+var bgp = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: "ajax_search.php?search=%QUERY&type=bgp",
+        filter: function (bgp_sessions) {
+            return $.map(bgp_sessions, function (bgp) {
+                return {
+                    count: bgp.count,
+                    url: bgp.url,
+                    name: bgp.name,
+                    description: bgp.description,
+                    localas: bgp.localas,
+                    bgp_image: bgp.bgp_image,
+                    remoteas: bgp.remoteas,
+                    colours: bgp.colours,
+                    hostname: bgp.hostname
+                };
+            });
+        },
+      wildcard: "%QUERY"
+  }
+});
+
+if ($(window).width() < 768) {
+    var cssMenu = 'typeahead-left';
+} else {
+    var cssMenu = '';
+}
+
+devices.initialize();
+ports.initialize();
+bgp.initialize();
+$('#gsearch').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: cssMenu
     }
-  ]);
+},
+{
+  source: devices.ttAdapter(),
+  async: true,
+  display: 'name',
+  valueKey: 'name',
+    templates: {
+        header: '<h5><strong>&nbsp;Devices</strong></h5>',
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><img src="{{device_image}}" border="0"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></a></p>')
+    }
+},
+{
+  source: ports.ttAdapter(),
+  async: true,
+  display: 'name',
+  valueKey: 'name',
+    templates: {
+        header: '<h5><strong>&nbsp;Ports</strong></h5>',
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
+    }
+},
+{
+  source: bgp.ttAdapter(),
+  async: true,
+  display: 'name',
+  valueKey: 'name',
+    templates: {
+        header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
+    }
+});
+$('#gsearch').bind('typeahead:open', function(ev, suggestion) {
+    $('#gsearch').addClass('search-box');
+});
 </script>

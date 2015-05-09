@@ -1,7 +1,7 @@
 -- *****************************************************************
 -- Juniper Enterprise Specific MIB: EX-MAC-NOTIFICATION 
 --
--- Copyright (c) 2008-2009, Juniper Networks, Inc.
+-- Copyright (c) 2008-2010, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -19,7 +19,7 @@ IMPORTS
                 FROM JUNIPER-EX-SMI;
 
 jnxMacNotificationMIB MODULE-IDENTITY
-    LAST-UPDATED "200905270000Z"
+    LAST-UPDATED "201004280000Z"
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
@@ -42,6 +42,16 @@ jnxMacNotificationMIB MODULE-IDENTITY
     REVISION  "200905270000Z"
     DESCRIPTION
             "Updated the description of the Objects."
+    
+    REVISION  "201002090000Z"
+    DESCRIPTION
+            "Updated the description of jnxHistMacChangedMsg. When next hop gets
+            changed the port information gets updated and is logged."
+
+    REVISION  "201004280000Z"
+    DESCRIPTION
+            "Added new scalar jnxMacAddressesUpdated which increments for each
+            mac address updated."
 
     ::= { jnxMacNotificationRoot 1 }
 
@@ -215,6 +225,7 @@ jnxHistMacChangedMsg OBJECT-TYPE
           0 - End of MIB object.
           1 - MAC learnt.
           2 - MAC removed.
+          3 - MAC updated.
 
         <VLAN> is VLAN number of the VLAN which the MAC address is
         belonged to and has size of 2 octet.
@@ -235,6 +246,15 @@ jnxHistTimestamp  OBJECT-TYPE
         containing the information denoted by the jnxHistMacChangedMsg
         object in this entry was generated."
     ::= { jnxMacHistoryEntry 3 }
+
+jnxMacAddressesUpdated OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of MAC addresses updated by the
+        device."
+    ::= { jnxMacNotificationMIBGlobalObjects 9 }
 
 -- ***********************************************************
 

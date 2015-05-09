@@ -1,4 +1,4 @@
--- MIB file created 11-Nov-2009 11:09:10, by
+-- MIB file created 04-May-2010 14:00:22, by
 --   SMICng version 2.2.11-beta(PRO)(Solaris), January 20, 2001. Enterprise key cisco.com
 
 OLD-CISCO-CHASSIS-MIB DEFINITIONS ::= BEGIN
@@ -587,6 +587,8 @@ chassisType OBJECT-TYPE
         csrp546(779),
         csrp547(780),
         cvs510-fxo(781),
+        c887-gvdsl2(782),
+        c887-srstvdsl2(783),
         c59xx(786),
         cat2960-24-lcs(787),
         cat2960-24-pcs(788),
@@ -596,9 +598,18 @@ chassisType OBJECT-TYPE
         cn4kibmeth(793),
         craie1783-rms06t(796),
         craie1783-rms10t(797),
+        cesw-540-8p-k9(798),
+        cesw-520-8p-k9(799),
         cn7kc7009(815),
         cn4kibm-cisco-eth(816),
-        cmwr-2941-dca(817)
+        cmwr-2941-dca(817),
+        c1841ck9(832),
+        c2801ck9(833),
+        c2811ck9(834),
+        c2821ck9(835),
+        c3825ck9(837),
+        c3845ck9(838),
+        c1906ck9(859)
         }
     ACCESS read-only
     STATUS deprecated
@@ -1327,6 +1338,8 @@ cardType OBJECT-TYPE
         ubr-mc16u-e(1041),
         ubr-mc28u-e(1042),
         ubr-dtcc(1043),
+        ubr-mc88v(1045),
+        ubr-mc2020(1046),
         gsr-8fe-tx(1050),
         gsr-8fe-fx(1051),
         ssrp-oc48-sm-sr(1052),
@@ -1471,6 +1484,15 @@ cardType OBJECT-TYPE
         cpu-1941w-2ge(1260),
         cpu-3825nv-2ge(1261),
         cpu-3845nv-2ge(1262),
+        cpu-3900SPE200-4ge(1269),
+        cpu-3900spe250-4ge(1274),
+        cpu-c1841c-2fe-k9(1277),
+        cpu-c2801c-2fe-k9(1278),
+        cpu-c2811c-2fe-k9(1279),
+        cpu-c2821c-2ge-k9(1280),
+        cpu-c3825c-2ge-k9(1282),
+        cpu-c3845c-2ge-k9(1283),
+        cpu-1906c-k9(1287),
         pos-1oc12(1300),
         p6-ct3(1301),
         ge(1302),
@@ -1482,6 +1504,8 @@ cardType OBJECT-TYPE
         srp-oc48-sr(1310),
         srp-oc48-ir(1311),
         atm-4oc3(1313),
+        srp-pos-1oc48-sm-sr(1315),
+        srp-pos-1oc48-sm-lr(1316),
         flashcard-48mb(1317),
         flashcard-128mb(1318),
         p24-ct1e1(1319),
@@ -2038,6 +2062,11 @@ cardType OBJECT-TYPE
         pvdm3-256(4374),
         nm-2838(4375),
         pano-2838(4376),
+        vwic3-mft4-t1e1(4379),
+        vwic3-mft1-t1e1(4380),
+        vwic3-mft1-g703(4381),
+        vwic3-mft2-t1e1(4382),
+        vwic3-mft2-g703(4383),
         rsp720Base(4400),
         rsp32GEBase(4401),
         rsp3210GEBase(4402),
@@ -2112,6 +2141,7 @@ cardType OBJECT-TYPE
         hwic-1ser(4559),
         hwic-2ser(4560),
         internal-service-module-aim(4561),
+        sm-1nm(4563),
         hwic-4ce1t1-pri(4576),
         dwdm-3268-sfp(4600),
         dwdm-3425-sfp(4601),
@@ -2221,8 +2251,22 @@ cardType OBJECT-TYPE
         pwr-cat-2960ac-235w-12v(4779),
         pwr-cat-2960ac-525w-12v(4780),
         pwr-c1941pwr-ac(4781),
+        pwr-c7225-ac(4787),
         mds-ds-x9232x256-k9(4800),
-        mds-ds13-slot-fabric-evia3(4801)
+        mds-ds13-slot-fabric-evia3(4801),
+        mds-ds-x9530-sf2a-k9(4819),
+        hwic-2t-c(4826),
+        hwic-1t-c(4827),
+        hwic-9fes-c(4828),
+        hwic-4fes-c(4829),
+        vwic2-mft1-g703-c(4830),
+        vwic2-mft2-g703-c(4831),
+        nm-16eswitch-c(4832),
+        harddisk-idc(4835),
+        vmss-sm-sre700K9(4840),
+        vmss-sm-sre900K9(4841),
+        iss-sm-sre700K9(4842),
+        iss-sm-sre900K9(4843)
         }
     ACCESS read-only
     STATUS deprecated

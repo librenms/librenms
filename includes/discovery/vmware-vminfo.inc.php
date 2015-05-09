@@ -23,40 +23,47 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
   /*
    * Fetch the list is Virtual Machines.
    *
-   *  VMWARE-VMINFO-MIB::vmwVmVMID.224 = INTEGER: 224
-   *  VMWARE-VMINFO-MIB::vmwVmVMID.416 = INTEGER: 416
+   *  vmwVmVMID.224 = INTEGER: 224
+   *  vmwVmVMID.416 = INTEGER: 416
    *  ...
    */
 
   $oids = snmp_walk($device, "VMWARE-VMINFO-MIB::vmwVmVMID", "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+  if (empty($oids)) {
+      $oids = trim(snmp_walk($device, "vmwVmUUID", "-Osq", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs"));
+      $oids = str_replace("vmwVmUUID.", "", $oids);
+  }
   if ($oids != "")
   {
     $oids = explode("\n", $oids);
 
-    foreach ($oids as $oid)
+    foreach ($oids as $data)
     {
+        $data = trim($data);
+        list($oid,) = explode(" ", $data);
       /*
        * Fetch the Virtual Machine information.
        *
-       *  VMWARE-VMINFO-MIB::vmwVmDisplayName.224 = STRING: My First VM
-       *  VMWARE-VMINFO-MIB::vmwVmDisplayName.416 = STRING: My Second VM
-       *  VMWARE-VMINFO-MIB::vmwVmGuestOS.224 = STRING: windows7Server64Guest
-       *  VMWARE-VMINFO-MIB::vmwVmGuestOS.416 = STRING: winLonghornGuest
-       *  VMWARE-VMINFO-MIB::vmwVmMemSize.224 = INTEGER: 8192 megabytes
-       *  VMWARE-VMINFO-MIB::vmwVmMemSize.416 = INTEGER: 8192 megabytes
-       *  VMWARE-VMINFO-MIB::vmwVmState.224 = STRING: poweredOn
-       *  VMWARE-VMINFO-MIB::vmwVmState.416 = STRING: poweredOn
-       *  VMWARE-VMINFO-MIB::vmwVmVMID.224 = INTEGER: 224
-       *  VMWARE-VMINFO-MIB::vmwVmVMID.416 = INTEGER: 416
-       *  VMWARE-VMINFO-MIB::vmwVmCpus.224 = INTEGER: 2
-       *  VMWARE-VMINFO-MIB::vmwVmCpus.416 = INTEGER: 2
+       *  vmwVmDisplayName.224 = STRING: My First VM
+       *  vmwVmDisplayName.416 = STRING: My Second VM
+       *  vmwVmGuestOS.224 = STRING: windows7Server64Guest
+       *  vmwVmGuestOS.416 = STRING: winLonghornGuest
+       *  vmwVmMemSize.224 = INTEGER: 8192 megabytes
+       *  vmwVmMemSize.416 = INTEGER: 8192 megabytes
+       *  vmwVmState.224 = STRING: poweredOn
+       *  vmwVmState.416 = STRING: poweredOn
+       *  vmwVmVMID.224 = INTEGER: 224
+       *  vmwVmVMID.416 = INTEGER: 416
+       *  vmwVmCpus.224 = INTEGER: 2
+       *  vmwVmCpus.416 = INTEGER: 2
        */
 
-      $vmwVmDisplayName = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmDisplayName." . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
-      $vmwVmGuestOS   = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmGuestOS."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
-      $vmwVmMemSize   = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmMemSize."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
-      $vmwVmState     = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmState."     . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
-      $vmwVmCpus    = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmCpus."    . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+
+      $vmwVmDisplayName = snmp_get($device, "vmwVmDisplayName." . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+      $vmwVmGuestOS   = snmp_get($device, "vmwVmGuestOS."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+      $vmwVmMemSize   = snmp_get($device, "vmwVmMemSize."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+      $vmwVmState     = snmp_get($device, "vmwVmState."     . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
+      $vmwVmCpus    = snmp_get($device, "vmwVmCpus."    . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
 
       /*
        * VMware does not return an INTEGER but a STRING of the vmwVmMemSize. This bug
@@ -74,7 +81,8 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
 
       if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND vm_type='vmware'",array($device['device_id'], $oid)) == 0)
       {
-        dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'vmware', 'vmwVmVMID' => $oid,'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
+        $vmid = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'vmware', 'vmwVmVMID' => $oid,'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
+        log_event(mres($vmwVmDisplayName) . " ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered",$device,'system',$vmid);
         echo("+");
         // FIXME eventlog
       } else {
@@ -94,7 +102,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
    * Get a list of all the known Virtual Machines for this host.
    */
 
-  $sql = "SELECT id, vmwVmVMID FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='vmware'";
+  $sql = "SELECT id, vmwVmVMID, vmwVmDisplayName FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='vmware'";
 
   foreach (dbFetchRows($sql) as $db_vm)
   {
@@ -105,6 +113,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
     if (!in_array($db_vm["vmwVmVMID"], $vmw_vmlist))
     {
       dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
+      log_event(mres($db_vm['vmwVmDisplayName']) . " Removed",$device,'system',$db_vm['vmwVmVMID']);
       echo("-");
       // FIXME eventlog
     }

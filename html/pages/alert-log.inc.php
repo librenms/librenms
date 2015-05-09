@@ -45,12 +45,15 @@ var grid = $("#alertlog").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
     foreach (get_all_devices() as $hostname) {
-        echo('"<option value=\"'.getidbyname($hostname).'\""+');
+        $device_id = getidbyname($hostname);
+        if (device_permitted($device_id)) {
+            echo('"<option value=\"'.$device_id.'\""+');
             if (getidbyname($hostname) == $_POST['device_id']) {
                 echo('" selected "+');
             }
-            echo('">'.$hostname.'</option>"+');
+           echo('">'.$hostname.'</option>"+');
         }
+    }
 ?>
                "</select>"+
                "</div>"+
