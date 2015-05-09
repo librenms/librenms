@@ -1088,6 +1088,15 @@ $config['os'][$os]['text']              = "Datacom";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "datacom";
 
+// UBNT EdgeSwitch 750W
+$os = "edgeswitch";
+$config['os'][$os]['text']              = "EdgeSwitch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "ubiquiti";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['ifname']            = 1;
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
