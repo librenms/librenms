@@ -19,6 +19,9 @@ Contributors to LibreNMS:
 - Alan Gregory <alan@opcaonet.com.br> (alangregory)
 - Joubert RedRat <me+github@redrat.com.br> (joubertredrat)
 - Len Lin <Ultra2D@users.noreply.github.com> (Ultra2D)
+- Christopher Freas <code@packetbusters.net> (nwautomator)
+- Stuart Henderson <stu@spacehopper.org> (sthen)
+- Filippo Giunchedi <filippo@esaurito.net> (filippog)
 
 [1]: http://observium.org/ "Observium web site"
 

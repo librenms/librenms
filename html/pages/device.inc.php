@@ -325,6 +325,15 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     </li>');
     }
 
+    if (device_permitted($device['device_id']))
+    {
+      echo('<li class="' . $select['alert-stats'] . '">
+      <a href="'.generate_device_url($device, array('tab' => 'alert-stats')).'">
+        <img src="images/16/chart_bar.png" align="absmiddle" border="0" /> Alert Stats
+      </a>
+    </li>');
+    }
+
     if ($_SESSION['userlevel'] >= "7")
     {
       if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
@@ -332,6 +341,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
       {
         if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
         if (is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
+      }
+      if ($config['oxidized']['enabled'] === TRUE && isset($config['oxidized']['url'])) {
+          $device_config_file = TRUE;
       }
     }
 

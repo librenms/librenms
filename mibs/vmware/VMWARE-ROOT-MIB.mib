@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2010 VMware, Inc.  All rights reserved. 
 -- **********************************************************
 
 VMWARE-ROOT-MIB DEFINITIONS ::= BEGIN
@@ -9,7 +9,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 vmware MODULE-IDENTITY
-       LAST-UPDATED "200707300000Z"
+       LAST-UPDATED "201004020000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -24,6 +24,11 @@ vmware MODULE-IDENTITY
                 This module defines the VMware SNMP MIB root
                 and its primary subtrees.
                "
+
+       REVISION      "201004020000Z"
+       DESCRIPTION
+               "Arc vmwDocumentation defined."
+
        REVISION      "200707300000Z"
        DESCRIPTION
                "The initial revision. Prior version was released in 
@@ -76,6 +81,13 @@ DESCRIPTION
      notifications varbind lists and can not be polled."
 ::= { vmware 50 }
 
+vmwSRM OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are only visible in
+     notifications from Site Recovery Manager and can not be polled."
+::= { vmware 51 }
+
 vmwOID OBJECT-IDENTITY
 STATUS  deprecated
 DESCRIPTION
@@ -94,6 +106,12 @@ DESCRIPTION
     "Used for product testing and development."
 ::= { vmware 700 }
 
+vmwDocumentation OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Used in product documentation, examples." 
+::= { vmware 750 }
+
 vmwObsolete OBJECT-IDENTITY
 STATUS  current
 DESCRIPTION
@@ -101,3 +119,4 @@ DESCRIPTION
 ::= { vmware 800 }
 
 END
+

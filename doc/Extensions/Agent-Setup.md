@@ -3,6 +3,8 @@ Agent setup
 
 To gather data from remote systems you can use LibreNMS in combination with check_mk (included in the scripts directory).
 
+The agent uses TCP-Port 6556, please allow access from the LibreNMS-Host and Poller-Nodes if you're using the Distributed Polling setup.
+
 On each of the hosts you would like to use the agent on then you need to do the following:
 
 * Copy the `check_mk_agent` script into `/usr/bin` and make it executable.
@@ -57,7 +59,7 @@ options {
 ```
 Restart your bind9/named after changing the configuration.
 
-Verify that everything works by executing `rdnc stats && cat /etc/bind/named.stats`.  
+Verify that everything works by executing `rndc stats && cat /etc/bind/named.stats`.  
 In case you get a `Permission Denied` error, make sure you chown'ed correctly.
 
 Note: if you change the path you will need to change the path in `scripts/agent-local/bind`.
@@ -88,4 +90,31 @@ And that your tinydns-instance is located in `/service/dns`, adjust this path if
   `mkdir /service/dns/log/main/tinystats && chown dnslog:nofiles /service/dns/log/main/tinystats`
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`  
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesnt rehook the logging and I'm forced to restart it entirely.
+
+### MySQL
+
+Unlike most other scripts, the MySQL script requires a configuration file `/usr/lib/check_mk_agent/local/mysql.cnf` with following content:
+
+```php
+<?php
+$mysql_user = 'root';
+$mysql_pass = 'toor';
+$mysql_host = 'localhost';
+$mysql_port = 3306;
+```
+
+NOTE: This only applies to the PHP-Version of the Statistics-poller. There's work being done in porting this script to Python, a different configuration file (if any) will apply.
+
+### Nginx
+
+It's required to have the following directive in your nginx-configuration responsible for the localhost-server:
+
+```text
+location /nginx-status {
+    stub_status on;
+    access_log   off;
+    allow 127.0.0.1;
+    deny all;
+}
+```
 

@@ -1,4 +1,4 @@
-<?php
+	<?php
 
 function poll_sensor($device, $class, $unit)
 {
@@ -11,19 +11,33 @@ function poll_sensor($device, $class, $unit)
 
     if ($sensor['poller_type'] == "snmp")
     {
+      if ($device['os'] == 'siklu') {
+          $mib = ":RADIO-BRIDGE-MIB";
+      } else {
+          $mib = '';
+      }
       if ($class == "temperature")
       {
         for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
         {
           if ($debug) echo("Attempt $i ");
-          $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+          $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
+          preg_match("/[\d\.]+/",$sensor_value,$temp_response);
+          if (!empty($temp_response[0])) {
+              $sensor_value = $temp_response[0];
+          }
 
           if (is_numeric($sensor_value) && $sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
           sleep(1); # Give the TME some time to reset
         }
       } else {
-        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+        if ($sensor['sensor_type'] == 'apc') {
+            $sensor_value = trim(str_replace("\"", "", snmp_walk($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB:PowerNet-MIB$mib")));
+        } else {
+            $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB$mib")));
+        }
       }
+      unset($mib);
     } else if ($sensor['poller_type'] == "agent")
     {
       if (isset($agent_sensors))
@@ -249,11 +263,14 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
   echo("This is mag_poll_mib_def Processing\n");
   $mib      = NULL;
   
-  list($mib,) = explode(":", $mib_name_table, 2);
-
-  //$mib_dirs = mib_dirs($mib_subdir);
-  
-  $rrd_file = strtolower(safename($mib)).'.rrd';
+  if (stristr($mib_name_table, "UBNT")) {
+      list($mib,) = explode(":", $mib_name_table, 2);
+      //$mib_dirs = mib_dirs($mib_subdir);
+      $rrd_file = strtolower(safename($mib)).'.rrd';
+  } else {
+      list($mib,$file) = explode(":", $mib_name_table, 2);
+      $rrd_file = strtolower(safename($file)).'.rrd';
+  }
 
   $rrdcreate  = '--step 300 ';
   $oidglist   = array();
@@ -263,9 +280,15 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     $oiddsname  = $param[1];
     $oiddsdesc  = $param[2];
     $oiddstype  = $param[3];
+    $oiddsopts  = $param[4];
     
     if (strlen($oiddsname) > 19) { $oiddsname = truncate($oiddsname, 19, ''); }
-    $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':600:U:100000000000';
+
+    if (empty($oiddsopts)) {
+        $oiddsopts = "600:U:100000000000";
+    }
+
+    $rrdcreate .= ' DS:'.$oiddsname.':'.$oiddstype.':'.$oiddsopts;
 
     if ($oidindex != '')
     {

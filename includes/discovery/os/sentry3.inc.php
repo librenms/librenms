@@ -2,7 +2,7 @@
 
 if (!$os)
 {
-  if (preg_match("/^Sentry\ Switched /", $sysDescr)) { $os = "sentry3"; }
+  if (preg_match("/^Sentry\ (Switched|Smart) /", $sysDescr)) { $os = "sentry3"; }
 }
 
 ?>

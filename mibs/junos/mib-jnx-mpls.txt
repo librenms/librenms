@@ -1,7 +1,7 @@
 --
 -- Juniper Multi-Protocol Label Switched Paths MIB
 --
--- Copyright (c) 1998-2004, 2006-2007, Juniper Networks, Inc.
+-- Copyright (c) 1998-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -561,7 +561,10 @@ MplsLspInfoEntry ::=
         mplsPathInfoExclude         Integer32,
         mplsPathInfoSetupPriority   INTEGER,
         mplsPathInfoHoldPriority    INTEGER,
-        mplsPathInfoProperties      INTEGER
+        mplsPathInfoProperties      INTEGER,
+        mplsLspInfoAggrOctets       Counter64,
+        mplsLspInfoAggrPackets      Counter64,
+        mplsPathInfoRecordRouteWithLabels     OCTET STRING
     }
 
 mplsLspInfoName OBJECT-TYPE
@@ -881,7 +884,51 @@ mplsPathInfoProperties OBJECT-TYPE
 	 unless mplsPathInfoName is not empty"
     ::= { mplsLspInfoEntry 27 }
 
+mplsLspInfoAggrOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have beeen forwarded over
+         current LSP. This is an aggregate count of octets
+         forwarded over all LSP instances from the time
+         LSP was up. The number reported is not realtime, may
+         be subject to several minutes delay.  The delay is
+         controllable by mpls statistics gathering interval,
+         which by default is once every 5 minutes.  If mpls
+         statistics gathering is not enabled, this number will
+         not increment."
+    ::= { mplsLspInfoEntry 28 }
 
+mplsLspInfoAggrPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been forwarded over
+         current LSP. This is an aggregate count of packets
+         forwarded over all LSP instances from the time
+         LSP was up. The number reported is not realtime, may
+         be subject to several minutes delay. The delay is
+         controllable by mpls statistics gathering interval,
+         which by default is once every 5 minutes. If mpls
+         statistics gathering is not enabled, this number will
+         not increment."
+    ::= { mplsLspInfoEntry 29 }
+
+mplsPathInfoRecordRouteWithLabels OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The route actually used for this path, as
+         recorded by the signaling protocol.
+         This field is a displayable string in the
+         format of XXX.XXX.XXX.XXX <flag/label> <space>
+         repeated for each address.
+         This field is meaningless unless mplsPathInfoName is
+         not empty"
+   ::= { mplsLspInfoEntry 30 }
 
 --
 -- definition of MPLS traps
@@ -997,3 +1044,4 @@ mplsPathInfoProperties OBJECT-TYPE
         ::= { mplsLspTraps 5 }
 
 END
+

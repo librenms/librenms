@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Firewalls MIB
 -- 
--- Copyright (c) 2000-2003, Juniper Networks, Inc.
+-- Copyright (c) 2000-2012, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -240,4 +240,84 @@ jnxFirewalls MODULE-IDENTITY
 		to have two counters of the same name and different type."
 	::= { jnxFirewallCounterEntry 8 }
 
+    jnxFWCntrXTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF JnxFWCntrXEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "An extended list of firewall filter counters.
+	    This table maintains the additional statistics
+	    for the additional policer counters and is only
+	    supported on MX platform for now."
+
+
+	::= { jnxFirewalls 3 }
+
+    jnxFWCntrXEntry      OBJECT-TYPE
+	SYNTAX      JnxFWCntrXEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "An entry of extended firewall table."
+	AUGMENTS    { jnxFirewallCounterEntry }
+	::= { jnxFWCntrXTable 1 }
+
+    JnxFWCntrXEntry ::=
+    SEQUENCE {
+           jnxFWCntrPolicerOfferedPktCount          Counter64,
+           jnxFWCntrPolicerOfferedByteCount         Counter64,
+           jnxFWCntrPolicerOutSpecPktCount          Counter64,
+           jnxFWCntrPolicerOutSpecByteCount         Counter64,
+           jnxFWCntrPolicerTxPktCount               Counter64,
+           jnxFWCntrPolicerTxByteCount              Counter64
+    }
+
+    jnxFWCntrPolicerOfferedPktCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 1 }
+
+    jnxFWCntrPolicerOfferedByteCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 2 }
+
+    jnxFWCntrPolicerOutSpecPktCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 3 }
+
+    jnxFWCntrPolicerOutSpecByteCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 4 }
+
+    jnxFWCntrPolicerTxPktCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 5 }
+
+    jnxFWCntrPolicerTxByteCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "  "
+	::= { jnxFWCntrXEntry 6 }
+    
 END

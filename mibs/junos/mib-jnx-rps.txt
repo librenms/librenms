@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: RPS 
 --
--- Copyright (c) 2007-2008, Juniper Networks, Inc.
+-- Copyright (c) 2007-2009, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.

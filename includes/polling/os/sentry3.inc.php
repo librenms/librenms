@@ -7,7 +7,7 @@
 $hardware = snmp_get($device, "towerModelNumber.1", "-Ovq", "Sentry3-MIB");
 $serial = snmp_get($device, "towerProductSN.1", "-Ovq", "Sentry3-MIB");
 $version = snmp_get($device, "systemVersion.0", "-Ovq", "Sentry3-MIB");
-$version = preg_split('/Sentry\ Switched\ CDU\ Version/', $version);
+$version = preg_split('/Sentry\ (Switched|Smart)\ CDU\ Version/', $version);
 $version = $version[1];
 
 ?>
