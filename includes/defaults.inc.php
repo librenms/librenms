@@ -404,6 +404,9 @@ $config['bad_iftype'][] = "mpls";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
 $config['bad_if_regexp'][] = "/^sl[0-9]/";
 
+// Rewrite Interfaces
+$config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
+
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
 $config['ignore_mount_removable']  = 1; # Ignore removable disk storage
