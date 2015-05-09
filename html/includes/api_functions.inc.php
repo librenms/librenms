@@ -536,7 +536,7 @@ function list_alerts() {
         $sql = "AND id=?";
         array_push($param,$alert_id);
     }
-    $alerts = dbFetchRows("SELECT * FROM `alerts` WHERE `state` IN (?) $sql",$param);
+    $alerts = dbFetchRows("SELECT `D`.`hostname`, `A`.* FROM `alerts` AS `A`, `devices` AS `D` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`state` IN (?) $sql",$param);
     $total_alerts = count($alerts);
     $output = array("status" => "ok", "err-msg" => '', "count" => $total_alerts, "alerts" => $alerts);
     $app->response->setStatus('200');
@@ -698,4 +698,18 @@ function get_inventory() {
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
+
+function list_oxidized() {
+  // return details of a single device
+  $app = \Slim\Slim::getInstance();
+  $app->response->headers->set('Content-Type', 'application/json');
+
+  $devices = array();
+  foreach (dbFetchRows("SELECT hostname,os FROM `devices` WHERE `status`='1'") as $device) {
+    $devices[] = $device;
+  }
+  $app->response->headers->set('Content-Type', 'application/json');
+  echo _json_encode($devices);
+
 }

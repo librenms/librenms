@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Structure of Management Information
 --
--- Copyright (c) 2002-2007, Juniper Networks, Inc.
+-- Copyright (c) 2002-2009, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.

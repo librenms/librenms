@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper Networks IPSEC Generic Flow Monitoring object mibs 
 --
--- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- Copyright (c) 2001-2011, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -99,7 +99,8 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             "The hash algorithm used in IPsec Phase-1 IKE negotiations."
          SYNTAX INTEGER {
                    md5(1),
-                   sha(2)
+                   sha(2),
+                   sha256(3)
          }
 
     JnxIkeAuthMethod ::= TEXTUAL-CONVENTION
@@ -196,7 +197,9 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          SYNTAX INTEGER{
                    unknown            (0),
                    hmacMd5            (1),
-                   hmacSha            (2)
+                   hmacSha            (2),
+                   hmacSha256         (3)
+
          }
 
     JnxRemotePeerType  ::= TEXTUAL-CONVENTION
@@ -586,10 +589,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          SYNTAX         Counter32
          UNITS          "Packets"
          MAX-ACCESS     read-only
-         STATUS         current
+         STATUS         obsolete 
          DESCRIPTION
             "The number of times that the remote peer is detected 
-             in a dead (or down) state."   
+             in a dead (or down) state. This attribute is obsolete"   
          ::= { jnxIkeTunnelMonEntry 27 }
 
 
@@ -664,7 +667,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIpSecTunMonDecryptFails         Counter64,
          jnxIpSecTunMonBadHeaders           Counter64,
          jnxIpSecTunMonBadTrailers          Counter64,
-         jnxIpSecTunMonDroppedPkts          Counter64        
+         jnxIpSecTunMonDroppedPkts          Counter64   -- obsolete        
       }											
 
       jnxIpSecTunMonRemoteGwAddrType OBJECT-TYPE
@@ -889,9 +892,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
       jnxIpSecTunMonDroppedPkts  OBJECT-TYPE
          SYNTAX         Counter64
          MAX-ACCESS 	read-only 
-         STATUS         current 
+         STATUS         obsolete
          DESCRIPTION
-            "Total number of dropped packets for this Phase-2 tunnel."
+            "Total number of dropped packets for this Phase-2 tunnel. 
+             This attribute is obsolete."
          ::= { jnxIpSecTunnelMonEntry 26 }
 
 
@@ -1069,7 +1073,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          STATUS     current
          DESCRIPTION
             "The algorithm used for authentication of packets which
-			 can be hmac-md5-96 or hmac-sha1-96"
+			 can be hmac-md5-96 or hmac-sha1-96 or hmac-sha-256-128"
          ::= { jnxIpSecSaMonEntry 13 }
 
       jnxIpSecSaMonState OBJECT-TYPE

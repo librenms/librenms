@@ -2,7 +2,7 @@
 
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
-## On the DB Server ##
+### On the DB Server ###
 
     apt-get install mysql-server mysql-client snmpd
     mysql -uroot -p
@@ -33,11 +33,11 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
     service mysql restart
 
-## On the NMS ##
+### On the NMS ###
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Debian 7.
 
-    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
+    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear php5-curl snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
 
 ### Cloning ###
 
@@ -58,9 +58,15 @@ Change the values to the right of the equal sign for lines beginning with `$conf
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
 
+** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise. **
+
+### Initialise the database ###
+
 Initiate the follow database with the following command:
 
     php build-base.php
+
+### Create admin user ###
 
 Create the admin user - priv should be 10
 
@@ -128,6 +134,8 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
+### Create cronjob ###
+
 The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
 
 If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).
@@ -148,3 +156,9 @@ LibreNMS performs daily updates by default.  At 00:15 system time every day, a `
 so that it looks like this:
 
     $config['update'] = 0;
+
+### Install complete ###
+
+That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+
+It would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.

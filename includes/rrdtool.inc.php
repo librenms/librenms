@@ -107,6 +107,10 @@ function rrdtool_graph($graph_file, $options)
 
     if ($config['rrdcached'])
     {
+      if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
+          $options = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$options);
+          $options = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$options);
+      }
       fwrite($rrd_pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
     } else {
       fwrite($rrd_pipes[0], "graph $graph_file $options");
@@ -150,10 +154,15 @@ function rrdtool($command, $filename, $options)
 {
   global $config, $debug, $rrd_pipes, $console_color;
 
-  $cmd = "$command $filename $options";
   if ($command != "create" && $config['rrdcached'])
   {
-    $cmd .= " --daemon " . $config['rrdcached'];
+      if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
+          $filename = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$filename);
+          $filename = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$filename);
+      }
+      $cmd = "$command $filename $options --daemon " . $config['rrdcached'];
+  } else {
+      $cmd = "$command $filename $options";
   }
 
   if ($config['norrd'])
@@ -262,15 +271,6 @@ function rrdtool_escape($string, $maxlength = NULL)
   {
     return $result;
   }
-}
-
-function shorten_interface_type($string) {
-
-    return str_ireplace(
-               array('FastEthernet','GigbitEthernet','TenGigabitEthernet','Port-Channel','Ethernet'),
-               array('Fa','Gi','Te','Po','Eth'),
-               $string
-           );
 }
 
 ?>

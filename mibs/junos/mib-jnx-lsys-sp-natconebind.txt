@@ -1,0 +1,199 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-NATCONEBIND-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpNATconebind                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpNATconebindMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- May 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the NAT-cone-bind-specific MIB for 
+             Juniper Enterprise Logical-System (LSYS) security profiles.  
+             Juniper documentation is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security NAT-cone-bind resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpNATconebind 1 }
+
+    jnxLsysSpNATconebindObjects  OBJECT IDENTIFIER ::= { jnxLsysSpNATconebindMIB 1 }
+    jnxLsysSpNATconebindSummary  OBJECT IDENTIFIER ::= { jnxLsysSpNATconebindMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular NAT-cone-bind resource information objects per LSYS:
+--   Below are NAT-cone-bind resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- The NAT-cone-bind resource table per LSYS
+
+    jnxLsysSpNATconebindTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpNATconebindEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE NAT-cone-bind objects for NAT-cone-bind 
+             resource consumption per LSYS."  
+    ::= { jnxLsysSpNATconebindObjects 1 }
+    
+    jnxLsysSpNATconebindEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpNATconebindEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in NAT-cone-bind resource table."
+    INDEX { IMPLIED jnxLsysSpNATconebindLsysName }          
+    ::= { jnxLsysSpNATconebindTable 1 }          
+
+    JnxLsysSpNATconebindEntry ::= 
+       SEQUENCE {
+          jnxLsysSpNATconebindLsysName    DisplayString,
+          jnxLsysSpNATconebindProfileName DisplayString,
+          jnxLsysSpNATconebindUsage       Unsigned32,
+          jnxLsysSpNATconebindReserved    Unsigned32,
+          jnxLsysSpNATconebindMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the NAT-cone-bind resource table
+ 
+    jnxLsysSpNATconebindLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which NAT-cone-bind 
+             resource information is retrieved. "
+        ::= { jnxLsysSpNATconebindEntry 1 }
+
+    jnxLsysSpNATconebindProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpNATconebindEntry 2 }
+
+    jnxLsysSpNATconebindUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpNATconebindEntry 3 }
+    
+    jnxLsysSpNATconebindReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpNATconebindEntry 4 } 
+
+    jnxLsysSpNATconebindMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpNATconebindEntry 5 }
+
+
+-- **********************************************************************
+-- The NAT-cone-bind resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpNATconebindUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The NAT-cone-bind resource consumption over all LSYS."
+    ::= { jnxLsysSpNATconebindSummary 1 }          
+
+    jnxLsysSpNATconebindMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-cone-bind resource maximum quota for the whole 
+            device for all LSYS."
+    ::= { jnxLsysSpNATconebindSummary 2 }
+    
+    jnxLsysSpNATconebindAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-cone-bind resource available in the whole device."
+    ::= { jnxLsysSpNATconebindSummary 3 }
+    
+    jnxLsysSpNATconebindHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of NAT-cone-bind resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATconebindSummary 4 }
+    
+    jnxLsysSpNATconebindHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most NAT-cone-bind resource."
+    ::= { jnxLsysSpNATconebindSummary 5 }
+    
+    jnxLsysSpNATconebindLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of NAT-cone-bind resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATconebindSummary 6 }
+    
+    jnxLsysSpNATconebindLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least NAT-cone-bind resource."
+    ::= { jnxLsysSpNATconebindSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of NAT-cone-bind resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

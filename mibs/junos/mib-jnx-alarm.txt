@@ -1,0 +1,89 @@
+--
+-- Juniper Enterprise Specific MIB: Ping MIB
+-- 
+-- Copyright (c) 2001-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-ALARM-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE 
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime
+	FROM SNMPv2-TC                  -- [RFC2579]
+    alarmClearEntry
+	FROM ALARM-MIB
+    jnxMibs, jnxAlarmExtMibRoot
+        FROM JUNIPER-SMI;
+
+jnxAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED "201209041502Z" -- Tue Sept 2 15:02:46 2012 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for alarms from the router chassis box."
+    ::= { jnxAlarmExtMibRoot 1 }
+
+jnxAlarmObjects	OBJECT IDENTIFIER ::= { jnxAlarmMIB 1 }
+
+--  Extension to Clear table.     
+--  Some systems may have a requirement that information
+--  on alarms that are no longer active be available. 
+--  This memo provides a clear table to support this 
+--  requirement. Though Clear table provides the history 
+--  of alarms raised, it doesn't the datAndTime when the 
+--  alarm was rasied. This information is critical. 
+--  A new table is deined that extends the alarmClearTable
+--  by AUGENTING it. This table will provide dateAndTime 
+--  a particular which is no longer active was raised.
+--
+-- Alarm Clear Table Extensions
+--
+
+
+jnxAlarmClearTable    OBJECT-TYPE
+    SYNTAX	    SEQUENCE OF JnxAlarmClearEntry
+    MAX-ACCESS	    not-accessible
+    STATUS	    current
+    DESCRIPTION	    
+	" This table augments alarmClearTable. This table
+	contains additional object needed to indicate 
+	DateAndTime when a particular alarm was raised."
+    ::= { jnxAlarmObjects 1}
+
+jnxAlarmClearEntry    OBJECT-TYPE
+    SYNTAX	    JnxAlarmClearEntry
+    MAX-ACCESS	    not-accessible
+    STATUS	    current
+    DESCRIPTION	    
+	" An entry containing additional information 
+	applicable to a particular entry in alarm
+	ClearTable."
+    AUGMENTS	    { alarmClearEntry }
+    ::= { jnxAlarmClearTable 1 }
+
+JnxAlarmClearEntry    ::=
+    SEQUENCE {
+	    jnxAlarmClearActiveDateAndTime    DateAndTime	
+	}
+
+jnxAlarmClearActiveDateAndTime	OBJECT-TYPE
+    SYNTAX	    DateAndTime
+    MAX-ACCESS	    read-only
+    STATUS	    current
+    DESCRIPTION
+	" This object indicates DateAndTime, when 
+	current alarm was raised."
+    ::=	{ jnxAlarmClearEntry 1 }
+
+END

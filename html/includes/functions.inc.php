@@ -13,8 +13,6 @@
  *
  */
 
-include("../includes/alerts.inc.php");
-
 function data_uri($file, $mime)
 {
   $contents = file_get_contents($file);
@@ -124,7 +122,7 @@ function generate_device_url($device, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1)
+function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1, $overlib=1)
 {
   global $config;
 
@@ -170,7 +168,11 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
   }
 
   if ($escape_text) { $text = htmlentities($text); }
-  $link = overlib_link($url, $text, escape_quotes($contents), $class);
+  if ($overlib == 0) {
+      $link = $contents;
+  } else {
+      $link = overlib_link($url, $text, escape_quotes($contents), $class);
+  }
 
   if (device_permitted($device['device_id']))
   {
@@ -186,7 +188,11 @@ function overlib_link($url, $text, $contents, $class)
 
   $contents = str_replace("\"", "\'", $contents);
   $output = '<a class="'.$class.'" href="'.$url.'"';
-  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
+  if ($config['web_mouseover'] === FALSE) {
+      $output .= ">";
+  } else {
+      $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
+  }
   $output .= $text."</a>";
 
   return $output;
@@ -406,7 +412,7 @@ function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
 
 }
 
-function generate_port_link($port, $text = NULL, $type = NULL)
+function generate_port_link($port, $text = NULL, $type = NULL, $overlib = 1, $single_graph = 0)
 {
   global $config;
 
@@ -431,17 +437,21 @@ function generate_port_link($port, $text = NULL, $type = NULL)
   $graph_array['from']     = $config['time']['day'];
   $graph_array['id']       = $port['port_id'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['week'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['month'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['year'];
-  $content .= generate_graph_tag($graph_array);
+  if ($single_graph == 0) {
+      $graph_array['from']     = $config['time']['week'];
+      $content .= generate_graph_tag($graph_array);
+      $graph_array['from']     = $config['time']['month'];
+      $content .= generate_graph_tag($graph_array);
+      $graph_array['from']     = $config['time']['year'];
+      $content .= generate_graph_tag($graph_array);
+  }
   $content .= "</div>";
 
   $url = generate_port_url($port);
 
-  if (port_permitted($port['port_id'], $port['device_id'])) {
+  if ($overlib == 0) {
+    return $content;
+  } elseif (port_permitted($port['port_id'], $port['device_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);
@@ -456,6 +466,10 @@ function generate_port_url($port, $vars=array())
 function generate_peer_url($peer, $vars=array())
 {
   return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
+}
+
+function generate_bill_url($bill, $vars=array()) {
+	return generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']), $vars);
 }
 
 function generate_port_image($args)
@@ -724,6 +738,15 @@ function is_admin() {
     return $allowed;
 }
 
+function is_read() {
+    if ($_SESSION['userlevel'] == '5') {
+        $allowed = true;
+    } else {
+        $allowed = false;
+    }
+    return $allowed;
+}
+
 function demo_account() {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 }
@@ -735,6 +758,23 @@ function get_client_ip() {
         $client_ip = $_SERVER['REMOTE_ADDR'];
     }
     return $client_ip;
+}
+
+function shorten_interface_type($string) {
+
+    return str_ireplace(
+               array('FastEthernet','GigbitEthernet','TenGigabitEthernet','Port-Channel','Ethernet'),
+               array('Fa','Gi','Te','Po','Eth'),
+               $string
+           );
+}
+
+function clean_bootgrid($string) {
+
+    $output = str_replace(array("\r","\n"), "", $string);
+    $output = addslashes($output);
+    return $output;
+
 }
 
 ?>
