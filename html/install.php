@@ -33,7 +33,7 @@ include("../includes/defaults.inc.php");
 // Work out the install directory
 $cur_dir = explode('/',$_SERVER['DOCUMENT_ROOT']);
 $install_dir = array_pop($cur_dir);
-$install_dir = array_pop($cur_dir);
+#$install_dir = array_pop($cur_dir);
 $install_dir = implode('/',$cur_dir);
 $config['install_dir'] = $install_dir;
 $config['log_dir'] = $install_dir.'/logs';
@@ -344,7 +344,7 @@ require('../build-base.php');
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <button type="submit" class="btn btn-success">Goto Add User</button>
-        </form> 
+        </form>
       </div>
       <div class="col-md-3">
       </div>
@@ -409,9 +409,9 @@ EOD;
   if(!file_exists("../config.php"))
   {
     $conf = fopen("../config.php", 'w');
-    if ($conf === false)
+    if ($conf != false)
     {
-      if(fwrite($handle, '<?php') === FALSE)
+      if(fwrite($conf, "<?php\n") === FALSE)
       {
         echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
         echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
@@ -419,7 +419,7 @@ EOD;
       else
       {
         $config_file = stripslashes($config_file);
-        fwrite($handle,$config_file);
+        fwrite($conf,$config_file);
         echo("<div class='alert alert-success'>The config file has been created</div>");
       }
     }
