@@ -422,6 +422,9 @@ EOD;
         fwrite($conf,$config_file);
         echo("<div class='alert alert-success'>The config file has been created</div>");
       }
+    } else {
+        echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
+        echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
     }
   }
 ?>
@@ -549,3 +552,4 @@ elseif($stage == "6")
   </div>
 </body>
 </html>
+
