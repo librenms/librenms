@@ -98,29 +98,31 @@ foreach ($rrd_list as $rrd)
   $i++; $iter++;
 }
 
-$rrd_options .= " CDEF:aggr".$in."bytes=" . $aggr_in.",ADDNAN";
-$rrd_options .= " CDEF:aggr".$out."bytes=" . $aggr_out.",ADDNAN";
-$rrd_options .= " CDEF:aggrinbits=aggrinbytes,".$multiplier.",*";
-$rrd_options .= " CDEF:aggroutbits=aggroutbytes,".$multiplier.",*";
-$rrd_options .= " VDEF:totalin=aggrinbytes,TOTAL";
-$rrd_options .= " VDEF:totalout=aggroutbytes,TOTAL";
-$rrd_options .= " COMMENT:' \\\\n'";
-$rrd_options .= " COMMENT:'".substr(str_pad("Aggregate In", $descr_len+5),0,$descr_len+5)."'";
-$rrd_options .= " GPRINT:aggrinbits:LAST:%6.2lf%s$units";
-$rrd_options .= " GPRINT:aggrinbits:AVERAGE:%6.2lf%s$units";
-$rrd_options .= " GPRINT:aggrinbits:MAX:%6.2lf%s$units";
-if (!$nototal) {
-  $rrd_options .= " GPRINT:totalin:%6.2lf%s$total_units";
+if (!$noagg){
+  $rrd_options .= " CDEF:aggr".$in."bytes=" . $aggr_in.",ADDNAN";
+  $rrd_options .= " CDEF:aggr".$out."bytes=" . $aggr_out.",ADDNAN";
+  $rrd_options .= " CDEF:aggrinbits=aggrinbytes,".$multiplier.",*";
+  $rrd_options .= " CDEF:aggroutbits=aggroutbytes,".$multiplier.",*";
+  $rrd_options .= " VDEF:totalin=aggrinbytes,TOTAL";
+  $rrd_options .= " VDEF:totalout=aggroutbytes,TOTAL";
+  $rrd_options .= " COMMENT:' \\\\n'";
+  $rrd_options .= " COMMENT:'".substr(str_pad("Aggregate In", $descr_len+5),0,$descr_len+5)."'";
+  $rrd_options .= " GPRINT:aggrinbits:LAST:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:aggrinbits:AVERAGE:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:aggrinbits:MAX:%6.2lf%s$units";
+  if (!$nototal) {
+    $rrd_options .= " GPRINT:totalin:%6.2lf%s$total_units";
+  }
+  $rrd_options .= "\\\\n";
+  $rrd_options .= " COMMENT:'".substr(str_pad("Aggregate Out", $descr_len+5),0,$descr_len+5)."'";
+  $rrd_options .= " GPRINT:aggroutbits:LAST:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:aggroutbits:AVERAGE:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:aggroutbits:MAX:%6.2lf%s$units";
+  if (!$nototal) {
+    $rrd_options .= " GPRINT:totalout:%6.2lf%s$total_units";
+  }
+  $rrd_options .= "\\\\n";
 }
-$rrd_options .= "\\\\n";
-$rrd_options .= " COMMENT:'".substr(str_pad("Aggregate Out", $descr_len+5),0,$descr_len+5)."'";
-$rrd_options .= " GPRINT:aggroutbits:LAST:%6.2lf%s$units";
-$rrd_options .= " GPRINT:aggroutbits:AVERAGE:%6.2lf%s$units";
-$rrd_options .= " GPRINT:aggroutbits:MAX:%6.2lf%s$units";
-if (!$nototal) {
-  $rrd_options .= " GPRINT:totalout:%6.2lf%s$total_units";
-}
-$rrd_options .= "\\\\n";
 
 if ($custom_graph) { $rrd_options .= $custom_graph; }
 

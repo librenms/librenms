@@ -9,6 +9,7 @@ if ($_GET['inverse']) { $in = 'out'; $out = 'in'; $inverse=TRUE; } else { $in = 
 if ($_GET['legend'] == "no")  { $rrd_options .= " -g"; }
 if ($_GET['nototal']) { $nototal=TRUE;} else { $nototal=FALSE;}
 if ($_GET['nodetails']) { $nodetails=TRUE; } else { $nodetails=FALSE; }
+if ($_GET['noagg']) { $noagg=TRUE; } else { $noagg=FALSE; }
 
 if ($_GET['title'] == "yes")  { $rrd_options .= " --title='".$graph_title."' "; }
 if (isset($_GET['graph_title']))  { $rrd_options .= " --title='".$_GET['graph_title']."' "; }
