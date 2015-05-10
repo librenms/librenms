@@ -23,6 +23,7 @@ Contributors to LibreNMS:
 - Stuart Henderson <stu@spacehopper.org> (sthen)
 - Filippo Giunchedi <filippo@esaurito.net> (filippog)
 - Lasse Leegaard <lasse@brandbil.dk> (lasseleegaard)
+- Mickael Marchand <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 
 [1]: http://observium.org/ "Observium web site"

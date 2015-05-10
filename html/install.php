@@ -33,7 +33,7 @@ include("../includes/defaults.inc.php");
 // Work out the install directory
 $cur_dir = explode('/',$_SERVER['DOCUMENT_ROOT']);
 $install_dir = array_pop($cur_dir);
-#$install_dir = array_pop($cur_dir);
+$install_dir = array_pop($cur_dir);
 $install_dir = implode('/',$cur_dir);
 $config['install_dir'] = $install_dir;
 $config['log_dir'] = $install_dir.'/logs';
