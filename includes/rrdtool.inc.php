@@ -256,21 +256,17 @@ function rrdtool_lastupdate($filename, $options)
      
 function rrdtool_escape($string, $maxlength = NULL)
 {
-  $result = str_replace(':','\:',$string);
-  $result = str_replace('%','%%',$result);
+  $result = shorten_interface_type($string);
 
-  // FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
-
-  $result = shorten_interface_type($result);
-
-  if ($maxlength != NULL)
-  {
-    return substr(str_pad($result, $maxlength),0,$maxlength+(strlen($result)-strlen($string)));
+  if ( is_numeric($maxlength) ) {
+    $extra  = substr_count($string,':',0,$maxlength);
+    $result = substr(str_pad($result, $maxlength),0,$maxlength+$extra);
+    $result = substr($result,0,(-1*$extra));
   }
-  else
-  {
-    return $result;
-  }
+
+  $result = str_replace(':','\:',$result);
+
+	return $result." ";
 }
 
 ?>
