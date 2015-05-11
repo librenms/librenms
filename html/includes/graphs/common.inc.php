@@ -1,22 +1,20 @@
 <?php
 
-if ($_GET['from'])    { $from   = mres($_GET['from']);   }
-if ($_GET['to'])      { $to     = mres($_GET['to']);     }
-if ($_GET['width'])   { $width  = mres($_GET['width']);  }
-if($config['trim_tobias']) { $width+=12; }
-if ($_GET['height'])  { $height = mres($_GET['height']); }
-if ($_GET['inverse']) { $in = 'out'; $out = 'in'; $inverse=TRUE; } else { $in = 'in'; $out = 'out'; }
-if ($_GET['legend'] == "no")  { $rrd_options .= " -g"; }
-if (empty($_GET['nototal'])) { $nototal=TRUE; } else { $nototal=FALSE; }
-if (empty($_GET['nodetails'])) { $nodetails=TRUE; } else { $nodetails=FALSE; }
-if (empty($_GET['noagg'])) { $noagg=TRUE; } else { $noagg=FALSE; }
-
-if ($_GET['title'] == "yes")  { $rrd_options .= " --title='".$graph_title."' "; }
-if (isset($_GET['graph_title']))  { $rrd_options .= " --title='".$_GET['graph_title']."' "; }
+if ($_GET['from'])               { $from   = mres($_GET['from']);                          }
+if ($_GET['to'])                 { $to     = mres($_GET['to']);                            }
+if ($_GET['width'])              { $width  = mres($_GET['width']);                         }
+if ($config['trim_tobias'])      { $width+=12;                                             }
+if ($_GET['height'])             { $height = mres($_GET['height']);                        }
+if ($_GET['inverse'])            { $in = 'out'; $out = 'in'; $inverse=TRUE;                } else { $in = 'in'; $out = 'out'; }
+if ($_GET['legend'] == "no")     { $rrd_options .= " -g";                                  }
+if (isset($_GET['nototal']))     { $nototal   = ((bool) $_GET['nototal']);                 } else { $nototal=true;            }
+if (isset($_GET['nodetails']))   { $nodetails = ((bool) $_GET['nodetails']);               } else { $nodetails=false;         }
+if (isset($_GET['noagg']))       { $noagg     = ((bool) $_GET['noagg']);                   } else { $noagg=true;              }
+if ($_GET['title'] == "yes")     { $rrd_options .= " --title='".$graph_title."' ";         }
+if (isset($_GET['graph_title'])) { $rrd_options .= " --title='".$_GET['graph_title']."' "; }
 
 if (!isset($scale_min) && !isset($scale_max)) { $rrd_options .= " --alt-autoscale-max"; }
 if (!isset($scale_min) && !isset($scale_max) && !isset($norigid)) { $rrd_options .= " --rigid"; }
-
 if (isset($scale_min)) { $rrd_options .= " -l $scale_min"; }
 if (isset($scale_max)) { $rrd_options .= " -u $scale_max"; }
 if (isset($scale_rigid)) { $rrd_options .= " -r"; }
@@ -34,5 +32,3 @@ if ($width <= "300") { $rrd_options .= " --font LEGEND:7:" . $config['mono_font'
 else {                 $rrd_options .= " --font LEGEND:8:" . $config['mono_font'] . " --font AXIS:7:" . $config['mono_font']; }
 
 $rrd_options .= " --font-render-mode normal";
-
-?>
