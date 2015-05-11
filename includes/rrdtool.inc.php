@@ -60,7 +60,7 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
  * @param array rrd_pipes
  */
 
-function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
+function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
   global $debug;
 
