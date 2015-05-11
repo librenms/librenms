@@ -105,6 +105,12 @@ $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "QNAP TurboNAS";
 $config['os'][$os]['ifXmcbc']           = 1;
 
+$os = "netapp";
+$config['os'][$os]['type']              = "storage";
+$config['os'][$os]['text']              = "NetApp";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $os = "endian";
 $config['os'][$os]['text']              = "Endian";
 $config['os'][$os]['type']              = "firewall";
