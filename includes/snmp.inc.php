@@ -56,7 +56,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   $array = array();
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value);
     list($oid, $index) = explode(".", $oid,2);
     if (!strstr($value, "at this OID") && isset($oid) && isset($index))
@@ -304,7 +304,7 @@ function snmp_cache_ifIndex($device)
   foreach (explode("\n", $data) as $entry)
   {
     list ($this_oid, $this_value) = preg_split("/=/", $entry);
-    list ($this_oid, $this_index) = explode(".", $this_oid);
+    list ($this_oid, $this_index) = explode(".", $this_oid, 2);
     $this_index = trim($this_index);
     $this_oid = trim($this_oid);
     $this_value = trim($this_value);
@@ -322,7 +322,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
   $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value);
     list($oid, $index) = explode(".", $oid, 2);
     if (!strstr($value, "at this OID") && isset($oid) && isset($index))
@@ -344,7 +344,7 @@ function snmpwalk_cache_oid_num($device, $oid, $array, $mib = NULL, $mibdir = NU
 
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value);
     list($oid, $index) = explode(".", $oid, 2);
     if (!strstr($value, "at this OID") && isset($oid) && isset($index))
@@ -366,7 +366,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = 
     $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
     foreach (explode("\n", $data) as $entry)
     {
-      list($r_oid,$value) = explode("=", $entry);
+      list($r_oid,$value) = explode("=", $entry, 2);
       $r_oid = trim($r_oid); $value = trim($value);
       $oid_parts = explode(".", $r_oid);
       $r_oid = $oid_parts['0'];
@@ -393,7 +393,7 @@ function snmpwalk_cache_double_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value);
     list($oid, $first, $second) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second))
@@ -412,7 +412,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value);
     list($oid, $first, $second, $third) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second))
@@ -473,7 +473,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
   $device_id = $device['device_id'];
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value); $value = str_replace("\"", "", $value);
     list($oid, $first, $second) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second))
@@ -532,7 +532,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
   $device_id = $device['device_id'];
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
+    list($oid,$value) = explode("=", $entry, 2);
     $oid = trim($oid); $value = trim($value); $value = str_replace("\"", "", $value);
     list($oid, $first, $second, $third) = explode(".", $oid);
     if ($debug) {echo("$entry || $oid || $first || $second || $third\n"); }
@@ -593,7 +593,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
   foreach (explode("\n", $data) as $entry)
   {
     $entry = str_replace($oid.".", "", $entry);
-    list($slotport, $value) = explode("=", $entry);
+    list($slotport, $value) = explode("=", $entry, 2);
     $slotport = trim($slotport); $value = trim($value);
     if ($array[$slotport]['ifIndex'])
     {
@@ -702,7 +702,7 @@ function snmp_cache_portIfIndex($device, $array)
   foreach (explode("\n", $output) as $entry)
   {
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
-    list($slotport, $ifIndex) = explode(" ", $entry);
+    list($slotport, $ifIndex) = explode(" ", $entry, 2);
     if ($slotport && $ifIndex) {
       $array[$ifIndex]['portIfIndex'] = $slotport;
       $array[$slotport]['ifIndex'] = $ifIndex;
@@ -750,7 +750,7 @@ function snmp_cache_portName($device, $array)
   foreach (explode("\n", $output) as $entry)
   {
     $entry = str_replace("portName.", "", $entry);
-    list($slotport, $portName) = explode("=", $entry);
+    list($slotport, $portName) = explode("=", $entry, 2);
     $slotport = trim($slotport); $portName = trim($portName);
     if ($array[$slotport]['ifIndex'])
     {
