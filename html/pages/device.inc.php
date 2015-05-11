@@ -6,10 +6,8 @@ if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($var
   $permit_ports = 1;
 }
 
-$device  = device_by_id_cache($vars['device']);
-if (!$device) {
+if (!is_numeric($vars['device'])) {
   $vars['device'] = device_by_name($vars['device']);
-  $device  = device_by_id_cache($vars['device']);
 }
 
 if (device_permitted($vars['device']) || $check_device == $vars['device'])
@@ -25,6 +23,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
   $select[$tab] = "active";
 
+  $device  = device_by_id_cache($vars['device']);
   $attribs = get_dev_attribs($device['device_id']);
 
   $entity_state = get_dev_entity_state($device['device_id']);
