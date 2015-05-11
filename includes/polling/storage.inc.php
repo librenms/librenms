@@ -13,7 +13,7 @@ foreach (dbFetchRows("SELECT * FROM storage WHERE device_id = ?", array($device[
    rrdtool_create($storage_rrd, "--step 300 DS:used:GAUGE:600:0:U DS:free:GAUGE:600:0:U ".$config['rrd_rra']);
   }
 
-  $file = $config['install_dir']."/includes/polling/storage-".$storage['storage_mib'].".inc.php";
+  $file = $config['install_dir']."/includes/polling/storage/".$storage['storage_mib'].".inc.php";
   if (is_file($file))
   {
     include($file);
