@@ -257,6 +257,7 @@ function rrdtool_lastupdate($filename, $options)
 function rrdtool_escape($string, $maxlength = NULL)
 {
   $result = shorten_interface_type($string);
+  $result = str_replace('%','%%',$result);
   if ( is_numeric($maxlength) ) {
     $extra  = substr_count($string,':',0,$maxlength);
     $result = substr(str_pad($result, $maxlength),0,$maxlength+$extra);
