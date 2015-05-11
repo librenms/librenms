@@ -257,16 +257,15 @@ function rrdtool_lastupdate($filename, $options)
 function rrdtool_escape($string, $maxlength = NULL)
 {
   $result = shorten_interface_type($string);
-
   if ( is_numeric($maxlength) ) {
     $extra  = substr_count($string,':',0,$maxlength);
     $result = substr(str_pad($result, $maxlength),0,$maxlength+$extra);
-    $result = substr($result,0,(-1*$extra));
+    if( $extra > 0 ) {
+      $result = substr($result,0,(-1*$extra));
+    }
   }
-
   $result = str_replace(':','\:',$result);
-
-	return $result." ";
+  return $result." ";
 }
 
 ?>
