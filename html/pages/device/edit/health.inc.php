@@ -17,12 +17,13 @@
 
 <h3>Health settings</h3>
 
+<form class="form-inline">
 <table class="table table-hover table-condensed table-bordered">
   <tr class="info">
-    <th class="col-sm-2">Class</th>
-    <th class="col-sm-2">Type</th>
-    <th class="col-sm-3">Desc</th>
-    <th class="col-sm-1">Current</th>
+    <th>Class</th>
+    <th>Type</th>
+    <th>Desc</th>
+    <th>Current</th>
     <th class="col-sm-1">High</th>
     <th class="col-sm-1">Low</th>
     <th class="col-sm-2">Alerts</th>
@@ -46,13 +47,17 @@ foreach ( dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_dele
     <td>'.$sensor['sensor_descr'].'</td>
     <td>'.$sensor['sensor_current'].'</td>
     <td>
-      <div class="form-group">
+      <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit'].'">
+        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
       </div>
     </td>
-    <td><div class="form-group">
-      <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
-    </div></td>
+    <td>
+      <div class="form-group has-feedback">
+        <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
+        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+      </div>
+    </td>
     <td>
       <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" '.$alert_status.'>
     </td>
@@ -62,7 +67,7 @@ foreach ( dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_dele
 
 ?>
 </table>
-
+</form>
 <form id="alert-reset">
 <?php
 foreach($rollback as $reset_data)
@@ -76,7 +81,7 @@ foreach($rollback as $reset_data)
 }
 ?>
 <input type="hidden" name="type" value="sensor-alert-reset">
-<button id = "newThread" class="btn btn-primary" type="submit">Reset values</button>
+<button id = "newThread" class="btn btn-primary btn-sm" type="submit">Reset values</button>
 </form>
 <script>
   $('#newThread').on('click', function(e){
@@ -113,14 +118,18 @@ foreach($rollback as $reset_data)
         dataType: "html",
         success: function(data){
           $this.closest('.form-group').addClass('has-success');
+          $this.next().addClass('glyphicon-ok');
           setTimeout(function(){
             $this.closest('.form-group').removeClass('has-success');
+            $this.next().removeClass('glyphicon-ok');
           }, 2000);
         },
         error:function(){
           $(this).closest('.form-group').addClass('has-error');
+          $this.next().addClass('glyphicon-remove');
           setTimeout(function(){
             $this.closest('.form-group').removeClass('has-error');
+             $this.next().removeClass('glyphicon-remove');
           }, 2000);
         }       
       });
