@@ -21,7 +21,7 @@ if(!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || (empt
 }
 else
 {
-  $update = dbUpdate(array($_POST['value_type'] => $_POST['data']), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'],$_POST['device_id']));
+  $update = dbUpdate(array($_POST['value_type'] => $_POST['data'], 'sensor_custom' => 'Yes'), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'],$_POST['device_id']));
   if(!empty($update) || $update == '0')
   {
     echo('success');
