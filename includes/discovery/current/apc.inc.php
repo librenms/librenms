@@ -103,6 +103,7 @@ if ($device['os'] == "apc")
         #rPDULoadBankConfigNearOverloadThreshold
         $warnlimit = snmp_get($device, "1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.".$index, "-Oqv", "");
 
+<<<<<<< HEAD
         if ($limit < 0 and $lowlimit < 0 and $warnlimit < 0){
             #rPDULoadPhaseConfigOverloadThreshold
             $limit     = snmp_get($device, "1.3.6.1.4.1.318.1.1.12.2.2.1.1.4.".$index, "-Oqv", "");
@@ -115,6 +116,8 @@ if ($device['os'] == "apc")
 
             echo "Phase ";
         }
+=======
+>>>>>>> parent of 638f5db... Fixed apc powerbar phase limit discovery for AP7852 fm 2.7.3
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
       }
     }
