@@ -101,7 +101,9 @@ if ($device['os'] == "apc")
         $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
 
         if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1)
+        {
             discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+        }
       }
     }
 
