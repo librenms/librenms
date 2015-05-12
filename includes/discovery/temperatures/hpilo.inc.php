@@ -21,9 +21,7 @@
       $threshold_oid = "1.3.6.1.4.1.232.6.2.6.8.1.5.$temperature_id";
       $threshold = snmp_get($device,$threshold_oid,"-Oqv","");
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'hpilo', $d
-escr, '2', '1', NULL, NULL, NULL, $threshold, $temperature);
+      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'hpilo', $descr, '2', '1', NULL, NULL, NULL, $threshold, $temperature);
     }
   }
 
-?>
