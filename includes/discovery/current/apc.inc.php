@@ -4,7 +4,11 @@
 if ($device['os'] == "apc")
 {
   # PDU - Phase
-  $oids = snmp_walk($device, "rPDULoadPhaseConfigIndex", "-OsqnU", "PowerNet-MIB");
+  $oids = snmp_walk($device, "rPDUStatusPhaseIndex", "-OsqnU", "PowerNet-MIB");
+  if (empty($oids)) {
+      $oids = snmp_walk($device, "rPDULoadPhaseConfigIndex", "-OsqnU", "PowerNet-MIB");
+  }
+
   if ($oids)
   {
     if ($debug) { echo($oids."\n"); }
@@ -210,4 +214,4 @@ if ($device['os'] == "apc")
     }
 }
 
-?>
+
