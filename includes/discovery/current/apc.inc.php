@@ -96,6 +96,17 @@ if ($device['os'] == "apc")
         $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "");
         $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
 
+        if ($limit < 0 and $lowlimit < 0 and $warnlimit < 0){
+            $limit_oid     = "1.3.6.1.4.1.318.1.1.12.2.2.1.1.4.".$index;        #rPDULoadPhaseConfigOverloadThreshold
+            $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.12.2.2.1.1.2.".$index;        #rPDULoadPhaseConfigLoLoadThreshold
+            $warnlimit_oid = "1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.".$index;        #rPDULoadPhaseConfigNearOverloadThreshold
+
+            $limit     = snmp_get($device, $limit_oid, "-Oqv", "");
+            $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "");
+            $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
+
+            echo "Phase ";
+        }
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
       }
     }
