@@ -3,15 +3,14 @@
 $where = 1;
 $param = array();
 
-$sql = " FROM `devices`";
+$sql = " FROM `devices`, `devices_perms` AS `DP`";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $where .= " AND `devices`.`device_id`=`DP`.`device_id` AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
 
 if (!empty($_POST['location'])) {
-
-    if (is_admin() === FALSE && is_read() === FALSE) {
-        $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id`=`DP`.`device_id` AND `DP`.`user_id`=?";
-        $param[] = $_SESSION['user_id'];
-    }
-
     $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
 }
 
