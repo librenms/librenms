@@ -13,7 +13,14 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $remote = " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'];
   }
 
-  $results = external_exec($config['ipmitool'] . $remote . " sensor 2>/dev/null|sort");
+  foreach ($config['ipmi']['type'] as $ipmi_type) {
+    $results = external_exec($config['ipmitool'] . " -I $ipmi_type". $remote . " sensor 2>/dev/null|sort");
+    if ($results != "")
+    {
+        set_dev_attrib($device, 'ipmi_type', $ipmi_type);
+        break;
+    }
+  }
 
   $index = 0;
 
