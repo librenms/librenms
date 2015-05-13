@@ -655,4 +655,10 @@ $config['callback_clear']                                = 'https://stats.libren
 // Stat graphs
 $config['alert_graph_date_format']                       = '%Y-%m-%d %H:%i';
 
+// IPMI type
+$config['ipmi']['type'][]                                = "lanplus";
+$config['ipmi']['type'][]                                = "lan";
+$config['ipmi']['type'][]                                = "imb";
+$config['ipmi']['type'][]                                = "open";
+
 ?>
