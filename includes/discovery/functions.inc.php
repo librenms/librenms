@@ -223,7 +223,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       list($high_limit, $low_limit) = array($low_limit, $high_limit);
     }
 
-    if ($high_limit != $sensor_entry['sensor_limit'])
+    if ($high_limit != $sensor_entry['sensor_limit'] && $sensor_entry['sensor_custom'] == 'No')
     {
       $update = array('sensor_limit' => ($high_limit == NULL ? array('NULL') : $high_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
@@ -232,7 +232,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
     }
 
-    if ($sensor_entry['sensor_limit_low'] != $low_limit)
+    if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No')
     {
       $update = array('sensor_limit_low' => ($low_limit == NULL ? array('NULL') : $low_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
@@ -241,7 +241,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device, 'sensor', $sensor_id);
     }
 
-    if ($warn_limit != $sensor_entry['sensor_limit_warn'])
+    if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No')
     {
       $update = array('sensor_limit_warn' => ($warn_limit == NULL ? array('NULL') : $warn_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
@@ -250,7 +250,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       log_event("Sensor Warn High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$warn_limit.")", $device, 'sensor', $sensor_id);
     }
 
-    if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit)
+    if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No')
     {
       $update = array('sensor_limit_low_warn' => ($low_warn_limit == NULL ? array('NULL') : $low_warn_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
