@@ -21,6 +21,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
         break;
     }
   }
+  echo $ipmi_type;
 
   $index = 0;
 
