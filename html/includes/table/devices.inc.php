@@ -7,7 +7,7 @@ $sql = " FROM `devices`";
 
 if (is_admin() === FALSE && is_read() === FALSE) {
     $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
-    $where .= " AND (`devices`.`device_id`=`DP`.`device_id` AND `DP`.`user_id`=?)";
+    $where .= " AND `DP`.`user_id`=?";
     $param[] = $_SESSION['user_id'];
 }
 
