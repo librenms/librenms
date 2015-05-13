@@ -6,7 +6,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 {
   $ipmi['user'] = get_dev_attrib($device,'ipmi_username');
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
-
+  $ipmi['type'] = get_dev_attrib($device,'ipmi_type');
   echo("Fetching IPMI sensor data...");
 
   if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost')
@@ -14,7 +14,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $remote = " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'];
   }
 
-  $results = external_exec($config['ipmitool'] . " -c " . $remote . " sdr 2>/dev/null");
+  $results = external_exec($config['ipmitool'] . " -I ".$ipmi['type']." -c " . $remote . " sdr 2>/dev/null");
   echo(" done.\n");
 
   foreach (explode("\n",$results) as $row)
