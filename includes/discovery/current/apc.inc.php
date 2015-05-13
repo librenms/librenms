@@ -5,6 +5,10 @@ if ($device['os'] == "apc")
 {
   # PDU - Phase
   $oids = snmp_walk($device, "rPDUStatusPhaseIndex", "-OsqnU", "PowerNet-MIB");
+  if (empty($oids)) {
+      $oids = snmp_walk($device, "rPDULoadPhaseConfigIndex", "-OsqnU", "PowerNet-MIB");
+  }
+
   if ($oids)
   {
     if ($debug) { echo($oids."\n"); }
@@ -96,7 +100,10 @@ if ($device['os'] == "apc")
         $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "");
         $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
 
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+        if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1)
+        {
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+        }
       }
     }
 
@@ -209,4 +216,4 @@ if ($device['os'] == "apc")
     }
 }
 
-?>
+
