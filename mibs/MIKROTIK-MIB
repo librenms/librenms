@@ -4,14 +4,16 @@ IMPORTS
 MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, IpAddress,
 Counter64, enterprises, NOTIFICATION-TYPE FROM SNMPv2-SMI
 TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
-OBJECT-GROUP FROM SNMPv2-CONF;
+TimeTicks FROM SNMPv2-SMI
+OBJECT-GROUP FROM SNMPv2-CONF
+NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "201006010000Z"
+  LAST-UPDATED "201404100000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "@mikrotik.com"
   DESCRIPTION ""
-  REVISION "201006010000Z"
+  REVISION "201404100000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -31,6 +33,11 @@ mtxrScripts OBJECT IDENTIFIER ::= { mtXRouterOs 8 }
 mtxrTraps OBJECT IDENTIFIER ::= { mtXRouterOs 9 }
 mtxrNstremeDual OBJECT IDENTIFIER ::= { mtXRouterOs 10 }
 mtxrNeighbor OBJECT IDENTIFIER ::= { mtXRouterOs 11 }
+mtxrGps OBJECT IDENTIFIER ::= { mtXRouterOs 12 }
+mtxrWirelessModem OBJECT IDENTIFIER ::= { mtXRouterOs 13 }
+mtxrInterfaceStats OBJECT IDENTIFIER ::= { mtXRouterOs 14 }
+mtxrPOE OBJECT IDENTIFIER ::= { mtXRouterOs 15 }
+mtxrLTEModem OBJECT IDENTIFIER ::= { mtXRouterOs 16 }
 
 ObjectIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "x"
@@ -59,6 +66,13 @@ Temperature ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION ""
     SYNTAX Integer32 (-2147483648..2147483647)
+
+Power ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
 
 mtxrWlStatTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrWlStatEntry
@@ -167,7 +181,16 @@ MtxrWlRtabEntry ::= SEQUENCE {
     mtxrWlRtabTxPackets Counter32,
     mtxrWlRtabRxPackets Counter32,
     mtxrWlRtabTxRate Gauge32,
-    mtxrWlRtabRxRate Gauge32
+    mtxrWlRtabRxRate Gauge32,
+    mtxrWlRtabRouterOSVersion DisplayString,
+    mtxrWlRtabUptime TimeTicks,
+    mtxrWlRtabSignalToNoise Integer32,
+    mtxrWlRtabTxStrengthCh0 Integer32,
+    mtxrWlRtabRxStrengthCh0 Integer32,
+    mtxrWlRtabTxStrengthCh1 Integer32,
+    mtxrWlRtabRxStrengthCh1 Integer32,
+    mtxrWlRtabTxStrengthCh2 Integer32,
+    mtxrWlRtabRxStrengthCh2 Integer32
 }
 
 mtxrWlRtabAddr OBJECT-TYPE
@@ -233,6 +256,69 @@ mtxrWlRtabRxRate OBJECT-TYPE
     DESCRIPTION "bits per second"
     ::= { mtxrWlRtabEntry 9 }
 
+mtxrWlRtabRouterOSVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "RouterOS version"
+    ::= { mtxrWlRtabEntry 10 }
+
+mtxrWlRtabUptime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "uptime"
+    ::= { mtxrWlRtabEntry 11 }
+
+mtxrWlRtabSignalToNoise OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Measured in dB, if value does not exist it is indicated with 0"
+    ::= { mtxrWlRtabEntry 12 }
+
+mtxrWlRtabTxStrengthCh0 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 13 }
+
+mtxrWlRtabRxStrengthCh0 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 14 }
+
+mtxrWlRtabTxStrengthCh1 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 15 }
+
+mtxrWlRtabRxStrengthCh1 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 16 }
+
+mtxrWlRtabTxStrengthCh2 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 17 }
+
+mtxrWlRtabRxStrengthCh2 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 18 }
+
 mtxrWlRtabEntryCount OBJECT-TYPE
     SYNTAX Gauge32
     MAX-ACCESS read-only
@@ -262,7 +348,11 @@ MtxrWlApEntry ::= SEQUENCE {
     mtxrWlApSsid DisplayString,
     mtxrWlApBssid MacAddress,
     mtxrWlApClientCount Counter32,
-    mtxrWlApBand DisplayString
+    mtxrWlApFreq Integer32,
+    mtxrWlApBand DisplayString,
+    mtxrWlApNoiseFloor Integer32,
+    mtxrWlApOverallTxCCQ Counter32,
+    mtxrWlApAuthClientCount Counter32
 }
 
 mtxrWlApIndex OBJECT-TYPE
@@ -307,12 +397,40 @@ mtxrWlApClientCount OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrWlApEntry 6 }
 
+mtxrWlApFreq OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "megahertz"
+    ::= { mtxrWlApEntry 7 }
+
 mtxrWlApBand OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWlApEntry 8 }
+
+mtxrWlApNoiseFloor OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlApEntry 9 }
+
+mtxrWlApOverallTxCCQ OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlApEntry 10 }
+
+mtxrWlApAuthClientCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlApEntry 11 }
 
 mtxrQueueSimpleTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrQueueSimpleEntry
@@ -340,7 +458,11 @@ MtxrQueueSimpleEntry ::= SEQUENCE {
     mtxrQueueSimpleBytesIn Counter64,
     mtxrQueueSimpleBytesOut Counter64,
     mtxrQueueSimplePacketsIn Counter32,
-    mtxrQueueSimplePacketsOut Counter32
+    mtxrQueueSimplePacketsOut Counter32,
+    mtxrQueueSimplePCQQueuesIn Counter32,
+    mtxrQueueSimplePCQQueuesOut Counter32,
+    mtxrQueueSimpleDroppedIn Counter32,
+    mtxrQueueSimpleDroppedOut Counter32
 }
 
 mtxrQueueSimpleIndex OBJECT-TYPE
@@ -420,6 +542,34 @@ mtxrQueueSimplePacketsOut OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrQueueSimpleEntry 11 }
 
+mtxrQueueSimplePCQQueuesIn OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueSimpleEntry 12 }
+
+mtxrQueueSimplePCQQueuesOut OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueSimpleEntry 13 }
+
+mtxrQueueSimpleDroppedIn OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueSimpleEntry 14 }
+
+mtxrQueueSimpleDroppedOut OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueSimpleEntry 15 }
+
 mtxrQueueTreeTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrQueueTreeEntry
     MAX-ACCESS not-accessible
@@ -442,7 +592,9 @@ MtxrQueueTreeEntry ::= SEQUENCE {
     mtxrQueueTreeParentIndex ObjectIndex,
     mtxrQueueTreeBytes Counter32,
     mtxrQueueTreePackets Counter32,
-    mtxrQueueTreeHCBytes Counter64
+    mtxrQueueTreeHCBytes Counter64,
+    mtxrQueueTreePCQQueues Counter32,
+    mtxrQueueTreeDropped Counter32
 }
 
 mtxrQueueTreeIndex OBJECT-TYPE
@@ -493,6 +645,20 @@ mtxrQueueTreeHCBytes OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrQueueTreeEntry 7 }
+
+mtxrQueueTreePCQQueues OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueTreeEntry 8 }
+
+mtxrQueueTreeDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrQueueTreeEntry 9 }
 
 mtxrHlCoreVoltage OBJECT-TYPE
     SYNTAX Voltage
@@ -570,6 +736,27 @@ mtxrHlProcessorTemperature OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrHealth 11 }
+
+mtxrHlPower OBJECT-TYPE
+    SYNTAX Power
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Watts"
+    ::= { mtxrHealth 12 }
+
+mtxrHlCurrent OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "mA"
+    ::= { mtxrHealth 13 }
+
+mtxrHlProcessorFrequency OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Mhz"
+    ::= { mtxrHealth 14 }
 
 mtxrLicSoftwareId OBJECT-TYPE
     SYNTAX DisplayString
@@ -793,7 +980,7 @@ mtxrDHCPLeaseCount OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrDHCP 1 }
 
--- REBOOT *********************************************************************
+-- SYSTEM ********************************************************************
 
 mtxrSystemReboot OBJECT-TYPE
     SYNTAX Integer32
@@ -801,6 +988,27 @@ mtxrSystemReboot OBJECT-TYPE
     STATUS current
     DESCRIPTION "set non zero to reboot"
     ::= { mtxrSystem 1 }
+
+mtxrUSBPowerReset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "switches off usb power for specified amout of seconds"
+    ::= { mtxrSystem 2 }
+
+mtxrSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "RouterBOARD serial number"
+    ::= { mtxrSystem 3 }
+
+mtxrFirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current firmware version"
+    ::= { mtxrSystem 4 }
 
 -- SCRIPTS ********************************************************************
 
@@ -938,7 +1146,8 @@ MtxrNeighborTableEntry ::= SEQUENCE {
 	mtxrNeighborVersion DisplayString,
 	mtxrNeighborPlatform DisplayString,
 	mtxrNeighborIdentity DisplayString,
-	mtxrNeighborSoftwareID DisplayString
+	mtxrNeighborSoftwareID DisplayString,
+        mtxrNeighborInterfaceID ObjectIndex
 }
 
 mtxrNeighborIndex OBJECT-TYPE
@@ -990,6 +1199,13 @@ mtxrNeighborSoftwareID OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrNeighborTableEntry 7 }
 
+mtxrNeighborInterfaceID OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrNeighborTableEntry 8 }
+
 -- GROUPS *********************************************************************
 
 mtxrWirelessGroup OBJECT-GROUP OBJECTS {
@@ -1008,12 +1224,25 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlRtabTxRate,
 	mtxrWlRtabRxRate,
 	mtxrWlRtabEntryCount,
+        mtxrWlRtabRouterOSVersion,
+        mtxrWlRtabUptime,
+        mtxrWlRtabSignalToNoise,
+        mtxrWlRtabTxStrengthCh0,
+        mtxrWlRtabRxStrengthCh0,
+        mtxrWlRtabTxStrengthCh1,
+        mtxrWlRtabRxStrengthCh1,
+        mtxrWlRtabTxStrengthCh2,
+        mtxrWlRtabRxStrengthCh2,
         mtxrWlApTxRate,
 	mtxrWlApRxRate,
 	mtxrWlApSsid,
         mtxrWlApBssid,
         mtxrWlApClientCount,
-        mtxrWlApBand
+        mtxrWlApBand,
+        mtxrWlApFreq,
+        mtxrWlApNoiseFloor,
+        mtxrWlApOverallTxCCQ,
+        mtxrWlApAuthClientCount
     }
     STATUS current
     DESCRIPTION ""
@@ -1024,8 +1253,15 @@ mtxrQueueGroup OBJECT-GROUP OBJECTS {
         mtxrQueueSimpleDstAddr, mtxrQueueSimpleDstMask, mtxrQueueSimpleIface,
         mtxrQueueSimpleBytesIn, mtxrQueueSimpleBytesOut,
         mtxrQueueSimplePacketsIn, mtxrQueueSimplePacketsOut, mtxrQueueTreeName,
+        mtxrQueueSimplePCQQueuesIn,
+        mtxrQueueSimplePCQQueuesOut,
+        mtxrQueueSimpleDroppedIn,
+        mtxrQueueSimpleDroppedOut,
         mtxrQueueTreeFlow, mtxrQueueTreeParentIndex, mtxrQueueTreeBytes,
-        mtxrQueueTreePackets, mtxrQueueTreeHCBytes
+        mtxrQueueTreePackets,
+        mtxrQueueTreeHCBytes,
+        mtxrQueueTreePCQQueues,
+        mtxrQueueTreeDropped
     }
     STATUS current
     DESCRIPTION ""
@@ -1035,7 +1271,9 @@ mtxrHealthGroup OBJECT-GROUP OBJECTS {
         mtxrHlCoreVoltage, mtxrHlThreeDotThreeVoltage, mtxrHlFiveVoltage,
         mtxrHlTwelveVoltage, mtxrHlSensorTemperature, mtxrHlCpuTemperature,
         mtxrHlBoardTemperature, mtxrHlVoltage, mtxrHlActiveFan, 
-	mtxrHlTemperature, mtxrHlProcessorTemperature
+	mtxrHlTemperature, mtxrHlProcessorTemperature,
+        mtxrHlCurrent, mtxrHlPower,
+        mtxrHlProcessorFrequency
     }
     STATUS current
     DESCRIPTION ""
@@ -1094,11 +1332,152 @@ mtxrNeighborGroup OBJECT-GROUP OBJECTS {
 	mtxrNeighborVersion,
 	mtxrNeighborPlatform,
 	mtxrNeighborIdentity,
-	mtxrNeighborSoftwareID
+	mtxrNeighborSoftwareID,
+	mtxrNeighborInterfaceID
     }
     STATUS current
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 11 }
+
+mtxrDHCPGroup OBJECT-GROUP OBJECTS {
+        mtxrDHCPLeaseCount
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 12 }
+
+mtxrSystemGroup OBJECT-GROUP OBJECTS {
+        mtxrSystemReboot,
+        mtxrUSBPowerReset,
+        mtxrSerialNumber,
+        mtxrFirmwareVersion
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 13 }
+
+mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
+        mtxrTrap,
+        mtxrTemperatureException
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 14 }
+
+mtxrGPSGroup OBJECT-GROUP OBJECTS {
+        mtxrDate,
+        mtxrLongtitude,
+        mtxrLatitude,
+        mtxrAltitude,
+        mtxrSpeed,
+        mtxrSattelites,
+        mtxrValid
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 15 }
+
+mtxrWirelessModemGroup OBJECT-GROUP OBJECTS {
+        mtxrWirelessModemSignalStrength,
+        mtxrWirelessModemSignalECIO
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 16 }
+
+mtxrInterfaceStatsGroup OBJECT-GROUP OBJECTS {
+        mtxrInterfaceStatsName,
+        mtxrInterfaceStatsDriverRxBytes,
+        mtxrInterfaceStatsDriverRxPackets,
+        mtxrInterfaceStatsDriverTxBytes,
+        mtxrInterfaceStatsDriverTxPackets,
+
+        mtxrInterfaceStatsTxRx64,
+        mtxrInterfaceStatsTxRx65To127,
+        mtxrInterfaceStatsTxRx128To255,
+        mtxrInterfaceStatsTxRx256To511,
+        mtxrInterfaceStatsTxRx512To1023,
+        mtxrInterfaceStatsTxRx1024To1518,
+        mtxrInterfaceStatsTxRx1519ToMax,
+
+        mtxrInterfaceStatsRxBytes,
+        mtxrInterfaceStatsRxPackets,
+        mtxrInterfaceStatsRxTooShort,
+        mtxrInterfaceStatsRx64,
+        mtxrInterfaceStatsRx65To127,
+        mtxrInterfaceStatsRx128To255,
+        mtxrInterfaceStatsRx256To511,
+        mtxrInterfaceStatsRx512To1023,
+        mtxrInterfaceStatsRx1024To1518,
+        mtxrInterfaceStatsRx1519ToMax,
+        mtxrInterfaceStatsRxTooLong,
+        mtxrInterfaceStatsRxBroadcast,
+        mtxrInterfaceStatsRxPause,
+        mtxrInterfaceStatsRxMulticast,
+        mtxrInterfaceStatsRxFCSError,
+        mtxrInterfaceStatsRxAlignError,
+        mtxrInterfaceStatsRxFragment,
+        mtxrInterfaceStatsRxOverflow,
+        mtxrInterfaceStatsRxControl,
+        mtxrInterfaceStatsRxUnknownOp,
+        mtxrInterfaceStatsRxLengthError,
+        mtxrInterfaceStatsRxCodeError,
+        mtxrInterfaceStatsRxCarrierError,
+        mtxrInterfaceStatsRxJabber,
+        mtxrInterfaceStatsRxDrop,
+
+        mtxrInterfaceStatsTxBytes,
+        mtxrInterfaceStatsTxPackets,
+        mtxrInterfaceStatsTxTooShort,
+        mtxrInterfaceStatsTx64,
+        mtxrInterfaceStatsTx65To127,
+        mtxrInterfaceStatsTx128To255,
+        mtxrInterfaceStatsTx256To511,
+        mtxrInterfaceStatsTx512To1023,
+        mtxrInterfaceStatsTx1024To1518,
+        mtxrInterfaceStatsTx1519ToMax,
+        mtxrInterfaceStatsTxTooLong,
+        mtxrInterfaceStatsTxBroadcast,
+        mtxrInterfaceStatsTxPause,
+        mtxrInterfaceStatsTxMulticast,
+        mtxrInterfaceStatsTxUnderrun,
+        mtxrInterfaceStatsTxCollision,
+        mtxrInterfaceStatsTxExcessiveCollision,
+        mtxrInterfaceStatsTxMultipleCollision,
+        mtxrInterfaceStatsTxSingleCollision,
+        mtxrInterfaceStatsTxExcessiveDeferred,
+        mtxrInterfaceStatsTxDeferred,
+        mtxrInterfaceStatsTxLateCollision,
+        mtxrInterfaceStatsTxTotalCollision,
+        mtxrInterfaceStatsTxPauseHonored,
+        mtxrInterfaceStatsTxDrop,
+        mtxrInterfaceStatsTxJabber,
+        mtxrInterfaceStatsTxFCSError,
+        mtxrInterfaceStatsTxControl,
+        mtxrInterfaceStatsTxFragment
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 17 }
+
+mtxrPOEGroup OBJECT-GROUP OBJECTS {
+        mtxrPOEName,
+        mtxrPOEStatus,
+        mtxrPOEVoltage,
+        mtxrPOECurrent,
+        mtxrPOEPower
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 18 }
+
+mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
+        mtxrLTEModemInterfaceIndex,
+        mtxrLTEModemSignalRSRP
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 19 }
 
 -- TRAPS **********************************************************************
 
@@ -1109,16 +1488,749 @@ mtxrTrap NOTIFICATION-TYPE
     DESCRIPTION "Mikrotik trap OID"
     ::= { mtxrNotifications 1 }
 
+mtxrTemperatureException NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Mikrotik CPU temperature exception trap"
+    ::= { mtxrNotifications 2 }
+
+-- GPS ************************************************************************
+
+mtxrDate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "UNIX time"
+    ::= { mtxrGps 1 }
+
+mtxrLongtitude OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "longtitude"
+    ::= { mtxrGps 2 }
+
+mtxrLatitude OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "latitude"
+    ::= { mtxrGps 3 }
+
+mtxrAltitude OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "altitude"
+    ::= { mtxrGps 4 }
+
+mtxrSpeed OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "speed"
+    ::= { mtxrGps 5 }
+
+mtxrSattelites OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "visible sattelite count"
+    ::= { mtxrGps 6 }
+
+mtxrValid OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "is the data valid"
+    ::= { mtxrGps 7 }
+
+-- Wireless Modem ************************************************************
+
+mtxrWirelessModemSignalStrength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "signal strength in dBm (if first ppp-client modem supports)"
+    ::= { mtxrWirelessModem 1 }
+
+mtxrWirelessModemSignalECIO OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "signal EC/IO in dB (if first ppp-client modem supports)"
+    ::= { mtxrWirelessModem 2 }
+
+-- Interface Stats ************************************************************
+
+mtxrInterfaceStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrInterfaceStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Extended interface statistics.
+    Some interfaces may have only parts of this table
+    with unavailable values set to zero."
+    ::= { mtxrInterfaceStats 1 }
+
+mtxrInterfaceStatsEntry OBJECT-TYPE
+    SYNTAX MtxrInterfaceStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrInterfaceStatsIndex }
+    ::= { mtxrInterfaceStatsTable 1 }
+
+MtxrInterfaceStatsEntry ::= SEQUENCE {
+    mtxrInterfaceStatsIndex ObjectIndex,
+    mtxrInterfaceStatsName DisplayString,
+
+    mtxrInterfaceStatsDriverRxBytes Counter64,
+    mtxrInterfaceStatsDriverRxPackets Counter64,
+    mtxrInterfaceStatsDriverTxBytes Counter64,
+    mtxrInterfaceStatsDriverTxPackets Counter64,
+
+    mtxrInterfaceStatsTxRx64 Counter64,
+    mtxrInterfaceStatsTxRx65To127 Counter64,
+    mtxrInterfaceStatsTxRx128To255 Counter64,
+    mtxrInterfaceStatsTxRx256To511 Counter64,
+    mtxrInterfaceStatsTxRx512To1023 Counter64,
+    mtxrInterfaceStatsTxRx1024To1518 Counter64,
+    mtxrInterfaceStatsTxRx1519ToMax Counter64,
+
+    mtxrInterfaceStatsRxBytes Counter64,
+    mtxrInterfaceStatsRxPackets Counter64,
+    mtxrInterfaceStatsRxTooShort Counter64,
+    mtxrInterfaceStatsRx64 Counter64,
+    mtxrInterfaceStatsRx65To127 Counter64,
+    mtxrInterfaceStatsRx128To255 Counter64,
+    mtxrInterfaceStatsRx256To511 Counter64,
+    mtxrInterfaceStatsRx512To1023 Counter64,
+    mtxrInterfaceStatsRx1024To1518 Counter64,
+    mtxrInterfaceStatsRx1519ToMax Counter64,
+    mtxrInterfaceStatsRxTooLong Counter64,
+    mtxrInterfaceStatsRxBroadcast Counter64,
+    mtxrInterfaceStatsRxPause Counter64,
+    mtxrInterfaceStatsRxMulticast Counter64,
+    mtxrInterfaceStatsRxFCSError Counter64,
+    mtxrInterfaceStatsRxAlignError Counter64,
+    mtxrInterfaceStatsRxFragment Counter64,
+    mtxrInterfaceStatsRxOverflow Counter64,
+    mtxrInterfaceStatsRxControl Counter64,
+    mtxrInterfaceStatsRxUnknownOp Counter64,
+    mtxrInterfaceStatsRxLengthError Counter64,
+    mtxrInterfaceStatsRxCodeError Counter64,
+    mtxrInterfaceStatsRxCarrierError Counter64,
+    mtxrInterfaceStatsRxJabber Counter64,
+    mtxrInterfaceStatsRxDrop Counter64,
+
+    mtxrInterfaceStatsTxBytes Counter64,
+    mtxrInterfaceStatsTxPackets Counter64,
+    mtxrInterfaceStatsTxTooShort Counter64,
+    mtxrInterfaceStatsTx64 Counter64,
+    mtxrInterfaceStatsTx65To127 Counter64,
+    mtxrInterfaceStatsTx128To255 Counter64,
+    mtxrInterfaceStatsTx256To511 Counter64,
+    mtxrInterfaceStatsTx512To1023 Counter64,
+    mtxrInterfaceStatsTx1024To1518 Counter64,
+    mtxrInterfaceStatsTx1519ToMax Counter64,
+    mtxrInterfaceStatsTxTooLong Counter64,
+    mtxrInterfaceStatsTxBroadcast Counter64,
+    mtxrInterfaceStatsTxPause Counter64,
+    mtxrInterfaceStatsTxMulticast Counter64,
+    mtxrInterfaceStatsTxUnderrun Counter64,
+    mtxrInterfaceStatsTxCollision Counter64,
+    mtxrInterfaceStatsTxExcessiveCollision Counter64,
+    mtxrInterfaceStatsTxMultipleCollision Counter64,
+    mtxrInterfaceStatsTxSingleCollision Counter64,
+    mtxrInterfaceStatsTxExcessiveDeferred Counter64,
+    mtxrInterfaceStatsTxDeferred Counter64,
+    mtxrInterfaceStatsTxLateCollision Counter64,
+    mtxrInterfaceStatsTxTotalCollision Counter64,
+    mtxrInterfaceStatsTxPauseHonored Counter64,
+    mtxrInterfaceStatsTxDrop Counter64,
+    mtxrInterfaceStatsTxJabber Counter64,
+    mtxrInterfaceStatsTxFCSError Counter64,
+    mtxrInterfaceStatsTxControl Counter64,
+    mtxrInterfaceStatsTxFragment Counter64
+}
+
+mtxrInterfaceStatsIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 1 }
+
+mtxrInterfaceStatsName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 2 }
+
+mtxrInterfaceStatsDriverRxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 11 }
+
+mtxrInterfaceStatsDriverRxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 12 }
+
+mtxrInterfaceStatsDriverTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 13 }
+
+mtxrInterfaceStatsDriverTxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 14 }
+
+mtxrInterfaceStatsTxRx64 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 15 }
+
+mtxrInterfaceStatsTxRx65To127 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 16 }
+
+mtxrInterfaceStatsTxRx128To255 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 17 }
+
+mtxrInterfaceStatsTxRx256To511 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 18 }
+
+mtxrInterfaceStatsTxRx512To1023 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 19 }
+
+mtxrInterfaceStatsTxRx1024To1518 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 20 }
+
+mtxrInterfaceStatsTxRx1519ToMax OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 21 }
+
+mtxrInterfaceStatsRxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 31 }
+ 
+mtxrInterfaceStatsRxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 32 }
+
+mtxrInterfaceStatsRxTooShort OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 33 }
+
+mtxrInterfaceStatsRx64 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 34 }
+
+mtxrInterfaceStatsRx65To127 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 35 }
+
+mtxrInterfaceStatsRx128To255 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 36 }
+
+mtxrInterfaceStatsRx256To511 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 37 }
+
+mtxrInterfaceStatsRx512To1023 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 38 }
+
+mtxrInterfaceStatsRx1024To1518 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 39 }
+
+mtxrInterfaceStatsRx1519ToMax OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 40 }
+
+mtxrInterfaceStatsRxTooLong OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 41 }
+
+mtxrInterfaceStatsRxBroadcast OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 42 }
+
+mtxrInterfaceStatsRxPause OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 43 }
+
+mtxrInterfaceStatsRxMulticast OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 44 }
+
+mtxrInterfaceStatsRxFCSError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 45 }
+
+mtxrInterfaceStatsRxAlignError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 46 }
+
+mtxrInterfaceStatsRxFragment OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 47 }
+
+mtxrInterfaceStatsRxOverflow OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 48 }
+
+mtxrInterfaceStatsRxControl OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 49 }
+
+mtxrInterfaceStatsRxUnknownOp OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 50 }
+
+mtxrInterfaceStatsRxLengthError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 51 }
+
+mtxrInterfaceStatsRxCodeError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 52 }
+
+mtxrInterfaceStatsRxCarrierError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 53 }
+
+mtxrInterfaceStatsRxJabber OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 54 }
+
+mtxrInterfaceStatsRxDrop OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 55 }
+
+mtxrInterfaceStatsTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 61 }
+
+mtxrInterfaceStatsTxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 62 }
+
+mtxrInterfaceStatsTxTooShort OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 63 }
+
+mtxrInterfaceStatsTx64 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 64 }
+
+mtxrInterfaceStatsTx65To127 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 65 }
+
+mtxrInterfaceStatsTx128To255 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 66 }
+
+mtxrInterfaceStatsTx256To511 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 67 }
+
+mtxrInterfaceStatsTx512To1023 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 68 }
+
+mtxrInterfaceStatsTx1024To1518 OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 69 }
+
+mtxrInterfaceStatsTx1519ToMax OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 70 }
+
+mtxrInterfaceStatsTxTooLong OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 71 }
+
+mtxrInterfaceStatsTxBroadcast OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 72 }
+
+mtxrInterfaceStatsTxPause OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 73 }
+
+mtxrInterfaceStatsTxMulticast OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 74 }
+
+mtxrInterfaceStatsTxUnderrun OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 75 }
+
+mtxrInterfaceStatsTxCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 76 }
+
+mtxrInterfaceStatsTxExcessiveCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 77 }
+
+mtxrInterfaceStatsTxMultipleCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 78 }
+
+mtxrInterfaceStatsTxSingleCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 79 }
+
+mtxrInterfaceStatsTxExcessiveDeferred OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 80 }
+
+mtxrInterfaceStatsTxDeferred OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 81 }
+
+mtxrInterfaceStatsTxLateCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 82 }
+
+mtxrInterfaceStatsTxTotalCollision OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 83 }
+
+mtxrInterfaceStatsTxPauseHonored OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 84 }
+
+mtxrInterfaceStatsTxDrop OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 85 }
+
+mtxrInterfaceStatsTxJabber OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 86 }
+
+mtxrInterfaceStatsTxFCSError OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 87 }
+
+mtxrInterfaceStatsTxControl OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 88 }
+
+mtxrInterfaceStatsTxFragment OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 89 }
+
+-- POE ************************************************************************
+
+mtxrPOETable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrPOEEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Power Over Ethernet"
+    ::= { mtxrPOE 1 }
+
+mtxrPOEEntry OBJECT-TYPE
+    SYNTAX MtxrPOEEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrPOEInterfaceIndex }
+    ::= { mtxrPOETable 1 }
+
+MtxrPOEEntry ::= SEQUENCE {
+    mtxrPOEInterfaceIndex ObjectIndex,
+    mtxrPOEName DisplayString,
+    mtxrPOEStatus Integer32,
+    mtxrPOEVoltage Voltage,
+    mtxrPOECurrent Integer32,
+    mtxrPOEPower Power
+}
+
+mtxrPOEInterfaceIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrPOEEntry 1 }
+
+mtxrPOEName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrPOEEntry 2 }
+
+mtxrPOEStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(1),
+        waitingForLoad(2),
+        poweredOn(3),
+        overload(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrPOEEntry 3 }
+
+mtxrPOEVoltage OBJECT-TYPE
+    SYNTAX Voltage
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "V"
+    ::= { mtxrPOEEntry 4 }
+
+mtxrPOECurrent OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "mA"
+    ::= { mtxrPOEEntry 5 }
+
+mtxrPOEPower OBJECT-TYPE
+    SYNTAX Power
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "W"
+    ::= { mtxrPOEEntry 6 }
+
+-- LTE Modem ************************************************************
+
+mtxrLTEModemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrLTEModemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "LTE Modems"
+    ::= { mtxrLTEModem 1 }
+
+mtxrLTEModemEntry OBJECT-TYPE
+    SYNTAX MtxrLTEModemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrLTEModemInterfaceIndex }
+    ::= { mtxrLTEModemTable 1 }
+
+MtxrLTEModemEntry ::= SEQUENCE {
+    mtxrLTEModemInterfaceIndex ObjectIndex,
+    mtxrLTEModemSignalRSRP Integer32
+}
+
+mtxrLTEModemInterfaceIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 1 }
+
+mtxrLTEModemSignalRSRP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dBm"
+    ::= { mtxrLTEModemEntry 2 }
+
+-- ***************************************************************************
 END
-
-
-
-
-
-
-
-
-
-
-
 
