@@ -430,6 +430,16 @@ $config['update'] = 1;
 ```
 By default, LibreNMS will auto update itself every 24 hours. You can stop this from happening by setting `update` to 0.
 
+#### IPMI
+Setup the types of IPMI protocols to test a host for and it what order.
+
+```php
+$config['ipmi']['type'][] = "lanplus";
+$config['ipmi']['type'][] = "lan";
+$config['ipmi']['type'][] = "imb";
+$config['ipmi']['type'][] = "open";
+```
+
 #### Distributed poller settings
 
 Please see [Distributed Poller](http://docs.librenms.org/Extensions/Distributed-Poller/) section of the docs for setup and configuration options.
