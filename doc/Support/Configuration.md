@@ -125,6 +125,7 @@ $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
