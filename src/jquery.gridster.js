@@ -3728,8 +3728,9 @@
 		}
 
 		for (var x = 1; x <= opts.cols; x++) {
+			var colWidth = ((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]));
 			styles += (opts.namespace + ' [data-sizex="' + x + '"] { width:' +
-			(full_width ? (this.$wrapper.width() - this.options.widget_margins[0] * 2) : ((x * opts.widget_base_dimensions[0]) + ((x - 1) * opts.widget_margins[0]))) + 'px; }\n');
+			(full_width ? (this.$wrapper.width() - this.options.widget_margins[0] * 2) : colWidth > this.$wrapper.width() ? this.$wrapper.width() : colWidth ) + 'px; }\n');
 
 		}
 

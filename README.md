@@ -18,7 +18,7 @@ and even those who had write permissions to the repo are not merging pull reques
 
 ## Forks
 
-As of result of the inactivity over the last year in the Ducksboard repository, [@dsmorse](https://github.com/dsmorse/gridster.js) has created a fork
+As of result of the inactivity over the last year in the [Ducksboard](https://github.com/ducksboard/gridster.js) repository, [@dsmorse](https://github.com/dsmorse/gridster.js) has created a fork
 for current support.  He will GLADLY accept pull requests, and will be working to merge existing
 Pull Requests from Ducksboard repo.
 
