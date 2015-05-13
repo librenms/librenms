@@ -1755,6 +1755,7 @@ if ($config['memcached']['enable'])
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
 $config['time']['now']        = time();
+$config['time']['now']       -= $config['time']['now']%300;
 $config['time']['fourhour']   = $config['time']['now'] - 14400;    //time() - (4 * 60 * 60);
 $config['time']['sixhour']    = $config['time']['now'] - 21600;    //time() - (6 * 60 * 60);
 $config['time']['twelvehour'] = $config['time']['now'] - 43200;    //time() - (12 * 60 * 60);
