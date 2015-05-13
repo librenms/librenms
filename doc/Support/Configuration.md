@@ -434,6 +434,7 @@ By default, LibreNMS will auto update itself every 24 hours. You can stop this f
 Setup the types of IPMI protocols to test a host for and it what order.
 
 ```php
+$config['ipmi']['type'] = array();
 $config['ipmi']['type'][] = "lanplus";
 $config['ipmi']['type'][] = "lan";
 $config['ipmi']['type'][] = "imb";
