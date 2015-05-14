@@ -36,7 +36,7 @@ if ($enabled == 1) {
                  'snmp_version'=>'SELECT COUNT(`snmpver`) AS `total`,`snmpver` FROM `devices` GROUP BY `snmpver`',
                  'os'=>'SELECT COUNT(`os`) AS `total`,`os` FROM `devices` GROUP BY `os`',
                  'type'=>'SELECT COUNT(`type`) AS `total`,`type` FROM `devices` GROUP BY `type`',
-                 'full_type'=>'SELECT COUNT(`device_id`) AS `total`, CONCAT_WS(', ', `os`,`hardware`,`type`) FROM `devices` GROUP BY `os`,`hardware`,`type`',
+                 'hardware'=>'SELECT COUNT(`device_id`) AS `total`, `hardware` FROM `devices` GROUP BY `hardware`',
                  'ipsec'=>'SELECT COUNT(`device_id`) AS `total` FROM `ipsec_tunnels`',
                  'ipv4_addresses'=>'SELECT COUNT(`ipv4_address_id`) AS `total` FROM `ipv4_addresses`',
                  'ipv4_macaddress'=>'SELECT COUNT(`port_id`) AS `total` FROM ipv4_mac',
@@ -60,7 +60,8 @@ if ($enabled == 1) {
                  'vlans'=>'SELECT COUNT(`vlan_id`) AS `total`,`vlan_type` FROM `vlans` GROUP BY `vlan_type`',
                  'vminfo'=>'SELECT COUNT(`id`) AS `total`,`vm_type` FROM `vminfo` GROUP BY `vm_type`',
                  'vmware'=>'SELECT COUNT(`id`) AS `total` FROM `vmware_vminfo`',
-                 'vrfs'=>'SELECT COUNT(`vrf_id`) AS `total` FROM `vrfs`');
+                 'vrfs'=>'SELECT COUNT(`vrf_id`) AS `total` FROM `vrfs`',
+                 'mysql_version'=>'SELECT 1 AS `total`, @@version AS `version`',);
 
 
     foreach ($queries as $name => $query) {
