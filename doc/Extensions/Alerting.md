@@ -257,6 +257,8 @@ $config['alert']['transports']['pagerduty'] = 'MYAPIKEYGOESHERE';
 
 That's it!
 
+__Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are ensure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
