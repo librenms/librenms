@@ -135,7 +135,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
   if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n"); }
 
-  if (is_null($low_warn_limit) || !is_null($warn_limit))
+  if (is_null($low_warn_limit) && !is_null($warn_limit))
   {
     // Warn limits only make sense when we have both a high and a low limit
     $low_warn_limit = NULL;
