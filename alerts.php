@@ -51,6 +51,8 @@ if( !defined("TEST") ) {
 	RunFollowUp();
 	echo "RunAlerts():\r\n";
 	RunAlerts();
+	echo "RunAcks():\r\n";
+	RunAcks();
 	echo "End  : ".date('r')."\r\n";
 }
 
@@ -64,7 +66,6 @@ unlink($config['install_dir']."/.alerts.lock");
  */
 function IsRuleValid($device,$rule) {
 	global $rulescache;
-//	var_dump("D:".$device." R:".$rule);
 	if( empty($rulescache[$device]) || !isset($rulescache[$device]) ) {
 		foreach( GetRules($device) as $chk ) {
 			$rulescache[$device][$chk['id']] = true;
@@ -74,6 +75,53 @@ function IsRuleValid($device,$rule) {
 		return true;
 	}
 	return false;
+}
+
+/**
+ * Issue Alert-Object
+ * @param array $alert
+ * @return boolean
+ */
+function IssueAlert($alert) {
+	global $config;
+	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
+	$obj = DescribeAlert($alert);
+	if( is_array($obj) ) {
+		$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');
+		if( isset($tpl['template']) ) {
+			$tpl = $tpl['template'];
+		} else {
+			$tpl = $default_tpl;
+		}
+		echo "Issuing Alert-UID #".$alert['id']."/".$alert['state'].": ";
+		$msg = FormatAlertTpl($tpl,$obj);
+		$obj['msg'] = $msg;
+		if( !empty($config['alert']['transports']) ) {
+			ExtTransports($obj);
+		}
+		echo "\r\n";
+	}
+}
+
+/**
+ * Issue ACK notification
+ * @return void
+ */
+function RunAcks() {
+	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state = 2 && alerts.open = 1") as $alert ) {
+		$tmp = array($alert['rule_id'],$alert['device_id']);
+		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
+		if( empty($alert['rule']) || !IsRuleValid($tmp[1],$tmp[0]) ) {
+			// Alert-Rule does not exist anymore, let's remove the alert-state.
+			echo "Stale-Rule: #".$tmp[0]."/".$tmp[1]."\r\n";
+			dbDelete('alerts','rule_id = ? && device_id = ?',array($tmp[0],$tmp[1]));
+			continue;
+		}
+		$alert['details'] = json_decode(gzuncompress($alert['details']),true);
+		$alert['state'] = 2;
+		IssueAlert($alert);
+		dbUpdate(array('open' => 0),'alerts','rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+	}
 }
 
 /**
@@ -124,7 +172,6 @@ function RunFollowUp() {
  */
 function RunAlerts() {
 	global $config;
-	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
 	foreach( dbFetchRows("SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1") as $alert ) {
 		$tmp = array($alert['rule_id'],$alert['device_id']);
 		$alert = dbFetchRow("SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1",array($alert['device_id'],$alert['rule_id']));
@@ -175,23 +222,8 @@ function RunAlerts() {
 			$noiss = true;
 		}
 		if( !$noiss ) {
-			$obj = DescribeAlert($alert);
-			if( is_array($obj) ) {
-				$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');
-				if( isset($tpl['template']) ) {
-					$tpl = $tpl['template'];
-				} else {
-					$tpl = $default_tpl;
-				}
-				echo "Issuing Alert-UID #".$alert['id'].": ";
-				$msg = FormatAlertTpl($tpl,$obj);
-				$obj['msg'] = $msg;
-				if( !empty($config['alert']['transports']) ) {
-					ExtTransports($obj);
-				}
-				echo "\r\n";
-				dbUpdate(array('alerted' => $alert['state']),'alerts','rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
-			}
+			IssueAlert($alert);
+			dbUpdate(array('alerted' => $alert['state']),'alerts','rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
 		}
 		if( !$noacc ) {
 			dbUpdate(array('open' => 0),'alerts','rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
@@ -283,7 +315,9 @@ function DescribeAlert($alert) {
 	$extra = $alert['details'];
 	if( $alert['state'] >= 1 ) {
 		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
-		if( $alert['state'] == 3 ) {
+		if( $alert['state'] == 2 ) {
+			$obj['title'] .= " got acknowledged";
+		} elseif( $alert['state'] == 3 ) {
 			$obj['title'] .= " got worse";
 		} elseif( $alert['state'] == 4 ) {
 			$obj['title'] .= " got better";
