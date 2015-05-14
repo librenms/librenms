@@ -61,7 +61,7 @@ if ($enabled == 1) {
                  'vminfo'=>'SELECT COUNT(`id`) AS `total`,`vm_type` FROM `vminfo` GROUP BY `vm_type`',
                  'vmware'=>'SELECT COUNT(`id`) AS `total` FROM `vmware_vminfo`',
                  'vrfs'=>'SELECT COUNT(`vrf_id`) AS `total` FROM `vrfs`',
-                 'mysql_version'=>'SELECT 1 AS `total`, @@version AS `version`');
+                 'mysql_version'=>'SELECT 1 AS `total`, @@version AS `version`',);
 
 
     foreach ($queries as $name => $query) {
