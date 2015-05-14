@@ -18,7 +18,12 @@ $i = 1;
 
 $pagetitle[] = "Customers";
 
-foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`") as $customer)
+if (!is_array($config['customers_descr'])) {
+    $config['customers_descr'] = array($config['customers_descr']);
+}
+$descr_type = "'". implode("', '", $config['customers_descr']) ."'";
+
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` IN (?) GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`", array(array($descr_type))) as $customer)
 {
   $i++;
 
@@ -26,7 +31,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = ?", array($customer['port_descr_descr'])) as $port)
+  foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` IN (?) AND `port_descr_descr` = ?", array(array($descr_type),$customer['port_descr_descr'])) as $port)
   {
     $device = device_by_id_cache($port['device_id']);
 
