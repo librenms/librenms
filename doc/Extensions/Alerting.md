@@ -14,6 +14,7 @@ Table of Content:
     - [IRC](#transports-irc)
     - [Slack](#transports-slack)
     - [HipChat](#transports-hipchat)
+    - [PagerDuty](#transports-pagerduty)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -241,6 +242,22 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
 > recommended that you specify the `text` message format to prevent unexpected
 > results, such as HipChat attempting to interpret angled brackets (`<` and
 > `>`).
+
+## <a name="transports-pagerduty">PagerDuty</a>
+
+Enabling PagerDuty transports is almost as easy as enabling email-transports.
+
+All you need is to create a Service with type Generic API on your PagerDuty dashboard.
+
+Now copy your API-Key from the newly created Service and setup the transport like:
+
+```php
+$config['alert']['transports']['pagerduty'] = 'MYAPIKEYGOESHERE';
+```
+
+That's it!
+
+__Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
 
 # <a name="entities">Entities
 
