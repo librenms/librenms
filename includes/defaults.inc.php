@@ -128,6 +128,7 @@ $config['public_status']    = false; // Enable public accessable status page
 $config['old_graphs']             = 1;   // RRDfiles from before the great rra reform. This is default for a while.
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['customers_descr']         = 'cust';
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
