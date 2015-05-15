@@ -255,7 +255,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 }
 ?>
 
-            <li><a href="ports/state=down/"><i class="fa fa-arrow-down fa-col-danger fa-fw fa-lg"></i> Down</a></li>
+            <li><a href="ports/state=down/"><i class="fa fa-exclamation-triangle fa-col-danger fa-fw fa-lg"></i> Down</a></li>
             <li><a href="ports/state=admindown/"><i class="fa fa-pause fa-col-info fa-fw fa-lg"></i> Disabled</a></li>
 <?php
 
