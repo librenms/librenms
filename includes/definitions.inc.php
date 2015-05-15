@@ -58,7 +58,7 @@ foreach ($single_config as $config_data)
   $tmp_name = $config_data['config_name'];
   if(!isset($config[$tmp_name]))
   {
-    $config[$tmp_name] = $config_data['config_value'];
+    $config[$tmp_name] = stripslashes($config_data['config_value']);
   }
 }
 // Array config values
@@ -69,7 +69,7 @@ foreach ($array_config as $config_data)
   $tmp_name = $config_data['config_name'];
   if(!isset($config[$tmp_name]))
   {
-    $config[$tmp_name] = explode(',',$config_data['config_value']);
+    $config[$tmp_name] = explode(',',stripslashes($config_data['config_value']));
   }
 }
 
@@ -78,7 +78,7 @@ $config_vars = get_defined_vars();
 $multi_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'multi-array' AND `config_disabled` =  '0' GROUP BY config_name");
 foreach ($multi_array_config as $config_data)
 {
-  create_array($config,$config_data['config_name'],$config_data['config_value'],'multi');
+  create_array($config,$config_data['config_name'],stripslashes($config_data['config_value']),'multi');
 }
 
 // Single-array config values
@@ -86,7 +86,7 @@ $config_vars = get_defined_vars();
 $single_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'single-array' AND `config_disabled` =  '0' GROUP BY config_name");
 foreach ($single_array_config as $config_data)
 {
-  create_array($config,$config_data['config_name'],$config_data['config_value'],'single');
+  create_array($config,$config_data['config_name'],stripslashes($config_data['config_value']),'single');
 }
 unset($config_vars);
 
