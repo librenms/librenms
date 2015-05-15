@@ -1,16 +1,49 @@
 <?php
 
-/*
- * LibreNMS
- *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
+/* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/**
+ * Global Settings
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2015 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Page
  */
+
+/**
+ * Array-To-Table
+ * @param array $a N-Dimensional, Associative Array
+ * @return string
+ */
+
+function a2t($a) {
+	$r = "<table class='table table-condensed table-hover'><tbody>";
+	foreach( $a as $k=>$v ) {
+		if( !empty($v) ) {
+			$r .= "<tr><td class='col-md-2'><i><b>".$k."</b></i></td><td class='col-md-10'>".(is_array($v)?a2t($v):"<code>".wordwrap($v,75,"<br/>")."</code>")."</td></tr>";
+		}
+	}
+	$r .= '</tbody></table>';
+	return $r;
+}
+if( $_SESSION['userlevel'] >= 10 ) {
+	echo "<div class='table-responsive'>".a2t($config)."</div>";
+} else {
+	include("includes/error-no-perm.inc.php");
+}
 
 if ($_SESSION['userlevel'] >= '10') {
 
@@ -101,9 +134,10 @@ $('#multi_value').toggle();
       <div class="panel-group" id="accordion">
 ');
 
-  foreach (dbFetchRows("SELECT config_id,config_group FROM `config` WHERE config_hidden='0' GROUP BY config_group ORDER BY config_group ASC") as $group)
+  foreach (dbFetchRows("SELECT config_id,config_group FROM `config` WHERE config_hidden='0' GROUP BY config_group ORDER BY config_group ASC ,config_group_order DESC") as $group)
   {
-    list($grp_num,$grp_title) = explode("_",$group['config_group']);
+    $grp_num = $group['config_group_order'];
+    $grp_title = $group['config_group'];
     $found++;
     echo('
         <div class="panel panel-default">
@@ -117,7 +151,7 @@ $('#multi_value').toggle();
           <div id="'.$grp_num.'_expand" class="panel-collapse collapse">
             <div class="panel-body">
 ');
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE config_group='".$group['config_group']."' ORDER BY config_sub_group ASC, config_name ASC") as $cfg)
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE config_group='".$group['config_group']."' ORDER BY config_sub_group ASC, config_sub_group_order DESC, config_name ASC") as $cfg)
     {
       $cfg_ids[] = $cfg['config_id'];
       $cfg_disabled = '';
@@ -127,9 +161,9 @@ $('#multi_value').toggle();
       }
       echo('
               <div class="form-group">
-                <label for="'.$cfg['config_id'].'" class="col-sm-3">'.$cfg['config_name'].': </label>
+                <label for="'.$cfg['config_id'].'" class="col-sm-3">$config[\''.str_replace(",", "']['", $cfg['config_name']).'\'] = </label>
                 <div class="col-sm-6 config-response">
-                  <input type="input" class="form-control input-sm config-item" name="'.$cfg['config_id'].'" id="'.$cfg['config_id'].'" value="'.$cfg['config_value'].'">
+                  <input type="input" class="form-control input-sm config-item" name="'.$cfg['config_id'].'" id="'.$cfg['config_id'].'" value="'.stripslashes(htmlspecialchars($cfg['config_value'])).'">
                 </div>
                 <div class="col-sm-1">
                   <div data-toggle="tooltip" title="'.$cfg['config_desc'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
