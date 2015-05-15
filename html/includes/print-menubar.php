@@ -144,7 +144,7 @@ if ($config['show_locations'])
             <li role="presentation" class="divider"></li>
             <li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>
             <li><a href="addhost/"><i class="fa fa-desktop fa-col-success fa-fw fa-lg"></i> Add Device</a></li>
-            <li><a href="delhost/"><i class="fa fa-desktop fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
+            <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
 }
 
 if ($links['count'] > 0) {
