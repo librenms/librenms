@@ -23,6 +23,35 @@
  * @subpackage Page
  */
 
+if (isset($vars['sub'])) {
+
+    if (file_exists(mres($vars['sub']))) {
+        require_once "pages/settings/".mres($vars['sub']).".inc.php";
+    } else {
+        print_error("This settings page doesn't exist, please go to the main settings page");
+    }
+
+} else {
+
+?>
+
+<div class="container-fluid">
+    <div class="row">
+<?php
+foreach (dbFetchRows("SELECT `config_group` FROM `config` GROUP BY `config_group`") as $sub_page) {
+    $sub_page = $sub_page['config_group'];
+?>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+            <a class="btn btn-primary" href="<?php echo(generate_url(array('page'=>'settings','sub'=>$sub_page))); ?>"><?php echo ucfirst($sub_page); ?></a>
+        </div>
+<?php
+}
+?>
+    </div>
+</div>
+
+<?php
+
 /**
  * Array-To-Table
  * @param array $a N-Dimensional, Associative Array
@@ -275,8 +304,8 @@ $(".toolTip").tooltip();
 </script>
 <?php
 
-} else {
-  include("includes/error-no-perm.inc.php");
+    } else {
+        include("includes/error-no-perm.inc.php");
+    }
 }
-
 ?>
