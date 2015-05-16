@@ -1,6 +1,22 @@
 <?php
 
-$sql = " FROM `storage` AS `S`, `devices` AS `D` WHERE `S`.`device_id` = `D`.`device_id`";
+$graph_type = "storage_usage";
+
+$where = 1;
+
+$sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id`";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `S`.`device_id` = `DP`.`device_id`";
+    $where .= " AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$sql .= " WHERE $where";
+
+if (isset($searchPhrase) && !empty($searchPhrase)) {
+    $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `storage_descr` LIKE '%$searchPhrase%')";
+}
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";
 
@@ -26,9 +42,7 @@ if ($rowCount != -1) {
 
 $sql = "SELECT * $sql";
 
-system("echo '$sql' >> /tmp/testing");
 foreach (dbFetchRows($sql,$param) as $drive) {
-    if (device_permitted($drive['device_id'])) {
         $skipdrive = 0;
 
         if ($drive["os"] == "junos") {
@@ -72,13 +86,12 @@ foreach (dbFetchRows($sql,$param) as $drive) {
 
         $background = get_percentage_colours($perc);
 
-        $response[] = array('device_id' => generate_device_link($drive),
+        $response[] = array('hostname' => generate_device_link($drive),
                             'storage_descr' => $drive['storage_descr'],
                             'graph' => $mini_graph,
-                            'usage' => $bar_link,
+                            'storage_size' => $bar_link,
                             'storage_used' => $perc . "%");
         if ($_POST['view'] == "graphs") {
-            system("echo 'test' >> /tmp/testing");
             $graph_array['height'] = "100";
             $graph_array['width']  = "216";
             $graph_array['to']     = $config['time']['now'];
@@ -88,14 +101,13 @@ foreach (dbFetchRows($sql,$param) as $drive) {
             $return_data = true;
             include("includes/print-graphrow.inc.php");
             unset($return_data);
-            $response[] = array('device_id' => $graph_data[0],
+            $response[] = array('hostname' => $graph_data[0],
                                 'storage_descr' => $graph_data[1],
                                 'graph' => $graph_data[2],
-                                'usage' => $graph_data[3],
+                                'storage_size' => $graph_data[3],
                                 'storage_used' => '');
 
         } # endif graphs
-    }
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
