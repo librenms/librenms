@@ -1,179 +1,144 @@
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
-    <script type='text/javascript'>
-     google.load('visualization', '1', {'packages': ['geochart']});
-     google.setOnLoadCallback(drawRegionsMap);
-
-    function drawRegionsMap() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Site');
-      data.addColumn('number', 'Status');
-      data.addColumn({type: 'string', role: 'tooltip'});
-      data.addRows([
 <?php
+/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-$locations_up = array();
-$locations_down = array();
-foreach (getlocations() as $location)
-{
-
-  $devices = array();
-  $devices_down = array();
-  $devices_up = array();
-  $count = 0;
-  $down  = 0;
-  // FIXME - doesn't handle sysLocation override.
-  foreach (dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
-  {
-    $devices[] = $device['hostname'];
-    $devices_up[] = $device;
-    $count++;
-    if ($device['status'] == "0" && $device['disabled'] == "0" && $device['ignore'] == "0") { $down++; $devices_down[] = $device['hostname']." DOWN"; }
-  }
-
-  $devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
-
-  if ($down > 0) {
-    $locations_down[]   = "['".$location."', 100, '".implode(", ", $devices_down)."']";
-  } else {
-    $locations_up[] = "['".$location."', 0, '".implode(", ", $devices_down)."']";
-  }
-}
-
-echo(implode(",\n", array_merge($locations_up, $locations_down)));
+/**
+ * Custom Frontpage
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2014 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Frontpage
+ */
 
 ?>
-
-      ]);
-
-      var options = {
-        region: 'world',
-        displayMode: 'markers',
-        keepAspectRatio: 0,
-        width: 1150,
-        height: 500,
-        magnifyingGlass: {enable: true, zoomFactor: 8},
-        colorAxis: {minValue: 0, maxValue: 100, colors: ['green', 'red']},
-        markerOpacity: 0.90,
-        sizeAxis: {minValue: 10,  maxValue: 10}
-      };
-
-      var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    };
-
-  </script>
-
-    <div style="margin:0 auto;" id='chart_div'></div>
-
+<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+<script type='text/javascript'>
+	google.load('visualization', '1', {'packages': ['geochart']});
+	google.setOnLoadCallback(drawRegionsMap);
+	function drawRegionsMap() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Site');
+		data.addColumn('number', 'Status');
+		data.addColumn('number', 'Size');
+		data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
+		data.addRows([
 <?php
-
-function generate_front_box ($background, $content)
-{
-echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 117px; height: 85px; background: $background;'>
-      $content
-      </div>");
+$locations = array();
+foreach (getlocations() as $location) {
+	$devices = array();
+	$devices_down = array();
+	$devices_up = array();
+	$count = 0;
+	$down  = 0;
+	foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE ( devices.location = ? || ( devices_attribs.attrib_type = 'override_sysLocation_string' && devices_attribs.attrib_value = ? ) ) && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location,$location)) as $device) {
+		if( $config['frontpage_custom']['globe'] == 'devices' || empty($config['frontpage_custom']['globe']) ) {
+			$devices[] = $device['hostname'];
+			$count++;
+			if( $device['status'] == "0" ) {
+				$down++;
+				$devices_down[] = $device['hostname']." DOWN";
+			} else {
+				$devices_up[] = $device;
+			}
+		} elseif( $config['frontpage_custom']['globe'] == 'ports' ) {
+			foreach( dbFetchRows("SELECT ifName,ifOperStatus,ifAdminStatus FROM ports WHERE ports.device_id = ? && ports.ignore = 0 && ports.disabled = 0 && ports.deleted = 0",array($device['device_id'])) as $port ) {
+				$count++;
+				if( $port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] == 'up' ) {
+					$down++;
+					$devices_down[] = $device['hostname']."/".$port['ifName']." DOWN";
+				} else {
+					$devices_up[] = $port;
+				}
+			}
+		}
+	}
+	$pdown = ($down / $count)*100;
+	if( $config['frontpage_custom']['globe'] == 'devices' || empty($config['frontpage_custom']['globe']) ) {
+		$devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
+	} elseif( $config['frontpage_custom']['globe'] == 'ports' ) {
+		$devices_down = array_merge(array(count($devices_up). " Ports OK"), $devices_down);
+	}
+	$locations[] = "			['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
 }
+echo implode(",\n", $locations);
+?>
 
-echo("<div style='padding: 3px 10px; background: #fff;'>");
+		]);
+		var options = {
+			region: 'world',
+			resolution: 'countries',
+			displayMode: 'markers',
+			keepAspectRatio: 1,
+			magnifyingGlass: {enable: true, zoomFactor: 100},
+			colorAxis: {minValue: 0,  maxValue: 100, colors: ['green', 'yellow', 'red']},
+			markerOpacity: 0.90,
+			tooltip: {isHtml: true},
+		};
+		var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+		chart.draw(data, options);
+	};
+</script>
+<?php
+include_once("includes/object-cache.inc.php");
+echo '<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-8">
+			<div id="chart_div"></div>
+		</div>
+		<div class="col-md-4">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-4">';
+						include_once("includes/device-summary-vert.inc.php");
+echo '					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">';
+						include_once("includes/front/boxes.inc.php");
+echo '					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">';
+			$device['device_id'] = '-1';
+			require_once('includes/print-alerts.php');
+			unset($device['device_id']);
+echo '		</div>
+	</div>
+</div>';
 
-if ($_SESSION['userlevel'] >= '10')
-{
-$sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'";
-} else {
-$sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0'";
-}
-foreach (dbFetchRows($sql) as $device)
-{
-      generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />
-      <span class=body-date-1>".truncate($device['location'], 20)."</span>
-      </center>");
+//From default.php - This code is not part of above license.
+if ($config['enable_syslog']) {
+$sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY seq DESC LIMIT 20";
+$query = mysql_query($sql);
+echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              &nbsp;
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Syslog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
-}
-
-if ($_SESSION['userlevel'] >= '10')
-{
-$sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
-} else {
-$sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
-}
-
-// These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
-
-if ($config['warn']['ifdown'])
-{
-  foreach (dbFetchRows($sql) as $interface)
-  {
-    if (!$interface['deleted'])
-    {
-     $interface = ifNameDescr($interface);
-     generate_front_box("#ffdd99", "<center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
-<!--      <img src='graph.php?type=bits&amp;if=".$interface['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=32' /> -->
-        <strong>".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
-        " . ($interface['ifAlias'] ? '<span class="body-date-1">'.truncate($interface['ifAlias'], 20, '').'</span>' : '') . "
-        </center>");
-    }
-  }
-}
-
-/* FIXME service permissions? seem nonexisting now.. */
-$sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
-foreach (dbFetchRows($sql) as $service)
-{
-    generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
-    <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span>
-    <strong>".$service['service_type']."</strong><br />
-    <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
-    </center>");
-}
-
-if (isset($config['enable_bgp']) && $config['enable_bgp'])
-{
-  if ($_SESSION['userlevel'] >= '10')
-  {
-    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0";
-  } else {
-    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0";
-  }
-  foreach (dbFetchRows($sql) as $peer)
-  {
-  generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span>
-      <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'><strong>".$peer['bgpPeerIdentifier']."</strong></span><br />
-      <span class=body-date-1>AS".truncate($peer['bgpPeerRemoteAs']." ".$peer['astext'], 14, "")."</span>
-      </center>");
-  }
-}
-
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
-{
-  if ($_SESSION['userlevel'] >= '10')
-  {
-  $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0";
-  } else {
-  $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" .
-  $config['uptime_warning'] . "' AND D.ignore = 0";
-  }
-
-  foreach (dbFetchRows($sql) as $device)
-  {
-     generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
-        <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
-        </center>");
-  }
-}
-
-if ($config['enable_syslog'])
-{
-  // Open Syslog Div
-  echo("<div style='margin: 4px; clear: both; padding: 5px;'>
-    <h3>Recent Syslog Messages</h3>
-  ");
-
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
-  echo("<table cellspacing=0 cellpadding=2 width=100%>");
   foreach (dbFetchRows($sql) as $entry)
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
@@ -181,17 +146,14 @@ if ($config['enable_syslog'])
     include("includes/print-syslog.inc.php");
   }
   echo("</table>");
-
-  echo("</div>"); // Close Syslog Div
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
 
 } else {
 
-  // Open eventlog Div
-  echo("<div style='margin: 4px; clear: both; padding: 5px;'>
-    <h3>Recent Eventlog Entries</h3>
-  ");
-
-  if ($_SESSION['userlevel'] >= '10')
+  if ($_SESSION['userlevel'] == '10')
   {
     $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %T') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
   } else {
@@ -199,16 +161,31 @@ if ($config['enable_syslog'])
     P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
   }
 
-  echo('<table cellspacing="0" cellpadding="1" width="100%">');
+  $data = mysql_query($query);
 
-  foreach (dbFetchRows($query) as $entry) {
+  echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              &nbsp;
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
+
+  foreach (dbFetchRows($query) as $entry)
+  {
     include("includes/print-event.inc.php");
   }
 
   echo("</table>");
-  echo("</div>"); // Close Syslog Div
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
 }
-
-echo("</div>");
-
 ?>
