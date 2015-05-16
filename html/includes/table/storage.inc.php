@@ -43,28 +43,6 @@ if ($rowCount != -1) {
 $sql = "SELECT * $sql";
 
 foreach (dbFetchRows($sql,$param) as $drive) {
-        $skipdrive = 0;
-
-        if ($drive["os"] == "junos") {
-            foreach ($config['ignore_junos_os_drives'] as $jdrive) {
-                if (preg_match($jdrive, $drive["storage_descr"])) {
-                    $skipdrive = 1;
-                }
-            }
-            $drive["storage_descr"] = preg_replace("/.*mounted on: (.*)/", "\\1", $drive["storage_descr"]);
-        }
-
-        if ($drive['os'] == "freebsd") {
-            foreach ($config['ignore_bsd_os_drives'] as $jdrive) {
-                if (preg_match($jdrive, $drive["storage_descr"])) {
-                    $skipdrive = 1;
-                }
-            }
-        }
-
-        if ($skipdrive) {
-            continue;
-        }
 
         $perc  = round($drive['storage_perc'], 0);
         $total = formatStorage($drive['storage_size']);
