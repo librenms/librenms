@@ -20,6 +20,8 @@ function poll_sensor($device, $class, $unit)
       {
         if ($device['os'] == 'netapp') {
             require "includes/polling/temperatures/netapp.inc.php";
+        } elseif ($device['os'] == 'fiberhome') {
+            require "includes/polling/temperatures/fiberhome.inc.php";
         } else {
           for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
           {
@@ -266,7 +268,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
   echo("This is mag_poll_mib_def Processing\n");
   $mib      = NULL;
-  
+
   if (stristr($mib_name_table, "UBNT")) {
       list($mib,) = explode(":", $mib_name_table, 2);
       //$mib_dirs = mib_dirs($mib_subdir);
@@ -285,7 +287,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     $oiddsdesc  = $param[2];
     $oiddstype  = $param[3];
     $oiddsopts  = $param[4];
-    
+
     if (strlen($oiddsname) > 19) { $oiddsname = truncate($oiddsname, 19, ''); }
 
     if (empty($oiddsopts)) {
@@ -300,7 +302,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     } else {
       $fulloid       = $oid;
     }
-    
+
     // Add to oid GET list
     $oidglist[] = $fulloid;
 
@@ -308,7 +310,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
   // Implde for LibreNMS Version
   $oidilist = implode(" ",$oidglist);
-  
+
   $snmpdata = snmp_get_multi($device, $oidilist, "-OQUs", $mib);
   if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0)
   {
@@ -328,7 +330,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     }
   }
 
-  $rrdfilename = $config['rrd_dir']."/".$device['hostname']."/".$rrd_file; 
+  $rrdfilename = $config['rrd_dir']."/".$device['hostname']."/".$rrd_file;
 
   if (!is_file($rrdfilename))
   {
@@ -340,7 +342,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
   {
     $graphs[$graphtoenable] = TRUE;
   }
-  
+
   return TRUE;
 }
 
