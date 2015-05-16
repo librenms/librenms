@@ -26,5 +26,6 @@ Contributors to LibreNMS:
 - Mickael Marchand <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
+- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 
 [1]: http://observium.org/ "Observium web site"
