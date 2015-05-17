@@ -686,7 +686,8 @@
 			, x = 0
 			, y = 0
 			, yCenter = 0
-			, sliceAttrs = [];
+			, sliceAttrs = []
+			, length = 0;
 		
 			if (!legendOptions.slices || !legendOptions.display)
 				return;
