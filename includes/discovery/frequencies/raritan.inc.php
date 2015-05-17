@@ -31,4 +31,3 @@ if ($device['os'] == 'raritan')
  }
 }
 
-?>

@@ -79,4 +79,3 @@ if ($device['os'] == 'raritan')
         } // foreach (explode("\n", $outlet_oids) as $outlet_data)
 }
 
-?>
