@@ -39,10 +39,12 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,state,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate $sql";
+$sql = "SELECT D.device_id,name AS alert,state,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate,details $sql";
 
+$rulei = 0;
 foreach (dbFetchRows($sql,$param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
+    $fault_detail = alert_details($alertlog['details']);
     $alert_state = $alertlog['state'];
     if ($alert_state=='0') {
         $glyph_icon = 'ok';
@@ -69,8 +71,10 @@ foreach (dbFetchRows($sql,$param) as $alertlog) {
         $glyph_color = 'khaki';
         $text = 'Better';
     }
-    $response[] = array('time_logged'=>$alertlog['humandate'],
-                        'hostname'=>generate_device_link($dev, shorthost($dev['hostname'])),
+    $response[] = array('id'=>$rulei++,
+                        'time_logged'=>$alertlog['humandate'],
+                        'details'=>'<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
+                        'hostname'=>'<div class="incident">'.generate_device_link($dev, shorthost($dev['hostname'])).'<div id="incident'.($rulei).'" class="collapse">'.$fault_detail.'</div></div>',
                         'alert'=>htmlspecialchars($alertlog['alert']),
                         'status'=>"<b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b>");
 }
