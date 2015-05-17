@@ -23,9 +23,21 @@
  * @subpackage Page
  */
 
+?>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <span id="message"></span>
+        </div>
+    </div>
+</div>
+
+<?php
+
 if (isset($vars['sub'])) {
 
-    if (file_exists(mres($vars['sub']))) {
+    if (file_exists("pages/settings/".mres($vars['sub']).".inc.php")) {
         require_once "pages/settings/".mres($vars['sub']).".inc.php";
     } else {
         print_error("This settings page doesn't exist, please go to the main settings page");
