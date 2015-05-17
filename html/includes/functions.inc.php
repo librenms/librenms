@@ -786,4 +786,35 @@ function add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf
     return($db_inserted);
 }
 
+function get_config_by_group($group) {
+    $group = array($group);
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+        $items[] = $config_item;
+    }
+    return $items;
+}
+
+function get_config_by_name($name) {
+    $name = array($name);
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` = '?'", array($name)) as $config_item) {
+        $items[] = $config_item;
+    }
+    return $items;
+}
+
+function set_config_name($name,$config_value) {
+    return dbUpdate(array('config_value' => $config_value), 'config', '`config_name`=?', array($name));
+}
+
+function get_url() {
+    // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
+    // http://stackoverflow.com/users/184600/ma%C4%8Dek
+    return sprintf(
+        "%s://%s%s",
+        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+        $_SERVER['SERVER_NAME'],
+        $_SERVER['REQUEST_URI']
+    );
+}
+
 ?>
