@@ -22,12 +22,7 @@ if (!is_numeric($_POST['config_id'])) {
     $message = 'ERROR: No alert selected';
     exit;
 } else {
-    if($_POST['config_value'] === true) {
-        $state = TRUE;
-    } else {
-        $state = FALSE;
-    }
-    $state = $_POST['config_value'];
+    $state = mres($_POST['config_value']);
     $update = dbUpdate(array('config_value' => $state), 'config', '`config_id`=?', array($_POST['config_id']));
     if(!empty($update) || $update == '0')
     {
