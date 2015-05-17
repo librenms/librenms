@@ -6,7 +6,6 @@ if (!$os){
      * OLT AN5516-01
      */
     if (preg_match('/^AN5516-0[16]$/',$sysDescr)) {
-        echo "Fiberhome $sysDescr\n";
         $os = "fiberhome";
     }
 }

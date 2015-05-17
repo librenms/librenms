@@ -20,8 +20,6 @@ function poll_sensor($device, $class, $unit)
       {
         if ($device['os'] == 'netapp') {
             require "includes/polling/temperatures/netapp.inc.php";
-        } elseif ($device['os'] == 'fiberhome') {
-            require "includes/polling/temperatures/fiberhome.inc.php";
         } else {
           for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
           {
