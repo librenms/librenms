@@ -1104,6 +1104,12 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['ifname']            = 1;
 
+// Fiberhome
+$os = "fiberhome";
+$config['os'][$os]['text']              = "Fiberhome";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "fiberhome";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
