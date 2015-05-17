@@ -191,7 +191,7 @@ function RunAlerts() {
 			$noiss = true;
 		}
 		if( !empty($rextra['delay']) ) {
-			if( (time()-strtotime($alert['time_logged'])) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']) < $rextra['delay']) ) {
+			if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
 				continue;
 			} else {
 				$alert['details']['delay'] = time();
