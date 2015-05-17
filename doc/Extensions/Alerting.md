@@ -152,8 +152,8 @@ $config['email_smtp_auth']                 = FALSE;                // Whether or
 $config['email_smtp_username']             = NULL;                 // SMTP username.
 $config['email_smtp_password']             = NULL;                 // Password for SMTP authentication.
 
-$config['alerts']['email']['default_only'] = FALSE;                // Only send alerts to default-contact
-$config['alerts']['email']['default']      = NULL;                 // Default-Contact
+$config['alert']['default_only']           = false;                //Only issue to default_mail
+$config['alert']['default_mail']           = '';                   //Default email
 ```
 
 ## <a name="transports-api">API</a>

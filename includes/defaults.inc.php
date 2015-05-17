@@ -237,6 +237,7 @@ $config['alert'] = array(
 	'admins' => false,                    //Issue to administrators
 	'default_only' => false,              //Only issue to default
 	'default_mail' => '',                 //Default email
+	'tolerance-window' => 10,             //Allow +/-10s tolerance to delay values to counter cron-irregularities
 );
 
 //Legacy options
