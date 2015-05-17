@@ -27,7 +27,11 @@ foreach ($periods as $period)
   unset($link_array['height'], $link_array['width']);
   $link = generate_url($link_array);
 
-  echo(overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
+    if ($return_data === TRUE) {
+        $graph_data[] = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
+    } else {
+        echo(overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
+    }
 }
 
 ?>
