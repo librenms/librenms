@@ -6,8 +6,8 @@ if ($device['os'] == 'raritan')
 {
   $divisor = "1000";
   $outlet_divisor = $divisor;
-  $inlet_divisor = 10.0;
   $multiplier = "1";
+
   // Check Inlets
   $inlet_oids = snmp_walk($device,"inletLabel","-Osqn","PDU2-MIB");
   $inlet_oids = trim($inlet_oids);
@@ -25,6 +25,7 @@ if ($device['os'] == 'raritan')
       $inlet_insert_index = $inlet_index;
 
       $inlet_oid       = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.$inletsuffix.1";
+      $inlet_divisor   = pow(10,snmp_get($device, "inletSensorDecimalDigits.1.$inletsuffix.rmsCurrent", "-Ovq","PDU2-MIB");
       $inlet_current   = snmp_get($device, "measurementsInletSensorValue.1.$inletsuffix.1", "-Ovq","PDU2-MIB") / $inlet_divisor;
 
       if ($inlet_current >= 0) {
