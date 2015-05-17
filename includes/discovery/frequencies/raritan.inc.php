@@ -19,7 +19,7 @@ if ($device['os'] == 'raritan')
       $inlet_insert_index = $inlet_index;
 
       $inlet_oid       = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.$inletsuffix.23";
-      $inlet_divisor   = pow(10,snmp_get($device, "inletSensorDecimalDigits.1.$inletsuffix.activePower", "-Ovq","PDU2-MIB"));
+      $inlet_divisor   = pow(10,snmp_get($device, "inletSensorDecimalDigits.1.$inletsuffix.frequency", "-Ovq","PDU2-MIB"));
       $inlet_frequency   = snmp_get($device, "measurementsInletSensorValue.$inletsuffix.1.frequency", "-Ovq", "PDU2-MIB") / $inlet_divisor;
 
       if ($inlet_frequency >= 0) {
