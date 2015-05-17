@@ -777,4 +777,33 @@ function clean_bootgrid($string) {
 
 }
 
+function alert_details($details) {
+    if( !is_array($details) ) {
+      $details = json_decode(gzuncompress($details),true);
+    }
+    $fault_detail = '';
+    foreach( $details['rule'] as $o=>$tmp_alerts ) {
+      $fallback = true;
+      $fault_detail .= "#".($o+1).":&nbsp;";
+      if( $tmp_alerts['bill_id'] ) {
+        $fault_detail .= '<a href="'.generate_bill_url($tmp_alerts).'">'.$tmp_alerts['bill_name'].'</a>;&nbsp;';
+        $fallback = false;
+      }
+      if( $tmp_alerts['port_id'] ) {
+        $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
+        $fallback = false;
+      }
+      if( $fallback === true ) {
+        foreach( $tmp_alerts as $k=>$v ) {
+          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1) {
+            $fault_detail .= "$k => '$v', ";
+          }
+        }
+        $fault_detail = rtrim($fault_detail,", ");
+      }
+      $fault_detail .= "<br>";
+    }
+    return $fault_detail;
+}
+
 ?>
