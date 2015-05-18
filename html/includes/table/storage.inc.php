@@ -68,7 +68,7 @@ foreach (dbFetchRows($sql,$param) as $drive) {
                             'storage_descr' => $drive['storage_descr'],
                             'graph' => $mini_graph,
                             'storage_size' => $bar_link,
-                            'storage_used' => $perc . "%");
+                            'storage_perc' => $perc . "%");
         if ($_POST['view'] == "graphs") {
             $graph_array['height'] = "100";
             $graph_array['width']  = "216";
@@ -83,7 +83,7 @@ foreach (dbFetchRows($sql,$param) as $drive) {
                                 'storage_descr' => $graph_data[1],
                                 'graph' => $graph_data[2],
                                 'storage_size' => $graph_data[3],
-                                'storage_used' => '');
+                                'storage_perc' => '');
 
         } # endif graphs
 }
