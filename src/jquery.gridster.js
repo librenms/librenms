@@ -3626,7 +3626,7 @@
 		cols = Math.min(max_cols, Math.max(cols, this.options.min_cols));
 		this.container_width = ((cols + 1) * this.options.widget_margins[0]) + (cols * this.min_widget_width);
 		if (this.is_responsive()) {
-			this.$el.css({'min-width': '100vw', 'max-width': '100vw'});
+			this.$el.css({'min-width': '100%', 'max-width': '100%'});
 			return this; //if we are responsive exit before setting the width of $el
 		}
 		this.$el.css('width', this.container_width);
