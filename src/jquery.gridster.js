@@ -3956,7 +3956,7 @@
 		this.baseX = ($window.width() - aw) / 2;
 		this.baseY = this.$wrapper.offset().top;
 
-		if (this.$wrapper.css('position') == 'relative') {
+		if (this.$wrapper.css('position') === 'relative') {
 			this.baseX = this.baseY = 0;
 		}
 
