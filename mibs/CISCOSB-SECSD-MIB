@@ -1,0 +1,423 @@
+CISCOSB-SECSD-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- Security Sensitive Data MIB
+-- Title:      CISCOSB Security Sensitive Data
+--             This Private MIB manages the Security Sensitive Data access.
+-- Version:    7.50
+-- Date:       31 Aug 2011
+--
+-- -------------------------------------------------------------
+
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    TEXTUAL-CONVENTION,DisplayString        FROM SNMPv2-TC
+    EnabledStatus                           FROM P-BRIDGE-MIB
+    TruthValue, RowStatus                   FROM SNMPv2-TC
+    OBJECT-TYPE                             FROM SNMPv2-SMI;
+
+
+rlSecSd  MODULE-IDENTITY
+          LAST-UPDATED "201108310000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for Security Sensitive Data (SSD),
+                  contains the MIB tables and scalars to manage the access through
+                  the different management channels as CLI, WEB and others,
+                  for sensitive data as user names and passwords in system."
+          REVISION "201108310000Z"
+          DESCRIPTION
+                "Initial revision."
+          ::= { switch001 209 }
+
+RlSecSdRuleUserType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data channels access users.
+         user-name      - the rule is per rlSecSdRuleUserName.
+         default-user   - the rule is per the default system user name.
+         all-users      - all users which their user level permission is less then 15.
+         level-15-users - users which their user level permission is 15."
+    SYNTAX INTEGER {
+        user-name(1),
+        default-user(2),
+        level-15-users(3),
+        all-users(4)
+    }
+
+RlSecSdChannelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data channels:
+         secure            - secure channels as console, ssh, scp, https.
+         insecure          - insecure channels as telnet, http.
+         secure-xml-snmp   - SNMPv3 with privacy or XML over https.
+         insecure-xml-snmp - SNMPv1/v2/v3 without privacy, xml over http."
+    SYNTAX INTEGER {
+        secure-xml-snmp(1),
+        secure(2),
+        insecure(3),
+        insecure-xml-snmp(4)
+    }
+
+RlSecSdAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data channels default read/write access action:
+         exclude           - Security Sensitive Data can not retrieved/set.
+         include-encrypted - SSD can retrieved/set as encrypted only.
+         include-decrypted - SSD can retrieved/set as decrypted only."
+    SYNTAX INTEGER {
+        exclude(1),
+        include-encrypted(2),
+        include-decrypted(3)
+    }
+
+RlSecSdPermitAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data channels access permit read/write action:
+         exclude           - Security Sensitive Data can not retrieved/set.
+         include-encrypted - SSD can retrieved/set as encrypted only.
+         include-decrypted - SSD can retrieved/set as decrypted only.
+         include-all       - SSD can retrieved/set as encrypted or as decrypted."
+    SYNTAX INTEGER {
+        exclude(1),
+        include-encrypted(2),
+        include-decrypted(3),
+        include-all(4)
+    }
+
+RlSecSdSessionAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data (SSD) channels access per session:
+         exclude           - Security Sensitive Data can not retrieved.
+         include-encrypted - SSD can retrieved as encrypted only.
+         include-decrypted - SSD can retrieved as decrypted only.
+         default           - Set to the default SSD access as defined by the SSD rules."
+    SYNTAX INTEGER {
+        exclude(1),
+        include-encrypted(2),
+        include-decrypted(3),
+        default(4)
+    }
+
+RlSecSdRuleOwnerType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Security Sensitive Data rule owner:
+         default - default rule which is defined by the device.
+         user    - rule which is defined by user."
+    SYNTAX INTEGER {
+        default(1),
+        user(2)
+    }
+
+--------------------------------------------------------------------------------
+--                           rlSecSd Tables                                   --
+--------------------------------------------------------------------------------
+
+----------------------------------
+-- rlSecSdRulesTable            --
+----------------------------------
+    rlSecSdRulesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RlSecSdRulesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The table holding the Security Sensitive Data access rules per:
+            user name / user level and management channel.
+            Allow to add/edit/remove Security Sensitive Data rules."
+    ::= {rlSecSd 1 }
+
+    rlSecSdRulesEntry  OBJECT-TYPE
+        SYNTAX      RlSecSdRulesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the rlSecSdRulesTable."
+        INDEX   { rlSecSdRuleUser,
+                  rlSecSdRuleUserName,
+                  rlSecSdRuleChannel
+                }
+    ::= {rlSecSdRulesTable 1 }
+
+    RlSecSdRulesEntry ::= SEQUENCE {
+        rlSecSdRuleUser              RlSecSdRuleUserType,
+        rlSecSdRuleUserName          DisplayString,
+        rlSecSdRuleChannel           RlSecSdChannelType,
+        rlSecSdRuleRead              RlSecSdAccessType,
+        rlSecSdRulePermitRead        RlSecSdPermitAccessType,
+        rlSecSdRuleIsDefault         TruthValue,
+        rlSecSdRuleOwner             RlSecSdRuleOwnerType,
+        rlSecSdRuleStatus            RowStatus
+    }
+
+    rlSecSdRuleUser OBJECT-TYPE
+        SYNTAX RlSecSdRuleUserType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Contains the Rule user type as described in RlSecSdRuleUserType."
+    ::= { rlSecSdRulesEntry 1 }
+
+    rlSecSdRuleUserName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..39))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Contains the Rule user name when rlSecSdRuleUser value is user-name,
+                     Otherwise it contains an empty string"
+    ::= { rlSecSdRulesEntry 2 }
+
+    rlSecSdRuleChannel OBJECT-TYPE
+        SYNTAX RlSecSdChannelType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Contains the Rule management channel type as described in RlSecSdChannelType.
+            secure-xml-snmp and insecure-xml-snmp management channels have no include-encrypted capability
+            thus their rlSecSdRulePermitRead and rlSecSdRuleRead can have only RlSecSdAccessType values of
+            exclude or include-decrypted."
+    ::= { rlSecSdRulesEntry 3 }
+
+    rlSecSdRuleRead OBJECT-TYPE
+        SYNTAX      RlSecSdAccessType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Contains the Rule default read access level as described in RlSecSdAccessType,
+            must be lower or equal access from rlSecSdRulePermitRead"
+    ::= { rlSecSdRulesEntry 4}
+
+    rlSecSdRulePermitRead OBJECT-TYPE
+        SYNTAX      RlSecSdPermitAccessType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Contains the Rule maximum permission access level as described in RlSecSdPermitAccessType."
+    ::= { rlSecSdRulesEntry 5}
+
+
+    rlSecSdRuleIsDefault OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "true  - Rule has created by the by the system.
+             false - Rule has created by the user."
+    ::= { rlSecSdRulesEntry 6}
+
+
+    rlSecSdRuleOwner OBJECT-TYPE
+        SYNTAX      RlSecSdRuleOwnerType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Contains the current Rule ownership as defined in RlSecSdRuleOwnerType.
+            when rlSecSdRuleIsDefault is true, rlSecSdRuleOwner allowed to change
+            default rule to user rule and vice versa."
+    ::= { rlSecSdRulesEntry 7}
+
+    rlSecSdRuleStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The status of a table entry.
+            It is used to Add/Edit/Delete an entry from this table."
+    ::= { rlSecSdRulesEntry 8}
+
+
+----------------------------------
+-- rlSecSdMngSessionsTable      --
+----------------------------------
+    rlSecSdMngSessionsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RlSecSdMngSessionsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The table holding Security Sensitive Data management sessions.
+            Allowing to get management channel, user name, user level."
+    ::= {rlSecSd 2 }
+
+    rlSecSdMngSessionsEntry  OBJECT-TYPE
+        SYNTAX      RlSecSdMngSessionsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the rlSecSdMngSessionsTable."
+        INDEX   { rlSecSdMngSessionId }
+    ::= {rlSecSdMngSessionsTable 2}
+
+    RlSecSdMngSessionsEntry ::= SEQUENCE {
+        rlSecSdMngSessionId          INTEGER,
+        rlSecSdMngSessionUserLevel   INTEGER,
+        rlSecSdMngSessionUserName    DisplayString,
+        rlSecSdMngSessionChannel     RlSecSdChannelType
+    }
+
+    rlSecSdMngSessionId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Contains the Security Sensitive Data management session identifier,
+             rlSecSdCurrentSessionId is used to get the current management session identifier"
+    ::= { rlSecSdMngSessionsEntry 1 }
+
+    rlSecSdMngSessionUserLevel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Contains the Security Sensitive Data management session user access level."
+    ::= { rlSecSdMngSessionsEntry 2 }
+
+    rlSecSdMngSessionUserName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..160))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Contains the Security Sensitive Data management session user name."
+    ::= { rlSecSdMngSessionsEntry 3 }
+
+    rlSecSdMngSessionChannel OBJECT-TYPE
+        SYNTAX RlSecSdChannelType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Contains the Security Sensitive Data management session channel type as described in RlSecSdChannelType."
+    ::= { rlSecSdMngSessionsEntry 4 }
+
+--------------------------------------------------------------------------------
+--                           rlSecSd Scalars                                  --
+--------------------------------------------------------------------------------
+
+----------------------------------
+-- rlSecSdSessionControl        --
+----------------------------------
+
+    rlSecSdSessionControl OBJECT-TYPE
+        SYNTAX RlSecSdSessionAccessType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Action scalar which set the default read access of Security Sensitive Data.
+            Affect only on session which from this scalar is configured.
+            Scalar Get value is the default-display/read of the session which from
+            this scalar is retrieved."
+    ::= { rlSecSd 3 }
+
+----------------------------------
+-- rlSecSdCurrentSessionId      --
+----------------------------------
+
+    rlSecSdCurrentSessionId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Get the current SSD management channel identifier,
+            used to get information from rlSecSdMngSessionsTable."
+    ::= { rlSecSd 4 }
+
+
+----------------------------------
+-- rlSecSdPassPhrase            --
+----------------------------------
+    rlSecSdPassPhrase OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..160))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Set the passphrase for the SSD encryptyption / decryption key.
+             on set, passphrase is in plain text format.
+             on get, passphrase is encrypted."
+        DEFVAL{""}
+    ::= { rlSecSd 5 }
+
+----------------------------------
+-- rlSecSdFilePassphraseControl --
+----------------------------------
+    rlSecSdFilePassphraseControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+            restricted(1),
+            unrestricted(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "File Passphrase control provides an additional level of protection on passphrase and configurations.
+            restricted - a device restricts its passphrase from being inserted into a configuration file.
+            unrestricted - (default) a device will include its passphrase when creating a configuration file."
+        DEFVAL { unrestricted }
+    ::= { rlSecSd 6 }
+
+----------------------------------
+-- rlSecSdFileIntegrityControl  --
+----------------------------------
+    rlSecSdFileIntegrityControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "File integrity control provides a validation of configuration file.
+            enable - Validate the configuration file digest when downloading the file to startup configuration.
+            disable - Do not validate."
+        DEFVAL { enable }
+    ::= { rlSecSd 7 }
+
+---------------------------------------
+-- rlSecSdConfigurationFileSsdDigest --
+---------------------------------------
+     rlSecSdConfigurationFileSsdDigest OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..160))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "SSD block in configuration file integrity digest, auxiliary action scalar for
+             internal system using during configuration download."
+        DEFVAL{""}
+    ::= { rlSecSd 8 }
+
+------------------------------------
+-- rlSecSdConfigurationFileDigest --
+------------------------------------
+     rlSecSdConfigurationFileDigest OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..160))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "SSD configuration file integrity digest, auxiliary action scalar for
+             internal system using during configuration download."
+        DEFVAL{""}
+    ::= { rlSecSd 9 }
+
+----------------------------------
+-- rlSecSdFileIndicator         --
+----------------------------------
+     rlSecSdFileIndicator OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..39))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Retrieve configuration file SSD indicator.
+             set value: configuration file name.
+             get value: Exclude, Encrypted, Plaintext"
+    ::= { rlSecSd 10 }
+
+END

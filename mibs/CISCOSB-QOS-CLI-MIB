@@ -35,26 +35,27 @@ CISCOSB-QOS-CLI-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,Counter32,
     Gauge32, Unsigned32, IpAddress, TimeTicks   FROM SNMPv2-SMI
-    InterfaceIndexOrZero, InterfaceIndex        FROM IF-MIB
+    InterfaceIndex,InterfaceIndexOrZero         FROM IF-MIB
     TruthValue, RowStatus, RowPointer,
     TEXTUAL-CONVENTION,DisplayString            FROM SNMPv2-TC
     Counter64, OBJECT-TYPE                      FROM SNMPv2-SMI
-    PortList                                    FROM Q-BRIDGE-MIB
-    Percents,switch001                               FROM CISCOSB-MIB
+    PortList,VlanId                             FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB
+    Percents,switch001                          FROM CISCOSB-MIB
     StatisticsDPType,StatisticsClearActionType  FROM CISCOSB-POLICY-MIB;
 
 
 rlQosCliMib MODULE-IDENTITY
         LAST-UPDATED "200604040000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "Added:
@@ -186,12 +187,15 @@ AceActionType ::= TEXTUAL-CONVENTION
          3- Deny-DisablePort deny the traffic that defined
                 by the parameters and disable the port.
          4- Deny-LogInput deny the traffic that defined
+                by the parameters and log incoming traffic.
+                 5- Permit-LogInput permit the traffic that defined
                 by the parameters and log incoming traffic."
     SYNTAX  INTEGER {
          permit(1),
          deny(2),
          deny-DisablePort(3),
-         deny-LogInput(4)
+         deny-LogInput(4),
+         permit-LogInput(5)
          }
 
 AceObjectType ::= TEXTUAL-CONVENTION
@@ -258,7 +262,7 @@ ClassMapAction ::= TEXTUAL-CONVENTION
          1- none - action not specified - use default action.
          2 -Mark IP-Precedence.
          3- Mark DSCP.
-         4- Set Egress queueu
+         4- Set Egress queue
          5- Mark VPT
          6- Choose queue by global trust mode."
     SYNTAX  INTEGER {
@@ -275,6 +279,47 @@ ClassMapAction ::= TEXTUAL-CONVENTION
 --v750 depcrated    trustTCP-UDPport(8),
 --v750 depcrated    trustCosDscp(9)
         }
+
+MarkVlanAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the mark vlan action type in the class map table.
+      1 - noMark - No vlan marking
+      2 - mark  - mark vlan tagged.
+      3 - markNestedVlan - add vlan tag to the packet. "
+    SYNTAX  INTEGER {
+        noMark(1),
+        mark(2),
+        markNestedVlan(3)
+    }
+
+RedirectAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the packet redirection options.
+     Redirection is applied only on permitted packets.
+      1 - disabled  - no redirect
+      2 - trap - trap to local_host (CPU)
+      3 - redirectToInterface - redirect to a output interface (port, trunk or vlan)
+      4 - redirectToAllPorts - redirect to all ports, except the ingress port.
+      5 - mirror - forward the packet and sent a copy to local_host (CPU)
+      6 - analyzerPort - forward the packet and sent a copy to egress port.
+      7 - loopback - redirect the packet the the port it was received.
+      8 - redirectToPortGroup - send to group of ports, defined in rlUserAssignedVidxTable table
+      9 - mirror_and_redirectToInterface - send the packet to interface and send a copy to local_host(CPU)
+      10 -mirror_and_redirectToInterfacesGroup - send the packet to group of ports and send a copy to local_host(CPU)  "
+    SYNTAX  INTEGER {
+        disabled(1),
+        trap(2),
+        redirectToInterface(3),
+        redirectToAllPorts(4),
+        mirror(5),
+        analyzerPort(6),
+        loopback(7),
+        redirectToPortGroup(8),
+        mirrorAndRedirectToInterface(9),
+        mirrorAndRedirectToInterfacesGroup(10)
+    }
 
 PolicerType ::= TEXTUAL-CONVENTION
     STATUS  current
@@ -370,7 +415,8 @@ AclDefaultAction ::= TEXTUAL-CONVENTION
          "Default action when the ACL reach end point."
     SYNTAX  INTEGER {
         deny-all(1),
-        forward-all(2)
+        forward-all(2),
+        application-specific(3)
 }
 
 InterfaceType ::= TEXTUAL-CONVENTION
@@ -423,6 +469,16 @@ RlQosAceTidxActionDropType  ::= TEXTUAL-CONVENTION
       hardDrop(1),
       softDrop(2)
 }
+
+RlQosApplicationDefaultActionType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Application default actions."
+   SYNTAX INTEGER {
+      forward(1),
+      hard-Drop(2),
+      soft-Drop(3),
+      trap(4)
+}
 --  CLI QOS MODE Scalar
 
 rlQosCliQosMode OBJECT-TYPE
@@ -460,7 +516,6 @@ rlQosMaxNumOfAce OBJECT-TYPE
     ::= { rlQosCliMib 3 }
 
  -- QoS Offset Table
-
 
 rlQosOffsetTable OBJECT-TYPE
     SYNTAX SEQUENCE OF RlQosOffsetEntry
@@ -805,7 +860,8 @@ RlQosAclEntry ::= SEQUENCE {
     rlQosAclIndex               INTEGER,
     rlQosAclName                DisplayString,
     rlQosAclType                AclObjectType,
-    rlQosAclStatus              RowStatus
+    rlQosAclStatus              RowStatus,
+    rlQosAclNumOfAces           INTEGER
     }
 
 rlQosAclIndex OBJECT-TYPE
@@ -843,6 +899,14 @@ rlQosAclStatus OBJECT-TYPE
        "The status of a table entry.
         It is used to delete/Add an entry from this table."
     ::= { rlQosAclEntry 4 }
+
+rlQosAclNumOfAces OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Holds number of aces in the acl."
+    ::= { rlQosAclEntry 5 }
 
 
 
@@ -934,13 +998,17 @@ RlQosClassMapEntry ::= SEQUENCE {
     rlQosClassMapPolicer        INTEGER,
     rlQosClassMapMatch1         INTEGER,
     rlQosClassMapMatch2         INTEGER,
-    rlQosClassMapMarkVlan       BinaryStatus,
+    rlQosClassMapMarkVlan       MarkVlanAction,
     rlQosClassMapNewVlan        INTEGER,
-    rlQosClassMapNewPort        INTEGER,
-    rlQosClassMapCopyPort       INTEGER,
+    rlQosClassMapRedirectAction RedirectAction,
+    rlQosClassMapDestInterface  INTEGER,
     rlQosClassMapStatus         RowStatus,
-    rlQosClassMapMatch3         INTEGER
+    rlQosClassMapMatch3         INTEGER,
+    rlQosClassMapTrapId         INTEGER,
+    rlQosClassMapCounterEnable  TruthValue,
+    rlQosClassMapTunnelIdx      Unsigned32
     }
+
 
 rlQosClassMapIndex OBJECT-TYPE
     SYNTAX INTEGER
@@ -1014,49 +1082,49 @@ rlQosClassMapMatch2  OBJECT-TYPE
     ::= { rlQosClassMapEntry 8 }
 
 rlQosClassMapMarkVlan  OBJECT-TYPE
-    SYNTAX BinaryStatus
+    SYNTAX MarkVlanAction
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "If 'enabled', than the classified
+        "If 'mark', than the classified
          traffic will be remarked with new VLAN id.
-         If 'disabled' VLAN id is not changed."
+         If 'disabled' VLAN id is not changed.
+         If markNestedVlan, if the egress interface defined as
+         VLAN tagged member then a new VLAN tag is added  to the packet."
     DEFVAL {1}
     ::= { rlQosClassMapEntry 9 }
 
 rlQosClassMapNewVlan  OBJECT-TYPE
-    SYNTAX INTEGER (0..4095)
+    SYNTAX INTEGER(0..4095)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "If rlQosClassMapMarkVlan 'enabled',
+        "If rlQosClassMapMarkVlan is not 'noMark',
          than the classified traffic will be
          remarked with new VLAN id.
          The value of this field sets new VLAN id."
     DEFVAL {0}
     ::= { rlQosClassMapEntry 10 }
 
-rlQosClassMapNewPort  OBJECT-TYPE
-    SYNTAX INTEGER
+rlQosClassMapRedirectAction  OBJECT-TYPE
+    SYNTAX RedirectAction
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "If value not zero, than the classified
-         traffic will be redirected to the new
-         egress physical port. The value of this
-         field sets new egress port."
-    DEFVAL {0}
+        "Specifiy the redirection action."
+    DEFVAL {disabled}
     ::= { rlQosClassMapEntry 11 }
 
-rlQosClassMapCopyPort  OBJECT-TYPE
+rlQosClassMapDestInterface  OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "If value not zero, than the classified
-         traffic will be copied to the desination
-         copy port. The value of this field sets
-         desination copy port."
+        "Relevant if rlQosClassMapRedirect is either
+        'redirectToInterface' or 'analyzerPort' or 'toMultipleInterfaces'.
+        Specified the output interface the packet is redireted to or
+        the port that gets copy of the packet in addition to the port
+        it was forwarded."
     DEFVAL {0}
     ::= { rlQosClassMapEntry 12 }
 
@@ -1078,6 +1146,35 @@ rlQosClassMapMatch3  OBJECT-TYPE
     DEFVAL {0}
     ::= { rlQosClassMapEntry 14 }
 
+rlQosClassMapTrapId  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If now zero, Indicates the trap type id the matched packets arrives with,
+        relevant when RedirectAction is trap or mirror."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 15 }
+
+rlQosClassMapCounterEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable counting per class map.
+        Counts packets matche the class map rules."
+    DEFVAL {false}
+    ::= { rlQosClassMapEntry 16 }
+
+rlQosClassMapTunnelIdx  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If not zero, then the tunnel data pointed by rlQosClassMapTunnelIdx
+        is added to the packet"
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 17 }
 
 --- QoS Policer table
 
@@ -3613,6 +3710,38 @@ rlQosClearCounters OBJECT-TYPE
       DEFVAL { 0 }
       ::= { rlQosClassifierUtilizationEntry 4 }
 
+rlQosClassifierUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..100)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The system classifier utilization percentage. "
+      ::= { rlQosClassifierUtilization 2 }
+
+rlQosClassifierRulesNumberUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of used rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 3 }
+
+rlQosClassifierFreeRulesNumUtilizationSystem OBJECT-TYPE
+   SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of free rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 4 }
+
+rlQosClassifierMaxRulesNumberUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Maximum number of rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 5 }
+
 
 
 -- CLI QoS Port to Profile Mapping Table
@@ -3665,23 +3794,6 @@ rlQosCPUSafeGuardEnable OBJECT-TYPE
     DESCRIPTION
         "This scalar enables/disables CPU Safeguard."
     ::= { rlQosCliMib 38 }
-
-rlQosClassifierUtilizationSystem OBJECT-TYPE
-    SYNTAX         Unsigned32  (0..100)
-      MAX-ACCESS     read-only
-      STATUS         current
-      DESCRIPTION
-           "The system classifier utilization percentage. "
-      ::= { rlQosClassifierUtilization 2 }
-
-rlQosClassifierRulesNumberUtilizationSystem OBJECT-TYPE
-    SYNTAX         Unsigned32
-      MAX-ACCESS     read-only
-      STATUS         current
-      DESCRIPTION
-           "Number of used rules per system, in short rule resolution "
-      ::= { rlQosClassifierUtilization 3 }
-
 
 --QoS Policy Class map priotiry refernce table
 
@@ -3798,12 +3910,13 @@ rlQosDenyAceStatisticsOtherFlowCounter OBJECT-TYPE
     ::= { rlQosCliMib  43 }
 
 rlQosDenyAceStatisticsClearIfCounters OBJECT-TYPE
-    SYNTAX      PortList
+    SYNTAX      InterfaceIndexOrZero
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Each bit that is set in this portList represent a port or trunk that
-         its hit counters should be reset."
+        "Keeps ifIndex a port or trunk or vlan that
+         its hit counters should be reset.
+                 If the value is 0 then all interfaces counters must be reset. "
     ::= { rlQosCliMib 44 }
 
 rlQosDenyAceStatisticsClearOtherFlowCounter OBJECT-TYPE
@@ -3913,5 +4026,171 @@ rlQosModeGlobalCfgStatus OBJECT-TYPE
         acceptable."
     ::= { rlQosModeGlobalCfgEntry 7 }
 
+-- ClassMapCounterTable
+rlQosClassMapCounterTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosClassMapCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  table is used to show statistics for
+         ACL applied on an interface."
+    ::= { rlQosCliMib 47 }
+
+rlQosClassMapCounterEntry OBJECT-TYPE
+    SYNTAX  RlQosClassMapCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This entry returns the value of the class map counter.
+        Entry is added/deleted to this MIB when counting is enabled/disabled
+        on the class map.
+        The counter is set to zero upon reading its value."
+    INDEX  {  rlQosClassMapIndex }
+    ::= { rlQosClassMapCounterTable 1 }
+
+RlQosClassMapCounterEntry ::= SEQUENCE {
+    rlQosClassMapCounterValue           Counter64
+}
+rlQosClassMapCounterValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This field returns the current value of the class map counter. "
+    ::= { rlQosClassMapCounterEntry 2 }
+
+--- rlQosApplicationTrapIdTable
+rlQosApplicationTrapIdTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosApplicationTrapIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  read only table is used to get the trapId
+        assisated to application wants to use the trap action in
+        the class map table"
+    ::= { rlQosCliMib 48 }
+
+rlQosApplicationTrapIdEntry OBJECT-TYPE
+    SYNTAX  RlQosApplicationTrapIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This entry holds the trapId for application using the trap
+        action in the class map table."
+    INDEX  { IMPLIED rlQosApplicationName }
+    ::= { rlQosApplicationTrapIdTable 1 }
+
+RlQosApplicationTrapIdEntry ::= SEQUENCE {
+    rlQosApplicationName           DisplayString,
+    rlQosApplicationTrapId         INTEGER
+}
+rlQosApplicationName OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This field represents the application name and traffic type. "
+    ::= { rlQosApplicationTrapIdEntry 1 }
+
+rlQosApplicationTrapId OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This field defines the trap id to be use in the class map entry. "
+    ::= { rlQosApplicationTrapIdEntry 2 }
+
+-- RevitalR 1-Feb-2012: add new scalar to define application-specific default action
+rlQoSApplicationDefaultAction OBJECT-TYPE
+    SYNTAX     RlQosApplicationDefaultActionType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar specifies application-specific default action"
+    ::= { rlQosCliMib 49 }
+
+rlQosLogInputInterfacesAceMatchedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosLogInputInterfacesAceMatchedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table holds a list and  of ACE matched log-input option interfaces."
+    ::= { rlQosCliMib 50 }
+
+rlQosLogInputInterfacesAceMatchedEntry  OBJECT-TYPE
+    SYNTAX RlQosLogInputInterfacesAceMatchedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table holds only one entry of port list and vlan list."
+    INDEX { rlQosLogInputInterfacesAceMatchedIndex }
+    ::= { rlQosLogInputInterfacesAceMatchedTable 1 }
+
+RlQosLogInputInterfacesAceMatchedEntry ::= SEQUENCE {
+        rlQosLogInputInterfacesAceMatchedIndex                  INTEGER,
+        rlQosLogInputInterfacesAceMatchedPorts                  PortList,
+        rlQosLogInputInterfacesAceMatchedVlanList1to1024        VlanList1,
+        rlQosLogInputInterfacesAceMatchedVlanList1025to2048     VlanList2,
+        rlQosLogInputInterfacesAceMatchedVlanList2049to3072     VlanList3,
+        rlQosLogInputInterfacesAceMatchedVlanList3073to4094     VlanList4
+    }
+
+rlQosLogInputInterfacesAceMatchedIndex      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "An index is entrie's sequence."
+    ::= { rlQosLogInputInterfacesAceMatchedEntry  1 }
+
+
+rlQosLogInputInterfacesAceMatchedPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "the matched log-input ACEs port list"
+    ::= { rlQosLogInputInterfacesAceMatchedEntry 2}
+
+rlQosLogInputInterfacesAceMatchedVlanList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 1 to 1024."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 3}
+
+rlQosLogInputInterfacesAceMatchedVlanList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 1025 to 2048."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 4}
+
+
+rlQosLogInputInterfacesAceMatchedVlanList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 2049 to 3072."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 5}
+
+rlQosLogInputInterfacesAceMatchedVlanList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 3073 to 4094."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 6}
+
+
+
 
 END
+

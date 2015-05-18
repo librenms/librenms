@@ -7,7 +7,7 @@ CISCOSB-SYSLOG-MIB DEFINITIONS ::= BEGIN
 -- 15-Jun-2003  Added rlSyslogFileMessagesLogged and rlSyslogCacheTotalMessages
 
 IMPORTS
-    switch001                                    FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,Counter32,
     MODULE-IDENTITY                         FROM SNMPv2-SMI
     DisplayString, TEXTUAL-CONVENTION,
@@ -15,15 +15,15 @@ IMPORTS
 
  rlSyslog MODULE-IDENTITY
           LAST-UPDATED "200602120000Z"
-		  ORGANIZATION "Cisco Small Business"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "The private MIB module definition for SYSLOG services in CISCOSB devices."
@@ -419,6 +419,37 @@ rlSyslogAlarmFlag OBJECT-TYPE
     DEFVAL  { false }
     ::= { rlSyslogPrivate 17 }
 
+rlSyslogOriginId OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(1),
+        hostname (2),
+        ip (3),
+        ipv6 (4),
+        string (5)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Defines the origin field of the SYSLOG message packets sent to the SYSLOG server"
+    DEFVAL { default }
+    ::= { rlSyslogPrivate 18 }
+
+rlSyslogOriginIdString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Defines the string origin of the SYSLOG message packets sent to the SYSLOG server"
+    ::= { rlSyslogPrivate 19 }
+
+rlSyslogHeaderSendingEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enabled sending/not sending of syslog header in syslog messages to syslog collectors."
+    DEFVAL  { true }
+    ::= { rlSyslogPrivate 20 }
 
 rlSyslogPhaseOneTests OBJECT IDENTIFIER ::= { rlSyslog 3}
 
@@ -455,7 +486,6 @@ rlSyslogPhaseOneTestGenerator OBJECT-TYPE
     DESCRIPTION
       "Writing a value to this leaf results in a test being run on the host."
     ::=  { rlSyslogPhaseOneTests 1 }
-
 
 END
 

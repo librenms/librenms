@@ -7,25 +7,25 @@ CISCOSB-SECURITY-SUITE DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,Counter32,
-    Gauge32, Unsigned32, IpAddress, TimeTicks   FROM SNMPv2-SMI
-    InterfaceIndexOrZero, InterfaceIndex        FROM IF-MIB
+    Gauge32, Unsigned32, IpAddress, TimeTicks     FROM SNMPv2-SMI
+    InterfaceIndexOrZero, InterfaceIndex,ifIndex  FROM IF-MIB
     TEXTUAL-CONVENTION,TruthValue, RowStatus,
-    RowPointer, DisplayString                   FROM SNMPv2-TC
-    Percents,switch001                               FROM CISCOSB-MIB
-    PortList                                    FROM Q-BRIDGE-MIB;
+    RowPointer, DisplayString                     FROM SNMPv2-TC
+    Percents,switch001                            FROM CISCOSB-MIB
+    PortList                                      FROM Q-BRIDGE-MIB;
 
 
 rlSecuritySuiteMib MODULE-IDENTITY
         LAST-UPDATED "200604080000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "The private MIB module definition for blocking attacks
@@ -83,6 +83,35 @@ RlSecuritySuiteDenyAttackType ::= TEXTUAL-CONVENTION
         syn(1),
         icmp-echo-request(2),
         fragmented(3)
+    }
+
+RlSecuritySuiteDenySynFinTcp ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the dropping SYN, FIN flags enabled TCP packets status"
+    SYNTAX INTEGER {
+        deny(1),
+        permit(2)
+    }
+
+RlSecuritySuiteSynProtectionMode ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the TCP SYN attack protection mode ."
+    SYNTAX INTEGER {
+        disabled(1),
+        report(2),
+        block(3)
+    }
+
+RlSecuritySuiteSynProtectionPortMode  ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the TCP SYN attack protection mode ."
+    SYNTAX INTEGER {
+        normal(1),
+        attacked(2),
+        blocked(3)
     }
 
 rlSecuritySuiteGlobalEnable OBJECT-TYPE
@@ -447,5 +476,93 @@ rlSecuritySuiteDenyStatus OBJECT-TYPE
        "The status of a table entry.
         It is used to delete/Add an entry from this table."
     ::= { rlSecuritySuiteDenyTypesEntry 6  }
+
+
+rlSecuritySuiteDenySynFinTcp OBJECT-TYPE
+ SYNTAX     RlSecuritySuiteDenySynFinTcp
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally enable or disable dropping of tcp packets with both SYN and FIN flags enabled. "
+    ::= { rlSecuritySuiteMib 9 }
+
+rlSecuritySuiteSynProtectionMode OBJECT-TYPE
+ SYNTAX     RlSecuritySuiteSynProtectionMode
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection mode on TCP SYN traffic.
+      Disabled - the system doesn't support protection against TCP SYN attack.
+      Report   - the system doesn't support protection against TCP SYN attack,but reports about it.
+      Block    - the systems supports protection against TCP SYN attack by blocking this traffic on the port.  "
+    ::= { rlSecuritySuiteMib 10 }
+
+rlSecuritySuiteSynProtectionTreshold OBJECT-TYPE
+ SYNTAX     INTEGER
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection mode treshold value in packet per second
+      on TCP SYN traffic."
+    ::= { rlSecuritySuiteMib 11 }
+
+rlSecuritySuiteSynProtectionRecoveryTimeout OBJECT-TYPE
+ SYNTAX     INTEGER
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection reovery time out in secounds."
+    ::= { rlSecuritySuiteMib 12 }
+
+rlSecuritySuiteSynProtectionPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteSynProtectionPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table keeps SYN protection status per port."
+    ::= { rlSecuritySuiteMib 13 }
+
+rlSecuritySuiteSynProtectionPortEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes TCP SYN protection status for one port."
+    INDEX { ifIndex}
+    ::= { rlSecuritySuiteSynProtectionPortTable 1 }
+
+RlSecuritySuiteSynProtectionPortEntry::= SEQUENCE {
+    rlSecuritySuiteSynProtectionPortMode                RlSecuritySuiteSynProtectionPortMode,
+    rlSecuritySuiteSynProtectionPortModeLastTimeAttack  RlSecuritySuiteSynProtectionPortMode,
+    rlSecuritySuiteSynProtectionPortLastTimeAttack      DisplayString
+    }
+
+rlSecuritySuiteSynProtectionPortMode OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection mode."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 1 }
+
+
+rlSecuritySuiteSynProtectionPortModeLastTimeAttack OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection last attack time mode."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 2 }
+
+rlSecuritySuiteSynProtectionPortLastTimeAttack OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection last attack time."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 3 }
+
+
+
 END
 

@@ -7,23 +7,24 @@ CISCOSB-DHCP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     OBJECT-TYPE, IpAddress, Unsigned32,
-    MODULE-IDENTITY                         FROM SNMPv2-SMI
-    DisplayString, TruthValue, RowStatus    FROM SNMPv2-TC
-    SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
-    switch001                                    FROM CISCOSB-MIB
-        PortList                                FROM Q-BRIDGE-MIB;
+    MODULE-IDENTITY                         	FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus    	FROM SNMPv2-TC
+    SnmpAdminString                         	FROM SNMP-FRAMEWORK-MIB
+    switch001                               	FROM CISCOSB-MIB
+    PortList                                    FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 rsDHCP MODULE-IDENTITY
           LAST-UPDATED "200310180000Z"
-		  ORGANIZATION "Cisco Small Business"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "The private MIB module definition for DHCP server support in CISCOSB devices."
@@ -220,10 +221,10 @@ rlDhcpRelayInterfaceListEntry OBJECT-TYPE
 RLDhcpRelayInterfaceListEntry::= SEQUENCE {
         rlDhcpRelayInterfaceListIndex              INTEGER,
         rlDhcpRelayInterfaceListPortList           PortList,
-        rlDhcpRelayInterfaceListVlanId1To1024      OCTET STRING,
-        rlDhcpRelayInterfaceListVlanId1025To2048   OCTET STRING,
-        rlDhcpRelayInterfaceListVlanId2049To3072   OCTET STRING,
-        rlDhcpRelayInterfaceListVlanId3073To4094   OCTET STRING
+        rlDhcpRelayInterfaceListVlanId1To1024      VlanList1,
+        rlDhcpRelayInterfaceListVlanId1025To2048   VlanList2,
+        rlDhcpRelayInterfaceListVlanId2049To3072   VlanList3,
+        rlDhcpRelayInterfaceListVlanId3073To4094   VlanList4
     }
 
 rlDhcpRelayInterfaceListIndex OBJECT-TYPE
@@ -244,7 +245,7 @@ rlDhcpRelayInterfaceListPortList OBJECT-TYPE
 
 
 rlDhcpRelayInterfaceListVlanId1To1024 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList1
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -252,7 +253,7 @@ rlDhcpRelayInterfaceListVlanId1To1024 OBJECT-TYPE
     ::= { rlDhcpRelayInterfaceListEntry 3 }
 
 rlDhcpRelayInterfaceListVlanId1025To2048 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList2
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -260,7 +261,7 @@ rlDhcpRelayInterfaceListVlanId1025To2048 OBJECT-TYPE
     ::= { rlDhcpRelayInterfaceListEntry 4 }
 
 rlDhcpRelayInterfaceListVlanId2049To3072 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList3
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -268,7 +269,7 @@ rlDhcpRelayInterfaceListVlanId2049To3072 OBJECT-TYPE
     ::= { rlDhcpRelayInterfaceListEntry 5 }
 
 rlDhcpRelayInterfaceListVlanId3073To4094 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList4
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -419,7 +420,9 @@ RlDhcpSrvIpAddrEntry ::= SEQUENCE {
       rlDhcpSrvIpAddrConfParamsName
          DisplayString,
       rlDhcpSrvIpAddrRowStatus
-         RowStatus
+         RowStatus,
+      rlDhcpSrvIpAddrOptionParamsName
+         DisplayString
       }
 
 rlDhcpSrvIpAddrIpAddr OBJECT-TYPE
@@ -542,6 +545,14 @@ rlDhcpSrvIpAddrState OBJECT-TYPE
     DEFVAL { valid }
     ::= { rlDhcpSrvIpAddrEntry 12 }
 
+rlDhcpSrvIpAddrOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of DHCP Option Table."
+    ::= { rlDhcpSrvIpAddrEntry 13 }
+
 -- Dynamic Table
 
 rlDhcpSrvDynamicTable OBJECT-TYPE
@@ -592,7 +603,9 @@ RlDhcpSrvDynamicEntry ::= SEQUENCE {
       rlDhcpSrvDynamicNumOfExpiredAddr
          Unsigned32,
       rlDhcpSrvDynamicNumOfDeclinedAddr
-         Unsigned32
+         Unsigned32,
+      rlDhcpSrvDynamicOptionParamsName
+         DisplayString
      }
 
 rlDhcpSrvDynamicPoolName OBJECT-TYPE
@@ -722,6 +735,14 @@ rlDhcpSrvDynamicNumOfDeclinedAddr OBJECT-TYPE
     DESCRIPTION
         "The number of declined addresses in space."
     ::= { rlDhcpSrvDynamicEntry 15 }
+
+rlDhcpSrvDynamicOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of DHCP Option Table."
+    ::= { rlDhcpSrvDynamicEntry 16 }
 
 -- Configuration Parameters Table
 
@@ -895,7 +916,7 @@ rlDhcpSrvConfParamsNmsIp OBJECT-TYPE
 rlDhcpSrvConfParamsOptionsList   OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-write
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
          "The sequence of option segments.  Each option segment
          is represented by a triplet <code/length/value>.
@@ -957,5 +978,197 @@ rlDhcpSrvNumOfUsedEntries OBJECT-TYPE
     DESCRIPTION
         "This variable shows number of entries (any type) stored in database."
     ::= { rsDHCP 52 }
+
+rlDhcpSrvNumOfPreAllocatedEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of preallocated entries."
+    ::= { rsDHCP 53 }
+
+rlDhcpSrvNumOfExpiredEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of expired entries."
+    ::= { rsDHCP 54 }
+
+rlDhcpSrvNumOfDeclinedEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of declined entries."
+    ::= { rsDHCP 55 }
+
+rlDhcpSrvNumOfAutomaticEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of automatic entries."
+    ::= { rsDHCP 56 }
+
+
+-- Option Parameters Table
+
+RlDhcpSrvOptionTypeEnum  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip Dhcp server option type enumeration."
+   SYNTAX INTEGER {
+        boolean(1),
+        integer(2),
+        ascii(3),
+        ip(4),
+        hex(5),
+        ip-list(6)
+    }
+
+rlDhcpSrvOptionParamsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvOptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The DHCP Option Parameters Table"
+    ::=  { rsDHCP 57 }
+
+rlDhcpSrvOptionParamsEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Each entry corresponds to one specific parameters set."
+    INDEX { rlDhcpSrvOptionParamsName, rlDhcpSrvOptionParamsCode }
+    ::=  { rlDhcpSrvOptionParamsTable 1 }
+
+RlDhcpSrvOptionParamsEntry ::= SEQUENCE {
+    rlDhcpSrvOptionParamsName
+       DisplayString,
+    rlDhcpSrvOptionParamsCode
+       Unsigned32,
+    rlDhcpSrvOptionParamsType
+       RlDhcpSrvOptionTypeEnum,
+    rlDhcpSrvOptionParamsOrigString
+       DisplayString,
+    rlDhcpSrvOptionParamsDescription
+       DisplayString,
+    rlDhcpSrvOptionParamsRowStatus
+       RowStatus
+   }
+rlDhcpSrvOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This value is a unique index for the
+        entry in the rlDhcpSrvOptionParamsTable."
+   ::= { rlDhcpSrvOptionParamsEntry 1 }
+
+rlDhcpSrvOptionParamsCode OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option code."
+    ::= { rlDhcpSrvOptionParamsEntry 2 }
+
+rlDhcpSrvOptionParamsType OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionTypeEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option type."
+    ::= { rlDhcpSrvOptionParamsEntry 3 }
+
+rlDhcpSrvOptionParamsOrigString OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option value."
+    ::= { rlDhcpSrvOptionParamsEntry 4 }
+
+rlDhcpSrvOptionParamsDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option description."
+    ::= { rlDhcpSrvOptionParamsEntry 5 }
+
+rlDhcpSrvOptionParamsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { rlDhcpSrvOptionParamsEntry 6 }
+
+-- Auxulary Option Table
+
+rlDhcpSrvAuxOptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvAuxOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The DHCP Auxulary Option Table"
+    ::=  { rsDHCP 58 }
+
+rlDhcpSrvAuxOptionEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvAuxOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Each entry contains pair option code/option type that permitted by option command."
+    INDEX { rlDhcpSrvAuxOptionCode, rlDhcpSrvAuxOptionType }
+    ::=  { rlDhcpSrvAuxOptionTable 1 }
+
+RlDhcpSrvAuxOptionEntry ::= SEQUENCE {
+    rlDhcpSrvAuxOptionCode
+       Unsigned32,
+    rlDhcpSrvAuxOptionType
+       RlDhcpSrvOptionTypeEnum,
+    rlDhcpSrvAuxOptionMinVal
+       Unsigned32,
+    rlDhcpSrvAuxOptionMaxVal
+       Unsigned32
+}
+
+rlDhcpSrvAuxOptionCode OBJECT-TYPE
+    SYNTAX Unsigned32 (1..254)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 1 }
+
+rlDhcpSrvAuxOptionType OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionTypeEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The option enumeration."
+    ::= { rlDhcpSrvAuxOptionEntry 2 }
+
+rlDhcpSrvAuxOptionMinVal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The minimal value of this option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 3 }
+
+rlDhcpSrvAuxOptionMaxVal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximal value of this option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 4 }
 
 END
