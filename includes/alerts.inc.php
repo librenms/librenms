@@ -162,7 +162,7 @@ function RunMacros($rule,$x=1) {
 	krsort($config['alert']['macros']['rule']);
 	foreach( $config['alert']['macros']['rule'] as $macro=>$value ) {
 		if( !strstr($macro," ") ) {
-			$rule = str_replace('%macros.'.$macro,$value,$rule);
+			$rule = str_replace('%macros.'.$macro,'('.$value.')',$rule);
 		}
 	}
 	if( strstr($rule,"%macros") ) {
