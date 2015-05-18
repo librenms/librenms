@@ -2916,7 +2916,7 @@
 		/* if there is not widgets overlapping in the new player position,
 		 * update the new placeholder position. */
 		if (!$overlapped_widgets.length) {
-			if (this.shift_widgets_up) {
+			if (this.options.shift_widgets_up) {
 				var pp = this.can_go_player_up(this.player_grid_data);
 				if (pp !== false) {
 					to_row = pp;
