@@ -2883,7 +2883,7 @@
 				$overlapped_widgets.each($.proxy(function (i, w) {
 					var $w = $(w);
 
-					if ($gr.can_go_down($w)) {
+					if ($gr.can_go_down($w) && $w.coords().grid.row === $gr.player_grid_data.row) {
 						$gr.move_widget_down($w, $gr.player_grid_data.size_y);
 						$gr.set_placeholder(to_col, to_row);
 					}
