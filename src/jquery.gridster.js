@@ -3956,6 +3956,10 @@
 		this.baseX = ($window.width() - aw) / 2;
 		this.baseY = this.$wrapper.offset().top;
 
+		if (this.$wrapper.css('position') == 'relative') {
+			this.baseX = this.baseY = 0;
+		}
+
 		$.each(this.faux_grid, $.proxy(function (i, coords) {
 			this.faux_grid[i] = coords.update({
 				left: this.baseX + (coords.data.col - 1) * this.min_widget_width,
