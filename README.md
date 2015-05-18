@@ -100,15 +100,7 @@ exception):
   of the GNU GPL v3 in regard to all of the remaining software (comprising
   LibreNMS).
 
-  The authorised third-party software packages under this exception are as
-  follows (their title, location, and license are noted where known):
-  - JpGraph (html/includes/jpgraph): QPL 1.0 license
-  - MIBS (mibs): unknown/various
-  - html/graph-realtime.php: BSD (original?)
-  - html/includes/collectd/: GPLv2 only
-  - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
-  - scripts/*/mysql: GPLv2 only
-  - check_mk (scripts/check_mk*): GPLv2
+  Please see [Acknowledgements][17]
 
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
@@ -126,3 +118,4 @@ exception):
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: http://docs.librenms.org/General/Contributing/
 [16]: http://docs.librenms.org/
+[17]: http://docs.librenms.org/General/Acknowledgement/
