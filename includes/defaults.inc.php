@@ -215,14 +215,14 @@ $config['alert'] = array(
 			'past_60m' => 'DATE_SUB(NOW(),INTERVAL 60 MINUTE)',
 
 			//Device Macros
-			'device' => '(%devices.disabled = "0" && %devices.ignore = "0")',
-			'device_up' => '(%devices.status = "1" && %macros.device)',
-			'device_down' => '(%devices.status = "0" && %macros.device)',
+			'device' => '%devices.disabled = "0" && %devices.ignore = "0"',
+			'device_up' => '%devices.status = "1" && %macros.device',
+			'device_down' => '%devices.status = "0" && %macros.device',
 
 			//Port Macros
-			'port' => '(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")',
-			'port_up' => '(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)',
-			'port_down' => '(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)',
+			'port' => '%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0"',
+			'port_up' => '%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port',
+			'port_down' => '%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port',
 			'port_usage_perc' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100',
 
 			//Misc Macros
