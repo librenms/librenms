@@ -60,14 +60,13 @@ foreach (dbFetchRows($sql,$param) as $drive) {
         $graph_array_zoom['width']  = "400";
         $link = "graphs/id=" . $graph_array['id'] . "/type=" . $graph_array['type'] . "/from=" . $graph_array['from'] . "/to=" . $graph_array['to'] . "/";
         $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
-        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
-
         $background = get_percentage_colours($perc);
+        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
 
         $response[] = array('hostname' => generate_device_link($drive),
                             'storage_descr' => $drive['storage_descr'],
                             'graph' => $mini_graph,
-                            'storage_size' => $bar_link,
+                            'storage_used' => $bar_link,
                             'storage_perc' => $perc . "%");
         if ($_POST['view'] == "graphs") {
             $graph_array['height'] = "100";
@@ -82,7 +81,7 @@ foreach (dbFetchRows($sql,$param) as $drive) {
             $response[] = array('hostname' => $graph_data[0],
                                 'storage_descr' => $graph_data[1],
                                 'graph' => $graph_data[2],
-                                'storage_size' => $graph_data[3],
+                                'storage_used' => $graph_data[3],
                                 'storage_perc' => '');
 
         } # endif graphs
