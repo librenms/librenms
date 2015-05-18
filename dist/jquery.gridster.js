@@ -2097,7 +2097,7 @@
 		isDOM || ($el = wgd.el);
 
 		var empty_upper_row = this.can_go_widget_up(wgd);
-		if (empty_upper_row) {
+		if (this.shift_widgets_up && empty_upper_row) {
 			wgd.row = empty_upper_row;
 			$el.attr('data-row', empty_upper_row);
 			this.$el.trigger('gridster:positionchanged', [wgd]);
@@ -2466,15 +2466,14 @@
 		var col = this.placeholder_grid_data.col;
 		var row = this.placeholder_grid_data.row;
 
-		var widgetsIncell = this.get_widgets_at_cell(col,row);
+		this.set_cells_player_occupies(col, row);
+		this.$player.coords().grid.row = row;
+		this.$player.coords().grid.col = col;
+
+		var widgetsIncell = this.get_widgets_under_player();
 		if (widgetsIncell.length > 0) {
 			this.move_widget_down(widgetsIncell, this.placeholder_grid_data.size_y);
 		}
-
-		this.set_cells_player_occupies(col, row);
-
-		this.$player.coords().grid.row = row;
-		this.$player.coords().grid.col = col;
 
 		if (this.options.draggable.stop) {
 			this.options.draggable.stop.call(this, event, ui);
@@ -4520,7 +4519,7 @@
 		cols = Math.min(max_cols, Math.max(cols, this.options.min_cols));
 		this.container_width = ((cols + 1) * this.options.widget_margins[0]) + (cols * this.min_widget_width);
 		if (this.is_responsive()) {
-			this.$el.css({'min-width': '100vw', 'max-width': '100vw'});
+			this.$el.css({'min-width': '100%', 'max-width': '100%'});
 			return this; //if we are responsive exit before setting the width of $el
 		}
 		this.$el.css('width', this.container_width);
@@ -4849,6 +4848,10 @@
 		var aw = this.$wrapper.width();
 		this.baseX = ($window.width() - aw) / 2;
 		this.baseY = this.$wrapper.offset().top;
+
+		if (this.$wrapper.css('position') === 'relative') {
+			this.baseX = this.baseY = 0;
+		}
 
 		$.each(this.faux_grid, $.proxy(function (i, coords) {
 			this.faux_grid[i] = coords.update({
