@@ -5,8 +5,8 @@
                 <th data-column-id="hostname">Device</th>
                 <th data-column-id="storage_descr">Storage</th>
                 <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
-                <th data-column-id="storage_size" data-searchable="false">Usage</th>
-                <th data-column-id="storage_perc" data-searchable="false">Used</th>
+                <th data-column-id="storage_used" data-searchable="false">Used</th>
+                <th data-column-id="storage_perc" data-searchable="false">Usage</th>
             </tr>
         </thead>
     </table>
