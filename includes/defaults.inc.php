@@ -244,7 +244,7 @@ $config['alert'] = array(
 
 $config['alerts']['email']['default']      = NULL;    // Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   // Only use default recipient
-$config['alerts']['email']['enable']       = TRUE;    // Enable email alerts
+$config['alerts']['email']['enable']       = FALSE;   // Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    // Populate as an array() with ASNs to alert on.
 $config['alerts']['port']['ifdown']        = FALSE;   // Generate alerts for ports that go down
 
