@@ -6,21 +6,21 @@ CISCOSB-DEVICEPARAMS-MIB DEFINITIONS ::= BEGIN
 -- Date:                 15-Jan-2007
 
 IMPORTS
-    switch001                                                     FROM CISCOSB-MIB
+    switch001                                               FROM CISCOSB-MIB
     OBJECT-TYPE, MODULE-IDENTITY, IpAddress                 FROM SNMPv2-SMI
     TruthValue, DisplayString, PhysAddress                  FROM SNMPv2-TC;
 
 rndDeviceParams MODULE-IDENTITY
                 LAST-UPDATED "200701020000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines general Parameters private MIBs."
@@ -644,7 +644,9 @@ RndImageInfoEntry ::= SEQUENCE {
     rndImage1Date                      DisplayString,
     rndImage2Date                      DisplayString,
     rndImage1Time                      DisplayString,
-    rndImage2Time                      DisplayString
+    rndImage2Time                      DisplayString,
+    rndImage1Description               DisplayString,
+    rndImage2Description               DisplayString
 }
 
 rndStackUnitNumber OBJECT-TYPE
@@ -719,6 +721,22 @@ rndImage2Time OBJECT-TYPE
     DESCRIPTION
         "Indicates the compilation time of image-2 (if present) in the system.If image-2 is not present show 'no info' text"
     ::= {rndImageInfoEntry 9 }
+
+rndImage1Description OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the description of image-1 in the system."
+    ::= {rndImageInfoEntry 10 }
+
+rndImage2Description OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the description of image-2 in the system."
+    ::= {rndImageInfoEntry 11 }
 
 rlComponentsInfoTable OBJECT-TYPE
     SYNTAX SEQUENCE OF RlComponentsInfoEntry

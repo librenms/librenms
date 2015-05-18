@@ -5,7 +5,7 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE                       FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString,
     TruthValue, RowStatus                              FROM SNMPv2-TC
-    switch001                                               FROM CISCOSB-MIB
+    switch001                                          FROM CISCOSB-MIB
     Counter                                            FROM RFC1155-SMI
     InterfaceIndex, InterfaceIndexOrZero               FROM IF-MIB
     SnmpAdminString                                    FROM SNMP-FRAMEWORK-MIB
@@ -13,15 +13,15 @@ IMPORTS
 
 rlEventsMib MODULE-IDENTITY
         LAST-UPDATED "201009110000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "MTS events MIB."
@@ -543,4 +543,17 @@ SmartPortMacroParameterOrder ::= TEXTUAL-CONVENTION
             "Since this an action table only createAndGo will be accepted and the conceptual row will vanish immediately
              after the action execution."
         ::= { rlAutoSmartTrunkRefreshEntry 3 }
-END
+
+
+       rlAutoSmartBusy OBJECT-TYPE
+           SYNTAX  TruthValue
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "If true indicates that the autosmartports system is temporarily busy performing a multiport
+                operation and therefore can not service management requests for the time-being."
+    ::= { rlPortEvents 11 }
+
+
+
+ END
