@@ -5,7 +5,7 @@ CISCOSB-GREEN-MIB DEFINITIONS ::= BEGIN
 -- Date:       25 Aug 2008
 --
 IMPORTS
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32    FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, TruthValue              FROM SNMPv2-TC
     PortList                                    FROM Q-BRIDGE-MIB
@@ -14,15 +14,15 @@ IMPORTS
 rlGreenEth MODULE-IDENTITY  -- August 15, 2008
 
         LAST-UPDATED  "200808150000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION   "The private MIB module definition for Green Ethernet Energy Detect feature."
         REVISION      "200808150000Z"
@@ -205,6 +205,20 @@ rlGreenEthForceShortReachIfIndexList OBJECT-TYPE
           not considering VCT results."
     DEFVAL  { ''H } -- empty octet string
     ::= { rlGreenEth 9 }
+
+
+rlGreenEthMaskLedStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        off       (0),
+        on        (1)
+
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Mask all ports led  according to the configuration."
+    DEFVAL{ off }
+    ::= { rlGreenEth 10 }
 
 END
 

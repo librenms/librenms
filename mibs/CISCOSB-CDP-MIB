@@ -8,7 +8,7 @@ CISCOSB-CDP-MIB DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-    switch001, rndNotifications             FROM CISCOSB-MIB
+    switch001, rndNotifications                   FROM CISCOSB-MIB
     rndErrorDesc, rndErrorSeverity          FROM CISCOSB-DEVICEPARAMS-MIB
     InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,
@@ -26,15 +26,15 @@ IMPORTS
 
 rlCdp MODULE-IDENTITY
          LAST-UPDATED "201102150000Z"
-		 ORGANIZATION "Cisco Small Business"
+         ORGANIZATION "Cisco Systems, Inc."
 
-		 CONTACT-INFO
-		 "Postal: 170 West Tasman Drive
-		 San Jose , CA 95134-1706
-		 USA
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
 
-		 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "The private MIB module definition for CDP protocol."
@@ -66,6 +66,9 @@ rlCdp MODULE-IDENTITY
                 "Added rlCdpLogMismatchDuplexTrap.
                  Added rlCdpLogMismatchVoiceVlanTrap.
                  Added rlCdpLogMismatchNativeVlanTrap."
+         REVISION "201202140000Z"
+         DESCRIPTION
+                "Added rlCdpTlvSysName to rlCdpTlvTable."
 
         ::= { switch001 137 }
 
@@ -89,7 +92,7 @@ RlCdpCounterTypes ::= TEXTUAL-CONVENTION
           totalInputPackets counter specifies the total number of received CDP packets
           totalOutputPackets counter specifies the total number of sent CDP packets
           illegalChksum counter specifies the number of received CDP packets with illegal checksum.
-          errorPackets counter specifies the number of recieved CDP packets with other error (duplicated TLVs, illegal TLVs, etc.)
+          errorPackets counter specifies the number of received CDP packets with other error (duplicated TLVs, illegal TLVs, etc.)
           maxNeighborsExceededInMainCache counter specifies the number of times a CDP neighbor could not be stored in the main cache.
           maxNeighborsExceededInSecondaryCache specifies counter the number of times a CDP neighbor could not be stored in the secondary cache. "
      SYNTAX INTEGER {
@@ -472,7 +475,8 @@ RlCdpTlvEntry ::= SEQUENCE {
     rlCdpTlvPowerAvailableRequestId             Unsigned32,
     rlCdpTlvPowerAvailablePowerManagementId     Unsigned32,
     rlCdpTlvPowerAvailable                      Unsigned32,
-    rlCdpTlvPowerAvailableManagementPowerLevel  Unsigned32
+    rlCdpTlvPowerAvailableManagementPowerLevel  Unsigned32,
+    rlCdpTlvSysName                             DisplayString
 }
 
 rlCdpTlvIfIndex OBJECT-TYPE
@@ -725,6 +729,15 @@ rlCdpTlvPowerAvailableManagementPowerLevel OBJECT-TYPE
         the local device has no preference."
     ::= { rlCdpTlvEntry 23 }
 
+rlCdpTlvSysName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The sysName MIB as will be advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 24 }
+
+--------------------------------------------------------------------------------
 
 rlCdpAdvertiseApplianceTlv OBJECT-TYPE
     SYNTAX  TruthValue
@@ -749,6 +762,7 @@ rlCdpValidateMandatoryTlvs OBJECT-TYPE
     DEFVAL     { false }
     ::= {rlCdp 18}
 
+
 -- rlCdpInterfaceCountersPTable
 
 rlCdpInterfaceCountersTable OBJECT-TYPE
@@ -756,7 +770,7 @@ rlCdpInterfaceCountersTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table contains all CDP counters values, indexed by counter name"
+        "This table contains all CDP counters values, indexed by interface id."
     ::= { rlCdp 19 }
 
 rlCdpInterfaceCountersEntry OBJECT-TYPE
@@ -765,37 +779,109 @@ rlCdpInterfaceCountersEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The row definition for this table."
-    INDEX { rlCdpInterfaceId, rlCdpInterfaceCountersName  }
+    INDEX { rlCdpInterfaceId  }
     ::= { rlCdpInterfaceCountersTable 1 }
 
 RlCdpInterfaceCountersEntry ::= SEQUENCE {
-    rlCdpInterfaceId               InterfaceIndex,
-    rlCdpInterfaceCountersName     RlCdpCounterTypes,
-    rlCdpInterfaceCountersValue    Counter32
+    rlCdpInterfaceId                    InterfaceIndex,
+    rlCdpInterfaceTotalInputPackets     Counter32,
+    rlCdpInterfaceV1InputPackets        Counter32,
+    rlCdpInterfaceV2InputPackets        Counter32,
+    rlCdpInterfaceTotalOutputPackets    Counter32,
+    rlCdpInterfaceV1OutputPackets       Counter32,
+    rlCdpInterfaceV2OutputPackets       Counter32,
+    rlCdpInterfaceIllegalChksum         Counter32,
+    rlCdpInterfaceErrorPackets          Counter32,
+    rlCdpInterfaceMaxNeighborsExceededInMainCache       Counter32,
+    rlCdpInterfaceMaxNeighborsExceededInSecondaryCache  Counter32
 }
 rlCdpInterfaceId OBJECT-TYPE
     SYNTAX  InterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
-        "Interface index, used as primary index for interface counters table."
+        "Interface id, used as index for interface counters table."
     ::= {rlCdpInterfaceCountersEntry 1}
 
-rlCdpInterfaceCountersName OBJECT-TYPE
-    SYNTAX  RlCdpCounterTypes
-    MAX-ACCESS  not-accessible
-    STATUS  current
-    DESCRIPTION
-        "counter name used as secondary key for interface counters table. "
-    ::= {rlCdpInterfaceCountersEntry 2}
-
-rlCdpInterfaceCountersValue OBJECT-TYPE
+rlCdpInterfaceTotalInputPackets OBJECT-TYPE
     SYNTAX  Counter32
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
-        "the value of the counter name specified by rlCdpCountersName, and rlCdpInterfaceId"
+        "Num of received packets on rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 2}
+
+rlCdpInterfaceV1InputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v1 received packets on rlCdpInterfaceId"
     ::= {rlCdpInterfaceCountersEntry 3}
+
+rlCdpInterfaceV2InputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v2 received packets on rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 4}
+
+rlCdpInterfaceTotalOutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 5}
+
+rlCdpInterfaceV1OutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v1 sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 6}
+
+rlCdpInterfaceV2OutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v2 sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 7}
+
+rlCdpInterfaceIllegalChksum OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of received packets with illegal CDP checksum."
+    ::= {rlCdpInterfaceCountersEntry 8}
+
+rlCdpInterfaceErrorPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "specifies the number of received CDP packets with other error (duplicated TLVs, illegal TLVs, etc.) "
+    ::= {rlCdpInterfaceCountersEntry 9}
+
+rlCdpInterfaceMaxNeighborsExceededInMainCache OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "specifies the number of times a CDP neighbor could not be stored in the main cache. "
+    ::= {rlCdpInterfaceCountersEntry 10}
+
+rlCdpInterfaceMaxNeighborsExceededInSecondaryCache OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " specifies the number of times a CDP neighbor could not be stored in the secondary cache."
+    ::= {rlCdpInterfaceCountersEntry 11}
 
 rlCdpInterfaceCountersClear OBJECT-TYPE
     SYNTAX  InterfaceIndexOrZero
@@ -830,8 +916,4 @@ rlCdpLogMismatchNativeVlanTrap NOTIFICATION-TYPE
     DESCRIPTION
         "Warning trap indicating that native vlan mismatch has been detected by CDP"
     ::=  { rndNotifications 226 }
-
-
 END
-
-

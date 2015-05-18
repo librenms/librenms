@@ -8,20 +8,20 @@ IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY                FROM SNMPv2-SMI
     ifIndex                                     FROM IF-MIB
     TimeStamp, DisplayString                    FROM SNMPv2-TC
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
 
-rlPhy MODULE-IDENTITY
+   rlPhy MODULE-IDENTITY
       LAST-UPDATED "200209300024Z"  -- September 30, 2002
-	  ORGANIZATION "Cisco Small Business"
+      ORGANIZATION "Cisco Systems, Inc."
 
-	  CONTACT-INFO
-	  "Postal: 170 West Tasman Drive
-	  San Jose , CA 95134-1706
-	  USA
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
 
-	  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-	  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
       DESCRIPTION
               "The MIB module describes the private MIB for testing Layer1 interfaces supported
