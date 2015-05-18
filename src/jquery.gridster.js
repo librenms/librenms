@@ -1290,6 +1290,9 @@
 	fn.update_widgets_dimensions = function () {
 		$.each(this.$widgets, $.proxy(function (idx, widget) {
 			var wgd = $(widget).coords().grid;
+			if (typeof (wgd) !== 'object') {
+				return;
+			}
 			var width = (wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
 			((wgd.size_x - 1) * this.options.widget_margins[0]));
 
