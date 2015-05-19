@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-SYSTEM-MIB DEFINITIONS ::= BEGIN
@@ -40,8 +45,8 @@ ruckusZDSystemMIB MODULE-IDENTITY
         "Ruckus Wireless, Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -241,6 +246,14 @@ ruckusZDSystemMgmtVlanID OBJECT-TYPE
         "Management Vlan ID"
     ::= { ruckusZDSystemExpInfo 67 }
 
+ruckusZDSystemCPUModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU Model"
+    ::= { ruckusZDSystemExpInfo 70 }
+
 ruckusZDSystemtCPUSpeed OBJECT-TYPE
     SYNTAX  Unsigned32
     UNITS
@@ -434,12 +447,13 @@ ruckusZDSystemIPEntry OBJECT-TYPE
     DESCRIPTION
         "Specifies IP configuration entry. ifIndex  always be 1"
     INDEX {
-        ifIndex  }
+        ruckusZDSystemIPIndex  }
     ::= { ruckusZDSystemIPTable 1 } 
     
 RuckusZDSystemIPEntry ::= SEQUENCE {
-  ruckusZDSystemIPVersion                	INTEGER,
-  ruckusZDSystemIPAddrMode			INTEGER,
+  ruckusZDSystemIPIndex							Unsigned32,
+  ruckusZDSystemIPVersion						INTEGER,
+  ruckusZDSystemIPAddrMode						INTEGER,
   ruckusZDSystemIPAddress                       IpAddress,
   ruckusZDSystemIPAddrNetmask                   IpAddress,
   ruckusZDSystemIPGateway                       IpAddress,
@@ -452,6 +466,14 @@ RuckusZDSystemIPEntry ::= SEQUENCE {
   ruckusZDSystemIPV6PrimaryDNS                  OCTET STRING,
   ruckusZDSystemIPV6SecondaryDNS                OCTET STRING
 }
+
+ruckusZDSystemIPIndex OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface index."
+    ::= { ruckusZDSystemIPEntry 1 }
 
 ruckusZDSystemIPVersion OBJECT-TYPE
     SYNTAX  INTEGER { ipv4(1), ipv6(2),dualstack(3) }  
@@ -1074,36 +1096,36 @@ ruckusZDSystemSNMPV3RwPrivacyKey OBJECT-TYPE
 
 ruckusZDSystemLoadBalanceInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 20 }
 
-ruckusZDSystemLoadBalanceStatus OBJECT-TYPE
-    SYNTAX  TruthValue 
+ruckusZDSystemLoadBalance24GStatus OBJECT-TYPE
+    SYNTAX  TruthValue {false(0), true(1)}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Enable/disable load balance service."
+        "Enable/disable load balance on 2.4G radio."
     ::= { ruckusZDSystemLoadBalanceInfo 1 }
 
-ruckusZDSystemLoadBalanceUserThreshold OBJECT-TYPE
-    SYNTAX  Unsigned32 
+ruckusZDSystemLoadBalance5GStatus OBJECT-TYPE
+    SYNTAX  TruthValue {false(0), true(1)}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Load balance user threshold."
-    ::= { ruckusZDSystemLoadBalanceInfo 2 }
+        "Enable/disable load balance on 5G radio."
+    ::= { ruckusZDSystemLoadBalanceInfo 2 }    
 
-ruckusZDSystemLoadBalanceUserDifference OBJECT-TYPE
-    SYNTAX  Unsigned32 
+ruckusZDSystemLoadBalanceAdjacent24GThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (1..100)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Load balance user difference."
+        "Adjacent 2.4G radio threshold(dB)."
     ::= { ruckusZDSystemLoadBalanceInfo 3 }
 
-ruckusZDSystemLoadBalanceTrafficThreshold OBJECT-TYPE
-    SYNTAX  Unsigned32 
+ruckusZDSystemLoadBalanceAdjacent5GThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (1..100) 
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Load balance traffic threshold."
+        "Adjacent 5G radio threshold(dB)."
     ::= { ruckusZDSystemLoadBalanceInfo 4 }
 
 ruckusZDSystemLoadBalanceTrafficDifference OBJECT-TYPE
@@ -1111,17 +1133,17 @@ ruckusZDSystemLoadBalanceTrafficDifference OBJECT-TYPE
     UNITS
         "Kbps"
     MAX-ACCESS read-write
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
-        "Load balance traffic difference."
+        "This node had been deprecated from 9.9; Load balance traffic difference."
     ::= { ruckusZDSystemLoadBalanceInfo 5 }
 
 ruckusZDSystemLoadBalanceType OBJECT-TYPE
     SYNTAX  INTEGER { user(1), traffic(2) }
     MAX-ACCESS read-write
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
-        "Load balance type."
+        "This node had been deprecated from 9.9; Load balance type."
     ::= { ruckusZDSystemLoadBalanceInfo 6 }
 
 --
