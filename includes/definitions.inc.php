@@ -1560,6 +1560,10 @@ $config['graph_types']['device']['netstat_snmp_pkt']['section'] = 'netstats';
 $config['graph_types']['device']['netstat_snmp_pkt']['order'] = '0';
 $config['graph_types']['device']['netstat_snmp_pkt']['descr'] = 'SNMP Packet Type Statistics';
 
+$config['graph_types']['device']['netstat_ip_forward']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_ip_forward']['order'] = '0';
+$config['graph_types']['device']['netstat_ip_forward']['descr'] = 'IP Forwarding Statistics';
+
 $config['graph_types']['device']['netstat_tcp']['section'] = 'netstats';
 $config['graph_types']['device']['netstat_tcp']['order'] = '0';
 $config['graph_types']['device']['netstat_tcp']['descr'] = 'TCP Statistics';
