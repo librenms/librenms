@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-WLAN-MIB DEFINITIONS ::= BEGIN
@@ -42,8 +47,8 @@ ruckusZDWLANMIB MODULE-IDENTITY
         "Ruckus Wireless, Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -73,10 +78,11 @@ ruckusZDWLANEntry OBJECT-TYPE
     DESCRIPTION
         "Specifies each ZD WLAN entry."
     INDEX {
-        ifIndex }
+        ruckusZDWLANIndex }
     ::= { ruckusZDWLANTable 1 }
 
 RuckusZDWLANEntry ::= SEQUENCE {
+  ruckusZDWLANIndex               		InterfaceIndex,
   ruckusZDWLANSSID                      RuckusSSID,
   ruckusZDWLANDescription               DisplayString,
   ruckusZDWLANAuthentication            DisplayString,
@@ -122,6 +128,14 @@ RuckusZDWLANEntry ::= SEQUENCE {
   ruckusZDWLANUpRetxFrame               Counter64,
   ruckusZDWLANNAME                      RuckusSSID
 }
+
+ruckusZDWLANIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index."
+    ::= { ruckusZDWLANEntry 200 }
 
 ruckusZDWLANSSID OBJECT-TYPE
     SYNTAX  RuckusSSID
@@ -811,7 +825,7 @@ ruckusZDWLANAP11gCapable OBJECT-TYPE
 
 ruckusZDWLANAPMultiModeAccessStatus OBJECT-TYPE
     SYNTAX TruthValue {false(0),true(1)}
-    MAX-ACCESS read-write
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "Support simutaneously connections from 11a/b/g clients."
@@ -1022,7 +1036,7 @@ ruckusZDWLANAPTotalUser OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Total number of concurrent users on this AP."
+        "Total number of client AP can support."
     ::= { ruckusZDWLANAPEntry 110 }
 
 ruckusZDWLANAPLANStatsRXByteRate OBJECT-TYPE
@@ -1040,7 +1054,6 @@ ruckusZDWLANAPLANStatsTXByteRate OBJECT-TYPE
     DESCRIPTION
         "Bytes rate transmitted on LAN port each 90s."
     ::= { ruckusZDWLANAPEntry 112 }
-
 
 ruckusZDWLANAPRadioStatsTable OBJECT-TYPE
     SYNTAX  SEQUENCE OF RuckusZDWLANAPRadioStatsEntry
@@ -1127,7 +1140,7 @@ ruckusZDWLANAPRadioStatsRadioIndex OBJECT-TYPE
     ::= { ruckusZDWLANAPRadioStatsEntry 2 }
 
 ruckusZDWLANAPRadioStatsRadioType OBJECT-TYPE
-    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3) }
+    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3), radio11ac(4)}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1256,7 +1269,7 @@ ruckusZDWLANAPRadioStatsPowerMgmt OBJECT-TYPE
 
 ruckusZDWLANAPRadioStatsMaxSta OBJECT-TYPE
     SYNTAX  Unsigned32 
-    MAX-ACCESS read-write
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "Number of max stations allowed."
@@ -1577,7 +1590,7 @@ ruckusZDWLANStaUser OBJECT-TYPE
     ::= { ruckusZDWLANStaEntry 5 }
 
 ruckusZDWLANStaRadioType OBJECT-TYPE
-    SYNTAX  INTEGER  { radio11a (0), radio11b (1), radio11g(2), radio11ng(3), radio11na(4) }
+    SYNTAX  INTEGER  { radio11a (0), radio11b (1), radio11g(2), radio11ng(3), radio11na(4), radio11ac(5) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1754,6 +1767,135 @@ ruckusZDWLANStaSignalStrength OBJECT-TYPE
         "Signal strength"
     ::= { ruckusZDWLANStaEntry 81 }
 
+ruckusZDWiredStaTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWiredStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Wired Station table."
+    ::= { ruckusZDWLANStaInfo 2 }
+
+ruckusZDWiredStaEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWiredStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Wired Station entry."
+    INDEX {
+        ruckusZDWiredStaMacAddr }
+    ::= { ruckusZDWiredStaTable 1 }
+
+RuckusZDWiredStaEntry ::= SEQUENCE {
+  ruckusZDWiredStaMacAddr               MacAddress,
+  ruckusZDWiredStaAPMacAddr             MacAddress,
+  ruckusZDWiredStaIPAddr                IpAddress,
+  ruckusZDWiredStaIPV6Addr              OCTET STRING,
+  ruckusZDWiredStaVlanID                INTEGER,
+  ruckusZDWiredStaUserName              DisplayString,
+  ruckusZDWiredStaAuthState             INTEGER,
+  ruckusZDWiredStaAssocTime             TimeTicks,
+  ruckusZDWiredStaRxPkts                Counter32,
+  ruckusZDWiredStaRxBytes               Counter64,
+  ruckusZDWiredStaTxPkts                Counter32,
+  ruckusZDWiredStaTxBytes               Counter64,
+}
+
+ruckusZDWiredStaMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The station's MAC Address."
+    ::= { ruckusZDWiredStaEntry 1 }
+
+ruckusZDWiredStaAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The MAC address of the associated AP."
+    ::= { ruckusZDWiredStaEntry 3 }
+
+ruckusZDWiredStaIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusZDWiredStaEntry 5 }
+
+ruckusZDWiredStaIPV6Addr OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(2..40))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IPV6 Address"
+    ::= { ruckusZDWiredStaEntry 6 }
+
+ruckusZDWiredStaVlanID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID of the station. 1 for not specified."
+    ::= { ruckusZDWiredStaEntry 8 }
+
+ruckusZDWiredStaUserName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Logined username of the client."
+    ::= { ruckusZDWiredStaEntry 9 }
+
+ruckusZDWiredStaAuthState OBJECT-TYPE
+    SYNTAX  INTEGER {Unauthorized(0), Authorized(1), Authorized-as-guest(2)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication state of authenticated terminal."
+    ::= { ruckusZDWiredStaEntry 10 }
+
+ruckusZDWiredStaAssocTime OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time client has been associated."
+    ::= { ruckusZDWiredStaEntry 11 }
+
+ruckusZDWiredStaRxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusZDWiredStaEntry 15 }
+
+ruckusZDWiredStaRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusZDWiredStaEntry 16 }
+
+ruckusZDWiredStaTxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusZDWiredStaEntry 17 }
+
+ruckusZDWiredStaTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusZDWiredStaEntry 18 }
+
 ruckusZDWLANRogueInfo OBJECT IDENTIFIER    ::= { ruckusZDWLANObjects 4 }
 
 ruckusZDWLANRogueTable OBJECT-TYPE
@@ -1771,10 +1913,11 @@ ruckusZDWLANRogueEntry OBJECT-TYPE
     DESCRIPTION
         "Specifies each ZD WLAN rogue device entry."
     INDEX {
-        ifIndex }
+        ruckusZDWLANRogueIndex }
     ::= { ruckusZDWLANRogueTable 1 }
 
 RuckusZDWLANRogueEntry ::= SEQUENCE {
+  ruckusZDWLANRogueIndex             	InterfaceIndex,
   ruckusZDWLANRogueMacAddr              MacAddress,
   ruckusZDWLANRogueSSID                 RuckusSSID,
   ruckusZDWLANRogueRadioType            INTEGER,
@@ -1784,6 +1927,14 @@ RuckusZDWLANRogueEntry ::= SEQUENCE {
   ruckusZDWLANRogueEncrypted            INTEGER,
   ruckusZDWLANRogueSignalStrength       Integer32
 }
+
+ruckusZDWLANRogueIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index."
+    ::= { ruckusZDWLANRogueEntry 200 }
 
 ruckusZDWLANRogueMacAddr OBJECT-TYPE
     SYNTAX  MacAddress 
@@ -1802,7 +1953,7 @@ ruckusZDWLANRogueSSID OBJECT-TYPE
     ::= { ruckusZDWLANRogueEntry 2 }
 
 ruckusZDWLANRogueRadioType OBJECT-TYPE
-    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3) }
+    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3), radio11ac(4) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
