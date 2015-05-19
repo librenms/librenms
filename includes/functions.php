@@ -229,9 +229,13 @@ function renamehost($id, $new, $source = 'console')
 
   // FIXME does not check if destination exists!
   $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-  rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
-  dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
-  log_event("Hostname changed -> $new ($source)", $id, 'system');
+  if (rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new") === TRUE) {
+      dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
+      log_event("Hostname changed -> $new ($source)", $id, 'system');
+  } else {
+      echo "Renaming of $host failed\n";
+      log_event("Renaming of $host failed", $id, 'system'); 
+  }
 }
 
 function delete_device($id)
