@@ -4,7 +4,7 @@ if ($device['os'] == "routeros")
 {
   $oids = snmp_walk($device, "mtxrHlActiveFan", "-OsqnU", "MIKROTIK-MIB");
   if ($debug) { echo($oids."\n"); }
-  if ($oids) echo("MIKROTIK-MIB ");
+  if ($oids !== false) echo("MIKROTIK-MIB ");
   $divisor = 1;
   $type = "mikrotik";
 
@@ -27,4 +27,3 @@ if ($device['os'] == "routeros")
   }
 }
 
-?>
