@@ -87,10 +87,10 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
     chown www-data:www-data logs
-    chmod 775 rrd
+    chmod 776 rrd
     chown librenms:librenms rrd
 
-> NOTE: If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
+> NOTE: If you're planing on running rrdcached, make sure that the path is also chmod'ed to 776 and chown'ed to librenms:librenms.
 
 Next, add the following to `/etc/lighttpd/librenms.conf`
 
