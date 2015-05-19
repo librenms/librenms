@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-EVENT-MIB DEFINITIONS ::= BEGIN
@@ -27,8 +32,8 @@ ruckusZDEventMIB MODULE-IDENTITY
         "Ruckus Wireless Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -803,6 +808,84 @@ ruckusZDEventSmartRedundancyStandbyDisconnected NOTIFICATION-TYPE
          "[Smart Redundancy] disconnected, system is in standby state"
     ::= { ruckusZDEventTraps 104 }             
                       
+ruckusZDEventLBSAdminEnabled NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] admin enable location database server"
+    ::= { ruckusZDEventTraps 120 }     
+ruckusZDEventLBSAdminDisabled NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] admin disable location database server"
+    ::= { ruckusZDEventTraps 121 }     
+ruckusZDEventLBSZDLSConnectionUp NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] the connection between ZD and LS from down to up"
+    ::= { ruckusZDEventTraps 122 }     
+ruckusZDEventLBSZDLSConnectionDown NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] the connection between ZD and LS from up to down"
+    ::= { ruckusZDEventTraps 123 }     
+ruckusZDEventLBSReceiveCMDFootfall NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] ZD receive passive tracking footfall command from LS"
+    ::= { ruckusZDEventTraps 124 }
+ruckusZDEventLBSReceiveCMDCalibration NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "[LBS] ZD receive passive tracking calibration command from LS"
+    ::= { ruckusZDEventTraps 125 }   
 --  Trap payload
 --
 

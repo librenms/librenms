@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-WLAN-CONFIG-MIB DEFINITIONS ::= BEGIN
@@ -33,8 +38,8 @@ ruckusZDWLANConfigMIB MODULE-IDENTITY
         "Ruckus Wireless, Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -68,35 +73,36 @@ ruckusZDWLANConfigEntry OBJECT-TYPE
     ::= { ruckusZDWLANConfigTable 1 }
 
 RuckusZDWLANConfigEntry ::= SEQUENCE {
-  ruckusZDWLANID                        	INTEGER,
-  ruckusZDWLANConfigSSID                	OCTET STRING,
-  ruckusZDWLANConfigDescription         	DisplayString,
-  ruckusZDWLANConfigName			OCTET STRING,
+  ruckusZDWLANID								INTEGER,
+  ruckusZDWLANConfigSSID						OCTET STRING,
+  ruckusZDWLANConfigDescription         		DisplayString,
+  ruckusZDWLANConfigName						OCTET STRING,
   ruckusZDWLANConfigWLANServiceType            	INTEGER,
-  ruckusZDWLANConfigAuthentication      	INTEGER,
-  ruckusZDWLANConfigEncryption          	INTEGER,
-  ruckusZDWLANConfigWEPKeyIndex         	INTEGER,
-  ruckusZDWLANConfigWEPKey              	OCTET STRING,
-  ruckusZDWLANConfigWPACipherType       	INTEGER,
-  ruckusZDWLANConfigWPAKey              	OCTET STRING, 
+  ruckusZDWLANConfigAuthentication      		INTEGER,
+  ruckusZDWLANConfigEncryption          		INTEGER,
+  ruckusZDWLANConfigWEPKeyIndex         		INTEGER,
+  ruckusZDWLANConfigWEPKey              		OCTET STRING,
+  ruckusZDWLANConfigWPACipherType				INTEGER,
+  ruckusZDWLANConfigWPAKey              		OCTET STRING,
   ruckusZDWLANConfigAuthenticationServerID      INTEGER,
-  ruckusZDWLANConfigWirelessClientIsolation     TruthValue, 
-  ruckusZDWLANConfigZeroITActivation       	INTEGER,
-  ruckusZDWLANConfigWLANHotspotID        	INTEGER,
-  ruckusZDWLANConfigWLANServicePriority 	INTEGER,
+  ruckusZDWLANConfigWirelessClientIsolation     INTEGER,
+  ruckusZDWLANConfigWirelessWhiteListID			INTEGER,
+  ruckusZDWLANConfigZeroITActivation       		INTEGER,
+  ruckusZDWLANConfigWLANHotspotID        		INTEGER,
+  ruckusZDWLANConfigWLANServicePriority 		INTEGER,
   ruckusZDWLANConfigAccountingServerID      	INTEGER,
   ruckusZDWLANConfigAccountingUpdateInterval    INTEGER,
-  ruckusZDWLANConfigUplinkRate          	OCTET STRING,
-  ruckusZDWLANConfigDownlinkRate        	OCTET STRING,
-  ruckusZDWLANConfigIGMPSnooping        	INTEGER,
-  ruckusZDWLANConfigVlanID              	INTEGER,
-  ruckusZDWLANConfigDynamicVLAN         	INTEGER,
-  ruckusZDWLANConfigHideSSID            	TruthValue,
+  ruckusZDWLANConfigUplinkRate          		OCTET STRING,
+  ruckusZDWLANConfigDownlinkRate        		OCTET STRING,
+  ruckusZDWLANConfigIGMPSnooping        		INTEGER,
+  ruckusZDWLANConfigVlanID              		INTEGER,
+  ruckusZDWLANConfigDynamicVLAN         		INTEGER,
+  ruckusZDWLANConfigHideSSID            		TruthValue,
   ruckusZDWLANConfigTunnelMode        	        TruthValue,
-  ruckusZDWLANConfigBackgroundScanning  	TruthValue,
-  ruckusZDWLANConfigMaxClientsPerAP     	INTEGER,
-  ruckusZDWLANConfigWebAuthentication   	INTEGER,
-  ruckusZDWLANConfigRowStatus           	RowStatus
+  ruckusZDWLANConfigBackgroundScanning  		TruthValue,
+  ruckusZDWLANConfigMaxClients     				INTEGER,
+  ruckusZDWLANConfigWebAuthentication   		INTEGER,
+  ruckusZDWLANConfigRowStatus           		RowStatus
 }
 
 ruckusZDWLANID OBJECT-TYPE
@@ -228,15 +234,23 @@ ruckusZDWLANConfigAuthenticationServerID OBJECT-TYPE
 
 ruckusZDWLANConfigWirelessClientIsolation OBJECT-TYPE
     SYNTAX  INTEGER {
-    		none(1),
-    		local(2),
-    		full(3) } 
+            enable(1),
+            disable(2) } 
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "set Wireless Client Isolation, clients will be unable to communicate with each other, or access any of the restricted subnet."
-    DEFVAL{none}
+    DEFVAL{2}
     ::= { ruckusZDWLANConfigEntry 28 }
+
+ruckusZDWLANConfigWirelessWhiteListID OBJECT-TYPE
+    SYNTAX  INTEGER (0..1024)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "make sure client isolation is enabled and then choose one id."
+    DEFVAL{none}
+    ::= { ruckusZDWLANConfigEntry 29 }
 
 ruckusZDWLANConfigZeroITActivation OBJECT-TYPE
     SYNTAX  INTEGER {
@@ -368,7 +382,7 @@ ruckusZDWLANConfigBackgroundScanning OBJECT-TYPE
         DEFVAL{false}
     ::= { ruckusZDWLANConfigEntry 53 }
 
-ruckusZDWLANConfigMaxClientsPerAP OBJECT-TYPE
+ruckusZDWLANConfigMaxClients OBJECT-TYPE
     SYNTAX  INTEGER (1..100)
     MAX-ACCESS read-write
     STATUS current
@@ -605,5 +619,136 @@ ruckusZDHotspotRowStatus OBJECT-TYPE
     DESCRIPTION
         "Create, Delete Administration control for this Hotspot."
     ::= { ruckusZDHotspotConfigEntry 15 }
+
+
+ruckusZDClientIsolationWhiteListTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDClientIsolationWhiteListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Client Isolation White List table."
+    ::= { ruckusZDWLANConfig 15 }
+
+ruckusZDClientIsolationWhiteListEntry OBJECT-TYPE
+    SYNTAX  RuckusZDClientIsolationWhiteListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Client Isolation White List entry."
+    INDEX { ruckusZDClientIsolationWhiteListID }
+    ::= { ruckusZDClientIsolationWhiteListTable 1 }
+
+RuckusZDClientIsolationWhiteListEntry ::= SEQUENCE {
+  ruckusZDClientIsolationWhiteListID				INTEGER,
+  ruckusZDClientIsolationWhiteListName				DisplayString,
+  ruckusZDClientIsolationWhiteListDescription		DisplayString,
+  ruckusZDClientIsolationWhiteListRowStatus			RowStatus
+}
+
+ruckusZDClientIsolationWhiteListID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Client Isolation White List ID. It can't be modified after creating it."
+    ::= { ruckusZDClientIsolationWhiteListEntry 1 }
+
+ruckusZDClientIsolationWhiteListName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name for this Client Isolation White List."
+    ::= { ruckusZDClientIsolationWhiteListEntry 5 }
+
+ruckusZDClientIsolationWhiteListDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Client Isolation White List."
+    ::= { ruckusZDClientIsolationWhiteListEntry 6 }
+
+ruckusZDClientIsolationWhiteListRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Client Isolation White List.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDClientIsolationWhiteListEntry 15 }
+
+
+ruckusZDClientIsolationWhiteListRuleTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDClientIsolationWhiteListRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Client Isolation White List Attribute in Client Isolation White 
+        List table."
+    ::= { ruckusZDWLANConfig 16 }
+
+ruckusZDClientIsolationWhiteListRuleEntry OBJECT-TYPE
+    SYNTAX  RuckusZDClientIsolationWhiteListRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Client Isolation White List entry."
+    INDEX { ruckusZDClientIsolationWhiteListID,
+        	ruckusZDClientIsolationWhiteListRuleID }
+    ::= { ruckusZDClientIsolationWhiteListRuleTable 1 }
+
+RuckusZDClientIsolationWhiteListRuleEntry ::= SEQUENCE {
+  ruckusZDClientIsolationWhiteListRuleID				INTEGER,
+  ruckusZDClientIsolationWhiteListRuleDescription		DisplayString,
+  ruckusZDClientIsolationWhiteListRuleMac				DisplayString,
+  ruckusZDClientIsolationWhiteListRuleDesAddr			DisplayString,
+  ruckusZDClientIsolationWhiteListRuleRowStatus			RowStatus
+}
+
+ruckusZDClientIsolationWhiteListRuleID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "WLAN Client Isolation White List Rule ID."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 1 }
+
+ruckusZDClientIsolationWhiteListRuleDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Client Isolation White List Rule."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 3 }
+
+ruckusZDClientIsolationWhiteListRuleMac OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..46))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 5 }
+
+ruckusZDClientIsolationWhiteListRuleDesAddr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..46))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 6 }
+    
+ruckusZDClientIsolationWhiteListRuleRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Wireless LAN group attr.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 10 }
             
 END
