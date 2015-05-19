@@ -114,12 +114,7 @@ $options = [
     ],
     "options" => [
         "host" => "my.influx.domain.tld",
-    ],
-    "filters" => [
-        "query" => [
-            "name" => "InfluxDB\\Filter\\ColumnsPointsFilter"
-        ],
-    ],
+    ]
 ];
 $client = \InfluxDB\ClientFactory::create($options);
 
@@ -187,30 +182,6 @@ array(1) {
 }
 ```
 
-By default data is returned as is. You can add filters in order to change a
-response as you prefer, by default this library carries a common filter that
-simplifies the response.
-
-```
-$client->setFilter(new ColumnsPointsFilter());
-
-$data = $client->query("select * from hd_used");
-```
-
-With the "ColumnsPointsFilter" you get a list of dictionaries, something like:
-
-```
-[
-    "serie_name" => [
-        [
-            "time" => 410545635590,
-            "sequence_number" => 390001,
-            "mark" => "element",
-        ],
-    ]
-]
-```
-
 ## Database operations
 
 You can create, list or destroy databases using dedicated methods
@@ -237,23 +208,3 @@ Corley\Benchmarks\InfluxDB\AdapterEvent
     sendDataUsingHttpAdapter: [1,000     ] [0.0026700308323] [374.52751]
     sendDataUsingUdpAdapter : [1,000     ] [0.0000436344147] [22,917.69026]
 ```
-
-### Filters
-
-Just what append when you apply the `ColumnsPointsFilter`
-
-```
-Corley\Benchmarks\InfluxDB\FilterEvent
-    Method Name                Iterations    Average Time      Ops/second
-    ------------------------  ------------  --------------    -------------
-    get10PointDirectData    : [10,000    ] [0.0001383633137] [7,227.34931]
-    get10PointFilteredData  : [10,000    ] [0.0001662570953] [6,014.78089]
-    get100PointDirectData   : [1,000     ] [0.0002406690121] [4,155.08416]
-    get100PointFilteredData : [1,000     ] [0.0008374640942] [1,194.08104]
-    get1000PointDirectData  : [100       ] [0.0011058974266] [904.24299]
-    get1000PointFilteredData: [100       ] [0.0074790692329] [133.70648]
-```
-
-in order to eliminate the http handshake and bandwidth overhead network
-operations are completely skipped
-

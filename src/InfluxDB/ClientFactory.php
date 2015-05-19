@@ -14,7 +14,6 @@ abstract class ClientFactory
      * @param array $options
      * @return Client
      * @throws InvalidArgumentException If not exist adapter name
-     * or not find adapter
      */
     public static function create(array $options)
     {
@@ -24,9 +23,6 @@ abstract class ClientFactory
                 "options" => [],
             ],
             "options" => [],
-            "filters" => [
-                "query" => false
-            ],
         ];
 
         $options = array_replace_recursive($defaultOptions, $options);
@@ -57,10 +53,6 @@ abstract class ClientFactory
 
         $client = new Client();
         $client->setAdapter($adapter);
-
-        if ($options["filters"]["query"]) {
-            $client->setFilter(new $options["filters"]["query"]["name"]);
-        }
 
         return $client;
     }

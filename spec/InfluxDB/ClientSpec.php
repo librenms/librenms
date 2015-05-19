@@ -6,7 +6,6 @@ use Prophecy\Argument;
 use InfluxDB\Adapter\GuzzleAdapter;
 use InfluxDB\Adapter\UdpAdapter;
 use InfluxDB\Adapter\AdapterInterface;
-use InfluxDB\Filter\FilterInterface;
 use InfluxDb\Adapter\QueryableInterface;
 
 class ClientSpec extends ObjectBehavior
@@ -83,16 +82,5 @@ class ClientSpec extends ObjectBehavior
         $this->setAdapter($adapter);
 
         $this->shouldThrow("\\BadMethodCallException")->duringQuery("select * from tcp.test");
-    }
-
-    function it_should_filter_returned_data(FilterInterface $filter, QueryableInterface $adapter)
-    {
-        $adapter->query(Argument::Any(), Argument::Any())->willReturn(null);
-        $filter->filter(Argument::Any())->shouldBeCalledTimes(1)->willReturn([]);
-
-        $this->setFilter($filter);
-        $this->setAdapter($adapter);
-
-        $this->query("select * from tcp.test")->shouldReturn([]);
     }
 }
