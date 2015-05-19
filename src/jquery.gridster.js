@@ -993,7 +993,7 @@
 	 * @return {Class} Returns the instance of the Gridster Class.
 	 */
 	fn.remove_empty_cells = function (col, row, size_x, size_y, exclude) {
-		/*var $nexts = this.widgets_below({
+		var $nexts = this.widgets_below({
 			col: col,
 			row: row,
 			size_x: size_x,
@@ -1002,10 +1002,8 @@
 
 
 		 $nexts.not(exclude).each($.proxy(function(i, widget) {
-		 console.log("from_remove")
 		 this.move_widget_up( $(widget), size_y );
 		 }, this));
-		 */
 
 		this.set_dom_grid_height();
 
