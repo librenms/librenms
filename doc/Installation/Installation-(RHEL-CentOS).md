@@ -54,7 +54,7 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
 ### Adding the librenms-user ###
 
     useradd librenms -d /opt/librenms -M -r
-    usermod -a -G librenms www-data
+    usermod -a -G librenms apache
 
 ### Using HTTPd (Apache2) ###
 
