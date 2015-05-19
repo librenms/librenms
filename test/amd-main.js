@@ -7,7 +7,7 @@ require.config({
     baseUrl: '../src/',
     paths: {
         'QUnit': '../libs/qunit/qunit/qunit',
-        'jquery': '../libs/jquery/jquery',
+        'jquery': '../libs/jquery/dist/jquery',
         'gridster': 'jquery.gridster'
     },
     map: {
