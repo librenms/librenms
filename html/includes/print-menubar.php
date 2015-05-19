@@ -185,7 +185,8 @@ if ($_SESSION['userlevel'] >= '10')
   echo('
             <li role="presentation" class="divider"></li>
             <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>
-            <li><a href="delsrv/"><i class="fa fa-cog fa-col-info fa-fw fa-lg"></i> Delete Service</a></li>');
+            <li><a href="editsrv/"><i class="fa fa-cog fa-col-primary fa-fw fa-lg"></i> Edit Service</a></li>
+            <li><a href="delsrv/"><i class="fa fa-cog fa-col-danger fa-fw fa-lg"></i> Delete Service</a></li>');
 }
 ?>
           </ul>
