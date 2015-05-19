@@ -14,6 +14,7 @@ $current      = dbFetchCell("select count(*) from sensors WHERE sensor_class='cu
 $freqs        = dbFetchCell("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = ?", array($device['device_id']));
 $power        = dbFetchCell("select count(*) from sensors WHERE sensor_class='power' AND device_id = ?", array($device['device_id']));
 $dBm        = dbFetchCell("select count(*) from sensors WHERE sensor_class='dBm' AND device_id = ?", array($device['device_id']));
+$states       = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -30,6 +31,7 @@ if ($freqs) { $datas[] = 'frequency'; }
 if ($current) { $datas[] = 'current'; }
 if ($power) { $datas[] = 'power'; }
 if ($dBm) { $datas[] = 'dbm'; }
+if ($states) { $datas[] = 'state'; }
 
 $type_text['overview'] = "Overview";
 $type_text['charge'] = "Battery Charge";
@@ -45,6 +47,7 @@ $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 $type_text['dbm'] = "dBm";
+$type_text['state'] = "State";
 
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],

@@ -34,6 +34,8 @@ function poll_sensor($device, $class, $unit)
             sleep(1); # Give the TME some time to reset
           }
         }
+      } elseif ($class == "state") {
+          $sensor_value = trim(str_replace("\"", "", snmp_walk($device, $sensor['sensor_oid'], "-Oevq", "SNMPv2-MIB")));
       } else {
         if ($sensor['sensor_type'] == 'apc') {
             $sensor_value = trim(str_replace("\"", "", snmp_walk($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB:PowerNet-MIB$mib")));
