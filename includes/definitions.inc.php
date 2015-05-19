@@ -6,6 +6,8 @@
 #                 YES, THAT MEANS YOU                   #
 /////////////////////////////////////////////////////////
 
+umask(0002);
+
 $config['os']['default']['over'][0]['graph']       = "device_processor";
 $config['os']['default']['over'][0]['text']        = "Processor Usage";
 $config['os']['default']['over'][1]['graph']       = "device_mempool";
