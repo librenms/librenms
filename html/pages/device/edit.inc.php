@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] < '7')
   $panes['alert-rules'] = 'Alert Rules';
   $panes['modules']  = 'Modules';
 
-  if ($config['enable_services'])
+  if ($config['show_services'])
   {
     $panes['services'] = 'Services';
   }
