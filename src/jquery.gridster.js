@@ -1203,7 +1203,7 @@
 		isDOM || ($el = wgd.el);
 
 		var empty_upper_row = this.can_go_widget_up(wgd);
-		if (this.shift_widgets_up && empty_upper_row) {
+		if (this.options.shift_widgets_up && empty_upper_row) {
 			wgd.row = empty_upper_row;
 			$el.attr('data-row', empty_upper_row);
 			this.$el.trigger('gridster:positionchanged', [wgd]);

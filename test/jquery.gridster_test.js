@@ -233,6 +233,19 @@
 		deepEqual(serialized, output);
 	});
 
+	test('When Adding widgets rows static placement is supported', 2, function () {
+		var input = [{col: 6, row: 3, size_x: 1, size_y: 1}];
+		var grid = this.el.gridster().data('gridster');
+		grid.options.shift_widgets_up = false;
+		//remove any widgets from the html config
+		grid.remove_all_widgets();
+		//make sure we are empty
+		equal(grid.get_num_widgets(), 0, 'Clearing the widgets to prepare for tests');
+		grid.add_widget('<li />', input[0].size_x, input[0].size_y, input[0].col, input[0].row);
+		var serialized = grid.serialize();
+		deepEqual(serialized, input);
+	});
+
 	test('When Adding widgets cols are respected', 2, function () {
 		var input = [{col: 6, row: 1, size_x: 1, size_y: 1}];
 		var grid = this.el.gridster().data('gridster');
