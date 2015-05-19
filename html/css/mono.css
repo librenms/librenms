@@ -14,6 +14,10 @@
     color: #357ebd;
 }
 
+.fa-col-danger {
+    color: #e30613;
+}
+
 .twitter-typeahead .tt-hint {
     border-color: #000 !important;
 }

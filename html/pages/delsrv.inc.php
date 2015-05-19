@@ -37,7 +37,7 @@ if ($_SESSION['userlevel'] < '5')
       <div class='col-sm-5'>
       </div>
     </div>
-    <button type='submit' name='Submit' class='btn btn-default input-sm'>Delete</button>
+    <button type='submit' name='Submit' class='btn btn-danger input-sm'>Delete</button>
   </div>
 </form>");
 
