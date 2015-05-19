@@ -1887,7 +1887,7 @@
 	 * @return {Class} Returns the instance of the Gridster Class.
 	 */
 	fn.remove_empty_cells = function (col, row, size_x, size_y, exclude) {
-		/*var $nexts = this.widgets_below({
+		var $nexts = this.widgets_below({
 			col: col,
 			row: row,
 			size_x: size_x,
@@ -1896,10 +1896,8 @@
 
 
 		 $nexts.not(exclude).each($.proxy(function(i, widget) {
-		 console.log("from_remove")
 		 this.move_widget_up( $(widget), size_y );
 		 }, this));
-		 */
 
 		this.set_dom_grid_height();
 
@@ -2097,7 +2095,7 @@
 		isDOM || ($el = wgd.el);
 
 		var empty_upper_row = this.can_go_widget_up(wgd);
-		if (this.shift_widgets_up && empty_upper_row) {
+		if (this.options.shift_widgets_up && empty_upper_row) {
 			wgd.row = empty_upper_row;
 			$el.attr('data-row', empty_upper_row);
 			this.$el.trigger('gridster:positionchanged', [wgd]);
@@ -2184,6 +2182,9 @@
 	fn.update_widgets_dimensions = function () {
 		$.each(this.$widgets, $.proxy(function (idx, widget) {
 			var wgd = $(widget).coords().grid;
+			if (typeof (wgd) !== 'object') {
+				return;
+			}
 			var width = (wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
 			((wgd.size_x - 1) * this.options.widget_margins[0]));
 
@@ -2470,10 +2471,12 @@
 		this.$player.coords().grid.row = row;
 		this.$player.coords().grid.col = col;
 
+/*
 		var widgetsIncell = this.get_widgets_under_player();
 		if (widgetsIncell.length > 0) {
 			this.move_widget_down(widgetsIncell, this.placeholder_grid_data.size_y);
 		}
+*/
 
 		if (this.options.draggable.stop) {
 			this.options.draggable.stop.call(this, event, ui);
@@ -2882,7 +2885,7 @@
 				$overlapped_widgets.each($.proxy(function (i, w) {
 					var $w = $(w);
 
-					if ($gr.can_go_down($w)) {
+					if ($gr.can_go_down($w) && $w.coords().grid.row === $gr.player_grid_data.row) {
 						$gr.move_widget_down($w, $gr.player_grid_data.size_y);
 						$gr.set_placeholder(to_col, to_row);
 					}
@@ -2915,7 +2918,7 @@
 		/* if there is not widgets overlapping in the new player position,
 		 * update the new placeholder position. */
 		if (!$overlapped_widgets.length) {
-			if (this.shift_widgets_up) {
+			if (this.options.shift_widgets_up) {
 				var pp = this.can_go_player_up(this.player_grid_data);
 				if (pp !== false) {
 					to_row = pp;
