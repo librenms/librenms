@@ -15,16 +15,6 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group factory
-     */
-    public function testDefaultParams()
-    {
-        $client = ClientFactory::create(["adapter" => ["name" => "InfluxDB\\Adapter\\GuzzleAdapter"]]);
-
-        $this->assertNull($client->getFilter());
-    }
-
-    /**
-     * @group factory
      * @expectedException InvalidArgumentException
      */
     public function testInvalidAdapter()
@@ -95,7 +85,6 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group factory
-     * @group filters
      * @dataProvider getTcpAdapters
      */
     public function testCreateTcpClientWithFilter($adapter)
@@ -109,11 +98,6 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
                 "username" => "user",
                 "password" => "pass",
             ],
-            "filters" => [
-                "query" => [
-                    "name" => "InfluxDB\\Filter\\ColumnsPointsFilter",
-                ],
-            ],
         ];
 
         $client = ClientFactory::create($options);
@@ -123,7 +107,5 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("127.0.0.1", $client->getAdapter()->getOptions()->getHost());
         $this->assertEquals("user", $client->getAdapter()->getOptions()->getUsername());
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
-
-        $this->assertInstanceOf("InfluxDB\\Filter\\ColumnsPointsFilter", $client->getFilter());
     }
 }
