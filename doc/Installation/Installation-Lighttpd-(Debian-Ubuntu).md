@@ -39,6 +39,11 @@ Install necessary software.  The packages listed below are an all-inclusive list
 
     apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear php5-curl snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
 
+### Adding the librenms-user ###
+
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms www-data
+
 ### Cloning ###
 
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
@@ -81,7 +86,11 @@ To prepare the web interface (and adding devices shortly), you'll need to set up
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
-    chown www-data:www-data rrd/
+    chown www-data:www-data logs
+    chmod 775 rrd
+    chown librenms:librenms rrd
+
+> NOTE: If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 Next, add the following to `/etc/lighttpd/librenms.conf`
 
@@ -145,7 +154,7 @@ If the thread count needs to be changed, you can do so by editing the cron file 
 
 Create the cronjob
 
-    cp librenms.cron /etc/cron.d/librenms
+    cp librenms.nonroot.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 
