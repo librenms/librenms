@@ -240,6 +240,9 @@ function delete_device($id)
   $ret = '';
 
   $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
+  if( empty($host) ) {
+    return "No such host.";
+  }
 
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
@@ -260,7 +263,11 @@ function delete_device($id)
     }
   }
 
-  shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
+  $ex = shell_exec("bash -c '( [ ! -d ".trim($config['rrd_dir'])."/".$host." ] || rm -vrf ".trim($config['rrd_dir'])."/".$host." 2>&1 ) && echo -n OK'");
+  $tmp = explode("\n",$ex);
+  if( $tmp[sizeof($tmp)-1] != "OK" ) {
+    $ret .= "Could not remove files:\n$ex\n";
+  }
 
   $ret .= "Removed device $host\n";
   return $ret;
