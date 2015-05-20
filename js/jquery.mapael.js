@@ -317,12 +317,12 @@
 			options.text.attrs["text-anchor"] = textPosition.textAnchor;
 			elem.textElem = paper.text(textPosition.x, textPosition.y, options.text.content).attr(options.text.attrs);
 			$.fn.mapael.setHoverOptions(elem.textElem, options.text.attrs, options.text.attrsHover);
-			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem, elem.textElem);
+			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			$(elem.textElem.node).attr("data-id", id);
 		} else {
-			$.fn.mapael.setHover(paper, elem.mapElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem);
+			$.fn.mapael.setHover(paper, elem.mapElem);
 		}
 		
 		// Init the tooltip
