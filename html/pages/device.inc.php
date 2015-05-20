@@ -353,7 +353,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     if ($device_config_file)
     {
       echo('<li class="' . $select['showconfig'] . '">
-    <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'/">
+    <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
       <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
     </a>
   </li>');
