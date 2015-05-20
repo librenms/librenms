@@ -124,6 +124,10 @@ Transports are located within `$config['install_dir']/includes/alerts/transports
 Contacts will be gathered automatically and passed to the configured transports.  
 The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.  
 At the moment LibreNMS only supports Port or Device permissions.  
+You can exclude the `SysContact` by setting:
+```php
+$config['alert']['syscontact'] = false;
+```
 To include users that have `Global-Read` or `Administrator` permissions it is required to add these additions to the `config.php` respectively:
 ```php
 $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
