@@ -176,10 +176,10 @@ First, create and chown the `rrd` directory and create the `logs` directory
     # For Nginx:
     chown nginx:nginx logs
 
-    chmod 775 rrd
+    chmod 777 rrd
     chown librenms:librenms rrd
 
-> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
+> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 777 and chown'ed to librenms:librenms.
 
 Start the web-server:
 

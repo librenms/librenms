@@ -6,7 +6,7 @@
 #                 YES, THAT MEANS YOU                   #
 /////////////////////////////////////////////////////////
 
-umask(0002);
+umask(0000);
 
 $config['os']['default']['over'][0]['graph']       = "device_processor";
 $config['os']['default']['over'][0]['text']        = "Processor Usage";

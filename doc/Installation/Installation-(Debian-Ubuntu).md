@@ -87,11 +87,11 @@ First, create and chown the `rrd` directory and create the `logs` directory:
 
     mkdir rrd logs
     chown www-data:www-data logs
-    chmod 775 rrd
+    chmod 777 rrd
     chown librenms:librenms rrd
 
 > NOTE: If you're not running Ubuntu or Debian, you will need to change `www-data` to the user and group which run the Apache web server.
-> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
+> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 777 and chown'ed to librenms:librenms.
 
 Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
 
