@@ -122,7 +122,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
 	echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
 	echo "<td><i>#".((int) $rulei++)."</i></td>";
         echo "<td>".$rule['name']."</td>";
-        echo "<td>";
+        echo "<td class='col-sm-4'>";
         if($rule_extra['invert'] === true) {
             echo "<strong><em>Inverted</em></strong> ";
         }
@@ -132,7 +132,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
         if($rule_extra['mute'] === true) {
             echo "<span class='glyphicon glyphicon-volume-off glyphicon-large text-primary' aria-hidden='true'></span></td>";
         }
-        echo "<td><small>Max: ".$rule_extra['count']."<br />Delay: ".$rule_extra['delay']."</small></td>";
+        echo "<td><small>Max: ".$rule_extra['count']."<br />Delay: ".$rule_extra['delay']."<br />Interval: ".$rule_extra['interval']."</small></td>";
         echo "<td>";
         if ($_SESSION['userlevel'] >= '10') {
             echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small'>";
