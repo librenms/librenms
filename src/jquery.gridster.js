@@ -399,8 +399,9 @@
 				size_x: size_x,
 				size_y: size_y
 			};
-
-			this.empty_cells(col, row, size_x, size_y);
+			if (this.options.avoid_overlapped_widgets) {
+				this.empty_cells(col, row, size_x, size_y);
+			}
 		}
 
 		var $w = $(html).attr({
@@ -529,44 +530,27 @@
 	 *  By default <code>size_x</code> is limited to the space available from
 	 *  the column where the widget begins, until the last column to the right.
 	 * @param {Number} [size_y] The number of rows that will occupy the widget.
-	 * @param {Boolean} [reposition] Set to false to not move the widget to
-	 *  the left if there is insufficient space on the right.
 	 * @param {Function} [callback] Function executed when the widget is removed.
 	 * @return {HTMLElement} Returns $widget.
 	 */
-	fn.resize_widget = function ($widget, size_x, size_y, reposition, callback) {
+	fn.resize_widget = function ($widget, size_x, size_y, callback) {
 		var wgd = $widget.coords().grid;
-		var col = wgd.col;
-		reposition !== false && (reposition = true);
-		var old_size_y = wgd.size_y;
-		var old_col = wgd.col;
-		var new_col = old_col;
 
 		size_x || (size_x = wgd.size_x);
 		size_y || (size_y = wgd.size_y);
 
-		//if (max_cols !== Infinity) {
-		//    size_x = Math.min(size_x, max_cols - col + 1);
-		//}
-
-		if (reposition && old_col + size_x - 1 > this.cols) {
-			var diff = old_col + (size_x - 1) - this.cols;
-			var c = old_col - diff;
-			new_col = Math.max(1, c);
+		//ensure the grid has the correct number of rows
+		if (!this.is_valid_row(wgd.row, size_y)){
+			this.add_faux_rows(Math.max(this.calculate_highest_row(wgd.row, size_y) - this.rows, 0));
 		}
 
-		//todo: check grid to see if we need to add row.
-		if (size_y > old_size_y) {
-			this.add_faux_rows(Math.max(size_y - old_size_y, 0));
-		}
-
-		var player_rcol = (col + size_x - 1);
-		if (player_rcol > this.cols) {
-			this.add_faux_cols(player_rcol - this.cols);
+		//ensure the grid has the correct number of cols
+		if (!this.is_valid_col(wgd.col, size_y)) {
+			this.add_faux_cols(Math.max(this.calculate_highest_row(wgd.col, size_x) - this.cols, 0));
 		}
 
 		var new_grid_data = {
-			col: new_col,
+			col: wgd.col,
 			row: wgd.row,
 			size_x: size_x,
 			size_y: size_y
@@ -903,20 +887,7 @@
 
 		$widget.removeClass('player-revert');
 
-		//update coords instance attributes
-		$widget.data('coords').update({
-			width: (new_wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
-			((new_wgd.size_x - 1) * this.options.widget_margins[0])),
-			height: (new_wgd.size_y * this.options.widget_base_dimensions[1] +
-			((new_wgd.size_y - 1) * this.options.widget_margins[1]))
-		});
-
-		$widget.attr({
-			'data-col': new_wgd.col,
-			'data-row': new_wgd.row,
-			'data-sizex': new_wgd.size_x,
-			'data-sizey': new_wgd.size_y
-		});
+		this.update_widget_dimensions($widget, new_wgd);
 
 		if (empty_cols.length) {
 			var cols_to_remove_holes = [
@@ -1187,7 +1158,6 @@
 		};
 	};
 
-
 	/**
 	 * Creates the grid coords object representing the widget an add it to the
 	 * mapped array of positions.
@@ -1235,6 +1205,7 @@
 		$el.data('coords').grid = wgd;
 
 		this.add_to_gridmap(wgd, $el);
+		this.update_widget_dimensions($el, wgd);
 
 		this.options.resize.enabled && this.add_resize_handle($el);
 
@@ -1269,16 +1240,30 @@
 	 * Update the width and height for a widgets coordinate data.
 	 *
 	 * @param {HTMLElement} $widget The widget to update.
-	 * @param {number} width The new width for this widget.
-	 * @param {number} height The new height for this widget.
+	 * @param wgd {Object} wgd Current widget grid data (col, row, size_x, size_y).
 	 * @method update_widget_dimensions
-	 * @return Returns the instance of the Gridster Class.
+	 * @return {Gridster} Returns the instance of the Gridster Class.
 	 */
-	fn.update_widget_dimensions = function ($widget, width, height) {
+	fn.update_widget_dimensions = function ($widget, wgd) {
+
+		var width = (wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
+		((wgd.size_x - 1) * this.options.widget_margins[0]));
+
+		var height = (wgd.size_y * this.options.widget_base_dimensions[1] +
+		((wgd.size_y - 1) * this.options.widget_margins[1]));
+
 		$widget.data('coords').update({
 			width: width,
 			height: height
 		});
+
+		$widget.attr({
+			'data-col': wgd.col,
+			'data-row': wgd.row,
+			'data-sizex': wgd.size_x,
+			'data-sizey': wgd.size_y
+		});
+
 		return this;
 	};
 
@@ -1295,13 +1280,7 @@
 			if (typeof (wgd) !== 'object') {
 				return;
 			}
-			var width = (wgd.size_x * (this.is_responsive() ? this.get_responsive_col_width() : this.options.widget_base_dimensions[0]) +
-			((wgd.size_x - 1) * this.options.widget_margins[0]));
-
-			var height = (wgd.size_y * this.options.widget_base_dimensions[1] +
-			((wgd.size_y - 1) * this.options.widget_margins[1]));
-
-			this.update_widget_dimensions($(widget), width, height);
+			this.update_widget_dimensions($(widget), wgd);
 		}, this));
 		return this;
 	};
@@ -1566,6 +1545,15 @@
 
 		this.$changed = this.$changed.add(this.$player);
 
+		// move the cells down if there is an overlap and we are in static mode
+		if (this.options.collision.wait_for_mouseup) {
+			this.for_each_cell_occupied(this.placeholder_grid_data, function (tcol, trow) {
+				if (this.is_widget(tcol, trow)) {
+					this.move_widget_down(this.is_widget(tcol, trow), this.placeholder_grid_data.size_y);
+				}
+			});
+		}
+
 		this.cells_occupied_by_player = this.get_cells_occupied(this.placeholder_grid_data);
 
 		var col = this.placeholder_grid_data.col;
@@ -1574,13 +1562,6 @@
 		this.set_cells_player_occupies(col, row);
 		this.$player.coords().grid.row = row;
 		this.$player.coords().grid.col = col;
-
-/* //TODO move the cells down if there is an overlap and we are in static mode
-		var widgetsIncell = this.get_widgets_under_player();
-		if (widgetsIncell.length > 0) {
-			this.move_widget_down(widgetsIncell, this.placeholder_grid_data.size_y);
-		}
-*/
 
 		if (this.options.draggable.stop) {
 			this.options.draggable.stop.call(this, event, ui);
@@ -1710,6 +1691,7 @@
 		}, this), 300);
 
 		this.set_dom_grid_width();
+		this.set_dom_grid_height();
 
 		if (this.options.max_cols === Infinity) {
 			this.drag_api.set_limits(this.cols * this.min_widget_width);
@@ -1940,7 +1922,6 @@
 			}
 			if ($gr.options.collision.wait_for_mouseup && $gr.drag_api.is_dragging){
 				//skip the swap and just 'move' the place holder
-				swap = true;
 				$gr.placeholder_grid_data.col = to_col;
 				$gr.placeholder_grid_data.row = to_row;
 
@@ -1964,7 +1945,7 @@
 				else if (!$gr.is_swap_occupied(wgd.col, outside_row, wgd.size_x, wgd.size_y) && !$gr.is_player_in(wgd.col, outside_row) && !$gr.is_in_queue(wgd.col, outside_row, $w)) {
 					swap = $gr.queue_widget(wgd.col, outside_row, $w);
 				}
-				else if ($gr.options.collision.wait_for_mouseup || (!$gr.is_swap_occupied(placeholder_cells.cols[0], placeholder_cells.rows[0], wgd.size_x, wgd.size_y) && !$gr.is_player_in(placeholder_cells.cols[0], placeholder_cells.rows[0]) && !$gr.is_in_queue(placeholder_cells.cols[0], placeholder_cells.rows[0], $w))) {
+				else if (!$gr.is_swap_occupied(placeholder_cells.cols[0], placeholder_cells.rows[0], wgd.size_x, wgd.size_y) && !$gr.is_player_in(placeholder_cells.cols[0], placeholder_cells.rows[0]) && !$gr.is_in_queue(placeholder_cells.cols[0], placeholder_cells.rows[0], $w)) {
 					swap = $gr.queue_widget(placeholder_cells.cols[0], placeholder_cells.rows[0], $w);
 				} else {
 					//in one last attempt we check for any other empty spaces
@@ -1994,14 +1975,6 @@
 
 			$gr.clean_up_changed();
 		}));
-
-
-		/* To show queued items in console
-		 for(var key in this.w_queue){
-		 console.log("key " +key);
-		 console.log(this.w_queue[key]);
-		 }
-		 */
 
 		//Move queued widgets
 		if (swap && this.can_placeholder_be_set(to_col, to_row, player_size_x, player_size_y)) {
@@ -2348,6 +2321,52 @@
 		return true;
 	};
 
+
+	/**
+	 * checks the grid to see if the desired column is a valid row in the config
+	 * @Param {Number} col number to check
+	 * @Param {Number} [size_y] optional number of columns in the offset
+	 * @Return {Boolean} true if the desire column exists in the grid.
+	 */
+	fn.is_valid_col = function (col, size_x) {
+		//if the grid is set to autogrow all cols are valid
+		if (this.options.max_cols === Infinity) {
+			return true;
+		}
+		return this.cols >= this.calculate_highest_col(col, size_x) ;
+	};
+
+	/**
+	 * checks the grid to see if the desired row is a valid row in the config
+	 * @Param {Number} row number to check
+	 * @Param {Number} [size_y] optional number of rows in the offset
+	 * @Return {Boolean} true if the desire row exists in the grid.
+	 */
+	fn.is_valid_row = function (row, size_y){
+		return  this.rows >= this.calculate_highest_row(row, size_y);
+	};
+
+	/**
+	 * extract out the logic to calculate the highest col the widget needs
+	 * in the grid in order to fit.  Based on the current row and desired size
+	 * @param {Number} col the column number of the current postiton of the widget
+	 * @param  {Number} [size_x] veritical size of the widget
+	 * @returns {number} highest col needed to contain the widget
+	 */
+	fn.calculate_highest_col = function (col, size_x) {
+		return col + (size_x || 1) - 1;
+	};
+
+	/**
+	 * extract out the logic to calculate the highest row the widget needs
+	 * in the grid in order to fit.  Based on the current row and desired size
+	 * @param {Number} row the row number of the current postiton of the widget
+	 * @param  {Number} [size_y] horizontal size of the widget
+	 * @returns {number} highest row needed to contain the widget
+	 */
+	fn.calculate_highest_row = function (row, size_y){
+		return row + (size_y || 1) - 1;
+	};
 
 	/**
 	 * Determines if the cell represented by col and row params is occupied.
@@ -2926,6 +2945,9 @@
 	 * @return {Boolean} Returns if the widget moved
 	 */
 	fn.move_widget_up = function ($widget, y_units) {
+		if (y_units === undefined){
+			return false;
+		}
 		var el_grid_data = $widget.coords().grid;
 		var actual_row = el_grid_data.row;
 		var moved = [];
@@ -3517,7 +3539,7 @@
 	 * @param col1 - col of upper left search
 	 * @param row1 - row of upper left search
 	 * @param col2 - col of lower right search
-	 * @param row2 - row of lower rigth search
+	 * @param row2 - row of lower right search
 	 * @returns {*|jQuery|HTMLElement} - a collection of the cells within the range
 	 */
 	fn.get_widgets_in_range = function (col1, row1, col2, row2) {
