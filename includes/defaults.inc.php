@@ -233,6 +233,7 @@ $config['alert'] = array(
 		'mail'  => false,                   //  E-Mail alerting
 		'irc'   => false,                   //  IRC Alerting
 	),
+	'syscontact' => true,                 //Issue to SysContact (or it's override)
 	'globals' => false,                   //Issue to global-read users
 	'admins' => false,                    //Issue to administrators
 	'default_only' => false,              //Only issue to default
