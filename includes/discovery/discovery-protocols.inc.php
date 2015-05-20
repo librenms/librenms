@@ -148,9 +148,8 @@ echo("OSPF Discovery: ");
 
 if ($config['autodiscovery']['ospf'] === TRUE) {
     echo "enabled\n";
-    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
+    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs` WHERE `device_id`=?", array($device['device_id'])) as $nbr) {
         $ip = $nbr['ospfNbrIpAddr'];
-        $device_id = $nbr['device_id'];
         if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
             echo("x");
             continue;
@@ -164,7 +163,7 @@ if ($config['autodiscovery']['ospf'] === TRUE) {
         if (isset($remote_device_id) && $remote_device_id > 0) {
             log_event("Device $name ($ip) autodiscovered through OSPF", $remote_device_id, 'system');
         } else {
-            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device_id, 'system');
+            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device['device_id'], 'system');
         }
     }
 } else {
