@@ -28,8 +28,9 @@ if ($device['os'] == "junos")
       } // End if checks
     } // End Foreach
   } // End if array
-    $srx_processors_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringCPUUsage", $srx_processors_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
 
+  $srx_processors_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringCPUUsage", $srx_processors_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
+  if ($debug) { print_r($processors_array); }
   if (is_array($srx_processors_array))
   {
     foreach ($srx_processors_array as $index => $entry)
