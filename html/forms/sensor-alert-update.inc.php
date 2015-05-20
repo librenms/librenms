@@ -14,6 +14,10 @@
 
 // FUA
 
+if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
+    dbUpdate(array('sensor_custom' => 'No'), 'sensors', '`sensor_id` = ?', array($_POST['sensor_id']));
+} else {
+
 if(!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']))
 {
   echo('error with data');
@@ -44,5 +48,6 @@ else
     echo('error');
     exit;
   }
+}
 }
 
