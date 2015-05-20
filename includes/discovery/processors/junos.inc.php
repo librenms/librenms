@@ -35,7 +35,7 @@ if ($device['os'] == "junos")
   {
     foreach ($srx_processors_array as $index => $entry)
     {
-      if ($index)
+      if (isset($index) && $index >= 0) 
       {
         $usage_oid = ".1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4." . $index;
         $descr = "CPU"; # No description in the table?
