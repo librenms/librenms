@@ -27,5 +27,6 @@ Contributors to LibreNMS:
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
+- Freddie Cash (fjwcash@gmail.com) (fjwcash)
 
 [1]: http://observium.org/ "Observium web site"
