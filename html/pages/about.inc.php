@@ -73,13 +73,18 @@ if ($callback_status == 1) {
 } else {
      $stats_checked = '';
 }
-$callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
+if (extension_loaded("curl")) {
+    $callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
+} else {
+    $callback = "PHP Curl module isn't installed, please install this, restart your web service and refresh this page.";
+}
 
 echo("
 <div class='table-responsive'>
     <table class='table table-condensed'>
       <tr>
-        <td colspan='4'><span class='bg-danger'>$callback</span></td>
+        <td colspan='4'><span class='bg-danger'>$callback</span><br />
+        Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
       <tr>");
 
 if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' && $callback_status != 2) {
