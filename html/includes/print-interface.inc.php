@@ -28,7 +28,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?", arr
   $mac = "<a href='" . generate_port_url($port, array('view' => 'macaccounting')) . "'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
 } else { $mac = ""; }
 
-echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='" . generate_port_url($port) . "/'\" style='cursor: pointer;'>
+echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='" . generate_port_url($port) . "'\" style='cursor: pointer;'>
          <td valign=top width=350>");
 echo("        <span class=list-large>
               " . generate_port_link($port, $port['ifIndex'] . ". ".$port['label']) . " $error_img $mac
