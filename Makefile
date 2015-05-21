@@ -45,4 +45,7 @@ vis:
 	$(GIT_SUBTREE) --prefix=lib/vis https://github.com/almende/vis.git master
 
 typeahead:
-	$(GIT_SUBTREE) -- prefix=lib/typeahead https://github.com/twitter/typeahead.js.git master
+	$(GIT_SUBTREE) --prefix=lib/typeahead https://github.com/twitter/typeahead.js.git master
+
+bonsai:
+	$(GIT_SUBTREE) --prefix=lib/bonsai https://github.com/shufgy/graphite-zoom-js.git master
