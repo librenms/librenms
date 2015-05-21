@@ -305,12 +305,17 @@
 		equal(grid.is_responsive(), true);
 	});
 
-	test('Gridster.sort_by_row_asc', function (assert) {
+	test('Gridster.sort_by_row_asc', 4, function (assert) {
 		var sorted = Gridster.sort_by_row_asc(this.serialization);
 
 		var result = pickup(sorted, 'name').join(',');
 		var expected = 'A,B,D,E,C';
-		assert.equal(result, expected);
+		//since the test data contains 3 #1, they could be in any order
+		ok( result.substring(0,5).indexOf('A') > -1, 'A is found in within the first 3 results');
+		ok( result.substring(0,5).indexOf('B') > -1, 'B is found in within the first 3 results');
+		ok( result.substring(0,5).indexOf('D') > -1, 'D is found in within the first 3 results');
+		//check the last to chars
+		equal( result.substring(6), expected.substring(6), 'E,C are the last two - In that order');
 	});
 
 	test('Gridster.sort_by_row_and_col_asc', function (assert) {
@@ -329,12 +334,17 @@
 		assert.equal(result, expected);
 	});
 
-	test('Gridster.sort_by_row_desc', function (assert) {
+	test('Gridster.sort_by_row_desc',4,  function (assert) {
 		var sorted = Gridster.sort_by_row_desc(this.serialization);
 
 		var result = pickup(sorted, 'name').join(',');
 		var expected = 'C,E,A,B,D';
-		assert.equal(result, expected);
+		//since the test data contains 3 #1, they could be in any order
+		ok( result.substring(4).indexOf('A') > -1, 'A is found in within the last 3 results');
+		ok( result.substring(4).indexOf('B') > -1, 'B is found in within the last 3 results');
+		ok( result.substring(4).indexOf('D') > -1, 'D is found in within the last 3 results');
+		//check the last to chars
+		equal( result.substring(0,3), expected.substring(0,3), 'C,E are the first two - In that order');
 	});
 
 	// errors
