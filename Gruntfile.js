@@ -132,6 +132,11 @@ module.exports = function(grunt) {
 		watch: {
 			files: ['libs/*.js', 'src/*.js', 'src/*.css', 'Gruntfile.js'],
 			tasks: ['concat', 'uglify', 'cssmin']
+		},
+		qunit: {
+			files: [
+				'test/jquery.gridster.html'
+			]
 		}
 	});
 
@@ -142,6 +147,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-qunit');
 	grunt.loadNpmTasks('grunt-contrib-yuidoc');
 	grunt.loadNpmTasks('grunt-bump');
 	grunt.loadNpmTasks('grunt-conventional-changelog');
@@ -149,7 +155,8 @@ module.exports = function(grunt) {
 
 	// Default task.
 	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'cssmin']);
-	grunt.registerTask('build', ['default']);
+	grunt.registerTask('build', ['default', 'qunit']);
+	grunt.registerTask('test', ['jshint','qunit']);
 	grunt.registerTask('docs', ['clean', 'build', 'yuidoc', 'copy:dist', 'gh-pages']);
 
 	grunt.registerTask('release:patch', ['build', 'bump-only:patch', 'build', 'docs', 'changelog']);
