@@ -199,31 +199,27 @@ if (!$auth)
 
   echo generate_graph_js_state($graph_array);
 
-?>
-
-<!-- Add the zoomBox for funky graph zooming -->
-<div id='zoomBox' style='position:absolute; overflow:hidden; left:0px;
-top:0px; width:0px; height:0px; visibility:visible; background:red;
-filter:alpha(opacity=50); -moz-opacity:0.5; -khtml-opacity:0.5;
-opacity:0.5'></div>
-<div id='zoomSensitiveZone' style='position:absolute; overflow:hidden;
-left:0px; top:0px; width:0px; height:0px; visibility:visible;
-cursor:crosshair; background:blue; filter:alpha(opacity=0); -moz-opacity:0;
--khtml-opacity:0; opacity:0' oncontextmenu='return false'></div>
-<STYLE MEDIA="print">
-/*Turn off the zoomBox*/
-div#zoomBox, div#zoomSensitiveZone {display: none}
-/*This keeps IE from cutting things off*/
-#why {position: static; width: auto}
-</STYLE>
-
-<?php
-
   echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
-  echo '<span class="graphiteGraph">';
+  echo '<div id="timepopup" style="position:absolute; display:none; z-index:1000;background:#FFFCBC;border:1px solid #c0c0c0"></div>';
+  echo "<div id='zoomBox' style='position:absolute; overflow:none; left:0px; top:0px; width:0px; height:0px; border:1px dashed #000; display:none; background:red; filter:alpha(opacity=50); -moz-opacity:0.5; -khtml-opacity:0.5; opacity:0.5'></div>";
+  $graph_array['zoom'] = 'enabled';
   echo(generate_graph_tag($graph_array));
-  echo '<input type="submit" value="Zoom me" onClick="initBonsai(\'317330dc6337227faa5df8dd149c344b\')">';
-  echo '</span>';
+    echo "<script>
+             var img_src = $('#317330dc6337227faa5df8dd149c344b').attr('src');
+             var from = getUrlParameter('from',img_src);
+             var to = getUrlParameter('to',img_src);
+             initGraph($('#317330dc6337227faa5df8dd149c344b'),'graph.php?device='+img_src,from,to);
+
+                $('#reset1').click(function(){reset($('#zoomGraphImage1'));return false});
+
+                $('#refresh_graphs').click(function(){
+                        var graph_type= $('#alt-graph').val();
+
+                        initGraph($('#zoomGraphImage1'),'show_new_image.php?sid=22674&type='+graph_type,-86400,-300);
+                        reset($('#zoomGraphImage1'));
+                        return false;
+                });
+  </script>";
   echo("</div>");
 
   if (isset($config['graph_descr'][$vars['type']]))
