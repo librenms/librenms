@@ -88,6 +88,9 @@ function IssueAlert($alert) {
 		return true;
 	}
 	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
+	if( $config['alert']['fixed-contacts'] == false ) {
+		$alert['details']['contacts'] = GetContacts($alert['details']['rule']);
+	}
 	$obj = DescribeAlert($alert);
 	if( is_array($obj) ) {
 		$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');

@@ -239,6 +239,7 @@ $config['alert'] = array(
 	'default_only' => false,              //Only issue to default
 	'default_mail' => '',                 //Default email
 	'tolerance-window' => 10,             //Allow +/-10s tolerance to delay values to counter cron-irregularities
+	'fixed-contacts' => true,             //If true any changes in user-permissions,user-mail,syscontact,default-mail will not be honoured until the next alert triggers.
 );
 
 //Legacy options
