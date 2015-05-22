@@ -33,6 +33,11 @@ if(is_admin() !== false) {
             <input type="hidden" name="alert_id" id="alert_id" value="">
             <input type="hidden" name="type" id="type" value="create-alert-item">
         <div class="form-group">
+            <div class="col-sm-12">
+                <span id="ajax_response"></span>
+            </div>
+        </div>
+        <div class="form-group">
                 <label for='entity' class='col-sm-3 control-label'>Entity: </label>
                 <div class="col-sm-5">
                         <input type='text' id='suggest' name='entity' class='form-control' placeholder='I.e: devices.status'/>
@@ -329,18 +334,19 @@ $('#rule-submit').click('', function(e) {
         url: "/ajax_form.php",
         data: $('form.alerts-form').serialize(),
         success: function(msg){
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-            $("#create-alert").modal('hide');
             if(msg.indexOf("ERROR:") <= -1) {
+                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                $("#create-alert").modal('hide');
                 $('#response').data('tagmanager').empty();
                 setTimeout(function() {
                     location.reload(1);
                 }, 1000);
+            } else {
+                $('#ajax_response').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             }
         },
         error: function(){
-            $("#message").html('<div class="alert alert-info">An error occurred creating this alert.</div>');
-            $("#create-alert").modal('hide');
+            $("#ajax_response").html('<div class="alert alert-info">An error occurred creating this alert.</div>');
         }
     });
 });
