@@ -1,21 +1,21 @@
 CISCOSB-HWENVIROMENT DEFINITIONS ::= BEGIN
 
 IMPORTS
-    switch001                                         FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString           FROM SNMPv2-TC;
 
 rlEnv MODULE-IDENTITY
         LAST-UPDATED "200309210000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "The private MIB module definition for environment of CISCOSB devices."
@@ -61,6 +61,42 @@ RlEnvMonState ::= TEXTUAL-CONVENTION
                         notFunctioning(6)
                 }
 
+RlEnvMonDirection ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the state of a device being monitored.
+                 Valid values are:
+
+                 unKnown(1):        if the board not support air flow direction.
+
+                 frontToBack(2):    the air flow direction of the fan is front to back.
+
+                 backToFront(3):    the air flow direction of the fan is back to front.
+
+                 clockwise(4):      the air flow direction of the fan is clock wise
+
+                 unClockwise(5):    the air flow direction of the fan is unclock wise
+
+                 insideOutside(6):  the air flow direction of the fan is inside outside
+
+                 outsideInside(7):  the air flow direction of the fan is outside inside
+
+                 rightToLeft(8):    the air flow direction of the fan is from right to left
+
+                 leftToRight(9):    the air flow direction of the fan is from left to right
+
+                "
+        SYNTAX  INTEGER {
+                        unKnown(1),
+                        frontToBack(2),
+                        backToFront(3),
+                        clockwise(4),
+                        unClockwise(5),
+                        insideOut(6),
+                        outsideIn(7),
+                        rightToLeft(8),
+                        leftToRight(9)
+                }
 
 rlEnvPhysicalDescription OBJECT IDENTIFIER ::= { rlEnv 1 }
 
@@ -150,7 +186,8 @@ RlEnvMonSupplyStatusEntry ::=
                 rlEnvMonSupplyStatusIndex    INTEGER ,
                 rlEnvMonSupplyStatusDescr    DisplayString,
                 rlEnvMonSupplyState          RlEnvMonState,
-                rlEnvMonSupplySource         INTEGER
+                rlEnvMonSupplySource         INTEGER,
+                rlEnvMonSupplyFanDirection   RlEnvMonDirection
         }
 
 rlEnvMonSupplyStatusIndex OBJECT-TYPE
@@ -206,7 +243,15 @@ rlEnvMonSupplySource OBJECT-TYPE
                 "
         ::= { rlEnvMonSupplyStatusEntry 4 }
 
+rlEnvMonSupplyFanDirection OBJECT-TYPE
+        SYNTAX     RlEnvMonDirection
+        MAX-ACCESS read-only
 
+        STATUS     current
+        DESCRIPTION
+                "The direction of the power supply's fan."
+        ::= { rlEnvMonSupplyStatusEntry 5 }
+        
 rlEnvFanData OBJECT IDENTIFIER ::= { rlEnv 5 }
 
 rlEnvFanDataTable OBJECT-TYPE
@@ -231,7 +276,8 @@ RlEnvFanDataEntry ::= SEQUENCE {
     rlEnvFanDataTemp           INTEGER,
     rlEnvFanDataSpeed          INTEGER,
     rlEnvFanDataOperLevel      INTEGER,
-    rlEnvFanDataAdminLevel     INTEGER
+    rlEnvFanDataAdminLevel     INTEGER,
+    rlEnvFanDataDirection      RlEnvMonDirection
 }
 
 rlEnvFanDataStackUnit OBJECT-TYPE
@@ -274,6 +320,14 @@ rlEnvFanDataAdminLevel OBJECT-TYPE
         "Configured fan speed level"
     ::= { rlEnvFanDataEntry 5 }
 
+rlEnvFanDataDirection OBJECT-TYPE
+        SYNTAX     RlEnvMonDirection
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The direction of the system's fan."
+        ::= { rlEnvFanDataEntry 6 }
 
 END
 

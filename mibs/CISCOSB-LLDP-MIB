@@ -33,15 +33,15 @@ IMPORTS
 
 rlLldp MODULE-IDENTITY
          LAST-UPDATED "200506200000Z"
-		 ORGANIZATION "Cisco Small Business"
+         ORGANIZATION "Cisco Systems, Inc."
 
-		 CONTACT-INFO
-		 "Postal: 170 West Tasman Drive
-		 San Jose , CA 95134-1706
-		 USA
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
 
-		 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "This private MIB module adds MIBs to LLDP (Link Layer Discovery Protocol)."
@@ -711,8 +711,21 @@ rlLldpRemTtl OBJECT-TYPE
             "This object contains the remote device Time To Live LLDP TLV."
     ::= { rlLldpRemTtlEntry 1 }
 
+rlLldpChassisIdSubtype OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    macAddress(4),
+                    local(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The type of encoding used to identify the chassis
+            associated with the local system."
 
-
+    REFERENCE
+            "IEEE 802.1AB-2004 9.5.2.2"
+    DEFVAL  { macAddress }
+    ::= { rlLldpConfig 5 }
 
 
 END

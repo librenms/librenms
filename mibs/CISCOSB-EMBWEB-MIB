@@ -6,21 +6,21 @@ CISCOSB-EMBWEB-MIB DEFINITIONS ::= BEGIN
 -- Date:                 28 Sep 2006
 
 IMPORTS
-    switch001                                     FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     OBJECT-TYPE, MODULE-IDENTITY, IpAddress FROM SNMPv2-SMI
     TruthValue, DisplayString, RowStatus    FROM SNMPv2-TC;
 
 rlEmbWeb MODULE-IDENTITY
          LAST-UPDATED "200607030000Z"
-		 ORGANIZATION "Cisco Small Business"
+         ORGANIZATION "Cisco Systems, Inc."
 
-		 CONTACT-INFO
-		 "Postal: 170 West Tasman Drive
-		 San Jose , CA 95134-1706
-		 USA
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
 
-		 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "This private MIB module adds MIBs to EMBWEB (Embedded Web Server)."

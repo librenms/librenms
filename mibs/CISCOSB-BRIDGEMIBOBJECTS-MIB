@@ -6,26 +6,66 @@ CISCOSB-BRIDGEMIBOBJECTS-MIB DEFINITIONS ::= BEGIN
 -- Date:                 15-Jan-2007
 
 IMPORTS
-    switch001                                                             FROM CISCOSB-MIB
+    switch001                                                        FROM CISCOSB-MIB
     OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Counter32               FROM SNMPv2-SMI
     TruthValue, DisplayString, RowStatus                             FROM SNMPv2-TC
     Counter                                                          FROM RFC1155-SMI
-    BridgeId, Timeout, dot1dBasePort                                 FROM BRIDGE-MIB
+    BridgeId, Timeout, dot1dBasePort,dot1dStpPort                    FROM BRIDGE-MIB
     InterfaceIndex, ifIndex                                          FROM IF-MIB
     PortList                                                         FROM Q-BRIDGE-MIB
     SnmpAdminString                                                  FROM SNMP-FRAMEWORK-MIB;
 
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+VlanList1 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        vlans, with the first octet specifying vlan 1 through
+        8, the second octet specifying vlan 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered vlan, and the least significant bit
+        represents the highest numbered vlan.  Thus, each vlan
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that vlan is included in the set of vlans; the vlan
+        is not included if its bit has a value of '0'.
+        VlanList1 represent vlans 1-1024"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList2 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 1025-2048"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList3 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 2049-3072"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList4 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 3073-4094"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+
+
 rlpBridgeMIBObjects MODULE-IDENTITY
                 LAST-UPDATED "200701020000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines bridge MIB objects private MIBs."
@@ -926,6 +966,51 @@ rldot1dStpSeparatedBridgesAutoConfig OBJECT-TYPE
     DEFVAL { false }
     ::= { rldot1dStpSeparatedBridges 3 }
 
+
+rldot1dStpDisabledPortStateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF Rldot1dStpDisabledPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Define stp port state for each stp disabled interface.
+      This is auxiliary MIB emulates stp enabled port behaviour in ASIC for stp disabled port.
+      The MIB contains only stp disabled ports entries "
+    ::=  { rldot1dStp 26 }
+
+rldot1dStpDisabledPortStateEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpDisabledPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Defines the contents of each line in the rldot1dStpDisabledPortStateTable table."
+    INDEX  { dot1dStpPort }
+    ::=  { rldot1dStpDisabledPortStateTable 1 }
+
+Rldot1dStpDisabledPortStateEntry ::= SEQUENCE {
+    rldot1dStpDisabledPortState        INTEGER
+
+}
+
+
+rldot1dStpDisabledPortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                blocking(2),
+                listening(3),
+                learning(4),
+                forwarding(5)
+
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The port's stp state as defined by  external
+            application .  This state controls what action a port takes on
+            reception of a frame."
+
+    DEFVAL {forwarding}
+    ::= { rldot1dStpDisabledPortStateEntry 1 }
+
+
 rldot1dExtBase  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 3 }
 
 rldot1dExtBaseMibVersion OBJECT-TYPE
@@ -962,6 +1047,9 @@ rldot1dDeviceCapabilities OBJECT-TYPE
          Capabilities that are allowed on a per-port basis are
          indicated in dot1dPortCapabilities."
     ::= { rldot1dExtBase 2 }
+
+
+
 
 rldot1wRStp  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 4 }
 
@@ -1153,6 +1241,10 @@ rldot1pPriorityMapStatus OBJECT-TYPE
     DESCRIPTION
         "The status of the  table entry. It's used to delete an entry"
     ::= { rldot1pPriorityMapEntry 5 }
+
+
+
+
 
 rldot1sMstp  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 6 }
 
@@ -1878,10 +1970,10 @@ rldot1sMstpInstanceVlanEntry OBJECT-TYPE
 
 Rldot1sMstpInstanceVlanEntry::= SEQUENCE {
         rldot1sMstpInstanceVlanId             INTEGER,
-        rldot1sMstpInstanceVlanId1To1024      OCTET STRING,
-        rldot1sMstpInstanceVlanId1025To2048   OCTET STRING,
-        rldot1sMstpInstanceVlanId2049To3072   OCTET STRING,
-        rldot1sMstpInstanceVlanId3073To4094   OCTET STRING
+        rldot1sMstpInstanceVlanId1To1024      VlanList1,
+        rldot1sMstpInstanceVlanId1025To2048   VlanList2,
+        rldot1sMstpInstanceVlanId2049To3072   VlanList3,
+        rldot1sMstpInstanceVlanId3073To4094   VlanList4
     }
 
 rldot1sMstpInstanceVlanId OBJECT-TYPE
@@ -1893,7 +1985,7 @@ rldot1sMstpInstanceVlanId OBJECT-TYPE
     ::= { rldot1sMstpInstanceVlanEntry 1 }
 
 rldot1sMstpInstanceVlanId1To1024 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList1
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
@@ -1901,7 +1993,7 @@ rldot1sMstpInstanceVlanId1To1024 OBJECT-TYPE
     ::= { rldot1sMstpInstanceVlanEntry 2 }
 
 rldot1sMstpInstanceVlanId1025To2048 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList2
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
@@ -1909,7 +2001,7 @@ rldot1sMstpInstanceVlanId1025To2048 OBJECT-TYPE
     ::= { rldot1sMstpInstanceVlanEntry 3 }
 
 rldot1sMstpInstanceVlanId2049To3072 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList3
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
@@ -1917,7 +2009,7 @@ rldot1sMstpInstanceVlanId2049To3072 OBJECT-TYPE
     ::= { rldot1sMstpInstanceVlanEntry 4 }
 
 rldot1sMstpInstanceVlanId3073To4094 OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(0..128))
+    SYNTAX  VlanList4
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
@@ -1947,6 +2039,9 @@ rldot1dTpAgingTimeMax OBJECT-TYPE
     REFERENCE
         "P802.1d/D9, July 14, 1989: Section 6.7.1.1.3"
     ::= { rldot1dTpAgingTime 2 }
+
+
+
 
 END
 

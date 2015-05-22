@@ -9,21 +9,21 @@ IMPORTS
     Unsigned32, IpAddress                       FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString, RowStatus
                                                 FROM SNMPv2-TC
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     InetAddressType, InetAddress                FROM INET-ADDRESS-MIB;
 
 
    rlSsh MODULE-IDENTITY
       LAST-UPDATED "200209300024Z"  -- September 30, 2002
-	  ORGANIZATION "Cisco Small Business"
+      ORGANIZATION "Cisco Systems, Inc."
 
-	  CONTACT-INFO
-	  "Postal: 170 West Tasman Drive
-	  San Jose , CA 95134-1706
-	  USA
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
 
-	  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-	  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
       DESCRIPTION
               "The MIB module describes the private MIB for SSH supported
@@ -495,6 +495,97 @@ rlSshServerSessionInetHMAC      OBJECT-TYPE
    DESCRIPTION  "Message authentication code used in this connection."
      ::=  { rlSshServerSessionInetTableEntry 8 }
 
+rlSshServerImportExportSelfKeyTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSshServerImportExportSelfKeyEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table can be used for 2 purposes:
+     1) Importing public/private key pair to serve as the device key when acting
+     as SSH server. This is done by setting entries to this table, according to
+     the specified format. When the last entry (footer) is set, the whole key
+     pair is checked and if valid, stored in CDB.
+     2) Exporting the device SSH server public/private key. This can be done by
+     performing GetNext operations on this table."
+    ::= { rlSshServer 8 }
+
+rlSshServerImportExportSelfKeyEntry  OBJECT-TYPE
+   SYNTAX RlSshServerImportExportSelfKeyEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSshServerImportExportSelfKeyAlgorithm,
+           rlSshServerImportExportSelfKeyFormat,
+           rlSshServerImportExportSelfKeyFragmentId}
+   ::= { rlSshServerImportExportSelfKeyTable 1 }
+
+RlSshServerImportExportSelfKeyEntry ::= SEQUENCE {
+  rlSshServerImportExportSelfKeyAlgorithm       RlSshPublicKeyAlgorithm,
+  rlSshServerImportExportSelfKeyFormat          INTEGER,
+  rlSshServerImportExportSelfKeyFragmentId      INTEGER,
+  rlSshServerImportExportSelfKeyFragmentText    OCTET STRING
+}
+
+rlSshServerImportExportSelfKeyAlgorithm   OBJECT-TYPE
+   SYNTAX RlSshPublicKeyAlgorithm
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Identifies the type of key pair."
+     ::=  { rlSshServerImportExportSelfKeyEntry  1 }
+
+rlSshServerImportExportSelfKeyFormat   OBJECT-TYPE
+   SYNTAX INTEGER {
+            uuencoded-format(1)
+           }
+
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Specifies the format of public/key pair. The following formats are
+    supported for import/export:
+    1) uuencoded_format - in this format both private and public key are in
+    uu-encoded format, and are seperated from one another by header and footer.
+    An example of the concateneation of all fragments in this format is:
+    -----BEGIN RSA PRIVATE KEY-----
+    tDaNkZZoCxXfkLLsLDlZ6T9H8U4Gz637eRV7BYBpapkidAxY1UG0/qgfKLPkbId4wzht6ArV9bE4fMtX
+    wSMOxL3q31pOmUdVhjbWYcgZQBDy1DjFSbuIEdP85c96B9bBE2nPv90mSvb/6j8R2NItT/KJeiYMtLtI
+    N3m6/zESKJGIrX0jP1RFDjVZSS5chSAFgB0egsLZEyOQn7jAqpX/x/easD2J6F/OjPXlJ9Hff2tMb3NU
+    QYyBoWH2J9IxhWB6Vo66R9Y04JGR18uL/rV2sMCtpg5ppkVTEpNTp9qE1yXocR2NmzUfNFap+GJ4IHj8
+    CzkVfmJM/kEWaJsYgHbAgLyRg4QVyelfobv1B71aQ+u1z9KGu/QajkWdR04OQfsGOL1CvU2LGYDcRjfH
+    jv+jl/UkDRRjoD9kt2WvouT+OL6esvKl0OJBqWbGNXg9TWv/VLtJIwgUno+MLaJuOM4Fh44+wpnqUXwQ
+    TFtBFc8pzt5BoOwbv9gXpicTkq4/+GhwXWXxSVFebKhnHAvKSLT+Ba7K7ZeR8EIIxbXdDNFOiS45R2KI
+    jxxXLXK44u6KGl5MygCKXUOFlJ+Zhgrq6ZH17z/RVJQ2CWqb5Ekn9GY3kH9QZ3mb4MDPfriWi2lHGXHY
+    JmJd4SLQhpBdnOS5tu84QmyU3dNbAdzghDsR+dEY/6g7Cn0kcVkeHNZ0H+mCZik5f6XBD8eplkk43bdR
+    FrkwTeAjwurGcKwdiKkR4DlfSq3DKssVBucTqUpqsKqPXLwTIL44rWKhEPXgGPB2XDG0VLvIRKkAgEGI
+    LNTwOm091Ro=
+    -----END RSA PRIVATE KEY-----
+
+    -----BEGIN RSA PUBLIC KEY-----
+    MIGHAoGBAOeIC9gRg3YaEGGMp3C00qNwLINAEDZV/J4BWM5WnWwCWZyHXDs2XiEmFu0ZONAD4gcT2f2f
+    NNfCBPye39VVuOkKQuSV0MLLX5800LZ4y1BNcPzPZHpnGaCzl7iAjhfj9MolzAh5VRjeiYt0t1um4dm+
+    q9A4BtfpJqDYxCW9uxd/AgEj
+    -----END RSA PUBLIC KEY-----
+    "
+     ::=  { rlSshServerImportExportSelfKeyEntry  2 }
+
+rlSshServerImportExportSelfKeyFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the key pair input/output."
+     ::=  { rlSshServerImportExportSelfKeyEntry  3 }
+
+rlSshServerImportExportSelfKeyFragmentText    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "A part of the readable text entry for the key pair input/output."
+     ::=  { rlSshServerImportExportSelfKeyEntry  4 }
+
 --
 -- SSH Server Scalars
 --
@@ -531,8 +622,7 @@ rlSshServerEnablePublicKeyAuthentication OBJECT-TYPE
         "If PK authentication is enabled, incoming SSH connections are
         authenticated using public key authentication (using
         rlSshServerAuthorizedUsersPublicKeyTable), before authenticating using
-        the router's standard AAA.  If disabled, SSH connections are only
-        authorized by the router's AAA component."
+        the router's standard AAA."
     ::= { rlSshServer 103 }
 
 rlSshServerRegenerateHostKey OBJECT-TYPE
@@ -544,13 +634,63 @@ rlSshServerRegenerateHostKey OBJECT-TYPE
         being regenerated.  The key size is host-specific."
     ::= { rlSshServer 104 }
 
+rlSshServerDefaultKeyFlag OBJECT-TYPE
+    SYNTAX  INTEGER {
+           rsa(1),
+           dsa(2),
+           all(3),
+           none(4)
+    }
+    MAX-ACCESS      read-only
+    STATUS current
+    DESCRIPTION
+        "This scalar indicates which of the SSH server keys are default keys
+         (automatically generated)."
+    ::= { rlSshServer 105 }
+    
+rlSshServerDeleteSelfKey OBJECT-TYPE
+    SYNTAX  RlSshPublicKeyAlgorithm
+    MAX-ACCESS      read-write
+    STATUS current
+    DESCRIPTION
+           "Setting to a value other than 'none' results in deleting the server self
+           key of the chosen type. As a result a default key may be created
+           (according to the MTSC..)"
+      ::= { rlSshServer 106 }    
+
+rlSshServerEnablePublicKeyAuthAutoLogin OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS current
+    DESCRIPTION
+        "If PK authentication is succesfull and AAA local DB method
+        is enabled for SSH line, the username is checked with AAA
+        local DB. If present, the user is authenticated automatically
+        without prompting for username or password."
+    ::= { rlSshServer 107 }
+
+rlSshServerEnablePasswordAuthentication OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS current
+    DESCRIPTION
+        "If password authentication is enabled, incoming SSH connections are
+        authenticated with username/password authentication using
+        the router's standard AAA."
+    ::= { rlSshServer 108 }
 --
 -- SSH Client Scalars
 --
 rlSshClient OBJECT IDENTIFIER ::= { rlSsh 3 }
 
 rlSshClientUserName OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(6..70))
+    SYNTAX      DisplayString(SIZE(1..70))
     MAX-ACCESS      read-write
     STATUS current
     DESCRIPTION
@@ -685,37 +825,31 @@ rlSshClientSelfPublicKeyFingerprint   OBJECT-TYPE
 
 rlSshClientAuthenticationMethod OBJECT-TYPE
     SYNTAX   INTEGER {
-        public-key(1),
-        password(2)
+        public-key-rsa(1),
+        public-key-dsa(2),
+        password(3)
     }
     MAX-ACCESS      read-write
     STATUS current
     DESCRIPTION
         "Specifies the global authentication method for SSH client. SSH client
          will apply this authentication method upon connecting to a remote server,
-         if no specific authentication method has been define for this operation."
+         if no specific authentication method has been defined for this operation."
     ::= { rlSshClient 5 }
 
 
 rlSshClientPassword OBJECT-TYPE
-    SYNTAX DisplayString(SIZE(0|6..70))
+    SYNTAX DisplayString(SIZE(0..70))
     MAX-ACCESS      read-write
     STATUS current
     DESCRIPTION
         "Specifies the global password for SSH client, to be used for 'password'
          authentication. SSH client will use this password during authentication
          phase (when connecting remote server), in case no specific password has
-         been specified for this operation. Note: in this case, if no global
-         password is configured, the default password to be used for this SCP
-         session is the username relevant for this session.
+         been specified for this operation.
          The value of this MIB must not contain charachters ':' or '@' (those
          are used to indicate parameters seperation in SCP copy).
-         GET operations on this MIB will result with an empty string, to keep
-         secrecy of the password. Also, password configuration is never exported
-         in the device configuration file.
-         The user can clear password configuration by setting this MIB to a 0
-         length string."
-    DEFVAL { "" }
+         Upon setting the password, its length must be in range 1-70."
     ::= { rlSshClient 6 }
 
 
@@ -776,7 +910,7 @@ rlSshClientPasswordChangeInetAddr     OBJECT-TYPE
      ::=  { rlSshClientPasswordChangeEntry  2 }
 
 rlSshClientPasswordChangeUsername   OBJECT-TYPE
-   SYNTAX DisplayString(SIZE(6..70))
+   SYNTAX DisplayString(SIZE(1..70))
    MAX-ACCESS read-write
    STATUS current
    DESCRIPTION
@@ -784,7 +918,7 @@ rlSshClientPasswordChangeUsername   OBJECT-TYPE
      ::=  { rlSshClientPasswordChangeEntry  3 }
 
 rlSshClientPasswordChangeOldPassword   OBJECT-TYPE
-   SYNTAX DisplayString(SIZE(0|6..70))
+   SYNTAX DisplayString(SIZE(0..70))
    MAX-ACCESS read-write
    STATUS current
    DESCRIPTION
@@ -794,7 +928,7 @@ rlSshClientPasswordChangeOldPassword   OBJECT-TYPE
      ::=  { rlSshClientPasswordChangeEntry  4 }
 
 rlSshClientPasswordChangeNewPassword   OBJECT-TYPE
-   SYNTAX DisplayString(SIZE(0|6..70))
+   SYNTAX DisplayString(SIZE(0..70))
    MAX-ACCESS read-write
    STATUS current
    DESCRIPTION
@@ -829,24 +963,14 @@ rlSshClientPasswordChangeFailureReason   OBJECT-TYPE
      field will contain the failure reason."
      ::=  { rlSshClientPasswordChangeEntry  7 }
 
-rlSshClientSavePassphraseForExportingKeys OBJECT-TYPE
-    SYNTAX DisplayString
+rlSshClientDeleteSelfKey OBJECT-TYPE
+    SYNTAX  RlSshPublicKeyAlgorithm
     MAX-ACCESS      read-write
     STATUS current
     DESCRIPTION
-        "A valid format for the value of this MIB should be:
-        public-key-algorithm:passphrase, while the passphrase length must be
-        in the range 8-96. For example: 'rsa:mypassphrase'.
-        The MIB should be set in order to be able to export a generated key
-        pair (by GET and GETNEXT on the MIB rlSshClientImportExportSelfKeyTable).
-        This MIB should be set after public/private key pair (of specified
-        algorithm) has been generated by setting the MIB rlSshClientRegenerateSelfKey.
-        Setting the MIB will cause the private key from the generated key pair
-        to be encrypted with the given passphrase.
-        The given passphrase will then be stored in FLASH.
-        If no appropriate key pair has been generated before, setting
-        this MIB will fail."
-    ::= { rlSshClient 8 }
+           "Setting to a value other than 'none' results in deleting the client self
+           key of the chosen type."
+      ::= { rlSshClient 8 }
 
 rlSshClientImportExportSelfKeyTable OBJECT-TYPE
    SYNTAX SEQUENCE OF RlSshClientImportExportSelfKeyEntry
@@ -855,13 +979,11 @@ rlSshClientImportExportSelfKeyTable OBJECT-TYPE
    DESCRIPTION
     "This table can be used for 2 purposes:
      1) Importing public/private key pair to serve as the device key when acting
-     as SSH client. This is done by setting entries to this table, and then
-     setting the MIB rlSshClientSaveImportedKeysWithPassphrase (see the
-     description of this MIB).
+     as SSH client. This is done by setting entries to this table, according to
+     the specified format. When the last entry (footer) is set, the whole key
+     pair is checked and if valid, stored in CDB.
      2) Exporting the device SSH client public/private key. This can be done by
-     performing GetNext operations on this table. The private key retreived will
-     be encoded with the passphrase given upon its creation/import, according to
-     the methods specified in rlSshClientImportExportSelfKeyFormat."
+     performing GetNext operations on this table."
     ::= { rlSshClient 9 }
 
 rlSshClientImportExportSelfKeyEntry  OBJECT-TYPE
@@ -892,7 +1014,7 @@ rlSshClientImportExportSelfKeyAlgorithm   OBJECT-TYPE
 
 rlSshClientImportExportSelfKeyFormat   OBJECT-TYPE
    SYNTAX INTEGER {
-            md5-3des-enc-private-public(1)
+            uuencoded-format(1)
            }
 
    MAX-ACCESS   not-accessible
@@ -900,8 +1022,8 @@ rlSshClientImportExportSelfKeyFormat   OBJECT-TYPE
    DESCRIPTION
     "Specifies the format of public/key pair. The following formats are
     supported for import/export:
-    1) md5_3des_enc_private_public - in this format the private key is encrypted
-    using 3des algorithm, using a key which is the MD5 digest of the key passphrase.
+    1) uuencoded_format - in this format both private and public key are in
+    uu-encoded format, and are seperated from one another by header and footer.
     An example of the concateneation of all fragments in this format is:
     -----BEGIN ENCRYPTED RSA PRIVATE KEY-----
     tDaNkZZoCxXfkLLsLDlZ6T9H8U4Gz637eRV7BYBpapkidAxY1UG0/qgfKLPkbId4wzht6ArV9bE4fMtX
@@ -941,36 +1063,96 @@ rlSshClientImportExportSelfKeyFragmentText    OBJECT-TYPE
     "A part of the readable text entry for the key pair input/output."
      ::=  { rlSshClientImportExportSelfKeyEntry  4 }
 
-rlSshClientSaveImportedKeysWithPassphrase OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS      read-write
-    STATUS current
-    DESCRIPTION
-        "A valid format for the value of this MIB should be:
-        public-key-algorithm:passphrase, while the passphrase length must be
-        in the range 8-96. For example: 'rsa:mypassphrase'.
-        This MIB should be set in order for the device to use an imported key
-        pair.
-        This MIB should be set after public/private key pair (of specified
-        algorithm) has been imported by setting the MIB
-        rlSshClientImportExportSelfKeyPairTable.
-        The private key given will then be decrypted using the
-        given passphrase, according to the format specified by
-        rlSshClientImportExportFormat. Then, the public and private key pair
-        will be saved to FLASH, as well as the passphrase.
-        If no appropriate key pair has been imported before, setting
-        this MIB will fail."
+
+rlSshClientRemoteServerPublicKeyFingerprintTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSshClientRemoteServerPublicKeyFingerprintEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "Table for storing fingerprints of remote servers public keys. It is used for
+     the purpose of server authentication. An entry can be inserted to this table
+     either explicitly by user configuration, or during copy operation, after
+     user's approval."
     ::= { rlSshClient 10 }
 
-rlSshClientDeleteSelfKey OBJECT-TYPE
-    SYNTAX  RlSshPublicKeyAlgorithm
+rlSshClientRemoteServerPublicKeyFingerprintEntry  OBJECT-TYPE
+   SYNTAX RlSshClientRemoteServerPublicKeyFingerprintEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSshClientRemoteServerFingerprintInetAddrType,
+           rlSshClientRemoteServerFingerprintInetAddr,
+           rlSshClientRemoteServerFingerprint }
+   ::= { rlSshClientRemoteServerPublicKeyFingerprintTable 1 }
+
+RlSshClientRemoteServerPublicKeyFingerprintEntry ::= SEQUENCE {
+  rlSshClientRemoteServerFingerprintInetAddrType  InetAddressType,
+  rlSshClientRemoteServerFingerprintInetAddr      InetAddress,
+  rlSshClientRemoteServerFingerprint              OCTET STRING,
+  rlSshClientRemoteServerFingerprintStatus        RowStatus
+}
+
+rlSshClientRemoteServerFingerprintInetAddrType   OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Remote server inet address type."
+     ::=  { rlSshClientRemoteServerPublicKeyFingerprintEntry  1 }
+
+rlSshClientRemoteServerFingerprintInetAddr     OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Remote server inet address."
+     ::=  { rlSshClientRemoteServerPublicKeyFingerprintEntry  2 }
+
+rlSshClientRemoteServerFingerprint     OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE(16))
+   MAX-ACCESS   read-create
+   STATUS current
+   DESCRIPTION
+    "Remote server fingerprint."
+     ::=  { rlSshClientRemoteServerPublicKeyFingerprintEntry  3 }
+
+rlSshClientRemoteServerFingerprintStatus     OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-create
+   STATUS current
+   DESCRIPTION
+    "Row status for this row."
+     ::=  { rlSshClientRemoteServerPublicKeyFingerprintEntry  4 }
+
+rlSshClientRemoteServersAuthenticationEnable OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enable(1),
+        disable(2)
+    }
     MAX-ACCESS      read-write
     STATUS current
     DESCRIPTION
-        "Setting to a value other than 'none' results in deleting the client self
-         key of the chosen type (from RAM and FLASH). In case this key has an
-         import/export passphrase, the passphrase will also be deleted (from
-         RAM and FLASH)."
-    ::= { rlSshClient 11 }
+     "Setting this field to 'enable' enables remote servers authentication.
+     As a result, while opening a session with a remote server, the fingerprint
+     of the remote server will be computed and looked for in the table
+     rlSshClientRemoteServerPublicKeyFingerprintTable. If an entry with the key
+     (server-inet-address, server-fingerprint) is found, the server is considered
+     authenticated. Otherwise, the server is not authenticated (unless the user
+     specifically approved this server can be trusted)."
+      ::= { rlSshClient 11 }
 
+rlSshClientDefaultKeyFlag OBJECT-TYPE
+    SYNTAX  INTEGER {
+           rsa(1),
+           dsa(2),
+           all(3),
+           none(4)
+    }
+    MAX-ACCESS      read-only
+    STATUS current
+    DESCRIPTION
+        "This scalar indicates which of the SSH client keys are default keys
+         (automatically generated)."
+    ::= { rlSshClient 12 }
 END

@@ -1,0 +1,51 @@
+CISCOSB-DHCPv6 DEFINITIONS ::= BEGIN
+
+-- Version:    7.60
+
+-- Date:       10-May-2012
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, IpAddress, Counter32                FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex                         FROM IF-MIB
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv6     FROM INET-ADDRESS-MIB -- RFC2851
+    switch001                                       FROM CISCOSB-MIB;
+
+rlDhcpv6 MODULE-IDENTITY
+        LAST-UPDATED "200604020000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for DHCP v6 features."
+        ::= { switch001  214}
+
+rlDhcpv6Common OBJECT IDENTIFIER ::= { rlDhcpv6 1}
+
+rlDhcpv6Client OBJECT IDENTIFIER ::= { rlDhcpv6 2}
+
+rlDhcpv6Relay OBJECT IDENTIFIER ::= { rlDhcpv6 3}
+
+------------------------------
+-- DHCP DUID
+------------------------------
+
+-- rlDhcpv6DuidEn --
+
+rlDhcpv6DuidEn OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(7..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rlDhcpv6Common 1 }
+
+END

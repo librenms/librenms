@@ -11,7 +11,7 @@ CISCOSB-BANNER-MIB DEFINITIONS ::= BEGIN
 -- -------------------------------------------------------------
 
 IMPORTS
-    switch001                                    FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     TEXTUAL-CONVENTION, RowStatus           FROM SNMPv2-TC
     SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
     EnabledStatus                           FROM P-BRIDGE-MIB
@@ -20,15 +20,15 @@ IMPORTS
 
  rlBanner MODULE-IDENTITY
           LAST-UPDATED "200803160000Z"
-		  ORGANIZATION "Cisco Small Business"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "The private MIB module definition for Banner displays messages in Cisco switching devices.
@@ -40,7 +40,6 @@ IMPORTS
                 "Initial revision."
           ::= { switch001 133 }
           --133 specifies the placement in switch001 (private MIBS) MIB tree
-
 
 
 -- -------------------------------------------------------------
