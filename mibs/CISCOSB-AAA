@@ -63,24 +63,25 @@ CISCOSB-AAA DEFINITIONS ::= BEGIN
 -- 21-Jun-2010 vkuk : system password global aging
 --                  rlAAACreationDateSystemPasswordLevel15
 IMPORTS
-    switch001, rlRadius,rlAAAEap                     FROM CISCOSB-MIB
+    switch001, rlRadius,rlAAAEap                      FROM CISCOSB-MIB
     Unsigned32, IpAddress,Counter32,
     MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
     TruthValue, RowStatus, DisplayString,
-    DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+    DateAndTime, TimeStamp,
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
     InetAddressType,InetAddress,InetAddressIPv6 FROM INET-ADDRESS-MIB; -- RFC2851
 
 rlAAA MODULE-IDENTITY
         LAST-UPDATED "201006210000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "The private MIB module definition for Authentication, Authorization and Accounting
@@ -112,7 +113,8 @@ RlAAAServiceType  ::= TEXTUAL-CONVENTION
       rlAAAServiceTypeHttp(2),
       rlAAAServiceTypeSsh(3),
       rlAAAServiceTypeHttps(4),
-      rlAAAServiceTypeSnmp(5)
+      rlAAAServiceTypeSnmp(5),
+      rlAAAServiceTypeSshPubkey(6)
 }
 
 RlAAALinePortType ::= TEXTUAL-CONVENTION
@@ -307,7 +309,9 @@ RlAAAMethodListEntry ::= SEQUENCE {
    rlAAAMethodType5                   RlAAAMethodtype,
    rlAAAMethodType6                   RlAAAMethodtype,
    rlAAAMethodType7                   RlAAAMethodtype,
-   rlAAAMethodListStatus              RowStatus
+   rlAAAMethodListStatus              RowStatus,
+   rlAAAAuthorizeEnable               INTEGER
+
 }
 
 rlAAAMethodListName OBJECT-TYPE
@@ -383,6 +387,12 @@ rlAAAMethodListStatus     OBJECT-TYPE
    DESCRIPTION       "method list status can be destroy or createAndGo"
    ::= { rlAAAMethodListEntry 9 }
 
+rlAAAAuthorizeEnable     OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "flag that indicates whether authorizatoin is enabled"
+   ::= { rlAAAMethodListEntry 10 }
 
 
 --
@@ -1247,7 +1257,7 @@ rlRadiusGlobalDefaultTimeout  OBJECT-TYPE
     ::= { rlRadius 2 }
 
 rlRadiusGlobalDefaultRetries  OBJECT-TYPE
-    SYNTAX INTEGER (1..10)
+    SYNTAX INTEGER (1..15)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1364,7 +1374,7 @@ rlRadiusServerTimeout  OBJECT-TYPE
     ::= { rlRadiusServerEntry 4 }
 
 rlRadiusServerRetries  OBJECT-TYPE
-    SYNTAX INTEGER (0..10)
+    SYNTAX INTEGER (0..15)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1490,7 +1500,8 @@ RlRadiusServerInetEntry ::= SEQUENCE {
     rlRadiusServerInetSource                        InetAddress,
     rlRadiusServerInetPriority                      INTEGER,
     rlRadiusServerInetStatus                        RowStatus,
-    rlRadiusServerInetUsage                         INTEGER
+    rlRadiusServerInetUsage                         INTEGER,
+    rlRadiusServerInetLastResponseTime              TimeStamp
 }
 
 rlRadiusServerInetAddressType OBJECT-TYPE
@@ -1543,7 +1554,7 @@ rlRadiusServerInetTimeout  OBJECT-TYPE
     ::= { rlRadiusServerInetEntry 5 }
 
 rlRadiusServerInetRetries  OBJECT-TYPE
-    SYNTAX INTEGER (0..10)
+    SYNTAX INTEGER (0..15)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1644,6 +1655,14 @@ rlRadiusServerInetUsage OBJECT-TYPE
     DEFVAL  { 3 }
     ::= { rlRadiusServerInetEntry 14 }
 
+rlRadiusServerInetLastResponseTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this server has response.
+            If there is no request to the server,  this object contains a zero value."
+    ::= { rlRadiusServerInetEntry 15 }
 
 rlRadiusGlobalIPv6DefaultSource  OBJECT-TYPE
     SYNTAX     InetAddressIPv6
@@ -1929,7 +1948,7 @@ rlTacacsServerSourceIpInterface OBJECT-TYPE
         "IP address of the interface to use with this server.
         A value of 0.0.0.0  for this object disables source
         address  specification. Value of 255.255.255.255 means that
-        rlTacacsGlobalDefaultSource will be used."
+        rlTacacsGlobalDefaultSourceIpInterface will be used."
     DEFVAL { '00000000'H }
     ::= { rlTacacsServerEntry 8 }
 
@@ -1951,6 +1970,175 @@ rlTacacsServerRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION        ""
     ::= { rlTacacsServerEntry 10 }
+
+
+rlTacacsGlobalDefaultSourceIPv6Interface  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the interface to use with TACACS+ server.
+        A NULL for this object disables source
+        address specification. This MIB is used if the value of the
+        field rlTacacsServerInetSourceInterface is 255.255.255.255."
+    DEFVAL { '0000000000000000'H }
+    ::= { rlTacacs 8 }
+
+
+rlTacacsServerInetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlTacacsServerInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the TACACS+
+        servers with which the cliient shares a secret."
+    ::= { rlTacacs 9 }
+
+rlTacacsServerInetEntry OBJECT-TYPE
+    SYNTAX RlTacacsServerInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a TACACS+
+        server with which the client shares
+        a secret."
+    INDEX      { rlTacacsServerInetAddressType, rlTacacsServerInetAddress }
+    ::= { rlTacacsServerInetTable 1 }
+
+RlTacacsServerInetEntry ::= SEQUENCE {
+    rlTacacsServerInetAddressType                   InetAddressType,
+    rlTacacsServerInetAddress                       InetAddress,
+    rlTacacsServerInetPortNumber                    INTEGER,
+    rlTacacsServerInetConnectionType                RlTacacsConnectionType,
+    rlTacacsServerInetConnectionStatus              RlTacacsConnectionStatus,
+    rlTacacsServerInetTimeout                       INTEGER,
+    rlTacacsServerInetUseGlobalDefaultKey           TruthValue,
+    rlTacacsServerInetKey                           DisplayString,
+    rlTacacsServerInetSourceInterfaceType           InetAddressType,
+    rlTacacsServerInetSourceInterface               InetAddress,
+    rlTacacsServerInetPriority                      INTEGER,
+    rlTacacsServerInetRowStatus                     RowStatus
+}
+
+rlTacacsServerInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of TACACS+ server reffered to
+         in this table entry .IPv6Z type is not supported."
+    ::= { rlTacacsServerInetEntry 1 }
+
+
+rlTacacsServerInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Inet Address address of the TACACS+ server
+        referred to in this table entry."
+    ::= { rlTacacsServerInetEntry 2 }
+
+rlTacacsServerInetPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The TCP port the client establishes connections with this server."
+    DEFVAL { 49 }
+    ::= { rlTacacsServerInetEntry 3 }
+
+rlTacacsServerInetConnectionType  OBJECT-TYPE
+    SYNTAX RlTacacsConnectionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies TCP connection type between device and TACACS+ server.
+        Either a single open connection between device and server
+        (rlTacacsSingleConnection), or open/close connection per
+        communication session (rlTacacsPerSessionConnection)."
+    DEFVAL { rlTacacsPerSessionConnection }
+    ::= { rlTacacsServerInetEntry 4 }
+
+rlTacacsServerInetConnectionStatus  OBJECT-TYPE
+    SYNTAX RlTacacsConnectionStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies status TCP connection type between device and TACACS+ server."
+    DEFVAL { rlTacacsConnected }
+    ::= { rlTacacsServerInetEntry 5 }
+
+rlTacacsServerInetTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this TACACS+ server to reply.
+        Value of 0 means that rlTacacsGlobalDefaultTimeout value is used."
+    DEFVAL  { 5 }
+    ::= { rlTacacsServerInetEntry 6 }
+
+rlTacacsServerInetUseGlobalDefaultKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlTacacsServerKey
+        is ignored and instead the value in the MIB
+        rlTacacsGlobalDefaultKey is used. Otherwise the value in
+        rlTacacsServerKey is used."
+    DEFVAL { false }
+    ::= { rlTacacsServerInetEntry 7 }
+
+rlTacacsServerInetKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Secret key to be shared with this TACACS+ server."
+    DEFVAL { "" }
+    ::= { rlTacacsServerInetEntry 8 }
+
+rlTacacsServerInetSourceInterfaceType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the interface to use with this server."
+    ::= { rlTacacsServerInetEntry 9 }
+
+rlTacacsServerInetSourceInterface OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inet address of the interface to use with this server.
+        A value of NULL for this object disables source
+        address specification for this server.
+        A value of 255.255.255.255 maens that the global default
+        rlTacacsGlobalDefaultSourceIpInterface or
+        rlTacacsGlobalDefaultSourceIPv6Interface values are used."
+    ::= { rlTacacsServerInetEntry 10 }
+
+rlTacacsServerInetPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the order in which the TACACS+ servers will be used,
+        when 0 is the highest priority. If more than one server share the
+        same priority - they will be used in lexicgoraphic order
+        (the order of entries in this table)."
+    DEFVAL  { 0 }
+    ::= { rlTacacsServerInetEntry 11 }
+
+rlTacacsServerInetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlTacacsServerInetEntry 12 }
 
 
 ---        AAA Login auditing control (SysLog)
@@ -2367,7 +2555,6 @@ rlAAASysPassStatPasswordExpieryDate OBJECT-TYPE
                      Otherwise zero size string"
   ::= { rlAAASysPassStatEntry 5 }
 
-
 ---        Number of failures before lock-out (1-5, 0 for disable)
 
 
@@ -2552,7 +2739,8 @@ RlAAAAccountingMethod  ::= TEXTUAL-CONVENTION
     DESCRIPTION    "Protocols, used for accounting."
     SYNTAX INTEGER {
         none(1),
-        radius(2)
+        radius(2),
+        tacacs(3)
 }
 
 rlAAAAccountingMngMethod OBJECT-TYPE
@@ -3125,5 +3313,19 @@ rlAAACreationDateSystemPasswordLevel15 OBJECT-TYPE
    DESCRIPTION       "The date on which the system Password for level 15 was created.
                       Otherwise zero size string"
    ::= { rlAAA 69 }
+
+---
+---   level 15 system password creation date
+---
+rlAAAPasswordRecoveryDisable OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "if this MIB is set to TRUE then when user will use 'password Recovery'
+                     to the device , the configuration will automatically be erased."
+   DEFVAL { false }
+   ::= { rlAAA 70 }
+
+
 
 END
