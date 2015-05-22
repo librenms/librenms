@@ -132,7 +132,7 @@ if(is_admin() !== false) {
         </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
+                        <button class="btn btn-success btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
                 </div>
         </div>
 </form>
@@ -366,11 +366,11 @@ $( "#suggest, #value" ).blur(function() {
         $("#value").closest('.form-group').addClass('has-error');
         $("#suggest").closest('.form-group').removeClass('has-error');
     } else {
-        $("#value").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').removeClass('has-error');
         $("#value").closest('.form-group').removeClass('has-error');
         $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
     }
-})
+});
 
 </script>
 
