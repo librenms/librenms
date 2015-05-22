@@ -8,7 +8,7 @@ CISCOSB-MNGINF-MIB DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-    switch001                                     FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,
     MODULE-IDENTITY                         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString,
@@ -17,15 +17,15 @@ IMPORTS
 
 rlMngInf MODULE-IDENTITY
          LAST-UPDATED "200309210000Z"
-		 ORGANIZATION "Cisco Small Business"
+         ORGANIZATION "Cisco Systems, Inc."
 
-		 CONTACT-INFO
-		 "Postal: 170 West Tasman Drive
-		 San Jose , CA 95134-1706
-		 USA
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
 
-		 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "The private MIB module definition for management access control."

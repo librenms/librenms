@@ -2,43 +2,534 @@ CISCOSB-DNSCL-MIB DEFINITIONS ::= BEGIN
 
 -- Title:                CISCOSB DNSCL Private Extension
 --                       This Private MIB supports the DNS Client for ROS
--- Version:              7.30
--- Date:                 24 Oct 2003
--- 30-May-2011  Added MODULE-IDENTITY
+-- Version:              7.60
+-- Date:                 20-May-2012
 
 
 
 IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,
+    IpAddress, Unsigned32, Integer32        FROM SNMPv2-SMI
     switch001                               FROM CISCOSB-MIB
     dnsResConfigSbeltEntry                  FROM DNS-RESOLVER-MIB
     DnsName, DnsType                        FROM DNS-SERVER-MIB
-    OBJECT-TYPE, IpAddress,
-    Unsigned32, Integer32                   FROM SNMPv2-SMI
     DisplayString, TEXTUAL-CONVENTION,
     TruthValue, RowStatus                   FROM SNMPv2-TC
-    dns, DnsName, DnsNameAsIndex, DnsClass, DnsType, DnsQClass,
-    DnsQType, DnsTime, DnsOpCode, DnsRespCode
-                                            FROM DNS-SERVER-MIB
-	InetAddress, InetAddressType            FROM INET-ADDRESS-MIB;
+    dns, DnsName, DnsNameAsIndex, DnsClass,
+    DnsType, DnsQClass, DnsQType, DnsTime,
+    DnsOpCode, DnsRespCode                  FROM DNS-SERVER-MIB
+    InetAddress, InetAddressType            FROM INET-ADDRESS-MIB
+    InterfaceIndex, ifIndex                 FROM IF-MIB;
+
+-------------------------------------------------------------------------------
+-- new MIBS definitions to support DHCPv6 --
+-------------------------------------------------------------------------------
 
 rlDnsCl MODULE-IDENTITY
-        LAST-UPDATED "201105300000Z"
-		ORGANIZATION "Cisco Small Business"
+      LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
-        DESCRIPTION
-             "The private MIB module definition for DNS Client."
-        REVISION "201105300000Z"
-        DESCRIPTION
-             "Initial revision."
-        ::= { switch001 93 }
+      DESCRIPTION
+              "The MIB module describes the private MIB for DNS supported
+               by CISCOSB's software and products."
+      REVISION     "201304010000Z"  -- April 1, 2013
+      DESCRIPTION
+              "Added MODULE-IDENTITY"
+      ::= { switch001 93  }
+      
+      
+-- domain name table
+rlDnsClv2DomainNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDnsClv2DomainNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "The domain names table for DNS client ver2."
+    ::= { rlDnsCl 14 }
+
+rlDnsClv2DomainNameEntry OBJECT-TYPE
+    SYNTAX RlDnsClv2DomainNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "The row definition for this table."
+    INDEX { rlDnsClv2DomainNameSource,
+            rlDnsClv2DomainNameIfIndex,
+            rlDnsClv2DomainNamePreference,
+            rlDnsClv2DomainNameName }
+    ::= { rlDnsClv2DomainNameTable 1 }
+
+RlDnsClv2DomainNameEntry ::= SEQUENCE {
+    rlDnsClv2DomainNameSource         INTEGER,
+    rlDnsClv2DomainNameIfIndex        InterfaceIndex,
+    rlDnsClv2DomainNamePreference     Integer32,
+    rlDnsClv2DomainNameName           DnsNameAsIndex,
+    rlDnsClv2DomainNameRowStatus      RowStatus
+}
+
+rlDnsClv2DomainNameSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        static(1),
+        dhcpv6(3),
+        dhcpv4(4)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The domain name source. 'static' if defined by user through CLI,
+        'dhcpv6' or 'dhcpv4' if received by DHCP network protocol."
+    DEFVAL  { static }
+    ::=   { rlDnsClv2DomainNameEntry 1 }
+
+rlDnsClv2DomainNameIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IfIndex from which the domain-name configuration was received,
+         for static entries, value will always be 1."
+    DEFVAL { 1 }
+    ::=   { rlDnsClv2DomainNameEntry 2 }
+
+rlDnsClv2DomainNamePreference OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This value identifies the preference of domain-name,
+         The lower the value, the more desirable the resolver considers this
+         domain-name in domain-search-list."
+    ::= { rlDnsClv2DomainNameEntry 3 }
+
+rlDnsClv2DomainNameName OBJECT-TYPE
+    SYNTAX DnsNameAsIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Domain-name name."
+    ::=   { rlDnsClv2DomainNameEntry 4 }
+
+rlDnsClv2DomainNameRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+         row installation and removal conventions."
+    ::= { rlDnsClv2DomainNameEntry 5 }
+--------------------------------------------------------------------------------
+-- DNS name-servers table
+--------------------------------------------------------------------------------
+rlDnsClv2ServersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDnsClv2ServersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The DNS servers table for DNS client ver2."
+    ::= { rlDnsCl 15 }
+
+rlDnsClv2ServersEntry OBJECT-TYPE
+    SYNTAX RlDnsClv2ServersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlDnsClv2ServersSource,
+            rlDnsClv2ServersIfIndex,
+            rlDnsClv2ServersPreference,
+            rlDnsClv2ServersAddrType ,
+            rlDnsClv2ServersInetAddr,
+            rlDnsClv2ServersSubTree,
+            rlDnsClv2ServersClass }
+    ::= { rlDnsClv2ServersTable 1 }
+
+RlDnsClv2ServersEntry ::= SEQUENCE {
+    rlDnsClv2ServersSource         INTEGER,
+    rlDnsClv2ServersIfIndex        InterfaceIndex,
+    rlDnsClv2ServersPreference     Integer32,
+    rlDnsClv2ServersAddrType       InetAddressType,
+    rlDnsClv2ServersInetAddr       InetAddress,
+    rlDnsClv2ServersSubTree        DnsNameAsIndex,
+    rlDnsClv2ServersClass          DnsClass,
+    rlDnsClv2ServersRowStatus      RowStatus
+}
+
+rlDnsClv2ServersSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        static(1),
+        dhcpv6(3),
+        dhcpv4(4)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The DNS servers source. Static if defined by user through CLI,
+         dhcpv6 or dhcpv4 if received by network protocol DHCPv6 or DHCPv4."
+    DEFVAL  { static }
+    ::=   { rlDnsClv2ServersEntry 1 }
+
+rlDnsClv2ServersIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IfIndex from which the DNS-server configuration was received,
+         for static entries, value will always be 1."
+    DEFVAL { 1 }
+    ::=   { rlDnsClv2ServersEntry 2 }
+
+rlDnsClv2ServersPreference OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This value identifies the preference for the name server
+         identified in this row of the table.  The lower the
+         value, the more desirable the resolver considers this
+         server."
+    ::=   { rlDnsClv2ServersEntry 3 }
+
+    rlDnsClv2ServersAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The address type of rlDnsClv2ServersInetAddr.  Only
+         IPv4, IPv4z, IPv6, and IPv6z addresses are expected, or
+         unknown(0) if datagrams for all local IP addresses are
+         accepted."
+   ::= { rlDnsClv2ServersEntry 4 }
+
+rlDnsClv2ServersInetAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the name server identified by
+         this row of the table."
+    ::= { rlDnsClv2ServersEntry 5 }
+
+rlDnsClv2ServersSubTree OBJECT-TYPE
+    SYNTAX DnsNameAsIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queries sent to the name server identified by this row
+         of the table are limited to those for names in the name
+         subtree identified by this variable.  If no such
+         limitation applies, the value of this variable is the
+         name of the root domain (a DNS name consisting of a
+         single zero octet)."
+    ::= { rlDnsClv2ServersEntry 6 }
+
+rlDnsClv2ServersClass OBJECT-TYPE
+    SYNTAX DnsClass
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The class of DNS queries that will be sent to the server
+         identified by this row of the table."
+    ::= { rlDnsClv2ServersEntry 7 }
+
+rlDnsClv2ServersRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+      "The row status variable, used according to
+      row installation and removal conventions."
+    ::= { rlDnsClv2ServersEntry 8 }
+
+--------------------------------------------------------------------------------
+-- DNS fixed addresses table
+--------------------------------------------------------------------------------
+rlDnsClv2FixedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDnsClv2FixedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Read-Only MIB for 'fixed' DNS names.
+         when a DNS entry is fixed, a refresh operation is invoked periodically,
+         to make sure the entry is kept 'warm' in the DNS cache.
+         if the refresh operation fails, the DNSCL will enter a polling state,
+         and will retry to resolve the entry again in constant intervals.
+         polling-interval duration for unresolved entries is configurable
+         by MIB scalar 'rlDnsClMinPollingInterval'."
+    ::= { rlDnsCl 16}
+
+rlDnsClv2FixedEntry OBJECT-TYPE
+    SYNTAX RlDnsClv2FixedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The row definition for this table."
+    INDEX { rlDnsClv2FixedName,
+            rlDnsClv2FixedType }
+    ::= { rlDnsClv2FixedTable 1 }
+
+RlDnsClv2FixedEntry ::= SEQUENCE {
+    rlDnsClv2FixedName          DnsNameAsIndex,
+    rlDnsClv2FixedType          DnsType,
+    rlDnsClv2FixedPrettyName    DnsName,
+    rlDnsClv2FixedState         INTEGER,
+    rlDnsClv2FixedCounter       Integer32,
+    rlDnsClv2FixedTTL           DnsTime,
+    rlDnsClv2FixedTTRefresh     DnsTime,
+    rlDnsClv2FixedTTPolling     DnsTime
+}
+
+rlDnsClv2FixedName OBJECT-TYPE
+    SYNTAX DnsNameAsIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "DNS name of FIXED domain name"
+    ::= { rlDnsClv2FixedEntry 1 }
+
+rlDnsClv2FixedType OBJECT-TYPE
+    SYNTAX DnsType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "requested type of Resource Record
+       for the current resolved fixed entry.
+       for e.g - A (IPv4), AAAA (IPv6)"
+    ::= { rlDnsClv2FixedEntry 2 }
+
+rlDnsClv2FixedPrettyName OBJECT-TYPE
+    SYNTAX DnsName
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Name of the RR at this row in the table.  This is
+       identical to the rlDnsClv2FixedName variable, except that
+       character case is preserved in this variable, per DNS
+       conventions."
+   REFERENCE
+       "RFC-1035 section 2.3.3."
+    ::= { rlDnsClv2FixedEntry 3 }
+
+rlDnsClv2FixedState OBJECT-TYPE
+    SYNTAX INTEGER {
+        init(1),
+        ready(2),
+        resolving(3),
+        refreshing(4),
+        polling(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "current state of fixed entry.
+       unresolved entries are in 'polling' state."
+    ::= { rlDnsClv2FixedEntry 4 }
+
+rlDnsClv2FixedCounter OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of 'fix' requests for this DNS name & type"
+    ::= { rlDnsClv2FixedEntry 5 }
+
+rlDnsClv2FixedTTL OBJECT-TYPE
+    SYNTAX DnsTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Remaining TTL of resolved fixed entry"
+    ::= { rlDnsClv2FixedEntry 6 }
+
+rlDnsClv2FixedTTRefresh OBJECT-TYPE
+    SYNTAX DnsTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Remaining time-to-refresh of resolved fixed entry"
+    ::= { rlDnsClv2FixedEntry 7 }
+
+rlDnsClv2FixedTTPolling OBJECT-TYPE
+    SYNTAX DnsTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Remaining polling-interval time of unresolved fixed entry"
+    ::= { rlDnsClv2FixedEntry 8 }
+
+--------------------------------------------------------------------------------
+-- Clear DNS action MIB
+--------------------------------------------------------------------------------
+rlDnsClv2ClearCacheTable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        staticOnly(1),
+        dynamicOnly(2),
+        all(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "action MIB for clearing DNS cache tables,
+        'static' option will clear all statically configured hostname-to-IP mappings,
+        'dynamic' option will clear both negative & positive cache from dynamic (DNS) entries,
+        'all' will clear all entries (static & dynamic) in static, positive & negative cache."
+    ::= { rlDnsCl 17 }
+
+--------------------------------------------------------------------------------
+-- DNS Read-Only Unified Cache Table
+--------------------------------------------------------------------------------
+rlDnsClv2UnifiedCacheTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDnsClv2UnifiedCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "Unified DNS Cache Table (static,dynamic & fixed entries).
+       This is a read-only MIB for presentation purposes."
+    ::= { rlDnsCl 18 }
+
+rlDnsClv2UnifiedCacheEntry OBJECT-TYPE
+    SYNTAX RlDnsClv2UnifiedCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The row definition for this table."
+    INDEX { rlDnsClv2UnifiedCacheName,     -- Hostname
+            rlDnsClv2UnifiedCacheSource,   -- Static/Dynamic/Fixed
+            rlDnsClv2UnifiedCacheState,    -- OK/NE/??
+            rlDnsClv2UnifiedCacheType,     -- NoResolution/IPv6/IPv4
+            rlDnsClv2UnifiedCacheIndex }
+    ::= { rlDnsClv2UnifiedCacheTable 1 }
+
+RlDnsClv2UnifiedCacheEntry ::= SEQUENCE {
+    -- keys
+    rlDnsClv2UnifiedCacheName               DnsNameAsIndex,
+    rlDnsClv2UnifiedCacheSource             INTEGER,   -- Static/Dynamic/Fixed
+    rlDnsClv2UnifiedCacheState              INTEGER,   -- OK/NE/??
+    rlDnsClv2UnifiedCacheType               INTEGER,
+    rlDnsClv2UnifiedCacheIndex              Integer32,
+    -- fields
+    rlDnsClv2UnifiedCacheInetAddrType       InetAddressType,
+    rlDnsClv2UnifiedCacheInetAddr           InetAddress,
+    rlDnsClv2UnifiedCacheTTL                DnsTime,
+    rlDnsClv2UnifiedCacheRemainingTTL       DnsTime,
+    rlDnsClv2UnifiedCachePrettyName         DnsName
+}
+
+-- keys:
+rlDnsClv2UnifiedCacheName OBJECT-TYPE
+    SYNTAX DnsNameAsIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The requested domain name"
+    ::= { rlDnsClv2UnifiedCacheEntry 1 }
+
+rlDnsClv2UnifiedCacheSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        static(1),
+        dynamic(2),
+        fixed(3)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The cache entry source (static/dynamic/fixed)."
+    ::= { rlDnsClv2UnifiedCacheEntry 2 }
+
+rlDnsClv2UnifiedCacheState OBJECT-TYPE
+    SYNTAX INTEGER {
+        ok(1), -- positive,
+        ne(2), -- negative
+        un(3)  -- unresolved
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The state of the current cache entry"
+    ::= { rlDnsClv2UnifiedCacheEntry 3 }
+
+rlDnsClv2UnifiedCacheType OBJECT-TYPE
+    SYNTAX INTEGER {
+        ipv6(1),
+        ipv4(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "IP address type of the Resource Record in the cache which is
+       identified in this row of the table.
+       for negative/unresolved entries the 'noResolution' value is returned."
+    ::= { rlDnsClv2UnifiedCacheEntry 4 }
+
+rlDnsClv2UnifiedCacheIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "A value which makes entries in the table unique when the
+       other index values do not provide a unique index."
+    ::= { rlDnsClv2UnifiedCacheEntry 5 }
+
+-- fields :
+rlDnsClv2UnifiedCacheInetAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "The INET address type of rlDnsClv2UnifiedCacheInetAddr,
+       for e.g IPv4, IPv6, IPv6z or UNKNOWN"
+    ::= { rlDnsClv2UnifiedCacheEntry 6 }
+
+rlDnsClv2UnifiedCacheInetAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Resolved IP Address of given Domain-Name"
+    ::= { rlDnsClv2UnifiedCacheEntry 7 }
+
+rlDnsClv2UnifiedCacheTTL OBJECT-TYPE
+    SYNTAX DnsTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Time-To-Live of RR in DNS cache.  This is the initial
+       TTL value which was received with the RR when it was originally received.
+       for unresolved entries, will return the polling interval instead of TTL"
+    ::= { rlDnsClv2UnifiedCacheEntry 8 }
+
+rlDnsClv2UnifiedCacheRemainingTTL OBJECT-TYPE
+    SYNTAX DnsTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Remaining TTL seconds since RR was received.
+       For unresolved entries, will return remaining time till next retry"
+    ::= { rlDnsClv2UnifiedCacheEntry 9 }
+
+rlDnsClv2UnifiedCachePrettyName OBJECT-TYPE
+   SYNTAX      DnsName
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+           "Name of the RR at this row in the table.  This is
+           identical to the rlDnsClv2UnifiedCacheName variable, except that
+           character case is preserved in this variable, per DNS
+           conventions."
+   REFERENCE
+           "RFC-1035 section 2.3.3."
+   ::= { rlDnsClv2UnifiedCacheEntry 10 }
+
+-------------------------------------------------------------------------------
+-- End of new MIBS definitions to support DHCPv6
+-------------------------------------------------------------------------------
 
 rlDnsClMibVersion OBJECT-TYPE
     SYNTAX      INTEGER
@@ -46,7 +537,7 @@ rlDnsClMibVersion OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "MIB's version, the current version is 1."
-	::= { rlDnsCl 1 }
+::= { rlDnsCl 1 }
 
 rlDnsClEnable OBJECT-TYPE
     SYNTAX INTEGER{
@@ -77,14 +568,14 @@ rlDnsClDomainNameEntry  OBJECT-TYPE
    ::= { rlDnsClDomainNameTable  1 }
 
 RlDnsClDomainNameEntry  ::= SEQUENCE {
-    rlDnsClDomainNameName           DnsName,
+    rlDnsClDomainNameName           DnsNameAsIndex,
     rlDnsClDomainNameOwner          INTEGER,
     rlDnsClDomainNameRowStatus      RowStatus
 }
 
 rlDnsClDomainNameName OBJECT-TYPE
-   SYNTAX DnsName
-   MAX-ACCESS read-write
+   SYNTAX DnsNameAsIndex
+   MAX-ACCESS not-accessible
    STATUS current
    DESCRIPTION
      "The domain name for this ifIndex."
@@ -93,7 +584,8 @@ rlDnsClDomainNameName OBJECT-TYPE
 rlDnsClDomainNameOwner OBJECT-TYPE
     SYNTAX  INTEGER{
            static(1),
-           dhcp(2)
+           dhcp(2),
+           dhcpv6(3)
     }
     MAX-ACCESS  read-write
     STATUS  current
@@ -113,22 +605,22 @@ rlDnsClDomainNameRowStatus  OBJECT-TYPE
     ::= { rlDnsClDomainNameEntry 3 }
 
 rlDnsClMaxNumOfRetransmissions OBJECT-TYPE
-    SYNTAX      INTEGER (0..10)
+    SYNTAX      INTEGER (0..100)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The maximum number of retransmissions for each query."
-    DEFVAL      { 3 }
+    DEFVAL      { 1 }
 ::= { rlDnsCl 4 }
 
 rlDnsClMinRetransmissionInterval OBJECT-TYPE
-    SYNTAX      INTEGER (1..15)
+    SYNTAX      INTEGER (1..3600)
     MAX-ACCESS      read-write
     STATUS      current
     DESCRIPTION
         "The minimum number of seconds that must elapsed before
          retransmission for each query."
-    DEFVAL      { 5 }
+    DEFVAL      { 2 }
 ::= { rlDnsCl 5 }
 
 rlDnsClNamesTable OBJECT-TYPE
@@ -151,7 +643,7 @@ rlDnsClNamesEntry  OBJECT-TYPE
    ::= { rlDnsClNamesTable 1 }
 
 RlDnsClNamesEntry  ::= SEQUENCE {
-  rlDnsClNamesName          DnsName,
+  rlDnsClNamesName          DnsNameAsIndex,
   rlDnsClNamesOwner         INTEGER,
   rlDnsClNamesIndex         Integer32,
   rlDnsClNamesAddr          IpAddress,
@@ -159,8 +651,8 @@ RlDnsClNamesEntry  ::= SEQUENCE {
 }
 
 rlDnsClNamesName OBJECT-TYPE
-   SYNTAX     DnsName
-   MAX-ACCESS read-only
+   SYNTAX     DnsNameAsIndex
+   MAX-ACCESS not-accessible
    STATUS     current
    DESCRIPTION
        "The host name."
@@ -169,9 +661,10 @@ rlDnsClNamesName OBJECT-TYPE
 rlDnsClNamesOwner OBJECT-TYPE
     SYNTAX  INTEGER{
            static(1),
-           dhcp(2)
+           dhcp(2),
+           dhcpv6(3)
     }
-    MAX-ACCESS  read-write
+    MAX-ACCESS not-accessible
     STATUS  current
     DESCRIPTION
        "The Host Name Entry owner. Static if  Host Name Entry defined by user, dhcp
@@ -235,7 +728,8 @@ RlDnsResConfigSbeltExtEntry  ::= SEQUENCE {
 rlDnsResConfigSbeltOwner OBJECT-TYPE
     SYNTAX  INTEGER{
            static(1),
-           dhcp(2)
+           dhcp(2),
+           dhcpv6(3)
     }
     MAX-ACCESS  read-write
     STATUS  current
@@ -269,7 +763,7 @@ rlDnsClNamesInetEntry  OBJECT-TYPE
    ::= { rlDnsClNamesInetTable 1 }
 
 RlDnsClNamesInetEntry  ::= SEQUENCE {
-  rlDnsClNamesInetName          DnsName,
+  rlDnsClNamesInetName          DnsNameAsIndex,
   rlDnsClNamesInetOwner         INTEGER,
   rlDnsClNamesInetIndex         Integer32,
   rlDnsClNamesInetRRType        DnsType,
@@ -279,8 +773,8 @@ RlDnsClNamesInetEntry  ::= SEQUENCE {
 }
 
 rlDnsClNamesInetName OBJECT-TYPE
-   SYNTAX     DnsName
-   MAX-ACCESS read-only
+   SYNTAX     DnsNameAsIndex
+   MAX-ACCESS not-accessible
    STATUS     current
    DESCRIPTION
        "The host name."
@@ -289,9 +783,10 @@ rlDnsClNamesInetName OBJECT-TYPE
 rlDnsClNamesInetOwner OBJECT-TYPE
     SYNTAX  INTEGER{
            static(1),
-           dhcp(2)
+           dhcp(2),
+           dhcpv6(3)
     }
-    MAX-ACCESS  read-write
+    MAX-ACCESS not-accessible
     STATUS  current
     DESCRIPTION
        "The Host Name Entry owner. Static if  Host Name Entry defined by user, dhcp
@@ -780,7 +1275,7 @@ rlDnsResNCacheErrInetSource OBJECT-TYPE
    ::= { rlDnsResNCacheErrInetEntry 7 }
 
 rlDnsResNCacheErrInetCode OBJECT-TYPE
-   SYNTAX      INTEGER { nonexistantName(1), noData(2), other(3) }
+   SYNTAX      INTEGER { nonexistantName(1), noData(2), other(3), unresolved(4) }
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION
@@ -793,7 +1288,9 @@ rlDnsResNCacheErrInetCode OBJECT-TYPE
            error (RCODE = 0) and no relevant data.
 
            other(3) indicates some other cached authoritative
-           error.  At present, no such errors are known to exist."
+           error.  At present, no such errors are known to exist.
+
+           unresolved(4) is used for 'fixed' entries that are currently unresolved."
    ::= { rlDnsResNCacheErrInetEntry 8 }
 
 rlDnsResNCacheErrInetStatus OBJECT-TYPE
@@ -809,7 +1306,7 @@ rlDnsResNCacheErrInetStatus OBJECT-TYPE
 
 rlDnsResNCacheErrInetIndex OBJECT-TYPE
    SYNTAX      Integer32
-   MAX-ACCESS  read-only
+   MAX-ACCESS  not-accessible
    STATUS      current
    DESCRIPTION
            "A value which makes entries in the table unique when the
@@ -860,7 +1357,8 @@ RlDnsResConfigSbeltExtInetEntry  ::= SEQUENCE {
 rlDnsResConfigSbeltInetOwner OBJECT-TYPE
     SYNTAX  INTEGER{
            static(1),
-           dhcp(2)
+           dhcp(2),
+           dhcpv6(3)
     }
     MAX-ACCESS  read-write
     STATUS  current
@@ -869,6 +1367,17 @@ rlDnsResConfigSbeltInetOwner OBJECT-TYPE
         if received by boot protocol like DHCP."
     DEFVAL  { static }
     ::=   { rlDnsResConfigSbeltExtInetEntry 1 }
+
+rlDnsClMinPollingInterval OBJECT-TYPE
+    SYNTAX      INTEGER (0..3600)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of seconds that must elapsed between invocations
+         of the resolving procedure for fixed DNS entries which are currently
+         unresolved."
+    DEFVAL      { 0 }
+::= { rlDnsCl 13 }
 
 END
 

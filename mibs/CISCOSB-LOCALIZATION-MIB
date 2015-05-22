@@ -8,7 +8,7 @@ CISCOSB-LOCALIZATION-MIB DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-    switch001                                    FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,
     MODULE-IDENTITY                         FROM SNMPv2-SMI
     SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
@@ -18,15 +18,15 @@ IMPORTS
 
 rlLocalization MODULE-IDENTITY
          LAST-UPDATED "200503150000Z"
-		 ORGANIZATION "Cisco Small Business"
+         ORGANIZATION "Cisco Systems, Inc."
 
-		 CONTACT-INFO
-		 "Postal: 170 West Tasman Drive
-		 San Jose , CA 95134-1706
-		 USA
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
 
-		 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "The private MIB module definition for product localization."
@@ -103,7 +103,9 @@ RlLocalizationLanguagesEntry ::= SEQUENCE {
     rlLocalizationLanguagesUrlHelpDir         DisplayString,
     rlLocalizationLanguageCode                DisplayString,
     rlLocalizationNumOfSections               INTEGER (0..100),
-    rlLocalizationNumOfEmbSections            INTEGER (0..100)
+    rlLocalizationNumOfEmbSections            INTEGER (0..100),
+    rlLocalizationVersion                     DisplayString (SIZE(0..15)),
+    rlLocalizationMd5ChksumFile               DisplayString
 }
 
 rlLocalizationLanguagesName OBJECT-TYPE
@@ -166,5 +168,25 @@ rlLocalizationNumOfEmbSections OBJECT-TYPE
     DESCRIPTION
         "Number of sections of the diagnostics file which is technically split."
     ::= { rlLocalizationLanguagesEntry 7 }
+
+rlLocalizationVersion OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the language file (x.y.z.w)"
+    ::= { rlLocalizationLanguagesEntry 8 }
+
+rlLocalizationMd5ChksumFile OBJECT-TYPE
+
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MD5 of the language file (as string)"
+    ::= { rlLocalizationLanguagesEntry 9 }
+
+
 END
 

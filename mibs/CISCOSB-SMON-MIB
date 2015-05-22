@@ -6,7 +6,7 @@ CISCOSB-SMON-MIB DEFINITIONS ::= BEGIN
 -- Date:                 15-Jan-2007
 
 IMPORTS
-    switch001                                                    FROM CISCOSB-MIB
+    switch001                                               FROM CISCOSB-MIB
     OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
     TruthValue                                              FROM SNMPv2-TC
     dot1dBasePort                                           FROM BRIDGE-MIB;
@@ -22,15 +22,15 @@ CopyModeType ::= TEXTUAL-CONVENTION
 }
 rlSmon MODULE-IDENTITY
                 LAST-UPDATED "200701020000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines SMON private MIBs."
@@ -101,7 +101,17 @@ rlPortCopyMode          OBJECT-TYPE
       SYNTAX                CopyModeType
       MAX-ACCESS            read-write
       STATUS                current
-      DESCRIPTION "This scalar defined a mode of the copy
+      DESCRIPTION "This scalar defines a mode of the copy
                    destination port"
       ::= { rlSmon 4}
+
+rlPortCopySessionsEnabled          OBJECT-TYPE
+      SYNTAX                TruthValue
+      MAX-ACCESS            read-write
+      STATUS                current
+      DESCRIPTION "This scalar enables globaly  port monitoring sessions "
+      DEFVAL{ true }
+
+      ::= { rlSmon 5}
+
 END

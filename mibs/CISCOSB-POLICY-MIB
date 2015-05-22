@@ -47,8 +47,8 @@ IMPORTS
     InterfaceIndexOrZero, InterfaceIndex        FROM IF-MIB
     diffServClassifierEntry                     FROM DIFF-SERV-MIB
     Percents, VlanPriority, switch001           FROM CISCOSB-MIB
-    PortList                                    FROM Q-BRIDGE-MIB
-    VlanId                                      FROM Q-BRIDGE-MIB;
+    PortList, VlanId                            FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 
 InterfaceType ::= TEXTUAL-CONVENTION
@@ -98,15 +98,15 @@ StatisticsCntrType  ::= TEXTUAL-CONVENTION
 
  rlPolicy MODULE-IDENTITY
           LAST-UPDATED "200606260000Z"
-		  ORGANIZATION "Cisco Small Business"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "The private MIB module definition generic traffic policy in CISCOSB devices."
@@ -291,6 +291,45 @@ RlPolicyRulesActionDropType  ::= TEXTUAL-CONVENTION
       softDrop(2)
 }
 
+RlPolicyMarkVlanAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the mark vlan action type in the class map table.
+      1 - noMark - No vlan marking
+      2 - mark  - mark vlan tagged.
+      3 - markNestedVlan - add vlan tag to the packet. "
+    SYNTAX  INTEGER {
+        noMark(1),
+        mark(2),
+        markNestedVlan(3)
+    }
+RlPolicyRedirectAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the packet redirection options.
+     Redirection is applied only on permitted packets.
+      1 - disabled  - no redirect
+      2 - trap - trap to local_host (CPU)
+      3 - redirectToInterface - redirect to a output interface (port, trunk or vlan)
+      4 - redirectToAllPorts - redirect to all ports, exept the ingress port.
+      5 - mirror - forward the packet and sent a copy to local_host (CPU)
+      6 - analyzerPort - forward the packet and sent a copy to egress port.
+      7 - loopback - redirect the packet the the port it was recieved.
+      8 - redirectToPortGroup - send to group of ports, defined in rlUserAssignedVidxTable table.
+      9 - mirror_and_redirectToInterface - send the packet to interface and send a copy to local_host(CPU)
+      10 -mirror_and_redirectToInterfacesGroup - send the packet to group of ports and send a copy to local_host(CPU)  "
+    SYNTAX  INTEGER {
+        disabled(1),
+        trap(2),
+        redirectToInterface(3),
+        redirectToAllPorts(4),
+        mirror(5),
+        analyzerPort(6),
+        loopback(7),
+        redirectToPortGroup(8),
+        mirrorAndRedirectToInterface(9),
+        mirrorAndRedirectToInterfacesGroup(10)
+    }
 
 rlPolicyMibVersion OBJECT-TYPE
     SYNTAX  INTEGER
@@ -1091,7 +1130,7 @@ RlPolicyRulesEntry ::= SEQUENCE  {
     rlPolicyRulesFurtherRefPointer      INTEGER,
     rlPolicyRulesDescription            DisplayString,
     rlPolicyRulesStatus                 RowStatus,
-    rlPolicyRulesCounterEnable          TruthValue,
+    rlPolicyRulesCounterIdx             INTEGER,
     rlPolicyRulesCounter                Counter32,
     rlPolicyRulesActionPointer          INTEGER,
     rlPolicyRulesTimeRange1             INTEGER,
@@ -1165,7 +1204,8 @@ rlPolicyRulesFilteringAction OBJECT-TYPE
         permit(4),
         blockAndDisablePort(5),
         blockTrapAndDisablePort(6),
-        blockAndLogInput(7)
+        blockAndLogInput(7),
+        permitAndLogInput(8)
   }
     MAX-ACCESS   read-write
     STATUS   current
@@ -1213,13 +1253,13 @@ rlPolicyRulesStatus OBJECT-TYPE
         "Row status of the Rules entry."
     ::= { rlPolicyRulesEntry 10 }
 
-rlPolicyRulesCounterEnable OBJECT-TYPE
-    SYNTAX  TruthValue
+rlPolicyRulesCounterIdx OBJECT-TYPE
+    SYNTAX  INTEGER
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "allow counting conforming and NonConforming packets ."
-    DEFVAL { false }
+        "If not zero, perform counting of matched packets ."
+    DEFVAL { 0 }
     ::= { rlPolicyRulesEntry 11 }
 
 rlPolicyRulesCounter OBJECT-TYPE
@@ -1227,7 +1267,7 @@ rlPolicyRulesCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
-        "The number of   passed this filtering rule."
+        "The number of packets that matched this filtering rule."
     ::= { rlPolicyRulesEntry 12 }
 
 rlPolicyRulesActionPointer  OBJECT-TYPE
@@ -1653,11 +1693,12 @@ RlPolicyActionEntry ::=  SEQUENCE  {
     rlPolicyActionAdvancedTrustMode             TruthValue,
     rlPolicyActionNewIpPrecedence               INTEGER,
     rlPolicyActionChangeIpPrecedence            TruthValue,
-    rlPolicyActionReDirect                      INTEGER,
-    rlPolicyActionCopyPort                      INTEGER,
-    rlPolicyActionChangeVid                     TruthValue,
-    rlPolicyActionNewVid                        INTEGER
-
+    rlPolicyActionReDirect                      RlPolicyRedirectAction,
+    rlPolicyActionNewInterface                  InterfaceIndexOrZero,
+    rlPolicyActionChangeVidAction               RlPolicyMarkVlanAction,
+    rlPolicyActionNewVid                        INTEGER,
+    rlPolicyActionTrapTypeId                    INTEGER,
+    rlPolicyActionAddTunnel                     Unsigned32
 }
 
 rlPolicyActionIndex OBJECT-TYPE
@@ -1838,7 +1879,6 @@ rlPolicyActionChangeNewDscpNonConform OBJECT-TYPE
     DEFVAL{ 0 }
     ::= { rlPolicyActionEntry 15 }
 
-
 rlPolicyActionAdvancedTrustMode OBJECT-TYPE
     SYNTAX  TruthValue
     MAX-ACCESS  read-write
@@ -1869,51 +1909,74 @@ rlPolicyActionChangeIpPrecedence OBJECT-TYPE
     DEFVAL{ false }
     ::= { rlPolicyActionEntry 18 }
 
+
 rlPolicyActionReDirect OBJECT-TYPE
-    SYNTAX  INTEGER
+    SYNTAX  RlPolicyRedirectAction
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "specify a ifIndex to redirect the arriving packet.
-        the default value is 0 means no redirection will be preformed."
-    DEFVAL{ 0 }
+        "Specified the redirection action/"
+    DEFVAL{ disabled }
     ::= { rlPolicyActionEntry 19 }
 
-rlPolicyActionCopyPort OBJECT-TYPE
-    SYNTAX  INTEGER
+rlPolicyActionNewInterface OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "specify port for which each arriving packet should be sent to in adition
-        to the regular output port"
+        "Relevant if rlQosClassMapRedirect is either
+        'redirectToInterface' or 'analyzerPort'.
+        Specified the output interface the packet is redireted to or
+        the port that gets copy of the packet in addition to the port
+        it was farwarded. "
     DEFVAL{ 0 }
     ::= { rlPolicyActionEntry 20 }
 
-rlPolicyActionChangeVid OBJECT-TYPE
-    SYNTAX  TruthValue
+rlPolicyActionChangeVidAction OBJECT-TYPE
+    SYNTAX  RlPolicyMarkVlanAction
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "by specify true the value tells the system to change
-        the Vlan id when packet leaves the device"
-    DEFVAL{ false }
+        "If 'mark', than the classified
+         traffic will be remarked with new VLAN id.
+         If 'disabled' VLAN id is not changed.
+         If markNestedVlan, if the egress interface defined as
+         VLAN tagged member then a new VLAN tag is added  to the packet."
+    DEFVAL{ noMark }
     ::= { rlPolicyActionEntry 21 }
 
 rlPolicyActionNewVid OBJECT-TYPE
-    SYNTAX  INTEGER (0 .. 4095)
+    SYNTAX  INTEGER(0..4095)
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "specify the new Vlan id to assigned to the packet"
+        "If rlPolicyActionChangeVid is true,
+         specify the new Vlan id to assigned to the packet"
     DEFVAL{ 0 }
     ::= { rlPolicyActionEntry 22 }
 
+rlPolicyActionTrapTypeId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+     "If now zero, Indicates the trap type id the matched packets arrives with,
+      relevant when RedirectAction is trap or mirror."
+    DEFVAL{ 0}
+    ::= { rlPolicyActionEntry 23 }
 
+rlPolicyActionAddTunnel OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If not zero - Tunnel is added to matched packets."
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 24 }
 
-
-------------
+-------------------
 -- Service Class
----
+-------------------
 rlPolicyServiceClass OBJECT IDENTIFIER ::= { rlPolicy 6 }
 
 rlPolicyServiceClassPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyServiceClass 1 }
@@ -3622,10 +3685,10 @@ rlPolicyDefaultForwardingEntry OBJECT-TYPE
 RlPolicyDefaultForwardingEntry::= SEQUENCE {
         rlPolicyDefaultForwardingIndex              INTEGER,
         rlPolicyDefaultForwardingPortList           PortList,
-        rlPolicyDefaultForwardingVlanId1To1024     OCTET STRING,
-        rlPolicyDefaultForwardingVlanId1025To2048  OCTET STRING,
-        rlPolicyDefaultForwardingVlanId2049To3072  OCTET STRING,
-        rlPolicyDefaultForwardingVlanId3073To4096  OCTET STRING,
+        rlPolicyDefaultForwardingVlanId1To1024      VlanList1,
+        rlPolicyDefaultForwardingVlanId1025To2048   VlanList2,
+        rlPolicyDefaultForwardingVlanId2049To3072   VlanList3,
+        rlPolicyDefaultForwardingVlanId3073To4096   VlanList4,
         rlPolicyDefaultForwardingLayer              INTEGER,
         rlPolicyDefaultForwardingAction             INTEGER,
         rlPolicyDefaultForwardingStatus             RowStatus,
@@ -3650,7 +3713,7 @@ rlPolicyDefaultForwardingPortList OBJECT-TYPE
 
 
 rlPolicyDefaultForwardingVlanId1To1024 OBJECT-TYPE
-    SYNTAX  OCTET STRING
+    SYNTAX  VlanList1
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -3658,7 +3721,7 @@ rlPolicyDefaultForwardingVlanId1To1024 OBJECT-TYPE
     ::= { rlPolicyDefaultForwardingEntry 3 }
 
 rlPolicyDefaultForwardingVlanId1025To2048 OBJECT-TYPE
-    SYNTAX  OCTET STRING
+    SYNTAX  VlanList2
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -3666,7 +3729,7 @@ rlPolicyDefaultForwardingVlanId1025To2048 OBJECT-TYPE
     ::= { rlPolicyDefaultForwardingEntry 4 }
 
 rlPolicyDefaultForwardingVlanId2049To3072 OBJECT-TYPE
-    SYNTAX  OCTET STRING
+    SYNTAX  VlanList3
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
@@ -3674,7 +3737,7 @@ rlPolicyDefaultForwardingVlanId2049To3072 OBJECT-TYPE
     ::= { rlPolicyDefaultForwardingEntry 5 }
 
 rlPolicyDefaultForwardingVlanId3073To4096 OBJECT-TYPE
-    SYNTAX  OCTET STRING
+    SYNTAX  VlanList4
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION

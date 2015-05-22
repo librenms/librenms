@@ -30,22 +30,22 @@ IMPORTS
     DisplayString                                           FROM SNMPv2-TC;
 
 swInterfaces MODULE-IDENTITY
-        LAST-UPDATED "201105300000Z"
-		ORGANIZATION "Cisco Small Business"
+      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
 		"Postal: 170 West Tasman Drive
 		San Jose , CA 95134-1706
 		USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
              "The private MIB module definition for Switch Interfaces."
-        REVISION "201105300000Z"
-        DESCRIPTION
-             "Initial revision."
+      	REVISION     "201304010000Z"  -- April 1, 2013
+      	DESCRIPTION
+              "Added MODULE-IDENTITY"
         ::= { switch001 43 }
 
 -- These bits can be set in any combination (except unknown)
@@ -66,7 +66,8 @@ AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
         fastHalf(4),
         fastFull(5),
         gigaHalf(6),
-        gigaFull(7)
+        gigaFull(7),
+        tenGigaFull(8)
     }
 
 --
@@ -74,13 +75,13 @@ AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
 --
 
 swIfTable    OBJECT-TYPE
-	SYNTAX  SEQUENCE  OF SwIfEntry
-	MAX-ACCESS   not-accessible
-	STATUS       current
-	DESCRIPTION
+   SYNTAX  SEQUENCE  OF SwIfEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
     "Switch media specific information and configuration of the device
      interfaces."
-	::=  { swInterfaces 1 }
+   ::=  { swInterfaces 1 }
 
 swIfEntry OBJECT-TYPE
    SYNTAX  SwIfEntry
@@ -135,7 +136,8 @@ SwIfEntry ::= SEQUENCE {
         swIfOperSpeedDuplexAutoNegotiationLocalCapabilities     AutoNegCapabilitiesBits,
         swIfSpeedDuplexNegotiationRemoteCapabilities            AutoNegCapabilitiesBits,
         swIfAdminComboMode                                      INTEGER,
-        swIfOperComboMode                                       INTEGER
+        swIfOperComboMode                                       INTEGER,
+        swIfAutoNegotiationMasterSlavePreference                INTEGER
     }
 
 
@@ -278,7 +280,10 @@ swIfType  OBJECT-TYPE
         eth100M(2),
         eth1000M(3),
         eth10G(4),
-        unknown(5)
+        eth20G(5),
+        eth40G(6),
+        eth100G(7),
+        unknown(8)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -692,11 +697,11 @@ swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities OBJECT-TYPE
         swIfSpeedDuplexAutoNegotiation is enabled.
         default bit means advertise all the port's capabilities
         according to its type."
-    DEFVAL { { default } }
+    DEFVAL { {default} }
     ::= { swIfEntry 40 }
 
 swIfOperSpeedDuplexAutoNegotiationLocalCapabilities OBJECT-TYPE
-    SYNTAX  AutoNegCapabilitiesBits
+    SYNTAX AutoNegCapabilitiesBits
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -705,7 +710,7 @@ swIfOperSpeedDuplexAutoNegotiationLocalCapabilities OBJECT-TYPE
     ::= { swIfEntry 41 }
 
 swIfSpeedDuplexNegotiationRemoteCapabilities OBJECT-TYPE
-    SYNTAX  AutoNegCapabilitiesBits
+    SYNTAX AutoNegCapabilitiesBits
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -741,6 +746,23 @@ swIfOperComboMode  OBJECT-TYPE
         "This variable specifies the operative mode of a combo Ethernet interface."
     ::= {  swIfEntry 44  }
 
+swIfAutoNegotiationMasterSlavePreference OBJECT-TYPE
+    SYNTAX  INTEGER {
+        preferMaster(1),
+        preferSlave(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the administrative mode of the Maste-Slave preference in auto negotiation."
+--    DEFVAL - according to MTSC parameter
+    ::= {  swIfEntry 45 }
+
+
+
+--
+-- swIfMibVersion
+--
 swIfMibVersion OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
@@ -749,6 +771,10 @@ swIfMibVersion OBJECT-TYPE
         "The swIfTable Mib's version, the current version is 3."
     ::= { swInterfaces 2 }
 
+
+--
+-- swIfPortLockSupport
+--
 swIfPortLockSupport OBJECT-TYPE
     SYNTAX  INTEGER {
         supported (1),
@@ -761,6 +787,9 @@ swIfPortLockSupport OBJECT-TYPE
     ::= { swInterfaces 3 }
 
 
+--
+-- swIfPortLockActionSupport
+--
 swIfPortLockActionSupport OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1))
     MAX-ACCESS  read-only
@@ -773,6 +802,10 @@ swIfPortLockActionSupport OBJECT-TYPE
             bit 2 - discardDisable"
     ::= { swInterfaces 4 }
 
+
+--
+-- swIfPortLockTrapSupport
+--
 swIfPortLockTrapSupport OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1))
     MAX-ACCESS  read-only
@@ -789,7 +822,9 @@ swIfPortLockTrapSupport OBJECT-TYPE
 
 
 
-
+--
+-- swIfPortLockIfRangeTable
+--
 swIfPortLockIfRangeTable    OBJECT-TYPE
    SYNTAX  SEQUENCE  OF SwIfPortLockIfRangeEntry
    MAX-ACCESS   not-accessible
@@ -1257,6 +1292,25 @@ rlCutThroughEnableAfterReset OBJECT-TYPE
         "Cut-Through global enable mode after reset."
     DEFVAL { false }
     ::= { rlIfInterfaces 31 }
+
+rlFlowControlMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        send-receive(1),
+        receive-only(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Define which mode will be enabled on flow control enabled ports.
+        The interfaces with enabled flow control will receive pause frames, but will not send flow control pause
+        frames
+        Send-receive: The interfaces with enabled flow control will receive and send pause frames.
+        Receive-only: The interfaces with enabled flow control will receive pause frames, but will not send flow
+       control pause frames."
+
+    ::= { rlIfInterfaces 32 }
+
+
 
 END
 

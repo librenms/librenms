@@ -5,7 +5,7 @@ CISCOSB-rndApplications DEFINITIONS ::= BEGIN
 -- Date:       17 May 2004
 
 IMPORTS
-    switch001                                                    FROM CISCOSB-MIB
+    switch001                                               FROM CISCOSB-MIB
     InterfaceIndexOrZero, InterfaceIndex, ifIndex           FROM IF-MIB
     TEXTUAL-CONVENTION,
     DisplayString, RowStatus, TruthValue                    FROM SNMPv2-TC
@@ -15,15 +15,15 @@ IMPORTS
 
 rndApplications  MODULE-IDENTITY
                  LAST-UPDATED "200406010000Z"
-				 ORGANIZATION "Cisco Small Business"
+                 ORGANIZATION "Cisco Systems, Inc."
 
-				 CONTACT-INFO
-				 "Postal: 170 West Tasman Drive
-				 San Jose , CA 95134-1706
-				 USA
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
 
-				 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                  DESCRIPTION
                       "The private MIB module definition for switch001 applications MIB."
@@ -1094,7 +1094,8 @@ RsPingInetEntry ::= SEQUENCE {
     rsPingInetMaxReturnTime    INTEGER,
     rsPingInetCompletionStatus PingCompletionStatus,
     rsPingInetTimeStamp        DisplayString,
-    rsPingInetEntryStatus      RowStatus
+    rsPingInetEntryStatus      RowStatus,
+    rsPingInetSourceAddr       InetAddress
     }
 
 rsPingInetAddressType OBJECT-TYPE
@@ -1228,6 +1229,13 @@ rsPingInetEntryStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION "The status of this table entry."
     ::= { rsPingInetEntry 15 }
+
+rsPingInetSourceAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of this table entry."
+    ::= { rsPingInetEntry 16 }
 
 --------------------------------------------------------------------------------
 
