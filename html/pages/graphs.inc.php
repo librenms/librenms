@@ -146,11 +146,11 @@ if (!$auth)
   echo('
         <div class="form-group">
             <label for="dtpickerfrom">From</label>
-            <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
+            <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date($config['dateformat']['byminute'], $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <div class="form-group">
             <label for="dtpickerto">To</label>
-            <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date('Y-m-d H:i', $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
+            <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date($config['dateformat']['byminute'], $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <input type="submit" class="btn btn-default" id="submit" value="Update" onclick="javascript:submitCustomRange(this.form);">
     </form>
