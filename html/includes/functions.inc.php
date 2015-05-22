@@ -342,7 +342,7 @@ function generate_graph_tag($args)
     $urlargs[] = $key."=".$arg;
   }
 
-  return '<img id="zoomGraphImage" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+  return '<img id="317330dc6337227faa5df8dd149c344b" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 }
 
 function generate_graph_js_state($args) {
