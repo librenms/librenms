@@ -2,7 +2,7 @@
 
 if ($config['enable_syslog'])
 {
-  $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
+  $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
   if (count($syslog))
   {
 echo('<div class="container-fluid">');

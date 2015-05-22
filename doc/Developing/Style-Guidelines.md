@@ -38,3 +38,23 @@ place.
 
 As an example pull request, see [PR 706](https://github.com/librenms/librenms/pull/706/files) to get an idea of what 
 it's like to convert an existing pure html table to Bootgrid.
+
+### Datetime format
+
+When displaying datetimes, please ensure you use the format YYYY-MM-DD mm:hh:ss where possible, you shouldn't change the 
+order of this as it will be confusing to users. Cutting it short to just display YYYY-MM-DD mm:hh is fine :).
+
+To keep things consistent we have the following variables which should be used rather than to format dates yourself. 
+This has the added benefit that users can customise the format:
+
+```php
+# Date format for PHP date()s
+$config['dateformat']['long']                             = "r"; # RFC2822 style
+$config['dateformat']['compact']                          = "Y-m-d H:i:s";
+$config['dateformat']['time']                             = "H:i:s";
+
+# Date format for MySQL DATE_FORMAT
+$config['dateformat']['mysql']['compact']                 = "%Y-%m-%d %H:%i:%s";
+$config['dateformat']['mysql']['date']                 = "%Y-%m-%d";
+$config['dateformat']['mysql']['time']                 = "%H:%i:%s";
+```

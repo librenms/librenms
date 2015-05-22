@@ -640,6 +640,11 @@ $config['dateformat']['long']                             = "r"; # RFC2822 style
 $config['dateformat']['compact']                          = "Y-m-d H:i:s";
 $config['dateformat']['time']                             = "H:i:s";
 
+# Date format for MySQL DATE_FORMAT
+$config['dateformat']['mysql']['compact']                 = "%Y-%m-%d %H:%i:%s"; 
+$config['dateformat']['mysql']['date']                 = "%Y-%m-%d"; 
+$config['dateformat']['mysql']['time']                 = "%H:%i:%s"; 
+
 $config['enable_clear_discovery']                        = 1;// Set this to 0 if you want to disable the web option to rediscover devices
 $config['enable_port_relationship']                      = TRUE;// Set this to false to not display neighbour relationships for ports
 

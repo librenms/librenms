@@ -10,7 +10,7 @@ echo("<img src='images/16/report.png'> Recent Events</a>");
 echo('        </div>
               <table class="table table-hover table-condensed table-striped">');
 
-$eventlog = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate FROM `eventlog` WHERE `host` = ? ORDER BY `datetime` DESC LIMIT 0,10", array($device['device_id']));
+$eventlog = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate FROM `eventlog` WHERE `host` = ? ORDER BY `datetime` DESC LIMIT 0,10", array($device['device_id']));
 foreach ($eventlog as $entry)
 {
   include("includes/print-event-short.inc.php");
