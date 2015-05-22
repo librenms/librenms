@@ -50,8 +50,8 @@ if (bill_permitted($bill_id))
     $bill_color = "#0000cc";
   }
 
-  $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '%M %D %Y')");
-  $totext   = dbFetchCell("SELECT DATE_FORMAT($dateto, '%M %D %Y')");
+  $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '".$config['dateformat']['mysql']['date']."')");
+  $totext   = dbFetchCell("SELECT DATE_FORMAT($dateto, '".$config['dateformat']['mysql']['date']."')");
   $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
   $unixto   = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 

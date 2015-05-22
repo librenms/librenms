@@ -39,7 +39,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,state,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate,details $sql";
+$sql = "SELECT D.device_id,name AS alert,state,time_logged,DATE_FORMAT(time_logged, '".$config['dateformat']['mysql']['compact']."') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql,$param) as $alertlog) {
