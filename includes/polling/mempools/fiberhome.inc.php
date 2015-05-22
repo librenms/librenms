@@ -14,4 +14,3 @@ if (is_numeric($perc)){
     $mempool['used'] = $memory_available / 100 * $perc;
     $mempool['free'] = $memory_available - $mempool['used'];
 }
-?>

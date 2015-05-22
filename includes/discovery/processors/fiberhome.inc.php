@@ -18,4 +18,3 @@ if ($device['os'] == "fiberhome") {
         discover_processor($valid['processor'], $device, "GEPON-OLT-COMMON-MIB::mgrCardCpuUtil.10", "1", "fiberhome", "Hswa 10 Processor", "100", $usage/100, NULL, NULL);
     };
 }
-?>
