@@ -100,7 +100,7 @@ $(function () {
     if( $("#dtpickerto").val() != "" ) {
         $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
     } else {
-        $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo date('Y-m-d H:i'); ?>');
+        $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo date($config['dateformat']['byminute']); ?>');
     }
 });
 </script>

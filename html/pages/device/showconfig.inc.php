@@ -48,7 +48,7 @@ if ($_SESSION['userlevel'] >= "7")
               if ($vars['rev'] == $svnlog["rev"]) {
                   echo('<span class="pagemenu-selected">');
               }
-              $linktext = "r" . $svnlog["rev"] . " <small>" . date("d M H:i", strtotime($svnlog["date"])) . "</small>";
+              $linktext = "r" . $svnlog["rev"] . " <small>" . date($config['dateformat']['byminute'], strtotime($svnlog["date"])) . "</small>";
               echo(generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog["rev"])));
 
               if ($vars['rev'] == $svnlog["rev"]) {
