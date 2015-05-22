@@ -51,6 +51,7 @@ This has the added benefit that users can customise the format:
 # Date format for PHP date()s
 $config['dateformat']['long']                             = "r"; # RFC2822 style
 $config['dateformat']['compact']                          = "Y-m-d H:i:s";
+$config['dateformat']['byminute']                         = "Y-m-d H:i";
 $config['dateformat']['time']                             = "H:i:s";
 
 # Date format for MySQL DATE_FORMAT
