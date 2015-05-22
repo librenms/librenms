@@ -18,4 +18,3 @@ if ($device['os'] == "fiberhome") {
         discover_mempool($valid_mempool, $device, 10 , "fiberhome", "Hswa 10 Memory", "100", NULL, NULL);
     };
 }
-?>
