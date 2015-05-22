@@ -24,16 +24,21 @@ if(is_admin() !== false) {
         </div>
         <div class="modal-body">
             <form method="post" role="form" id="group" class="form-horizontal group-form">
+        <div class="form-group">
+            <div class="col-sm-12">
+                <span id="ajax_response"></span>
+            </div>
+        </div>
         <div class='form-group'>
             <label for='name' class='col-sm-3 control-label'>Name: </label>
             <div class='col-sm-9'>
-                <input type='text' id='name' name='name' class='form-control' maxlength='200'>
+                <input type='text' id='name' name='name' class='form-control has-feedback' maxlength='200'>
             </div>
         </div>
         <div class='form-group'>
             <label for='desc' class='col-sm-3 control-label'>Description: </label>
             <div class='col-sm-9'>
-                <input type='text' id='desc' name='desc' class='form-control' maxlength='200'>
+                <input type='text' id='desc' name='desc' class='form-control has-feedback' maxlength='200'>
             </div>
         </div>
             <input type="hidden" name="group_id" id="group_id" value="">
@@ -41,7 +46,7 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='pattern' class='col-sm-3 control-label'>Pattern: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='suggest' name='pattern' class='form-control' placeholder='I.e: devices.status'/>
+                        <input type='text' id='suggest' name='pattern' class='form-control has-feedback' placeholder='I.e: devices.status'/>
                 </div>
         </div>
         <div class="form-group">
@@ -52,7 +57,7 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='condition' class='col-sm-3 control-label'>Condition: </label>
                 <div class="col-sm-5">
-                        <select id='condition' name='condition' placeholder='Condition' class='form-control'>
+                        <select id='condition' name='condition' placeholder='Condition' class='form-control has-feedback'>
                                 <option value='='>Equals</option>
                                 <option value='!='>Not Equals</option>
 				<option value='~'>Like</option>
@@ -67,14 +72,15 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='value' class='col-sm-3 control-label'>Value: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='value' name='value' class='form-control'/>
+                        <input type='text' id='value' name='value' class='form-control has-feedback'/>
                 </div>
         </div>
         <div class="form-group">
                 <label for='group-glue' class='col-sm-3 control-label'>Connection: </label>
                 <div class="col-sm-5">
-                        <button class="btn btn-default btn-sm" type="submit" name="group-glue" value="&&" id="and" name="and">And</button>
-                        <button class="btn btn-default btn-sm" type="submit" name="group-glue" value="||" id="or" name="or">Or</button>
+                        <button class="btn btn-warning btn-sm" type="submit" name="group-glue" value="&&" id="and" name="and">And</button>
+                        <button class="btn btn-warning btn-sm" type="submit" name="group-glue" value="||" id="or" name="or">Or</button>
+                        <span id="next-step-and"></span>
                 </div>
         </div>
             <div class="row">
@@ -84,7 +90,7 @@ if(is_admin() !== false) {
             </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
-                        <button class="btn btn-default btn-sm" type="submit" name="group-submit" id="group-submit" value="save">Save Group</button>
+                        <button class="btn btn-success btn-sm" type="submit" name="group-submit" id="group-submit" value="save">Save Group</button>
                 </div>
         </div>
 </form>
@@ -164,6 +170,7 @@ $('#suggest').typeahead({
 
 $('#and, #or').click('', function(e) {
     e.preventDefault();
+    $("#next-step-and").html("");
     var entity = $('#suggest').val();
     var condition = $('#condition').val();
     var value = $('#value').val();
@@ -188,13 +195,15 @@ $('#group-submit').click('', function(e) {
         url: "/ajax_form.php",
         data: $('form.group-form').serialize(),
         success: function(msg){
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-            $("#create-group").modal('hide');
             if(msg.indexOf("ERROR:") <= -1) {
+                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                $("#create-group").modal('hide');
                 $('#response').data('tagmanager').empty();
                 setTimeout(function() {
                     location.reload(1);
                 }, 1000);
+            } else {
+                $('#ajax_response').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             }
         },
         error: function(){
@@ -202,6 +211,34 @@ $('#group-submit').click('', function(e) {
             $("#create-group").modal('hide');
         }
     });
+});
+
+$( "#name, #suggest, #value" ).blur(function() {
+    var $this = $(this);
+    var name = $('#name').val();
+    var suggest = $('#suggest').val();
+    var value = $('#value').val();
+    if (name == "") {
+        $("#next-step-and").html("");
+        $("#suggest").closest('.form-group').removeClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#name").closest('.form-group').addClass('has-error');
+    } else if (suggest == "") {
+        $("#next-step-and").html("");
+        $("#name").closest('.form-group').removeClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').addClass('has-error');
+    } else if (value == "") {
+        $("#next-step-and").html("");
+        $("#name").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').removeClass('has-error');
+        $("#value").closest('.form-group').addClass('has-error');
+    } else {
+        $("#name").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').removeClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
+    }
 });
 
 </script>
