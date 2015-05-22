@@ -40,7 +40,7 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='entity' class='col-sm-3 control-label'>Entity: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='suggest' name='entity' class='form-control' placeholder='I.e: devices.status'/>
+                        <input type='text' id='suggest' name='entity' class='form-control has-feedback' placeholder='I.e: devices.status'/>
                 </div>
         </div>
         <div class="form-group">
@@ -66,15 +66,16 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='value' class='col-sm-3 control-label'>Value: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='value' name='value' class='form-control'/>
+                        <input type='text' id='value' name='value' class='form-control has-feedback'/> <span id="next-step-value"></span>
                 </div>
         </div>
 
         <div class="form-group">
                 <label for='rule-glue' class='col-sm-3 control-label'>Connection: </label>
                 <div class="col-sm-5">
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-glue" value="&&" id="and" name="and">And</button>
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-glue" value="||" id="or" name="or">Or</button>
+                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="&&" id="and" name="and">And</button>
+                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="||" id="or" name="or">Or</button>
+                        <span id="next-step-and"></span>
                 </div>
         </div>
         <div class="form-group">
@@ -308,6 +309,7 @@ $('#map-stub').typeahead({
 
 $('#and, #or').click('', function(e) {
     e.preventDefault();
+    $("#next-step-and").html("");
     var entity = $('#suggest').val();
     var condition = $('#condition').val();
     var value = $('#value').val();
@@ -350,6 +352,25 @@ $('#rule-submit').click('', function(e) {
         }
     });
 });
+
+$( "#suggest, #value" ).blur(function() {
+    var $this = $(this);
+    var suggest = $('#suggest').val();
+    var value = $('#value').val();
+    if (suggest == "") {
+        $("#next-step-and").html("");
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').addClass('has-error');
+    } else if (value == "") {
+        $("#next-step-and").html("");
+        $("#value").closest('.form-group').addClass('has-error');
+        $("#suggest").closest('.form-group').removeClass('has-error');
+    } else {
+        $("#value").closest('.form-group').addClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
+    }
+})
 
 </script>
 
