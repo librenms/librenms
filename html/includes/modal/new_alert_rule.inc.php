@@ -366,7 +366,7 @@ $( "#suggest, #value" ).blur(function() {
         $("#value").closest('.form-group').addClass('has-error');
         $("#suggest").closest('.form-group').removeClass('has-error');
     } else {
-        $("#value").closest('.form-group').addClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
         $("#value").closest('.form-group').removeClass('has-error');
         $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
     }
