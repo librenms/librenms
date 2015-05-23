@@ -28,5 +28,6 @@ Contributors to LibreNMS:
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
+- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 
 [1]: http://observium.org/ "Observium web site"
