@@ -40,16 +40,11 @@
   },
   "jspm": {
 	"main": "jquery.gridster",
-    "format": "register",
     "directories": {
       "lib": "dist"
     },
     "dependencies": {
       "jquery": "github:components/jquery@2.0.3"
-    },
-    "devDependencies": {
-      "traceur": "github:jmcriffey/bower-traceur@0.0.87",
-      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.87"
     }
   }
 }
