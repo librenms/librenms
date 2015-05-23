@@ -39,6 +39,7 @@
     "grunt-conventional-changelog": "~1.0.0"
   },
   "jspm": {
+	"main": "jquery.gridster",
     "format": "register",
     "directories": {
       "lib": "dist"
