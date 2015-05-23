@@ -205,20 +205,11 @@ if (!$auth)
   $graph_array['zoom'] = 'enabled';
   echo(generate_graph_tag($graph_array));
     echo "<script>
-             var img_src = $('#317330dc6337227faa5df8dd149c344b').attr('src');
-             var from = getUrlParameter('from',img_src);
-             var to = getUrlParameter('to',img_src);
-             initGraph($('#317330dc6337227faa5df8dd149c344b'),'graph.php?device='+img_src,from,to);
+                var img_src = $('#317330dc6337227faa5df8dd149c344b').attr('src');
+                var from = getUrlParameter('from',img_src);
+                var to = getUrlParameter('to',img_src);
+                initGraph($('#317330dc6337227faa5df8dd149c344b'),'graph.php?device='+img_src,from,to);
 
-                $('#reset1').click(function(){reset($('#zoomGraphImage1'));return false});
-
-                $('#refresh_graphs').click(function(){
-                        var graph_type= $('#alt-graph').val();
-
-                        initGraph($('#zoomGraphImage1'),'show_new_image.php?sid=22674&type='+graph_type,-86400,-300);
-                        reset($('#zoomGraphImage1'));
-                        return false;
-                });
   </script>";
   echo("</div>");
 

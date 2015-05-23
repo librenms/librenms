@@ -337,7 +337,7 @@ function print_graph_tag($args)
 function generate_graph_tag($args)
 {
   if ($args['zoom'] == 'enabled') {
-      $g_id = '317330dc6337227faa5df8dd149c344b';
+      $g_id = 'id="317330dc6337227faa5df8dd149c344b"';
   }
   $urlargs = array();
   foreach ($args as $key => $arg)
@@ -345,7 +345,7 @@ function generate_graph_tag($args)
     $urlargs[] = $key."=".$arg;
   }
 
-  return '<img id="'.$g_id.'" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+  return '<img '.$g_id.' src="graph.php?' . implode('&amp;',$urlargs).'" border="0" width="'.$args['width'].'" height="'.$args['height'].'" />';
 }
 
 function generate_graph_js_state($args) {
