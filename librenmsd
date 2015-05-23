@@ -1,0 +1,337 @@
+#!/usr/bin/env php
+<?php
+/* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/**
+ * Daemon
+ * @author Daniel Preussker (f0o) <f0o@librenms.org>
+ * @copyright 2015 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Daemon
+ */
+
+// IMPORTANT: Please set this!
+$BASEDIR="/opt/librenms";
+
+/* LSB metadata
+### BEGIN INIT INFO
+# Provides:          librenms
+# Required-Start:    $remote_fs $network
+# Required-Stop:     $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts LibreNMS-Daemon
+# Description:       Starts the LibreNMS Daemon to poll and discover devices or services, issue alerts and account bills
+### END INIT INFO
+*/
+
+/* Red Hat chkconfig metadata
+# chkconfig: 2345 90 90
+# description: Starts the LibreNMS Daemon to poll and discover devices or services, issue alerts and account bills
+*/
+
+declare(ticks=1);
+pcntl_signal(SIGCHLD, 'cleanup');
+chdir($BASEDIR);
+
+// Load config
+$config = array(); //Make scrut happy as we global $config
+$config = loadcnf();
+
+//Be an initscript
+$code = 2;
+if( $argc > 1 ) {
+	switch( $argv[1] ) {
+		case "foreground":
+			goto main;
+		break;
+		case "start":
+			$code = start();
+			if( $code === 2 ) {
+				goto main;
+			} else {
+				$code = (int) !$code;
+			}
+		break;
+		case "stop":
+			$code = (int) !stop();
+		break;
+		case "status":
+			$code = (int) !status();
+		break;
+		case "restart":
+			stop();
+			$code = start();
+			if( $code === 2 ) {
+				goto main;
+			} else {
+				$code = (int) !$code;
+			}
+		break;
+		default:
+			echo "Unknown '".$argv[1]."'\r\n";
+		break;
+	}
+} else {
+	echo 'Usage: '.$argv[0].' start|stop|restart|status|foreground'."\r\n";
+}
+exit($code);
+
+/**
+ * Start Process
+ * @return boolean|int
+ */
+function start() {
+	global $config;
+	if( status() === false ) {
+		if( !posix_setuid($config['daemon']['uid']) || !posix_seteuid($config['daemon']['uid']) ) {
+			echo 'Could not set UID '.$config['daemon']['uid']."\r\n";
+			return false;
+		}
+		$pid = fork();
+		if( $pid === true ) {
+			return 2;
+		} elseif( $pid > 0 ) {
+			if( !file_put_contents($config['install_dir'].'/librenmsd.pid',$pid,LOCK_EX) ) {
+				echo 'WARNING: Could to write to PID file "'.$config['install_dir'].'/librenmsd.pid"!'."\r\n";
+			}
+			echo 'Started LibreNMS-Daemon with PID: '.$pid."\r\n";
+			return true;
+		} else {
+			echo 'Could not start LibreNMS-Daemon.'."\r\n";
+		}
+	}
+	return false;
+}
+
+/**
+ * Stop Process
+ * @return boolean
+ */
+function stop() {
+	global $config;
+	if( status() === true ) {
+		$pid = trim(file_get_contents($config['install_dir'].'/librenmsd.pid'));
+		if( posix_kill($pid, SIGKILL) && (sleep(2) !== false && !status()) ) {
+			echo 'Stopped LibreNMS-Daemon'."\r\n";
+			return true;
+		} else {
+			echo 'Could not stop LibreNMS-Daemon, Kill manually PID: '.$pid."\r\n";
+		}
+	}
+	return false;
+}
+
+/**
+ * Process Status
+ * @return boolean
+ */
+function status() {
+	global $config;
+	if( file_exists($config['install_dir'].'/librenmsd.pid') ) {
+		$pid = trim(file_get_contents($config['install_dir'].'/librenmsd.pid'));
+		if( file_exists('/proc/'.$pid.'/stat') ) {
+			echo 'LibreNMS-Daemon is running ('.$pid.').'."\r\n";
+			return true;
+		} else {
+			unlink($config['install_dir'].'/librenmsd.pid');
+			echo 'LibreNMS-Daemon is not running'."\r\n";
+		}
+	} else {
+		echo 'LibreNMS-Daemon is not running'."\r\n";
+	}
+	return false;
+}
+
+/**
+ * (Re)syunc Clocks
+ * @return void
+ */
+function clocksync() {
+	global $step, $ts, $i;
+	$ts = time() - ( time() % $step );
+	$i  = (($ts%86400)/$step);
+	logger("Clock sync'd",LOG_INFO,'clock');
+}
+
+/**
+ * (Re)load config
+ * @return array
+ */
+function loadcnf() {
+	global $config;
+	unset($config);
+	require("includes/defaults.inc.php");
+	require("config.php");
+	require("includes/definitions.inc.php");
+	logger("Config reloaded",LOG_DEBUG,'main');
+	return $config;
+}
+
+/**
+ * Sleep until timestamp
+ * @param float $ts Microtime-Target
+ * @return boolean
+ */
+function sleep_until($ts) {
+	while( ($delta=($ts-microtime(true))) > 0 ) {
+		usleep(($delta/2)*1000000);
+	}
+	return true;
+}
+
+/**
+ * Fork-wrapper
+ * @return int|boolean
+ */
+function fork() {
+	$pid = pcntl_fork();
+	if( $pid == -1 ) {
+		return false;
+	} elseif( $pid ) {
+		return $pid;
+	} else {
+		return true;
+	}
+}
+
+/**
+ * Log messages
+ * @param string|array $msgs Message/s
+ * @param int $lvl Log-Level
+ * @param string $prefix Log-Prefix
+ * @return void
+ */
+function logger($msgs,$lvl=LOG_INFO,$prefix='') {
+	global $config;
+	if( $lvl === LOG_DEBUG && ($config['daemon']['debug'] === false || ($config['daemon']['debug'] !== true && stripos($config['daemon']['debug'],$prefix) === false) ) ) {
+		return;
+	}
+	openlog('librenms', (LOG_CONS | LOG_NDELAY | LOG_PID), $config['daemon']['facility']);
+	if( !is_array($msgs) ) {
+		$msgs = explode("\n",$msgs);
+	}
+	foreach( $msgs as $msg ) {
+		if( !empty($msg) ) {
+			if( !empty($prefix) ) {
+				$msg = '['.strtoupper($prefix).'] '.$msg;
+			}
+			syslog($lvl,$msg);
+		}
+	}
+	closelog();
+}
+
+/**
+ * Spawn a job as fork
+ * @param array $job Job-Object
+ * @return int
+ */
+function spawn($job) {
+	global $config, $jobs;
+	$pid = fork();
+	if( $pid === true ) {
+		$job['file'] = $config['install_dir'].'/'.$job['file'];
+		$code = 0;
+		$out = '';
+		if( $job['type'] == 'exec' ) {
+			$out  = explode("\n",shell_exec($job['file'].' '.$job['args'].' 2>&1 || echo -n $?'));
+			$code = (int) array_pop($out);
+		} elseif( $job['type'] == 'include' ) {
+			if( !file_exists($job['file']) ) {
+				$out = 'File not found: '.$job['file'];
+				$code = 127;
+			} else {
+				ob_start();
+				require($job['file']);
+				$out = ob_get_clean();
+			}
+		}
+		logger($out,LOG_DEBUG,'jobctl');
+		exit($code);
+		return 0;
+	} else {
+		$job = $job['file'].($job['args'] ? ' '.$job['args'] : '');
+		$jobs[$pid] = $job;
+		logger("'".$job."' / '".$pid."' - Spawned",LOG_INFO,'jobctl');
+		return $pid;
+	}
+}
+
+/**
+ * Cleanup Zombies
+ * @param int $sig Signal
+ * @param int $pid PID defaults to -1
+ * @param int $status Exit-Status
+ * @return void
+ */
+function cleanup($sig, $pid=-1, $status=null) {
+	global $jobs;
+	while( ($pid=pcntl_waitpid($pid, $status, WNOHANG)) != -1 ) {
+		$status = pcntl_wexitstatus($status);
+		logger("'".$jobs[$pid]."' / '".$pid."' - Terminated, Status: ".$status,LOG_INFO,'jobctl');
+		unset($jobs[$pid]);
+	}
+}
+
+/**
+ * Main-loop
+ */
+main:
+$step   = 10;
+$ts     = 0;
+$i      = 0;
+$jobs   = array();
+clocksync();
+
+logger('Initialized',LOG_INFO,'main');
+$sync = false;
+do {
+	if( $sync === true && $i == 3 ) {
+		// Resync-Clock at interval 3
+		clocksync();
+		$sync = false;
+	}
+
+	$ts += $step;
+	logger('Interval #'.$i,LOG_DEBUG,'clock');
+
+	// Update config-cache
+	$config = loadcnf();
+
+	// Cycle through daemons
+	foreach( $config['daemon']['intervals'] as $f => $d ) {
+		if( ($i*$step)%$f == 0 ) {
+			foreach( $d as $int => $run ) {
+				if( (($i*$step)/$f)%$int == 0 ) {
+					foreach( $run as $job ) {
+						spawn($job);
+					}
+				}
+			}
+		}
+	}
+
+	if( $i == 8639 ) {
+		// Overflow at interval 8639
+		$i = 0;
+		$sync = true;
+	} else {
+		$i++;
+	}
+
+} while( sleep_until($ts) === true );
+?>

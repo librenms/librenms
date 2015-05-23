@@ -1886,4 +1886,11 @@ if (!isset($config['log_file'])) { $config['log_dir'] . "/" . $config['project_i
 if (!isset($config['plugin_dir']))  { $config['plugin_dir']  = $config['html_dir'] . '/plugins'; }
 if (!isset($config['title_image'])) { $config['title_image']      = "images/librenms_logo_".$config['site_style'].".png"; }
 
-?>
+//Add additional jobs to the daemon depending on the user's config
+if( $config['show_services'] ) {
+	$config['daemon']['intervals'][60][5][] = array('type'=>'exec',    'file'=>'check-services.php');
+}
+if( $config['enable_billing'] ) {
+	$config['daemon']['intervals'][60][5][]    = array('type'=>'exec', 'file'=>'poll-billing.php');
+	$config['daemon']['intervals'][60][1440][] = array('type'=>'exec', 'file'=>'billing-calculate.php');
+}

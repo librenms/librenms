@@ -632,4 +632,14 @@ $dyn_config['email_smtp_secure'] = array('', 'tls', 'ssl');
 $config['unix-agent-connection-time-out'] 		= 10; //seconds
 $config['unix-agent-read-time-out'] 			= 10; //seconds
 
-?>
+// Daemon Config
+$config['daemon']['facility'] = LOG_DAEMON;                        // Log-facility.
+$config['daemon']['debug']    = false;                             // Debug, General Enable/Disable (true/false) or Enable specific sections by names (clock,jobctl,..).
+$config['daemon']['uid']      = posix_getpwnam('librenms')['uid']; // UID to use for daemon.
+
+// Daemon Intervals
+$config['daemon']['intervals'][60][1][]    = array('type'=>'include', 'file'=>'alerts.php');                          // Alerts run every minute.
+$config['daemon']['intervals'][60][2][]    = array('type'=>'exec',    'file'=>'discovery.php',     'args'=>'-h new'); // Discover new devices every 2 minutes
+$config['daemon']['intervals'][60][5][]    = array('type'=>'exec',    'file'=>'poller-wrapper.py', 'args'=>'16');     // Poller runs every 5 minutes
+$config['daemon']['intervals'][3600][6][]  = array('type'=>'exec',    'file'=>'discovery.php',     'args'=>'-h all'); // Re-Discover every 6 Hours
+$config['daemon']['intervals'][86400][1][] = array('type'=>'exec',    'file'=>'daily.sh');                            // Daily at midnight.
