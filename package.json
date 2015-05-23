@@ -42,9 +42,6 @@
 	"main": "jquery.gridster",
     "directories": {
       "lib": "dist"
-    },
-    "dependencies": {
-      "jquery": "github:components/jquery@2.0.3"
     }
   }
 }
