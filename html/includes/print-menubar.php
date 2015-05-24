@@ -235,6 +235,15 @@ if ($_SESSION['userlevel'] >= '5')
   if ($config['int_peering']) { echo('            <li><a href="iftype/type=peering/"><i class="fa fa-user-plus fa-fw fa-lg"></i> Peering</a></li>'); $ifbreak = 1; }
   if ($config['int_peering'] && $config['int_transit']) { echo('            <li><a href="iftype/type=peering,transit/"><i class="fa fa-user-secret fa-fw fa-lg"></i> Peering + Transit</a></li>'); $ifbreak = 1; }
   if ($config['int_core']) { echo('            <li><a href="iftype/type=core/"><i class="fa fa-anchor fa-fw fa-lg"></i> Core</a></li>'); $ifbreak = 1; }
+    if (is_array($config['custom_descr']) === FALSE) {
+        $config['custom_descr'] = array($config['custom_descr']);
+    }
+    foreach ($config['custom_descr'] as $custom_type) {
+        if (!empty($custom_type)) {
+            echo '          <li><a href="iftype/type=' . strtolower($custom_type) . '"><i class="fa fa-connectdevelop fa-fw fa-lg"></i> ' . ucfirst($custom_type) . '</a></li>';
+            $ifbreak = 1;
+        }
+    }
 }
 
 if ($ifbreak) {
