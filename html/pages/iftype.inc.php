@@ -7,6 +7,16 @@ if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
 $type_where = " (";
 foreach (explode(",", $vars['type']) as $type)
 {
+    if (is_array($config[$type."_descr"]) === FALSE) {
+        $config[$type."_descr"] = array($config[$type."_descr"]);
+    }
+    foreach ($config[$type."_descr"] as $additional_type) {
+        if(!empty($additional_type)) {
+            $type_where .= " $or `port_descr_type` = ?";
+            $or = "OR";
+            $type_param[] = $additional_type;
+        }
+    }
   $type_where .= " $or `port_descr_type` = ?";
   $or = "OR";
   $type_param[] = $type;
