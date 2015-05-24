@@ -70,6 +70,7 @@ if ($config['alerts']['email']['enable'] === TRUE) {
     print_warn("You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4");
 }
 
+// Test rrdcached
 if (!$config['rrdcached']) {
     $rrd_dir = stat($config['rrd_dir']);
     if ($rrd_dir[4] == 0 || $rrd_dir[5] == 0) {
@@ -80,6 +81,7 @@ if (!$config['rrdcached']) {
     }
 }
 
+// Disk space and permission checks
 if (substr(sprintf('%o', fileperms($config['temp_dir'])), -3) != 777) {
     print_warn("Your tmp directory (".$config['temp_dir'].") is not set to 777 so graphs most likely won't be generated");
 }
@@ -92,6 +94,17 @@ if ($space_check < 1) {
     print_fail("Disk space where " . $config['install_dir'] . " is located is empty!!!");
 }
 
+// Check programs
+$bins = array('fping');
+foreach ($bins as $bin) {
+    if (!is_file($config[$bin])) {
+        print_fail("$bin location is incorrect orbin not installed");
+    } else {
+        print_ok("$bin has been found");
+    }
+}
+
+// Modules test
 $modules = explode(",",$options['m']);
 foreach ($modules as $module) {
     switch ($module) {
