@@ -34,7 +34,7 @@
 	"download": "https://github.com/neveldo/jQuery-Mapael/tags",
 	"dependencies": {
 		"jquery": ">=1.7",
-		"raphael": ">=2.1.2",
+		"raphael": ">=2.1.4",
 		"jquery-mousewheel": ">=3.1.6"
 	}
 }
