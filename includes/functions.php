@@ -526,8 +526,12 @@ function utime()
 
 function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0')
 {
+  global $config;
   $host = trim(strtolower($host));
 
+  if (is_numeric($poller_group) === FALSE) {
+      $poller_group = $config['distributed_poller_group'];
+  }
   $device = array('hostname' => $host,
                   'sysName' => $host,
                   'community' => $community,
