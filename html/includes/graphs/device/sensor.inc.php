@@ -4,7 +4,7 @@ include("includes/graphs/common.inc.php");
 
 if ($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
 
-$rrd_options .= " -l 0 -E ";
+$rrd_options .= " -E ";
 $iter = "1";
 $rrd_options .= " COMMENT:'".str_pad($unit_long,$descr_len)."    Cur     Min    Max\\n'";
 
