@@ -369,7 +369,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
         if ($config['nfsen_suffix']) { $nfsensuffix = $config['nfsen_suffix']; }
         $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
         $nfsen_filename = (strstr($basefilename_underscored, $nfsensuffix, true));
-        if (is_file($nfsenrrds . $nfsen_filename . ".rrd")) { $nfsen_rrd_file = $nfsenrrds . $basefilename_underscored . ".rrd"; }
+        if (is_file($nfsenrrds . $nfsen_filename . ".rrd")) { $nfsen_rrd_file = $nfsenrrds . $nfsen_filename . ".rrd"; }
       }
     }
 
