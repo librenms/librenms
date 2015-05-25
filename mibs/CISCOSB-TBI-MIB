@@ -9,20 +9,20 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
     TruthValue, RowStatus,
     TEXTUAL-CONVENTION,DisplayString            FROM SNMPv2-TC
-    switch001                                        FROM CISCOSB-MIB;
+    switch001                                   FROM CISCOSB-MIB;
 
 
 rlTBIMib MODULE-IDENTITY
         LAST-UPDATED "200604040000Z"
-		ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
                 "Time Range Infrastructure MIBs initial version. "

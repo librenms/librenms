@@ -51,6 +51,11 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
 
+### Adding the librenms-user ###
+
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms apache
+
 ### Using HTTPd (Apache2) ###
 
 Set `httpd` to start on system boot.
@@ -167,9 +172,14 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
     # For HTTPd (Apache):
-    chown apache:apache rrd/
+    chown apache:apache logs
     # For Nginx:
-    chown nginx:nginx rrd/
+    chown nginx:nginx logs
+
+    chmod 775 rrd
+    chown librenms:librenms rrd
+
+> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 Start the web-server:
 
@@ -202,7 +212,7 @@ If the thread count needs to be changed, you can do so by editing the cron file 
 
 Create the cronjob
 
-    cp librenms.cron /etc/cron.d/librenms
+    cp librenms.nonroot.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 

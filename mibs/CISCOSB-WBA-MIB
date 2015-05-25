@@ -1,0 +1,334 @@
+CISCOSB-WBA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                       FROM CISCOSB-MIB
+    InetAddressType,InetAddress,InetAddressIPv6     FROM INET-ADDRESS-MIB -- RFC2851
+    SnmpAdminString                                 FROM SNMP-FRAMEWORK-MIB
+    TEXTUAL-CONVENTION, DisplayString,MacAddress    FROM SNMPv2-TC
+    OBJECT-TYPE                                     FROM SNMPv2-SMI;
+
+
+rlWBA   MODULE-IDENTITY
+        LAST-UPDATED "201007050000Z"
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Web Based Authentication."
+        REVISION "201007050000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 228 }
+
+RlWBAStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The host(mac,ifindex) authentication status"
+     SYNTAX INTEGER {
+            unknown(0),
+            inProcess(1),
+            failAuthen(2),
+            pending(3),
+            authenticating(4),
+            authenticated(5),
+            waitAck(6)
+     }
+
+RlWBARetryFlagOp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The retry flag options"
+     SYNTAX INTEGER {
+            off(0),
+            on(1)
+     }
+
+rlWBAAuxiliaryTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlWBAAuxiliaryEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The table is an auxiliary table with 1 entry only. Used
+                       to pass user credentials to authentication manager and provide
+                       the users' authentication status."
+   ::= { rlWBA 1 }
+
+rlWBAAuxiliaryEntry OBJECT-TYPE
+    SYNTAX  RlWBAAuxiliaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlWBAIp }
+    ::= { rlWBAAuxiliaryTable 1 }
+
+RlWBAAuxiliaryEntry ::= SEQUENCE {
+    rlWBAIp                 InetAddress,
+    rlWBAStatus             RlWBAStatusType,
+    rlAuxFailReason         INTEGER,
+    rlIsRetryFlag           RlWBARetryFlagOp,
+    rlWBAUsername           DisplayString,
+    rlWBAPassword           DisplayString
+}
+
+
+rlWBAIp OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlWBAAuxiliaryEntry 1 }
+
+rlWBAStatus OBJECT-TYPE
+    SYNTAX  RlWBAStatusType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The host authentication status."
+    ::= { rlWBAAuxiliaryEntry 2 }
+
+rlAuxFailReason OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION    "Web Based Authentication fail reason"
+
+   ::= { rlWBAAuxiliaryEntry 3 }
+
+rlIsRetryFlag OBJECT-TYPE
+    SYNTAX  RlWBARetryFlagOp
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION    "Web Based Authentication retry flag.
+                    If flag is on it means the host that started authentication process was out
+                    due to higher priority session. The host must retry authenticating until higher session
+                    is accepted/failed. The default value is OFF"
+    DEFVAL{ off }
+   ::= { rlWBAAuxiliaryEntry 4 }
+
+rlWBAUsername OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Web Based Authentication User Name"
+   ::= { rlWBAAuxiliaryEntry 5 }
+
+rlWBAPassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..16))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Web Based Authentication User Password."
+
+   ::= { rlWBAAuxiliaryEntry 6 }
+
+
+
+
+
+
+
+-- -------------------------------------------------------------
+-- ---------   Image Tables     --------------------------------
+-- -------------------------------------------------------------
+
+
+
+
+ rlWBAImageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlWBAImageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds the images content."
+    ::= {rlWBA 2 }
+
+    rlWBAImageEntry  OBJECT-TYPE
+    SYNTAX      RlWBAImageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlWBAImageTable."
+    INDEX    { rlWBAImageNumber,rlWBAImageIndex}
+    ::= {rlWBAImageTable  1 }
+
+    RlWBAImageEntry ::= SEQUENCE {
+    rlWBAImageNumber     INTEGER (1..10),
+    rlWBAImageIndex      INTEGER (1..1000),
+    rlWBAImageText       OCTET STRING
+    }
+
+
+    rlWBAImageNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the Image number ... "
+    ::= { rlWBAImageEntry 1 }
+
+    rlWBAImageIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "This variable identifies the Data of index of the image cut into octetes of 160 bytes"
+
+    ::= { rlWBAImageEntry 2 }
+
+
+    rlWBAImageText OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies the MIB which holds image content ."
+    ::= { rlWBAImageEntry 3 }
+
+
+
+-- -------------------------------------------------------------
+-- ---------   Image Tables     --------------------------------
+-- -------------------------------------------------------------
+
+ rlWBADataTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlWBADataEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds the Data content."
+    ::= {rlWBA 3 }
+
+    rlWBADataEntry  OBJECT-TYPE
+    SYNTAX      RlWBADataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlWBADataTable."
+    INDEX    { rlWBADataNumber,rlWBADataIndex}
+    ::= {rlWBADataTable  1 }
+
+    RlWBADataEntry ::= SEQUENCE {
+    rlWBADataNumber     INTEGER (1..10),
+    rlWBADataIndex      INTEGER (1..1000),
+    rlWBADataText       SnmpAdminString
+    }
+
+
+    rlWBADataNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the Data of index of the image cut into octets of 160 bytes"
+    ::= { rlWBADataEntry 1 }
+
+    rlWBADataIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TBD"
+
+    ::= { rlWBADataEntry 2 }
+
+
+    rlWBADataText OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies the MIB which holds a section of the Data content in the table.(chunk of 160 bytes)"
+    ::= { rlWBADataEntry 3 }
+
+
+-- image information
+ rlWBAImageInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlWBAImageInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds the images content."
+    ::= {rlWBA 4 }
+
+    rlWBAImageInfoEntry  OBJECT-TYPE
+    SYNTAX      RlWBAImageInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlWBAImageInfoTable."
+    INDEX    { rlWBAImageInfoNumber}
+    ::= {rlWBAImageInfoTable  1 }
+
+    RlWBAImageInfoEntry ::= SEQUENCE {
+    rlWBAImageInfoNumber     INTEGER (1..10),
+    rlWBAImageInfoName       SnmpAdminString,
+    rlWBAImageInfoSize       INTEGER
+
+    }
+
+
+    rlWBAImageInfoNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the Image number ... "
+    ::= { rlWBAImageInfoEntry 1 }
+
+    rlWBAImageInfoName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable identifies the Name of the image eg: myImage.png"
+
+    ::= { rlWBAImageInfoEntry 2 }
+
+
+    rlWBAImageInfoSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies the size of the image."
+    ::= { rlWBAImageInfoEntry 3 }
+
+
+
+    rlWBAImageClear OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION    "Action to Clear a certain image "
+
+   ::= {rlWBA 5}
+
+    rlWBADataClear OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION    "Action to Clear a certain image "
+
+   ::= {rlWBA 6 }
+
+    rlWBAImageDownloadFinishStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION    "Finish status of customization image download"
+
+   ::= {rlWBA 7}
+
+END
+
+
+
+
+
+

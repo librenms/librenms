@@ -1,25 +1,26 @@
 CISCOSB-COPY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    switch001, rndNotifications                  FROM CISCOSB-MIB
+    switch001, rndNotifications             FROM CISCOSB-MIB
     rndErrorDesc , rndErrorSeverity         FROM CISCOSB-DEVICEPARAMS-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,Counter32, TimeTicks,
     MODULE-IDENTITY, NOTIFICATION-TYPE      FROM SNMPv2-SMI
     DisplayString, TEXTUAL-CONVENTION,
     TruthValue, RowStatus                   FROM SNMPv2-TC
-    InetAddressType,InetAddress             FROM INET-ADDRESS-MIB; -- RFC2851
+    InetAddressType,InetAddress             FROM INET-ADDRESS-MIB
+    RlSecSdAccessType                       FROM CISCOSB-SECSD-MIB; -- RFC2851
 
  rlCopy   MODULE-IDENTITY
-          LAST-UPDATED "200602020000Z"
-		  ORGANIZATION "Cisco Small Business"
+          LAST-UPDATED "201005110000Z"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "Added field rlCopyInetSpecificCopyInfo"
@@ -66,7 +67,12 @@ RlCopyLocationType ::= TEXTUAL-CONVENTION
         tftp(3),
         xmodem(4),
         scp(5),
-        serial(6)
+        serial(6),
+        http(7),
+        https(8),
+        http-xml(9),
+        https-xml(10)
+
 }
 
 RlCopyFileType ::= TEXTUAL-CONVENTION
@@ -87,6 +93,17 @@ RlCopyFileType ::= TEXTUAL-CONVENTION
         logging(11),
         mirrorConfig(12),
         usb(13)
+}
+RlCopySecSdAccessType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Sec sd access type"
+    SYNTAX  INTEGER {
+        exclude(1),
+        include-encrypted(2),
+        include-decrypted(3),
+        default(4)
+
 }
 
 rlCopyMibVersion OBJECT-TYPE
@@ -296,6 +313,7 @@ rlCopyHistoryIndex OBJECT-TYPE
          for this copy operation."
     DEFVAL { 0 }
     ::= { rlCopyEntry 18 }
+
 
 rlCopyFreeHistoryIndex OBJECT-TYPE
     SYNTAX  INTEGER
@@ -1134,6 +1152,73 @@ rlCopyMirrorTimeout  OBJECT-TYPE
           The MIB is for debugging purposes only, and given value should be the
           number of minutes for time-interval of this copy."
     ::= { rlCopy 11 }
+
+rlCopyOptionsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table includes more field options for the copy operation."
+    ::= {rlCopy 12 }
+
+rlCopyOptionsEntry OBJECT-TYPE
+    SYNTAX RlCopyOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the rlCopyOptionsTable."
+    INDEX {rlCopyOptionsIndex }
+    ::= { rlCopyOptionsTable  1 }
+
+RlCopyOptionsEntry ::= SEQUENCE {
+    rlCopyOptionsIndex               Unsigned32,
+    rlCopyOptionsRequestedSsdAccess  RlCopySecSdAccessType
+}
+
+rlCopyOptionsIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index should be equal to the value of rlCopyInetIndex of the relevant rlCopyInetEntry."
+    ::= { rlCopyOptionsEntry 1 }
+
+rlCopyOptionsRequestedSsdAccess  OBJECT-TYPE
+    SYNTAX  RlCopySecSdAccessType
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The requested format for sensitive data in the copy. Relevant only for configuration file upload"
+    DEFVAL { default }
+    ::= { rlCopyOptionsEntry 2 }
+
+rlCopyMirror OBJECT IDENTIFIER ::= { rlCopy 13 }
+
+rlCopyMirrorEnable  OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " This MIB should be used in order to enable/disable automatic copy of
+          startup-config to mirror-config."
+    ::= { rlCopyMirror 1 }
+
+        ---         File Copy downgrade status
+
+rlCopyStaticDowngradeStatus  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controls whether static downgrade in progress "
+    DEFVAL { false }
+    ::= { rlCopy 14 }
+
+
+
 
 END
 

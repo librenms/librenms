@@ -1,13 +1,13 @@
 CISCOSB-IpRouter DEFINITIONS ::= BEGIN
 
 -- Title:      CISCOSB IP Router Private Extension
--- Version:    7.37.00.00
--- Date:       17 May 2004
+-- Version:    7.50.00.00
+-- Date:       30 Nov 2010
 
 IMPORTS
     rip2Spec, ipRedundancy, ipRouteLeaking, ipRipFilter,
     rlIpRoutingProtPreference, rlOspf, ipSpec               FROM CISCOSB-IP
-    rip2IfConfEntry                                         FROM RFC1389-MIB
+    rip2IfConfEntry                                         FROM RIPv2-MIB
     ospfIfEntry, AreaID, RouterID, ospfVirtIfEntry          FROM OSPF-MIB
     Unsigned32, Integer32, Counter32, IpAddress,
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
@@ -18,15 +18,15 @@ IMPORTS
 
    rlIpRouter  MODULE-IDENTITY
                  LAST-UPDATED "200406010000Z"
-				 ORGANIZATION "Cisco Small Business"
+                 ORGANIZATION "Cisco Systems, Inc."
 
-				 CONTACT-INFO
-				 "Postal: 170 West Tasman Drive
-				 San Jose , CA 95134-1706
-				 USA
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
 
-				 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                  DESCRIPTION
                       "The private MIB module definition for switch001 router MIB."
@@ -47,7 +47,7 @@ rsRip2IfConfTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-           "This table is extension of rip2IfConfTable (RFC 1389 ,RIP 2)"
+           "This table is extension of rip2IfConfTable (RFC 1724 ,RIP 2)"
     ::=  { rip2Spec 1  }
 
 rsRip2IfConfEntry   OBJECT-TYPE
@@ -60,10 +60,15 @@ rsRip2IfConfEntry   OBJECT-TYPE
     ::=  {  rsRip2IfConfTable 1  }
 
 RsRip2IfConfEntry  ::= SEQUENCE {
-    rsRip2IfConfAddress    IpAddress,
-    rsRip2IfConfVirtualDis INTEGER,
-    rsRip2IfConfAutoSend   INTEGER,
-    rlRip2IfConfKeyChain   DisplayString
+    rsRip2IfConfAddress             IpAddress,
+    rsRip2IfConfVirtualDis          INTEGER,
+    rlRip2IfConfKeyChain            DisplayString,
+    rlRip2IfConfAdminStatus         INTEGER,
+    rlRip2IfConfInFilteringType     INTEGER,
+    rlRip2IfConfOutFilteringType    INTEGER,
+    rlRip2IfConfInFilterListName    DisplayString,
+    rlRip2IfConfOutFilterListName   DisplayString,
+    rlRip2IfConfDefInfOriginate     INTEGER
     }
 
 rsRip2IfConfAddress  OBJECT-TYPE
@@ -86,21 +91,6 @@ rsRip2IfConfVirtualDis OBJECT-TYPE
     DEFVAL  { 1 }
     ::=   { rsRip2IfConfEntry  2  }
 
-rsRip2IfConfAutoSend OBJECT-TYPE
-    SYNTAX  INTEGER {
-       enable  (1),
-       disable (2)
-       }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "This variable controls RIP automatic send behavior. If enabled
-          and no routers were heard on the interface, RIP will only send
-          default route with high metric. Otherwise RIP will send updates
-          according to configuration. "
-    DEFVAL  {enable}
-     ::=   { rsRip2IfConfEntry  3  }
-
 rlRip2IfConfKeyChain OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-write
@@ -108,30 +98,181 @@ rlRip2IfConfKeyChain OBJECT-TYPE
     DESCRIPTION
         "Name of the key-chain which rip2
          interface uses for md5 authentication"
-    ::= { rsRip2IfConfEntry  4 }
+    ::= { rsRip2IfConfEntry  3 }
 
-rlRip2AutoInterfaceCreation OBJECT-TYPE
+rlRip2IfConfAdminStatus OBJECT-TYPE
     SYNTAX  INTEGER {
        enable  (1),
        disable (2)
        }
-    MAX-ACCESS  read-only
-    STATUS  current
+    MAX-ACCESS  read-write
+    STATUS      current
     DESCRIPTION
-         "This variable controls RIP automatic creation and activation of
-          interfaces.  If value is enable - IP interface creation results in
-          creation and activation of rip Interface.  If value is disable
-          Rip interface is created but not activated.
-          The option is a platform parameter."
-    ::=  { rip2Spec 2  }
+         "This variable defines administrative status of RIP interface. "
+    DEFVAL  {enable}
+     ::= { rsRip2IfConfEntry  4  }
+
+rlRip2IfConfInFilteringType OBJECT-TYPE
+    SYNTAX  INTEGER {
+       none  (1),
+       stdIpAcl (2),
+       pefixList (3)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Type of Rx filtering (ACL, Prefix List etc)."
+    DEFVAL  {none}
+     ::= { rsRip2IfConfEntry  5  }
+
+rlRip2IfConfOutFilteringType OBJECT-TYPE
+    SYNTAX  INTEGER {
+       none  (1),
+       stdIpAcl (2),
+       pefixList (3)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Type of Tx filtering (ACL, Prefix List etc)."
+    DEFVAL  {none}
+     ::= { rsRip2IfConfEntry  6  }
+
+rlRip2IfConfInFilterListName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of a filtering list. The list defines
+         which networks are to be received and which
+         are to be suppressed in routing updates.
+         List type is defined by rlRip2IfConfFilteringType."
+    ::= { rsRip2IfConfEntry  7 }
+
+rlRip2IfConfOutFilterListName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of a filtering list. The list defines
+         which networks are to be sent and which
+         are to be suppressed.
+         List type is defined by rlRip2IfConfFilteringType."
+    ::= { rsRip2IfConfEntry  8 }
+
+rlRip2IfConfDefInfOriginate  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        global      (1),
+        disabled    (2),
+        enabled     (3),
+        passiveOnly (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to global RIP behavior is specified by the value of
+         rlRip2GlobalDefaultInformationOriginate scalar
+         if set to enabled RIP will advertise default route on this interfaces
+         if set to passiveOnly RIP will advertise default route on this interfaces
+         only if it is configured to passive mode"
+    DEFVAL { global }
+    ::= { rsRip2IfConfEntry  9 }
+
 
 rlRip2MibVersion OBJECT-TYPE
     SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "MIB's version, the current version is 1."
+        "MIB's version, the current version is 2."
+    ::=  { rip2Spec 2  }
+
+rlRip2RedistDefaultMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default metric value when RIP advertises routes,
+         derived by other protocols."
+    DEFVAL { 1 }
     ::=  { rip2Spec 3  }
+
+rlRip2RedistStaticTransparent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to use the routing table metric
+         for redistributed static routes as the RIP metric.
+         If set to FALSE then the metric defined in
+         rlRip2RedistDefaultMetric is used."
+    DEFVAL { false }
+    ::=  { rip2Spec 4  }
+
+rlRip2ClearStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clears RIP statistics counters of all interfaces and all peers."
+    DEFVAL { false }
+    ::=  { rip2Spec 5  }
+
+rlRip2IfConfGlobalPassiveInterface OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to TRUE all interfaces created will be created as passive (rip2IfConfSend = doNotSend)"
+    DEFVAL { false }
+    ::= { rip2Spec 6 }
+
+
+rlRip2GlobalDefInfOriginate  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled    (1),
+        enabled     (2),
+        passiveOnly (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to Enabled RIP will advertise default route on all RIP interfaces
+         if set to PassiveOnly RIP will advertise default route on all RIP passive interfaces"
+    DEFVAL { disabled }
+    ::= { rip2Spec 7 }
+
+rlRip2RedistConnected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to redistribute
+         directly connected interfaces, on which RIP is not enabled."
+    DEFVAL { false }
+    ::=  { rip2Spec 8  }
+
+rlRip2RedistConnectedTransparent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to use the routing table metric
+         for redistributed connected routes as the RIP metric.
+         If set to FALSE then the metric defined in
+         rlRip2RedistDefaultMetric is used."
+    DEFVAL { false }
+    ::=  { rip2Spec 9  }
+
+rlRip2RedistConnectedMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User defined metric value when RIP advertises
+         directly connected interfaces, on which RIP is not enabled."
+    DEFVAL { 0 }
+    ::=  { rip2Spec 10  }
 
 --
 -- CISCOSB Private IP Router Redundancy

@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-AAA-MIB DEFINITIONS ::= BEGIN
@@ -27,8 +32,8 @@ ruckusZDAAAMIB MODULE-IDENTITY
         "Ruckus Wireless, Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -144,7 +149,8 @@ RuckusZDAAASvrEntry ::= SEQUENCE {
 
   ruckusZDAAARadiusFailoverTimeout		INTEGER,
   ruckusZDAAARadiusFailoverRetry		INTEGER,
-  ruckusZDAAARadiusFailoverReconnectPrimary	INTEGER
+  ruckusZDAAARadiusFailoverReconnectPrimary	INTEGER,
+  ruckusZDAAARadiusFailoverConsecutiveDropPkts  INTEGER
 }
 
 ruckusZDAAARadiusBackupControl OBJECT-TYPE
@@ -213,7 +219,7 @@ ruckusZDAAARadiusSecondarySvrPasswd OBJECT-TYPE
     ::= { ruckusZDAAASvrEntry 17 }
 
 ruckusZDAAARadiusFailoverTimeout OBJECT-TYPE
-    SYNTAX  INTEGER (3..10)
+    SYNTAX  INTEGER (2..20)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -231,13 +237,23 @@ ruckusZDAAARadiusFailoverRetry OBJECT-TYPE
     ::= { ruckusZDAAASvrEntry 21 }
 
 ruckusZDAAARadiusFailoverReconnectPrimary OBJECT-TYPE
-    SYNTAX  INTEGER (2..10)
+    SYNTAX  INTEGER (1..86400)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "The number of seconds configured for RADIUS Server to reconnect to the Primary Server for the Server."
         DEFVAL {5}
     ::= { ruckusZDAAASvrEntry 22 }
+
+ruckusZDAAARadiusFailoverConsecutiveDropPkts OBJECT-TYPE
+	SYNTAX  INTEGER (1..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The max number of consecutive packets configured for RADIUS Server."
+        DEFVAL {1}
+    ::= { ruckusZDAAASvrEntry 23 }
+
 
 
 END

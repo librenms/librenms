@@ -38,7 +38,8 @@ if (!empty($_POST['ignore']))   { $sql .= " AND `ignore`= ?";       $param[] = $
 if (!empty($_POST['location']) && $_POST['location'] == "Unset") { $location_filter = ''; }
 if (!empty($_POST['location'])) {
     $sql .= " AND (((`DB`.`attrib_value`='1' AND `DA`.`attrib_type`='override_sysLocation_string' AND `DA`.`attrib_value` = ?)) OR `location` = ?)";
-    $param = array(mres($_POST['location']),mres($_POST['location']));
+    $param[] = mres($_POST['location']);
+    $param[] = mres($_POST['location']);
 }
 if( !empty($_POST['group']) ) {
     require_once('../includes/device-groups.inc.php');

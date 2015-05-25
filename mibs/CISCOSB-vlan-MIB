@@ -34,10 +34,11 @@ CISCOSB-vlan-MIB DEFINITIONS ::= BEGIN
 -- 06-Sep-2010 (GenadyB) Added rldot1qPortVlanStaticTable MIB
 
 IMPORTS
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     DisplayString, TruthValue, RowStatus,
     MacAddress                                  FROM SNMPv2-TC
     VlanIndex, dot1qVlanIndex, PortList         FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB
     ifIndex                                     FROM IF-MIB
     dot1dBasePort                               FROM BRIDGE-MIB
     SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
@@ -46,15 +47,15 @@ IMPORTS
 
 vlan MODULE-IDENTITY
               LAST-UPDATED "200602120000Z"
-			  ORGANIZATION "Cisco Small Business"
+              ORGANIZATION "Cisco Systems, Inc."
 
-			  CONTACT-INFO
-			  "Postal: 170 West Tasman Drive
-			  San Jose , CA 95134-1706
-			  USA
+              CONTACT-INFO
+              "Postal: 170 West Tasman Drive
+              San Jose , CA 95134-1706
+              USA
 
-			  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-			  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+              
+              Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
               DESCRIPTION
                       "The private MIB module definition for IP Multicast support in CISCOSB devices."
@@ -371,7 +372,7 @@ vlanDynamicVlanEntry OBJECT-TYPE
 
 VlanDynamicVlanEntry ::= SEQUENCE {
         vlanDynamicVlanMacAddress  MacAddress,
-        vlanDynamicVlanTag     VlanIndex,
+        vlanDynamicVlanTag         VlanIndex,
         vlanDynamicVlanStatus      RowStatus
     }
 
@@ -861,8 +862,8 @@ vlanSubnetPortEntry OBJECT-TYPE
 
 VlanSubnetPortEntry ::=
     SEQUENCE {        vlanSubnetPortGroupId            INTEGER,
-                      vlanSubnetPortGroupVid            INTEGER,
-                      vlanSubnetPortRowStatus            RowStatus    }
+                      vlanSubnetPortGroupVid           INTEGER,
+                      vlanSubnetPortRowStatus          RowStatus    }
 
 vlanSubnetPortGroupId OBJECT-TYPE
     SYNTAX      INTEGER (1..2147483647)
@@ -911,8 +912,8 @@ vlanTriplePlayEntry OBJECT-TYPE
     ::= { vlanTriplePlayTable 1 }
 
 VlanTriplePlayEntry ::= SEQUENCE {
-        vlanTriplePlayInnerVID     VlanIndex,
-        vlanTriplePlayMulticastTvVID     VlanIndex,
+        vlanTriplePlayInnerVID       VlanIndex,
+        vlanTriplePlayMulticastTvVID VlanIndex,
         vlanTriplePlayRowStatus  RowStatus
     }
 
@@ -961,8 +962,8 @@ vlanTriplePlayMulticatTvEntry OBJECT-TYPE
     ::= { vlanTriplePlayMulticastTvTable 1 }
 
 VlanTriplePlayMulticatTvEntry ::= SEQUENCE {
-              vlanTriplePlayMulticastTvMulticastTvVID      VlanIndex,
-        vlanTriplePlayMulticastTvMulticastTvPortList         PortList
+        vlanTriplePlayMulticastTvMulticastTvVID      VlanIndex,
+        vlanTriplePlayMulticastTvMulticastTvPortList PortList
 
 }
 
@@ -1287,9 +1288,9 @@ vlanInetTriplePlayEntry OBJECT-TYPE
 
 VlanInetTriplePlayEntry ::= SEQUENCE {
         vlanInetTriplePlayInetAddressType   InetAddressType,
-        vlanInetTriplePlayInnerVID              VlanIndex,
-        vlanInetTriplePlayMulticastTvVID        VlanIndex,
-        vlanInetTriplePlayRowStatus             RowStatus
+        vlanInetTriplePlayInnerVID          VlanIndex,
+        vlanInetTriplePlayMulticastTvVID    VlanIndex,
+        vlanInetTriplePlayRowStatus         RowStatus
     }
 
 vlanInetTriplePlayInetAddressType OBJECT-TYPE
@@ -1346,7 +1347,7 @@ vlanInetTriplePlayMulticatTvEntry OBJECT-TYPE
 
 VlanInetTriplePlayMulticatTvEntry ::= SEQUENCE {
         vlanInetTriplePlayMulticastTvMulticastTvVID      VlanIndex,
-        vlanInetTriplePlayMulticastTvMulticastTvPortList         PortList
+        vlanInetTriplePlayMulticastTvMulticastTvPortList PortList
 }
 
 vlanInetTriplePlayMulticastTvMulticastTvVID      OBJECT-TYPE
@@ -1373,6 +1374,7 @@ vlanAsymmetricEnabled OBJECT-TYPE
     DESCRIPTION
          "Indicates enabled or disabled of Asymetric Vlan"
     ::= { vlan 58 }
+
 
 --------------------------------------------------
 --  Private VLAN - MIBs definition
@@ -1483,11 +1485,13 @@ vlanPrivateMapEntry OBJECT-TYPE
     ::= { vlanPrivateMapTable 1 }
 
 VlanPrivateMapEntry ::= SEQUENCE {
-        vlanPrivateMapPrimaryVid        VlanIndex,
-        vlanPrivateMapSecondaryVid      VlanIndex,
-        vlanPrivateMapPrimaryPorts      PortList,
-        vlanPrivateMapSecondaryPorts    PortList,
-        vlanPrivateMapStatus            RowStatus
+        vlanPrivateMapPrimaryVid            VlanIndex,
+        vlanPrivateMapSecondaryVid          VlanIndex,
+        vlanPrivateMapPrimaryPorts          PortList,
+        vlanPrivateMapSecondaryPorts        PortList,
+        vlanPrivateMapPrimaryOperPorts      PortList,
+        vlanPrivateMapSecondaryOperPorts    PortList,
+        vlanPrivateMapStatus                RowStatus
 }
 
 vlanPrivateMapPrimaryVid OBJECT-TYPE
@@ -1526,6 +1530,24 @@ vlanPrivateMapSecondaryPorts  OBJECT-TYPE
           association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
     ::= { vlanPrivateMapEntry 4}
 
+vlanPrivateMapPrimaryOperPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The private vlan active promiscuous ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 5}
+
+vlanPrivateMapSecondaryOperPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The private vlan active host ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 6}
+
 vlanPrivateMapStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-write
@@ -1533,7 +1555,7 @@ vlanPrivateMapStatus OBJECT-TYPE
     DESCRIPTION
        "The row status variable, used according to
        row installation and removal conventions."
-    ::= { vlanPrivateMapEntry 5 }
+    ::= { vlanPrivateMapEntry 7 }
 
 -- end of vlanPrivateMapTable
 
@@ -1560,10 +1582,10 @@ vlanTrunkPortModeEntry  OBJECT-TYPE
 
 VlanTrunkPortModeEntry::=SEQUENCE{
    vlanTrunkPortModeNativeVlanId   VlanIndex,
-   vlanTrunkModeList1to1024        OCTET STRING,
-   vlanTrunkModeList1025to2048     OCTET STRING,
-   vlanTrunkModeList2049to3072     OCTET STRING,
-   vlanTrunkModeList3073to4094     OCTET STRING
+   vlanTrunkModeList1to1024        VlanList1,
+   vlanTrunkModeList1025to2048     VlanList2,
+   vlanTrunkModeList2049to3072     VlanList3,
+   vlanTrunkModeList3073to4094     VlanList4
 }
 
 vlanTrunkPortModeNativeVlanId OBJECT-TYPE
@@ -1576,7 +1598,7 @@ vlanTrunkPortModeNativeVlanId OBJECT-TYPE
    ::= { vlanTrunkPortModeEntry 1 }
 
 vlanTrunkModeList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1585,7 +1607,7 @@ vlanTrunkModeList1to1024 OBJECT-TYPE
    ::= { vlanTrunkPortModeEntry 2 }
 
 vlanTrunkModeList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1594,7 +1616,7 @@ vlanTrunkModeList1025to2048 OBJECT-TYPE
    ::= { vlanTrunkPortModeEntry 3 }
 
 vlanTrunkModeList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1603,7 +1625,7 @@ vlanTrunkModeList2049to3072 OBJECT-TYPE
    ::= { vlanTrunkPortModeEntry 4 }
 
 vlanTrunkModeList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1674,10 +1696,10 @@ vlanCustomerPortModeEntry  OBJECT-TYPE
 
 VlanCustomerPortModeEntry::=SEQUENCE{
    vlanCustomerPortModeVlanId                VlanIndex,
-   vlanCustomerPortModeMtvList1to1024        OCTET STRING,
-   vlanCustomerPortModeMtvList1025to2048     OCTET STRING,
-   vlanCustomerPortModeMtvList2049to3072     OCTET STRING,
-   vlanCustomerPortModeMtvList3073to4094     OCTET STRING
+   vlanCustomerPortModeMtvList1to1024        VlanList1,
+   vlanCustomerPortModeMtvList1025to2048     VlanList2,
+   vlanCustomerPortModeMtvList2049to3072     VlanList3,
+   vlanCustomerPortModeMtvList3073to4094     VlanList4
 
 }
 
@@ -1691,7 +1713,7 @@ vlanCustomerPortModeVlanId OBJECT-TYPE
    ::= { vlanCustomerPortModeEntry 1 }
 
 vlanCustomerPortModeMtvList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION
@@ -1700,7 +1722,7 @@ vlanCustomerPortModeMtvList1to1024 OBJECT-TYPE
    ::= { vlanCustomerPortModeEntry 2 }
 
 vlanCustomerPortModeMtvList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION
@@ -1709,7 +1731,7 @@ vlanCustomerPortModeMtvList1025to2048 OBJECT-TYPE
    ::= { vlanCustomerPortModeEntry 3 }
 
 vlanCustomerPortModeMtvList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION
@@ -1718,7 +1740,7 @@ vlanCustomerPortModeMtvList2049to3072 OBJECT-TYPE
    ::= { vlanCustomerPortModeEntry 4 }
 
 vlanCustomerPortModeMtvList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION
@@ -1889,22 +1911,22 @@ rldot1qPortVlanStaticEntry OBJECT-TYPE
 
 Rldot1qPortVlanStaticEntry ::=SEQUENCE {
 
-    rldot1qPortVlanStaticEgressList1to1024              OCTET STRING,
-    rldot1qPortVlanStaticEgressList1025to2048           OCTET STRING,
-    rldot1qPortVlanStaticEgressList2049to3072           OCTET STRING,
-    rldot1qPortVlanStaticEgressList3073to4094           OCTET STRING,
-    rldot1qPortVlanStaticUntaggedEgressList1to1024      OCTET STRING,
-    rldot1qPortVlanStaticUntaggedEgressList1025to2048   OCTET STRING,
-    rldot1qPortVlanStaticUntaggedEgressList2049to3072   OCTET STRING,
-    rldot1qPortVlanStaticUntaggedEgressList3073to4094   OCTET STRING,
-    rldot1qPortVlanStaticForbiddenList1to1024           OCTET STRING,
-    rldot1qPortVlanStaticForbiddenList1025to2048        OCTET STRING,
-    rldot1qPortVlanStaticForbiddenList2049to3072        OCTET STRING,
-    rldot1qPortVlanStaticForbiddenList3073to4094        OCTET STRING
+    rldot1qPortVlanStaticEgressList1to1024              VlanList1,
+    rldot1qPortVlanStaticEgressList1025to2048           VlanList2,
+    rldot1qPortVlanStaticEgressList2049to3072           VlanList3,
+    rldot1qPortVlanStaticEgressList3073to4094           VlanList4,
+    rldot1qPortVlanStaticUntaggedEgressList1to1024      VlanList1,
+    rldot1qPortVlanStaticUntaggedEgressList1025to2048   VlanList2,
+    rldot1qPortVlanStaticUntaggedEgressList2049to3072   VlanList3,
+    rldot1qPortVlanStaticUntaggedEgressList3073to4094   VlanList4,
+    rldot1qPortVlanStaticForbiddenList1to1024           VlanList1,
+    rldot1qPortVlanStaticForbiddenList1025to2048        VlanList2,
+    rldot1qPortVlanStaticForbiddenList2049to3072        VlanList3,
+    rldot1qPortVlanStaticForbiddenList3073to4094        VlanList4
 }
 
 rldot1qPortVlanStaticEgressList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1913,7 +1935,7 @@ rldot1qPortVlanStaticEgressList1to1024 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 1 }
 
 rldot1qPortVlanStaticEgressList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1922,7 +1944,7 @@ rldot1qPortVlanStaticEgressList1025to2048 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 2 }
 
 rldot1qPortVlanStaticEgressList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1931,7 +1953,7 @@ rldot1qPortVlanStaticEgressList2049to3072 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 3 }
 
 rldot1qPortVlanStaticEgressList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1940,7 +1962,7 @@ rldot1qPortVlanStaticEgressList3073to4094 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 4}
 
 rldot1qPortVlanStaticUntaggedEgressList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1949,7 +1971,7 @@ rldot1qPortVlanStaticUntaggedEgressList1to1024 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 5 }
 
 rldot1qPortVlanStaticUntaggedEgressList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1958,7 +1980,7 @@ rldot1qPortVlanStaticUntaggedEgressList1025to2048 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 6 }
 
 rldot1qPortVlanStaticUntaggedEgressList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1967,7 +1989,7 @@ rldot1qPortVlanStaticUntaggedEgressList2049to3072 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 7 }
 
 rldot1qPortVlanStaticUntaggedEgressList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1976,7 +1998,7 @@ rldot1qPortVlanStaticUntaggedEgressList3073to4094 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 8}
 
 rldot1qPortVlanStaticForbiddenList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1985,7 +2007,7 @@ rldot1qPortVlanStaticForbiddenList1to1024 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 9 }
 
 rldot1qPortVlanStaticForbiddenList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -1994,7 +2016,7 @@ rldot1qPortVlanStaticForbiddenList1025to2048 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 10 }
 
 rldot1qPortVlanStaticForbiddenList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2003,7 +2025,7 @@ rldot1qPortVlanStaticForbiddenList2049to3072 OBJECT-TYPE
    ::= { rldot1qPortVlanStaticEntry 11 }
 
 rldot1qPortVlanStaticForbiddenList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2030,28 +2052,33 @@ rldot1qVlanStaticListEntry OBJECT-TYPE
 
 Rldot1qVlanStaticListEntry ::=SEQUENCE {
     rldot1qVlanStaticListIndex         INTEGER,
-    rldot1qVlanStaticList1to1024       OCTET STRING,
-    rldot1qVlanStaticList1025to2048    OCTET STRING,
-    rldot1qVlanStaticList2049to3072    OCTET STRING,
-    rldot1qVlanStaticList3073to4094    OCTET STRING
+    rldot1qVlanStaticList1to1024       VlanList1,
+    rldot1qVlanStaticList1025to2048    VlanList2,
+    rldot1qVlanStaticList2049to3072    VlanList3,
+    rldot1qVlanStaticList3073to4094    VlanList4
 
 }
 
 rldot1qVlanStaticListIndex  OBJECT-TYPE
    SYNTAX      INTEGER {
-
-        static(0)
+        static(0),
+        dynamicGvrp(1),
+        dynamicRava(2)
    }
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
      "An index is entrie's sequence.
-     The table contains only one static entry."
-
+      This field substitutes a vlan type.
+      If the vlan was created by user configuration then
+      the type is static.
+      If the vlan was created by GVRP/MVRP protocols then the type is dynamicGvrp.
+      If the vlan was created by Radius server attribute assignment mechanism then
+      the type is dynamicRava."
    ::= { rldot1qVlanStaticListEntry 1}
 
 rldot1qVlanStaticList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2060,29 +2087,29 @@ rldot1qVlanStaticList1to1024 OBJECT-TYPE
    ::= { rldot1qVlanStaticListEntry 2}
 
 rldot1qVlanStaticList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "A list of staticaly created vlans from 1025 to 2048."
+     "A list of according to the type field created vlans from 1025 to 2048."
    DEFVAL {'00'H}
    ::= { rldot1qVlanStaticListEntry 3}
 
 rldot1qVlanStaticList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "A list of staticaly created vlans from 2049 to 3072."
+     "A list of according to the type field created vlans from 2049 to 3072."
    DEFVAL {'00'H}
    ::= { rldot1qVlanStaticListEntry 4}
 
 rldot1qVlanStaticList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "A list of staticaly created vlans from 3073 to 4094."
+     "A list of according to the type field created vlans from 3073 to 4094."
    DEFVAL {'00'H}
    ::= { rldot1qVlanStaticListEntry 5}
 
@@ -2136,14 +2163,14 @@ rlPortVlanTriplePlayMulticastTvEntry OBJECT-TYPE
     ::= { rlPortVlanTriplePlayMulticastTvTable 1 }
 
 RlPortVlanTriplePlayMulticastTvEntry ::=SEQUENCE {
-    rlPortVlanTriplePlayMulticastTvList1to1024       OCTET STRING,
-    rlPortVlanTriplePlayMulticastTvList1025to2048    OCTET STRING,
-    rlPortVlanTriplePlayMulticastTvList2049to3072    OCTET STRING,
-    rlPortVlanTriplePlayMulticastTvList3073to4094    OCTET STRING
+    rlPortVlanTriplePlayMulticastTvList1to1024       VlanList1,
+    rlPortVlanTriplePlayMulticastTvList1025to2048    VlanList2,
+    rlPortVlanTriplePlayMulticastTvList2049to3072    VlanList3,
+    rlPortVlanTriplePlayMulticastTvList3073to4094    VlanList4
 }
 
 rlPortVlanTriplePlayMulticastTvList1to1024  OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList1
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2152,7 +2179,7 @@ rlPortVlanTriplePlayMulticastTvList1to1024  OBJECT-TYPE
    ::= { rlPortVlanTriplePlayMulticastTvEntry 1}
 
 rlPortVlanTriplePlayMulticastTvList1025to2048  OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList2
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2161,7 +2188,7 @@ rlPortVlanTriplePlayMulticastTvList1025to2048  OBJECT-TYPE
    ::= { rlPortVlanTriplePlayMulticastTvEntry 2}
 
 rlPortVlanTriplePlayMulticastTvList2049to3072  OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList3
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2170,7 +2197,7 @@ rlPortVlanTriplePlayMulticastTvList2049to3072  OBJECT-TYPE
    ::= { rlPortVlanTriplePlayMulticastTvEntry 3}
 
 rlPortVlanTriplePlayMulticastTvList3073to4094  OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
+   SYNTAX      VlanList4
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2178,7 +2205,44 @@ rlPortVlanTriplePlayMulticastTvList3073to4094  OBJECT-TYPE
 
    ::= { rlPortVlanTriplePlayMulticastTvEntry 4}
 
--- next free ::= {vlan 72}
+rldot1qVlanMembershipTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qVlanMembershipTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains a bitmap of the VLAN owners(applications) that can create the VLAN and/or add a port to the VLAN."
+    ::= { vlan 72 }
+
+rldot1qVlanMembershipTypeEntry  OBJECT-TYPE
+    SYNTAX      Rldot1qVlanMembershipTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Staticly or dynamicly created VLAN ID owner entry"
+    INDEX   {dot1qVlanIndex}
+    ::= { rldot1qVlanMembershipTypeTable 1 }
+
+Rldot1qVlanMembershipTypeEntry ::=SEQUENCE {
+    rldot1qVlanMembershipTypeBitmap        INTEGER
+
+}
+
+rldot1qVlanMembershipTypeBitmap  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "This field contains a bitmap of owners that can creates and/or  add a port
+      to the VLAN.
+      There exist three such type of owners :
+      Default VLAN
+      Manual created VLAN
+      Dynamic(RAVA)created VLAN
+      GVRP(MVRP)created VLAN
+     "
+   ::= { rldot1qVlanMembershipTypeEntry 1}
+
+-- next free ::= {vlan 73}
 
 
 END

@@ -33,9 +33,14 @@ if(is_admin() !== false) {
             <input type="hidden" name="alert_id" id="alert_id" value="">
             <input type="hidden" name="type" id="type" value="create-alert-item">
         <div class="form-group">
+            <div class="col-sm-12">
+                <span id="ajax_response"></span>
+            </div>
+        </div>
+        <div class="form-group">
                 <label for='entity' class='col-sm-3 control-label'>Entity: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='suggest' name='entity' class='form-control' placeholder='I.e: devices.status'/>
+                        <input type='text' id='suggest' name='entity' class='form-control has-feedback' placeholder='I.e: devices.status'/>
                 </div>
         </div>
         <div class="form-group">
@@ -61,15 +66,16 @@ if(is_admin() !== false) {
         <div class="form-group">
                 <label for='value' class='col-sm-3 control-label'>Value: </label>
                 <div class="col-sm-5">
-                        <input type='text' id='value' name='value' class='form-control'/>
+                        <input type='text' id='value' name='value' class='form-control has-feedback'/> <span id="next-step-value"></span>
                 </div>
         </div>
 
         <div class="form-group">
                 <label for='rule-glue' class='col-sm-3 control-label'>Connection: </label>
                 <div class="col-sm-5">
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-glue" value="&&" id="and" name="and">And</button>
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-glue" value="||" id="or" name="or">Or</button>
+                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="&&" id="and" name="and">And</button>
+                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="||" id="or" name="or">Or</button>
+                        <span id="next-step-and"></span>
                 </div>
         </div>
         <div class="form-group">
@@ -126,7 +132,7 @@ if(is_admin() !== false) {
         </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
-                        <button class="btn btn-default btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
+                        <button class="btn btn-success btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
                 </div>
         </div>
 </form>
@@ -303,6 +309,7 @@ $('#map-stub').typeahead({
 
 $('#and, #or').click('', function(e) {
     e.preventDefault();
+    $("#next-step-and").html("");
     var entity = $('#suggest').val();
     var condition = $('#condition').val();
     var value = $('#value').val();
@@ -329,20 +336,40 @@ $('#rule-submit').click('', function(e) {
         url: "/ajax_form.php",
         data: $('form.alerts-form').serialize(),
         success: function(msg){
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-            $("#create-alert").modal('hide');
             if(msg.indexOf("ERROR:") <= -1) {
+                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                $("#create-alert").modal('hide');
                 $('#response').data('tagmanager').empty();
                 setTimeout(function() {
                     location.reload(1);
                 }, 1000);
+            } else {
+                $('#ajax_response').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             }
         },
         error: function(){
-            $("#message").html('<div class="alert alert-info">An error occurred creating this alert.</div>');
-            $("#create-alert").modal('hide');
+            $("#ajax_response").html('<div class="alert alert-info">An error occurred creating this alert.</div>');
         }
     });
+});
+
+$( "#suggest, #value" ).blur(function() {
+    var $this = $(this);
+    var suggest = $('#suggest').val();
+    var value = $('#value').val();
+    if (suggest == "") {
+        $("#next-step-and").html("");
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#suggest").closest('.form-group').addClass('has-error');
+    } else if (value == "") {
+        $("#next-step-and").html("");
+        $("#value").closest('.form-group').addClass('has-error');
+        $("#suggest").closest('.form-group').removeClass('has-error');
+    } else {
+        $("#suggest").closest('.form-group').removeClass('has-error');
+        $("#value").closest('.form-group').removeClass('has-error');
+        $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
+    }
 });
 
 </script>

@@ -27,6 +27,7 @@
     <th class="col-sm-1">High</th>
     <th class="col-sm-1">Low</th>
     <th class="col-sm-2">Alerts</th>
+    <th></th>
   </tr>
 <?php
 foreach ( dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_deleted='0'", array($device['device_id'])) as $sensor)
@@ -39,6 +40,11 @@ foreach ( dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_dele
   else
   {
     $alert_status = '';
+  }
+  if ($sensor['sensor_custom'] == 'No') {
+      $custom = 'disabled';
+  } else {
+      $custom = '';
   }
   echo('
   <tr>
@@ -60,6 +66,9 @@ foreach ( dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_dele
     </td>
     <td>
       <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" '.$alert_status.'>
+    </td>
+    <td>
+        <a type="button" class="btn btn-danger btn-sm '.$custom.' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="'.$sensor['sensor_id'].'">Clear custom</a>
     </td>
   </tr>
 ');
@@ -134,8 +143,7 @@ foreach($rollback as $reset_data)
         }       
       });
     });
-</script>
-<script>
+
   $("[name='alert-status']").bootstrapSwitch('offColor','danger');
   $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
     event.preventDefault();
@@ -155,5 +163,23 @@ foreach($rollback as $reset_data)
       }
     });
   });
+    $("[name='remove-custom']").on('click', function(event) {
+        event.preventDefault();
+        var $this = $(this);
+        var sensor_id = $(this).data("sensor_id");
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: { type: "sensor-alert-update", sensor_id: sensor_id, sub_type: "remove-custom" },
+            dataType: "html",
+            success: function(data){
+                $this.addClass('disabled');
+            },
+            error:function(){
+                //alert('bad');
+            }
+        });
+    });
+
 </script>
 

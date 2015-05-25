@@ -1,0 +1,112 @@
+CISCOSB-RLINVENTORYENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                            FROM CISCOSB-MIB
+    Unsigned32, OBJECT-TYPE                              FROM SNMPv2-SMI
+    DisplayString                                        FROM RFC1213-MIB;
+
+
+UnitIfindexType ::= TEXTUAL-CONVENTION
+    STATUS                 current
+    DESCRIPTION          "Unit or ifindex type."
+    SYNTAX  INTEGER {
+        unit(0),
+        ifindex(1)
+}
+
+    rlInventoryEntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlInventoryEntEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION        "A table that contains INVENTORY entities in the system."
+    ::= { switch001 217 }
+
+
+   rlInventoryEntEntry OBJECT-TYPE
+    SYNTAX              RlInventoryEntEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION        "An entry (conceptual row) in the  rlInventoryEnvTable."
+    INDEX  { rlInventoryEntUnitOrIfindex ,rlInventoryEntUnitIfindexID }
+    ::= { rlInventoryEntTable 1 }
+
+    RlInventoryEntEntry::= SEQUENCE {
+    rlInventoryEntUnitOrIfindex             UnitIfindexType,
+    rlInventoryEntUnitIfindexID             Unsigned32,
+    rlInventoryEntVendorID                  DisplayString,
+    rlInventoryEntPID                       DisplayString,
+    rlInventoryEntName                      DisplayString,
+    rlInventoryEntDescription               DisplayString,
+    rlInventoryEntSerialNumber              DisplayString,
+    rlInventoryEntUnitNum                   Unsigned32
+    }
+
+    rlInventoryEntUnitOrIfindex OBJECT-TYPE
+    SYNTAX              UnitIfindexType
+    MAX-ACCESS          read-only
+        STATUS              current
+    DESCRIPTION        "this field will be equal to zero if this is a unit else 1 if this is a port."
+    ::= { rlInventoryEntEntry 1 }
+
+
+    rlInventoryEntUnitIfindexID OBJECT-TYPE
+    SYNTAX             Unsigned32
+    MAX-ACCESS        read-only
+    STATUS              current
+    DESCRIPTION        "if rlInventoryEntUnitOrIfindex = 0 this field contain the unit number else if  rlInventoryEntUnitOrIfindex = 1
+This field contain the if_index number."
+    ::= { rlInventoryEntEntry 2 }
+
+
+    rlInventoryEntVendorID OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION        "Vendor identification"
+    ::= { rlInventoryEntEntry 3 }
+
+    rlInventoryEntPID OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "Physical identification"
+    ::= { rlInventoryEntEntry 4}
+
+    rlInventoryEntName OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "Unit number of interface name"
+    ::= { rlInventoryEntEntry 5 }
+
+    rlInventoryEntDescription OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS           read-only
+        STATUS              current
+    DESCRIPTION             "Description of the entity"
+    ::= { rlInventoryEntEntry 6}
+
+   rlInventoryEntSerialNumber OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION        "The serial number of the interface or unit."
+    ::= { rlInventoryEntEntry 7 }
+
+   rlInventoryEntUnitNum OBJECT-TYPE
+    SYNTAX              Unsigned32
+    MAX-ACCESS        	read-only
+    STATUS              current
+    DESCRIPTION        "if rlInventoryEntUnitOrIfindex = 1 this field contain the unit number that associated to this port"
+    ::= { rlInventoryEntEntry 8 }
+
+
+END
+
+
+
+
+
+
+
+

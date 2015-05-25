@@ -1,6 +1,11 @@
 --
--- Copyright (c) 2010 by Ruckus Wireless, Inc.
--- All Rights Reserved
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
 --
 
 RUCKUS-ZD-AP-MIB DEFINITIONS ::= BEGIN
@@ -33,8 +38,8 @@ ruckusZDAPMIB MODULE-IDENTITY
         "Ruckus Wireless, Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -176,7 +181,7 @@ ruckusZDAPConfigGpsLongitude OBJECT-TYPE
     ::= { ruckusZDAPConfigEntry 11 }
     
 ruckusZDAPConfigIPVersion OBJECT-TYPE
-    SYNTAX  INTEGER { ipv4(1), ipv6(2),dualstack(3) }  
+    SYNTAX  INTEGER { ipv4(1), ipv6(2), dualstack(3),  useparentsetting(4)}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -297,9 +302,10 @@ ruckusZDAPConfigRadioType OBJECT-TYPE
     SYNTAX  INTEGER {
             ieee80211bg(1),
             ieee80211na(2),
-            ieee80211a(3),       
+            ieee80211a(3),
 	    	ieee80211n(4),
-            ieee80211ng(5) } 
+            ieee80211ng(5),
+            ieee80211ac(6) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -436,5 +442,79 @@ ruckusZDAPConfigRebootNow OBJECT-TYPE
     DESCRIPTION
         "AP reboot right now."
     ::= { ruckusZDAPConfigEntry 64 }
+ruckusZDAPLBSInfo OBJECT IDENTIFIER    ::= { ruckusZDAPObjects 2 }    
+ruckusZDAPLBSVenueTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDAPLBSVenueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD AP LBS venue table."
+    ::= { ruckusZDAPLBSInfo 1 }
+ruckusZDAPLBSVenueEntry OBJECT-TYPE
+    SYNTAX  RuckusZDAPLBSVenueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies a LBS venue info per entry."
+    INDEX {
+        ruckusZDAPLBSAPGroupID }
+    ::= { ruckusZDAPLBSVenueTable 1 }
+RuckusZDAPLBSVenueEntry ::= SEQUENCE {
+  ruckusZDAPLBSAPGroupID                    INTEGER,
+  ruckusZDAPLBSVenueName                    OCTET STRING,
+  ruckusZDAPLBSVenueAPGrpName               OCTET STRING,
+  ruckusZDAPLBSVenueLSConnection            INTEGER,
+  ruckusZDAPLBSVenue24GMode                 INTEGER,
+  ruckusZDAPLBSVenue5GMode                  INTEGER,
+}
+ruckusZDAPLBSAPGroupID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "LBS the ID of AP group reference venue. Max value:for zd1000,8;for 
+        zd1100,32;for zd3000,256;zd5000,512."
+    ::= { ruckusZDAPLBSVenueEntry 1 }
+ruckusZDAPLBSVenueName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vneue name"
+    ::= { ruckusZDAPLBSVenueEntry 2 }
+ruckusZDAPLBSVenueAPGrpName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP group name has referenced this venue"
+    ::= { ruckusZDAPLBSVenueEntry 3 }
+ruckusZDAPLBSVenueLSConnection OBJECT-TYPE
+    SYNTAX  INTEGER {
+            down(0), up(1) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "LS connection status"
+    DEFVAL{down}
+    ::= { ruckusZDAPLBSVenueEntry 4 }    
+ruckusZDAPLBSVenue24GMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            disable(0), footfall(1), calibration(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "2.4G band mode"
+    DEFVAL{disable}    
+    ::= { ruckusZDAPLBSVenueEntry 5 }   
+ruckusZDAPLBSVenue5GMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            disable(0), footfall(1), calibration(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "5G band mode"
+    DEFVAL{disable}
+    ::= { ruckusZDAPLBSVenueEntry 6 }    
     
 END

@@ -143,8 +143,8 @@ if ($config['show_locations'])
   echo('
             <li role="presentation" class="divider"></li>
             <li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>
-            <li><a href="addhost/"><i class="fa fa-desktop fa-col-success fa-fw fa-lg"></i> Add Device</a></li>
-            <li><a href="delhost/"><i class="fa fa-desktop fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
+            <li><a href="addhost/"><i class="fa fa-plus fa-col-success fa-fw fa-lg"></i> Add Device</a></li>
+            <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
 }
 
 if ($links['count'] > 0) {
@@ -185,7 +185,8 @@ if ($_SESSION['userlevel'] >= '10')
   echo('
             <li role="presentation" class="divider"></li>
             <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>
-            <li><a href="delsrv/"><i class="fa fa-cog fa-col-info fa-fw fa-lg"></i> Delete Service</a></li>');
+            <li><a href="editsrv/"><i class="fa fa-cog fa-col-primary fa-fw fa-lg"></i> Edit Service</a></li>
+            <li><a href="delsrv/"><i class="fa fa-cog fa-col-danger fa-fw fa-lg"></i> Delete Service</a></li>');
 }
 ?>
           </ul>
@@ -255,8 +256,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 }
 ?>
 
-            <li><a href="ports/state=down/"><i class="fa fa-chain-broken fa-col-success fa-fw fa-lg"></i> Down</a></li>
-            <li><a href="ports/state=admindown/"><i class="fa fa-chain-broken fa-col-info fa-fw fa-lg"></i> Disabled</a></li>
+            <li><a href="ports/state=down/"><i class="fa fa-exclamation-triangle fa-col-danger fa-fw fa-lg"></i> Down</a></li>
+            <li><a href="ports/state=admindown/"><i class="fa fa-pause fa-col-info fa-fw fa-lg"></i> Disabled</a></li>
 <?php
 
 if ($deleted_ports) { echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-col-primary fa-fw fa-lg"></i> Deleted ('.$deleted_ports.')</a></li>'); }
@@ -291,7 +292,7 @@ if ($menu_sensors)
   echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square');
+$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o');
 foreach (array('fanspeed','humidity','temperature') as $item)
 {
   if (isset($menu_sensors[$item]))

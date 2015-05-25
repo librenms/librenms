@@ -192,15 +192,15 @@ IMPORTS
 
 switch001 MODULE-IDENTITY
                 LAST-UPDATED "200701020000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines CISCOSB private MIBs."
@@ -691,13 +691,32 @@ rlSysmngMib OBJECT IDENTIFIER ::= { switch001 204 }
 
 rlFip OBJECT IDENTIFIER ::= { switch001 205 }
 
-rlDebugCapabilities OBJECT IDENTIFIER ::= { switch001 206 }     
+rlDebugCapabilities OBJECT IDENTIFIER ::= { switch001 206 }
 
 rlIpStdAcl  OBJECT IDENTIFIER ::= { switch001 207 }
 
 rlWBA  OBJECT IDENTIFIER ::= { switch001 208 }
 
+rlSecSd  OBJECT IDENTIFIER ::= { switch001 209 }
+
+rlOspf  OBJECT IDENTIFIER ::= { switch001 210 }
+
+rlRtRedist OBJECT IDENTIFIER ::= { switch001 211 }
+
+rlIpPrefList  OBJECT IDENTIFIER ::= { switch001 212 }
+
+rlVoipSnoop  OBJECT IDENTIFIER ::= { switch001 213 }
+
+rlDhcpv6  OBJECT IDENTIFIER ::= { switch001 214}
+
+rlIpv6Fhs  OBJECT IDENTIFIER ::= { switch001 215} 
+
+rlInventoryEnt  OBJECT IDENTIFIER ::= { switch001 217}
+
+rlUdld OBJECT IDENTIFIER ::= { switch001 218 }
+
 rndEndOfMibGroup   OBJECT IDENTIFIER ::= { switch001 1000  }
+
 -- see CISCOSB-ENDOFMIB-MIB.MIB
 
 END

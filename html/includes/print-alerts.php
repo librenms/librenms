@@ -48,7 +48,7 @@ var grid = $("#alerts").bootgrid({
       $(this).toggleClass('glyphicon-plus glyphicon-minus');
     });
     grid.find(".incident").each( function() {
-      $(this).parent().addClass('col-md-12 col-sm-12 col-xs-12');
+      $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
       $(this).parent().parent().on("mouseenter", function() {
         $(this).find(".incident-toggle").fadeIn(200);
       }).on("mouseleave", function() {

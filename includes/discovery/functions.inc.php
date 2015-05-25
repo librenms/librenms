@@ -13,9 +13,8 @@
 
 function discover_new_device($hostname)
 {
-  global $config, $debug;
+    global $config, $debug;
 
-  if ($config['autodiscovery']['xdp']) {
     if (!empty($config['mydomain']) && isDomainResolves($hostname . "." . $config['mydomain']) ) {
       $dst_host = $hostname . "." . $config['mydomain'];
     } else {
@@ -50,10 +49,6 @@ function discover_new_device($hostname)
     } else {
       if ($debug) { echo("$ip not in a matched network - skipping\n"); }
     }
-  } else {
-    if ($debug) { echo("autodiscovery disabled - skipping\n"); }
-    return FALSE;
-  }
 }
 
 function discover_device($device, $options = NULL)

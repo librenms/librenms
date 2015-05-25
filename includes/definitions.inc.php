@@ -47,6 +47,8 @@ foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
 #                 YES, THAT MEANS YOU                   #
 /////////////////////////////////////////////////////////
 
+umask(0002);
+
 $config['os']['default']['over'][0]['graph']       = "device_processor";
 $config['os']['default']['over'][0]['text']        = "Processor Usage";
 $config['os']['default']['over'][1]['graph']       = "device_mempool";
@@ -1145,6 +1147,12 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['ifname']            = 1;
 
+// Fiberhome
+$os = "fiberhome";
+$config['os'][$os]['text']              = "Fiberhome";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "fiberhome";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
@@ -1592,6 +1600,10 @@ $config['graph_types']['device']['netstat_snmp']['descr'] = 'SNMP Statistics';
 $config['graph_types']['device']['netstat_snmp_pkt']['section'] = 'netstats';
 $config['graph_types']['device']['netstat_snmp_pkt']['order'] = '0';
 $config['graph_types']['device']['netstat_snmp_pkt']['descr'] = 'SNMP Packet Type Statistics';
+
+$config['graph_types']['device']['netstat_ip_forward']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_ip_forward']['order'] = '0';
+$config['graph_types']['device']['netstat_ip_forward']['descr'] = 'IP Forwarding Statistics';
 
 $config['graph_types']['device']['netstat_tcp']['section'] = 'netstats';
 $config['graph_types']['device']['netstat_tcp']['order'] = '0';

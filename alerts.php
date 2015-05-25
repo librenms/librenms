@@ -84,7 +84,13 @@ function IsRuleValid($device,$rule) {
  */
 function IssueAlert($alert) {
 	global $config;
+	if( dbFetchCell('SELECT attrib_value FROM devices_attribs WHERE attrib_type = "disable_notify" && device_id = ?',array($alert['device_id'])) == "1" ) {
+		return true;
+	}
 	$default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}"; //FIXME: Put somewhere else?
+	if( $config['alert']['fixed-contacts'] == false ) {
+		$alert['details']['contacts'] = GetContacts($alert['details']['rule']);
+	}
 	$obj = DescribeAlert($alert);
 	if( is_array($obj) ) {
 		$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');
@@ -101,6 +107,7 @@ function IssueAlert($alert) {
 		}
 		echo "\r\n";
 	}
+	return true;
 }
 
 /**
@@ -191,7 +198,7 @@ function RunAlerts() {
 			$noiss = true;
 		}
 		if( !empty($rextra['delay']) ) {
-			if( (time()-strtotime($alert['time_logged'])) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']) < $rextra['delay']) ) {
+			if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
 				continue;
 			} else {
 				$alert['details']['delay'] = time();
@@ -312,6 +319,7 @@ function DescribeAlert($alert) {
 	$i = 0;
 	$device = dbFetchRow("SELECT hostname FROM devices WHERE device_id = ?",array($alert['device_id']));
 	$obj['hostname'] = $device['hostname'];
+	$obj['device_id'] = $alert['device_id'];
 	$extra = $alert['details'];
 	if( $alert['state'] >= 1 ) {
 		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
