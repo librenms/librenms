@@ -211,6 +211,8 @@ Arrays of subnets to exclude in auto discovery mode.
 
 #### Email configuration
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
 ```php
 $config['email_backend']              = 'mail';
 $config['email_from']                 = NULL;
