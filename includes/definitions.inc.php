@@ -14,32 +14,34 @@ if (!$database_link)
 $database_db = mysql_select_db($config['db_name'], $database_link);
 
 function mergecnf($obj) {
-    $pointer = array();
-    $val = $obj['config_value'];
-    $obj = $obj['config_name'];
-    $obj = explode('.',$obj,2);
-    if (!isset($obj[1])) {
-        if (filter_var($val,FILTER_VALIDATE_INT)) {
-            $val = (int) $val;
-        } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
-            $val = (float) $val;
-        } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
-            $val =(boolean) $val;
-        }
-        if (!empty($obj[0])) {
-            return array($obj[0] => $val);
-        } else {
-            return array($val);
-        }
-    } else {
-        $pointer[$obj[0]] = mergecnf(array('config_name'=>$obj[1],'config_value'=>$val));
+  $pointer = array();
+  $val = $obj['config_value'];
+  $obj = $obj['config_name'];
+  $obj = explode('.',$obj,2);
+  if( !isset($obj[1]) ) {
+    if( filter_var($val,FILTER_VALIDATE_INT) ) {
+      $val = (int) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_FLOAT) ) {
+      $val = (float) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_BOOLEAN,FILTER_NULL_ON_FAILURE) !== NULL ) {
+      $val = filter_var($val,FILTER_VALIDATE_BOOLEAN);
     }
-    return $pointer;
+    if( !empty($obj[0]) ) {
+      return array($obj[0] => $val);
+    } else {
+      return array($val);
+    }
+  } else {
+    $pointer[$obj[0]] = mergecnf(array('config_name'=>$obj[1],'config_value'=>$val));
+  }
+  return $pointer;
 }
 
+$clone = $config;
 foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
-    $config = array_merge_recursive($config,mergecnf($obj));
+    $clone = array_replace_recursive($clone,mergecnf($obj));
 }
+$config = array_replace_recursive($clone,$config);
 
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
