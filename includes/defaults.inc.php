@@ -625,4 +625,7 @@ $config['ipmi']['type'][]                                = "lan";
 $config['ipmi']['type'][]                                = "imb";
 $config['ipmi']['type'][]                                = "open";
 
+// Options needed for dyn config - do NOT edit
+$dyn_config['email_backend'] = array('mail','sendmail','smtp');
+$dyn_config['email_smtp_secure'] = array('', 'tls', 'ssl');
 ?>

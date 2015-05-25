@@ -28,7 +28,6 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
-echo $config['install_dir'] . "/includes/console_colour.php";
 include_once($config['install_dir'] . "/includes/console_colour.php");
 
 $console_color = new Console_Color2();
