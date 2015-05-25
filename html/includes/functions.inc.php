@@ -805,12 +805,17 @@ function get_config_by_group($group) {
     return $items;
 }
 
-function get_config_by_name($name) {
+function get_config_like_name($name) {
     $name = array($name);
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` = '?'", array($name)) as $config_item) {
-        $items[] = $config_item;
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+        $items[$config_item['config_name']] = $config_item;
     }
     return $items;
+}
+
+function get_config_by_name($name) {
+    $config_item = dbFetchRow("SELECT * FROM `config` WHERE `config_name` = ?", array($name));
+    return $config_item;    
 }
 
 function set_config_name($name,$config_value) {
