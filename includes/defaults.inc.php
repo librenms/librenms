@@ -129,6 +129,10 @@ $config['old_graphs']             = 1;   // RRDfiles from before the great rra r
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
 $config['customers_descr']         = 'cust';
+$config['transit_descr']           = ""; // Add custom transit descriptions (can be an array)
+$config['peering_descr']           = ""; // Add custom peering descriptions (can be an array)
+$config['core_descr']              = ""; // Add custom core descriptions (can be an array)
+$config['custom_descr']            = ""; // Add custom interface descriptions (can be an array)
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
