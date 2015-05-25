@@ -30,8 +30,8 @@
 		return this.each(function() {
 		
 			var $self = $(this)
-				, $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
-				, $container = $("." + options.map.cssClass, this).empty().append($tooltip)
+				, $container = $("." + options.map.cssClass, this).empty()
+				, $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none").appendTo(options.map.tooltip.target || $container)
 				, mapConf = $.fn.mapael.maps[options.map.name]
 				, paper = new Raphael($container[0], mapConf.width, mapConf.height)
 				, elemOptions = {}
@@ -1072,7 +1072,8 @@
 		map : {
 			cssClass : "map"
 			, tooltip : {
-				cssClass : "mapTooltip"
+				cssClass : "mapTooltip",
+				target: null
 			}
 			, defaultArea : {
 				attrs : {
