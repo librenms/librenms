@@ -10,30 +10,39 @@ CISCOSB-rndMng DEFINITIONS ::= BEGIN
 -- 13-Jun-2006  Added   value {none} of rndAction
 -- 20-Jun-2006  Added   rlRebootDelay
 -- 19-Dec-2006  Added   resetToFactoryDefaults
+-- 04-Apr-2012  Added   rlScheduledReload
+-- 04-Dec-2012  Added   rlSysNameTable
 
 IMPORTS
-    switch001                                                    FROM CISCOSB-MIB
+    switch001                                               FROM CISCOSB-MIB
     Unsigned32,
     MODULE-IDENTITY, OBJECT-TYPE, TimeTicks                 FROM SNMPv2-SMI
     RowStatus, TruthValue, DisplayString,
     TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
-    InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB;
+    InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB
+    InterfaceIndex                                          FROM IF-MIB;
 
 
 rndMng  MODULE-IDENTITY
-        LAST-UPDATED "200606200000Z"
-		ORGANIZATION "Cisco Small Business"
+        LAST-UPDATED "201212040000Z"
+        ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
              "The private MIB module definition for switch001 general management MIB."
+        REVISION "201212040000Z"
+        DESCRIPTION
+             "Added rlSysNameTable object."
+        REVISION "201204040000Z"
+        DESCRIPTION
+             "Added rlScheduledReload object."
         REVISION "200902240000Z"
         DESCRIPTION
              "Added rlRunningCDBequalToStartupCDB object."
@@ -354,6 +363,127 @@ rlClearMib OBJECT-TYPE
      Set table entries default values for table with static entries.
      Set scalar default value."
     ::=  { rndMng 14  }
+
+-------------------------------------------------------------------------------
+-- Scheduled Reload
+-------------------------------------------------------------------------------
+rlScheduledReload OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for requesting a delayed reload of the device in a
+        specific desired time, should be configured in one of the following formats:
+        'athhmmddMM' , 'inhhhmmm' or '', setting this value to an empty string
+        will result in request for cancellation of a (previously) committed system reload.
+        to complete the request, the 'rlScheduledReloadCommit' must also be set to either
+        TRUE (apply) or FALSE (discard) for completion of the transaction.
+        failing from doing so will result in an indefinite lock of the API"
+    ::= { rndMng 15 }
+
+rlScheduledReloadPendingDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the most recently requested scheduled-reload due date
+         in 'inhhhmmathhmmssddMMYYYYw' format. where 'w' stands for weekDay (1-7).
+         if there is no pending/scheduled reload request, string will be empty"
+    ::= { rndMng 16 }
+
+rlScheduledReloadApprovedDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the most recently approved/committed scheduled-reload date
+         in 'inhhhmmathhmmssddMMYYYYw' format. where 'w' stands for weekDay (1-7).
+         if there is no committed scheduled-reload , string will be empty"
+    ::= { rndMng 17 }
+
+rlScheduledReloadCommit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "commits the pending scheduled-reload request, and completes the transaction.
+        when this value is set to TRUE, the system is instructed to perform the
+        requested reload operation at the requested date/time
+        as was given in 'rlScheduledReload'.
+        setting this value to FALSE will discard the request."
+    ::= { rndMng 18 }
+
+-------------------------------------------------------------------------------
+-- System Name Configuration Table
+-------------------------------------------------------------------------------
+rlSysNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSysNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Holds the current system name configuration."
+    ::= { rndMng 19 }
+
+rlSysNameEntry OBJECT-TYPE
+    SYNTAX RlSysNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition of this table."
+    INDEX { rlSysNameSource,
+            rlSysNameIfIndex }
+    ::= { rlSysNameTable 1 }
+
+RlSysNameEntry ::= SEQUENCE {
+    rlSysNameSource    INTEGER,
+    rlSysNameIfIndex   InterfaceIndex,
+    rlSysNameName      DisplayString (SIZE (0..255)),
+    rlSysNameRowStatus RowStatus
+}
+
+rlSysNameSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        dhcpv6(1),
+        dhcpv4(2),
+        static(3)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The system name source. 'static' if defined by user through CLI,
+        'dhcpv6' or 'dhcpv4' if received by DHCP network protocol."
+    DEFVAL  { static }
+    ::=   { rlSysNameEntry 1 }
+
+rlSysNameIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IfIndex from which the system-name configuration was received,
+         for static entries, value will always be 1."
+    DEFVAL { 1 }
+    ::=   { rlSysNameEntry 2 }
+
+rlSysNameName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "An administratively-assigned name for this managed node.
+         By convention, this is the node's fully-qualified domain
+         name.  If the name is unknown, the value is the zero-length
+         string."
+    ::=   { rlSysNameEntry 3 }
+
+rlSysNameRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+         row installation and removal conventions."
+    ::= { rlSysNameEntry 4 }
 
 
 END

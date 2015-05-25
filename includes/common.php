@@ -561,12 +561,35 @@ function is_valid_hostname($hostname)
   return ctype_alnum(str_replace('_','',str_replace('-','',str_replace('.','',$hostname))));
 }
 
-function add_service($device, $service, $descr)
-{
-  $insert = array('device_id' => $device['device_id'], 'service_ip' => $device['hostname'], 'service_type' => $service,
-                  'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $descr, 'service_param' => "", 'service_ignore' => "0");
+function add_service($device, $service, $descr, $service_ip, $service_param = "", $service_ignore = 0) {
 
-  echo dbInsert($insert, 'services');
+  if (!is_array($device)) {
+      $device = device_by_id_cache($device);
+  }
+
+  if (empty($service_ip)) {
+      $service_ip = $device['hostname'];
+  }
+
+  $insert = array('device_id' => $device['device_id'], 'service_ip' => $service_ip, 'service_type' => $service,
+                  'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $descr, 'service_param' => $service_param, 'service_ignore' => $service_ignore);
+
+  return dbInsert($insert, 'services');
+}
+
+function edit_service($service, $descr, $service_ip, $service_param = "", $service_ignore = 0) {
+
+    if (!is_numeric($service)) {
+        return false;
+    }
+
+    $update = array('service_ip' => $service_ip,
+                    'service_changed' => array('UNIX_TIMESTAMP(NOW())'),
+                    'service_desc' => $descr,
+                    'service_param' => $service_param,
+                    'service_ignore' => $service_ignore);
+    return dbUpdate($update, 'services', '`service_id`=?', array($service));
+
 }
 
 ?>

@@ -122,8 +122,14 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 Transports are located within `$config['install_dir']/includes/alerts/transports.*.php` and defined as well as configured via `$config['alert']['transports']['Example'] = 'Some Options'`.  
 
 Contacts will be gathered automatically and passed to the configured transports.  
+By default the Contacts will be only gathered when the alert triggers and will ignore future changes in contacts for the incident. If you want contacts to be re-gathered before each dispatch, please set `$config['alert']['fixed-contacts'] = false;` in your config.php.
+
 The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.  
 At the moment LibreNMS only supports Port or Device permissions.  
+You can exclude the `SysContact` by setting:
+```php
+$config['alert']['syscontact'] = false;
+```
 To include users that have `Global-Read` or `Administrator` permissions it is required to add these additions to the `config.php` respectively:
 ```php
 $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
@@ -152,8 +158,8 @@ $config['email_smtp_auth']                 = FALSE;                // Whether or
 $config['email_smtp_username']             = NULL;                 // SMTP username.
 $config['email_smtp_password']             = NULL;                 // Password for SMTP authentication.
 
-$config['alerts']['email']['default_only'] = FALSE;                // Only send alerts to default-contact
-$config['alerts']['email']['default']      = NULL;                 // Default-Contact
+$config['alert']['default_only']           = false;                //Only issue to default_mail
+$config['alert']['default_mail']           = '';                   //Default email
 ```
 
 ## <a name="transports-api">API</a>

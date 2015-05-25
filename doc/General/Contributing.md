@@ -1,3 +1,7 @@
+All contributors to LibreNMS retain copyright to their own code and are not
+required to sign over their rights to any other party.
+
+
 Contributor Agreement
 ---------------------
 
@@ -27,9 +31,6 @@ commit log:
 
 Copyright
 ---------
-
-All contributors to LibreNMS retain copyright to their own code and are not
-required to sign over their rights to any other party.
 
 We recommend that if you add a new file containing original code to the code
 base that you include a copyright notice in it as per the Free Software
@@ -77,7 +78,9 @@ General Guidelines
 
 - Please join us in IRC at irc.freenode.net in channel ##librenms if you're
   able.  Collaborating in real time makes the coordination of contributions
-  easier.
+  easier.  If you're not a regular IRC user, just browse to [Freenode
+  web chat](http://webchat.freenode.net/) and follow the prompts to chat
+  via the web client.
 
 - Ensure you read the Code Guidelines documention and understand the code
   style that should be adhered to [6].

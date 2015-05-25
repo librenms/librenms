@@ -23,30 +23,31 @@ CISCOSB-Physicaldescription-MIB DEFINITIONS ::= BEGIN
 -- 14-Jan-2007 rlPhdModuleType was moved to a separated text file
 -- 15-Jan-2007 Devided file appolo.txt to a few files
 --             Renamed file appolo.txt to ralan-mib.mib
-
+-- 23-Jul-2012 IdanS: Add rlPhdUnitGenParamRegistrationDone and rlPhdUnitGenParamRegistrationSuppressed to RlPhdUnitGenParamEntry
+-- 09-Oct-2012 yahal: Add rlPhdUnitEnvParamMonitorAutoRecoveryEnable & rlPhdUnitEnvParamMonitorTemperatureStatus & rlPhdUnitEnvParamMonitorTemperatureStatus
 
 IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, TimeTicks,
-    NOTIFICATION-TYPE                           FROM SNMPv2-SMI
-    DisplayString, PhysAddress, RowStatus       FROM SNMPv2-TC
-    JackType                                    FROM MAU-MIB
-    switch001, rndNotifications                      FROM CISCOSB-MIB
-    RlEnvMonState                               FROM CISCOSB-HWENVIROMENT
-    EntitySensorStatus, EntitySensorValue       FROM ENTITY-SENSOR-MIB
-    InterfaceIndexOrZero,ifIndex,InterfaceIndex FROM IF-MIB
-    rndErrorDesc, rndErrorSeverity              FROM CISCOSB-DEVICEPARAMS-MIB;
+    NOTIFICATION-TYPE                                       FROM SNMPv2-SMI
+    DisplayString, PhysAddress, RowStatus, TruthValue       FROM SNMPv2-TC
+    JackType                                                FROM MAU-MIB
+    switch001, rndNotifications                             FROM CISCOSB-MIB
+    RlEnvMonState                                           FROM CISCOSB-HWENVIROMENT
+    EntitySensorStatus, EntitySensorValue                   FROM ENTITY-SENSOR-MIB
+    InterfaceIndexOrZero,ifIndex,InterfaceIndex             FROM IF-MIB
+    rndErrorDesc, rndErrorSeverity                          FROM CISCOSB-DEVICEPARAMS-MIB;
 
 rlPhysicalDescription  MODULE-IDENTITY
                        LAST-UPDATED "200602120000Z"
-					   ORGANIZATION "Cisco Small Business"
+                       ORGANIZATION "Cisco Systems, Inc."
 
-					   CONTACT-INFO
-					   "Postal: 170 West Tasman Drive
-					   San Jose , CA 95134-1706
-					   USA
+                       CONTACT-INFO
+                       "Postal: 170 West Tasman Drive
+                       San Jose , CA 95134-1706
+                       USA
 
-					   Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-					   Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                       
+                       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                        DESCRIPTION
                             "The private MIB module definition for physical
@@ -58,6 +59,34 @@ rlPhysicalDescription  MODULE-IDENTITY
                        DESCRIPTION
                             "Initial version of this MIB."
                        ::= { switch001 53 }
+
+CascadePortState ::= INTEGER {
+   error                (0),
+   init                 (1),
+   down                 (2),
+   active               (3),
+   standby              (4)
+}
+
+CascadePortSpeed ::= INTEGER {
+   port-speed-10M                     (0),
+   port-speed-100M                    (1),
+   port-speed-1G                      (2),
+   port-speed-10G                     (3),
+   port-speed-12G                     (4),
+   port-speed-2500M                   (5),
+   port-speed-5G                      (6),
+   port-speed-13600M                  (7),
+   port-speed-20G                     (8),
+   port-speed-40G                     (9),
+   port-speed-16G                     (10),
+   port-speed-15G                     (11),
+   port-speed-75G                     (12),
+   port-speed-100G                    (13),
+   unknown                            (14)
+}
+
+
 
 rlPhdMibVersion OBJECT-TYPE
     SYNTAX      INTEGER
@@ -629,16 +658,16 @@ RlPhdUnitGenParamEntry ::= SEQUENCE {
     rlPhdUnitGenParamModelName       DisplayString,
     rlPhdUnitGenParamMd5ChksumBoot   DisplayString,
     rlPhdUnitGenParamMd5ChksumImage1 DisplayString,
-    rlPhdUnitGenParamMd5ChksumImage2 DisplayString
+    rlPhdUnitGenParamMd5ChksumImage2 DisplayString,
+    rlPhdUnitGenParamRegistrationDone          TruthValue,
+    rlPhdUnitGenParamRegistrationSuppressed    TruthValue
 }
 
 rlPhdUnitGenParamStackUnit OBJECT-TYPE
        SYNTAX      INTEGER
        MAX-ACCESS  read-only
        STATUS      current
-       DESCRIPTION "The index of the stack unit to which this conceptual row corresponds.
-                    Note that the index will be the same index as the index
-                    of a 'chassis' physical entity in the entity MIB of the product."
+       DESCRIPTION "The index of the stack unit to which this conceptual row corresponds."
        ::= { rlPhdUnitGenParamEntry 1 }
 
 rlPhdUnitGenParamSoftwareVersion OBJECT-TYPE
@@ -732,6 +761,20 @@ rlPhdUnitGenParamMd5ChksumImage2 OBJECT-TYPE
        DESCRIPTION "MD5 Checksum for Image 2"
        ::= { rlPhdUnitGenParamEntry 14 }
 
+rlPhdUnitGenParamRegistrationDone OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Registration Done."
+       ::= { rlPhdUnitGenParamEntry 15 }
+
+rlPhdUnitGenParamRegistrationSuppressed OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Registration Suppressed."
+       ::= { rlPhdUnitGenParamEntry 16 }
+
 rlPhdUnitEnvParamTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlPhdUnitEnvParamEntry
     MAX-ACCESS  not-accessible
@@ -751,17 +794,20 @@ rlPhdUnitEnvParamEntry OBJECT-TYPE
     ::= { rlPhdUnitEnvParamTable 1 }
 
 RlPhdUnitEnvParamEntry ::= SEQUENCE {
-    rlPhdUnitEnvParamStackUnit                   INTEGER,
-    rlPhdUnitEnvParamMainPSStatus                RlEnvMonState,
-    rlPhdUnitEnvParamRedundantPSStatus           RlEnvMonState,
-    rlPhdUnitEnvParamFan1Status                  RlEnvMonState,
-    rlPhdUnitEnvParamFan2Status                  RlEnvMonState,
-    rlPhdUnitEnvParamFan3Status                  RlEnvMonState,
-    rlPhdUnitEnvParamFan4Status                  RlEnvMonState,
-    rlPhdUnitEnvParamFan5Status                  RlEnvMonState,
-    rlPhdUnitEnvParamTempSensorValue             EntitySensorValue,
-    rlPhdUnitEnvParamTempSensorStatus            EntitySensorStatus,
-    rlPhdUnitEnvParamUpTime                      TimeTicks
+    rlPhdUnitEnvParamStackUnit                                     INTEGER,
+    rlPhdUnitEnvParamMainPSStatus                                  RlEnvMonState,
+    rlPhdUnitEnvParamRedundantPSStatus                             RlEnvMonState,
+    rlPhdUnitEnvParamFan1Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan2Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan3Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan4Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan5Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamTempSensorValue                               EntitySensorValue,
+    rlPhdUnitEnvParamTempSensorStatus                              EntitySensorStatus,
+    rlPhdUnitEnvParamUpTime                                        TimeTicks,
+    rlPhdUnitEnvParamMonitorAutoRecoveryEnable                     TruthValue,
+    rlPhdUnitEnvParamMonitorTemperatureStatus                      INTEGER,
+    rlPhdUnitEnvParamMonitorOperStatus                             TruthValue
 }
 
 rlPhdUnitEnvParamStackUnit OBJECT-TYPE
@@ -852,6 +898,34 @@ rlPhdUnitEnvParamUpTime OBJECT-TYPE
         DESCRIPTION
                "Up time of the unit in 100th of second (sec/100)."
         ::= { rlPhdUnitEnvParamEntry 11 }
+
+rlPhdUnitEnvParamMonitorAutoRecoveryEnable OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+               "Disable environment automatic recovery option"
+        ::= { rlPhdUnitEnvParamEntry 12 }
+
+rlPhdUnitEnvParamMonitorTemperatureStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        overTemperatureThreshold(2),
+        overCriticalTemperatureThreshold(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Display environment monitoring chassis temperature status"
+        ::= { rlPhdUnitEnvParamEntry 13 }
+
+rlPhdUnitEnvParamMonitorOperStatus OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Display environment automatic recovery current status (active/not active)"
+        ::= { rlPhdUnitEnvParamEntry 14 }
 
 rlPhdStackOrderTopUnit OBJECT-TYPE
     SYNTAX      INTEGER
@@ -966,9 +1040,11 @@ rlCascadeEntry OBJECT-TYPE
 
 RlCascadeEntry ::= SEQUENCE {
     rlCascadeNeighborIfIndex   InterfaceIndexOrZero,
-    rlCascadeNeighborUnit      INTEGER,
-    rlCascadeTrunkId           INTEGER,
-    rlCascadeUnitId            INTEGER
+    rlCascadeNeighborUnit              INTEGER,
+    rlCascadeTrunkId                   INTEGER,
+    rlCascadeUnitId                    INTEGER,
+    rlCascadePortSpeed                 CascadePortSpeed,
+    rlCascadePortState                 CascadePortState
 }
 
 rlCascadeNeighborIfIndex OBJECT-TYPE
@@ -1005,6 +1081,22 @@ rlCascadeUnitId OBJECT-TYPE
     DESCRIPTION
         "The unit number matching the current ifIndex"
     ::= { rlCascadeEntry 4 }
+
+rlCascadePortSpeed OBJECT-TYPE
+    SYNTAX      CascadePortSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port speed"
+    ::= { rlCascadeEntry 5 }
+
+rlCascadePortState OBJECT-TYPE
+    SYNTAX      CascadePortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port state according to cascade LAG state machine"
+    ::= { rlCascadeEntry 6 }
 
 rlCascadeAfterResetTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlCascadeAfterResetEntry
@@ -1110,5 +1202,99 @@ rlStackLinkChange NOTIFICATION-TYPE
     DESCRIPTION
         "Trap indicating that Link has change in one of the Stacking Ports."
     ::= { rndNotifications 195 }
+
+
+----------------------
+-- rlPhdUnitStackTable
+----------------------
+
+StackPortType  ::= INTEGER {
+   port-type-100M    (0),
+   port-type-1G      (1),
+   port-type-5G      (2),
+   port-type-10G     (3)
+}
+
+ConnectionType ::= INTEGER {
+    copper          (1),
+    combo-copper    (2),
+    combo-fiber     (3),
+    fiber           (4),
+    direct-attached (5)
+}
+
+
+rlPhdUnitStackPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdUnitStackPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing information required for stack port.
+         The index for the table is ifindex; the ports that represented in that table are
+         operational stack ports or ports that can be stack ports after reset"
+    ::= { rlPhysicalDescription 25}
+
+rlPhdUnitStackPortEntry OBJECT-TYPE
+    SYNTAX      RlPhdUnitStackPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in rlPhdUnitStackPortTable "
+    INDEX { rlPhdModuleStackUnit, ifIndex }
+    ::= { rlPhdUnitStackPortTable 1 }
+
+
+RlPhdUnitStackPortEntry::= SEQUENCE {
+    rlPhdUnitStackPortName              DisplayString,
+    rlPhdUnitStackPortType              StackPortType,
+    rlPhdUnitStackPortConnectionType    ConnectionType,
+    rlPhdUnitStackPortColumn            INTEGER,
+    rlPhdUnitStackPortRow               INTEGER
+}
+
+rlPhdUnitStackPortName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stack port name"
+    ::= { rlPhdUnitStackPortEntry 1 }
+
+rlPhdUnitStackPortType OBJECT-TYPE
+    SYNTAX      StackPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stack port type"
+    ::= { rlPhdUnitStackPortEntry 2 }
+
+rlPhdUnitStackPortConnectionType OBJECT-TYPE
+    SYNTAX      ConnectionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational connection type
+        (copper(1), combo-copper(2), combo-fiber(3), fiber(4), direct-Attached(5))"
+    ::= { rlPhdUnitStackPortEntry 3 }
+
+rlPhdUnitStackPortRow OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which row (the uppermost being numbered 1 and the highest row
+             number assigned to the lowest row) this actual/candidate cascade
+             port resides within the chassis of its stack unit."
+    ::= { rlPhdUnitStackPortEntry 4 }
+
+rlPhdUnitStackPortColumn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which column (the leftmost being numbered 1 and the highest column
+         number assigned to the rightmost column) this actual/candidate cascade
+             port resides within the chassis of its stack unit."
+    ::= { rlPhdUnitStackPortEntry 5 }
 
 END

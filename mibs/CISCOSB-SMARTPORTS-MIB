@@ -11,7 +11,7 @@ CISCOSB-SMARTPORTS-MIB DEFINITIONS ::= BEGIN
 -- -------------------------------------------------------------
 
 IMPORTS
-    switch001                                    FROM CISCOSB-MIB
+    switch001                               FROM CISCOSB-MIB
     TEXTUAL-CONVENTION,DisplayString        FROM SNMPv2-TC
     InterfaceIndexOrZero                    FROM IF-MIB
     SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
@@ -22,15 +22,15 @@ IMPORTS
 
  rlSmartPorts MODULE-IDENTITY
           LAST-UPDATED "200807300000Z"
-		  ORGANIZATION "Cisco Small Business"
+          ORGANIZATION "Cisco Systems, Inc."
 
-		  CONTACT-INFO
-		  "Postal: 170 West Tasman Drive
-		  San Jose , CA 95134-1706
-		  USA
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
 
-		  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
           DESCRIPTION
                   "The private MIB module definition for Smart Ports -
@@ -89,8 +89,8 @@ RlSmartPortsMacroNameOrZero  ::= TEXTUAL-CONVENTION
         holding:
         macro name
         macro type: user defined,
-                    Cisco provided per interface
-                    Cisco provided globally
+                    CISCOSB provided per interface
+                    CISCOSB provided globally
         and matches a macro index to be used as identifier in
         rlSmartPortsMacroContentTable where the macro content really IS
         Allow to add/remove user defined macros."
@@ -139,8 +139,8 @@ RlSmartPortsMacroNameOrZero  ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "This variable identifies the  macro type: user defined,
-                                                   Cisco provided per interface
-                                                   Cisco provided globally"
+                                                   CISCOSB provided per interface
+                                                   CISCOSB provided globally"
     ::= { rlSmartPortsMacroManageEntry 3 }
 
 
@@ -322,6 +322,27 @@ RlSmartPortsMacroNameOrZero  ::= TEXTUAL-CONVENTION
         "In case the last macro had failed you will get i'ts command line number
          from specific terminal you had used ."
     ::= { rlSmartPorts 7 }
+
+
+     rlSmartPortsCondenseMode OBJECT-TYPE
+       SYNTAX  INTEGER {
+           enabled  (1),
+           disabled (2)
+       }
+       MAX-ACCESS  read-write 
+       STATUS      current
+       DESCRIPTION
+           "disabled    - in macro description macro such as x no_x will be removed
+            enabled     - in macro description macro such as x no_x will not be removed
+            when condense mode is enabled (by default) each time a macro with the name
+            no_x is applied and prior to that a macro x was applied , they will be removed
+            from the list...
+
+             "
+
+       DEFVAL {enabled}
+    ::= { rlSmartPorts 8 }
+
 
 
 

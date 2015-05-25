@@ -6,7 +6,7 @@ global $link_exists;
 
 $community = $device['community'];
 
-if ($device['os'] == "ironware")
+if ($device['os'] == "ironware" && $config['autodiscovery']['xdp'] === TRUE)
 {
   echo(" Brocade FDP: ");
   $fdp_array = snmpwalk_cache_twopart_oid($device, "snFdpCacheEntry", array(), "FOUNDRY-SN-SWITCH-GROUP-MIB");
@@ -47,7 +47,7 @@ if ($device['os'] == "ironware")
 echo(" CISCO-CDP-MIB: ");
 unset($cdp_array);
 $cdp_array = snmpwalk_cache_twopart_oid($device, "cdpCache", array(), "CISCO-CDP-MIB");
-if ($cdp_array)
+if ($cdp_array && $config['autodiscovery']['xdp'] === TRUE)
 {
   unset($cdp_links);
   foreach (array_keys($cdp_array) as $key)
@@ -96,7 +96,7 @@ unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid($device, "lldpRemoteSystemsData", array(), "LLDP-MIB");
 $dot1d_array = snmpwalk_cache_oid($device, "dot1dBasePortIfIndex", array(), "BRIDGE-MIB");
 
-if ($lldp_array)
+if ($lldp_array && $config['autodiscovery']['xdp'] === TRUE)
 {
   $lldp_links = "";
   foreach (array_keys($lldp_array) as $key)
@@ -148,9 +148,8 @@ echo("OSPF Discovery: ");
 
 if ($config['autodiscovery']['ospf'] === TRUE) {
     echo "enabled\n";
-    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs`") as $nbr) {
+    foreach (dbFetchRows("SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs` WHERE `device_id`=?", array($device['device_id'])) as $nbr) {
         $ip = $nbr['ospfNbrIpAddr'];
-        $device_id = $nbr['device_id'];
         if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
             echo("x");
             continue;
@@ -164,7 +163,7 @@ if ($config['autodiscovery']['ospf'] === TRUE) {
         if (isset($remote_device_id) && $remote_device_id > 0) {
             log_event("Device $name ($ip) autodiscovered through OSPF", $remote_device_id, 'system');
         } else {
-            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device_id, 'system');
+            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device['device_id'], 'system');
         }
     }
 } else {

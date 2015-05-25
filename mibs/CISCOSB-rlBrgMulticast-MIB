@@ -3,39 +3,17 @@ CISCOSB-rlBrgMulticast-MIB DEFINITIONS ::= BEGIN
 -- Title:      CISCOSB Multicast Bridge Configuration
 -- Version:    7.46
 -- Date:       15-Jan-2007
--- 30-May-2011  Added MODULE-IDENTITY
 --
 
 IMPORTS
-    InterfaceIndex                                       FROM IF-MIB
     TruthValue,TEXTUAL-CONVENTION,
     RowStatus                                            FROM SNMPv2-TC
     VlanIndex,PortList                                   FROM Q-BRIDGE-MIB
-    MacAddress                                           FROM BRIDGE-MIB
-    Unsigned32, TimeTicks, IpAddress, NOTIFICATION-TYPE,
-    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    Unsigned32, IpAddress, NOTIFICATION-TYPE,
+    OBJECT-TYPE                                          FROM SNMPv2-SMI
     rndErrorDesc, rndErrorSeverity                       FROM CISCOSB-DEVICEPARAMS-MIB
-    switch001,rlBrgMulticast,rndNotifications            FROM CISCOSB-MIB
-    InetAddressType, InetAddress                         FROM INET-ADDRESS-MIB;
-
-rlMacMulticast MODULE-IDENTITY
-        LAST-UPDATED "201105300000Z"
-		ORGANIZATION "Cisco Small Business"
-
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
-
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
-
-        DESCRIPTION
-             "The private MIB module definition for IGMP Snooping and MAC Multicast."
-        REVISION "201105300000Z"
-        DESCRIPTION
-             "Initial revision."
-        ::= { switch001 55 }
+    switch001, rlMacMulticast, rndNotifications                FROM CISCOSB-MIB
+    InetAddressType, InetAddress, InetVersion            FROM INET-ADDRESS-MIB;
 
 -- IGMP Snooping and mac multicast moved here from appolo ,
 -- under mac multicast because of historic reasons
@@ -54,7 +32,7 @@ rlIgmpSnoop  OBJECT IDENTIFIER ::= { rlMacMulticast 2 }
 -- rlIgmpSnooping
 --
 
-rlIgmpSnoopMibVersion OBJECT-TYPE
+ rlIgmpSnoopMibVersion OBJECT-TYPE
      SYNTAX      INTEGER
      MAX-ACCESS  read-only
      STATUS      current
@@ -217,9 +195,10 @@ IgmpVersion ::= TEXTUAL-CONVENTION
         v3(3)
 }
 
+
 -- rlIgmpSnoopVlanTable  changed to Inet type (November 2007)  DEPRICATED (See rlIgmpMldSnoopVlanTable)
 
-rlIgmpSnoopVlanTable OBJECT-TYPE
+ rlIgmpSnoopVlanTable OBJECT-TYPE
      SYNTAX      SEQUENCE OF RlIgmpSnoopVlanEntry
      MAX-ACCESS  not-accessible
      STATUS      obsolete
@@ -228,7 +207,7 @@ rlIgmpSnoopVlanTable OBJECT-TYPE
          aging-out timers , filter ports and permanent ports."
      ::= { rlIgmpSnoop 7 }
 
-rlIgmpSnoopVlanEntry OBJECT-TYPE
+ rlIgmpSnoopVlanEntry OBJECT-TYPE
      SYNTAX      RlIgmpSnoopVlanEntry
      MAX-ACCESS  not-accessible
      STATUS      obsolete
@@ -527,7 +506,8 @@ RlIgmpSnoopQuerierVlanEntry ::= SEQUENCE {
     rlIgmpSnoopQuerierAdminAddr                     IpAddress,
     rlIgmpSnoopQuerierOperAddr                      IpAddress,
     rlIgmpSnoopQuerierAdminVersionNumber            IgmpVersion,
-    rlIgmpSnoopQuerierOperVersionNumber             IgmpVersion
+    rlIgmpSnoopQuerierOperVersionNumber             IgmpVersion,
+    rlIgmpSnoopQuerierElectionEnable                TruthValue
 }
 
 rlIgmpSnoopQuerierVlanTag OBJECT-TYPE
@@ -586,6 +566,25 @@ rlIgmpSnoopQuerierOperVersionNumber OBJECT-TYPE
         "The current operational version number of IGMP Snoop Querier for the vlan."
     ::= { rlIgmpSnoopQuerierVlanEntry 7 }
 
+rlIgmpSnoopQuerierElectionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether or not to participate in querier election.
+         When true, the snooping querier participates in querier election.
+         When false, the snooping querier is the elected querier until a general
+         query is heard from another router on the vlan (always lose)."
+    ::= { rlIgmpSnoopQuerierVlanEntry 8 }
+
+
+rlIgmpSnoopQuerierEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Globally enable/disable IGMP Snooping Querier in the switch."
+    ::= { rlIgmpSnoop 13 }
 
 --
 --
@@ -609,568 +608,6 @@ rlMacMulticastUnregFilterEnable OBJECT-TYPE
     DESCRIPTION
         "Each bit represent a port whether Unregistered Multicast Filtering enable "
  ::= { rlMacMulticastFilter  1 }
-
---  rlBrgMulticastMibVersion
-
-rlBrgMulticastMibVersion OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "MIB's version, the current version is 4.
-         Snooping supports IGMPv1/v2/v3 and MLDv1/v2."
-::= { rlBrgMulticast 1 }
-
--- rlBrgStaticIpMulticastTable   (replaced by rlBrgStaticInetMulticastTable)
-
-rlBrgStaticIpMulticastTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlBrgStaticIpMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing filtering information for IP Multicast
-         addresses for each VLAN."
-    ::= { rlBrgMulticast 3}
-
-rlBrgStaticIpMulticastEntry OBJECT-TYPE
-    SYNTAX      RlBrgStaticIpMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Filtering information configured into the device.
-         The set of ports to which frames containing this IP
-         Multicast destination address and IP source address
-         are allowed to be forwarded."
-    INDEX { rlBrgStaticIpMulticastVlanTag,
-            rlBrgStaticIpMulticastGroupAddress,
-            rlBrgStaticIpMulticastSourceAddress }
-    ::= { rlBrgStaticIpMulticastTable 1 }
-
-RlBrgStaticIpMulticastEntry ::= SEQUENCE {
-        rlBrgStaticIpMulticastVlanTag           VlanIndex,
-        rlBrgStaticIpMulticastGroupAddress      IpAddress,
-        rlBrgStaticIpMulticastSourceAddress     IpAddress,
-        rlBrgStaticIpMulticastFrwPorts          PortList,
-        rlBrgStaticIpMulticastForbiddenPorts    PortList,
-        rlBrgStaticIpMulticastStatus            RowStatus
-}
-
-rlBrgStaticIpMulticastVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The VLAN tag for which this entry is configured."
-    ::= { rlBrgStaticIpMulticastEntry 1}
-
-rlBrgStaticIpMulticastGroupAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The multicast group address for which the filtering information applies "
-    ::= { rlBrgStaticIpMulticastEntry 2}
-
-rlBrgStaticIpMulticastSourceAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The unicast group address for which the filtering information applies."
-    ::= { rlBrgStaticIpMulticastEntry 3}
-
-rlBrgStaticIpMulticastFrwPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "The ports the data should be forwarded to "
-    ::= { rlBrgStaticIpMulticastEntry 4}
-
-rlBrgStaticIpMulticastForbiddenPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "The ports that overrides dynamic configuration and
-          prevents multicast data forwarding for the group or
-          group and source to these ports."
-    ::= { rlBrgStaticIpMulticastEntry 5}
-
-rlBrgStaticIpMulticastStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The status of the table entry. It's used to add/delete an entry"
-    ::= { rlBrgStaticIpMulticastEntry  6}
-
--- bridge ip multicast FDB
--- rlBrgIpMulticastTable  (See rlBrgInetMulticastTable)
-
-rlBrgIpMulticastTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlBrgIpMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing all filtering information for IP
-         Multicast addresses for each VLAN "
-    ::= { rlBrgMulticast 4}
-
-rlBrgIpMulticastEntry OBJECT-TYPE
-    SYNTAX      RlBrgIpMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlBrgIpMulticastTable
-         contains IP Multicast FDB data "
-    INDEX { rlBrgIpMulticastVlanTag,
-            rlBrgIpMulticastGroupAddress,
-            rlBrgIpMulticastSourceAddress }
-::= { rlBrgIpMulticastTable 1 }
-
-RlBrgIpMulticastEntry ::= SEQUENCE {
-    rlBrgIpMulticastVlanTag         VlanIndex,
-    rlBrgIpMulticastGroupAddress    IpAddress,
-    rlBrgIpMulticastSourceAddress   IpAddress,
-    rlBrgIpMulticastEgressPorts     PortList,
-    rlBrgIpMulticastLearntPorts     PortList
-}
-
-rlBrgIpMulticastVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry is configured."
-    ::= { rlBrgIpMulticastEntry 1}
-
-rlBrgIpMulticastGroupAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgIpMulticastEntry 2}
-
-rlBrgIpMulticastSourceAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgIpMulticastEntry 3}
-
-rlBrgIpMulticastEgressPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The complete set of ports, in this VLAN, to which frames
-         destined for this Group IP address or Group and Source
-         address are currently being explicitly forwarded.  This
-         does not include ports for which this address is only implicitly
-         forwarded, in the dot1qForwardAllPorts list."
-    ::= { rlBrgIpMulticastEntry 4}
-
-rlBrgIpMulticastLearntPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The subset of ports in rlBrgIpMulticastEgressPorts which
-         were learnt by IGMP or some other dynamic mechanism,
-         in this Filtering database.."
-    ::= { rlBrgIpMulticastEntry 5}
-
--- static ipm inet bridge configuration
---  rlBrgStaticInetMulticastTable  IPM FDB
-
-rlBrgStaticInetMulticastTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlBrgStaticInetMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing filtering information for INET (Pv4 and IPv6)
-        Multicast addresses for each VLAN."
-    ::= { rlBrgMulticast 5}
-
-rlBrgStaticInetMulticastEntry OBJECT-TYPE
-    SYNTAX      RlBrgStaticInetMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Filtering information configured into the device.
-         The set of ports to which frames containing this IP
-         Multicast destination address and IP source address
-         are allowed to be forwarded."
-    INDEX { rlBrgStaticInetMulticastVlanTag,
-            rlBrgStaticInetMulticastGroupAddressType, rlBrgStaticInetMulticastGroupAddress,
-            rlBrgStaticInetMulticastSourceAddressType, rlBrgStaticInetMulticastSourceAddress }
-    ::= { rlBrgStaticInetMulticastTable 1 }
-
-RlBrgStaticInetMulticastEntry ::= SEQUENCE {
-        rlBrgStaticInetMulticastVlanTag           VlanIndex,
-        rlBrgStaticInetMulticastGroupAddressType  InetAddressType,
-        rlBrgStaticInetMulticastGroupAddress      InetAddress,
-        rlBrgStaticInetMulticastSourceAddressType InetAddressType,
-        rlBrgStaticInetMulticastSourceAddress     InetAddress,
-        rlBrgStaticInetMulticastFrwPorts          PortList,
-        rlBrgStaticInetMulticastForbiddenPorts    PortList,
-        rlBrgStaticInetMulticastStatus            RowStatus
-}
-
-rlBrgStaticInetMulticastVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The VLAN tag for which this entry is configured."
-    ::= { rlBrgStaticInetMulticastEntry 1}
-
-rlBrgStaticInetMulticastGroupAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type ipv6/ipv4."
-    ::= { rlBrgStaticInetMulticastEntry 2}
-
-rlBrgStaticInetMulticastGroupAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The multicast group address for which the filtering information applies "
-    ::= { rlBrgStaticInetMulticastEntry 3}
-
-rlBrgStaticInetMulticastSourceAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type ipv6/ipv4."
-    ::= { rlBrgStaticInetMulticastEntry 4}
-
-rlBrgStaticInetMulticastSourceAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "The unicast group address for which the filtering information applies."
-    ::= { rlBrgStaticInetMulticastEntry 5}
-
-rlBrgStaticInetMulticastFrwPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "The ports the data should be forwarded to "
-    ::= { rlBrgStaticInetMulticastEntry 6}
-
-rlBrgStaticInetMulticastForbiddenPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "The ports that overrides dynamic configuration and
-          prevents multicast data forwarding for the group or
-          group and source to these ports."
-    ::= { rlBrgStaticInetMulticastEntry 7}
-
-rlBrgStaticInetMulticastStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The status of the table entry. It's used to add/delete an entry"
-    ::= { rlBrgStaticInetMulticastEntry  8}
-
--- rlBrgInetMulticastTable  IPM FDB
-
-rlBrgInetMulticastTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlBrgInetMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing all filtering information for IP
-         Multicast addresses for each VLAN "
-    ::= { rlBrgMulticast 6}
-
-rlBrgInetMulticastEntry OBJECT-TYPE
-    SYNTAX      RlBrgInetMulticastEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlBrgInetMulticastTable
-         contains IP Multicast FDB data "
-    INDEX { rlBrgInetMulticastVlanTag,
-            rlBrgInetMulticastGroupAddressType, rlBrgInetMulticastGroupAddress,
-            rlBrgInetMulticastSourceAddressType, rlBrgInetMulticastSourceAddress }
-::= { rlBrgInetMulticastTable 1 }
-
-RlBrgInetMulticastEntry ::= SEQUENCE {
-    rlBrgInetMulticastVlanTag           VlanIndex,
-    rlBrgInetMulticastGroupAddressType  InetAddressType,
-    rlBrgInetMulticastGroupAddress      InetAddress,
-    rlBrgInetMulticastSourceAddressType InetAddressType,
-    rlBrgInetMulticastSourceAddress     InetAddress,
-    rlBrgInetMulticastEgressPorts       PortList,
-    rlBrgInetMulticastLearntPorts       PortList
-}
-
-rlBrgInetMulticastVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry is configured."
-    ::= { rlBrgInetMulticastEntry 1}
-
-rlBrgInetMulticastGroupAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type IPv4/IPv6."
-    ::= { rlBrgInetMulticastEntry 2}
-
-rlBrgInetMulticastGroupAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgInetMulticastEntry 3}
-
-rlBrgInetMulticastSourceAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type IPv4/IPv6."
-    ::= { rlBrgInetMulticastEntry 4}
-
-rlBrgInetMulticastSourceAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgInetMulticastEntry 5}
-
-rlBrgInetMulticastEgressPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The complete set of ports, in this VLAN, to which frames
-         destined for this Group IP address or Group and Source
-         address are currently being explicitly forwarded.  This
-         does not include ports for which this address is only implicitly
-         forwarded, in the dot1qForwardAllPorts list."
-    ::= { rlBrgInetMulticastEntry 6}
-
-rlBrgInetMulticastLearntPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The subset of ports in rlBrgIpMulticastEgressPorts which
-         were learnt by IGMP or some other dynamic mechanism,
-         in this Filtering database.."
-    ::= { rlBrgInetMulticastEntry 7}
-
-
--- IPM FDB overlapping Reference Table
-
-rlBrgIpmFdbRefTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlBrgIpmFdbRefEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing all information stored in
-         IPM FDB overlapping Reference Table "
-    ::= { rlBrgMulticast 7}
-
-rlBrgIpmFdbRefEntry OBJECT-TYPE
-    SYNTAX      RlBrgIpmFdbRefEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlBrgIpmFdbRefTable
-         contains overlapping Reference Table FDB data "
-    INDEX { rlBrgIpmFdbRefVlanTag,
-            rlBrgIpmFdbRefGroupAddressType, rlBrgIpmFdbRefGroupAddress,
-            rlBrgIpmFdbRefSourceAddressType, rlBrgIpmFdbRefSourceAddress }
-::= { rlBrgIpmFdbRefTable 1 }
-
-RlBrgIpmFdbRefEntry ::= SEQUENCE {
-    rlBrgIpmFdbRefVlanTag           VlanIndex,
-    rlBrgIpmFdbRefGroupAddressType  InetAddressType,
-    rlBrgIpmFdbRefGroupAddress      InetAddress,
-    rlBrgIpmFdbRefSourceAddressType InetAddressType,
-    rlBrgIpmFdbRefSourceAddress     InetAddress,
-    rlBrgIpmFdbRefPorts             PortList
-}
-
-rlBrgIpmFdbRefVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry is configured."
-    ::= { rlBrgIpmFdbRefEntry 1}
-
-rlBrgIpmFdbRefGroupAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgIpmFdbRefEntry 2}
-
-rlBrgIpmFdbRefGroupAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgIpmFdbRefEntry 3}
-
-rlBrgIpmFdbRefSourceAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgIpmFdbRefEntry 4}
-
-rlBrgIpmFdbRefSourceAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgIpmFdbRefEntry 5}
-
-rlBrgIpmFdbRefPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The list of ports represented in IPM FDB overlapping
-            Reference Table"
-    ::= { rlBrgIpmFdbRefEntry 6}
-
-
--- IPM FDB Dynamic command MIB
-DynamicCmdType ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
-        "Type of Dynamic IPM FDB command:
-         Create Entry, Delete Entry, Set ports Pset."
-    SYNTAX  INTEGER {
-        createEntry(0),
-        deleteEntry(1),
-        addPorts(2),
-        deletePorts(3)
-}
-
-rlBrgDynamicCmdTable OBJECT-TYPE
-   SYNTAX  SEQUENCE OF RlBrgDynamicCmdEntry
-    MAX-ACCESS   not-accessible
-    STATUS   current
-    DESCRIPTION
-       "The (conceptual) table for Dynamic IPM FDB command. For debugging purposes
-        only. This MIB is prohibited to be used with working IGMP/MLD snooping"
-    ::= {  rlBrgMulticast 8 }
-
-rlBrgDynamicCmdEntry OBJECT-TYPE
-    SYNTAX      RlBrgDynamicCmdEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlBrgDynamicCmdTable."
-    INDEX  { rlBrgDynamicCmdKey }
-    ::= { rlBrgDynamicCmdTable 1 }
-
-RlBrgDynamicCmdEntry ::= SEQUENCE {
-    rlBrgDynamicCmdKey               INTEGER,
-    rlBrgDynamicCmdVlanTag           VlanIndex,
-    rlBrgDynamicCmdGroupAddressType  InetAddressType,
-    rlBrgDynamicCmdGroupAddress      InetAddress,
-    rlBrgDynamicCmdSourceAddressType InetAddressType,
-    rlBrgDynamicCmdSourceAddress     InetAddress,
-    rlBrgDynamicCmdPorts             PortList,
-    rlBrgDynamicCmdType              DynamicCmdType
-}
-
-rlBrgDynamicCmdKey OBJECT-TYPE
-    SYNTAX      INTEGER (1)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Key of the rlBrgDynamicCmdTable table"
-    ::= { rlBrgDynamicCmdEntry 1 }
-
-rlBrgDynamicCmdVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry is configured."
-    ::= { rlBrgDynamicCmdEntry 2}
-
-rlBrgDynamicCmdGroupAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgDynamicCmdEntry 3}
-
-rlBrgDynamicCmdGroupAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "Multicast group address (destination address) of data frames "
-    ::= { rlBrgDynamicCmdEntry 4}
-
-rlBrgDynamicCmdSourceAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgDynamicCmdEntry 5}
-
-rlBrgDynamicCmdSourceAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Unicast source address of data frames."
-    ::= { rlBrgDynamicCmdEntry 6}
-
-rlBrgDynamicCmdPorts OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The list of ports for them the command is issued"
-    ::= { rlBrgDynamicCmdEntry 7}
-
-rlBrgDynamicCmdType OBJECT-TYPE
-    SYNTAX      DynamicCmdType
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Current type of command"
-    ::= { rlBrgDynamicCmdEntry 8 }
-
-
 
 
 -- mld
@@ -1679,14 +1116,14 @@ rlIgmpMldSnoopVlanAdminLastMemberQueryInterval OBJECT-TYPE
     ::= { rlIgmpMldSnoopVlanEntry 27 }
 
 rlIgmpMldSnoopVlanAdminLastMemberQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..7)
+    SYNTAX     Unsigned32 (0..7)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
             "Represents the number of group-specific and
             group-and-source-specific queries sent by the router before
-            it assumes there are no local members.
-          DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness }"
+            it assumes there are no local members. Value 0 is used to indicate 
+             usage of default value. DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness }"
     ::= { rlIgmpMldSnoopVlanEntry 28 }
 
 rlIgmpMldSnoopVlanAdminStartupQueryInterval OBJECT-TYPE
@@ -1829,113 +1266,201 @@ rlIgmpMldSnoopMulticastTvStatus OBJECT-TYPE
     ::= { rlIgmpMldSnoopMulticastTvEntry 5 }
 
 
--- rlIgmpMldSnoopQuerierVlanTable (replaces rlIgmpSnoopQuerierVlanTable)
 
-rlIgmpMldSnoopQuerierVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpMldSnoopQuerierVlanEntry
+MldVersion ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "MLD version."
+    SYNTAX  INTEGER {
+        none(0),
+        v1(1),
+        v2(2)
+}
+
+
+
+-- rlMldSnoopQuerierVlanTable
+
+rlMldSnoopQuerierVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlMldSnoopQuerierVlanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-       "A table that contains IGMP/MLD Snooping Querier information about
+       "A table that contains MLD Snooping Querier information about
         every vlan. This is indexed by vlan tag."
     ::= { rlMldSnoop 7 }
 
-rlIgmpMldSnoopQuerierVlanEntry OBJECT-TYPE
-    SYNTAX      RlIgmpMldSnoopQuerierVlanEntry
+rlMldSnoopQuerierVlanEntry OBJECT-TYPE
+    SYNTAX      RlMldSnoopQuerierVlanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpMldSnoopQuerierVlanTable."
-    INDEX  { rlIgmpMldSnoopQuerierVlanTag }
-    ::= { rlIgmpMldSnoopQuerierVlanTable 1 }
+        "An entry (conceptual row) in the rlMldSnoopQuerierVlanTable."
+    INDEX  { rlMldSnoopQuerierVlanTag }
+    ::= { rlMldSnoopQuerierVlanTable 1 }
 
-RlIgmpMldSnoopQuerierVlanEntry ::= SEQUENCE {
-    rlIgmpMldSnoopQuerierVlanTag                       VlanIndex,
-    rlIgmpMldSnoopQuerierAdminEnable                   TruthValue,
-    rlIgmpMldSnoopQuerierOperEnable                    TruthValue,
-    rlIgmpMldSnoopQuerierAdminAddrInetAddressType      InetAddressType,
-    rlIgmpMldSnoopQuerierAdminAddr                     InetAddress,
-    rlIgmpMldSnoopQuerierOperAddrInetAddressType       InetAddressType,
-    rlIgmpMldSnoopQuerierOperAddr                      InetAddress,
-    rlIgmpMldSnoopQuerierAdminVersionNumber            IgmpVersion,
-    rlIgmpMldSnoopQuerierOperVersionNumber             IgmpVersion
+RlMldSnoopQuerierVlanEntry ::= SEQUENCE {
+    rlMldSnoopQuerierVlanTag                       VlanIndex,
+    rlMldSnoopQuerierAdminEnable                   TruthValue,
+    rlMldSnoopQuerierOperEnable                    TruthValue,
+    rlMldSnoopQuerierAdminAddrInetAddressType      InetAddressType,
+    rlMldSnoopQuerierAdminAddr                     InetAddress,
+    rlMldSnoopQuerierOperAddrInetAddressType       InetAddressType,
+    rlMldSnoopQuerierOperAddr                      InetAddress,
+    rlMldSnoopQuerierAdminVersionNumber            MldVersion,
+    rlMldSnoopQuerierOperVersionNumber             MldVersion,
+        rlMldSnoopQuerierElectionEnable                TruthValue
 }
 
-rlIgmpMldSnoopQuerierVlanTag OBJECT-TYPE
+rlMldSnoopQuerierVlanTag OBJECT-TYPE
     SYNTAX      VlanIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "An IGMP/MLD Snoop Querier entry vlan tag."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 1 }
+        "An MLD Snoop Querier entry vlan tag."
+    ::= { rlMldSnoopQuerierVlanEntry 1 }
 
-rlIgmpMldSnoopQuerierAdminEnable OBJECT-TYPE
+rlMldSnoopQuerierAdminEnable OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The desired administrative state of IGMP/MLD Snoop Querier on the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 2 }
+        "The desired administrative state of MLD Snoop Querier on the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 2 }
 
-rlIgmpMldSnoopQuerierOperEnable OBJECT-TYPE
+rlMldSnoopQuerierOperEnable OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current operational state of IGMP/MLD Snoop Querier on the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 3 }
+        "The current operational state of MLD Snoop Querier on the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 3 }
 
-rlIgmpMldSnoopQuerierAdminAddrInetAddressType OBJECT-TYPE
+rlMldSnoopQuerierAdminAddrInetAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Inet type IPv6/IPv4."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 4}
+    ::= { rlMldSnoopQuerierVlanEntry 4}
 
-rlIgmpMldSnoopQuerierAdminAddr OBJECT-TYPE
+rlMldSnoopQuerierAdminAddr OBJECT-TYPE
     SYNTAX      InetAddress
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The desired IP address is being used in IGMP/MLD Snoop Querier messages on the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 5 }
+        "The desired IP address is being used in MLD Snoop Querier messages on the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 5 }
 
-rlIgmpMldSnoopQuerierOperAddrInetAddressType OBJECT-TYPE
+rlMldSnoopQuerierOperAddrInetAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Inet type IPv6/IPv4."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 6}
+    ::= { rlMldSnoopQuerierVlanEntry 6}
 
-rlIgmpMldSnoopQuerierOperAddr OBJECT-TYPE
+rlMldSnoopQuerierOperAddr OBJECT-TYPE
     SYNTAX      InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current operational IP address is being used in IGMP/MLD Snoop Querier messages on the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 7 }
+        "The current operational IP address is being used in MLD Snoop Querier messages on the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 7 }
 
-rlIgmpMldSnoopQuerierAdminVersionNumber OBJECT-TYPE
-    SYNTAX      IgmpVersion
+rlMldSnoopQuerierAdminVersionNumber OBJECT-TYPE
+    SYNTAX      MldVersion
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The highest version number of IGMP Snoop Querier for the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 8 }
+        "The highest version number of MLD Snoop Querier for the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 8 }
 
-rlIgmpMldSnoopQuerierOperVersionNumber OBJECT-TYPE
-    SYNTAX      IgmpVersion
+rlMldSnoopQuerierOperVersionNumber OBJECT-TYPE
+    SYNTAX      MldVersion
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current operational version number of IGMP Snoop Querier for the vlan."
-    ::= { rlIgmpMldSnoopQuerierVlanEntry 9 }
+        "The current operational version number of MLD Snoop Querier for the vlan."
+    ::= { rlMldSnoopQuerierVlanEntry 9 }
+
+rlMldSnoopQuerierElectionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether or not to participate in querier election.
+         When true, the snooping querier participates in querier election.
+         When false, the snooping querier is the elected querier until a general
+         query is heard from another router on the vlan (always lose)."
+    ::= { rlMldSnoopQuerierVlanEntry 10 }
+---
+
+rlMldSnoopQuerierEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Globally enable/disable MLD Snooping Querier in the switch."
+    ::= { rlMldSnoop 8 }
 
 
+rlIgmpMldSnoopQuerierGlobalAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlIgmpMldSnoopQuerierGlobalAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that contains IGMP/MLD Snooping Querier global address."
+    ::= { rlMldSnoop 9 }
 
 
+rlIgmpMldSnoopQuerierGlobalAddressEntry OBJECT-TYPE
+    SYNTAX      RlIgmpMldSnoopQuerierGlobalAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlIgmpMldSnoopQuerierGlobalAddressTable."
+    INDEX  { rlIgmpMldSnoopQuerierGlobalAddressIPVersion }
+    ::= { rlIgmpMldSnoopQuerierGlobalAddressTable 1 }
+
+RlIgmpMldSnoopQuerierGlobalAddressEntry ::= SEQUENCE {
+    rlIgmpMldSnoopQuerierGlobalAddressIPVersion InetVersion,
+    rlIgmpMldSnoopQuerierGlobalAddressType      InetAddressType,
+    rlIgmpMldSnoopQuerierGlobalAddress          InetAddress
+}
+
+rlIgmpMldSnoopQuerierGlobalAddressIPVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM interface.  A physical interface
+            may be configured in multiple modes concurrently, e.g., IPv4
+            and IPv6; however, the traffic is considered to be logically
+            separate."
+    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 1 }
+
+rlIgmpMldSnoopQuerierGlobalAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv6/IPv4."
+    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 2}
+
+rlIgmpMldSnoopQuerierGlobalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The desired address to used in IGMP/MLD Snoop Querier messages if
+         such an address is not configured on the vlan."
+    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 3 }
+
+
+---
+--- TRAPS
+---
 
 rlMacMulticastUnregFilterFailed TRAP-TYPE
     ENTERPRISE  switch001
@@ -1950,6 +1475,16 @@ rlIgmpMldSnoopTriplePlayPort NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating that a query was recieved on a triple play port."
     ::= { rndNotifications 208 }
+
+
+rlbrgIgmpSnoopQrrDuplicateIP  NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that duplicate ip\ipv6 address 
+         occured between two queries"
+    ::= { rndNotifications 227 }
+
 
 END
 
