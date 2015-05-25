@@ -13,82 +13,35 @@ if (!$database_link)
 }
 $database_db = mysql_select_db($config['db_name'], $database_link);
 
-function create_array(&$arr,$string,$data,$type)
-{
-  // The original source of this code is from Stackoverflow (www.stackoverflow.com).
-  // http://stackoverflow.com/questions/9145902/create-variable-length-array-from-string
-  // Answer provided by stewe (http://stackoverflow.com/users/511300/stewe)
-  // This code is slightly adapted from the original posting.
-
-  $a=explode(',',$string);
-  $last=count($a)-1;
-  $p=&$arr;
-
-  foreach($a as $k=>$key)
-  {
-    if ($k==$last)
-    {
-      if($type == 'multi')
-      {
-        if (!isset($p[$key])) {
-            $p[$key]=explode(',',$data);
+function mergecnf($obj) {
+    global $config;
+    $val = $obj['config_value'];
+    $obj = $obj['config_name'];
+    $obj = explode('.',$obj);
+    $str = "";
+    foreach ($obj as $sub) {
+        if (!empty($sub)) {
+            $str .= "['".addslashes($sub)."']";
+        } else {
+            $str .= "[]";
         }
-      }
-      elseif($type == 'single')
-      {
-        if (!isset($p[$key])) {
-          $p[$key]=$data;
-        }
-      }
     }
-    else if (is_array($p))
-    {
-//      $p[$key]=array();
+    $str = '$config'.$str.' = ';
+    if (filter_var($val,FILTER_VALIDATE_INT)) {
+        $str .= "(int) '$val';";
+    } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
+        $str .= "(float) '$val';";
+    } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
+        $str .= "(boolean) '$val';";
+    } else {
+        $str .= "'$val';";
     }
-  $p=&$p[$key];
-  }
+    eval('return array('.$str.')');
 }
 
-// We should be able to get config values from the DB now.
-// Single field config values
-$config_vars = get_defined_vars();
-$single_config = dbFetchRows("SELECT `config_name`, `config_value` FROM  `config` WHERE `config_type` = 'single' AND `config_disabled` = '0'");
-foreach ($single_config as $config_data)
-{
-  $tmp_name = $config_data['config_name'];
-  if(!isset($config[$tmp_name]))
-  {
-    $config[$tmp_name] = stripslashes($config_data['config_value']);
-  }
+foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
+    $config = array_merge_recursive($config,mergecnf($obj));
 }
-// Array config values
-$config_vars = get_defined_vars();
-$array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'array' AND `config_disabled` =  '0' GROUP BY config_name");
-foreach ($array_config as $config_data)
-{
-  $tmp_name = $config_data['config_name'];
-  if(!isset($config[$tmp_name]))
-  {
-    $config[$tmp_name] = explode(',',stripslashes($config_data['config_value']));
-  }
-}
-
-// Multi-array config values
-$config_vars = get_defined_vars();
-$multi_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'multi-array' AND `config_disabled` =  '0' GROUP BY config_name");
-foreach ($multi_array_config as $config_data)
-{
-  create_array($config,$config_data['config_name'],stripslashes($config_data['config_value']),'multi');
-}
-
-// Single-array config values
-$config_vars = get_defined_vars();
-$single_array_config = dbFetchRows("SELECT `config_name`, GROUP_CONCAT( `config_value` ) AS `config_value` FROM `config` WHERE `config_type` =  'single-array' AND `config_disabled` =  '0' GROUP BY config_name");
-foreach ($single_array_config as $config_data)
-{
-  create_array($config,$config_data['config_name'],stripslashes($config_data['config_value']),'single');
-}
-unset($config_vars);
 
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
