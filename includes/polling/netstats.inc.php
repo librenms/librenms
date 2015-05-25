@@ -7,6 +7,7 @@
   include("netstats-udp.inc.php");
   include("netstats-icmp.inc.php");
   include("netstats-snmp.inc.php");
+  include("netstats-ip_forward.inc.php");
 
   echo("\n");
 

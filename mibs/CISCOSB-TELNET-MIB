@@ -6,22 +6,22 @@ CISCOSB-TELNET-MIB DEFINITIONS ::= BEGIN
 -- Date:                 24-Nov-2008
 
 IMPORTS
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     OBJECT-TYPE, MODULE-IDENTITY, IpAddress     FROM SNMPv2-SMI
     TruthValue,DisplayString                    FROM SNMPv2-TC
     InetAddressType, InetAddress                FROM INET-ADDRESS-MIB; -- RFC2851
 
 rlTelnet MODULE-IDENTITY
                 LAST-UPDATED "200811240000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines telnet private MIBs."

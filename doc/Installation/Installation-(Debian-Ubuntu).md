@@ -55,6 +55,11 @@ Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd resta
 In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 
+### Adding the librenms-user ###
+
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms www-data
+
 ### Cloning ###
 
 LibreNMS is installed using git.  If you're not familiar with git, check out the [git book][2] or the tips at [git ready][3].  The initial install from github.com is called a `git clone`; subsequent updates are done through `git pull`.
@@ -81,9 +86,12 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory:
 
     mkdir rrd logs
-    chown www-data:www-data logs/ rrd/
+    chown www-data:www-data logs
+    chmod 775 rrd
+    chown librenms:librenms rrd
 
 > NOTE: If you're not running Ubuntu or Debian, you will need to change `www-data` to the user and group which run the Apache web server.
+> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
 
@@ -168,7 +176,7 @@ LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job ru
 
 Create the cronjob
 
-    cp librenms.cron /etc/cron.d/librenms
+    cp librenms.nonroot.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 

@@ -17,22 +17,22 @@ IMPORTS
     OBJECT-TYPE                                 FROM SNMPv2-SMI;
 
 rlFile MODULE-IDENTITY
-        LAST-UPDATED "201105300000Z"
-		ORGANIZATION "Cisco Small Business"
+      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
 		"Postal: 170 West Tasman Drive
 		San Jose , CA 95134-1706
 		USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
              "The private MIB module definition for File Private Extension."
-        REVISION "201105300000Z"
-        DESCRIPTION
-             "Initial revision."
+      	REVISION     "201304010000Z"  -- April 1, 2013
+      	DESCRIPTION
+              "Added MODULE-IDENTITY"
         ::= { switch001 96 }
 
 rlFileMibVersion OBJECT-TYPE

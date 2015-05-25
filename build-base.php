@@ -20,7 +20,11 @@ if ($connection === FALSE) {
 	exit(1);
 }
 
-mysql_select_db( $config['db_name']  );
+$select = mysql_select_db( $config['db_name']  );
+if ($select === FALSE) {
+  echo( "ERROR: Cannot select database: " . mysql_error() . "\n" );
+  exit(1);
+}
 
 while( !feof( $sql_fh ) ) {
   $line = fgetss( $sql_fh );

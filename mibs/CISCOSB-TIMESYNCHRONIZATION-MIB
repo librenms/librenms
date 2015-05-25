@@ -1,24 +1,25 @@
 CISCOSB-TIMESYNCHRONIZATION-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    switch001                                        FROM CISCOSB-MIB
+    switch001                                   FROM CISCOSB-MIB
     Unsigned32, Integer32, IpAddress,
     MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
     InetAddressType, InetAddress                FROM INET-ADDRESS-MIB
     DisplayString, TEXTUAL-CONVENTION   ,
-    RowStatus, TruthValue                       FROM SNMPv2-TC;
+    RowStatus, TruthValue                       FROM SNMPv2-TC
+    InterfaceIndex                              FROM IF-MIB;
 
 rlTimeSynchronization MODULE-IDENTITY
       LAST-UPDATED "200408030024Z"
-	  ORGANIZATION "Cisco Small Business"
+      ORGANIZATION "Cisco Systems, Inc."
 
-	  CONTACT-INFO
-	  "Postal: 170 West Tasman Drive
-	  San Jose , CA 95134-1706
-	  USA
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
 
-	  Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-	  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
       DESCRIPTION
               "The MIB module describes the private MIB for SNTP & TIME definitions."
@@ -284,7 +285,8 @@ RlTimeZoneEntry ::= SEQUENCE {
     rlTimeZoneTZDSTOffset               INTEGER,
     rlTimeZoneTimeZoneName              DisplayString (SIZE(0..16)),
     rlTimeZoneDataType                  INTEGER,
-    rlTimeZoneDataSourceIfIndex         INTEGER
+    rlTimeZoneDataSourceIfIndex         INTEGER,
+    rlTimeZoneDataDynamicConfSource     INTEGER
 }
 
 rlTimeZoneIndex OBJECT-TYPE
@@ -421,6 +423,19 @@ rlTimeZoneDataSourceIfIndex OBJECT-TYPE
                      relevant only for dynamic entry), and this is the only value allowed for SET in this case."
         DEFVAL      { 0 }
         ::= { rlTimeZoneEntry 13 }
+
+rlTimeZoneDataDynamicConfSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    dhcpv4(2),
+                    dhcpv6(3)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The source of dynamic data in this entry, for example: dhcpv4.
+                 Values other than 'none' are relevant only for dynamic entry."
+    DEFVAL      { none }
+        ::= { rlTimeZoneEntry 14 }
 
 
 rlClockStatus OBJECT-TYPE
@@ -747,7 +762,9 @@ rlSntpUnicastAdminState OBJECT-TYPE
 rlSntpBroadcastAdminState OBJECT-TYPE
         SYNTAX      INTEGER {
                        enabled(1),
-                       disabled(2)
+                       disabled(2),
+                       ipv4OnlyEnabled(3),
+                       ipv6OnlyEnabled(4)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -761,7 +778,9 @@ rlSntpBroadcastAdminState OBJECT-TYPE
 rlSntpAnycastAdminState OBJECT-TYPE
         SYNTAX      INTEGER {
                        enabled(1),
-                       disabled(2)
+                       disabled(2),
+                       ipv4OnlyEnabled(3),
+                       ipv6OnlyEnabled(4)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -1708,6 +1727,164 @@ rlSntpServerInetRowStatus OBJECT-TYPE
         STATUS      current
         DESCRIPTION "The Status of this SNTP server information."
         ::= { rlSntpServerInetEntry 10 }
+
+
+rlSntpAllServerInetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpAllServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing all SNTP servers (for example: statically
+                     configured, dynamically configured) to be queried in unicast
+                     or broadcast mode."
+        ::= { rlSntpConfig 18 }
+
+rlSntpAllServerInetEntry OBJECT-TYPE
+        SYNTAX      RlSntpAllServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A server entry."
+
+        INDEX       {   rlSntpAllServerSource,
+                        rlSntpAllServerIfIndex,
+                        rlSntpAllServerPreference,
+                        rlSntpAllServerInetAddressType,
+                        rlSntpAllServerInetAddress
+                    }
+        ::= { rlSntpAllServerInetTable 1 }
+
+RlSntpAllServerInetEntry ::=
+        SEQUENCE {
+           rlSntpAllServerSource              INTEGER,
+           rlSntpAllServerIfIndex             InterfaceIndex,
+           rlSntpAllServerPreference          INTEGER,
+           rlSntpAllServerInetAddressType     InetAddressType,
+           rlSntpAllServerInetAddress         InetAddress,
+           rlSntpAllServerInetPolled          TruthValue,
+           rlSntpAllServerInetStratum         NTPStratum,
+           rlSntpAllServerInetLastResp        NTPTimeStamp,
+           rlSntpAllServerInetStatus          INTEGER,
+           rlSntpAllServerInetOffset          NTPTimeStamp,
+           rlSntpAllServerInetDelay           NTPSignedTimeValue,
+           rlSntpAllServerInetKeyIdentifier   Unsigned32
+        }
+
+rlSntpAllServerSource OBJECT-TYPE
+        SYNTAX INTEGER {
+         static(1),
+         dhcpv6(2)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The SNTP server source: static means manually defined,
+                     dhcpv6 means learnt from DHCP. Only static entries are
+                     stored in CDB."
+        ::= { rlSntpAllServerInetEntry 1 }
+
+rlSntpAllServerIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex from which the SNTP server configuration was
+                     received (for dhcpv6 configurations). For static entries
+                     the value of this field will always be 1. "
+        ::= { rlSntpAllServerInetEntry 2 }
+
+rlSntpAllServerPreference OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The preference of SNTP server (for dhcpv6 configurations).
+                     For static entries the value of this field will always be 0. "
+        ::= { rlSntpAllServerInetEntry 3 }
+
+rlSntpAllServerInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "SNTP server inet address type."
+        ::= { rlSntpAllServerInetEntry 4 }
+
+rlSntpAllServerInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "SNTP server inet address."
+        ::= { rlSntpAllServerInetEntry 5 }
+
+rlSntpAllServerInetPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpAllServerInetEntry 6 }
+
+rlSntpAllServerInetStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpAllServerInetEntry 7 }
+
+rlSntpAllServerInetLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Response Time"
+        ::= { rlSntpAllServerInetEntry 8 }
+
+rlSntpAllServerInetStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Server.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpAllServerInetEntry 9 }
+
+rlSntpAllServerInetOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAllServerInetEntry 10 }
+
+rlSntpAllServerInetDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAllServerInetEntry 11 }
+
+rlSntpAllServerInetKeyIdentifier OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Authentication key identifier. The valid range is
+                     1-4294967295.
+                     Value zero, means no authentication is being done."
+        ::= { rlSntpAllServerInetEntry 12 }
+
 
 
 END

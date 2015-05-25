@@ -27,7 +27,7 @@ $invert = mres($_POST['invert']);
 $name = mres($_POST['name']);
 
 if(empty($rule)) {
-    $update_message = "ERROR: No rule was generated";
+    $update_message = "ERROR: No rule was generated - did you forget to click and / or?";
 } elseif(validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
     $device_id = $_POST['device_id'];
     if(!is_numeric($count)) {

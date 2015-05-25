@@ -6,8 +6,8 @@ CISCOSB-DOT1X-MIB DEFINITIONS ::= BEGIN
 -- Date:                 15-Jan-2007
 
 IMPORTS
-    switch001                                                                             FROM CISCOSB-MIB
-    OBJECT-TYPE, MODULE-IDENTITY, Counter32, Counter64, TimeTicks                   FROM SNMPv2-SMI
+    switch001                                                                       FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Counter32, Counter64, TimeTicks, Unsigned32       FROM SNMPv2-SMI
     TruthValue, RowStatus                                                           FROM SNMPv2-TC
     VlanIndex, PortList, dot1qFdbId                                                 FROM Q-BRIDGE-MIB
     MacAddress                                                                      FROM BRIDGE-MIB
@@ -16,15 +16,15 @@ IMPORTS
 
 rldot1x MODULE-IDENTITY
                 LAST-UPDATED "200701020000Z"
-				ORGANIZATION "Cisco Small Business"
+                ORGANIZATION "Cisco Systems, Inc."
 
-				CONTACT-INFO
-				"Postal: 170 West Tasman Drive
-				San Jose , CA 95134-1706
-				USA
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
                       "This private MIB module defines dot1x private MIBs."
@@ -190,6 +190,18 @@ Rldot1xAuthenticationPortEntry::=
         rldot1xTimeBasedName
             SnmpAdminString,
         rldot1xTimeBasedActive
+            TruthValue,
+        rldot1xRadiusAttrVlanIdentifier
+            VlanIndex,
+        rldot1xMaxHosts
+            Unsigned32,
+        rldot1xMaxLoginAttempts
+            INTEGER,
+        rldot1xTimeoutSilencePeriod
+            INTEGER,
+        rldot1xNumOfAuthorizedHosts
+            INTEGER,
+        rldot1xAuthenticationOpenEnabled
             TruthValue
     }
 
@@ -197,12 +209,16 @@ rldot1xAuthenticationPortMethod OBJECT-TYPE
     SYNTAX      INTEGER {
                     eapolOnly(1),
                     macAndEapol(2),
-                    macOnly(3)
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
                 }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of the mac based authenication."
+        "The value of the 802.1x-based, mac-based and web-based authentication."
     DEFVAL   { eapolOnly }
      ::= { rldot1xAuthenticationPortEntry 1 }
 
@@ -239,6 +255,67 @@ rldot1xTimeBasedActive OBJECT-TYPE
     DESCRIPTION
          "Specifies if time range is active now or not."
     ::= { rldot1xAuthenticationPortEntry 5 }
+
+rldot1xRadiusAttrVlanIdentifier OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "In case that value is not 0,
+         This field will define the VLAN ID in case that it is not received from Radius attributes
+         in Radius-Accept message."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 6 }
+
+rldot1xMaxHosts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of authenticated hosts allowed on the interface.
+         A value of 0 means no limitation."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 7 }
+
+rldot1xMaxLoginAttempts OBJECT-TYPE
+    SYNTAX      INTEGER (0.. 10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowedlogin attempts on the interface.
+         A value of 0 means the infinite number of attemtps.
+         The configuration is applied only to Web-Based authentication."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 8 }
+
+rldot1xTimeoutSilencePeriod OBJECT-TYPE
+    SYNTAX      INTEGER (0.. 65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the number of seconds that if an authorized client did not send traffic during this period,
+         then the client is changed to unauthrized.
+         The configuration is applied only to Web-Based authentication."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 9 }
+
+rldot1xNumOfAuthorizedHosts OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "Number of authorized host in multi-sessions mode."
+    ::= { rldot1xAuthenticationPortEntry 10 }
+
+rldot1xAuthenticationOpenEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Open access allows clients or devices to gain network access before authentication is performed.
+         In the mode the switch performs failure replies received from a Radius server as success."
+    DEFVAL { false }
+    ::= { rldot1xAuthenticationPortEntry 11 }
 
  --------------------------------------------------------------
  -- The Authenticator Statistics Table
@@ -752,6 +829,8 @@ rldot1xTimeBasedActive OBJECT-TYPE
         rldot1xAuthMultiSessionRadiusAttrSecondFilterId
             SnmpAdminString,
         rlDot1xAuthMultiSessionMonitorResultsReason
+            INTEGER,
+        rlDot1xAuthMultiSessionMethodType
             INTEGER     }
 
  rldot1xAuthMultiSessionStatsPortNumber OBJECT-TYPE
@@ -896,13 +975,28 @@ rldot1xTimeBasedActive OBJECT-TYPE
                     frsMthDeny(18),   -- First method is "deny"
                     radApierr(19),    -- RADIUS API returned error (e.g. No RADIUS server is configured).
                     radInvlres(20),   -- RADIUS server returned invalid packet (e.g. EAP Attribute is missing)
-                    radNoresp(21)     -- RADIUS server is not responding
+                    radNoresp(21),    -- RADIUS server is not responding
+                    aclEgress(22),    -- ACL sent by radius Server is already bound as egress acl
+                    maxHosts(23),     -- Max hosts allowed per port are reached
+                    noActivity(24)    -- There is no traffic from this host
                 }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The monitor result reason of the session."
     ::= { rldot1xAuthMultiSessionStatsEntry 13 }
+
+ rlDot1xAuthMultiSessionMethodType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    eapol(1),
+                    mac(2),
+                    web(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current session method type."
+     ::= { rldot1xAuthMultiSessionStatsEntry 14 }
 
  --------------------------------------------------------------
  -- The Authenticator Configuration Table
@@ -1113,5 +1207,116 @@ rldot1xClearPortMibCounters OBJECT-TYPE
         "Each bit that is set in this portList represent a port that
          its mib counters should be reset."
     ::= { rldot1x  24 }
+
+rldot1xWebQuietFailureTrapEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps when a client is set in quiet state
+         after the maximum sequential attempts of login."
+    ::= { rldot1x 25 }
+
+rldot1xMacWebAuthSuccessTrapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    eapolOnly(1),
+                    macAndEapol(2),
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps per authentication method
+         when a session is successfully authenticated."
+    ::= { rldot1x 26 }
+
+rldot1xMacWebAuthFailureTrapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    eapolOnly(1),
+                    macAndEapol(2),
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps per authentication method when a session was failed."
+    ::= { rldot1x 27 }
+
+ --------------------------------------------------------------
+ -- The Locked Cients Table
+ --------------------------------------------------------------
+
+ rldot1xLockedCientsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xLockedCientsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the locked clients information for Web-based authentication."
+    REFERENCE
+        "9.4.2 Authenticator Statistics"
+    ::= { rldot1x 28 }
+
+ rldot1xLockedCientsEntry OBJECT-TYPE
+    SYNTAX      Rldot1xLockedCientsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The locked clients entry that entered silence period timeout for Web-based authentication."
+    INDEX { rldot1xLockedCientsPortNumber, rldot1xLockedCientsSourceMac }
+    ::= { rldot1xLockedCientsTable 1 }
+
+ Rldot1xLockedCientsEntry ::=
+    SEQUENCE {
+        rldot1xLockedCientsPortNumber
+            INTEGER,
+        rldot1xLockedCientsSourceMac
+            MacAddress,
+        rldot1xLockedCientsRemainedTime
+            INTEGER,
+        rldot1xLockedCientsRowStatus
+            RowStatus
+        }
+
+ rldot1xLockedCientsPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xLockedCientsEntry 1 }
+
+ rldot1xLockedCientsSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the locked client."
+    ::= { rldot1xLockedCientsEntry 2 }
+
+ rldot1xLockedCientsRemainedTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time that is remained till the expiry of silence period."
+    ::= { rldot1xLockedCientsEntry 3 }
+
+ rldot1xLockedCientsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rldot1xLockedCientsEntry 4 }
 
 END
