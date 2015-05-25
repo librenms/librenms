@@ -789,7 +789,18 @@ function add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf
 function get_config_by_group($group) {
     $group = array($group);
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
-        $items[] = $config_item;
+        $val = $config_item['config_value'];
+        if (filter_var($val,FILTER_VALIDATE_INT)) {
+            $val = (int) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
+            $val = (float) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
+            $val =(boolean) $val;
+        }
+        if ($val === TRUE) {
+            $config_item += array('config_checked'=>'checked');
+        }
+        $items[$config_item['config_name']] = $config_item;
     }
     return $items;
 }

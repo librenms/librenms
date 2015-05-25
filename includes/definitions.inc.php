@@ -14,29 +14,27 @@ if (!$database_link)
 $database_db = mysql_select_db($config['db_name'], $database_link);
 
 function mergecnf($obj) {
-    global $config;
+    $pointer = array();
     $val = $obj['config_value'];
     $obj = $obj['config_name'];
-    $obj = explode('.',$obj);
-    $str = "";
-    foreach ($obj as $sub) {
-        if (!empty($sub)) {
-            $str .= "['".addslashes($sub)."']";
-        } else {
-            $str .= "[]";
+    $obj = explode('.',$obj,2);
+    if (!isset($obj[1])) {
+        if (filter_var($val,FILTER_VALIDATE_INT)) {
+            $val = (int) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
+            $val = (float) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
+            $val =(boolean) $val;
         }
-    }
-    $str = '$config'.$str.' = ';
-    if (filter_var($val,FILTER_VALIDATE_INT)) {
-        $str .= "(int) '$val';";
-    } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
-        $str .= "(float) '$val';";
-    } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
-        $str .= "(boolean) '$val';";
+        if (!empty($obj[0])) {
+            return array($obj[0] => $val);
+        } else {
+            return array($val);
+        }
     } else {
-        $str .= "'$val';";
+        $pointer[$obj[0]] = mergecnf(array('config_name'=>$obj[1],'config_value'=>$val));
     }
-    eval('return array('.$str.')');
+    return $pointer;
 }
 
 foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
