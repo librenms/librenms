@@ -1192,3 +1192,12 @@ function id_to_target($id) {
     }
     return $id;
 }
+
+function first_oid_match($device, $list) {
+    foreach ($list as $item) {
+	$tmp = trim(snmp_get($device, $item, "-Ovq"), '" ');
+	if (!empty($tmp)) {
+	    return $tmp;
+	}
+    }
+}
