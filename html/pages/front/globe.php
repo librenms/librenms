@@ -43,7 +43,7 @@ foreach (getlocations() as $location) {
 	$count = 0;
 	$down  = 0;
 	foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE ( devices.location = ? || ( devices_attribs.attrib_type = 'override_sysLocation_string' && devices_attribs.attrib_value = ? ) ) && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location,$location)) as $device) {
-		if( $config['frontpage_custom']['globe'] == 'devices' || empty($config['frontpage_custom']['globe']) ) {
+		if( $config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers']) ) {
 			$devices[] = $device['hostname'];
 			$count++;
 			if( $device['status'] == "0" ) {
@@ -52,7 +52,7 @@ foreach (getlocations() as $location) {
 			} else {
 				$devices_up[] = $device;
 			}
-		} elseif( $config['frontpage_custom']['globe'] == 'ports' ) {
+		} elseif( $config['frontpage_globe']['markers'] == 'ports' ) {
 			foreach( dbFetchRows("SELECT ifName,ifOperStatus,ifAdminStatus FROM ports WHERE ports.device_id = ? && ports.ignore = 0 && ports.disabled = 0 && ports.deleted = 0",array($device['device_id'])) as $port ) {
 				$count++;
 				if( $port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] == 'up' ) {
@@ -65,9 +65,9 @@ foreach (getlocations() as $location) {
 		}
 	}
 	$pdown = ($down / $count)*100;
-	if( $config['frontpage_custom']['globe'] == 'devices' || empty($config['frontpage_custom']['globe']) ) {
+	if( $config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers']) ) {
 		$devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
-	} elseif( $config['frontpage_custom']['globe'] == 'ports' ) {
+	} elseif( $config['frontpage_globe']['markers'] == 'ports' ) {
 		$devices_down = array_merge(array(count($devices_up). " Ports OK"), $devices_down);
 	}
 	$locations[] = "			['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
@@ -77,8 +77,8 @@ echo implode(",\n", $locations);
 
 		]);
 		var options = {
-			region: 'world',
-			resolution: 'countries',
+			region: '<?php echo($config['frontpage_globe']['region'] ? $config['frontpage_globe']['region'] : "world") ?>',
+			resolution: '<?php echo($config['frontpage_globe']['resolution'] ? $config['frontpage_globe']['resolution'] : "countries") ?>',
 			displayMode: 'markers',
 			keepAspectRatio: 1,
 			magnifyingGlass: {enable: true, zoomFactor: 100},
