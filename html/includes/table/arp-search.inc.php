@@ -70,7 +70,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
     $response[] = array('mac_address'=>formatMac($entry['mac_address']),
                         'ipv4_address'=>$entry['ipv4_address'],
                         'hostname'=>generate_device_link($entry),
-                        'interface'=>generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img,
+                        'interface'=>generate_port_link($entry, makeshortif(fixifname(ifLabel($entry)['label']))) . ' ' . $error_img,
                         'remote_device'=>$arp_name,
                         'remote_interface'=>$arp_if);
     }
