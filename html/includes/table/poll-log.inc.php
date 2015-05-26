@@ -16,13 +16,13 @@ if (!isset($sort) || empty($sort)) {
     $sort = 'last_polled_timetaken DESC';
 }
 
+$sql .= " AND D.status ='1' AND D.ignore='0' AND D.disabled='0' ORDER BY $sort";
+
 $count_sql = "SELECT COUNT(`D`.`device_id`) $sql";
 $total = dbFetchCell($count_sql);
 if (empty($total)) {
     $total = 0;
 }
-
-$sql .= " AND D.status ='1' AND D.ignore='0' AND D.disabled='0' ORDER BY $sort";
 
 if (isset($current)) {
     $limit_low = ($current * $rowCount) - ($rowCount);
