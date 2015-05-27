@@ -46,7 +46,7 @@ foreach($opts as $option) {
 
   $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   if($code != 200) {
-    var_dump("API '$url' returnd Error");
+    var_dump("API '$url' returned Error");
     var_dump("Params: " . $message);
     var_dump("Return: " . $ret);
     return false;

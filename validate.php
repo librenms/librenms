@@ -98,7 +98,7 @@ if ($space_check < 1) {
 $bins = array('fping');
 foreach ($bins as $bin) {
     if (!is_file($config[$bin])) {
-        print_fail("$bin location is incorrect orbin not installed");
+        print_fail("$bin location is incorrect or bin not installed");
     } else {
         print_ok("$bin has been found");
     }
