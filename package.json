@@ -37,5 +37,8 @@
     "grunt-conventional-changelog": "~1.0.0",
     "grunt-gh-pages": "^0.10.0",
     "jshint-stylish": "^1.0.1"
-  }
+  },
+  "scripts": {
+  "test": "grunt test"
+}
 }
