@@ -42,7 +42,7 @@ foreach( $opts as $tmp_api ) {
 	$ret = curl_exec($curl);
 	$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 	if( $code != 200 ) {
-		var_dump("API '$host' returnd Error"); //FIXME: propper debuging
+		var_dump("API '$host' returned Error"); //FIXME: propper debuging
 		var_dump("Params: ".$alert_message); //FIXME: propper debuging
 		var_dump("Return: ".$ret); //FIXME: propper debuging
 		return false;
