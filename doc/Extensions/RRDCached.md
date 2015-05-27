@@ -13,10 +13,10 @@ vi /etc/yum.repos.d/rpmforge.repo
 - Enable the Extra repo
 
 ```ssh
-yum update rrdttol
+yum update rrdtool
 vi /etc/yum.repos.d/rpmforge.repo 
 ```
-- Disable both repo's
+- Disable the [rpmforge] and [rpmforge-extras] repos again
 
 ```ssh
 service rrdcached start
