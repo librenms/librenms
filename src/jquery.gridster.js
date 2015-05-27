@@ -1185,10 +1185,6 @@
 		if (this.options.avoid_overlapped_widgets && !this.can_move_to(
 						{size_x: wgd.size_x, size_y: wgd.size_y}, wgd.col, wgd.row)
 		) {
-			if (!$el.hasClass('.disp_ad')) {
-				$el.remove();
-				return false;
-			}
 			$.extend(wgd, this.next_position(wgd.size_x, wgd.size_y));
 			$el.attr({
 				'data-col': wgd.col,

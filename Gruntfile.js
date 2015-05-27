@@ -101,7 +101,7 @@ module.exports = function(grunt) {
 					message: 'update docs for changes from v<%= pkg.version %> ',
 					base: 'gh-pages',
 					add: true,
-					push: false
+					push: true
 				},
 				src: '**'
 			}
