@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.8 - 2015-05-26
+/*! gridster.js - v0.6.8 - 2015-05-27
 * http://gridster.net/
 * Copyright (c) 2015 ducksboard; Licensed MIT */
 
@@ -5068,7 +5068,7 @@
 ;(function(root, factory) {
 	'use strict';
 	if(typeof exports === 'object') {
-        module.exports = factory(require('jquery'), require('./jquery-gridster.js'));
+        module.exports = factory(require('jquery'), require('./jquery.gridster.js'));
     }
     else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'gridster'], factory);

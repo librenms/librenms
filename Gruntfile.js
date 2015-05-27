@@ -86,6 +86,16 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		replace: {
+			'rails-version': {
+				src: ['lib/gridster.js-rails/version.rb'],
+				dest: 'lib/gridster.js-rails/version.rb',
+				replacements: [{
+					from: /(\S*)(VERSION = ).*/g,
+					to: '$1$2"<%= pkg.version %>"'
+				}]
+			}
+		},
 		copy: {
 			dist: {
 				files: [{
@@ -93,6 +103,27 @@ module.exports = function(grunt) {
 					dest: 'gh-pages/',
 					src: ['dist/*', 'demos/**']
 				}]
+			},
+			rails: {
+				files: [{
+					expand: true,
+					flatten: true,
+					dest: 'vendor/assets/javascripts/',
+					src: ['dist/*.js']
+				}, {
+					expand: true,
+					flatten: true,
+					dest: 'vendor/assets/stylesheets/',
+					src: ['dist/*.css']
+				}]
+			}
+		},
+		shell: {
+			'build-rails-gem': {
+				command: 'gem build gridster.js-rails.gemspec'
+			},
+			'publish-rails-gem': {
+				command: 'gem push gridster.js-rails-<%= pkg.version %>'
 			}
 		},
 		'gh-pages': {
@@ -152,17 +183,25 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-bump');
 	grunt.loadNpmTasks('grunt-conventional-changelog');
 	grunt.loadNpmTasks('grunt-gh-pages');
+	grunt.loadNpmTasks('grunt-text-replace');
+	grunt.loadNpmTasks('grunt-shell');
 
 	// Default task.
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'cssmin']);
-	grunt.registerTask('build', ['default', 'qunit']);
+	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'cssmin', 'replace:rails-version', 'copy:rails']);
+	grunt.registerTask('build', ['default', 'qunit', 'shell:build-rails-gem']);
 	grunt.registerTask('test', ['jshint','qunit']);
 	grunt.registerTask('docs', ['clean', 'build', 'yuidoc', 'copy:dist', 'gh-pages']);
 
+	//builds and releases the gem files
+	grunt.registerTask('rails:publish', ['shell:build-rails-gem', 'shell:publish-rails-gem']);
+
+	//use one of the four release tasks to build the artifacts for the release (it will push the docs pages only)
 	grunt.registerTask('release:patch', ['build', 'bump-only:patch', 'build', 'docs', 'changelog']);
 	grunt.registerTask('release:minor', ['build', 'bump-only:minor', 'build', 'docs', 'changelog']);
 	grunt.registerTask('release:major', ['build', 'bump-only:major', 'build', 'docs', 'changelog']);
-	grunt.registerTask('release:git', ['build', 'bump-only:git', 'build', 'docs', 'changelog', 'bump-commit']);
-	grunt.registerTask('release:commit', ['bump-commit']);
+	grunt.registerTask('release:git',   ['build', 'bump-only:git', 'build', 'docs', 'changelog']);
+
+	//use this task to publish the release artifacts
+	grunt.registerTask('release:commit', ['bump-commit', 'shell:publish-rails-gem']);
 
 };

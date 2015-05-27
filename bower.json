@@ -20,6 +20,10 @@
     "CONTRIBUTING.md",
     "Gruntfile.js",
     "package.json",
-    "test/"
+    "test/",
+    "gridster.js-rails.gemspec",
+    "Gemfile",
+    "Gemfile.lock",
+    "lib"
   ]
 }
