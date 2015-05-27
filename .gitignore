@@ -5,3 +5,5 @@ demo/
 .idea
 .DS_Store
 *.iml
+vendor
+*.gem

@@ -25,6 +25,31 @@ As of result of the inactivity over the last year in the [Ducksboard](https://gi
 for current support.  He will GLADLY accept pull requests, and will be working to merge existing
 Pull Requests from Ducksboard repo.
 
+## Ruby on Rails integration
+
+This artifact is published to [rubygems.org](https://rubygems.org/gems/gridster.js-rails) to be consumed by ruby on rails applications.
+
+Include gridster.js-rails in Gemfile;
+
+``` ruby
+gem 'gridster.js-rails'
+```
+
+and run bundle install.
+
+### Configuration
+
+Add this line to app/assets/stylesheets/application.css
+
+``` css
+ *= require jquery.gridster
+```
+
+Add this line to app/assets/javascripts/application.js
+
+``` javascript
+//= require jquery.gridster
+```
 
 ## Contributing to this project
 
