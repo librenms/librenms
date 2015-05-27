@@ -30,8 +30,12 @@ if (!empty($_POST['type']))     {
   }
 }
 if (!empty($_POST['state'])) {
-    $sql .= " AND status= ?";       $param[] = $state;
-    $sql .= " AND disabled='0' AND `ignore`='0'"; $param[] = '';
+    $sql .= " AND status= ?";
+    if( is_numeric($_POST['state']) ) {
+        $param[] = $_POST['state'];
+    } else {
+        $param[] = str_replace(array('up','down'),array(1,0),$_POST['state']);
+    }
 }
 if (!empty($_POST['disabled'])) { $sql .= " AND disabled= ?";     $param[] = $_POST['disabled']; }
 if (!empty($_POST['ignore']))   { $sql .= " AND `ignore`= ?";       $param[] = $_POST['ignore']; }
