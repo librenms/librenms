@@ -19,8 +19,6 @@ vi /etc/yum.repos.d/rpmforge.repo
 - Disable the [rpmforge] and [rpmforge-extras] repos again
 
 ```ssh
-service rrdcached start
-chkconfig rrdcached on
 vi /etc/sysconfig/rrdcached
 
 # Settings for rrdcached
@@ -31,7 +29,8 @@ mkdir /var/run/rrdcached
 chown librenms:librenms /var/run/rrdcached/
 chown librenms:librenms /var/rrdtool/
 chown librenms:librenms /var/rrdtool/rrdcached/
-service rrdcached restart
+chkconfig rrdcached on
+service rrdcached start
 ```
 
 Edit config.php to include:
