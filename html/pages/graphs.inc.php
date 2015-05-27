@@ -200,7 +200,17 @@ if (!$auth)
   echo generate_graph_js_state($graph_array);
 
   echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
+  echo '<div id="timepopup" style="position:absolute; display:none; z-index:1000;background:#FFFCBC;border:1px solid #c0c0c0"></div>';
+  echo "<div id='zoomBox' style='position:absolute; overflow:none; left:0px; top:0px; width:0px; height:0px; border:1px dashed #000; display:none; background:red; filter:alpha(opacity=50); -moz-opacity:0.5; -khtml-opacity:0.5; opacity:0.5'></div>";
+  $graph_array['zoom'] = 'enabled';
   echo(generate_graph_tag($graph_array));
+    echo "<script>
+                var img_src = $('#317330dc6337227faa5df8dd149c344b').attr('src');
+                var from = getUrlParameter('from',img_src);
+                var to = getUrlParameter('to',img_src);
+                initGraph($('#317330dc6337227faa5df8dd149c344b'),'graph.php?device='+img_src,from,to);
+
+  </script>";
   echo("</div>");
 
   if (isset($config['graph_descr'][$vars['type']]))

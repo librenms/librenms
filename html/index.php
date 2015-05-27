@@ -150,6 +150,7 @@ if (empty($config['favicon'])) {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+  <script src="js/zoom.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
