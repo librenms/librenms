@@ -4,6 +4,6 @@ node_js:
 install:
   - npm install
 before_script:
-  - npm install
+  - bower install
 script:
-  - grunt --verbose
+  - grunt build --verbose

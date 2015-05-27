@@ -1,3 +1,6 @@
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Build Status](https://travis-ci.org/dsmorse/gridster.js.svg)](http://travis-ci.org/dsmorse/gridster.js)
+
 Gridster.js
 ===========
 
