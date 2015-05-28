@@ -13,7 +13,7 @@
     "dist/jquery.gridster.js",
     "dist/jquery.gridster.css"
   ],
-  "private": true,
+  "private": false,
   "ignore": [
     ".bowerrc",
     ".gitignore",
