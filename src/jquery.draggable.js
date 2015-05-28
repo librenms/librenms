@@ -419,6 +419,10 @@
             return this.options.ignore_dragging(event);
         }
 
+        if (this.options.resize) {
+            return ! $(event.target).is(this.options.items);
+        }
+
         return $(event.target).is(this.options.ignore_dragging.join(', '));
     };
 
