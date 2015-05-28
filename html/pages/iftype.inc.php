@@ -1,4 +1,11 @@
-<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
+<table class="table table-condensed table-hover table-striped">
+    <tr bgcolor='$iftype'>
+        <th>Device</th>
+        <th>Interface</th>
+        <th>Speed</th>
+        <th>Circuit</th>
+        <th>Notes</th>
+    </tr>
 
 <?php
 
@@ -37,7 +44,7 @@ for ($i = 0; $i < count($types_array);$i++) $types_array[$i] = ucfirst($types_ar
 $types = implode(' + ',$types_array);
 
 echo("<tr class='iftype'>
-             <td><span class=list-large>Total Graph for ports of type : ".$types."</span><br />");
+             <td colspan='5'><span class=list-large>Total Graph for ports of type : ".$types."</span><br />");
 
 if ($if_list)
 {
@@ -58,7 +65,14 @@ if ($if_list)
     if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
     echo("<tr class='iftype'>
              <td><span class=list-large>" . generate_port_link($port,$port['port_descr_descr']) . "</span><br />
-            <span class=interface-desc style='float: left;'>".generate_device_link($port)." ".generate_port_link($port)." </span>");
+            <span class=interface-desc style='float: left;'>".generate_device_link($port)." ".generate_port_link($port)." </span></td>
+             <td>".generate_port_link($port, makeshortif($port['ifDescr']))."</td>
+             <td>".$port['port_descr_speed']."</td>
+             <td>".$port['port_descr_circuit']."</td>
+             <td>".$port['port_descr_notes']."</td>
+           </tr>
+           <tr class='iftype'>
+             <td colspan='5'");
 
     if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = ?", array($port['port_id'])))
     {
