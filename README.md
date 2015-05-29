@@ -1,6 +1,8 @@
-[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 [![Build Status](https://travis-ci.org/dsmorse/gridster.js.svg)](http://travis-ci.org/dsmorse/gridster.js)
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 [![Gem Version](https://badge.fury.io/rb/gridster.js-rails.svg)](http://badge.fury.io/rb/gridster.js-rails)
+[![GitHub version](https://badge.fury.io/gh/dsmorse%2Fgridster.js.svg)](http://badge.fury.io/gh/dsmorse%2Fgridster.js)
+[![Bower version](https://badge.fury.io/bo/gridster-js.svg)](http://badge.fury.io/bo/gridster-js)
 
 Gridster.js
 ===========
