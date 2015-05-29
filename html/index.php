@@ -274,7 +274,7 @@ if (isset($pagetitle) && is_array($pagetitle))
 ?>
 
 <?php
-if($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
+if($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes")) {
 ?>
 <nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-bottom">
   <div class="container">
