@@ -123,7 +123,7 @@ module.exports = function(grunt) {
 				command: 'gem build gridster.js-rails.gemspec'
 			},
 			'publish-rails-gem': {
-				command: 'gem push gridster.js-rails-<%= pkg.version %>'
+				command: 'gem push gridster.js-rails-<%= pkg.version %>.gem'
 			}
 		},
 		'gh-pages': {
@@ -153,7 +153,13 @@ module.exports = function(grunt) {
 			}
 		},
 		clean: {
-			dist: ['.grunt','gh-pages', 'dist']
+			dist: [
+				'gridster.js-rails*.gem',
+				'.grunt',
+				'gh-pages',
+				'dist',
+				'vendor'
+			]
 		},
 		changelog: {
 			options: {
@@ -193,7 +199,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('docs', ['clean', 'build', 'yuidoc', 'copy:dist', 'gh-pages']);
 
 	//builds and releases the gem files
-	grunt.registerTask('rails:publish', ['shell:build-rails-gem', 'shell:publish-rails-gem']);
+	grunt.registerTask('rails:publish', ['clean', 'build', 'shell:publish-rails-gem']);
 
 	//use one of the four release tasks to build the artifacts for the release (it will push the docs pages only)
 	grunt.registerTask('release:patch', ['build', 'bump-only:patch', 'build', 'docs', 'changelog']);

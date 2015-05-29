@@ -12,9 +12,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/dsmorse/gridster.js"
   spec.licenses      = ['MIT']
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| 
-     f.match(%r{^(test|spec|features|dist|demos|node_modules|src|\.bowerrc|\.jshintrc|Gruntfile\.js|bower\.json|package\.json)})
-  }
+  spec.files         = Dir["{demos,lib,vendor}/**/*"] + ["LICENSE", "bower.json", "package.json", "CHANGELOG.md", "README.md"]
 
   spec.require_paths = ["lib"]
 

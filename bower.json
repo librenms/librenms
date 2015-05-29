@@ -1,6 +1,6 @@
 {
   "name": "gridster",
-  "homepage": "https://github.com/DecksterTeam/gridster.js",
+  "homepage": "dsmorse.github.io/gridster.js/",
   "version": "0.6.9",
   "dependencies": {
     "jquery": "^2.1.3"
@@ -16,7 +16,9 @@
   "private": false,
   "ignore": [
     ".bowerrc",
+    ".jshintrc",
     ".gitignore",
+    ".travis.yml",
     "CONTRIBUTING.md",
     "Gruntfile.js",
     "package.json",
