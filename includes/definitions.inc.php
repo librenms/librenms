@@ -1114,6 +1114,15 @@ $config['os'][$os]['text']              = "Fiberhome";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "fiberhome";
 
+// PBN, Pacific Broadband Networks 
+$os = "pbn";
+$config['os'][$os]['text']              = "PBN";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifXmcbc']           = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "pbn";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
