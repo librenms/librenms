@@ -174,6 +174,10 @@ if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
   {
     include("includes/print-menubar.php");
   }
+} else {
+    echo "<style>body { padding-top: 0px !important;
+          padding-bottom: 0px !important; }</style>";
+
 }
 
 ?>
@@ -270,7 +274,7 @@ if (isset($pagetitle) && is_array($pagetitle))
 ?>
 
 <?php
-if($config['enable_footer'] == 1) {
+if($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
 ?>
 <nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-bottom">
   <div class="container">
