@@ -29,5 +29,6 @@ Contributors to LibreNMS:
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
+- Vitali Kari <vitali.kari@gmail.com> (vitalisator)
 
 [1]: http://observium.org/ "Observium web site"
