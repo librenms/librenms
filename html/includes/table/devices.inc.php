@@ -155,7 +155,12 @@ foreach (dbFetchRows($sql, $param) as $device) {
             $hostname = generate_device_link($device);
             $platform = $device['hardware'] . '<br />' . $device['features'];
             $os = $device['os_text'] . '<br />' . $device['version'];
-            $uptime = formatUptime($device['uptime'], 'short') . '<br />' . truncate($device['location'],32, '');
+            if (extension_loaded('mbstring')) {
+                $location = mb_substr($device['location'], 0, 32, 'utf8');
+            } else {
+                $location = truncate($device['location'], 32, '');
+            }
+            $uptime = formatUptime($device['uptime'], 'short') . '<br />' . $location;
             if ($subformat == "detail") {
                 $hostname .= '<br />' . $device['sysName'];
                 if ($port_count) {
