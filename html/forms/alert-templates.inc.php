@@ -61,7 +61,7 @@ if(!empty($name)) {
         if(dbInsert(array('template' => $_REQUEST['template'], 'name' => $name), "alert_templates")) {
             $ok = "Alert template has been created.";
         } else {
-            $error = "Could not create aler template";
+            $error = "Could not create alert template";
         }
     } else {
         $error = "We could not work out what you wanted to do!";
