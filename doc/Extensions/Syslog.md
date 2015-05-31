@@ -26,7 +26,7 @@ options {
         chain_hostnames(off);
         flush_lines(0);
         use_dns(no);
-	    use_fqdn(no);
+        use_fqdn(no);
         owner("root");
         group("adm");
         perm(0640);
