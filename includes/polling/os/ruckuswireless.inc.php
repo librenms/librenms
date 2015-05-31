@@ -11,13 +11,24 @@
 * the source code distribution for details.
 */
 
+$productmib = trim(snmp_get($device, ".1.3.6.1.2.1.1.2.0", "-Oqv"), '" ');
+
 $ruckusmodels = array(
-    ".1.3.6.1.2.1.1.1.0",
+    "$productmib.5.0",
     ".1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0",
     ".1.3.6.1.4.1.25053.1.1.2.1.1.1.1.0",
+    ".1.3.6.1.2.1.1.1.0",
 );
+$ruckusversions = array(
+    "$productmib.8.0",
+    ".1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1",
+);
+$ruckusserials = array(
+    "$productmib.7.0",
+    ".1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0"
+);
+
 $hardware = first_oid_match($device, $ruckusmodels);
-$productmib = trim(snmp_get($device, ".1.3.6.1.2.1.1.2.0", "-Oqv"), '" ');
-$version = first_oid_match($device, array("$productmib.8.0", ".1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1"));
-$serial = first_oid_match($device, array("$productmib.7.0", ".1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0"));
+$version = first_oid_match($device, $ruckusversions);
+$serial = first_oid_match($device, $ruckusserials);
 ?>
