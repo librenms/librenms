@@ -483,7 +483,6 @@ if(is_file("includes/print-menubar-custom.inc.php"))
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
-          <li role="presentation" class="divider"></li>
 <?php
 if ($_SESSION['userlevel'] >= '10')
 {
