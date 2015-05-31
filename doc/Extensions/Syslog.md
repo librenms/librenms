@@ -17,68 +17,52 @@ yum install syslog-ng
 Once syslog-ng is installed, edit the relevant config file (most likely /etc/syslog-ng/syslog-ng.conf) and paste the following:
 
 ```ssh
-@version: 3.5
-@include "scl.conf"
-@include "`scl-root`/system/tty10.conf"
-
 # First, set some global options.
 options {
-        chain_hostnames(off);
+        chain_hostnames(0);
         flush_lines(0);
-        use_dns(no);
-		use_fqdn(no);
-        owner("root");
-        group("adm");
+        use_dns(1); # Search name with DNS of the machine
+        use_fqdn(1); # Use all FQDN name of the machine
         perm(0640);
         stats_freq(0);
-        bad_hostname("^gconfd$");
+        keep_hostname(0);
+        log_fifo_size (1000);
+        time_reopen (10);
+        create_dirs (no);
 };
- 
-########################
-# Sources
-########################
+
+
 source s_sys {
-       system();
-       internal();
+        system();
+        internal();
 };
- 
+
+
 source s_net {
-        tcp(port(514) flags(syslog-protocol));
         udp(port(514) flags(syslog-protocol));
+        tcp(port(514) flags(syslog-protocol));
 };
- 
-########################
-# Destinations
-########################
+
+
 destination d_librenms {
         program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM\n") template-escape(yes));
 };
- 
-########################
-# Log paths
-########################
+
+
 log {
         source(s_net);
         source(s_sys);
         destination(d_librenms);
 };
- 
-###
-# Include all config files in /etc/syslog-ng/conf.d/
-###
-@include "/etc/syslog-ng/conf.d/*.conf"
+
+
+@include "/etc/syslog-ng/conf.d/"
 ```
 
 Next start syslog-ng:
 
 ```ssh
 service syslog-ng restart
-```
-
-Add the following to your LibreNMS config.php file to enable the Syslog extension:
-
-```ssh
-$config['enable_syslog'] = 1;
 ```
 
 ### Client configuration
@@ -121,4 +105,4 @@ logging librenms.ip
 logging server librenms.ip 5 use-vrf default facility local6
 ```
 
-If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
+If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web ui.
