@@ -1,5 +1,12 @@
+<a name="v0.6.10"></a>
+### v0.6.10 (2015-05-31)
+  * Add Ruby on Rails support 
+
 <a name="v0.6.9"></a>
 ### v0.6.9 (2015-05-27)
+  * bug fixes for positions and overlap
+  * dist modified to support webpack deployements
+  * new 'sticky' layout option which allows widgets to be places absolutely into a position on the grid.
 
 <a name="v0.6.8"></a>
 ### v0.6.8 (2015-04-28)

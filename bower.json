@@ -1,7 +1,7 @@
 {
   "name": "gridster",
   "homepage": "dsmorse.github.io/gridster.js/",
-  "version": "0.6.9.2",
+  "version": "0.6.10",
   "dependencies": {
     "jquery": "^2.1.3"
   },
