@@ -3,7 +3,7 @@
   "title": "gridster.js",
   "description": "a drag-and-drop multi-column jQuery grid plugin",
   "version": "0.6.9",
-  "homepage": "dsmorse.github.io/gridster.js/",
+  "homepage": "https://dsmorse.github.io/gridster.js/",
   "author": {
     "name": "ducksboard"
   },
