@@ -27,8 +27,16 @@ $ruckusserials = array(
     "$productmib.7.0",
     ".1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0"
 );
+$ruckuscountries = array(
+    "$productmib.9.0",
+    ".1.3.6.1.4.1.25053.1.2.1.1.1.1.20"
+);
 
 $hardware = first_oid_match($device, $ruckusmodels);
 $version = first_oid_match($device, $ruckusversions);
 $serial = first_oid_match($device, $ruckusserials);
+$ruckuscountry = first_oid_match($device, $ruckuscountries);
+if (isset($ruckuscountry) && $ruckuscountry != "") {
+    $version .= " ($ruckuscountry)";
+}
 ?>
