@@ -533,7 +533,7 @@ echo('
            <a href="#"><i class="fa fa-code fa-fw fa-lg"></i> API</a>
            <ul class="dropdown-menu scrollable-menu">
              <li><a href="api-access/"><i class="fa fa-wrench fa-fw fa-lg"></i> API Settings</a></li>
-             <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank"><i class="fa fa-book fa-fw fa-lg"></i> API Documentation</a></li>
+             <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank"><i class="fa fa-book fa-fw fa-lg"></i> API Docs</a></li>
            </ul>
            </li>
            <li role="presentation" class="divider"></li>');
