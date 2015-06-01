@@ -16,6 +16,8 @@ $tmp_devices = array();
 if (!empty($device['hostname'])) {
     $sql = ' WHERE `devices`.`hostname`=?';
     $sql_array = array($device['hostname']);
+    $mac_sql = ' AND `D`.`hostname` = ?';
+    $mac_array = array($device['hostname']);
 } else {
     $sql = ' WHERE 1';
 }
@@ -39,13 +41,15 @@ foreach (dbFetchRows("SELECT DISTINCT least(`devices`.`device_id`, `remote_devic
 $tmp_exp_ids = implode(',',$tmp_ids);
 
 $port_ids = array();
-foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `remote_port_id`, GREATEST(`P`.`port_id`,`M`.`port_id`) AS `local_port_id` FROM `ipv4_mac` AS `M` LEFT JOIN `ports` AS `P`  ON `M`.`mac_address` = `P`.`ifPhysAddress` WHERE `P`.`port_id` IS NOT NULL AND `M`.`port_id` IS NOT NULL", array()) as $macs) {
+$port_devices = array();
+foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `remote_port_id`, GREATEST(`P`.`port_id`,`M`.`port_id`) AS `local_port_id` FROM `ipv4_mac` AS `M` LEFT JOIN `ports` AS `P`  ON `M`.`mac_address` = `P`.`ifPhysAddress` LEFT JOIN `devices` AS `D` ON `P`.`device_id`=`D`.`device_id` WHERE `P`.`port_id` IS NOT NULL AND `M`.`port_id` IS NOT NULL $mac_sql", $mac_array) as $macs) {
     if (!in_array($macs['local_port_id'], $port_ids) && port_permitted($macs['local_port_id'])) {
-        $port_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id`=?", array($macs['local_port_id']));
         $port_det = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($macs['local_port_id']));
-        if (!in_array($port_dev['device_id'],$tmp_ids)) {
+        $port_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id`=?", array($port_det['device_id']));
+        if (!in_array($port_dev['device_id'],$tmp_ids) && !in_array($port_dev['device_id'],$port_devices)) {
             $mac_devices[] = array('id'=>$port_dev['device_id'], 'label'=>$port_dev['hostname'], 'title'=>generate_device_link($port_dev,'',array(),'','','',0),'group'=>$port_dev['location'], 'shape'=>'box');
-            array_push($port_ids, $port_dev['device_id']);
+            array_push($port_ids, $port_det['port_id']);
+            array_push($port_devices, $port_dev['device_id']);
             $port_data = $port_det;
             $from = $port_dev['device_id'];
             $port = shorten_interface_type($port_det['ifName']);
@@ -78,11 +82,12 @@ foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `re
         }
     }
     if (!in_array($macs['remote_port_id'], $port_ids) && port_permitted($macs['remote_port_id'])) {
-        $port_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id`=?", array($macs['remote_port_id']));
         $port_det = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($macs['remote_port_id']));
-        if (!in_array($port_dev['device_id'],$tmp_ids)) {
+        $port_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id`=?", array($port_det['device_id']));
+        if (!in_array($port_dev['device_id'],$tmp_ids) && !in_array($port_dev['device_id'],$port_devices)) {
             $mac_devices[] = array('id'=>$port_dev['device_id'], 'label'=>$port_dev['hostname'], 'title'=>generate_device_link($port_dev,'',array(),'','','',0),'group'=>$port_dev['location'], 'shape'=>'box');
-            array_push($port_ids, $port_dev['device_id']);
+            array_push($port_ids, $port_det['port_id']);
+            array_push($port_devices, $port_dev['device_id']);
             $to = $port_dev['device_id'];
             $port .= ' > ' . shorten_interface_type($port_det['ifName']);
         }
@@ -94,7 +99,6 @@ $node_devices = array_merge($tmp_devices,$mac_devices);
 $nodes = json_encode($node_devices);
  
 if (is_array($tmp_devices[0])) {
-    $tmp_links = array();
     foreach (dbFetchRows("SELECT local_device_id, remote_device_id, `remote_hostname`,`ports`.*, `remote_port` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` WHERE (`local_device_id` IN ($tmp_exp_ids) AND `remote_device_id` IN ($tmp_exp_ids))") as $link_devices) {
         foreach ($tmp_devices as $k=>$v) {
             if ($v['id'] == $link_devices['local_device_id']) {
@@ -136,10 +140,9 @@ if (is_array($tmp_devices[0])) {
 
         $tmp_links[] = array('from'=>$from,'to'=>$to,'label'=>$port,'title'=>generate_port_link($port_data, "<img src='graph.php?type=port_bits&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
     }
- 
-    $edges = json_encode($tmp_links);
 }
 
+$edges = json_encode($tmp_links);
  
 ?>
  
