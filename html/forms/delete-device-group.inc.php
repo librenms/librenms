@@ -27,10 +27,10 @@ if(!is_numeric($_POST['group_id'])) {
           include('forms/delete-alert-map.inc.php');
         }
       }
-      echo('group has been deleted.');
+      echo('Group has been deleted.');
       exit;
     } else {
-      echo('ERROR: group has not been deleted.');
+      echo('ERROR: Group has not been deleted.');
       exit;
     }
 }
