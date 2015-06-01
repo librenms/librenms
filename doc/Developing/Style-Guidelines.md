@@ -59,3 +59,4 @@ $config['dateformat']['mysql']['compact']                 = "%Y-%m-%d %H:%i:%s";
 $config['dateformat']['mysql']['date']                 = "%Y-%m-%d";
 $config['dateformat']['mysql']['time']                 = "%H:%i:%s";
 ```
+
