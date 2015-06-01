@@ -30,5 +30,6 @@ Contributors to LibreNMS:
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator)
+- James Campbell <neokjames@gmail.com> (neokjames)
 
 [1]: http://observium.org/ "Observium web site"
