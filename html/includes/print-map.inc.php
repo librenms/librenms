@@ -42,7 +42,7 @@ $tmp_exp_ids = implode(',',$tmp_ids);
 
 $port_ids = array();
 $port_devices = array();
-foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `remote_port_id`, GREATEST(`P`.`port_id`,`M`.`port_id`) AS `local_port_id` FROM `ipv4_mac` AS `M` LEFT JOIN `ports` AS `P`  ON `M`.`mac_address` = `P`.`ifPhysAddress` LEFT JOIN `devices` AS `D` ON `P`.`device_id`=`D`.`device_id` WHERE `P`.`port_id` IS NOT NULL AND `M`.`port_id` IS NOT NULL $mac_sql", $mac_array) as $macs) {
+foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `remote_port_id`, GREATEST(`P`.`port_id`,`M`.`port_id`) AS `local_port_id` FROM `ipv4_mac` AS `M` LEFT JOIN `ports` AS `P`  ON `M`.`mac_address` = `P`.`ifPhysAddress` LEFT JOIN `devices` AS `D` ON `P`.`device_id`=`D`.`device_id` WHERE `P`.`port_id` IS NOT NULL AND `M`.`port_id` IS NOT NULL AND `M`.`port_id` != 0 AND `P`.`port_id` != 0 $mac_sql", $mac_array) as $macs) {
     if (!in_array($macs['local_port_id'], $port_ids) && port_permitted($macs['local_port_id'])) {
         $port_det = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($macs['local_port_id']));
         $port_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id`=?", array($port_det['device_id']));
@@ -143,6 +143,8 @@ if (is_array($tmp_devices[0])) {
 }
 
 $edges = json_encode($tmp_links);
+
+if (count($node_devices) > 1 && count($tmp_links) > 0) {
  
 ?>
  
@@ -204,6 +206,12 @@ network.redraw();
 </script>
 
 <?php
+
+} else {
+
+    print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
+
+}
 
 $pagetitle[] = "Map";
 
