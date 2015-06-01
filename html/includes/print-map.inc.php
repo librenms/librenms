@@ -42,6 +42,7 @@ $tmp_exp_ids = implode(',',$tmp_ids);
 
 $port_ids = array();
 $port_devices = array();
+$tmp_links = array();
 foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `remote_port_id`, GREATEST(`P`.`port_id`,`M`.`port_id`) AS `local_port_id` FROM `ipv4_mac` AS `M` LEFT JOIN `ports` AS `P`  ON `M`.`mac_address` = `P`.`ifPhysAddress` LEFT JOIN `devices` AS `D` ON `P`.`device_id`=`D`.`device_id` WHERE `P`.`port_id` IS NOT NULL AND `M`.`port_id` IS NOT NULL AND `M`.`port_id` != 0 AND `P`.`port_id` != 0 $mac_sql", $mac_array) as $macs) {
     if (!in_array($macs['local_port_id'], $port_ids) && port_permitted($macs['local_port_id'])) {
         $port_det = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($macs['local_port_id']));
@@ -93,6 +94,7 @@ foreach (dbFetchRows("SELECT DISTINCT LEAST(`M`.`port_id`, `P`.`port_id`) AS `re
         }
     }
     $tmp_links[] = array('from'=>$from,'to'=>$to,'label'=>$port,'title'=>generate_port_link($port_data, "<img src='graph.php?type=port_bits&amp;id=".$port_data['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
+    unset($port);
 }
 
 $node_devices = array_merge($tmp_devices,$mac_devices);
