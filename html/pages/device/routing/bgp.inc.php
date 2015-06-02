@@ -1,7 +1,3 @@
-<div style='padding: 10px; height: 20px; clear: both; display: block;'>
-  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : <?php echo($device['bgpLocalAs']); ?></div>
-</div>
-
 <?php
 
 $link_array = array('page'    => 'device',
@@ -12,6 +8,8 @@ $link_array = array('page'    => 'device',
 if(!isset($vars['view'])) { $vars['view'] = "basic"; }
 
 print_optionbar_start();
+
+echo "<strong>Local AS : " .$device['bgpLocalAs']."</strong> ";
 
 echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
 
