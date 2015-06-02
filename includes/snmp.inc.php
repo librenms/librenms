@@ -818,4 +818,107 @@ function snmp_gen_auth (&$device)
   return $cmd;
 }
 
+/*
+ * Example:
+ * snmptranslate -Td -On -M mibs -m RUCKUS-ZD-SYSTEM-MIB RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta
+ * .1.3.6.1.4.1.25053.1.2.1.1.1.15.30
+ * ruckusZDSystemStatsAllNumSta OBJECT-TYPE
+ *   -- FROM	RUCKUS-ZD-SYSTEM-MIB
+ *     SYNTAX	Unsigned32
+ *     MAX-ACCESS	read-only
+ *     STATUS	current
+ *     DESCRIPTION	"Number of All client devices"
+ *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1) 
+ *           ruckusZDSystemStats(15) 30 }
+ */
+function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
+{
+    global $debug;
+
+    $lastpart = end(explode(".", $oid));
+
+    $cmd = "snmptranslate -Td -On";
+    $cmd .= mibdir($mibdir);
+    $cmd .= " -m ".$module." ".$module."::";
+    $cmd .= $lastpart;
+
+    $result = array();
+    $lines = preg_split('/\n+/', trim(external_exec($cmd)));
+    foreach ($lines as $l) {
+        $f = preg_split('/\s+/', trim($l));
+        // first line is all numeric
+        if (preg_match('/^[\d.]+$/', $f[0])) {
+            $result['oid'] = $f[0];
+            continue;
+        }
+        // then the name of the object type
+        if ($f[1] && $f[1] == "OBJECT-TYPE") {
+            $result[strtolower($f[1])] = $f[0];
+            continue;
+        }
+        // then the other data elements
+        if ($f[0] == "--" && $f[1] == "FROM") {
+            $result[strtolower($f[1])] = $f[2];
+            continue;
+        }
+        if ($f[0] == "MAX-ACCESS") {
+            $result[strtolower($f[0])] = $f[1];
+            continue;
+        }
+        if ($f[0] == "STATUS") {
+            $result[strtolower($f[0])] = $f[1];
+            continue;
+        }
+        if ($f[0] == "SYNTAX") {
+            $result[strtolower($f[0])] = $f[1];
+            continue;
+        }
+        if ($f[0] == "DESCRIPTION") {
+            $desc = explode('"', $l);
+            if ($desc[1]) {
+                $str = preg_replace('/^[\s.]*/', '', $desc[1]);
+                $str = preg_replace('/[\s.]*$/', '', $str);
+                $result[strtolower($f[0])] = $str;
+            }
+            continue;
+        }
+    }
+    // This gets rid of the main mib entry that doesn't have any useful data in it
+    if (isset($result['syntax'])) {
+        $result['mib'] = $mib;
+        return $result;
+    }
+    else {
+        return null;
+    }
+}
+
+
+/*
+ * Example:
+ * snmptranslate -Ts -M mibs -m RUCKUS-ZD-SYSTEM-MIB | grep ruckusZDSystemStats
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats.ruckusZDSystemStatsNumAP
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats.ruckusZDSystemStatsNumSta
+ * ...
+ */
+function snmp_mib_walk($mib, $module, $mibdir = null)
+{
+    $cmd = "snmptranslate -Ts";
+    $cmd .= mibdir($mibdir);
+    $cmd .= " -m ".$module;
+    $result = array();
+    $data = preg_split('/\n+/', external_exec($cmd));
+    foreach ($data as $oid) {
+        // only include oids which are part of this mib
+        if (strstr($oid, $mib)) {
+            $obj = snmp_mib_parse($oid, $mib, $module, $mibdir);
+            if ($obj) {
+                $result[] = $obj;
+            }
+        }
+    }
+    return $result;
+}
+
 ?>
