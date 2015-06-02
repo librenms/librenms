@@ -56,11 +56,17 @@ if ($_SESSION['userlevel'] >= '5')
   $host_sql = "SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY D.hostname ORDER BY D.hostname";
   $host_par = array($_SESSION['user_id']);
 }
+  $shift = 1;
   foreach (dbFetchRows($host_sql, $host_par) as $device)
   {
     $device_id = $device['device_id'];
     $device_hostname = $device['hostname'];
-    array_unshift($sql_param,$device_id);
+    if ($shift == 1) {
+        array_unshift($sql_param, $device_id);
+        $shift = 0;
+    } else {
+        $sql_param[0] = $device_id;
+    }
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where", $sql_param) as $service)
     {
        include("includes/print-service.inc.php");
