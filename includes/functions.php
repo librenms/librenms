@@ -1201,3 +1201,12 @@ function first_oid_match($device, $list) {
 	}
     }
 }
+
+function fix_integer_value($value) {
+    if ($value < 0) {
+        $return = 4294967296+$value;
+    } else {
+        $return = $value;
+    }
+    return $return;
+}
