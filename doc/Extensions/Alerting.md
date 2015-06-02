@@ -15,6 +15,7 @@ Table of Content:
     - [Slack](#transports-slack)
     - [HipChat](#transports-hipchat)
     - [PagerDuty](#transports-pagerduty)
+    - [Pushover](#transports-pushover)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -264,6 +265,31 @@ $config['alert']['transports']['pagerduty'] = 'MYAPIKEYGOESHERE';
 That's it!
 
 __Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
+
+## <a name="transports-pushover">Pushover</a>
+
+Enabling Pushover support is fairly easy, there are only two required parameters.
+
+Firstly you need to create a new Application (called LibreNMS, for example) in your account on the Pushover website (https://pushover.net/apps)
+
+Now copy your API Token/Key from the newly created Application and setup the transport in your config.php like:
+
+```php
+$config['alert']['transports']['pushover'][] = array(
+                                                    "appkey" => 'APPLICATIONAPIKEYGOESHERE',
+                                                    "userkey" => 'USERKEYGOESHERE',
+                                                    );
+```
+
+To modify the Critical alert sound, add the 'sound_critical' parameter, example:
+
+```php
+$config['alert']['transports']['pushover'][] = array(
+                                                    "appkey" => 'APPLICATIONAPIKEYGOESHERE',
+                                                    "userkey" => 'USERKEYGOESHERE',
+                                                    "sound_critical" => 'siren',
+                                                    );
+```
 
 # <a name="entities">Entities
 
