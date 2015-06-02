@@ -1204,6 +1204,7 @@ function first_oid_match($device, $list) {
 
 function ip_to_hex($ip) {
 
+    $return = '';
     if (strstr($ip, ":")) {
         $ipv6 = explode(':', $ip);
         foreach ($ipv6 as $item) {
