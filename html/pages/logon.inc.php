@@ -3,6 +3,7 @@ if( $config['twofactor'] && isset($twofactorform) ) {
   echo twofactor_form();
 } else { 
 ?>
+<center><img src="librenms_logo.png" alt="LibreNMS Logo" /></center>
       <form class="form-horizontal" role="form" action="" method="post" name="logonform">
         <div class="form-group">
           <div class="col-sm-offset-4 col-sm-4">
