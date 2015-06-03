@@ -33,7 +33,9 @@ if ($config['enable_bgp'])
 
     foreach (explode("\n", $peers) as $peer)
     {
-      list($ver, $peer) = explode(".", $peer,2);
+      if ($peer2 === TRUE) {
+          list($ver, $peer) = explode(".", $peer,2);
+      }
       list($peer_ip, $peer_as) = explode(" ",  $peer);
 
       if ($peer && $peer_ip != "0.0.0.0")
