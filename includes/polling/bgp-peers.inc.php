@@ -23,7 +23,7 @@ if ($config['enable_bgp'])
         }
 
         if ($peer2 === TRUE) {
-            $bgp_peer_ip = ip_to_hex($peer['bgpPeerIdentifier']);
+            $bgp_peer_ident = ip_to_dec($peer['bgpPeerIdentifier']);
             if (strstr($peer['bgpPeerIdentifier'],":")) {
                 $ip_type = 2;
                 $ip_len = 16;
@@ -33,7 +33,7 @@ if ($config['enable_bgp'])
                 $ip_len = 4;
                 $ip_ver = 'ipv4';
             }
-            $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ip;
+            $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
             $peer_data_tmp = snmp_get_multi($device,
                 " cbgpPeer2State.". $peer_identifier .
                 " cbgpPeer2AdminStatus.". $peer_identifier .
@@ -47,6 +47,15 @@ if ($config['enable_bgp'])
             $ident = "$ip_ver.\"".$peer['bgpPeerIdentifier'].'"';
             unset($peer_data);
             foreach ($peer_data_tmp[$ident] as $k => $v) {
+                if (strstr($k, "cbgpPeer2LocalAddr")) {
+                    if ($ip_ver == 'ipv6') {
+                        $v = preg_replace("/ /", ":", $v);
+                        $v = strtolower($v);
+                        rtrim($v,":");
+                    } else {
+                        $v = hex_to_ip($v);
+                    }
+                }
                 $peer_data .= "$v\n";
             }
         } else {
@@ -170,8 +179,7 @@ if ($config['enable_bgp'])
         if ($debug) { echo("$afi $safi\n"); }
 
         if ($device['os_group'] == "cisco") {
-
-            $bgp_peer_ip = ip_to_hex($peer['bgpPeerIdentifier']);
+            $bgp_peer_ident = ip_to_dec($peer['bgpPeerIdentifier']);
             if (strstr($peer['bgpPeerIdentifier'], ":")) {
                 $ip_type = 2;
                 $ip_len = 16;
@@ -189,11 +197,10 @@ if ($config['enable_bgp'])
             } elseif ($peer_afi['safi'] == "vpn") {
                 $ip_cast = 128;
             }
-            $check = snmp_get($device,"cbgpPeer2AcceptedPrefixes.".$ip_type.'.'.$ip_len.'.'.$bgp_peer_ip.'.'.$ip_type.'.'.$ip_cast,"","CISCO-BGP4-MIB", $config['mibdir']);
+            $check = snmp_get($device,"cbgpPeer2AcceptedPrefixes.".$ip_type.'.'.$ip_len.'.'.$bgp_peer_ident.'.'.$ip_type.'.'.$ip_cast,"","CISCO-BGP4-MIB", $config['mibdir']);
 
             if(!empty($check)) {
-
-                $cgp_peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ip . '.' . $ip_type . '.' . $ip_cast;
+                $cgp_peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident . '.' . $ip_type . '.' . $ip_cast;
                 $cbgp_data_tmp = snmp_get_multi($device,
                     " cbgpPeer2AcceptedPrefixes.". $cgp_peer_identifier .
                     " cbgpPeer2DeniedPrefixes.". $cgp_peer_identifier .
