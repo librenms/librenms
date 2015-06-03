@@ -31,8 +31,8 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql,$param) as $mempool) {
         $perc                       = round($mempool['mempool_perc'], 0);
         $total                      = formatStorage($mempool['mempool_total']);
-        $used                       = formatStorage($mempool['mempool_used']);
         $free                       = formatStorage($mempool['mempool_free']);
+        $used                       = formatStorage($mempool['mempool_used']);
         $graph_array['type']        = $graph_type;
         $graph_array['id']          = $mempool['mempool_id'];
         $graph_array['from']        = $config['time']['day'];
@@ -45,12 +45,13 @@ foreach (dbFetchRows($sql,$param) as $mempool) {
         $link = "graphs/id=" . $graph_array['id'] . "/type=" . $graph_array['type'] . "/from=" . $graph_array['from'] . "/to=" . $graph_array['to'] . "/";
         $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
         $background = get_percentage_colours($perc);
-        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free , "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
+        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
 
         $response[] = array('hostname' => generate_device_link($mempool),
                             'mempool_descr' => $mempool['mempool_descr'],
                             'graph' => $mini_graph,
-                            'mempool_usage' => $bar_link);
+                            'mempool_used' => $bar_link,
+                            'mempool_perc' => $perc . "%");
         if ($_POST['view'] == "graphs") {
             $graph_array['height'] = "100";
             $graph_array['width']  = "216";
@@ -63,7 +64,8 @@ foreach (dbFetchRows($sql,$param) as $mempool) {
             $response[] = array('hostname' => $graph_data[0],
                                 'mempool_descr' => $graph_data[1],
                                 'graph' => $graph_data[2],
-                                'mempool_usage' => $graph_data[3]);
+                                'mempool_used' => $graph_data[3],
+                                'mempool_perc' => '');
         } # endif graphs
 }
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);

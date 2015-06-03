@@ -5,7 +5,8 @@
                 <th data-column-id="hostname">Device</th>
                 <th data-column-id="mempool_descr">Memory</th>
                 <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
-                <th data-column-id="mempool_usage" data-searchable="false">Usage</th>
+                <th data-column-id="mempool_used" data-searchable="false">Used</th>
+                <th data-column-id="mempool_perc" data-searchable="false">Usage</th>
             </tr>
         </thead>
     </table>
@@ -14,7 +15,7 @@
 <script>
     var grid = $("#mempool").bootgrid({
         ajax: true,
-        rowCount: [50,100,250,-1],
+        rowCount: [25,50,100,250,-1],
         post: function ()
         {
             return {
