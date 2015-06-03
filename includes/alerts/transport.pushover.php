@@ -36,57 +36,57 @@
  */
 
 foreach( $opts as $api ) {
-	$data = array();
-	$data['token'] = $api['appkey'];
-	$data['user'] = $api['userkey'];
-        switch( $obj['severity'] ) {
-            case "critical":
-                $severity = "Critical";
-                $data['priority'] = 1;
-                if( !empty( $api['sound_critical'] ) ) {
-                    $data['sound'] = $api['sound_critical'];
-                }
-                break;
-            case "warning":
-                $severity = "Warning";
-                $data['priority'] = 0;
-                if( !empty( $api['sound_warning'] ) ) {
-                    $data['sound'] = $api['sound_warning'];
-                }
-                break;
+    $data = array();
+    $data['token'] = $api['appkey'];
+    $data['user'] = $api['userkey'];
+    switch( $obj['severity'] ) {
+        case "critical":
+            $severity = "Critical";
+            $data['priority'] = 1;
+            if( !empty( $api['sound_critical'] ) ) {
+                $data['sound'] = $api['sound_critical'];
+            }
+            break;
+        case "warning":
+            $severity = "Warning";
+            $data['priority'] = 0;
+            if( !empty( $api['sound_warning'] ) ) {
+                $data['sound'] = $api['sound_warning'];
+            }
+            break;
+    }
+    switch( $obj['state'] ) {
+        case 0:
+            $title_text = "OK";
+            if( !empty( $api['sound_ok'] ) ) {
+                $data['sound'] = $api['sound_ok'];
+            }
+            break;
+        case 1:
+            $title_text = $severity;
+            break;
+        case 2:
+            $title_text = "Acknowledged";
+            break;
+    }
+    $data['title'] = $title_text." - ".$obj['hostname']." - ".$obj['name'];
+    $message_text = "Timestamp: ".$obj['timestamp'];
+    if( !empty( $obj['faults'] ) ) {
+        $message_text .= "\n\nFaults:\n";
+        foreach($obj['faults'] as $k => $faults) {
+            $message_text .= "#".$k." ".$faults['string']."\n";
         }
-        $curl = curl_init();
-        switch( $obj['state'] ) {
-            case 0:
-                $title_text = "OK";
-                if( !empty( $api['sound_ok'] ) ) {
-                    $data['sound'] = $api['sound_ok'];
-                }
-                break;
-            case 1:
-                $title_text = $severity;
-                break;
-            case 2:
-                $title_text = "Acknowledged";
-                break;
-        }
-        $data['title'] = $title_text." - ".$obj['hostname']." - ".$obj['name'];
-	$message_text = "Timestamp: ".$obj['timestamp'];
-        if( !empty( $obj['faults'] ) ) {
-            $message_text .= "\n\nFaults:\n";
-	        foreach($obj['faults'] as $k => $faults) {
-                    $message_text .= "#".$k." ".$faults['string']."\n";
-                }
-        }
-	$data['message'] = $message_text;
-	curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
-	curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
-	curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-	$ret = curl_exec($curl);
-	$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-	if( $code != 200 ) {
-		var_dump("Pushover returned error"); //FIXME: proper debugging
-		return false;
-	}
+    }
+    $data['message'] = $message_text;
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
+    curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    $ret = curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if( $code != 200 ) {
+        var_dump("Pushover returned error"); //FIXME: proper debugging
+        return false;
+    }
 }
 return true;
