@@ -252,7 +252,7 @@ function ExtTransports($obj) {
 			eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir']."/includes/alerts/transport.".$transport.".php").' };');
 			$tmp = $tmp($obj,$opts);
 			echo ($tmp ? "OK" : "ERROR")."; ";
-            log_event("Issued ".$severity." alert for rule ".$obj['name']." to transport".$transport,$obj['hostname'],"Alerts");
+                        log_event("Issued ".$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'",$obj['device_id']);
 		}
 	}
 }
