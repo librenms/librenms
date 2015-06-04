@@ -13,7 +13,7 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="UDP_PORT" value="5551"/>
+        <env name="UDP_PORT" value="4444"/>
         <env name="UDP_DB" value="udp.test"/>
 
         <env name="TCP_PORT" value="8086"/>

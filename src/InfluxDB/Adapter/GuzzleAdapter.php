@@ -67,6 +67,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
             'query' => [
                 "q" => $query,
+                "db" => $this->getOptions()->getDatabase(),
             ]
         ];
 
@@ -74,7 +75,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             $options["query"]["time_precision"] = $timePrecision;
         }
 
-        $endpoint = $this->options->getHttpSeriesEndpoint();
+        $endpoint = $this->options->getHttpQueryEndpoint();
 
         return $this->httpClient->get($endpoint, $options)->json();
     }
@@ -86,10 +87,12 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
     {
         $options = [
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+            "query" => [
+                "q" => "show databases",
+            ],
         ];
 
-        $endpoint = $this->options->getHttpDatabaseEndpoint();
-
+        $endpoint = $this->options->getHttpQueryEndpoint();
         return $this->httpClient->get($endpoint, $options)->json();
     }
 
@@ -100,11 +103,11 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
     {
         $httpMessage = [
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
-            "body" => json_encode(["name" => $name])
+            "query" => ["q" => "CREATE DATABASE \"{$name}\""],
         ];
 
-        $endpoint = $this->options->getHttpDatabaseEndpoint();
-        return $this->httpClient->post($endpoint, $httpMessage)->json();
+        $endpoint = $this->options->getHttpQueryEndpoint();
+        return $this->httpClient->get($endpoint, $httpMessage)->json();
     }
 
     /**
@@ -114,9 +117,10 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
     {
         $httpMessage = [
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+            "query" => ["q" => "drop database \"{$name}\""],
         ];
 
-        $endpoint = $this->options->getHttpDatabaseEndpoint($name);
-        return $this->httpClient->delete($endpoint, $httpMessage)->json();
+        $endpoint = $this->options->getHttpQueryEndpoint();
+        return $this->httpClient->get($endpoint, $httpMessage)->json();
     }
 }

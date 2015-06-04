@@ -160,11 +160,10 @@ class Options
     public function getHttpSeriesEndpoint()
     {
         return sprintf(
-            "%s://%s:%d/db/%s/series",
+            "%s://%s:%d/write",
             $this->getProtocol(),
             $this->getHost(),
-            $this->getPort(),
-            $this->getDatabase()
+            $this->getPort()
         );
     }
 
@@ -173,18 +172,14 @@ class Options
      * @param string $name
      * @return string
      */
-    public function getHttpDatabaseEndpoint($name = false)
+    public function getHttpQueryEndpoint($name = false)
     {
         $url = sprintf(
-            "%s://%s:%d/db",
+            "%s://%s:%d/query",
             $this->getProtocol(),
             $this->getHost(),
             $this->getPort()
         );
-
-        if ($name !== false) {
-            $url .= "/{$name}";
-        }
 
         return $url;
     }

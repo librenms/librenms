@@ -42,17 +42,17 @@ class Client
      * @param bool|string $timePrecision
      * @return mixed
      */
-    public function mark($name, array $values, $timePrecision = false)
+    public function mark($name, array $values = [], $timePrecision = false)
     {
         $data =[];
 
         $timePrecision = $this->clearTimePrecision($timePrecision);
 
-        $data['name'] = $name;
-        $data['columns'] = array_keys($values);
-        $data['points'][] = array_values($values);
+        $data["database"] = $this->getAdapter()->getOptions()->getDatabase();
+        $data['points'][0]['name'] = $name;
+        $data['points'][0]['fields'] = $values;
 
-        return $this->getAdapter()->send([$data], $timePrecision);
+        return $this->getAdapter()->send($data, $timePrecision);
     }
 
     /**
