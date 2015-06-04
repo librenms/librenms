@@ -38,8 +38,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->object = $influx;
 
         $databases = $this->object->getDatabases();
-        foreach ($databases as $database) {
-            $this->object->deleteDatabase($database["name"]);
+        if (array_key_exists("values", $databases["results"][0]["series"][0])) {
+            foreach ($databases["results"][0]["series"][0]["values"] as $database) {
+                $this->object->deleteDatabase($database[0]);
+            }
         }
 
         $this->object->createDatabase($this->rawOptions["udp"]["database"]);
@@ -51,11 +53,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGuzzleHttpApiWorksCorrectly()
     {
-        $this->object->mark("tcp.test", ["mark" => "element"]);
+        $t = $this->object->mark("tcp.test", ["mark" => "element"]);
 
-        $body = $this->object->query("select * from tcp.test");
-        $this->assertCount(1, $body[0]["points"]);
-        $this->assertEquals("element", $body[0]["points"][0][2]);
+        sleep(1);
+
+        $body = $this->object->query("select * from \"tcp.test\"");
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("mark", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals("element", $body["results"][0]["series"][0]["values"][0][1]);
     }
 
     /**
