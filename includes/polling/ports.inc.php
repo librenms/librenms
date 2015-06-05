@@ -215,7 +215,7 @@ foreach ($ports as $port)
       $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
     }
 
-    // Overwrite ifSpeed with ifHighSpeed if it's over 10G
+    // Overwrite ifSpeed with ifHighSpeed if it's over 1G
     if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
     {
       echo("HighSpeed ");
