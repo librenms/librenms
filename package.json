@@ -47,5 +47,11 @@
   "main": "dist/jquery.gridster.js",
   "directories": {
     "test": "test"
+  },
+  "jspm": {
+    "main": "jquery.gridster",
+    "directories": {
+      "lib": "dist"
+    }
   }
 }
