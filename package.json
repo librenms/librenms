@@ -14,6 +14,7 @@
   "bugs": {
     "url": "https://github.com/dsmorse/gridster.js/issues"
   },
+  "license": "MIT",
   "licenses": [
     {
       "type": "MIT",
@@ -42,5 +43,9 @@
   },
   "scripts": {
     "test": "grunt test"
+  },
+  "main": "dist/jquery.gridster.js",
+  "directories": {
+    "test": "test"
   }
 }
