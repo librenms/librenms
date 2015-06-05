@@ -7,3 +7,5 @@ demo/
 *.iml
 vendor
 *.gem
+*.css.map
+demos/assets/css/demo.css

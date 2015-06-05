@@ -31,11 +31,6 @@ module.exports = function(grunt) {
 			dist_extras_js: {
 				src: ['src/jquery.coords.js', 'src/jquery.collision.js', 'src/utils.js', 'src/jquery.draggable.js', 'src/jquery.<%= pkg.name %>.js', 'src/jquery.<%= pkg.name %>.extras.js'],
 				dest: 'dist/jquery.<%= pkg.name %>.with-extras.js'
-			},
-
-			dist_css: {
-				src: ['src/jquery.<%= pkg.name %>.css'],
-				dest: 'dist/jquery.<%= pkg.name %>.css'
 			}
 		},
 		uglify: {
@@ -102,6 +97,10 @@ module.exports = function(grunt) {
 					expand: true,
 					dest: 'gh-pages/',
 					src: ['dist/*', 'demos/**']
+				},{
+					expand: true,
+					dest: 'dist',
+					src: ['src/jquery.gridster.less']
 				}]
 			},
 			rails: {
@@ -167,13 +166,33 @@ module.exports = function(grunt) {
 			}
 		},
 		watch: {
-			files: ['libs/*.js', 'src/*.js', 'src/*.css', 'Gruntfile.js'],
-			tasks: ['concat', 'uglify', 'cssmin']
+			files: ['libs/*.js', 'src/*.js', 'src/*.less', 'Gruntfile.js'],
+			tasks: ['concat', 'uglify', 'less', 'cssmin']
 		},
 		qunit: {
 			files: [
 				'test/jquery.gridster.html'
 			]
+		},
+		less: {
+			default: {
+				options: {
+					sourceMap: true,
+					sourceMapFilename: 'dist/jquery.gridster.css.map'
+				},
+				files: {
+					'dist/jquery.gridster.css': 'src/jquery.gridster.less'
+				}
+			},
+			demo: {
+				options: {
+					sourceMap: true,
+					sourceMapFilename: 'demos/assets/css/demo.css.map'
+				},
+				files: {
+					'demos/assets/css/demo.css': 'demos/assets/less/demo.less'
+				}
+			}
 		}
 	});
 
@@ -182,6 +201,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
@@ -193,7 +213,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-shell');
 
 	// Default task.
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'cssmin', 'replace:rails-version', 'copy:rails']);
+	grunt.registerTask('default', ['jshint', 'concat', 'less', 'uglify', 'cssmin', 'replace:rails-version', 'copy:rails']);
 	grunt.registerTask('build', ['default', 'qunit', 'shell:build-rails-gem']);
 	grunt.registerTask('test', ['jshint','qunit']);
 	grunt.registerTask('docs', ['clean', 'build', 'yuidoc', 'copy:dist', 'gh-pages']);
