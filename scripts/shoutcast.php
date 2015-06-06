@@ -40,7 +40,7 @@
 	$cmd	= (isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : "");
 
 	function get_data($host, $port) {
-	    $fp		= @fsockopen($host, $port, &$errno, &$errstr, 5);
+	    $fp		= @fsockopen($host, $port, $errno, $errstr, 5);
 	    if(!$fp) { $connect = 0; }
 	    if (!isset($connect)) {
 		fputs($fp, "GET /7.html HTTP/1.0\r\n"
