@@ -1247,3 +1247,23 @@ function ip_exists($ip) {
     }
     return true;
 }
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { echo ...; }'
+ */
+function d_echo($text) {
+    global $debug;
+    if ($debug) {
+        echo "$text\n";
+    }
+}
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
+ */
+function d_print_r($var) {
+    global $debug;
+    if ($debug) {
+        print_r($var);
+    }
+}
