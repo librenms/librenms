@@ -819,15 +819,17 @@ function snmp_gen_auth (&$device)
 }
 
 /*
+ * Translate the given MIB into a vaguely useful PHP array.  Each keyword becomes an array index.
+ *
  * Example:
  * snmptranslate -Td -On -M mibs -m RUCKUS-ZD-SYSTEM-MIB RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta
  * .1.3.6.1.4.1.25053.1.2.1.1.1.15.30
  * ruckusZDSystemStatsAllNumSta OBJECT-TYPE
- *   -- FROM	RUCKUS-ZD-SYSTEM-MIB
- *     SYNTAX	Unsigned32
- *     MAX-ACCESS	read-only
- *     STATUS	current
- *     DESCRIPTION	"Number of All client devices"
+ *   -- FROM    RUCKUS-ZD-SYSTEM-MIB
+ *     SYNTAX   Unsigned32
+ *     MAX-ACCESS       read-only
+ *     STATUS   current
+ *     DESCRIPTION      "Number of All client devices"
  *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1) 
  *           ruckusZDSystemStats(15) 30 }
  */
@@ -843,7 +845,7 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
     $cmd .= $lastpart;
 
     $result = array();
-    $lines = preg_split('/\n+/', trim(external_exec($cmd)));
+    $lines = preg_split('/\n+/', trim(shell_exec($cmd)));
     foreach ($lines as $l) {
         $f = preg_split('/\s+/', trim($l));
         // first line is all numeric
@@ -853,16 +855,16 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
         }
         // then the name of the object type
         if ($f[1] && $f[1] == "OBJECT-TYPE") {
-            $result[strtolower($f[1])] = $f[0];
+            $result['object_type'] = $f[0];
             continue;
         }
         // then the other data elements
         if ($f[0] == "--" && $f[1] == "FROM") {
-            $result[strtolower($f[1])] = $f[2];
+            $result['module'] = $f[2];
             continue;
         }
         if ($f[0] == "MAX-ACCESS") {
-            $result[strtolower($f[0])] = $f[1];
+            $result['max_access'] = $f[1];
             continue;
         }
         if ($f[0] == "STATUS") {
@@ -895,6 +897,10 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
 
 
 /*
+ * Walks through the given MIB module, looking for the given MIB.
+ * NOTE: different from snmp walk - this doesn't touch the device.
+ * NOTE: There's probably a better way to do this with snmptranslate.
+ *
  * Example:
  * snmptranslate -Ts -M mibs -m RUCKUS-ZD-SYSTEM-MIB | grep ruckusZDSystemStats
  * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats
@@ -908,7 +914,7 @@ function snmp_mib_walk($mib, $module, $mibdir = null)
     $cmd .= mibdir($mibdir);
     $cmd .= " -m ".$module;
     $result = array();
-    $data = preg_split('/\n+/', external_exec($cmd));
+    $data = preg_split('/\n+/', shell_exec($cmd));
     foreach ($data as $oid) {
         // only include oids which are part of this mib
         if (strstr($oid, $mib)) {
@@ -919,6 +925,75 @@ function snmp_mib_walk($mib, $module, $mibdir = null)
         }
     }
     return $result;
+}
+
+/*
+ * @return an array containing all of the mib objects, keyed by object-type;
+ * returns an empty array if something goes wrong.
+ */
+function snmp_mib_load($mib, $module, $mibdir = null)
+{
+    $mibs = array();
+    foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
+        $mibs[$obj['object_type']] = $obj;
+    }
+    return $mibs;
+}
+
+/*
+ * Turn the given oid (name or numeric value) into a MODULE::mib name.
+ * @return an array consisting of the module and mib names, or null if no matching MIB is found.
+ */
+function snmp_translate($oid, $module, $mibdir = null)
+{
+    if ($module !== "all") {
+        $oid = "$module::$oid";
+    }
+    $cmd = "snmptranslate" . mibdir($mibdir);
+    $cmd .= " -m $module $oid";                 // load all the MIBs looking for our object
+    $cmd .= " 2>/dev/null";                     // ignore invalid MIBs
+
+    $lines = preg_split('/\n+/', shell_exec($cmd));
+    if (!$lines) {
+        d_echo("No results from snmptranslate");
+        return null;
+    }
+
+    $matches = array();
+    if (!preg_match('/(.*)::(.*)/', $lines[0], $matches)) {
+        d_echo("This doesn't look like a MIB: ".$lines[0]);
+        return null;
+    }
+
+    d_echo("SNMP translated: $module::$oid -> $matches[1]::$matches[2]");
+    return $matches;
+}
+
+/*
+ * Validate MIBs and set $device['mibs'][$name] = $module based on the results.
+ * Can be slow due to use of snmptranslate - call only during discovery.
+ */
+function set_mibs($list, &$device)
+{
+    foreach ($list as $name => $module) {
+        $matches = snmp_translate($name, $module);
+        if ($matches) {
+            $device['mibs'][$matches[2]] = $matches[1];
+        }
+    }
+}
+
+/*
+ * Validate the MIB given in sysObjectId against our MIB collection.  If none is found, do nothing.
+ * If one is found, call set_mibs() for the given MIB name & module.
+ */
+function set_os_mib(&$device)
+{
+    $sysObjectId = trim(snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn"));
+    if ($sysObjectId === false || $sysObjectID === "") {
+        return;
+    }
+    set_mibs(array($sysObjectId => "all"), $device);
 }
 
 ?>
