@@ -533,6 +533,7 @@ $config['poller_modules']['aruba-controller']             = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['applications']                 = 1;
 $config['poller_modules']['cisco-asa-firewall']           = 1;
+$config['poller_modules']['mib']                          = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -565,7 +566,6 @@ $config['discovery_modules']['toner']                     = 1;
 $config['discovery_modules']['ucd-diskio']                = 1;
 $config['discovery_modules']['services']                  = 1;
 $config['discovery_modules']['charge']                    = 1;
-$config['discovery_modules']['mib']                       = 0;
 
 $config['modules_compat']['rfc1628']['liebert']           = 1;
 $config['modules_compat']['rfc1628']['netmanplus']        = 1;
