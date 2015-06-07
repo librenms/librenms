@@ -23,31 +23,27 @@ class Client
         return $this->adapter;
     }
 
-    public function mark($name, array $values = [], $timePrecision = false)
+    public function mark($name, array $values = [])
     {
         $data = $name;
         if (!is_array($name)) {
             $data =[];
-
-            $timePrecision = $this->clearTimePrecision($timePrecision);
 
             $data["database"] = $this->getAdapter()->getOptions()->getDatabase();
             $data['points'][0]['name'] = $name;
             $data['points'][0]['fields'] = $values;
         }
 
-        return $this->getAdapter()->send($data, $timePrecision);
+        return $this->getAdapter()->send($data);
     }
 
-    public function query($query, $timePrecision = false)
+    public function query($query)
     {
         if (!($this->getAdapter() instanceOf QueryableInterface)) {
             throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
         }
 
-        $timePrecision = $this->clearTimePrecision($timePrecision);
-
-        $return = $this->getAdapter()->query($query, $timePrecision);
+        $return = $this->getAdapter()->query($query);
 
         return $return;
     }
@@ -57,7 +53,7 @@ class Client
         if (!($this->getAdapter() instanceOf QueryableInterface)) {
             throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
         }
-        return $this->getAdapter()->getDatabases();
+        return $this->getAdapter()->query("show databases");
     }
 
     public function createDatabase($name)
@@ -65,7 +61,7 @@ class Client
         if (!($this->getAdapter() instanceOf QueryableInterface)) {
             throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
         }
-        return $this->getAdapter()->createDatabase($name);
+        return $this->getAdapter()->query("create database \"{$name}\"");
     }
 
     public function deleteDatabase($name)
@@ -73,7 +69,7 @@ class Client
         if (!($this->getAdapter() instanceOf QueryableInterface)) {
             throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
         }
-        return $this->getAdapter()->deleteDatabase($name);
+        return $this->getAdapter()->query("drop database \"{$name}\"");
     }
 
     private function clearTimePrecision($timePrecision)

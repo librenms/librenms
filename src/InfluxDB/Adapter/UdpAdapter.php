@@ -30,7 +30,7 @@ class UdpAdapter implements AdapterInterface
     /**
      * {@inheritDoc}
      */
-    public function send($message, $timePrecision = false)
+    public function send($message)
     {
         $message = json_encode($message);
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
