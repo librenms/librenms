@@ -774,7 +774,65 @@ function clean_bootgrid($string) {
     $output = str_replace(array("\r","\n"), "", $string);
     $output = addslashes($output);
     return $output;
+}
 
+//Insert new config items
+function add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf_desc) {
+    if (dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config')) {
+        $db_inserted = 1;
+    } else {
+        $db_inserted = 0;
+    }
+    return($db_inserted);
+}
+
+function get_config_by_group($group) {
+    $group = array($group);
+    $items = array();
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+        $val = $config_item['config_value'];
+        if (filter_var($val,FILTER_VALIDATE_INT)) {
+            $val = (int) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_FLOAT)) {
+            $val = (float) $val;
+        } elseif (filter_var($val,FILTER_VALIDATE_BOOLEAN)) {
+            $val =(boolean) $val;
+        }
+        if ($val === TRUE) {
+            $config_item += array('config_checked'=>'checked');
+        }
+        $items[$config_item['config_name']] = $config_item;
+    }
+    return $items;
+}
+
+function get_config_like_name($name) {
+    $name = array($name);
+    $items = array();
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+        $items[$config_item['config_name']] = $config_item;
+    }
+    return $items;
+}
+
+function get_config_by_name($name) {
+    $config_item = dbFetchRow("SELECT * FROM `config` WHERE `config_name` = ?", array($name));
+    return $config_item;    
+}
+
+function set_config_name($name,$config_value) {
+    return dbUpdate(array('config_value' => $config_value), 'config', '`config_name`=?', array($name));
+}
+
+function get_url() {
+    // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
+    // http://stackoverflow.com/users/184600/ma%C4%8Dek
+    return sprintf(
+        "%s://%s%s",
+        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+        $_SERVER['SERVER_NAME'],
+        $_SERVER['REQUEST_URI']
+    );
 }
 
 function alert_details($details) {

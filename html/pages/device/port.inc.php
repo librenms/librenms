@@ -4,7 +4,7 @@ if (!isset($vars['view']) ) { $vars['view'] = "graphs"; }
 
 $port = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($vars['port']));
 
-if ($config['memcached']['enable'])
+if ($config['memcached']['enable'] === TRUE)
 {
   $state = $memcache->get('port-'.$port['port_id'].'-state');
   if($debug) { print_r($state); }
