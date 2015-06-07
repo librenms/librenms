@@ -1,0 +1,727 @@
+
+-- *****************************************************************************
+-- Juniper-IGMP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   IGMP MIB
+--
+-- Copyright (c) 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IGMP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniInterfaceLocationType, JuniInterfaceLocationValue
+        FROM Juniper-TC;
+
+juniIgmpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200608250540Z"  -- 25-Aug-06 12:40 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IGMP MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200608250540Z"  -- 25-Aug-06 12:40 AM EST  - JUNOSe 7.0   
+    DESCRIPTION
+        "Added juniIgmpIfLocationType for support on REX platform and 
+         deprecated juniIgmpGroupsTable."
+    REVISION    "200309291839Z"  -- 29-Sep-03 02:39 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added IGMP administration state support."
+    REVISION    "200210281455Z"  -- 28-Oct-02 09:55 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added support for interface addresses and multicast group limits."
+    REVISION    "200009261850Z"  -- 26-Sep-00 02:50 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 40 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniIgmpProxyGroupState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "IP multicast group state in respect to the host IGMP (IGMP proxy)
+        behavior."
+    SYNTAX      INTEGER {
+                    juniIgmpProxyGroupUnknown (0),
+                    juniIgmpProxyGroupIdleMember(1),
+                    juniIgmpProxyGroupDelayingMember(2) }
+
+JuniIgmpProxyInterfaceState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "IGMP proxy Interface state."
+    SYNTAX      INTEGER {
+                    juniIgmpProxyInterfaceUnknown(0),
+                    juniIgmpProxyInterfaceStateV1RouterPresent(1),
+                    juniIgmpProxyInterfaceStateNonV1RouterPresent(2) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIgmpMIBObject     OBJECT IDENTIFIER ::= { juniIgmpMIB 1 }
+juniIgmpProtocol      OBJECT IDENTIFIER ::= { juniIgmpMIBObject 1 }
+juniIgmpProxy         OBJECT IDENTIFIER ::= { juniIgmpMIBObject 2 }
+juniIgmpGlobal        OBJECT IDENTIFIER ::= { juniIgmpMIBObject 3 }
+
+
+--
+-- System wide platform dependent objects
+--
+juniIgmpGroupsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIgmpGroupsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated table of max multicast groups for each physical port.
+        This has been replaced by juniIgmpGroupsTable2."
+    ::= { juniIgmpGlobal 1 }
+
+juniIgmpGroupsEntry  OBJECT-TYPE
+    SYNTAX      JuniIgmpGroupsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated entry representing per physical port max multicast groups
+        configurations.  This has been replaced by juniIgmpGroupsEntry2."
+    INDEX     { juniIgmpGroupsSlot,
+                juniIgmpGroupsPort }
+    ::= { juniIgmpGroupsTable 1 }
+
+JuniIgmpGroupsEntry ::= SEQUENCE {
+    juniIgmpGroupsSlot          Integer32,
+    juniIgmpGroupsPort          Integer32,
+    juniIgmpGroupsMaxGroups     Integer32 }
+
+juniIgmpGroupsSlot  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated physical slot position to configure the max multicast groups
+        for any selected port.  This has been replaced by 
+        juniIgmpIfLocationIndex."
+    ::= { juniIgmpGroupsEntry 1 }
+
+juniIgmpGroupsPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated physical port to configure max multicast groups.
+        This has been replaced by juniIgmpIfLocationIndex."
+    ::= { juniIgmpGroupsEntry 2 }
+
+juniIgmpGroupsMaxGroups  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..65535)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated max multicast groups limit value for each physical port.
+        This has been replaced by juniIgmpGroupsMaxGroups2."
+    ::= { juniIgmpGroupsEntry 3 }
+
+juniIgmpIfLocationType OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the interpretation of JuniInterfaceLocationValue object
+        values into platform-dependent interface location components, e.g.,
+        'slot.port' on an ERX."
+    ::= { juniIgmpGlobal 2 }
+
+juniIgmpGroupsTable2  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIgmpGroupsEntry2
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of max multicast groups for each physical port."
+    ::= { juniIgmpGlobal 3 }
+
+juniIgmpGroupsEntry2  OBJECT-TYPE
+    SYNTAX      JuniIgmpGroupsEntry2
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents per physical port max multicast groups
+        configurations."
+    INDEX     { juniIgmpIfLocationIndex }
+    ::= { juniIgmpGroupsTable2 1 }
+
+JuniIgmpGroupsEntry2 ::= SEQUENCE {
+    juniIgmpIfLocationIndex     JuniInterfaceLocationValue,
+    juniIgmpGroupsMaxGroups2    Integer32 }
+
+juniIgmpIfLocationIndex  OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocationValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of a platform interface location."
+    ::= { juniIgmpGroupsEntry2 1 }
+
+juniIgmpGroupsMaxGroups2 OBJECT-TYPE
+    SYNTAX      Integer32 (-1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the max multicast groups limit for each physical port."
+    ::= { juniIgmpGroupsEntry2 2 }
+
+--
+--  The IGMP Interface Table
+--
+juniIgmpInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the interfaces on which IGMP is enabled."
+    ::= { juniIgmpProtocol 1 }
+
+juniIgmpInterfaceEntry  OBJECT-TYPE
+    SYNTAX      JuniIgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing an interface on which IGMP is enabled."
+    INDEX     { juniIgmpInterfaceIfIndex }
+    ::= { juniIgmpInterfaceTable 1 }
+
+JuniIgmpInterfaceEntry ::= SEQUENCE {
+    juniIgmpInterfaceIfIndex         InterfaceIndex,
+    juniIgmpInterfaceQuerierTimeout  Integer32,
+    juniIgmpInterfaceImmediateLeave  TruthValue,
+    juniIgmpInterfaceAccessGroup     DisplayString,
+    juniIgmpInterfacePromiscuous     TruthValue,
+    juniIgmpInterfaceMaxGroups       Integer32,
+    juniIgmpInterfaceIoaPacketReplIfIndex InterfaceIndex }
+
+juniIgmpInterfaceIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which IGMP is enabled."
+    ::= { juniIgmpInterfaceEntry 1 }
+
+juniIgmpInterfaceQuerierTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (1..399)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure other-querier-present timeout on an interface."
+    ::= { juniIgmpInterfaceEntry 2 }
+
+juniIgmpInterfaceImmediateLeave  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable feature to stop traffic immediately after receive
+        leave."
+    ::= { juniIgmpInterfaceEntry 3 }
+
+juniIgmpInterfaceAccessGroup  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the access group list."
+    ::= { juniIgmpInterfaceEntry 4 }
+
+juniIgmpInterfacePromiscuous  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the promiscuous state."
+    ::= { juniIgmpInterfaceEntry 5 }
+
+juniIgmpInterfaceMaxGroups  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the multicast groups limit."
+    ::= { juniIgmpInterfaceEntry 6 }
+
+juniIgmpInterfaceIoaPacketReplIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the IOA packet replication interface."
+    ::= { juniIgmpInterfaceEntry 7 }
+
+
+--
+-- Scalar objects
+--
+juniIgmpRouterPromiscuous  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the promiscuous state of the router."
+    ::= { juniIgmpProtocol 2 }
+
+juniIgmpAdminState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Adminstratively enable/disable the IGMP on the router."
+    ::= { juniIgmpProtocol 3 }
+
+
+--
+-- The IGMP Proxy Interface Table
+--
+juniIgmpProxyInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIgmpProxyInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IGMP proxy interface table consists of interface on which the IGMP
+        proxy is enabled."
+    ::= { juniIgmpProxy 1 }
+
+juniIgmpProxyInterfaceEntry  OBJECT-TYPE
+    SYNTAX      JuniIgmpProxyInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the juniIgmpProxyInterfaceTable."
+    INDEX     { juniIgmpProxyInterfaceIfIndex }
+    ::= { juniIgmpProxyInterfaceTable 1 }
+
+JuniIgmpProxyInterfaceEntry ::= SEQUENCE {
+    juniIgmpProxyInterfaceIfIndex                   InterfaceIndex,
+    juniIgmpProxyInterfaceAddress                   IpAddress,
+    juniIgmpProxyInterfaceMask                      IpAddress,
+    juniIgmpProxyInterfaceState                     JuniIgmpProxyInterfaceState,
+    juniIgmpProxyInterfaceStatus                    RowStatus,
+    juniIgmpProxyInterfaceVersion                   Integer32,
+    juniIgmpProxyInterfaceV1RoutePresentTimeout     Integer32,
+    juniIgmpProxyInterfaceUnsolicitedReportInterval Integer32,
+    juniIgmpProxyInterfaceTotalGroupCount           Counter32,
+    juniIgmpProxyInterfaceWrongVersionCount         Counter32,
+    juniIgmpProxyInterfaceV1QueryReceiveCount       Counter32,
+    juniIgmpProxyInterfaceV2QueryReceiveCount       Counter32,
+    juniIgmpProxyInterfaceV1ReportReceiveCount      Counter32,
+    juniIgmpProxyInterfaceV2ReportReceiveCount      Counter32,
+    juniIgmpProxyInterfaceV1JoinReportCount         Counter32,
+    juniIgmpProxyInterfaceV2JoinReportCount         Counter32,
+    juniIgmpProxyInterfaceLeaveReportCount          Counter32 }
+
+juniIgmpProxyInterfaceIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which the IGMP proxy is
+        enabled."
+    ::= { juniIgmpProxyInterfaceEntry 1 }
+
+juniIgmpProxyInterfaceAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the interface for which the IGMP proxy is enabled."
+    ::= { juniIgmpProxyInterfaceEntry 2 }
+
+juniIgmpProxyInterfaceMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet mask of the interface for which the IGMP proxy is
+        enabled."
+    ::= { juniIgmpProxyInterfaceEntry 3 }
+
+juniIgmpProxyInterfaceState  OBJECT-TYPE
+    SYNTAX      JuniIgmpProxyInterfaceState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the IGMP proxy interface has v1 router present timeout running, it
+        is in IgmpIntfStateV1RtPresent state.  Otherwise, it is in
+        IgmpIntfStateNonV1RtPresent states.  While it is in
+        IgmpIntfStateV1RtPresent, it only sends out version 1 group membership
+        report(s).  While it is in IgmpIntfStateNonV1RtPresent state, it sends
+        out version 2 group membership report(s)."
+    ::= { juniIgmpProxyInterfaceEntry 4 }
+
+juniIgmpProxyInterfaceStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The state of the IGMP proxy interface.  This object follows the
+        RowStatus behavior.  The destruction of the the row deletes the IGMP
+        proxy inteface."
+    ::= { juniIgmpProxyInterfaceEntry 5 }
+
+juniIgmpProxyInterfaceVersion  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of IGMP that this IGMP proxy interface is running."
+    ::= { juniIgmpProxyInterfaceEntry 6 }
+
+juniIgmpProxyInterfaceV1RoutePresentTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IGMP version 1 router present timeout is the time between IGMP
+        proxy receives a version 1 query and the time it assumes that there is
+        no more IGMP version 1 router IGMP running.  While before the V1 router
+        present timeout expires, the IGMP proxy only sends out version 1 group
+        membership report.  When it expires, it sends out version 2 group
+        membership report."
+    DEFVAL    { 400 }
+    ::= { juniIgmpProxyInterfaceEntry 7 }
+
+juniIgmpProxyInterfaceUnsolicitedReportInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The unsolicited report interval specifies the time between the two
+        initial group membership reports that the IGMP proxy sends."
+    DEFVAL    { 10 }
+    ::= { juniIgmpProxyInterfaceEntry 8 }
+
+juniIgmpProxyInterfaceTotalGroupCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of multicast groups for this upstream interface (interface
+        running IGMP proxy)."
+    ::= { juniIgmpProxyInterfaceEntry 9 }
+
+juniIgmpProxyInterfaceWrongVersionCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of wrong version of IGMP packets received on this
+        interface."
+    ::= { juniIgmpProxyInterfaceEntry 10 }
+
+juniIgmpProxyInterfaceV1QueryReceiveCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 1 IGMP queries received on this interface"
+    ::= { juniIgmpProxyInterfaceEntry 11 }
+
+juniIgmpProxyInterfaceV2QueryReceiveCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 2 IGMP queries received on this interface."
+    ::= { juniIgmpProxyInterfaceEntry 12 }
+
+juniIgmpProxyInterfaceV1ReportReceiveCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 1 group membership reports received on this
+        interface."
+    ::= { juniIgmpProxyInterfaceEntry 13 }
+
+juniIgmpProxyInterfaceV2ReportReceiveCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 2 group membership reports received on this
+        interface."
+    ::= { juniIgmpProxyInterfaceEntry 14 }
+
+juniIgmpProxyInterfaceV1JoinReportCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 1 group membership reports sent on this
+        interface."
+    ::= { juniIgmpProxyInterfaceEntry 15 }
+
+juniIgmpProxyInterfaceV2JoinReportCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of version 2 group membership reports sent on this
+        interface."
+    ::= { juniIgmpProxyInterfaceEntry 16 }
+
+juniIgmpProxyInterfaceLeaveReportCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of group leave reports sent on this interface."
+    ::= { juniIgmpProxyInterfaceEntry 17 }
+
+
+--
+-- The IGMP Proxy Cache Table
+--
+juniIgmpProxyCacheTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIgmpProxyCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP multicast group table.  The table is a union of multicast member
+        groups from all its downstream interfaces and for which the IGMP proxy
+        send group membership report."
+    ::= { juniIgmpProxy 2 }
+
+juniIgmpProxyCacheEntry  OBJECT-TYPE
+    SYNTAX      JuniIgmpProxyCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the juniIgmpProxyCacheTable."
+    INDEX     { juniIgmpProxyIfIndex,
+                juniIgmpProxyAddress }
+    ::= { juniIgmpProxyCacheTable 1 }
+
+JuniIgmpProxyCacheEntry ::= SEQUENCE {
+    juniIgmpProxyIfIndex  InterfaceIndex,
+    juniIgmpProxyAddress  IpAddress,
+    juniIgmpProxyStatus   JuniIgmpProxyGroupState }
+
+juniIgmpProxyIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which IGMP proxy is enabled."
+    ::= { juniIgmpProxyCacheEntry 1 }
+
+juniIgmpProxyAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP multicast group address that the IGMP proxy sends group
+        membership for."
+    ::= { juniIgmpProxyCacheEntry 2 }
+
+juniIgmpProxyStatus  OBJECT-TYPE
+    SYNTAX      JuniIgmpProxyGroupState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of this entry.  When the IGMP proxy has a delay time running
+        for this multicast group, the state of this enry is in the
+        juniIgmpDelayingMember state.  When the delay time expires, the IGMP
+        proxy sends an unsolicited report and the state of this group enters
+        juniIgmpDelayMember state."
+    ::= { juniIgmpProxyCacheEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniIgmpTrapControl      OBJECT IDENTIFIER ::= { juniIgmpMIB 2 }
+-- juniIgmpTraps            OBJECT IDENTIFIER ::= { juniIgmpMIB 3 }
+-- juniIgmpTrapPrefix       OBJECT IDENTIFIER ::= { juniIgmpTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIgmpConformance OBJECT IDENTIFIER ::= { juniIgmpMIB 4 }
+juniIgmpCompliances OBJECT IDENTIFIER ::= { juniIgmpConformance 1 }
+juniIgmpGroups      OBJECT IDENTIFIER ::= { juniIgmpConformance 2 }
+
+--
+-- compliance statements
+--
+juniIgmpCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        IGMP MIB.  This statement became obsolete when support was added for
+        interface addresses and multicast group limits."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup }
+    ::= { juniIgmpCompliances 1 }                                  -- JUNOSe 3.0
+
+juniIgmpCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        IGMP MIB.  This statement became obsolete when support was added for the
+        administrative state object."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup,
+            juniIgmpGroupsGroup }
+    ::= { juniIgmpCompliances 2 }                                  -- JUNOSe 5.0
+
+juniIgmpCompliance3  MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated compliance statement for entities that implement the Juniper
+        IGMP MIB.  This statement was deprecated when support was added for the 
+        juniIgmpIfLocationType object."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup2,
+            juniIgmpGroupsGroup }
+    ::= { juniIgmpCompliances 3 }                                  -- JUNOSe 5.1
+
+juniIgmpCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper IGMP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup2,
+            juniIgmpGroupsGroup2 }
+    ::= { juniIgmpCompliances 4 }                                  -- JUNOSe 7.0
+
+
+--
+-- units of conformance
+--
+juniIgmpProxyInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIgmpProxyInterfaceAddress,
+        juniIgmpProxyInterfaceMask,
+        juniIgmpProxyInterfaceState,
+        juniIgmpProxyInterfaceStatus,
+        juniIgmpProxyInterfaceVersion,
+        juniIgmpProxyInterfaceV1RoutePresentTimeout,
+        juniIgmpProxyInterfaceUnsolicitedReportInterval,
+        juniIgmpProxyInterfaceTotalGroupCount,
+        juniIgmpProxyInterfaceWrongVersionCount,
+        juniIgmpProxyInterfaceV1QueryReceiveCount,
+        juniIgmpProxyInterfaceV2QueryReceiveCount,
+        juniIgmpProxyInterfaceV1ReportReceiveCount,
+        juniIgmpProxyInterfaceV2ReportReceiveCount,
+        juniIgmpProxyInterfaceV1JoinReportCount,
+        juniIgmpProxyInterfaceV2JoinReportCount,
+        juniIgmpProxyInterfaceLeaveReportCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IGMP proxy interfaces
+        in a Juniper product."
+    ::= { juniIgmpGroups 1 }                                       -- JUNOSe 3.0
+
+juniIgmpProxyCacheGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIgmpProxyStatus }
+    STATUS      current
+    DESCRIPTION
+        "An object providing management of IGMP proxy caches in a Juniper
+        product."
+    ::= { juniIgmpGroups 2 }                                       -- JUNOSe 3.0
+
+juniIgmpInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+         juniIgmpInterfaceQuerierTimeout,
+         juniIgmpInterfaceImmediateLeave,
+         juniIgmpInterfaceAccessGroup,
+         juniIgmpInterfacePromiscuous,
+         juniIgmpInterfaceMaxGroups,
+
+         juniIgmpRouterPromiscuous }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of IGMP interfaces
+        in a Juniper product.  This group became obsolete when the
+        administrative state object was added."
+    ::= { juniIgmpGroups 3 }                                       -- JUNOSe 5.0
+
+juniIgmpGroupsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIgmpGroupsMaxGroups }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated object providing management of IGMP global mCast groups in a
+        Juniper product.  This group was deprecated when support was added for
+        juniIgmpIfLocationType."
+    ::= { juniIgmpGroups 4 }                                       -- JUNOSe 5.0
+
+juniIgmpInterfaceGroup2  OBJECT-GROUP
+    OBJECTS {
+         juniIgmpInterfaceQuerierTimeout,
+         juniIgmpInterfaceImmediateLeave,
+         juniIgmpInterfaceAccessGroup,
+         juniIgmpInterfacePromiscuous,
+         juniIgmpInterfaceMaxGroups,
+
+         juniIgmpRouterPromiscuous,
+         juniIgmpAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IGMP interfaces in a
+        Juniper product."
+    ::= { juniIgmpGroups 5 }                                       -- JUNOSe 5.1
+
+
+juniIgmpGroupsGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIgmpIfLocationType,
+        juniIgmpGroupsMaxGroups2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IGMP global mCast
+        groups in a Juniper product."
+    ::= { juniIgmpGroups 6 }                                       -- JUNOSe 7.0
+
+END

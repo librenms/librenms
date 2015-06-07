@@ -1,0 +1,170 @@
+RAPID-SYSTEM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+        Integer32, Unsigned32, IpAddress, Gauge32,
+        enterprises, NOTIFICATION-TYPE        FROM SNMPv2-SMI
+        rapidstream                           FROM RAPID-MIB;
+
+
+    rsSystemConfigMIB MODULE-IDENTITY
+        LAST-UPDATED  "9906261200Z"
+        ORGANIZATION  "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                 "   Ella Yu
+                     WatchGuard Technologies, Inc.
+                     1841 Zanker Road
+                     San Jose, CA 95112
+                     USA
+
+                     408-519-4888
+                     ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module to describe WatchGuard Firebox system
+             configuration."
+        REVISION      "9906261200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        REVISION      "200406011200Z"
+        DESCRIPTION
+            "Removed old MIB objects."
+        ::= { rapidstream 2 }
+
+     -- significant branches
+     
+    rsSysTraps OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object for system wide traps 
+             in this entity."
+        ::= { rsSystemConfigMIB 3 }
+
+    rsSysTrapObjects OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object for objects which are used
+             as part of traps."
+        ::= { rsSystemConfigMIB 4 }
+
+    rsSysTrapControl OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects
+             which are trap control for the entity."
+        ::= { rsSystemConfigMIB 5 }
+
+     --
+     -- rsSysTraps
+     --
+     -- object used in trap reporting
+
+    rsAlarmId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The id of the alarm that generates a trap."
+        ::= { rsSysTrapObjects 1 }
+
+    rsAlarmLabel OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the alarm that generates a trap."
+        ::= { rsSysTrapObjects 2 }
+
+    rsAlarmTime OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time of the alarm that generates a trap."
+        ::= { rsSysTrapObjects 3 }
+
+    rsAlarmLevel OBJECT-TYPE
+        SYNTAX      INTEGER {
+                         normal(4),
+                         warning(3),
+                         error(2), 
+                         critical(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The level of an alarm generated."
+        ::= { rsSysTrapObjects 4 }
+
+    rsAlarmHostname OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The host name of the system where alarm occurred"
+        ::= { rsSysTrapObjects 5 }
+
+    rsAlarmMsg OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The message describing the nature of this alarm."
+        ::= { rsSysTrapObjects 6 }
+
+
+     --
+     -- trap control
+     --
+    rsAlarmTrapEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                         false(0),
+                         true(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Indicates whether rsAlarmTrap trap should be generated."
+        DEFVAL { true }
+        ::= { rsSysTrapControl 1 }
+
+     -- 
+     -- traps themselves
+     --
+
+    rsSysTrapsPrefix OBJECT-IDENTITY
+        STATUS     current
+        DESCRIPTION ""
+        ::= { rsSysTraps 0 }
+
+    rsAlarmTrap  NOTIFICATION-TYPE
+        OBJECTS {
+            rsAlarmId,
+            rsAlarmLabel,
+            rsAlarmTime,
+            rsAlarmLevel,
+            rsAlarmHostname,
+            rsAlarmMsg
+        }
+        STATUS     current
+        DESCRIPTION
+            "An alarm was raised by Monitoring Agent of this
+             RapidStream entity."
+        ::= { rsSysTrapsPrefix 1 }
+
+    rsSnmpStart  NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "This trap is sent when the snmp starts."
+        ::= { rsSysTrapsPrefix 2 }
+
+    rsSnmpShutdown  NOTIFICATION-TYPE
+        STATUS     current
+        DESCRIPTION
+            "This trap is sent when the snmp terminates."
+        ::= { rsSysTrapsPrefix 3 }
+
+END

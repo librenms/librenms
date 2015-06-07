@@ -1,0 +1,509 @@
+-- ======================================================================================
+-- Copyright (C)  2009   by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:    CDP-COMPLIANCE-MIB
+-- Reference:     
+-- Version:          1.0
+-- History:           
+-- ======================================================================================
+HUAWEI-CDP-COMPLIANCE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+ 	TEXTUAL-CONVENTION, TimeStamp, TruthValue
+		FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+ 
+ 	TimeFilter, ZeroBasedCounter32
+		FROM RMON2-MIB
+
+    InterfaceIndex
+        FROM IF-MIB
+            
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+
+    hwDatacomm
+        FROM HUAWEI-MIB;
+ 
+    hwCdpComplianceMIB MODULE-IDENTITY
+        LAST-UPDATED "200905050000Z"  
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "VRP Team Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            http://www.huawei.com
+        Zip:100085
+            "
+        DESCRIPTION
+            "This file is an file for CDP compliance. It provides such functions of 
+           globally enabling or disabling the CDP compliance function, enabling the global
+           alarm, querying and clearing statistics on ports."
+            ::= { hwDatacomm 198 }  
+	
+    -- ============================================================================
+    -- Node definitions
+    -- ============================================================================ 
+ 
+    hwCdpComplianceObjects  OBJECT IDENTIFIER ::= { hwCdpComplianceMIB 1} 
+
+    hwCdpComplianceNotifications OBJECT IDENTIFIER ::= { hwCdpComplianceMIB 2 }  
+    
+    hwCdpComplianceConformance  OBJECT IDENTIFIER ::= { hwCdpComplianceMIB 3 }
+ 
+
+  -- ============================================================================
+  --
+  -- ======================= Objects definitions=================================
+  --
+  -- ============================================================================  
+
+	hwCdpComplianceConfiguration OBJECT IDENTIFIER ::= { hwCdpComplianceObjects 1 }
+	hwCdpComplianceStatistics OBJECT IDENTIFIER ::= { hwCdpComplianceObjects 2 }
+	hwCdpComplianceRemoteSystemsData OBJECT IDENTIFIER ::= { hwCdpComplianceObjects 3 }	
+	
+	--
+	-- ***********************************************************
+	--
+	-- C D P C O MP L I A N C E C O N F I G
+	--
+	-- ***********************************************************
+	--
+	hwCdpComplianceEnable OBJECT-TYPE
+	SYNTAX EnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The administratively desired status of the global CDP compliance function.
+		If the associated hwCdpComplianceEnable object has a
+		value of 'disable(2)', then the system will discard CDP packets.
+		If the associated hwCdpComplianceEnable object has a
+		value of 'enable(1)', then the system will counter and keep the latest CDP packets."
+	DEFVAL { disable }
+	::= { hwCdpComplianceConfiguration 1 }   
+		
+	hwCdpComplianceNotificationInterval OBJECT-TYPE
+	SYNTAX Integer32(1..10)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The hwCdpComplianceNotificationInterval indicates the interval (in units of
+		seconds) of sending CDP notifications.
+		The default value for hwCdpComplianceNotificationInterval object is five seconds.
+		The value of this object must be restored from non-volatile
+		storage after a re-initialization of the management system."
+	DEFVAL { 5 }
+	::= { hwCdpComplianceConfiguration 2 } 
+	
+	--
+	-- hwCdpCompliancePortConfigTable: CDP compliance configuration on a per port basis
+	--
+	hwCdpCompliancePortConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwCdpCompliancePortConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table that controls CDP compliance function setting on individual
+		ports."
+	::= { hwCdpComplianceConfiguration 3 }  
+	
+	hwCdpCompliancePortConfigEntry OBJECT-TYPE
+	SYNTAX HwCdpCompliancePortConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"CDP compliance configuration information for a particular port.
+		This configuration parameter controls transmission and
+		the reception of CDP frames on those ports whose rows are
+		created in this table."
+	INDEX { hwCdpCompliancePortConfigIfIndex }
+	::= { hwCdpCompliancePortConfigTable 1 } 
+	
+	HwCdpCompliancePortConfigEntry ::= SEQUENCE {
+    hwCdpCompliancePortConfigIfIndex InterfaceIndex,
+	hwCdpCompliancePortConfigAdminStatus INTEGER,       
+	hwCdpCompliancePortConfigHoldTime Integer32,       	
+	hwCdpCompliancePortConfigNotificationEnable TruthValue,
+	hwCdpCompliancePortStatsReset EnabledStatus }   
+	
+    hwCdpCompliancePortConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the configured bridge port, reference RFC2233."
+    ::={ hwCdpCompliancePortConfigEntry 1 }
+	
+	hwCdpCompliancePortConfigAdminStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+	disabled(1),
+	rxOnly(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The administratively desired status of the CDP compliance of the port.
+		If the associated hwCdpCompliancePortConfigAdminStatus object has a
+		value of 'disabled(1)', then port will discard CDP packets received on this port.
+		If the associated hwCdpCompliancePortConfigAdminStatus object has a
+		value of 'rxOnly(2)', then the port will receive and store the CDP packet,
+		but it will not transmit CDP frames on this port."
+	DEFVAL { disabled }
+	::= { hwCdpCompliancePortConfigEntry 2 }   
+	
+	hwCdpCompliancePortConfigHoldTime OBJECT-TYPE
+	SYNTAX Integer32(10..254)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The seconds of holding the recieved CDP packets.
+		The received CDP packets wiil be aged if no new CDP packets received after 
+		so many seconds. This value should equal to or greater than the TTL value 
+		in the received CDP packets."
+	DEFVAL { 180 }
+	::= { hwCdpCompliancePortConfigEntry 3 } 
+
+	hwCdpCompliancePortConfigNotificationEnable OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The hwCdpCompliancePortConfigNotificationEnable controls, on a per
+		port basis, whether or not notifications from the agent
+		are enabled. The value true(1) means that notifications are
+		enabled; the value false(2) means that they are not."
+	DEFVAL { false }
+	::= { hwCdpCompliancePortConfigEntry 4 }
+	
+   hwCdpCompliancePortStatsReset OBJECT-TYPE
+    	SYNTAX EnabledStatus
+    	MAX-ACCESS read-write
+    	STATUS current
+   		DESCRIPTION 
+   			"Clears the statistics of packets received on the current port."     
+   		::= {hwCdpCompliancePortConfigEntry 5}
+	
+	
+	--
+	-- ***********************************************************
+	--
+	-- hwCdpComplianceStatistics
+	--
+	-- ***********************************************************
+	--
+	-- CDP Stats Group   
+	
+	hwCdpComplianceStatsRemTablesLastChangeTime OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value of sysUpTime object (defined in IETF RFC 3418)
+		at the time an entry is created, modified, or deleted in the
+		in tables associated with the hwCdpComplianceRemoteSystemData 
+		objects associated with remote systems.
+		An NMS can use this object to reduce polling of the
+		hwCdpComplianceRemoteSystemData objects."
+	::= { hwCdpComplianceStatistics 1 } 
+		
+	hwCdpComplianceStatsRemTablesAgeouts OBJECT-TYPE
+	SYNTAX ZeroBasedCounter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of times the complete set of information
+		advertised by a particular MSAP has been deleted from tables
+		contained in hwCdpComplianceRemoteSystemsData 
+		because the information timeliness interval has expired.
+		This counter should be incremented only once when the complete
+		set of information is completely invalidated (aged out)
+		from all related tables. Partial aging, similar to deletion
+		case, is not allowed, and thus, should not change the value
+		of this counter."
+	::= { hwCdpComplianceStatistics 2 } 
+	
+
+	--
+	-- RX statistics
+	--
+	hwCdpComplianceStatsRxPortTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwCdpComplianceStatsRxPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing CDP reception statistics for individual
+		ports. Entries are not required to exist in this table while
+		the hwCdpCompliancePortConfigEntry object is equal to 'disabled(1)'."
+	::= { hwCdpComplianceStatistics 3 }    
+	
+	hwCdpComplianceStatsRxPortEntry OBJECT-TYPE
+	SYNTAX HwCdpComplianceStatsRxPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"CDP frame reception statistics for a particular port.
+		All counter values in a particular entry shall be
+		maintained on a continuing basis and shall not be deleted
+		until ageed out.
+		All statistical counters associated with a particular
+		port on the port become frozen whenever the
+		adminStatus is disabled for the same port."
+	INDEX { hwCdpComplianceStatsRxPortIfIndex }
+	::= { hwCdpComplianceStatsRxPortTable 1 } 
+	
+	HwCdpComplianceStatsRxPortEntry ::= SEQUENCE { 
+	hwCdpComplianceStatsRxPortIfIndex InterfaceIndex,
+	hwCdpComplianceStatsRxPortFramesTotal Counter32,
+	hwCdpComplianceStatsRxPortAgeoutsTotal Counter32
+	}          
+
+    hwCdpComplianceStatsRxPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the bridge port receiving CDP packets, reference RFC2233."
+    ::={ hwCdpComplianceStatsRxPortEntry 1 }
+		
+	hwCdpComplianceStatsRxPortFramesTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of valid CDP frames received on the indicated port,
+		 while this CDP compliance function is enabled."
+	::= { hwCdpComplianceStatsRxPortEntry 2 }   
+		
+	hwCdpComplianceStatsRxPortAgeoutsTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The counter that represents the number of age-outs that
+		occurred on a given port. An age-out is the number of
+		times the complete set of information advertised by a
+		particular MSAP has been deleted from tables contained in
+		hwCdpComplianceRemoteSystemsData because
+		the information timeliness interval has expired.
+		This counter is similar to hwCdpComplianceStatsRemTablesAgeouts, 
+		exceptthat the counter is on a per port basis. This enables NMS to
+		poll tables associated with the hwCdpComplianceRemoteSystemsData objects
+		associated with remote systems on the indicated port only.
+		This counter should be set to zero during agent initialization
+		and its value should not be saved in non-volatile storage.
+		When a port's admin status changes from 'disabled' to
+		'rxOnly', the counter associated with
+		the same port should reset to 0. The agent should also flush
+		all remote system information associated with the same port.
+		This counter should be incremented only once when the
+		complete set of information is invalidated (aged out) from
+		all related tables on a particular port. "
+	::= { hwCdpComplianceStatsRxPortEntry 3 }   
+	
+	
+	-- ***********************************************************
+	--
+	-- R E M O T E S Y S T E M S D A T A
+	--
+	-- ***********************************************************
+	hwCdpComplianceRemoteTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwCdpComplianceRemoteEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table contains one or more rows per physical network
+		connection known to this agent. The agent may wish to ensure
+		that only one hwCdpComplianceRemoteEntry is present for each local port,
+		or it may choose to maintain multiple hwCdpComplianceRemoteEntry for
+		the same local port.
+		The following procedure may be used to retrieve remote
+		systems information updates from an CDP compliance agent:
+		1. NMS polls all tables associated with remote systems
+		and keeps a local copy of the information retrieved.
+		2. CDP compliance agent updates remote systems MIB objects, and
+		sends out notifications to a list of notification destinations.
+		3. NMS receives the notifications and compares the new
+		values of objects listed in step 1.
+		Periodically, NMS should poll the object
+		hwCdpStatsRemTablesLastChangeTime to find out if anything
+		has changed since the last poll. if something has
+		changed, NMS will poll the objects listed in step 1 to
+		figure out what kind of changes occurred in the tables.
+		if value of hwCdpComplianceStatsRemTablesInserts has changed,
+		then NMS will walk all tables by employing TimeFilter
+		with the last-polled time value. This request will
+		return new objects or objects whose values are updated
+		since the last poll.
+		if value of hwCdpComplianceStatsRemTablesAgeouts has changed,
+		then NMS will walk the hwCdpComplianceStatsRxPortAgeoutsTotal and
+		compare the new values with previously recorded ones.
+		For ports whose hwCdpComplianceStatsRxPortAgeoutsTotal value is
+		greater than the recorded value, NMS will have to
+		retrieve objects associated with those ports from
+		table(s) without employing a TimeFilter (which is
+		performed by specifying 0 for the TimeFilter.)
+		hwCdpComplianceStatsRemTablesDeletes and hwCdpComplianceStatsRemTablesDrops
+		objects are provided for informational purposes."
+	::= { hwCdpComplianceRemoteSystemsData 1 }  
+	
+	hwCdpComplianceRemoteEntry OBJECT-TYPE
+	SYNTAX HwCdpComplianceRemoteEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Information about a particular physical network connection.
+		Entries may be created and deleted in this table by the agent,
+		if a physical topology discovery process is active."
+	INDEX {  
+	hwCdpComplianceRemLocalPortIfIndex
+		}
+	::= { hwCdpComplianceRemoteTable 1 }    
+	
+	HwCdpComplianceRemoteEntry ::= SEQUENCE { 
+	hwCdpComplianceRemLocalPortIfIndex InterfaceIndex,  
+    hwCdpComplianceRemTimeMark TimeFilter,  
+	hwCdpComplianceRemoteInfo OCTET STRING
+	}             
+      
+    hwCdpComplianceRemLocalPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the local bridge port receving CDP packets, reference RFC2233."
+    ::={ hwCdpComplianceRemoteEntry 1 }
+
+    hwCdpComplianceRemTimeMark OBJECT-TYPE
+	SYNTAX TimeFilter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A time filter for this entry. See the time filter textual
+		convention in IETF RFC 2021 and
+		http://www.ietf.org/IESG/Implementations/RFC2021-Implementation.txt
+		to see how time filter works."
+	REFERENCE
+		"IETF RFC 2021 section 6"
+	::= { hwCdpComplianceRemoteEntry 2 }   
+     
+    hwCdpComplianceRemoteInfo  OBJECT-TYPE 
+    SYNTAX  OCTET STRING (SIZE(0..1600))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " The latest CDP packet recieved oon the port."
+    ::= { hwCdpComplianceRemoteEntry 3 }
+	
+	
+	--
+	-- ***********************************************************
+	--
+	-- C D P C O M P L I A N C E M I B N O T I F I C A T I O N S
+	--
+	-- ***********************************************************
+	--
+	hwCdpComplianceNotificationPrefix OBJECT IDENTIFIER ::= { hwCdpComplianceNotifications 1 }
+	hwCdpComplianceRemTablesChange NOTIFICATION-TYPE
+	OBJECTS {
+	hwCdpComplianceStatsRemTablesLastChangeTime,
+	hwCdpComplianceStatsRemTablesAgeouts
+	}
+	STATUS current
+	DESCRIPTION
+		"A hwCdpComplianceRemTablesChange notification is sent when the value
+		of hwCdpComplianceStatsRemTableLastChangeTime changes. It can be
+		utilized by an NMS to trigger LLDP remote systems table
+		maintenance polls.
+		Note that transmission of hwCdpComplianceRemTablesChange
+		notifications are throttled by the agent, as specified by the
+		'hwCdpComplianceNotificationInterval' object."
+	::= { hwCdpComplianceNotificationPrefix 1 }   
+	
+	--
+	-- ***********************************************************
+	--
+	-- H U A W E I C  D P C O M P L I A N C E M I B C O N F O R M A N C E
+	--
+	-- ***********************************************************
+	--
+     
+    hwCdpComplianceCompliances OBJECT IDENTIFIER ::= { hwCdpComplianceConformance 1 }
+	hwCdpComplianceGroups OBJECT IDENTIFIER ::= { hwCdpComplianceConformance 2 }
+	-- compliance statements
+	hwCdpComplianceCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		the HUAWEI-CDP-COMPLIANCE-MIB."
+	MODULE -- this module
+	MANDATORY-GROUPS { 
+	hwCdpComplianceConfigGroup,
+	hwCdpComplianceStatsGroup,
+	hwCdpComplianceRemSysGroup
+	-- hwCdpComplianceNotificationsGroup
+	}
+	::= { hwCdpComplianceCompliances 1 }    
+	   
+	-- MIB groupings
+	hwCdpComplianceConfigGroup OBJECT-GROUP
+	OBJECTS {  
+	hwCdpComplianceEnable,
+	hwCdpComplianceNotificationInterval,
+	hwCdpCompliancePortConfigAdminStatus,
+	hwCdpCompliancePortConfigHoldTime,
+	hwCdpCompliancePortConfigNotificationEnable
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of objects which are used to configure the
+		CDP compliance implementation behavior.
+		This group is mandatory for agents which implement the Huawei CDP compliance."
+	::= { hwCdpComplianceGroups 1 }     
+	
+	hwCdpComplianceStatsGroup OBJECT-GROUP
+	OBJECTS {  
+	hwCdpComplianceStatsRxPortFramesTotal,
+	hwCdpCompliancePortStatsReset,
+	hwCdpComplianceStatsRemTablesLastChangeTime,
+	hwCdpComplianceStatsRemTablesAgeouts,
+	hwCdpComplianceStatsRxPortAgeoutsTotal
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of objects which are used to represent LLDP
+		 statistics.
+		This group is mandatory for agents which implement the LLDP
+		and have the capability of receiving and transmitting LLDP frames."
+	::= { hwCdpComplianceGroups 2 } 
+     
+    
+    hwCdpComplianceRemSysGroup OBJECT-GROUP
+	OBJECTS {  
+	hwCdpComplianceRemoteInfo,
+	hwCdpComplianceRemTimeMark
+	}
+	STATUS current
+	DESCRIPTION
+		"The CDP packet received on the port."
+	::= { hwCdpComplianceGroups 3 } 
+
+
+   hwCdpComplianceTrapGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {  
+	hwCdpComplianceRemTablesChange	
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of notifications used to indicate HUAWEI-CDP-COMPLIANCE-MIB
+		data consistency and general status information.
+		This group is mandatory for agents which implement the huawei CDP compliance
+		and have the capability of receiving CDP frames."
+	::= { hwCdpComplianceGroups 4 }  
+
+END

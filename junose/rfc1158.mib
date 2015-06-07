@@ -1,0 +1,29 @@
+-- Note: This module was defined before there was a "Concise MIB Definitions"
+--       (RFC 1212) and therefore the OBJECT-TYPE definitions were not included.
+
+RFC1158-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        mgmt, OBJECT-TYPE, NetworkAddress, IpAddress,
+        Counter, Gauge, TimeTicks
+            FROM RFC1155-SMI;
+
+DisplayString ::=
+            OCTET STRING
+
+mib-2      OBJECT IDENTIFIER ::= { mgmt 1 }    -- MIB-II
+
+system     OBJECT IDENTIFIER ::= { mib-2 1 }
+interfaces OBJECT IDENTIFIER ::= { mib-2 2 }
+at         OBJECT IDENTIFIER ::= { mib-2 3 }
+ip         OBJECT IDENTIFIER ::= { mib-2 4 }
+icmp       OBJECT IDENTIFIER ::= { mib-2 5 }
+tcp        OBJECT IDENTIFIER ::= { mib-2 6 }
+udp        OBJECT IDENTIFIER ::= { mib-2 7 }
+egp        OBJECT IDENTIFIER ::= { mib-2 8 }
+-- cmot    OBJECT IDENTIFIER ::= { mib-2 9 }
+transmission OBJECT IDENTIFIER ::= { mib-2 10 }
+snmp       OBJECT IDENTIFIER ::= { mib-2 11 }
+
+END
+

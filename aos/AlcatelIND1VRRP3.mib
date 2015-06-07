@@ -1,0 +1,844 @@
+ALCATEL-IND1-VRRP3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Counter32, 
+        Integer32                           FROM SNMPv2-SMI
+
+        RowStatus, MacAddress,
+        TruthValue, TimeStamp               FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	softentIND1Vrrp                     FROM ALCATEL-IND1-BASE
+        ifIndex                             FROM IF-MIB
+        InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+
+	VrId                                FROM VRRP-MIB;
+
+
+alcatelIND1VRRP3MIB MODULE-IDENTITY
+    LAST-UPDATED "200704030000Z"
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Proprietary VRRP MIB definitions for simultaneous 
+             support of IPv4 and IPv6 protocols.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+	       or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION "200704030000Z"    -- 02 April 2007
+    DESCRIPTION "The latest version of this MIB Module."
+
+    ::= { softentIND1Vrrp 2 }
+
+
+
+--
+--  VRRP MIB Groups
+--
+
+alaVrrp3Operations  OBJECT IDENTIFIER ::= { alcatelIND1VRRP3MIB 1 }
+alaVrrp3Statistics  OBJECT IDENTIFIER ::= { alcatelIND1VRRP3MIB 2 }
+alaVrrp3Conformance OBJECT IDENTIFIER ::= { alcatelIND1VRRP3MIB 3 }
+
+--
+--  Start of MIB objects
+--
+
+alaVrrp3NotificationCntl  OBJECT-TYPE
+    SYNTAX       INTEGER {
+        enabled     (1),
+        disabled    (2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Indicates whether the VRRP-enabled router will generate
+         SNMP traps for events defined in this MIB. 'Enabled'
+         results in SNMP traps; 'disabled', no traps are sent."
+    DEFVAL { enabled }
+    ::= { alaVrrp3Operations 1 }
+
+--
+--  VRRP Operations Table
+--
+
+alaVrrp3OperTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AlaVrrp3OperEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Unified Operations table for a VRRP router which
+         consists of a sequence (i.e., one or more conceptual
+         rows) of 'alaVrrp3OperEntry' items."
+    ::= { alaVrrp3Operations 2 }
+
+alaVrrp3OperEntry OBJECT-TYPE
+    SYNTAX       AlaVrrp3OperEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry in the alaVrrp3OperTable containing the
+         operational characteristics of a virtual router. On a
+         VRRP router, a given virtual router is identified by a
+         combination of the IP version, VRID, and ifIndex.
+
+         Note that rows in this table can be distinguished on a
+         Multi-stacked device running both VRRP over IPv4 and
+         IPv6 interfaces.
+
+         Rows in the table cannot be modified unless the value
+         of 'alaVrrp3OperAdminState' is 'disabled' and the
+         'alaVrrp3OperState' has transitioned to
+         'initialize'"
+
+    INDEX    { alaVrrp3OperIpVersion, alaVrrp3OperVrId, 
+               ifIndex }
+    ::= { alaVrrp3OperTable 1 }
+
+AlaVrrp3OperEntry ::=
+    SEQUENCE {
+        alaVrrp3OperIpVersion
+            INTEGER,
+        alaVrrp3OperVrId
+            VrId,
+        alaVrrp3OperVirtualMacAddr
+            MacAddress,
+        alaVrrp3OperState
+            INTEGER,
+        alaVrrp3OperAdminState
+            INTEGER,
+        alaVrrp3OperPriority
+            Integer32,
+        alaVrrp3OperVersion
+            INTEGER,
+        alaVrrp3OperIpAddrCount
+            Integer32,
+        alaVrrp3OperMasterIpAddrType
+            InetAddressType,
+        alaVrrp3OperMasterIpAddr
+            InetAddress,
+        alaVrrp3OperPrimaryIpAddrType
+            InetAddressType,
+        alaVrrp3OperPrimaryIpAddr
+            InetAddress,
+        alaVrrp3OperAdvInterval
+            Integer32,
+        alaVrrp3OperPreemptMode
+            TruthValue,
+        alaVrrp3OperAcceptMode
+            TruthValue,
+        alaVrrp3OperUpTime
+            TimeStamp,
+        alaVrrp3OperRowStatus
+            RowStatus
+    }
+
+alaVrrp3OperIpVersion OBJECT-TYPE
+    SYNTAX       INTEGER {
+        ipv4     (1),
+        ipv6     (2)
+    }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This object contains the IP version on which this VRRP
+         instance is running."
+    ::= { alaVrrp3OperEntry 1 }
+
+alaVrrp3OperVrId OBJECT-TYPE
+    SYNTAX       VrId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This object contains the Virtual Router Identifier
+         (VRID)."
+    ::= { alaVrrp3OperEntry 2 }
+
+alaVrrp3OperVirtualMacAddr OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The virtual MAC address of the virtual router.
+         Although this object can be derived from the
+         'alaVrrp3OperVrId' object, it is defined so that it
+         is easily obtainable by a management application and
+         can be included in VRRP-related SNMP traps."
+    ::= { alaVrrp3OperEntry 3 }
+
+alaVrrp3OperState OBJECT-TYPE
+    SYNTAX       INTEGER {
+        initialize   (1),
+        backup       (2),
+        master       (3)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current state of the virtual router. This object
+         has three defined values:
+
+         - `initialize', which indicates that the
+           virtual router is waiting for a startup event.
+
+         - `backup', which indicates the virtual router is
+           monitoring the availability of the master router.
+
+         - `master', which indicates that the virtual router
+           is forwarding packets for IP addresses that are
+           associated with this router.
+
+         Setting the `alaVrrp3OperAdminState' object (below)
+         Initiates transitions in the value of this object."
+    ::= { alaVrrp3OperEntry 4 }
+
+alaVrrp3OperAdminState OBJECT-TYPE
+    SYNTAX       INTEGER {
+        up       (1),
+        down     (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object will enable/disable the virtual router
+         function. Setting the value to `up', will transition
+         the state of the virtual router from `initialize' to
+         `backup' or `master', depending on the value of
+         `alaVrrp3OperPriority'.
+
+         Setting the value to `down', will transition the
+         router from `master' or `backup' to `initialize'. State
+         transitions may not be immediate; they sometimes depend
+         on other factors, such as the interface (IF) state.
+
+         The `alaVrrp3OperAdminState' object must be set to
+         `down' prior to modifying the other read-create objects
+         in the conceptual row. The value of the
+         alaVrrp3OperRowStatus' object (below) must be
+         `active', signifying that the conceptual row is valid
+         (i.e., the objects are correctly set), in order for
+         this object to be set to `up'."
+    DEFVAL    { down }
+    ::= { alaVrrp3OperEntry 5 }
+
+alaVrrp3OperPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the priority to be used for the
+         virtual router master election process. Higher values
+         imply higher priority.
+
+         A priority of '0', although not settable, is sent by
+         the master router to indicate that this router has
+         ceased to participate in VRRP and a backup virtual
+         router should transition to become a new master.
+
+         A priority of 255 is used for the router that owns the
+         associated IP address(es)."
+    DEFVAL       { 100 }
+    ::= { alaVrrp3OperEntry 6 }
+
+alaVrrp3OperVersion OBJECT-TYPE
+    SYNTAX       INTEGER {
+        vrrpv2   (1),
+        vrrpv3   (2)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object contains the VRRP version this VRRP
+         instance is running."
+    ::= { alaVrrp3OperEntry 7 }
+
+alaVrrp3OperIpAddrCount OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of IP addresses associated with this
+         virtual router. This number is equal to the number
+         of rows in the alaVrrp3AssoIpAddrTable that
+         correspond to a given combination of IP version, 
+         VRID, and ifIndex."
+    ::= { alaVrrp3OperEntry 8 }
+
+alaVrrp3OperMasterIpAddrType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This specifies the type of
+         alaVrrp3OperMasterIpAddr in this row."
+    ::= { alaVrrp3OperEntry 9 }
+
+alaVrrp3OperMasterIpAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The master router's real (primary for vrrp over IPv4)
+         IP address. This is the IP address listed as the
+         source in the advertisement last received by this
+         virtual router.  For IPv6, a link local address."
+    ::= { alaVrrp3OperEntry 10 }
+
+alaVrrp3OperPrimaryIpAddrType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This specifies the the type of
+         alaVrrp3OperPrimaryIpAddr in this row."
+    ::= { alaVrrp3OperEntry 11 }
+
+alaVrrp3OperPrimaryIpAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "For VRRP over IPv6 this is the link local address 
+         for a given ifIndex.  For VRRP over IPv4, in the 
+         case where there is more than one IP address for
+         a given `ifIndex', this object is used to
+         specify the IP address that will become the
+         alaVrrp3OperMasterIpAddr', should the virtual router
+         transition from backup to master."
+    DEFVAL       { '00000000'H } -- 0.0.0.0 or ::
+    ::= { alaVrrp3OperEntry 12 }
+
+alaVrrp3OperAdvInterval OBJECT-TYPE
+    SYNTAX       Integer32 (1..4095)
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The time interval, in centiseconds, between sending
+         advertisement messages. Only the master router sends
+         VRRP advertisements."
+    DEFVAL       { 100 }
+    ::= { alaVrrp3OperEntry 13 }
+
+alaVrrp3OperPreemptMode OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Controls whether a higher priority virtual router will
+         preempt a lower priority master."
+    DEFVAL       { true }
+    ::= { alaVrrp3OperEntry 14 }
+
+alaVrrp3OperAcceptMode OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Controls whether a virtual router in the master state
+         will accept packets addressed to the address owner's 
+         IPv6 address as its own it it is not the IP address 
+         owner.
+         This is required only for rows indicating VRRP over IPv6.
+         This object can be sparse and should not be implemented
+         for rows indicating VRRP for Ipv4."
+    DEFVAL       { true }
+    ::= { alaVrrp3OperEntry 15 }
+
+alaVrrp3OperUpTime OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This is the value of the `sysUpTime' object when this
+         virtual router (i.e., the `alaVrrp3OperState') transitioned
+         out of `initialized'."
+    ::= { alaVrrp3OperEntry 16 }
+
+alaVrrp3OperRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status variable, used in accordance to
+         installation and removal conventions for conceptual
+         rows. The rowstatus of a currently active row in the
+         alaVrrp3OperTable is constrained by the operational
+         state of the corresponding virtual router.
+         When `alaVrrp3OperRowStatus' is set to active(1), no
+         other objects in the conceptual row, with the exception
+         of `alaVrrp3OperAdminState', can be modified. Prior
+         to setting the `alaVrrp3OperRowStatus' object from
+         `active' to a different value, the
+         `alaVrrp3OperAdminState' object must be set to
+         `down' and the `alaVrrp3OperState' object be transitioned
+         to `initialize'.
+
+         To create a row in this table, a manager sets this
+         object to either createAndGo(4) or createAndWait(5).
+         Until instances of all corresponding columns are
+         appropriately configured, the value of the
+         corresponding instance of the `alaVrrp3OperRowStatus'
+         column will be read as notReady(3).
+         In particular, a newly created row cannot be made
+         active(1) until (minimally) the corresponding instance
+         of `alaVrrp3OperVrId' has been set and there is at
+         least one active row in the `alaVrrp3AssoIpAddrTable'
+         defining an associated IP address for the virtual
+         router."
+    ::= { alaVrrp3OperEntry 17 }
+
+--
+--  VRRP Associated Address Table
+--
+
+alaVrrp3AssoIpAddrTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AlaVrrp3AssoIpAddrEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The table of addresses associated with this 
+         virtual router."
+    ::= { alaVrrp3Operations 3 }
+
+alaVrrp3AssoIpAddrEntry OBJECT-TYPE
+    SYNTAX       AlaVrrp3AssoIpAddrEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry in the table contains an IP address that is
+         associated with a virtual router. The number of rows
+         for a given IP version, VrId, and ifIndex will equal 
+         the number of IP addresses associated (e.g., backed
+         up) by the virtual router (equivalent to
+         'alaVrrp3OperIpAddrCount').
+
+         Rows in the table cannot be modified unless the value
+         of `alaVrrp3OperAdminState' is `disabled' and the
+         `alaVrrp3OperState' has transitioned to`initialize'."
+
+    INDEX    { alaVrrp3OperIpVersion, alaVrrp3OperVrId, ifIndex, 
+               alaVrrp3AssoIpAddrType, alaVrrp3AssoIpAddr }
+    ::= { alaVrrp3AssoIpAddrTable 1 }
+
+AlaVrrp3AssoIpAddrEntry ::=
+    SEQUENCE {
+        alaVrrp3AssoIpAddrType
+            InetAddressType,
+        alaVrrp3AssoIpAddr
+            InetAddress,
+        alaVrrp3AssoIpAddrRowStatus
+            RowStatus
+    }
+
+alaVrrp3AssoIpAddrType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The IP addresses type of alaVrrp3AssoIpAddr in this
+         row."
+    ::= { alaVrrp3AssoIpAddrEntry 1 }
+
+alaVrrp3AssoIpAddr OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The assigned IP addresses that a virtual router is
+         responsible for backing up."
+    ::= { alaVrrp3AssoIpAddrEntry 2 }
+
+alaVrrp3AssoIpAddrRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status variable, used according to
+         installation and removal conventions for conceptual
+         rows. Setting this object to active(1) or
+         createAndGo(4) results in the addition of an associated
+         address for a virtual router.
+
+         Destroying the entry or setting it to notInService(2)
+         removes the associated address from the virtual router.
+         The use of other values is implementation-dependent."
+    ::= { alaVrrp3AssoIpAddrEntry 3 }
+
+--
+--  VRRP Router Statistics
+--
+
+alaVrrp3RouterChecksumErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets received with an
+         invalid VRRP checksum value."
+    ::= { alaVrrp3Statistics 1 }
+
+alaVrrp3RouterVersionErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets received with an
+         unknown or unsupported version number."
+    ::= { alaVrrp3Statistics 2 }
+
+alaVrrp3RouterVrIdErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets received with an
+         invalid VRID for this virtual router."
+    ::= { alaVrrp3Statistics 3 }
+
+--
+--  VRRP Router Statistics Table
+--
+
+alaVrrp3RouterStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AlaVRRP3RouterStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Table of virtual router statistics."
+    ::= { alaVrrp3Statistics 4 }
+
+alaVrrp3RouterStatsEntry OBJECT-TYPE
+    SYNTAX       AlaVRRP3RouterStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry in the table, containing statistics
+         information about a given virtual router."
+    INDEX    { alaVrrp3OperIpVersion, alaVrrp3OperVrId, 
+               ifIndex }
+    ::= { alaVrrp3RouterStatsTable 1 }
+
+AlaVRRP3RouterStatsEntry ::=
+    SEQUENCE {
+        alaVrrp3StatsBecomeMaster
+            Counter32,
+        alaVrrp3StatsAdvertiseRcvd
+            Counter32,
+        alaVrrp3StatsAdvIntervalErrors
+            Counter32,
+        alaVrrp3StatsIpTtlErrors
+            Counter32,
+        alaVrrp3StatsPriZeroPktsRcvd
+            Counter32,
+        alaVrrp3StatsPriZeroPktsSent
+            Counter32,
+        alaVrrp3StatsInvldTypePktsRcvd
+            Counter32,
+        alaVrrp3StatsAddressListErrors
+            Counter32,
+        alaVrrp3StatsInvldAuthType
+            Counter32,
+        alaVrrp3StatsPacketLengthErrors
+            Counter32
+    }
+
+
+alaVrrp3StatsBecomeMaster OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of times that this virtual router's
+         state has transitioned to MASTER."
+    ::= { alaVrrp3RouterStatsEntry 1 }
+
+alaVrrp3StatsAdvertiseRcvd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP advertisements received by
+         this virtual router."
+    ::= { alaVrrp3RouterStatsEntry 2 }
+
+alaVrrp3StatsAdvIntervalErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP advertisement packets
+         received for which the advertisement interval is
+         different than the one configured for the local virtual
+         router."
+    ::= { alaVrrp3RouterStatsEntry 3 }
+
+alaVrrp3StatsIpTtlErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets received by the
+         virtual router with IP TTL (Time-To-Live) not equal to
+         255. It also indicates the number of VRRPv3 packets
+         received by the virtual router with IPv6 hop limit not
+         equal to 255."
+    ::= { alaVrrp3RouterStatsEntry 4 }
+
+alaVrrp3StatsPriZeroPktsRcvd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets received by the
+         virtual router with a priority of '0'."
+    ::= { alaVrrp3RouterStatsEntry 5 }
+
+alaVrrp3StatsPriZeroPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of VRRP packets sent by the virtual
+         router with a priority of '0'."
+    ::= { alaVrrp3RouterStatsEntry 6 }
+
+alaVrrp3StatsInvldTypePktsRcvd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of VRRP packets received by the virtual
+         router with an invalid value in the 'type' field."
+    ::= { alaVrrp3RouterStatsEntry 7 }
+
+alaVrrp3StatsAddressListErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of packets received for which the
+         address list does not match the locally configured list
+         for the virtual router."
+    ::= { alaVrrp3RouterStatsEntry 8 }
+
+alaVrrp3StatsInvldAuthType OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of packets received with 'Auth Type'
+         not equal to Authentication Type 0, No Authentication.
+         This is required only for rows indicating VRRP over IPv4.
+         This object can be sparse and should not be implemented
+         for rows indicating VRRP for Ipv6."
+    ::= { alaVrrp3RouterStatsEntry 9 }
+
+alaVrrp3StatsPacketLengthErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of packets received with a packet
+         length less than the length of the VRRP header."
+    ::= { alaVrrp3RouterStatsEntry 10 }
+
+--
+--   Trap Definitions
+--
+
+alaVrrp3Notifications   OBJECT IDENTIFIER ::= { alcatelIND1VRRP3MIB 0 }
+
+---
+--- Objects used in the traps
+---
+
+alaVrrp3TrapNewMasterReason OBJECT-TYPE
+    SYNTAX        INTEGER {
+        priority         (0),
+        preempted        (1),
+        masterNoResponse (2)
+    }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This indicates the reason for NewMaster trap.
+         Used by alaVrrp3TrapNewMaster trap."
+    ::= { alaVrrp3Operations 4 }
+
+alaVrrp3TrapProtoErrReason OBJECT-TYPE
+    SYNTAX        INTEGER {
+        hopLimitError (0),
+        versionError  (1),
+        checksumError (2),
+        vridError     (3)
+    }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This indicates the reason for protocol error trap.
+         Used by alaVrrp3TrapProtoError trap."
+    ::= { alaVrrp3Operations 5 }
+
+
+alaVrrp3TrapNewMaster NOTIFICATION-TYPE
+    OBJECTS      { alaVrrp3OperMasterIpAddrType,
+                   alaVrrp3OperMasterIpAddr,
+                   alaVrrp3TrapNewMasterReason
+                 }
+    STATUS       current
+    DESCRIPTION
+        "The newMaster trap indicates that the sending agent
+         has transitioned to 'Master' state."
+    ::= { alaVrrp3Notifications 1 }
+
+alaVrrp3TrapProtoError NOTIFICATION-TYPE
+    OBJECTS      { alaVrrp3TrapProtoErrReason
+                 }
+    STATUS       current
+    DESCRIPTION
+        "The error trap indicates that the sending agent has
+         encountered the protocol error indicated by
+         ErrorReason."
+    ::= { alaVrrp3Notifications 2 }
+
+
+--
+--  Conformance Information
+--
+
+alaVrrp3MIBCompliances  OBJECT IDENTIFIER ::= { alaVrrp3Conformance 1 }
+alaVrrp3MIBGroups       OBJECT IDENTIFIER ::= { alaVrrp3Conformance 2 }
+
+--
+-- Compliance Statements
+--
+
+
+alaVrrp3MIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+	"The compliance statement for switches with Alcatel VRRP and
+	implementing ALCATEL-IND1-VRRP3-MIB."
+
+    MODULE -- this module
+    MANDATORY-GROUPS  {
+        alaVrrp3OperGroup,
+        alaVrrp3StatsGroup,
+        alaVrrp3TrapInfoGroup,
+        alaVrrp3NotificationsGroup
+    }
+
+    OBJECT        alaVrrp3OperPriority
+    WRITE-SYNTAX  Integer32 (1..255)
+    DESCRIPTION  "SETable values are from 1 to 255."
+    ::= { alaVrrp3MIBCompliances 1 }
+
+--
+-- Conformance Groups
+--
+
+alaVrrp3OperGroup   OBJECT-GROUP
+    OBJECTS  {
+        alaVrrp3NotificationCntl,
+        alaVrrp3OperVirtualMacAddr,
+        alaVrrp3OperState,
+        alaVrrp3OperAdminState,
+        alaVrrp3OperPriority,
+        alaVrrp3OperVersion,
+        alaVrrp3OperIpAddrCount,
+        alaVrrp3OperMasterIpAddrType,
+        alaVrrp3OperMasterIpAddr,
+        alaVrrp3OperPrimaryIpAddrType,
+        alaVrrp3OperPrimaryIpAddr,
+        alaVrrp3OperAdvInterval,
+        alaVrrp3OperPreemptMode,
+        alaVrrp3OperAcceptMode,
+        alaVrrp3OperUpTime,
+        alaVrrp3OperRowStatus,
+        alaVrrp3AssoIpAddrRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel VRRP."
+    ::= { alaVrrp3MIBGroups 1 }
+
+alaVrrp3StatsGroup  OBJECT-GROUP
+    OBJECTS  {
+        alaVrrp3RouterChecksumErrors,
+        alaVrrp3RouterVersionErrors,
+        alaVrrp3RouterVrIdErrors,
+        alaVrrp3StatsBecomeMaster,
+        alaVrrp3StatsAdvertiseRcvd,
+        alaVrrp3StatsAdvIntervalErrors,
+        alaVrrp3StatsPriZeroPktsRcvd,
+        alaVrrp3StatsPriZeroPktsSent,
+        alaVrrp3StatsInvldTypePktsRcvd,
+        alaVrrp3StatsInvldAuthType,
+        alaVrrp3StatsIpTtlErrors,
+        alaVrrp3StatsAddressListErrors,
+        alaVrrp3StatsPacketLengthErrors
+    }
+    STATUS current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel VRRP."
+    ::= { alaVrrp3MIBGroups 2 }
+
+alaVrrp3TrapInfoGroup  OBJECT-GROUP
+    OBJECTS  {
+        alaVrrp3TrapNewMasterReason,
+        alaVrrp3TrapProtoErrReason
+    }
+    STATUS current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel VRRP."
+    ::= { alaVrrp3MIBGroups 3 }
+
+alaVrrp3NotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alaVrrp3TrapNewMaster,
+        alaVrrp3TrapProtoError
+    }
+    STATUS current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel VRRP."
+    ::= { alaVrrp3MIBGroups 4 }
+
+END
+

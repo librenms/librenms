@@ -1,0 +1,681 @@
+
+-- *****************************************************************************
+-- Juniper-LOG-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for Logging Management
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-LOG-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32, Counter32,
+    Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, TimeStamp,
+    DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniLogSeverity
+        FROM Juniper-TC;
+    
+juniLogMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Logging Facility MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103161902Z"  -- 16-Mar-01 02:02 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION    "200003270500Z"  -- 27-Mar-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Replace single syslog destination with table of syslog destinations,
+        and add syslog facility as an attribute for syslogs."
+    REVISION    "9911080000Z"    --  8-Nov-99               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 28 }
+
+--
+-- Brief Description of Logging Facility Model
+--
+-- A system application may support one or more logging categories.  Each
+-- category can be separately configured for severity and verbosity levels of
+-- the logging messages it generates in reponse to category-specific events.
+-- The severity level filters the generation of messages; the verbosity level
+-- controls the content of each generated message.  Each category is resource-
+-- limited in the rate of messages it can generate, thus high event volume in
+-- one category will not exhaust common resources to the extent that other log
+-- categories are starved.
+-- 
+-- Generated log messages are recorded into a central circular repository,
+-- called the log message table.  Each such recorded message is examined and can
+-- be sent to as many as three logging destinations:  network-based SYSLOG 
+-- server; local console; and local nonvolatile log file.  Each of these
+-- destinations is separately configurable for severity level of messages it
+-- wishes to receive.
+--
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniLogCatName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION
+        "The name of a log category.  Represents textual information taken from
+        the NVT ASCII character set."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE (1..32))
+
+JuniLogVerbosity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The log verbosity level. Not all event types
+        offer medium- or high-verbosity levels of detail."
+    SYNTAX      INTEGER {   
+                    low(0),
+                    medium(1),
+                    high(2) }
+
+JuniLogSyslogFacility ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The syslog daemon facility id."
+    SYNTAX      INTEGER {
+                    local0(0),
+                    local1(1),
+                    local2(2),
+                    local3(3),
+                    local4(4),
+                    local5(5),
+                    local6(6),
+                    local7(7) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniLogObjects        OBJECT IDENTIFIER ::= { juniLogMIB 1 }
+
+juniLogDestinations   OBJECT IDENTIFIER ::= { juniLogObjects 1 }
+juniLogCategories     OBJECT IDENTIFIER ::= { juniLogObjects 2 }
+juniLogMessages       OBJECT IDENTIFIER ::= { juniLogObjects 3 }
+
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+-- Log Destinations
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+juniLogDestSyslog         OBJECT IDENTIFIER ::= { juniLogDestinations 1 }
+juniLogDestConsole        OBJECT IDENTIFIER ::= { juniLogDestinations 2 }
+juniLogDestNvFile         OBJECT IDENTIFIER ::= { juniLogDestinations 3 }
+
+--
+-- SYSLOG server log destination
+--
+-- Scalar objects supporting a single syslog destination are obsoleted in favor
+-- of a table of syslog destinations.
+--
+juniLogDestSyslogSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity   
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The minimum severity level of messages sent to the SYSLOG server.  A
+        value of 'off' indicates no log messages are sent to this destination."
+    ::= { juniLogDestSyslog 1 }
+
+juniLogDestSyslogAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the SYSLOG server to which log messages are to be
+        sent.  A value of 0.0.0.0 indicates no server address is configured."
+    ::= { juniLogDestSyslog 2 }
+
+juniLogSyslogTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the characteristics of each syslog destination."
+    ::= { juniLogDestSyslog 3 }
+
+juniLogSyslogEntry OBJECT-TYPE
+    SYNTAX      JuniLogSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describingthe characteristics of a syslog destination."
+    INDEX     { juniLogSyslogIpAddress }
+    ::= { juniLogSyslogTable 1 }
+
+JuniLogSyslogEntry ::= SEQUENCE {
+    juniLogSyslogIpAddress  IpAddress,
+    juniLogSyslogRowStatus  RowStatus,
+    juniLogSyslogSeverity   JuniLogSeverity,
+    juniLogSyslogFacility   JuniLogSyslogFacility }
+
+juniLogSyslogIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of this syslog destination.  This value must be a
+        unicast IP address."
+    ::= { juniLogSyslogEntry 1 }
+
+juniLogSyslogRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table.  Only
+        'createAndGo' and 'destroy' are supported."
+    ::= { juniLogSyslogEntry 2 }
+
+juniLogSyslogSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The severity level for this syslog destination.  Setting this value to
+        'off' suppresses log messages from being sent to this syslog
+        destination."
+    DEFVAL    { off }
+    ::= { juniLogSyslogEntry 3 }
+
+juniLogSyslogFacility OBJECT-TYPE
+    SYNTAX      JuniLogSyslogFacility
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The facility id attached to messages sent to this syslog destination."
+    DEFVAL    { local7 }
+    ::= { juniLogSyslogEntry 4 }
+
+
+--
+-- Local console log destination
+--
+juniLogDestConsoleSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity   
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum severity level of messages sent to the console.  A value of
+        'off' indicates no log messages are sent to this destination."
+    ::= { juniLogDestConsole 1 }
+
+
+--
+-- Local nonvolatile file log destination
+--
+juniLogDestNvFileSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity   
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum severity level of messages sent to the nonvolatile log
+        file.  A value of 'off' indicates no log messages are to be sent to this
+        destination."
+    ::= { juniLogDestNvFile 1 }
+
+
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+-- Log Categories
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+juniLogCatScalars        OBJECT IDENTIFIER ::= { juniLogCategories 1 }
+-- reserved for attributes pertaining to all logs
+
+-- 
+-- Log Category Table
+-- 
+juniLogCatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogCatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the characteristics of each log category."
+    ::= { juniLogCategories 2 }
+
+juniLogCatEntry OBJECT-TYPE
+    SYNTAX      JuniLogCatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the characteristics of a log category." 
+    INDEX   { juniLogCatIndex }
+    ::= { juniLogCatTable 1 }
+
+JuniLogCatEntry ::= SEQUENCE {
+    juniLogCatIndex         Integer32,
+    juniLogCatName          JuniLogCatName,
+    juniLogCatDescr         DisplayString,
+    juniLogCatEngineering   TruthValue,
+    juniLogCatDiscards      Counter32,
+    juniLogCatSeverity      JuniLogSeverity,
+    juniLogCatVerbosity     JuniLogVerbosity }
+
+juniLogCatIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An integer index uniquely associated with a log.
+
+        Index values do not necessarily persist across system reboots.
+        Following reboot, mappings of (reboot-invariant) log category names to
+        log index values is available in the juniLogCatNameTable."
+    ::= { juniLogCatEntry 1 }
+
+juniLogCatName OBJECT-TYPE
+    SYNTAX      JuniLogCatName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this log category."
+    ::= { juniLogCatEntry 2 }
+
+juniLogCatDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A description of the functionality for which events are recorded by
+        this log category."
+    ::= { juniLogCatEntry 3 }
+
+juniLogCatEngineering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether this log is intended mainly for engineering
+        development and debug purposes."
+    ::= { juniLogCatEntry 4 }
+
+juniLogCatDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of messages generated by this log category that were
+        discarded because of resource limitations."
+    ::= { juniLogCatEntry 5 }
+
+juniLogCatSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The severity level for this log category. 
+
+        The value 'off' disables recording of this log category's messages.  For
+        other severity level values, only messages at or above this severity
+        level will be logged in juniLogMsgTable."
+    ::= { juniLogCatEntry 6 }
+
+juniLogCatVerbosity OBJECT-TYPE
+    SYNTAX      JuniLogVerbosity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The verbosity level for this log category.
+
+        Supplementary information may be available for certain event types.
+        This object controls whether that additional information, if available
+        for a given event, is recorded."
+    ::= { juniLogCatEntry 7}
+
+
+--
+-- Log Category Name Table
+--
+juniLogCatNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogCatNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table mapping each log category's name to its index."
+    ::= { juniLogCategories 3 }
+
+juniLogCatNameEntry OBJECT-TYPE
+    SYNTAX      JuniLogCatNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry mapping a log category's name to its index."
+    INDEX     { IMPLIED juniLogCatNameName }
+    ::= { juniLogCatNameTable 1 }
+
+JuniLogCatNameEntry ::= SEQUENCE {
+    juniLogCatNameName      JuniLogCatName,
+    juniLogCatNameIndex     Integer32 }
+
+juniLogCatNameName OBJECT-TYPE
+    SYNTAX      JuniLogCatName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the log category."
+    ::= { juniLogCatNameEntry 1 }
+
+juniLogCatNameIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The log index associated with this log category."
+    ::= { juniLogCatNameEntry 2 }
+
+
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+-- Log Messages
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+--
+-- Log Message Scalars
+--
+juniLogMsgScalars     OBJECT IDENTIFIER   ::= { juniLogMessages 1 }
+
+juniLogMsgCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum capacity, in number of log messages, of the
+        juniLogMsgTable."
+    ::= { juniLogMsgScalars 1 }
+
+juniLogMsgLastSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of the most recent juniLogMsgTable entry.
+
+        By monitoring this object's rate of change in relation to the
+        juniLogMsgTable capacity, a management client can determine whether it
+        is polling juniLogMsgTable frequently enough to avoid missing log
+        messages."
+    ::= { juniLogMsgScalars 2 }
+
+
+--
+-- Log Message Table
+--
+juniLogMsgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogMsgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of log messages generated by this device."
+    ::= { juniLogMessages 2 }
+
+juniLogMsgEntry OBJECT-TYPE
+    SYNTAX      JuniLogMsgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A log message generated by this device."
+    INDEX     { juniLogMsgSysUpTimeStamp,
+                juniLogMsgSequenceNumber }
+    ::= { juniLogMsgTable 1 }
+
+JuniLogMsgEntry ::= SEQUENCE {
+    juniLogMsgSysUpTimeStamp    TimeStamp,
+    juniLogMsgSequenceNumber    Unsigned32,
+    juniLogMsgCatName           JuniLogCatName,
+    juniLogMsgCatIndex          Integer32,
+    juniLogMsgSeverity          JuniLogSeverity,
+    juniLogMsgText              DisplayString,
+    juniLogMsgDateAndTimeStamp  DateAndTime }
+
+juniLogMsgSysUpTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this log message was recorded."
+    ::= { juniLogMsgEntry 1 }
+
+juniLogMsgSequenceNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A sequence number that uniquely identifies this entry.  Sequence
+        numbers are assigned consecutively beginning with 1.  More recent
+        entries have higher sequence numbers."
+    ::= { juniLogMsgEntry 2 }
+
+juniLogMsgCatName OBJECT-TYPE
+    SYNTAX      JuniLogCatName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the log category that contributed this message."
+    ::= { juniLogMsgEntry 3 }
+
+juniLogMsgCatIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of the log category that contributed this message."
+    ::= { juniLogMsgEntry 4 }
+
+juniLogMsgSeverity OBJECT-TYPE
+    SYNTAX      JuniLogSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the message."
+    ::= { juniLogMsgEntry 5 }
+
+juniLogMsgText  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The text of the log message.
+        
+        Truncation of log message text is indicated by n asterisk character
+        ('*') in the last octet of a maximum-size string."
+    ::= { juniLogMsgEntry 6 }
+
+juniLogMsgDateAndTimeStamp  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time this message was generated."
+    ::= { juniLogMsgEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniLogTrapControl      OBJECT IDENTIFIER ::= { juniLogMIB 2 }
+
+juniLogMsgThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of log messages which, when added to juniLogMsgTable, cause a
+        juniLogMsgThresholdTrap to be generated.
+        
+        This value is expressed as a percentage of the capacity of
+        juniLogMsgTable.  A value of zero disables trap generation."
+    ::= { juniLogTrapControl 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The following OBJECT IDENTIFIERS is used to define SNMPv2 
+-- Notifications that are easily translated into SNMPv1 Traps.
+juniLogTrapPrefix         OBJECT IDENTIFIER ::= { juniLogMIB 0 }
+
+juniLogMsgThresholdTrap NOTIFICATION-TYPE
+    OBJECTS {
+        juniLogMsgCapacity,
+        juniLogMsgLastSeqNumber,
+        juniLogMsgThreshold }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated to report that an incremental number of log
+        messages (described by the value of juniLogMsgThreshold) have been added
+        to juniLogMsgTable."
+    ::= { juniLogTrapPrefix 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniLogMIBConformance  OBJECT IDENTIFIER ::= { juniLogMIB 4 }
+juniLogMIBCompliances  OBJECT IDENTIFIER ::= { juniLogMIBConformance 1 }
+juniLogMIBGroups       OBJECT IDENTIFIER ::= { juniLogMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniLogCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+
+        "Obsolete compliance statement for entities which implement the Juniper
+        Networks Log MIB.  This statement became obsolete when support for
+        multiple SYSLOGs was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniLogGroup }
+    ::= { juniLogMIBCompliances 1 }                                -- JUNOSe 1.3
+
+juniLogCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Networks Log MIB, including support for multiple SYSLOG destinations."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniLogGroup2,
+            juniLogTrapGroup }
+    ::= { juniLogMIBCompliances 2 }                                -- JUNOSe 2.0
+
+--
+-- units of conformance
+--
+juniLogGroup  OBJECT-GROUP
+    OBJECTS {
+        -- log destinations
+        juniLogDestSyslogSeverity,
+        juniLogDestSyslogAddress,
+        juniLogDestConsoleSeverity,
+        juniLogDestNvFileSeverity,
+
+        -- log categories
+        juniLogCatName,
+        juniLogCatDescr,
+        juniLogCatEngineering,
+        juniLogCatDiscards,
+        juniLogCatSeverity,
+        juniLogCatVerbosity,
+
+        -- log category names
+        juniLogCatNameName,
+        juniLogCatNameIndex,
+
+        -- log message scalars
+        juniLogMsgCapacity,
+        juniLogMsgLastSeqNumber,
+
+        -- log messages
+        juniLogMsgCatName,
+        juniLogMsgCatIndex,
+        juniLogMsgSeverity,
+        juniLogMsgText,
+        juniLogMsgDateAndTimeStamp,
+
+        -- trap control
+        juniLogMsgThreshold }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of Juniper Networks
+        logging capabilities.  This group became obsolete when support for
+        multiple SYSLOGs was added."
+    ::= { juniLogMIBGroups 1 }
+    
+juniLogGroup2  OBJECT-GROUP
+    OBJECTS {
+        -- log destinations
+        juniLogSyslogRowStatus,
+        juniLogSyslogSeverity,
+        juniLogSyslogFacility,
+        juniLogDestConsoleSeverity,
+        juniLogDestNvFileSeverity,
+
+        -- log categories
+        juniLogCatName,
+        juniLogCatDescr,
+        juniLogCatEngineering,
+        juniLogCatDiscards,
+        juniLogCatSeverity,
+        juniLogCatVerbosity,
+
+        -- log category names
+        juniLogCatNameName,
+        juniLogCatNameIndex,
+
+        -- log message scalars
+        juniLogMsgCapacity,
+        juniLogMsgLastSeqNumber,
+
+        -- log messages
+        juniLogMsgCatName,
+        juniLogMsgCatIndex,
+        juniLogMsgSeverity,
+        juniLogMsgText,
+        juniLogMsgDateAndTimeStamp,
+
+        -- trap control
+        juniLogMsgThreshold }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Juniper Networks
+        logging capabilities, including support for multiple SYSLOG
+        destinations."
+    ::= { juniLogMIBGroups 2 }
+    
+juniLogTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniLogMsgThresholdTrap }
+    STATUS      current
+    DESCRIPTION
+        "A management notification pertaining to logging operations."
+    ::= { juniLogMIBGroups 3 }
+
+END

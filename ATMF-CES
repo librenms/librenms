@@ -1,0 +1,924 @@
+ATMF-CES DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises                                 FROM RFC1155-SMI
+    OBJECT-TYPE, MODULE-IDENTITY, Counter32,
+    Gauge32                                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus               FROM SNMPv2-TC
+    InterfaceIndex                              FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF;
+
+atmfCES MODULE-IDENTITY
+    LAST-UPDATED "9611050000Z"
+    ORGANIZATION "ATM Forum Circuit Emulation Working Group"
+    CONTACT-INFO "The ATM Forum
+                  2570 West El Camino Real, Suite 304
+                  Mountain View, CA 94040-1313 USA
+                  Phone: +1 415-949-6700
+                  Fax:   +1 415-949-6705
+                  info@atmforum.com"
+    DESCRIPTION  "The MIB module used to describe the
+                  Circuit Emulation Interworking Function
+                  (Version 2.0)"
+    REVISION     "9502030000Z"
+    DESCRIPTION  "The MIB Module to describe the DS1/E1Circuit
+                  Emulation Interworking Function (Version 1.0)
+                  Note: The new Version 2 CES MIB replaces this earlier
+                  Version 1 CES MIB which exists as the (deprecated)
+                  first branch from the overall atmfCESmib object."
+::= { atmfCESmib 2 } 
+
+atmForum                    OBJECT IDENTIFIER ::= { enterprises 353 }
+atmForumNetworkManagement   OBJECT IDENTIFIER ::= {atmForum 5 }
+atmfCESmib      OBJECT IDENTIFIER ::= { atmForumNetworkManagement 2 }
+
+-- An OBJECT IDENTIFIER for all ATM Forum circuit emulation MIBs
+-- has been assigned as a branch from the ATM Forum Network
+-- Management tree.  This MIB for the version 2 ATM Forum Circuit
+-- Emulation specification is attached as the second branch from the
+-- overall atmfCESmib object.
+
+
+-- The following TEXTUAL-CONVENTIONS are used to link the CES
+-- interworking function to ATM interface port, plus the
+-- associated VPI and VCI.
+
+VpiInteger ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An integer large enough to hold a VPI"
+    SYNTAX     INTEGER (0..4095)
+
+VciInteger ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An integer large enough to hold a VCI"
+    SYNTAX     INTEGER (0..65535)
+
+CESConnectionPort ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION 
+        "Indicates the port associated with a Circuit Emulation
+         connection.  Objects of this type are always defined as
+         part of a set that includes
+            fooPort       CESConnectionPort
+            fooVpi        VpiInteger
+            fooVci        VciInteger
+         The interpretation of these objects is as follows:
+         1. If no connection exists, 'fooPort' has a value of 0.
+            Because Interface table entries always have 'ifIndex'
+            values greater than 0, 'fooPort' reliably serves as a
+            'connection exists' flag.
+            If no connection exists, 'fooVpi' and 'fooVci' are 
+            not relevant and have a value of 0.
+         2. If a PVC or SVC exists, 'fooPort' is defined to have
+            the value of the MIB-II/RFC1573 'ifIndex' of the ATM
+            interface associated with the VCC.  The ifType
+            associated with such an ifIndex value is either
+            atm(37) or atmLogical(80). 'fooVpi' and 'fooVci'
+            will contain its VPI/VCI."
+    SYNTAX     INTEGER (0..2147483647)
+
+AtmAddr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS  current
+    DESCRIPTION
+        "The ATM address used by the network entity.  The address
+         types are: no address (0 octets), E.164 (8 octets), and
+         NSAP-encoded ATM Endsystem Address (20 octets).
+         Note: The E.164 address is encoded in BCD format."
+    SYNTAX  OCTET STRING (SIZE(0|8|20))
+
+
+-- This is the MIB module for the ATM Forum Circuit Emulation
+-- Service Interoperability Specification Version 2.0.
+-- 
+-- This MIB contains four tables:
+--    CES Configuration Table
+--    CES Mapping Table
+--    CES Statistics Table
+--    CES Active SVC Table
+
+
+-- CES Configuration Table
+
+atmfCESObjects  OBJECT IDENTIFIER ::= {atmfCES 1}
+
+atmfCESConfTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AtmfCESConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The CES configuration table used to manage interworking
+         between CBR interfaces or channels and ATM Virtual Channel
+         Links (VCLs).  The reverse mapping is shown in the
+         atmfCESMappingTable."
+    ::= { atmfCESObjects  1 }
+
+atmfCESConfEntry    OBJECT-TYPE
+    SYNTAX  AtmfCESConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry in the CES configuration table.  There is one
+         entry in the table per CES entity, mapping one CBR
+         interface, channel, or bundle to an ATM VCL.
+
+         Creation of a row in this table with a non-zero
+         atmfCESAtmIndex causes a corresponding entry in the
+         atmVclTable of the ATM-MIB (RFC1695) to be created."
+    INDEX   { atmfCESCbrIndex }
+    ::= { atmfCESConfTable 1 }
+
+AtmfCESConfEntry ::= SEQUENCE  {
+    atmfCESCbrIndex                   InterfaceIndex,
+    atmfCESAtmIndex                   CESConnectionPort,
+    atmfCESAtmVpi                     VpiInteger,
+    atmfCESAtmVci                     VciInteger,
+    atmfCESCbrService                 INTEGER,
+    atmfCESCbrClockMode               INTEGER,
+    atmfCESCas                        INTEGER,
+    atmfCESPartialFill                INTEGER,
+    atmfCESBufMaxSize                 INTEGER,
+    atmfCESCdvRxT                     INTEGER,
+    atmfCESCellLossIntegrationPeriod  INTEGER,
+    atmfCESConnType                   INTEGER,
+    atmfCESLocalAddr                  AtmAddr,
+    atmfCESAdminStatus                INTEGER,
+    atmfCESOperStatus                 INTEGER,
+    atmfCESConfRowStatus              RowStatus
+    }
+
+atmfCESCbrIndex         OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The value of this object is equal to MIB II's ifIndex value
+         of the CBR interface, channel, or bundle that is being
+         cross-connected to an ATM VCL."
+    ::= { atmfCESConfEntry 1 }
+
+atmfCESAtmIndex         OBJECT-TYPE
+    SYNTAX        CESConnectionPort
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The value of this object is equal to MIB II's
+         ifIndex value of the ATM Port interface mapped 
+         through this CES IWF to a CBR interface.  This value
+         is overwritten whenever an active or passive SVC is
+         established.
+
+         The distinguished value zero indicates that no ATM
+         interface has been specified."
+    ::= { atmfCESConfEntry 2 }
+
+atmfCESAtmVpi           OBJECT-TYPE
+    SYNTAX        VpiInteger
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The value of this object is equal to the VPI used
+         by the ATM VCL mapped through this CES IWF to a CBR
+         interface.  This value is overwritten whenever an
+         active or passive SVC is established.
+
+         The value is not relevant if no ATM interface has been
+         specified (i.e., atmfCESAtmIndex is set to zero)."
+    ::= { atmfCESConfEntry 3 }
+
+atmfCESAtmVci           OBJECT-TYPE
+    SYNTAX        VciInteger
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The value of this object is equal to the VCI used
+         by the ATM VCL mapped through this CES IWF to a CBR
+         interface.  This value is overwritten whenever an
+         active or passive SVC is established.
+
+         The distinguished value zero indicates that no ATM
+         VCL has been specified."
+    ::= { atmfCESConfEntry 4 }
+
+atmfCESCbrService       OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      unstructured(1),
+                      structured(2)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Define if DSx/Ex service isas structured or unstructurednot. A
+         structured(2) interface is some nx64kbKbps. An unstructured
+         (1) interface is 1.544Mbps, 2.048Mbps, 6.312Mbps, 44.736 Mbps,
+         or 34.368 Mbps. unstructured(1) passes all bits through the
+         ATM network.  strucutured(2) passes data bits through the
+         ATM network, and may also pass signalling bits
+         
+         At this time, only unstructured mode is defined for the
+         44.736 Mbps and 34.368 Mbps services."
+    ::= { atmfCESConfEntry 5 }
+
+atmfCESCbrClockMode     OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      synchronous(1),
+                      srts(2),
+                      adaptive(3)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Define if DSx/Ex service clocking mode. This maps into
+         transmit clock source of CBR interface.
+
+         For structured modes this value, if present, must be set to
+         synchronous(1)."
+    DEFVAL { synchronous } 
+    ::= { atmfCESConfEntry 6 }
+
+atmfCESCas      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      basic(1),
+                      e1Cas(2),
+                      ds1SfCas(3),
+                      ds1EsfCas(4),
+                      j2Cas(5)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This parameter selects which AAL1 Format should be used:
+         Basic does not carry CAS bits, and uses a single 125 usec frame.
+         e1Cas, ds1SfCas, dS1EsfCas and j2Cas carry CAS bits in a
+         multiframe structure for E1, DS1 SF, DS1 ESF and J2 
+         respectively.
+         This applies to structured interfaces only. Default is
+         basic (1). For unstructured interfaces this value, if present,
+         must be set to the default of basic (1)."
+    DEFVAL { basic } 
+    ::= { atmfCESConfEntry 7 }
+
+atmfCESPartialFill     OBJECT-TYPE
+    SYNTAX        INTEGER (0 .. 47)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "If partial cell fill is used, the number of user octets per
+         cell must be set with this parameter.  Setting this parameter
+         to zero disables partial cell fill, and causes all cells to
+         be completely filled before they are sent."
+    DEFVAL { 0 } -- Partial Cell Fill not used
+    ::= { atmfCESConfEntry 8 }
+
+atmfCESBufMaxSize      OBJECT-TYPE
+    SYNTAX        INTEGER  (1..65536)
+    UNITS         "10 usec"
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Define maximum size in 10 microsecond increments of the
+          reassembly buffer. Some implementations may want allow the
+          maximum buffer size to be programmed to a size less than the
+          physical limit to reduce the maximum delay through a circuit."
+    DEFVAL { 128 } 
+    ::= { atmfCESConfEntry 9 }
+
+atmfCESCdvRxT         OBJECT-TYPE
+    SYNTAX        INTEGER  (1..65535)
+    UNITS         "10 usec"
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The maximum cell arrival jitter in 10 usec increments that 
+         the reassembly process will tolerate in the cell stream
+         without producing errors on the CBR service interface."
+    DEFVAL { 100 } 
+    ::= { atmfCESConfEntry 10 }
+
+atmfCESCellLossIntegrationPeriod   OBJECT-TYPE
+    SYNTAX        INTEGER  (1000 .. 65535)
+    UNITS         "msec"
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The time in milliseconds for the cell loss integration period. 
+         If a cells are continuously lost for this period of time,
+         atmfCESCellLossStatus is set to loss (2). The
+         default definition is 2500."
+    DEFVAL { 2500 } 
+    ::= { atmfCESConfEntry 11 }
+
+atmfCESConnType              OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      other(1),
+                      pvc(2),
+                      activeSvc(3),
+                      passiveSvc(4)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The type of ATM connectivity between associated CES IWF's.
+         Valid values are:
+            other      - none of the types specified below
+            pvc        - supporting connectivity is a permanent
+                         virtual connection
+            activeSvc  - attempt calls whenever none established
+            passiveSvc - accept calls"
+    ::= { atmfCESConfEntry 12 }
+
+atmfCESLocalAddr              OBJECT-TYPE
+    SYNTAX        AtmAddr
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The ATM address of the local CES IWF process. This address
+         may be used by the automatic SVC establishment procedures to
+         identify the intended recipient CES IWF of an incoming automatic
+         SVC call request. Optionally, the MAX-ACCESS of this object
+         may be read-only, for those implementations where it is
+         not desired to manually configure this address."
+    ::= { atmfCESConfEntry 13 }
+
+atmfCESAdminStatus           OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      up(1),
+                      down(2)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The desired administrative status of the CES interworking
+         function.  The up and down states indicate that the traffic
+         flow is enabled or disabled respectively across the CES
+         interworking function."
+    ::= { atmfCESConfEntry 14 }
+
+atmfCESOperStatus            OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      up(1),
+                      down(2),
+                      unknown(3)
+                      }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The operational status of the CES interworking function.
+         The up and down states indicate that the traffic flow is
+         enabled or disabled respectively across the CES interworking
+         function.  The unknown state indicates that the state of the
+         CES interworking function cannot be determined.  The state
+         will be down or unknown if the supporting CBR or ATM
+         interfaces are down or unknown, respectively."
+    ::= { atmfCESConfEntry 15 }
+
+atmfCESConfRowStatus         OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This object is used to create new rows in this table, modify
+         existing rows, and to delete existing rows."
+    ::= { atmfCESConfEntry 16 }
+
+
+-- CES Mapping Table
+
+atmfCESMappingTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtmfCESMappingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The CES mapping table used to show the mapping from ATM
+         VCLs to CBR interfaces or channels.  The mapping and
+         interworking functions are configured in the
+         atmfCESConfTable."
+    ::= { atmfCESObjects 2 }
+
+atmfCESMappingEntry    OBJECT-TYPE
+    SYNTAX        AtmfCESMappingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the CES mapping table.  There is one entry
+         in the table corresponding to each active row in the
+         atmfCESConfTable for which there is a non-zero
+         atmfCESAtmIndex."
+    INDEX   { atmfCESAtmIndex,
+              atmfCESAtmVpi,
+              atmfCESAtmVci }
+    ::= { atmfCESMappingTable 1 }
+
+AtmfCESMappingEntry ::= SEQUENCE  {
+    atmfCESMappingCbrIndex               InterfaceIndex
+    }
+
+atmfCESMappingCbrIndex     OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of this object is equal to MIB II's ifIndex value
+         of the CBR interface, channel, or bundle that is being
+         cross-connected to an ATM VCL.  Examples of the ifType
+         value for the CBR entity are ds1(18), ds3(30), ds0(81), or
+         ds0bundle(82)."
+    ::= { atmfCESMappingEntry 1 }
+
+
+-- CES Statistics Table
+
+atmfCESStatsTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtmfCESStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The CES AAL1 statistical data table."
+    ::= { atmfCESObjects 3 }
+
+atmfCESStatsEntry    OBJECT-TYPE
+    SYNTAX        AtmfCESStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the CES AAL1 Stats table.  There is one
+         entry in this table corresponding to each entry in the
+         atmfCESConfTable."
+    AUGMENTS  { atmfCESConfEntry }
+    ::= { atmfCESStatsTable 1 }
+
+AtmfCESStatsEntry ::= SEQUENCE  {
+    atmfCESReassCells           Counter32,
+    atmfCESHdrErrors            Counter32,
+    atmfCESPointerReframes      Counter32,
+    atmfCESPointerParityErrors  Counter32,
+    atmfCESAal1SeqErrors        Counter32,
+    atmfCESLostCells            Counter32,
+    atmfCESMisinsertedCells     Counter32,
+    atmfCESBufUnderflows        Counter32,
+    atmfCESBufOverflows         Counter32,
+    atmfCESCellLossStatus       INTEGER
+    }
+
+atmfCESReassCells         OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This count gives the number of cells played out to the
+         CES Service Interface. It excludes cells that were
+         discarded for any reason, including cells that were not used
+         due to being declared misinserted, or discarded while the
+         reassembler was waiting to achieve synchronization."
+    ::= { atmfCESStatsEntry 1 }
+
+atmfCESHdrErrors         OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of the number of AAL1 header errors detected,
+         including those corrected.  Header errors include correctable
+         and uncorrectable CRC, plus bad parity."
+    ::= { atmfCESStatsEntry 2 }
+
+atmfCESPointerReframes    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This records the count of the number of events in which the
+         AAL1 reassembler found that an SDT pointer is not where it is
+         expected, and the pointer must be reacquired. This count is
+         only meaningful for structured CES modes, as unstructured CES
+         modes do not use pointers. For unstructured CES modes, this
+         count, if present, should indicate zero."
+    ::= { atmfCESStatsEntry 3 }
+
+atmfCESPointerParityErrors    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This records the count of the number of events in which the
+         AAL1 reassembler detects a parity check failure at the point
+         where a structured data pointer is expected. This count is only
+         meaningful for structured CES modes, as unstructured CES modes
+         do not use pointers. For unstructured CES modes, this count, if
+         present, should indicate zero."
+    ::= { atmfCESStatsEntry 4 }
+
+atmfCESAal1SeqErrors      OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of times that the sequence number of an incoming AAL1
+         Type 1 SAR-PDU causes a transition from the 'sync' state to
+         the 'out of sequence' state, as defined by ITU-T I.363.1."
+    ::= { atmfCESStatsEntry 5 }
+
+atmfCESLostCells   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of lost cells, as detected by the AAL1 sequence number
+         processing, for example. This records the count of the number
+         of cells detected as lost in the network prior to the
+         destination CES IWF AAL1 layer processing."
+    ::= { atmfCESStatsEntry 6 }
+
+atmfCESMisinsertedCells   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of AAL1 sequence violations which the AAL Convergence
+         sublayer interprets as a misinserted cell, as defined by
+         ITU-T I.363.1."
+    ::= { atmfCESStatsEntry 7 }
+
+atmfCESBufUnderflows      OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of buffer underflows. This records the count of the
+         number of times the CES reassembly buffer underflows. In the
+         case of a continuous underflow caused by a loss of ATM cell
+         flow, a single buffer underflow should be counted. If the CES
+         IWF is implemented with multiple buffers (such as a cell level
+         buffer and a bit level buffer), then either buffer underflow
+         will cause this count to be incremented."
+    ::= { atmfCESStatsEntry 8 }
+
+atmfCESBufOverflows      OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of buffer overflows. This records the count of the
+         number of times the CES reassembly buffer overflows. If the CES
+         IWF is implemented with multiple buffers (such as a cell level
+         buffer and a bit level buffer, then either buffer overflow will
+         cause this count to be incremented "
+    ::= { atmfCESStatsEntry 9 }
+
+atmfCESCellLossStatus      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                     noLoss(1),
+                     loss(2)
+                     }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "When cells are continuously lost for the number of milliseconds
+         specified by atmfCESCellLossIntegrationPeriod, the value is set
+         to loss (2). When cells are no longer lost, the value is set 
+         to noLoss (1)."
+    ::= { atmfCESStatsEntry 10 }
+
+
+-- CES Active SVC Table
+
+atmfCESActiveSvcTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtmfCESActiveSvcEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The table used to manage active SVCs established across ATM
+         networks between CES entities."
+    ::= { atmfCESObjects 4 }
+
+atmfCESActiveSvcEntry    OBJECT-TYPE
+    SYNTAX        AtmfCESActiveSvcEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the CES active SVC table.  There is one
+         entry in the table corresponding to each active row in
+         the atmfCESConfTable for which the atmfCESConnType takes
+         the value 'activeSvc'."
+    INDEX   { atmfCESCbrIndex }
+    ::= { atmfCESActiveSvcTable 1 }
+
+AtmfCESActiveSvcEntry ::= SEQUENCE  {
+    atmfCESRemoteAddr                       AtmAddr,
+    atmfCESFirstRetryInterval               INTEGER,
+    atmfCESRetryTimer                       INTEGER,
+    atmfCESRetryLimit                       INTEGER,
+    atmfCESRetryFailures                    Gauge32,
+    atmfCESActiveSvcRestart                 INTEGER,
+    atmfCESActiveSvcOperStatus              INTEGER,
+    atmfCESLastReleaseCause                 INTEGER,
+    atmfCESLastReleaseDiagnostics           OCTET STRING
+    }
+
+atmfCESRemoteAddr              OBJECT-TYPE
+    SYNTAX        AtmAddr
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The ATM address supporting the corresponding far end
+         CES IWF process.  If no address is supplied, no attempts
+         to establish the active SVC are initiated."
+    ::= { atmfCESActiveSvcEntry 1 }
+
+atmfCESFirstRetryInterval       OBJECT-TYPE
+    SYNTAX        INTEGER (1..3600)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The time to wait before attempting to establish the SVC
+         after the first failed call attempt.  The time to wait
+         between subsequent call attempts may differ to implement
+         a backoff scheme.  Zero represents an infinite interval
+         indicating no retries."
+    DEFVAL { 10 }
+    ::= { atmfCESActiveSvcEntry 2 }
+
+atmfCESRetryTimer              OBJECT-TYPE
+    SYNTAX        INTEGER (0..86400)
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the current value of the retry timer for
+         this connection.  When the value reaches zero an attempt
+         will be made to establish the active SVC.  When the timer
+         is not running, the value zero shall be returned."
+    ::= { atmfCESActiveSvcEntry 3 }
+
+atmfCESRetryLimit              OBJECT-TYPE
+    SYNTAX        INTEGER (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Sets a maximum limit on how many consecutive unsuccessful
+         call setup attempts can be made before stopping the attempt
+         to set up the connection.  If this limit is reached then
+         management action will be required (e.g. setting
+         atmfCESActiveSvcRestart to 'restart') to initiate a new
+         attempt to establish the connection.  A value of zero
+         indicates no limit - the attempts will continue until
+         successful. If this object is not present, no limit on call
+         attempts is assumed."
+    DEFVAL { 0 }
+    ::= { atmfCESActiveSvcEntry 4 }
+
+atmfCESRetryFailures           OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates how many attempts to establish the connection
+         have failed.  This count is reset whenever a connection
+         is successfully established or the active SVC is restarted."
+    ::= { atmfCESActiveSvcEntry 5 }
+
+atmfCESActiveSvcRestart        OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      restart(1),
+                      noop(2)
+                      }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When the value is set to 'restart' the active SVC
+         is released if necessary and a new setup procedure
+         is begun.  As a result of this action, the
+         atmfCESActiveSvcOperStatus object transitions to
+         'establishmentInProgress' (if not already in this state)
+         and the atmfCESRetryFailures object is cleared.
+
+         When the value is set to 'noop' no operation is
+         performed.  When read, the value 'noop' is returned."
+    ::= { atmfCESActiveSvcEntry 6 }
+
+atmfCESActiveSvcOperStatus     OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      other(1),
+                      establishmentInProgress(2),
+                      connected(3),
+                      retriesExhausted(4),
+                      noAddressSupplied(5),
+                      lowerLayerDown(6)
+                      }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Describes the status of the active SVC.  Valid values are:
+            other              - none of the types specified below
+            establishmentInProgress - connection is not operational,
+                                      but call attempts are ongoing
+            connected          - connection is currently operational
+            retriesExhausted   - retry limit has been reached and call
+                                 attempts have ceased
+            noAddressSupplied  - no remote address has been configured,
+                                 so no call attempts are initiated
+            lowerLayerDown     - underlying CES IWF is not operational
+
+         When the row is not 'active', the value of this object is
+         'other'."
+    ::= { atmfCESActiveSvcEntry 7 }
+
+atmfCESLastReleaseCause        OBJECT-TYPE
+    SYNTAX        INTEGER(1..127)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Value of the Cause field of the Cause information element
+         in the last RELEASE signalling message received for this
+         active SVC.  Indicates the reason for the release."
+    ::= { atmfCESActiveSvcEntry 8 }
+
+atmfCESLastReleaseDiagnostics  OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Value of the first 8 bytes of diagnostic information
+         from the Cause field of the Cause information element
+         in the last RELEASE signalling message received for this
+         active SVC."
+    ::= { atmfCESActiveSvcEntry 9 }
+
+
+-- Conformance Information
+
+atmfCESConformance    OBJECT IDENTIFIER ::= { atmfCES 2 }
+
+atmfCESGroups         OBJECT IDENTIFIER ::= { atmfCESConformance 1 }
+atmfCESCompliances    OBJECT IDENTIFIER ::= { atmfCESConformance 2 }
+
+-- Compliance Statements
+
+atmfCESCompliance     MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which support
+         the ATM Forum Circuit Emulation Services."
+
+MODULE  -- this module
+MANDATORY-GROUPS {
+                 atmfCESBasicConfigGroup,
+                 atmfCESBasicStatsGroup
+                 }
+
+GROUP            atmfCESStructConfigGroup
+DESCRIPTION      "This group is mandatory only for IWFs that
+                  support Structured DS1, E1 or J2 Nx64 kbit/s
+                  Service."
+
+GROUP            atmfCESStructStatsGroup
+DESCRIPTION      "This group is mandatory only for IWFs that
+                  support Structured DS1, E1 or J2 Nx64 kbit/s
+                  Service."
+
+GROUP            atmfCESSvcConfigGroup
+DESCRIPTION      "This group is mandatory only when support for
+                  automatic SVC initiation procedures is provided."
+
+        OBJECT           atmfCESLocalAddr
+        MIN-ACCESS       read-only
+        DESCRIPTION      "Support for manual configuration of the local
+                          CES interworking function address is not
+                          required."
+
+    ::= { atmfCESCompliances 1 }
+
+-- Units of Conformance
+
+atmfCESBasicConfigGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESAtmIndex,
+            atmfCESAtmVpi,
+            atmfCESAtmVci,
+            atmfCESCbrService,
+            atmfCESCbrClockMode,
+            atmfCESBufMaxSize,
+            atmfCESCdvRxT,
+            atmfCESCellLossIntegrationPeriod,
+            atmfCESConnType,
+            atmfCESConfRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration information
+         for generic Circuit Emulation Service IWFs."
+    ::= { atmfCESGroups 1 }
+
+atmfCESOptionalConfigGroup     OBJECT-GROUP
+    OBJECTS {
+            atmfCESAdminStatus,
+            atmfCESOperStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects providing configuration
+         information for generic Circuit Emulation Service IWFs."
+    ::= { atmfCESGroups 2}
+
+atmfCESBasicStatsGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESReassCells,
+            atmfCESHdrErrors,
+            atmfCESBufUnderflows,
+            atmfCESBufOverflows,
+            atmfCESCellLossStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing statistics information
+         for generic Circuit Emulation Service IWFs."
+    ::= { atmfCESGroups 3 }
+
+atmfCESOptionalStatsGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESAal1SeqErrors,
+            atmfCESLostCells,
+            atmfCESMisinsertedCells
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects providing statistics
+         information for generic Circuit Emulation Service IWFs."
+    ::= { atmfCESGroups 4 }
+
+atmfCESStructConfigGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESCas,
+            atmfCESPartialFill
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration information
+         for Structured DS1, E1 or J2 Nx64 kbit/s Service IWFs."
+    ::= { atmfCESGroups 5 }
+
+atmfCESStructStatsGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESPointerReframes
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing statistics information
+         for Structured DS1, E1 or J2 Nx64 kbit/s Service IWFs."
+    ::= { atmfCESGroups 6 }
+
+atmfCESOptionalStructStatsGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESPointerParityErrors
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects providing statistics
+         information for Structured DS1, E1 or J2 Nx64 kbit/s Service
+         IWFs."
+    ::= { atmfCESGroups 7 }
+
+atmfCESMappingGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESMappingCbrIndex
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about the
+         mapping from ATM VCLs to CBR interfaces or channels."
+    ::= { atmfCESGroups 8 }
+
+atmfCESSvcConfigGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESLocalAddr,
+            atmfCESRemoteAddr,
+            atmfCESFirstRetryInterval,
+            atmfCESRetryTimer,
+            atmfCESRetryFailures,
+            atmfCESActiveSvcRestart,
+            atmfCESActiveSvcOperStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing SVC connection
+         establishment support configuration information for CES
+         IWFs."
+    ::= { atmfCESGroups 9 }
+
+atmfCESOptionalSvcConfigGroup    OBJECT-GROUP
+    OBJECTS {
+            atmfCESRetryLimit,
+            atmfCESLastReleaseCause,
+            atmfCESLastReleaseDiagnostics
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects providing SVC connection
+         establishment support configuration information for CES
+         IWFs."
+    ::= { atmfCESGroups 10 }
+
+END

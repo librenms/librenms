@@ -1,0 +1,797 @@
+-- =================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-RADIUS-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+    HUAWEI-BRAS-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI
+                EnabledStatus
+                                FROM P-BRIDGE-MIB
+            RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+        hwBRASRadius MODULE-IDENTITY 
+            LAST-UPDATED "200504181334Z"        -- April 18, 2005 at 13:34 GMT
+            ORGANIZATION 
+                "       
+                NanJing Institute,Huawei Technologies Co.,Ltd.
+                HuiHong Mansion,No.91 BaiXia Rd.
+                NanJing, P.R. of China
+                Zipcode:210001
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            CONTACT-INFO 
+                "The MIB contains objects of module COPS."
+            DESCRIPTION 
+                "Description."
+            ::= { hwBRASMib 15}
+--
+-- Node definitions
+--
+ 
+            hwRadiusGroupObject OBJECT IDENTIFIER ::= { hwBRASRadius 1 }
+
+        hwRadiusGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRadiusGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Radius Group Table.
+                "
+            ::= { hwRadiusGroupObject 1 }
+
+        hwRadiusGroupEntry OBJECT-TYPE
+            SYNTAX HwRadiusGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Radius Group Entry.
+                 Radius group table is used to configure the attribute of radius group including some public information of radius gruop.
+                                 Radius gruop table is uniquely identified by Radius group name which is the key word entered when radius group table is created and cannot be changed.
+                "
+            INDEX { hwRadiusGroupName }
+            ::= { hwRadiusGroupTable 1 }
+
+        HwRadiusGroupEntry ::=
+            SEQUENCE {
+                hwRadiusGroupName
+                    OCTET STRING,
+                hwRadiusServerKey
+                    OCTET STRING,
+                hwRadiusServerProtType
+                    INTEGER,
+                hwRadiusServerRetransmit
+                    Integer32,
+                hwRadiusServerTimeout
+                    Integer32,     
+                hwRadiusServerAttrTran
+                        TruthValue,
+                hwRadiusPacketUnit
+                        INTEGER,
+                hwRadiusDomainInclude
+                        INTEGER,
+                hwRadiusClassASCar
+                        TruthValue,
+                        hwRadiusAlgorithm    
+                                INTEGER,  
+                hwRadiusServerNasPortFmt
+                    OCTET STRING,
+                hwRadiusGroupRowStatus
+                    RowStatus,
+                hwRadiusServerSourceInterface
+                    OCTET STRING,
+                    hwRadiusServerNasIpAddress
+                        IpAddress
+             }
+
+        hwRadiusGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "RadiusGroup name.
+                "
+            ::= { hwRadiusGroupEntry 1 }
+
+        hwRadiusServerKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius Server  secret.
+                "
+            ::= { hwRadiusGroupEntry 2 }
+
+        hwRadiusServerProtType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                radius(1),
+                radiusPlus10(2),
+                radiusPlus11(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius protocol.
+                "
+            ::= { hwRadiusGroupEntry 3 }
+
+        hwRadiusServerRetransmit OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Max number of radius packet retransmission.
+                "
+            ::= { hwRadiusGroupEntry 4 }
+
+        hwRadiusServerTimeout OBJECT-TYPE
+            SYNTAX Integer32 (3..25)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius packet retransmission interval.
+                "
+            ::= { hwRadiusGroupEntry 5 }   
+            
+               hwRadiusServerAttrTran OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the function of Radius server attribute translation is enabled.
+                 1 indicates that it is enabled.
+                 2 indicates that is is disabled.
+                "
+            DEFVAL { false }
+            ::= { hwRadiusGroupEntry 6 }
+
+        hwRadiusPacketUnit OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    byte(1),
+                    kbyte(2),
+                    mbyte(3),
+                    gbyte(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The packet unit of Radius server which is active when the Radius protocol is standard.
+                "
+            DEFVAL { byte }
+            ::= { hwRadiusGroupEntry 7 }
+
+        hwRadiusDomainInclude OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                     includingDomain(1),
+                     notIncludingDomain(2),
+                     original(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the domain of Radius server is included.    
+                "
+            DEFVAL { includingdomain }
+            ::= { hwRadiusGroupEntry 8 }
+
+        hwRadiusClassASCar OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "RADIUS server regards CLASS as CAR parameter.
+                "
+            DEFVAL { false }
+            ::= { hwRadiusGroupEntry 9 }
+            
+                    
+            hwRadiusAlgorithm OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    masterbackup(1),
+                    shareloading(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Packet sending algorithm of Radius server.
+                "
+            DEFVAL { masterbackup }
+            ::= { hwRadiusGroupEntry 10 }
+
+        hwRadiusServerNasPortFmt OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius Nas port format string.
+                "
+            ::= { hwRadiusGroupEntry 11 }
+
+        hwRadiusGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status.
+
+                Support add and delete."
+            ::= { hwRadiusGroupEntry 12 }
+
+        hwRadiusServerSourceInterface OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius server source interface name.
+                "
+            ::= { hwRadiusGroupEntry 13 }
+            
+        hwRadiusServerNasIpAddress OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "Radius server NAS IP address"
+       
+            ::= { hwRadiusGroupEntry 14 }   
+                
+             
+        hwRadiusServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRadiusServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Radius server gruop extend table.
+                "
+            ::= { hwRadiusGroupObject 2 }
+        
+        hwRadiusServerEntry OBJECT-TYPE
+            SYNTAX HwRadiusServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwRadiusGroupName ,hwRadiusServerIndex,hwRadiusServerType}
+            ::= { hwRadiusServerTable 1 }
+        
+        HwRadiusServerEntry ::=
+            SEQUENCE {    
+                hwRadiusServerIndex
+                    Integer32,  
+                hwRadiusServerType
+                INTEGER,
+                hwRadiusServerVRF
+                                OCTET STRING,
+                hwRadiusServerIP
+                IpAddress,  
+                hwRadiusServerPort
+                Integer32,  
+                            hwRadiusServerWeight
+                Integer32,   
+                hwRadiusServerSecretKey
+                                OCTET STRING,
+                hwRadiusServerRowStatus
+                RowStatus,
+                hwRadiusServerPktSendNumber
+                Integer32,
+                hwRadiusServerPktSendInterval
+                Integer32,            
+                hwRadiusServerSourceInterfaceEachServer
+                OCTET STRING                    
+                       }  
+               
+     
+        hwRadiusServerIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IP address index of authentication and accounting server, read-only.
+                "
+            ::= { hwRadiusServerEntry 1 } 
+       
+           hwRadiusServerType OBJECT-TYPE    
+                SYNTAX INTEGER 
+                    {  
+                    auth(1),
+                    acct(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Type of authentication and accounting server, read-only.
+                "
+            ::= { hwRadiusServerEntry 2 }  
+            
+        hwRadiusServerVRF OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Vpn-instance of authentication and accounting server.
+                "
+            ::= { hwRadiusServerEntry 3 }
+
+        hwRadiusServerIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of authentication and accounting server which is unnecessary to configure.
+                "
+            ::= { hwRadiusServerEntry 4} 
+            
+
+        hwRadiusServerPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Port number of authentication and accounting server. Use the default value, if it is not configured.
+                "
+            ::= { hwRadiusServerEntry 5 }  
+            
+               hwRadiusServerWeight OBJECT-TYPE  
+                   SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Weight of authentication and accounting server, which is unnecessary to configure.
+                "
+            ::= { hwRadiusServerEntry 6 }  
+            
+
+              hwRadiusServerSecretKey OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Secret of authentication and accounting server.
+                "
+            ::= { hwRadiusServerEntry 7 }
+
+        hwRadiusServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status,either Add or Del.
+
+                Support add and delete.
+                "
+            ::= { hwRadiusServerEntry 8 }    
+    
+            hwRadiusServerPktSendNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of packets that can be sent
+                
+                "
+            ::= { hwRadiusServerEntry 9 }   
+            
+        hwRadiusServerPktSendInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The interval for counting the number of sent packets(in sec)
+                "
+            ::= { hwRadiusServerEntry 10 }  
+            
+        hwRadiusServerSourceInterfaceEachServer OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..1023))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Radius server source interface name
+                "
+            ::= { hwRadiusServerEntry 11 }
+         
+        hwRadiusClientTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRadiusClientEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configuration table of server client end.
+                "
+            ::= { hwRadiusGroupObject 3 }  
+            
+        hwRadiusClientEntry OBJECT-TYPE
+            SYNTAX HwRadiusClientEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwRadiusClientIP, hwRadiusClientVrf }
+            ::= { hwRadiusClientTable 1}
+        
+        HwRadiusClientEntry ::=
+            SEQUENCE { 
+                hwRadiusClientIP
+                    IpAddress,
+                hwRadiusClientVrf
+                    OCTET STRING,
+                hwRadiusClientKey
+                    OCTET STRING,
+                hwRadiusClientGroupName
+                        OCTET STRING,
+                hwRadiusClientRowStatus
+                        RowStatus
+                    }
+             
+        hwRadiusClientIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Client ip address.
+                "
+            ::= { hwRadiusClientEntry 1 }    
+
+        hwRadiusClientVrf OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Client vpn instance.
+                "
+            ::= { hwRadiusClientEntry 2 }    
+
+        hwRadiusClientKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Client share key.
+                "               
+            ::= { hwRadiusClientEntry 3 }    
+
+        hwRadiusClientGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))            
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Client group name.
+                "
+            ::= { hwRadiusClientEntry 4 }    
+            
+        hwRadiusClientRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Client row status.
+                "
+            ::= { hwRadiusClientEntry 5 }    
+
+            
+        hwRadiusAuthorServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRadiusAuthorServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configuration table of AUTHOR server.
+                "
+            ::= { hwRadiusGroupObject 4 }
+        
+        hwRadiusAuthorServerEntry OBJECT-TYPE
+            SYNTAX HwRadiusAuthorServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwRadiusAuthorServerIP, hwRadiusAuthorServerVrf}
+            ::= { hwRadiusAuthorServerTable 1 }
+        
+        HwRadiusAuthorServerEntry ::=
+            SEQUENCE { 
+                hwRadiusAuthorServerIP
+                    IpAddress,
+                hwRadiusAuthorServerVrf
+                    OCTET STRING,
+                hwRadiusAuthorServerKey
+                    OCTET STRING,
+                hwRadiusAuthorServerGroupName
+                        OCTET STRING,
+                hwRadiusAuthorServerRowStatus
+                        RowStatus
+                    }
+             
+        hwRadiusAuthorServerIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Authorization Server ip address.
+                "
+            ::= { hwRadiusAuthorServerEntry 1 }    
+
+        hwRadiusAuthorServerVrf OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Authorization Server vpn instance.
+                "
+            ::= { hwRadiusAuthorServerEntry 2 }
+
+        hwRadiusAuthorServerKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Authorization Server share key.
+                "               
+            ::= { hwRadiusAuthorServerEntry 3 }    
+
+        hwRadiusAuthorServerGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))            
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Authorization Server group name.
+                "
+            ::= { hwRadiusAuthorServerEntry 4 }    
+            
+        hwRadiusAuthorServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Authorization Server row status.
+                "
+            ::= { hwRadiusAuthorServerEntry 5 }
+
+        hwRadiusSetting OBJECT IDENTIFIER ::= { hwRadiusGroupObject 5 }
+
+        hwRadiusSettingEntry OBJECT IDENTIFIER ::= { hwRadiusSetting 1 }
+
+        hwEnableSourcePortsExtended OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "To enable one or more ports to be used as the source ports for sending out RADIUS requests.
+                "
+            DEFVAL{2}
+            ::= { hwRadiusSettingEntry 1 }
+        hwSourcePortsExtendedStartPort OBJECT-TYPE
+            SYNTAX Integer32 (0|5000..55535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The start port to be used as the source ports for sending out RADIUS requests.
+                "
+            ::= { hwRadiusSettingEntry 2 }
+        hwSourcePortsExtendedPortNum OBJECT-TYPE
+            SYNTAX Integer32 (0|1..32)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of port to be used as the source ports for sending out RADIUS requests.
+                "
+            ::= { hwRadiusSettingEntry 3 }
+            
+    ---Radius server up/down trap
+    
+            hwRadiusMIBTrap OBJECT IDENTIFIER ::= { hwBRASRadius 2 }    
+            hwRadiusTrapObject OBJECT IDENTIFIER ::= { hwRadiusMIBTrap 1 }
+            
+
+        hwStateChangeServerIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of authentication or accounting server which state is changed.
+
+                "
+            ::= { hwRadiusTrapObject 1 } 
+            
+            hwStateChangeServerVrf OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " Vpn-instance of authentication or accounting server which state is changed.
+
+                "
+            ::= { hwRadiusTrapObject 2 }        
+                    
+        hwRadiusTrapsDefine OBJECT IDENTIFIER ::= { hwRadiusMIBTrap 2 }
+                
+        hwRadiusServerTraps OBJECT IDENTIFIER ::= { hwRadiusTrapsDefine 1 }
+        hwRadiusAuthServerUp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerIp,hwStateChangeServerVrf }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Radius authentication server up
+                2 Notice/Trap generation cause:  Radius authentication server up 
+                3 Repair suggestions:
+                    Check radius authentication server status .                
+                "
+            ::= { hwRadiusServerTraps 1 }
+            
+        hwRadiusAuthServerDown NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerIp,hwStateChangeServerVrf }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Radius authentication server down
+                2 Notice/Trap generation cause:  Radius authentication server down 
+                3 Repair suggestions:
+                    Check radius authentication server status .
+                "
+            ::= { hwRadiusServerTraps 2 }            
+
+        hwRadiusAcctServerUp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerIp,hwStateChangeServerVrf }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Radius accounting server up
+                2 Notice/Trap generation cause:  Radius accounting server up 
+                3 Repair suggestions:
+                    Check radius accounting server status .
+                "
+            ::= { hwRadiusServerTraps 3 }
+
+                hwRadiusAcctServerDown NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerIp,hwStateChangeServerVrf }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Radius accounting server down
+                2 Notice/Trap generation cause:  Radius accounting server down 
+                3 Repair suggestions:
+                    Check radius accounting server status .
+                "
+            ::= { hwRadiusServerTraps 4 }
+        
+    
+    --  ============== conformance information ==============
+        hwRadiusConformance OBJECT IDENTIFIER ::= { hwBRASRadius 3 }
+        
+        
+        hwRadiusCompliances OBJECT IDENTIFIER ::= { hwRadiusConformance 1 }
+        hwRadiusCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwRadiusGroupGroup, hwRadiusServerGroup,
+                           hwRadiusClientGroup, hwRadiusAuthorServerGroup,
+                              hwRadiusSettingGroup, hwRadiusTrapObjectGroup, hwRadiusTrapsDefineGroup }  
+                                               
+              ::= { hwRadiusCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwRadiusGroups OBJECT IDENTIFIER ::= { hwRadiusConformance 2 } 
+        
+        hwRadiusGroupGroup OBJECT-GROUP
+            OBJECTS {
+                hwRadiusGroupName,
+                hwRadiusServerKey,
+                hwRadiusServerProtType,
+                hwRadiusServerRetransmit,
+                hwRadiusServerTimeout,     
+                hwRadiusServerAttrTran,
+                hwRadiusPacketUnit,
+                hwRadiusDomainInclude,
+                hwRadiusClassASCar,
+                        hwRadiusAlgorithm,  
+                hwRadiusServerNasPortFmt,
+                hwRadiusGroupRowStatus,
+                hwRadiusServerSourceInterface,
+                hwRadiusServerNasIpAddress
+             }       
+            STATUS current
+            DESCRIPTION 
+                "The radius group group."
+            ::= { hwRadiusGroups 1 }
+
+
+        hwRadiusServerGroup OBJECT-GROUP
+            OBJECTS {    
+                hwRadiusServerIndex,  
+                hwRadiusServerType,
+                hwRadiusServerVRF,
+                hwRadiusServerIP,  
+                hwRadiusServerPort,  
+                            hwRadiusServerWeight,   
+                hwRadiusServerSecretKey,
+                hwRadiusServerRowStatus,
+                hwRadiusServerPktSendNumber,                        
+                hwRadiusServerPktSendInterval,            
+                hwRadiusServerSourceInterfaceEachServer            
+                           }          
+            STATUS current
+            DESCRIPTION 
+                "The Radius Server group."
+            ::= { hwRadiusGroups 2 }
+            
+        hwRadiusClientGroup OBJECT-GROUP
+            OBJECTS { 
+                hwRadiusClientIP,
+                hwRadiusClientVrf,
+                hwRadiusClientKey,
+                hwRadiusClientGroupName,
+                hwRadiusClientRowStatus
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The Radius Client group."
+            ::= { hwRadiusGroups 3 }
+            
+        hwRadiusAuthorServerGroup OBJECT-GROUP
+            OBJECTS { 
+                hwRadiusAuthorServerIP,
+                hwRadiusAuthorServerVrf,
+                hwRadiusAuthorServerKey,
+                hwRadiusAuthorServerGroupName,
+                hwRadiusAuthorServerRowStatus
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The Radius Author Server group."
+            ::= { hwRadiusGroups 4 }
+            
+        hwRadiusSettingGroup OBJECT-GROUP
+            OBJECTS { 
+                hwEnableSourcePortsExtended,
+                hwSourcePortsExtendedStartPort,
+                hwSourcePortsExtendedPortNum
+                }
+            STATUS current
+            DESCRIPTION 
+                "The common setting of Radius server."
+            ::= { hwRadiusGroups 5 }
+            
+        hwRadiusTrapObjectGroup OBJECT-GROUP
+                OBJECTS { 
+                hwStateChangeServerIp,
+                hwStateChangeServerVrf
+                }
+            STATUS current
+            DESCRIPTION 
+                "The Radius Trap Object group."
+            ::= { hwRadiusGroups 6 }             
+                    
+        hwRadiusTrapsDefineGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { 
+                hwRadiusAuthServerUp,
+                hwRadiusAuthServerDown,
+                hwRadiusAcctServerUp,
+                hwRadiusAcctServerDown
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The Radius Traps Define group."
+            ::= { hwRadiusGroups 7 }            
+             
+                    
+        --  ============== conformance information define end ==============
+
+    
+    END
+
+

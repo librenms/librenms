@@ -1,0 +1,3362 @@
+
+-- *****************************************************************************
+-- Juniper-IP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for IP Protocol Management
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2008 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE, Unsigned32, IpAddress, Counter64,
+    Gauge32
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero, ifIndex
+        FROM IF-MIB
+    ipCidrRouteEntry
+        FROM IP-FORWARD-MIB
+    ipCidrRouteNumber
+        FROM IP-FORWARD-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniIpAddrLessIf, JuniNextIfIndex
+        FROM Juniper-TC;
+
+
+juniIpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200701172302Z"  -- 17-Jan-07 06:02 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The IP Protocol MIB for the Juniper Networks enterprise."
+    -- Revision History                                     
+    REVISION    "200701172302Z"  -- 17-Jan-07 06:02 PM EST  - JUNOSe 7.3.2
+    DESCRIPTION
+        "Added warm-restart replay initial sequence preference for an IP
+        interface by adding juniIpIfInitSeqPrefOper and juniIpIfInitSeqPrefAdmin."
+    REVISION    "200503301349Z"  -- 30-Mar-05 01:49 PM IST  - JUNOSe 7.0
+    DESCRIPTION
+         "Added IP Route Summary support for Unicast and Multicast Routes."
+    REVISION    "200504292037Z"  -- 29-Apr-05 04:37 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+         "Added RLI-1925 Source Address Validation Failure Traps support."
+    REVISION    "200409201349Z"  -- 20-Sep-04 09:49 AM EDT  - JUNOSe 6.1
+    DESCRIPTION
+         "Added RLI-1684 Route Table Maximum Route support."
+    REVISION    "200409101526Z"  -- 04-Sep-10 10:26 AM EST  - JUNOSe 6.0
+    DESCRIPTION
+	"Obsoleted the following objects:
+	   juniIpVpnIdOui
+	   juniIpVpnIdIndex"
+    REVISION    "200311031526Z"  -- 03-Nov-03 10:26 AM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Added support to juniIpIfEntry for TCP MSS configuration."
+    REVISION    "200306251948Z"  -- 25-Jun-03 03:48 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added IP interface summary statistics support - juniIpIfSummary.
+         Added support for Interface Mirroring by adding juniIpIfAnalyzerMode.
+         Added support to juniIpIfEntry for IP interface auto configure."
+    REVISION    "200302111905Z"  -- 11-Feb-03 02:05 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         In juniIpInterfaceGroup, added juniIpIfRouterIndex
+         In juniIpIfTable, to support unnumbered interfaces referencing numbered
+         interfaces in addition to loopback interfaces, the following objects
+         were deprecated:
+            juniIpIfLoopback
+            juniIpIfLoopbackUid
+         and the following objects were added:
+            juniIpIfInheritNum
+            juniIpIfInheritNumUid
+         In juniIpAddrTable, to support unnumbered interfaces referencing
+         numbered interfaces in addition to loopback interfaces, the following
+         object was deprecated:
+            juniIpAdEntUnnumLoopbackIfIndex
+         and the following object was added:
+            juniIpAdEntUnnumInheritNumIfIndex
+         Added new types to juniIpIfType."
+    REVISION    "200210231853Z"  -- 23-Oct-02 02:53 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added the following scalar objects:
+            juniIpBgpCommunityNewFormat
+            juniIpBgpAsConfedSetNewFormat
+         Obsoleted the following objects:
+            juniIpArpTimeout
+            juniIpRouteLimit "
+    REVISION    "200204032206Z"  -- 03-Apr-02 05:06 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Obsoleted the following objects with the introduction of QoS:
+            juniIpIfStatsInForwardedPackets
+            juniIpIfStatsInForwardedOctets
+            juniIpIfStatsOutRequestedPackets
+            juniIpIfStatsOutRequesteOctets
+            juniIpIfStatsGreenOutSchedDropPackets
+            juniIpIfStatsYellowOutSchedDropPackets
+            juniIpIfStatsRedOutSchedDropOctets
+            juniIpIfStatsGreenOutSchedDropOctets
+            juniIpIfStatsYellowOutSchedDropOctets
+            juniIpIfStatsRedOutSchedDropOctet "
+    REVISION    "200107051400Z"  -- 05-Jul-01 10:00 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added the juniIpIfAssocTable."
+    REVISION    "200106181911Z"  -- 18-Jun-01 03:11 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "o In juniIpIfTable, added the following:
+            juniIpIfSAValidation
+            juniIpIfCreationType
+            juniIpIfProfileId
+            juniIpIfAlwaysUp
+            juniIpIfLoopback
+            juniIpIfLoopbackUid
+            juniIpIfDebounceTime
+            juniIpIfForwarding
+            juniIpIfForceFragmentation
+            juniIpIfSharesLowerUid
+            juniIpIfFilterOptions
+            juniIpIfName
+            juniIpIfArpTimeout
+            juniIpIfAdminSpeed
+            juniIpIfMultipathMode
+            juniIpIfSharedNhAddr
+            juniIpIfSharedNhRouterId
+            juniIpIfPrimaryIpAddress
+            juniIpIfPrimaryIpMask
+            juniIpIfOperDebounceTime
+         o In juniIpAddrTable, added juniIpAdEntIsSecondary
+         o In juniIpAddrTable, deprecated juniIpAdEntIgmpEnable
+         o Added following scalars:
+            juniIpDebounceTime
+            juniIpRouterId
+            juniIpSourceRoutingAdminStatus
+            juniIpVpnIdOui
+            juniIpVpnIdIndex
+         o In juniIpIfStatsTable, added:
+            juniIpIfStatsGreenOutSchedDropPackets
+            juniIpIfStatsYellowOutSchedDropPackets
+            juniIpIfStatsRedOutSchedDropPackets
+            juniIpIfStatsGreenOutSchedDropOctets
+            juniIpIfStatsYellowOutSchedDropOctets
+            juniIpIfStatsRedOutSchedDropOctets
+         o Changed the type of juniIpRouteStaticNextHop to JuniIpAddrLessIf to
+           support setting static routes next hop values to unnumbered IP
+           interfaces.  This type is a Juniper TC, which can transparently
+           support the original IpAddress type, so existing clients are not
+           negatively affected by this change."
+    REVISION    "200007310000Z"  -- 31-Jul-00               - JUNOSe 2.2
+    DESCRIPTION
+        "o Added extended IP interface statistics."
+    REVISION      "9911090000Z"  --  9-Nov-99               - JUNOSe 1.3
+    DESCRIPTION
+        "o In juniIpIfTable, added null(5) enumeration value for juniIpIfType.
+         o Added juniIpIfTypeId object."
+    REVISION      "9909160000Z"  -- 16-Sep-99               - JUNOSe 1.1
+    DESCRIPTION
+        "o In juniIpAddrTable, added juniIpAdEntUnnumLoopbackIfIndex,
+           juniIpAdEntIrdpEnable, juniIpAdEntAccessRouteEnable,
+           juniIpAdEntAccessRouteHost.
+         o In juniIpRouteStaticTable, changed Tos to Preference, and added Tag.
+         o Added juniIpCidrRouteTable (proprietary extensions to standard
+           ipCidrRouteTable)."
+    REVISION      "9811190000Z"  -- 19-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 12 }
+   
+ 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpObjects     OBJECT IDENTIFIER ::= { juniIpMIB 1 }
+
+juniIpInterface   OBJECT IDENTIFIER ::= { juniIpObjects 1 }
+juniIpAddress     OBJECT IDENTIFIER ::= { juniIpObjects 2 }
+juniIpRoute       OBJECT IDENTIFIER ::= { juniIpObjects 3 }
+juniIpGlobals     OBJECT IDENTIFIER ::= { juniIpObjects 4 }
+juniIpIfSummary   OBJECT IDENTIFIER ::= { juniIpObjects 5 }
+juniIpRouteSummary   OBJECT IDENTIFIER ::= { juniIpObjects 6 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Global attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpDebounceTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in milliseconds that an event has to be in the same state
+        before being reported."
+    DEFVAL    { 0 }
+    ::= { juniIpGlobals 1 }
+
+juniIpRouterId  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The router-id that this IP router will use to identify itself."
+    ::= { juniIpGlobals 2 }
+
+juniIpSourceRoutingAdminStatus  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative setting for source routing."
+    ::= { juniIpGlobals 3 }
+
+juniIpVpnIdOui  OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The OUI portion of the VPN identifier.  This object must be set
+        coincident with the index portion of the VpnId (juniIpVpnIdIndex),
+        otherwise the set will fail."
+    ::= { juniIpGlobals 4 }
+
+juniIpVpnIdIndex  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The index portion of the VPN identifier.  This object must be set
+         coincident with the OUI portion of the VpnId (juniIpVpnOui), otherwise
+         the set will fail."
+    ::= { juniIpGlobals 5 }
+
+juniIpBgpCommunityNewFormat  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The BGP community format to be used.  Set to true to use the community
+        number, as number format."
+    DEFVAL    { false }
+    ::= { juniIpGlobals 6 }
+
+juniIpBgpAsConfedSetNewFormat  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The BGP as confederation set format to be used.  Set to true to display
+        the confederation set as a comma separated list, enclosed in squared
+        braces."
+    DEFVAL    { false }
+    ::= { juniIpGlobals 7 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Interface Summary Statistics Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpIfSummaryTotalIntf  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces."
+    ::= { juniIpIfSummary 1 }
+
+juniIpIfSummaryTotalIntfUp  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces in operational state UP."
+    ::= { juniIpIfSummary 2 }
+
+juniIpIfSummaryTotalIntfDown  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces in operational state DOWN."
+    ::= { juniIpIfSummary 3 }
+
+juniIpIfSummaryTotalIntfProtUp  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces in protocol state UP."
+    ::= { juniIpIfSummary 4 }
+
+juniIpIfSummaryTotalIntfProtDown  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces in protocol state DOWN."
+    ::= { juniIpIfSummary 5 }
+
+juniIpIfSummaryTotalIntfProtNotPresent  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP interfaces in protocol state NOT PRESENT."
+    ::= { juniIpIfSummary 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Route Summary Statistics Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpRouteUnicastSummary   OBJECT IDENTIFIER ::= { juniIpRouteSummary 1 }
+juniIpRouteMulticastSummary   OBJECT IDENTIFIER ::= { juniIpRouteSummary 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Route Unicast Summary Statistics Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniIpRouteSummaryUnicastTotalRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP routes."
+    ::= { juniIpRouteUnicastSummary 1 }
+
+juniIpRouteSummaryUnicastTotalBytes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes in unicast route entries."
+    ::= { juniIpRouteUnicastSummary  2 }
+
+juniIpRouteSummaryUnicastIsisRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP ISIS routes."
+    ::= { juniIpRouteUnicastSummary  3 }
+
+juniIpRouteSummaryUnicastIsisLevel1Routes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Level 1 ISIS routes."
+    ::= { juniIpRouteUnicastSummary  4 }                       
+    
+
+juniIpRouteSummaryUnicastIsisLevel2Routes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Level 2 ISIS routes."
+    ::= { juniIpRouteUnicastSummary  5 }
+
+
+juniIpRouteSummaryUnicastRipRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP RIP routes."
+    ::= { juniIpRouteUnicastSummary  6 }
+
+juniIpRouteSummaryUnicastStaticRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION                   
+        "The total number of Unicast IP Static routes."
+    ::= { juniIpRouteUnicastSummary  7 }
+
+
+juniIpRouteSummaryUnicastConnectedRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Connected routes."
+    ::= { juniIpRouteUnicastSummary  8 }     
+    
+juniIpRouteSummaryUnicastBgpRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP BGP routes."
+    ::= { juniIpRouteUnicastSummary  9 }
+
+juniIpRouteSummaryUnicastOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP OSPF routes."
+    ::= { juniIpRouteUnicastSummary  10 }
+
+juniIpRouteSummaryUnicastIntraAreaOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Intra Area OSPF routes."
+    ::= { juniIpRouteUnicastSummary  11 }
+                                 
+
+juniIpRouteSummaryUnicastInterAreaOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Inter Area OSPF routes."
+    ::= { juniIpRouteUnicastSummary  12 }
+    
+juniIpRouteSummaryUnicastExternalOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP External OSPF routes."
+    ::= { juniIpRouteUnicastSummary  13 }
+    
+                                         
+juniIpRouteSummaryUnicastOtherInternalRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Other Internal routes."
+    ::= { juniIpRouteUnicastSummary  14}
+
+juniIpRouteSummaryUnicastAccessRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Access routes."
+    ::= { juniIpRouteUnicastSummary  15 }    
+    
+juniIpRouteSummaryUnicastIntCreatedAccessHostRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Internally Created Access Host routes."
+    ::= { juniIpRouteUnicastSummary  16 }
+                                          
+juniIpRouteSummaryUnicastIntDialoutRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Unicast IP Internally Created Dialout routes."
+    ::= { juniIpRouteUnicastSummary  17 }
+       
+juniIpRouteSummaryUnicastRouteMemoryActive  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast IP Route Memory Storage."
+    ::= { juniIpRouteUnicastSummary  18 }
+                                          
+juniIpRouteSummaryUnicastLastRouteAddedOrDeletedIP  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+ 		"IP address for last Unicast route added or deleted."
+    ::= { juniIpRouteUnicastSummary  19 }
+
+juniIpRouteSummaryUnicastLastRouteAddedOrDeletedMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subnet mask for last Unicast route added or deleted."
+    ::= { juniIpRouteUnicastSummary  20 }
+
+juniIpRouteSummaryUnicastLastRouteAddedOrDeletedClient  OBJECT-TYPE
+    SYNTAX      INTEGER { 
+    				inValid(0),
+                    isis(1),
+                    rip(2),
+	        		ospf(3),
+	        		static(4),
+	        		local(5),
+	        		bgp(6),
+	        		mbgp(7),
+	        		staticLow(8),
+                    ospfInternal(9),
+                    ospfExternal(10),
+                    dvmrp(11),
+                    dvmrpAggregate(12),
+                    hidden(13),
+                    access(14),
+                    accessInternal(15),
+                    dialOut(16),
+                    default(17) }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client for last Unicast route added or deleted."
+    ::= { juniIpRouteUnicastSummary  21 }
+
+juniIpRouteSummaryUnicastLastRouteAddedOrDeletedDate  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Date for last Unicast route added or deleted."
+    ::= { juniIpRouteUnicastSummary  22 }
+    
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Route Multicast Summary Statistics Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniIpRouteSummaryMulticastTotalRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP routes."
+    ::= { juniIpRouteMulticastSummary   1 }
+
+juniIpRouteSummaryMulticastTotalBytes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes in multicast route entries."
+	::= { juniIpRouteMulticastSummary  2 }
+
+juniIpRouteSummaryMulticastIsisRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP ISIS routes."
+    ::= { juniIpRouteMulticastSummary  3 }
+                        
+juniIpRouteSummaryMulticastLevel1IsisRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Level 1 ISIS routes."
+    ::= { juniIpRouteMulticastSummary  4 }                        
+    
+
+juniIpRouteSummaryMulticastLevel2IsisRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Level 2 ISIS routes."
+    ::= { juniIpRouteMulticastSummary  5 }
+
+juniIpRouteSummaryMulticastRipRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP RIP routes."
+    ::= { juniIpRouteMulticastSummary  6 }
+
+juniIpRouteSummaryMulticastStaticRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Static routes."
+    ::= { juniIpRouteMulticastSummary  7 }
+
+
+juniIpRouteSummaryMulticastConnectedRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Connected routes."
+    ::= { juniIpRouteMulticastSummary  8 }
+
+juniIpRouteSummaryMulticastBgpRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP BGP routes."
+    ::= { juniIpRouteMulticastSummary  9 }
+
+juniIpRouteSummaryMulticastOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP OSPF routes."
+    ::= { juniIpRouteMulticastSummary  10 }
+
+juniIpRouteSummaryMulticastIntraAreaOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Intra Area OSPF routes."
+    ::= { juniIpRouteMulticastSummary  11 }
+    
+juniIpRouteSummaryMulticastInterAreaOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Inter Area OSPF routes."
+    ::= { juniIpRouteMulticastSummary  12 }      
+    
+juniIpRouteSummaryMulticastExternalOspfRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP External OSPF routes."
+    ::= { juniIpRouteMulticastSummary  13 }    
+    
+juniIpRouteSummaryMulticastOtherInternalRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Other Internal routes."
+    ::= { juniIpRouteMulticastSummary  14}
+
+juniIpRouteSummaryMulticastAccessRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Access routes."
+    ::= { juniIpRouteMulticastSummary  15 }
+
+juniIpRouteSummaryMulticastIntCreatedAccessHostRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Internally Created Access Host routes."
+    ::= { juniIpRouteMulticastSummary  16 }
+
+juniIpRouteSummaryMultiastIntDialoutRoutes  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Multicast IP Internally Created Dialout routes."
+    ::= { juniIpRouteMulticastSummary  17 }   
+    
+juniIpRouteSummaryMulticastRouteMemoryActive  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast IP Route Memory Storage."
+    ::= { juniIpRouteMulticastSummary  18 }
+    
+juniIpRouteSummaryMulticastLastRouteAddedOrDeletedIP  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address for last Multicast route added or deleted."
+    ::= { juniIpRouteMulticastSummary  19 }
+
+juniIpRouteSummaryMulticastLastRouteAddedOrDeletedMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subnet Mask for last Multicast route added or deleted."
+    ::= { juniIpRouteMulticastSummary  20 }
+
+juniIpRouteSummaryMulticastLastRouteAddedOrDeletedClient  OBJECT-TYPE
+    SYNTAX      INTEGER { 
+    				inValid(0),
+                    isis(1),
+                    rip(2),
+	        		ospf(3),
+	        		static(4),
+	        		local(5),
+	        		bgp(6),
+	        		mbgp(7),
+	        		staticLow(8),
+                    ospfInternal(9),
+                    ospfExternal(10),
+                    dvmrp(11),
+                    dvmrpAggregate(12),
+                    hidden(13),
+                    access(14),
+                    accessInternal(15),
+                    dialOut(16),
+                    default(17)
+ 	 }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Client for last Multicast route added or deleted."   
+	::= { juniIpRouteMulticastSummary  21}
+
+juniIpRouteSummaryMulticastLastRouteAddedOrDeletedDate  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Date for last Multicast route added or deleted."    
+	::= { juniIpRouteMulticastSummary  22} 
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Interface attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating new IP interfaces
+--
+juniIpNextIfIndex  OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniIpIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.  "
+    ::= { juniIpInterface 1 }
+
+
+--
+-- The IP Interface Table
+--
+juniIpIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for IP interfaces present in the system."
+    ::= { juniIpInterface 2 }
+
+juniIpIfEntry  OBJECT-TYPE
+    SYNTAX      JuniIpIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniIpIfIndex }
+    ::= { juniIpIfTable 1 }
+
+JuniIpIfEntry ::= SEQUENCE {
+    juniIpIfIndex                InterfaceIndex,
+    juniIpIfRowStatus            RowStatus,
+    juniIpIfLowerIfIndex         InterfaceIndexOrZero,
+    juniIpIfType                 INTEGER,
+    juniIpIfTypeId               Unsigned32,
+    juniIpIfSAValidationEnable   JuniEnable,
+    juniIpIfCreationType         INTEGER,
+    juniIpIfProfileId            Unsigned32,
+    juniIpIfAlwaysUp             JuniEnable,
+    juniIpIfLoopback             JuniEnable,
+    juniIpIfLoopbackUid          InterfaceIndexOrZero,
+    juniIpIfDebounceTime         Integer32,
+    juniIpIfForwarding           JuniEnable,
+    juniIpIfForceFragmentation   JuniEnable,
+    juniIpIfSharesLowerUid       JuniEnable,
+    juniIpIfFilterOptions        Unsigned32,
+    juniIpIfName                 OCTET STRING,
+    juniIpIfArpTimeout           Unsigned32,
+    juniIpIfAdminSpeed           Unsigned32,
+    juniIpIfMultipathMode        INTEGER,
+    juniIpIfSharedNhAddr         IpAddress,
+    juniIpIfSharedNhRouterId     Unsigned32,
+    juniIpIfPrimaryIpAddress     IpAddress,
+    juniIpIfPrimaryIpMask        IpAddress,
+    juniIpIfOperDebounceTime     Integer32,
+    juniIpIfRouterIndex          Unsigned32,
+    juniIpIfInheritNum           JuniEnable,
+    juniIpIfInheritNumUid        InterfaceIndexOrZero,
+    juniIpIfAnalyzerMode         INTEGER,
+    juniIpIfAutoConfigure        JuniEnable,
+    juniIpIfTcpMss               Integer32,
+    juniIpIfInitSeqPrefOper      Unsigned32,
+    juniIpIfInitSeqPrefAdmin     Unsigned32,
+    juniIpIfArpSpoofCheck        JuniEnable }
+
+juniIpIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the IP interface.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniIpNextIfIndex."
+    ::= { juniIpIfEntry 1 }
+
+juniIpIfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpIfRowStatus
+            juniIpIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniIpIfIndex must have been determined previously,
+            typically by reading juniIpNextIfIndex.
+
+            The interface identified by a nonzero juniIpIfLowerIfIndex must
+            exist.
+
+            If juniIpIfType is configured to be 'loopback' or 'null',
+            juniIpIfLowerIfIndex must be set to zero.
+
+            The selected value of juniIpIfType must be compatible with the
+            underlying media interface identified by juniIpIfLowerIfIndex.
+
+        Once created, the following objects may not be modified:
+            juniIpIfLowerIfIndex
+            juniIpIfType
+            juniIpIfTypeId
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniIpIfEntry 2 }
+
+juniIpIfLowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a media interface over which this IP interface is to be
+        layered.  A value of zero is used when juniIpIfType is specified to be
+        loopback(4) or null(5)."
+    ::= { juniIpIfEntry 3 }
+
+juniIpIfType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(0),
+                    broadcast(1),
+                    pointToPoint(2),
+                    nbma(3),
+                    loopback(4),
+                    null(5),
+                    bgpMplsVpn(6),
+                    vrfInternal(7),
+                    dialout(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of network interface."
+    DEFVAL    { pointToPoint }
+    ::= { juniIpIfEntry 4 }
+
+juniIpIfTypeId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A numerical distinguisher relevant for the loopback and null IP
+        interface types.
+            loopback    Must be unique for all IP interfaces of this type.
+            null        Must be unique for all IP interfaces of this type.
+                        (FOR IMPLEMENTATIONS THAT SUPPORT ONE AND ONLY ONE NULL
+                        INTERFACE, THE VALUE ZERO MUST BE USED.)
+
+        For all other IP interface types, this object is not relevant, reports a
+        value of zero when read, and must be given a value of zero if explicitly
+        configured during creation."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 5 }
+
+juniIpIfSAValidationEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable source address validation on this IP network interface."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 6 }
+
+juniIpIfCreationType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    static(1),
+                    dynamic(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specify if the interface was created due to static configuration or due
+        to some dynamic event.  Dynamic interfaces are not stored in NVS."
+    ::= { juniIpIfEntry 7 }
+
+juniIpIfProfileId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identified the profile used when creating a dynamic interface."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 8 }
+
+juniIpIfAlwaysUp  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, the interface is determined to be up regardless of the
+        state of any lower layer interfaces."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 9 }
+
+juniIpIfLoopback  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether the interface is a loopback type interface.
+
+        This object has been replaced by juniIpIfInheritNum."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 10 }
+
+juniIpIfLoopbackUid  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Specify the interface index of a loopback interface whose IP address
+        should be used when sourcing traffic on this interface.  Useful for
+        unnumbered interfaces.
+
+        This object has been replaced by juniIpIfInheritNumUid."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 11 }
+
+juniIpIfDebounceTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time in milliseconds that a layer 2 interface must remain
+        in a state before it is conveyed to the IP layer.  Useful for interfaces
+        that experience brief outages that should not constitute a route flap.
+        A value of 0 indicates that the feature is disabled."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 12 }
+
+juniIpIfForwarding  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the forwarding of IP traffic to/from this interface.
+        This is currently only applicable to the out-of-band management port."
+    DEFVAL    { enable }
+    ::= { juniIpIfEntry 13 }
+
+juniIpIfForceFragmentation  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Force the fragmentation of all IP packets greater than the interface
+        MTU even if the DF bit is set."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 14 }
+
+juniIpIfSharesLowerUid  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the interface as sharing a lower interface with another
+        interface vs owning it outright."
+    ::= { juniIpIfEntry 15 }
+
+juniIpIfFilterOptions  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Bit mask to configure the interface to filter packets with IP header
+        options.  Currently, either no bits or all bits may be set."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 16 }
+
+juniIpIfName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the IP interface discriminator for an IP interface not attached
+        to a layer 2 interface with a specific location."
+    DEFVAL    { ''H }
+    ::= { juniIpIfEntry 17 }
+
+juniIpIfArpTimeout  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the ARP timeout for this interface in seconds."
+    DEFVAL    { 21600 }
+    ::= { juniIpIfEntry 18 }
+
+
+juniIpIfAdminSpeed  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set an administrative speed for the interface that overrides the speed
+        learned from the lower layer.  A value of 0 indicates no speed is
+        specified."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 19 }
+
+juniIpIfMultipathMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    hashed(1),
+                    roundRobin(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configure the mode this interface should use when forwarding equal-cost
+        multipath traffic."
+    DEFVAL    { hashed }
+    ::= { juniIpIfEntry 20 }
+
+juniIpIfSharedNhAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address of either a direct or indirect next-hop toward which
+        this shared interface should point."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 21 }
+
+juniIpIfSharedNhRouterId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The identifier for the domain of a virtual router in which the
+        juniIpIfSharedNhAddr should be resolved."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 22 }
+
+juniIpIfPrimaryIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the primary IP network on an interface."
+    ::= { juniIpIfEntry 23 }
+
+juniIpIfPrimaryIpMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask of the primary IP network on an interface."
+    ::= { juniIpIfEntry 24 }
+
+juniIpIfOperDebounceTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the operational time in milliseconds that a layer2 interface
+        must remain in a state before it is conveyed to the IP layer.  Useful
+        for interfaces that experience brief outages that should not constitute
+        a route flap.  A value of 0 indicates that the feature is disabled."
+    ::= { juniIpIfEntry 25 }
+
+juniIpIfRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index or ID of the router."
+    ::= { juniIpIfEntry 26 }
+
+juniIpIfInheritNum  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this numbered interface is referenced by unnumbered
+        interfaces."
+    ::= { juniIpIfEntry 27 }
+
+juniIpIfInheritNumUid  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the interface index of a numbered interface whose IP address
+        should be used when sourcing traffic on this interface.  Useful for
+        unnumbered interfaces."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 28 }
+
+juniIpIfAnalyzerMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1),
+                    default(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to set the interface to analyzer mode.  When enabled(1), all IP
+        packets entering this interface and all non-mirror IP packets leaving
+        this interface will be dropped.  The value default(2) specifies that
+        this interface will be the default analyzer port for the virtual-router
+        where the interface resides."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 29 }
+
+juniIpIfAutoConfigure  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, IP subscriber interfaces are created dynamically based on
+        any attributes defined in the service-profile and the rules associated
+        with the DCM profile selected for this subscriber."
+    DEFVAL    { disable }
+    ::= { juniIpIfEntry 30 }
+
+juniIpIfTcpMss  OBJECT-TYPE
+    SYNTAX      Integer32 (0|160..10240)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures TCP MSS value for an IP interface.  When configured, MSS
+        value of TCP SYN packets received or transmitted on the interface will
+        be compared with the configured value and lowest of the two will replace
+        the value in the packet."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 31 }
+
+juniIpIfInitSeqPrefOper  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the operational warm-restart replay initial sequence
+        preference value for an IP interface.  Following an HA SRP switchover,
+        high-preference (value 1) IP interfaces are replayed first, followed by
+        static routes, and then low-preference (value 0) IP interfaces.  This
+        allows static routes that are dependent on high-preference interfaces to
+        be resolved and routing protocols to exchange information with peers
+        over high-preference interfaces before low-preference interfaces are
+        replayed.  An IP interface is designated as high-preference either (1)
+        implicitly by configuring an IGP or PIM protocol on that interface, or
+        (2) explicitly by juniIpIfInitSeqPrefAdmin (or CLI) configuration."
+    ::= { juniIpIfEntry 32 }
+
+juniIpIfInitSeqPrefAdmin  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures the warm-restart replay initial sequence preference value
+        for an IP interface.  See the juniIpIfInitSeqPrefOper description for more
+        information."
+    DEFVAL    { 0 }
+    ::= { juniIpIfEntry 33 }
+
+juniIpIfArpSpoofCheck  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, IP ARP spoof checking is performed on ARP packets
+        received on the IP interface."
+    DEFVAL    { enable }
+    ::= { juniIpIfEntry 34 }
+
+--
+-- The IP Interface Statistics Table
+--
+juniIpIfStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for IP interfaces present in the system."
+    ::= { juniIpInterface 3 }
+
+juniIpIfStatsEntry  OBJECT-TYPE
+    SYNTAX      JuniIpIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains statistics for an IP interface."
+    INDEX     { juniIpIfStatsIndex }
+    ::= { juniIpIfStatsTable 1 }
+
+JuniIpIfStatsEntry ::= SEQUENCE {
+    juniIpIfStatsIndex                       InterfaceIndex,
+    juniIpIfStatsInPackets                   Counter64,
+    juniIpIfStatsInOctets                    Counter64,
+    juniIpIfStatsInPoliciedPackets           Counter64,
+    juniIpIfStatsInPoliciedOctets            Counter64,
+    juniIpIfStatsInErrorPackets              Counter64,
+    juniIpIfStatsInSpoofedPackets            Counter64,
+    juniIpIfStatsInForwardedPackets          Counter64,
+    juniIpIfStatsInForwardedOctets           Counter64,
+    juniIpIfStatsOutForwardedPackets         Counter64,
+    juniIpIfStatsOutForwardedOctets          Counter64,
+    juniIpIfStatsOutSchedDropPackets         Counter64,
+    juniIpIfStatsOutSchedDropOctets          Counter64,
+    juniIpIfStatsOutRequestedPackets         Counter64,
+    juniIpIfStatsOutRequestedOctets          Counter64,
+    juniIpIfStatsOutPoliciedPackets          Counter64,
+    juniIpIfStatsOutPoliciedOctets           Counter64,
+    juniIpIfStatsGreenOutSchedDropPackets    Counter64,
+    juniIpIfStatsYellowOutSchedDropPackets   Counter64,
+    juniIpIfStatsRedOutSchedDropPackets      Counter64,
+    juniIpIfStatsGreenOutSchedDropOctets     Counter64,
+    juniIpIfStatsYellowOutSchedDropOctets    Counter64,
+    juniIpIfStatsRedOutSchedDropOctets       Counter64 }
+
+juniIpIfStatsIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the IP interface."
+    ::= { juniIpIfStatsEntry 1 }
+
+juniIpIfStatsInPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received on this interface."
+    ::= { juniIpIfStatsEntry 2 }
+
+juniIpIfStatsInOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received on this interface."
+    ::= { juniIpIfStatsEntry 3 }
+
+juniIpIfStatsInPoliciedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to rate limiters attached to this
+        interface."
+    ::= { juniIpIfStatsEntry 4 }
+
+juniIpIfStatsInPoliciedOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets dropped due to rate limiters attached to this
+        interface."
+    ::= { juniIpIfStatsEntry 5 }
+
+juniIpIfStatsInErrorPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received with errors on this interface."
+    ::= { juniIpIfStatsEntry 6 }
+
+juniIpIfStatsInSpoofedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received on this interface with destination
+        unknown."
+    ::= { juniIpIfStatsEntry 7 }
+
+juniIpIfStatsInForwardedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of packets received on this interface that were forwarded
+        by any interface in the system."
+    ::= { juniIpIfStatsEntry 8 }
+
+juniIpIfStatsInForwardedOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of octets received on this interface that were forwarded by
+        any interface in the system."
+    ::= { juniIpIfStatsEntry 9 }
+
+juniIpIfStatsOutForwardedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets forwarded by this interface."
+    ::= { juniIpIfStatsEntry 10 }
+
+juniIpIfStatsOutForwardedOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets forwarded by this interface."
+    ::= { juniIpIfStatsEntry 11 }
+
+juniIpIfStatsOutSchedDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped at this interface due to output queue
+        congestion."
+    ::= { juniIpIfStatsEntry 12 }
+
+juniIpIfStatsOutSchedDropOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets dropped at this interface due to output queue
+        congestion."
+    ::= { juniIpIfStatsEntry 13 }
+
+juniIpIfStatsOutRequestedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of packets requested for transmission at this interface."
+    ::= { juniIpIfStatsEntry 14 }
+
+juniIpIfStatsOutRequestedOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of octets requested for transmission at this interface."
+    ::= { juniIpIfStatsEntry 15 }
+
+juniIpIfStatsOutPoliciedPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to rate limiters attached to this
+        interface."
+    ::= { juniIpIfStatsEntry 16 }
+
+juniIpIfStatsOutPoliciedOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets dropped due to rate limiters attached to this
+        interface."
+    ::= { juniIpIfStatsEntry 17 }
+
+juniIpIfStatsGreenOutSchedDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of packets dropped at this interface due to output queue
+        congestion in the green output queue.  The green output queue has lowest
+        drop probability."
+    ::= { juniIpIfStatsEntry 18 }
+
+juniIpIfStatsYellowOutSchedDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of packets dropped at this interface due to output queue
+        congestion in the yellow output queue.  The yellow output queue has
+        medium level drop probability."
+    ::= { juniIpIfStatsEntry 19 }
+
+juniIpIfStatsRedOutSchedDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of packets dropped at this interface due to output queue
+        congestion in the red output queue.  The red output queue has highest
+        level drop probability."
+    ::= { juniIpIfStatsEntry 20 }
+
+juniIpIfStatsGreenOutSchedDropOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of octets dropped at this interface due to output queue
+        congestion in the green output queue.  The green output queue has the
+        lowest drop probability."
+    ::= { juniIpIfStatsEntry 21 }
+
+juniIpIfStatsYellowOutSchedDropOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of octets dropped at this interface due to output queue
+        congestion in the yellow output queue.  The yellow output queue has the
+        medium drop probability."
+    ::= { juniIpIfStatsEntry 22 }
+
+juniIpIfStatsRedOutSchedDropOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of octets dropped at this interface due to output queue
+        congestion in the red output queue.  The red output queue has the
+        highest drop probability."
+    ::= { juniIpIfStatsEntry 23 }
+
+
+--
+-- The IP Interface Association Table
+--
+juniIpIfAssocTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpIfAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of interfaces present in the system."
+    ::= { juniIpInterface 4 }
+
+juniIpIfAssocEntry  OBJECT-TYPE
+    SYNTAX      JuniIpIfAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table returns the ifIndex of the IP interface
+        associated with the lower layer ifIndex supplied as the index to this
+        table.
+
+        The purpose of this table is to translate L2 interfaces to corresponding
+        L3 interfaces for billing applications.  Since interesting billing
+        related statistics are kept at L3, it is often useful to know the L2-L3
+        relationship.  Note that this table is not confined to L2-L3
+        relationships.  Any interface sublayer can be used to access this table
+        to determine the relationship with the L3 interface."
+    INDEX     { juniIpIfAssocLowerIfIndex }
+    ::= { juniIpIfAssocTable 1 }
+
+JuniIpIfAssocEntry ::= SEQUENCE {
+    juniIpIfAssocLowerIfIndex    InterfaceIndex,
+    juniIpIfAssocIpIfIndex       InterfaceIndexOrZero }
+
+juniIpIfAssocLowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the lower layer interface."
+    ::= { juniIpIfAssocEntry 1 }
+
+juniIpIfAssocIpIfIndex  OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The ifIndex of the IP interface associated with the lower layer
+        juniIpIfAssocLowerIfIndex.  In cases where there is not a 1 to 1
+        relationship between lower layer and higher layer IP interface, a zero
+        value juniIpIfAssocIpIfIndex is returned; this includes the case where
+        an IP interface has not yet been configued at the top of the interface
+        column.
+
+        An example usage of this table:
+
+        Assume a user needs to know the ifIndex relationship for all interfaces
+        with the L3 IP interface.
+
+        Then starting at the bottom of the stack below, the ATM and AAL5's
+        ifIndex would be used to access the table.  The agent will return 0 for
+        each of these cases because multiple customer's traffic is demultiplexed
+        at these levels.
+
+         IP_1
+         PPP        IP_2
+         ATM1483_1  ATM1483_2
+           \         /
+              AAL5
+              ATM
+
+        If the ATM1483_1 ifIndex is used to access this table, then the value of
+        juniIpIfAssocLowerIfIndex will be set to the ifIndex of IP_1.
+        Similarily, if the ATM1483_2 ifIndex is used to access this table, the
+        juniIpifAssocLowerIfIndex will set to the ifIndex of IP_2."
+    ::= { juniIpIfAssocEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Address attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IP globals
+--
+juniIpAddrGlobals  OBJECT IDENTIFIER ::= { juniIpAddress 1 }
+
+juniIpArpTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Timeout, in seconds, for ARP requests issued by this entity."
+    ::= { juniIpAddrGlobals 1 }
+
+--
+-- IP Address management
+--
+juniIpAddrTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP addressing information for this entity's IP network interfaces.
+        Representation of both numbered and unnumbered IP interfaces is
+        supported."
+    ::= { juniIpAddress 2 }
+
+juniIpAddrEntry  OBJECT-TYPE
+    SYNTAX      JuniIpAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP addressing information for one of this entity's IP network
+        interfaces.  This interface could be either numbered or unnumbered.
+
+        The following objects correspond to (read-only) counterparts in the
+        IP-MIB ipAddrTable:
+            juniIpAdEntAddr
+            juniIpAdEntIfIndex
+            juniIpAdEntNetMask
+            juniIpAdEntBcastAddr
+            juniIpAdEntReasmMaxSize "
+    INDEX     { juniIpAdEntAddr }
+    ::= { juniIpAddrTable 1 }
+
+JuniIpAddrEntry ::= SEQUENCE {
+    juniIpAdEntAddr                     JuniIpAddrLessIf,
+    juniIpAdEntIfIndex                  InterfaceIndex,
+    juniIpAdEntNetMask                  IpAddress,
+    juniIpAdEntBcastAddr                Integer32,
+    juniIpAdEntReasmMaxSize             Integer32,
+    juniIpAdEntRowStatus                RowStatus,
+    juniIpAdEntAdminStatus              JuniEnable,
+    juniIpAdEntArpRspEnable             JuniEnable,
+    juniIpAdEntProxyArpRspEnable        JuniEnable,
+    juniIpAdEntIgmpEnable               JuniEnable,
+    juniIpAdEntDirectedBcastEnable      JuniEnable,
+    juniIpAdEntIcmpRedirectEnable       JuniEnable,
+    juniIpAdEntIcmpMaskReplyEnable      JuniEnable,
+    juniIpAdEntIcmpUnreachEnable        JuniEnable,
+    juniIpAdEntMtu                      Integer32,
+    juniIpAdEntUnnumLoopbackIfIndex     InterfaceIndexOrZero,
+    juniIpAdEntIrdpEnable               JuniEnable,
+    juniIpAdEntAccessRouteEnable        JuniEnable,
+    juniIpAdEntAccessRouteHost          IpAddress,
+    juniIpAdEntIsSecondary              JuniEnable,
+    juniIpAdEntUnnumInheritNumIfIndex   InterfaceIndexOrZero }
+
+juniIpAdEntAddr  OBJECT-TYPE
+    SYNTAX      JuniIpAddrLessIf
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address for a numbered IP network interface, if this object's
+        value has the form 'a.b.c.d', where 'a' is nonzero; or, the ifIndex
+        (interpreting the low 24 bits of this value as an integer) of an
+        unnumbered ('address-less') IP interface, if this object's value has the
+        form '0.b.c.d'."
+    ::= { juniIpAddrEntry 1 }
+
+juniIpAdEntIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the network interface to which this entry's IP
+        addressing mode pertains."
+    ::= { juniIpAddrEntry 2 }
+
+juniIpAdEntNetMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet mask associated with the IP address of this entry.  The
+        network and host bit fields of the mask are filled with 1's and 0's,
+        respectively.
+
+        If this entry represents an unnumbered IP interface, this object should
+        have a value of all ones."
+    DEFVAL    { 'ffffffff'H }
+    ::= { juniIpAddrEntry 3 }
+
+juniIpAdEntBcastAddr  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the least-significant bit in the IP broadcast address used
+        for sending datagrams on the IP network interface associated with this
+        entry.  For example, when the Internet standard all-ones broadcast
+        address is used, the value will be 1.  This value applies to both the
+        subnet and network broadcasts addresses used by the entity on this
+        interface."
+    ::= { juniIpAddrEntry 4 }
+
+juniIpAdEntReasmMaxSize  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of the largest IP datagram which this entity can re-assemble
+        from incoming IP fragmented datagrams received on this interface."
+    ::= { juniIpAddrEntry 5 }
+
+juniIpAdEntRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls the creation/deletion of entries in this table according to
+        the RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create entries for both numbered and unnumbered IP interfaces, the
+        following entry objects MUST be explicitly configured:
+            juniIpAdEntRowStatus
+            juniIpAdEntIfIndex
+
+        To create an entry for a numbered IP interface, the following conditions
+        must also hold:
+            <none>
+
+        To create an entry for an unnumbered IP interface, the following
+        conditions must also hold:
+
+            juniIpAdEntUnnumInheritNumIfIndex must be configured with a nonzero
+            ifIndex value of an IP numbered interface."
+    ::= { juniIpAddrEntry 6 }
+
+juniIpAdEntAdminStatus  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable operation of IP on this IP network interface."
+    DEFVAL    { enable }
+    ::= { juniIpAddrEntry 7 }
+
+juniIpAdEntArpRspEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ARP response on this IP network interface."
+    DEFVAL    { enable }
+    ::= { juniIpAddrEntry 8 }
+
+juniIpAdEntProxyArpRspEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable proxy ARP response on this IP network interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 9 }
+
+juniIpAdEntIgmpEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Enable/disable IGMP operation on this IP network interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 10 }
+
+juniIpAdEntDirectedBcastEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable forwarding of directed broadcasts on this IP network
+        interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 11 }
+
+juniIpAdEntIcmpRedirectEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable transmission of ICMP Redirect messages on this IP
+        network interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 12 }
+
+juniIpAdEntIcmpMaskReplyEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable transmission of ICMP Mask Reply messages on this IP
+        network interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 13 }
+
+juniIpAdEntIcmpUnreachEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable transmission of ICMP Unreachable messages on this IP
+        network interface."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 14 }
+
+juniIpAdEntMtu  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured MTU size for this IP network interface.  If set to zero,
+        the default MTU size, as determined by the underlying network media, is
+        used."
+    ::= { juniIpAddrEntry 15 }
+
+juniIpAdEntUnnumLoopbackIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "For unnumbered interfaces, the ifIndex of the IP loopback interface
+        whose IP address is used as the source IP address for IP packets
+        transmitted on the unnumbered network.
+
+        For numbered interfaces, this object has a value of zero.
+
+        This object has been replaced by juniIpAdEntUnnumInheritNumIfIndex."
+    DEFVAL    { 0 }
+    ::= { juniIpAddrEntry 16 }
+
+juniIpAdEntIrdpEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls whether ICMP Router Discovery Protocol operation is permitted
+        to be sent on this network."
+    DEFVAL    { enable }
+    ::= { juniIpAddrEntry 17 }
+
+juniIpAdEntAccessRouteEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If enabled, then establishment/loss of a point-to-point network
+        connection causes a host route for the remote host to be created/deleted
+        automatically."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 18 }
+
+juniIpAdEntAccessRouteHost  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If an access route has been established, the IP address of the remote
+        host is reported by this object; otherwise, this object contains the
+        value 0.0.0.0."
+    ::= { juniIpAddrEntry 19 }
+
+juniIpAdEntIsSecondary  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If enabled, then the IP address corresponding to this entry is a
+        secondary address.  If disabled, then the IP address corresponding to
+        this entry is te primary address."
+    DEFVAL    { disable }
+    ::= { juniIpAddrEntry 20 }
+
+juniIpAdEntUnnumInheritNumIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For unnumbered interfaces, the ifIndex of the IP numbered interface
+        whose IP address is used as the source IP address for IP packets
+        transmitted on the unnumbered network.
+
+        For numbered interfaces, this object has a value of zero."
+    DEFVAL    { 0 }
+    ::= { juniIpAddrEntry 21 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Route
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Route Globals
+--
+juniIpRouteGlobals  OBJECT IDENTIFIER ::= { juniIpRoute 1 }
+
+juniIpRouteLimit  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Maximum number of IP routes maintained by this entity.
+
+        Setting a value lower than the current number of routes prevents
+        additional routes from being learned or configured, but does not cause
+        existing excess routes to be deleted to enforce the new limit."
+    ::= { juniIpRouteGlobals 1 }
+
+juniIpRouteTableLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VRF Route Table Maximum Number of Routes Limit."
+    DEFVAL    { 0 }
+    ::= { juniIpRouteGlobals 2 }
+
+juniIpRouteTableWarnPercent  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VRF Route Table Percentage of the Route Limit at which to issue a warning.
+         The percentage is only valid when juniIpRouteTableWarnOnly is false. It must be set to 0 if
+         juniIpRouteTableWarnOnly is true."
+    DEFVAL    { 0 }
+    ::= { juniIpRouteGlobals 3 }
+
+juniIpRouteTableWarnOnly  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VRF Route Table Maximum Number of Routes Warning flag. 
+         Do not actually limit the number of routes in the table"
+    DEFVAL    { false }
+    ::= { juniIpRouteGlobals 4 }
+
+juniIpRouteTableWarnThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The computed number of route to issue a warning. If juniIpRouteTableWarnOnly is true
+         this value will be juniIpRouteTableLimit and if juniIpRouteTableWarnOnly is false it will
+         be juniIpRouteTableLimit * juniIpRouteTableWarnPercentage" 
+    ::= { juniIpRouteGlobals 5 }
+
+--
+-- Static Route Table
+--
+juniIpRouteStaticTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRouteStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of static routes configured on this entity.
+
+        The object definitions and indexing for this table are chosen to closely
+        align with the IP-FORWARD-MIB's ipCidrRouteTable.
+
+        This  table serves three purposes:
+        1. Provide the means for configuring static routes.
+        2. Provide an efficient view of static routes (otherwise they must be
+           observed by traversing the entire routing table).
+        3. Provide view of static routes configured on network interfaces that
+           are currently inactive.  (In this implementation, static routes
+           configured on inactive interfaces are not visible in the routing
+           table.)"
+    ::= { juniIpRoute 2 }
+
+juniIpRouteStaticEntry  OBJECT-TYPE
+    SYNTAX      JuniIpRouteStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A static route."
+    INDEX     { juniIpRouteStaticDest,
+                juniIpRouteStaticMask,
+                juniIpRouteStaticPref,
+                juniIpRouteStaticNextHop }
+    ::= { juniIpRouteStaticTable 1 }
+
+JuniIpRouteStaticEntry ::= SEQUENCE {
+    juniIpRouteStaticDest        IpAddress,
+    juniIpRouteStaticMask        IpAddress,
+    juniIpRouteStaticPref        Integer32,
+    juniIpRouteStaticNextHop     JuniIpAddrLessIf,
+    juniIpRouteStaticRowStatus   RowStatus,
+    juniIpRouteStaticIfIndex     Integer32,
+    juniIpRouteStaticStatus      INTEGER,
+    juniIpRouteStaticNextHopAS   Integer32,
+    juniIpRouteStaticMetric      Integer32,
+    juniIpRouteStaticTag         Unsigned32 }
+
+juniIpRouteStaticDest  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address of this route.
+
+        This object may not take a Multicast (Class D) address value.
+
+        Any assignment (implicit or otherwise) of an instance of this object to
+        a value x must be rejected if the bitwise logical-AND of x with the
+        value of the corresponding instance of the juniIpRouteStaticMask object
+        is not equal to x."
+    ::= { juniIpRouteStaticEntry 1 }
+
+juniIpRouteStaticMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the mask to be logical-ANDed with the destination address
+        before being compared to the value in the juniIpRouteStaticDest field.
+        For those systems that do not support arbitrary subnet masks, an agent
+        constructs the value of the juniIpRouteStaticMask by reference to the IP
+        Address Class.
+
+        Any assignment (implicit or otherwise) of an instance of this object to
+        a value x must be rejected if the bitwise logical-AND of x with the
+        value of the corresponding instance of the juniIpRouteStaticDest object
+        is not equal to juniIpRouteStaticDest."
+    ::= { juniIpRouteStaticEntry 2 }
+
+-- The following convention is included for specification
+-- of TOS Field contents.  At this time, the Host Requirements
+-- and the Router Requirements documents disagree on the width
+-- of the TOS field.  This mapping describes the Router
+-- Requirements mapping, and leaves room to widen the TOS field
+-- without impact to fielded systems.
+
+juniIpRouteStaticPref  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference of this static route.  Higher values correspond to
+        higher preference.  A static route with preference of zero will never be
+        installed as an active route."
+    ::= { juniIpRouteStaticEntry 3 }
+
+juniIpRouteStaticNextHop  OBJECT-TYPE
+    SYNTAX      JuniIpAddrLessIf
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the next hop toward the destination."
+    ::= { juniIpRouteStaticEntry 4 }
+
+juniIpRouteStaticRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status variable, used according to row installation and removal
+        conventions."
+    ::= { juniIpRouteStaticEntry 5 }
+
+juniIpRouteStaticIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value which identifies the local interface through which
+        the next hop of this route should be reached.  A value of zero means the
+        router should automatically determine the interface through which the
+        specified next-hop address is reached.
+
+        An implementation may disallow non-zero values from being configured."
+    DEFVAL    { 0 }
+    ::= { juniIpRouteStaticEntry 6 }
+
+juniIpRouteStaticStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    active(0),
+                    inactive(1),
+                    incomplete(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of this static route.
+
+        active(0) indicates this route is currently being used to reach the
+        specified destination.
+
+        inactive(1) indicates this route is considered valid, but currently is
+        superseded by another routing table entry for the destination, having a
+        higher preference value.
+
+        incomplete(2) indicates this route entry contains information that is
+        incomplete, or is inconsistent with other system configuration (for
+        example, the interface specified in juniIpRouteStaticIfIndex does not
+        exist)."
+    ::= { juniIpRouteStaticEntry 7 }
+
+juniIpRouteStaticNextHopAS  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Autonomous System Number of the Next Hop.  The semantics of this
+        object are determined by the routing-protocol specified in the route's
+        ipCidrRouteProto value.  When this object is unknown or not relevant its
+        value should be set to zero."
+    DEFVAL    { 0 }
+    ::= { juniIpRouteStaticEntry 8 }
+
+juniIpRouteStaticMetric  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The primary routing metric for this route.  The semantics of this
+        metric are determined by the routing-protocol specified in the route's
+        ipCidrRouteProto value.  If this metric is not used, its value should be
+        set to -1."
+    DEFVAL    { -1 }
+    ::= { juniIpRouteStaticEntry 9 }
+
+juniIpRouteStaticTag  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A tag value for this static route."
+    DEFVAL    { 0 }
+    ::= { juniIpRouteStaticEntry 10 }
+
+
+--
+-- Extensions to IP CIDR Route Table
+--
+juniIpCidrRouteTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpCidrRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of routes active on this entity.  This table is an augmentation
+        of the IP-FORWARD-MIB's ipCidrRouteTable."
+    ::= { juniIpRoute 3 }
+
+juniIpCidrRouteEntry  OBJECT-TYPE
+    SYNTAX      JuniIpCidrRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Additional attributes of an active route."
+    AUGMENTS  { ipCidrRouteEntry }
+    ::= { juniIpCidrRouteTable 1 }
+
+JuniIpCidrRouteEntry ::= SEQUENCE {
+    juniIpCidrRoutePref  Integer32,
+    juniIpCidrRouteArea  IpAddress,
+    juniIpCidrRouteTag   Unsigned32 }
+
+juniIpCidrRoutePref  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference of this route.  Higher values correspond to higher
+        preference."
+    ::= { juniIpCidrRouteEntry 1 }
+
+juniIpCidrRouteArea  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Area to which this route pertains.  A value of 0.0.0.0 indicates no
+        area is identified."
+    ::= { juniIpCidrRouteEntry 2 }
+
+juniIpCidrRouteTag  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A tag value for this route."
+    ::= { juniIpCidrRouteEntry 3 }
+
+--
+-- The IP Route BFD Table
+--
+ 
+juniIpRouteStaticBFDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRouteStaticBFDEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper IP interface table describes the BFD-specific
+        characteristics of interfaces."
+    ::= { juniIpRoute 4 }
+
+juniIpRouteStaticBFDEntry OBJECT-TYPE
+    SYNTAX      JuniIpRouteStaticBFDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper IP interface table describes the BFD-specific
+        characteristics of one interface."
+    AUGMENTS  { juniIpRouteStaticEntry } 
+    ::= { juniIpRouteStaticBFDTable 1 }
+
+JuniIpRouteStaticBFDEntry ::= SEQUENCE {
+    juniIpRouteStaticBfdEnable   TruthValue,
+    juniIpRouteStaticBfdMinRxInterval   Integer32,
+    juniIpRouteStaticBfdMinTxInterval   Integer32,
+    juniIpRouteStaticBfdMultiplier	Integer32
+}
+
+juniIpRouteStaticBfdEnable   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether BFD session on the interface is active or not"
+    DEFVAL    { false }
+    ::= { juniIpRouteStaticBFDEntry 1 }
+    
+juniIpRouteStaticBfdMinRxInterval   OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies upper-limit on rate local-system requires remote-system to
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }
+    ::= { juniIpRouteStaticBFDEntry 2 }
+
+juniIpRouteStaticBfdMinTxInterval   OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies lower-limit on rate local-system requires remote-system to 
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }                 
+    ::= { juniIpRouteStaticBFDEntry 3 }
+
+juniIpRouteStaticBfdMultiplier	OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies detection-multiplier "
+    DEFVAL    { 3 }                         
+    ::= { juniIpRouteStaticBFDEntry 4 }
+    
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+juniIpTrapEnables OBJECT IDENTIFIER ::= { juniIpMIB 2 }
+juniIpTraps       OBJECT IDENTIFIER ::= { juniIpMIB 3 }
+juniIpTrapPrefix  OBJECT IDENTIFIER ::= { juniIpTraps 0 }
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Trap Definitions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniIpSaValidateTrapEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable source address validation traps."
+    DEFVAL    { false }
+    ::= { juniIpTrapEnables 1 }
+
+juniIpRouteTableTrapRouteLimitExceeded NOTIFICATION-TYPE
+     OBJECTS {juniIpRouteTableLimit, ipCidrRouteNumber}
+     STATUS       current
+     DESCRIPTION
+         "The  juniIpRouteTableTrapRouteLimitExceeded Trap indicates that the configured
+          route Table Limit has been exceeded. Issued once every 5 minutes that
+          the limit is being exceeded."
+        ::= { juniIpTrapPrefix 1 }
+
+juniIpRouteTableTrapRouteLimitRemove NOTIFICATION-TYPE
+     OBJECTS {juniIpRouteTableLimit, ipCidrRouteNumber}
+     STATUS       current
+     DESCRIPTION
+         "The  juniIpRouteTableTrapRouteTableLimitRemove Trap indicates that routes have been
+          freed up for 30 seconds and the Route Table Limit is no longer being violated.
+          Issued once."
+        ::= { juniIpTrapPrefix 2 }
+
+juniIpRouteTableTrapWarnThresholdExceeded NOTIFICATION-TYPE
+     OBJECTS {juniIpRouteTableLimit, juniIpRouteTableWarnThreshold, ipCidrRouteNumber}
+     STATUS       current
+     DESCRIPTION
+         "The  juniIpRouteTableTrapWarnThresholdExceeded Trap indicates that the computed
+          warning threshold has been exceeded.
+          Issued once every 5 minutes that the warning threshold is being execeeded."
+
+     ::= { juniIpTrapPrefix 3 }
+
+juniIpTrapSaValidationFailure NOTIFICATION-TYPE
+     OBJECTS {ifIndex, juniIpIfSaValFailSrcIpAddr, juniIpIfSaValFailDestIpAddr}
+     STATUS       current
+     DESCRIPTION
+         "The  juniIpTrapSaValidationFailure Trap indicates that a source address validation
+          failure occurred on an interface.  The interface on which the failure occurred,
+          the source ip address and the destination ip address of the packet causing the
+          failure are returned."
+
+     ::= { juniIpTrapPrefix 4 }
+  
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpMIBNotificationObjects  OBJECT IDENTIFIER ::= { juniIpTraps 1 }
+
+juniIpIfSaValFailSrcIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The source IP address of the packet that caused the last source address
+         validation failure on the IP interface."
+    ::= { juniIpMIBNotificationObjects 1 }
+
+juniIpIfSaValFailDestIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address of the packet that caused the last source address
+         validation failure on the IP interface."
+    ::= { juniIpMIBNotificationObjects 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpConformance     OBJECT IDENTIFIER ::= { juniIpMIB 4 }
+juniIpCompliances     OBJECT IDENTIFIER ::= { juniIpConformance 1 }
+juniIpGroups          OBJECT IDENTIFIER ::= { juniIpConformance 2 }
+
+--
+-- compliance statements
+--
+juniIpCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when the IP interface and IP
+        address groups changed and the global objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup,
+            juniIpAddressGroup,
+            juniIpRouteGroup }
+    ::= { juniIpCompliances 1 }                                    -- JUNOSe 2.2
+
+juniIpCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when the juniIpIfAssocTable was
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup2,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    ::= { juniIpCompliances 2 }                                    -- JUNOSe 3.0
+
+juniIpCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when the QoS related objects
+        were obsoleted."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup3,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    ::= { juniIpCompliances 3 }                                   -- JUNOSe 3.2
+
+juniIpCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the
+        Juniper IP MIB.  This statement became obsolete when the QoS related
+        objects were obsoleted."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup4,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    ::= { juniIpCompliances 4 }                                    -- JUNOSe 4.0
+
+juniIpCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when support was added for
+        router index and unnumbered interfaces referencing numbered interfaces."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup4,
+            juniIpAddressGroup3,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2 }
+    ::= { juniIpCompliances 5 }                                    -- JUNOSe 4.1
+
+juniIpCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when interface mirroring and 
+        interface auto configure support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup5,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2 }
+    ::= { juniIpCompliances 6 }                                    -- JUNOSe 5.0
+
+juniIpCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB.  This statement became obsolete when interface TCP MSS feature
+        was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup6,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2,
+            juniIpIfSummaryGroup }
+    ::= { juniIpCompliances 7 }                                    -- JUNOSe 5.1
+
+juniIpCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        IP MIB. This statement became obsolete when  juniIpVpnIdOui and 
+	juniIpVpnIdIndex were obsoleted."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2,
+            juniIpIfSummaryGroup }
+    ::= { juniIpCompliances 8 }                                    -- JUNOSe 5.2
+
+
+juniIpCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationsGroup }
+    ::= { juniIpCompliances 9 }                                    -- JUNOSe 6.0
+
+juniIpCompliance10  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationsGroup }
+    ::= { juniIpCompliances 10 }                                    -- JUNOSe 6.1
+                                  
+
+juniIpCompliance11  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB. This statement became obsolete when  juniIpVpnIdOui and 
+	juniIpVpnIdIndex were obsoleted."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup1,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpRouteSummaryGroup }
+    ::= { juniIpCompliances 11 }                                    -- JUNOSe 7.0
+                        
+juniIpCompliance12  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB. This statement became obsolete when juniIpIfInitSeqPrefOper and
+        juniIpIfInitSeqPrefAdmin were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup1,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpRouteSummaryGroup,
+            juniIpRouteStaticBFDGroup }
+    ::= { juniIpCompliances 12 }                                    -- JUNOSe 7.3
+                        
+juniIpCompliance13  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB. This statement became obsolete when juniIpIfArpSpoofCheck was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup8,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup1,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpRouteSummaryGroup,
+            juniIpRouteStaticBFDGroup }
+    ::= { juniIpCompliances 13 }                                  -- JUNOSe 7.3.2
+
+juniIpCompliance14  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper IP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpInterfaceGroup9,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup1,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpRouteSummaryGroup,
+            juniIpRouteStaticBFDGroup }
+    ::= { juniIpCompliances 14 }                                  -- JUNOSe 9.3
+
+--
+-- units of conformance
+--
+juniIpInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsInForwardedPackets,
+        juniIpIfStatsInForwardedOctets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutRequestedPackets,
+        juniIpIfStatsOutRequestedOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when new objects were
+        added to the juniIpIfTable and the juniIpIfStatsTable."
+    ::= { juniIpGroups 1 }                                         -- JUNOSe 2.2
+
+juniIpAddressGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpArpTimeout,
+
+        juniIpAdEntRowStatus,
+        juniIpAdEntIfIndex,
+        juniIpAdEntNetMask,
+        juniIpAdEntAdminStatus,
+        juniIpAdEntArpRspEnable,
+        juniIpAdEntProxyArpRspEnable,
+        juniIpAdEntIgmpEnable,
+        juniIpAdEntDirectedBcastEnable,
+        juniIpAdEntIcmpRedirectEnable,
+        juniIpAdEntIcmpMaskReplyEnable,
+        juniIpAdEntIcmpUnreachEnable,
+        juniIpAdEntMtu,
+        juniIpAdEntUnnumLoopbackIfIndex,
+        juniIpAdEntIrdpEnable,
+        juniIpAdEntAccessRouteEnable,
+        juniIpAdEntAccessRouteHost }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP address capabilities in
+        a Juniper product.  This group became obsolete when
+        juniIpAdEntIgmpEnable was deprecated and juniIpAdEntIsSecondary was
+        added."
+    ::= { juniIpGroups 2 }                                         -- JUNOSe 2.2
+
+juniIpRouteGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteLimit,
+
+        juniIpRouteStaticDest,
+        juniIpRouteStaticMask,
+        juniIpRouteStaticPref,
+        juniIpRouteStaticNextHop,
+        juniIpRouteStaticRowStatus,
+        juniIpRouteStaticIfIndex,
+        juniIpRouteStaticStatus,
+        juniIpRouteStaticNextHopAS,
+        juniIpRouteStaticMetric,
+        juniIpRouteStaticTag,
+
+        juniIpCidrRoutePref,
+        juniIpCidrRouteArea,
+        juniIpCidrRouteTag }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP routing capabilities in
+        a Juniper product.  This group became obsolete when juniIpRouteLimit was
+        obsoleted."
+    ::= { juniIpGroups 3 }                                         -- JUNOSe 2.2
+
+juniIpGlobalGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpDebounceTime,
+        juniIpRouterId,
+        juniIpSourceRoutingAdminStatus,
+        juniIpVpnIdOui,
+        juniIpVpnIdIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of IP global objects for managing instances of IP
+        in a Juniper product.  This group became obsolete when BGP new format
+        objects were added."
+    ::= { juniIpGroups 4 }                                         -- JUNOSe 3.0
+
+juniIpInterfaceGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfLoopback,
+        juniIpIfLoopbackUid,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsInForwardedPackets,
+        juniIpIfStatsInForwardedOctets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutRequestedPackets,
+        juniIpIfStatsOutRequestedOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+        juniIpIfStatsGreenOutSchedDropPackets,
+        juniIpIfStatsYellowOutSchedDropPackets,
+        juniIpIfStatsRedOutSchedDropPackets,
+        juniIpIfStatsGreenOutSchedDropOctets,
+        juniIpIfStatsYellowOutSchedDropOctets,
+        juniIpIfStatsRedOutSchedDropOctets }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the
+        juniIpIfAssocTable was added."
+    ::= { juniIpGroups 5 }                                         -- JUNOSe 3.0
+
+juniIpAddressGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpArpTimeout,
+
+        juniIpAdEntRowStatus,
+        juniIpAdEntIfIndex,
+        juniIpAdEntNetMask,
+        juniIpAdEntBcastAddr,
+        juniIpAdEntReasmMaxSize,
+        juniIpAdEntAdminStatus,
+        juniIpAdEntArpRspEnable,
+        juniIpAdEntProxyArpRspEnable,
+        juniIpAdEntDirectedBcastEnable,
+        juniIpAdEntIcmpRedirectEnable,
+        juniIpAdEntIcmpMaskReplyEnable,
+        juniIpAdEntIcmpUnreachEnable,
+        juniIpAdEntMtu,
+        juniIpAdEntUnnumLoopbackIfIndex,
+        juniIpAdEntIrdpEnable,
+        juniIpAdEntAccessRouteEnable,
+        juniIpAdEntAccessRouteHost,
+        juniIpAdEntIsSecondary }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP address capabilities in
+        a Juniper product.  This group became obsolete when when
+        juniIpArpTimeout was obsoleted."
+    ::= { juniIpGroups 6 }                                         -- JUNOSe 3.0
+
+juniIpInterfaceGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfLoopback,
+        juniIpIfLoopbackUid,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsInForwardedPackets,
+        juniIpIfStatsInForwardedOctets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutRequestedPackets,
+        juniIpIfStatsOutRequestedOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+        juniIpIfStatsGreenOutSchedDropPackets,
+        juniIpIfStatsYellowOutSchedDropPackets,
+        juniIpIfStatsRedOutSchedDropPackets,
+        juniIpIfStatsGreenOutSchedDropOctets,
+        juniIpIfStatsYellowOutSchedDropOctets,
+        juniIpIfStatsRedOutSchedDropOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the QoS related
+        objects were obsoleted."
+    ::= { juniIpGroups 7 }                                         -- JUNOSe 3.2
+
+juniIpInterfaceGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfLoopback,
+        juniIpIfLoopbackUid,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the
+        juniIpIfInheritNum and juniIpIfInheritNumUid objects were added and
+        juniIpIfLoopback and juniIpIfLoopbackUid were deprecated."
+    ::= { juniIpGroups 8 }                                         -- JUNOSe 4.0
+
+juniIpAddressGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIpAdEntRowStatus,
+        juniIpAdEntIfIndex,
+        juniIpAdEntNetMask,
+        juniIpAdEntBcastAddr,
+        juniIpAdEntReasmMaxSize,
+        juniIpAdEntAdminStatus,
+        juniIpAdEntArpRspEnable,
+        juniIpAdEntProxyArpRspEnable,
+        juniIpAdEntDirectedBcastEnable,
+        juniIpAdEntIcmpRedirectEnable,
+        juniIpAdEntIcmpMaskReplyEnable,
+        juniIpAdEntIcmpUnreachEnable,
+        juniIpAdEntMtu,
+        juniIpAdEntUnnumLoopbackIfIndex,
+        juniIpAdEntIrdpEnable,
+        juniIpAdEntAccessRouteEnable,
+        juniIpAdEntAccessRouteHost,
+        juniIpAdEntIsSecondary }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP address capabilities in
+        a Juniper product.  This group became obsolete when the
+        juniIpAdEntUnnumInheritNumIfIndex object was added and
+        juniIpAdEntUnnumLoopbackIfIndex was deprecated."
+    ::= { juniIpGroups 9 }                                         -- JUNOSe 4.1
+
+juniIpRouteGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteStaticDest,
+        juniIpRouteStaticMask,
+        juniIpRouteStaticPref,
+        juniIpRouteStaticNextHop,
+        juniIpRouteStaticRowStatus,
+        juniIpRouteStaticIfIndex,
+        juniIpRouteStaticStatus,
+        juniIpRouteStaticNextHopAS,
+        juniIpRouteStaticMetric,
+        juniIpRouteStaticTag,
+
+        juniIpCidrRoutePref,
+        juniIpCidrRouteArea,
+        juniIpCidrRouteTag }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects for managing IP routing capabilities in a
+        Juniper product."
+    ::= { juniIpGroups 10 }                                        -- JUNOSe 4.1
+
+juniIpGlobalGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpDebounceTime,
+        juniIpRouterId,
+        juniIpSourceRoutingAdminStatus,
+        juniIpVpnIdOui,
+        juniIpVpnIdIndex,
+        juniIpBgpCommunityNewFormat,
+        juniIpBgpAsConfedSetNewFormat }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of IP global objects for managing instances of IP
+        in a Juniper product. This group became obsolete when juniIpVpnIdOui and 
+	juniIpVpnIdIndex were obsoleted."
+    ::= { juniIpGroups 11 }                                        -- JUNOSe 4.1
+
+juniIpInterfaceGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+        juniIpIfRouterIndex,
+        juniIpIfInheritNum,
+        juniIpIfInheritNumUid,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the
+        juniIpIfAnalyzerMode object was added."
+    ::= { juniIpGroups 12 }                                        -- JUNOSe 5.0
+
+juniIpAddressGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniIpAdEntRowStatus,
+        juniIpAdEntIfIndex,
+        juniIpAdEntNetMask,
+        juniIpAdEntBcastAddr,
+        juniIpAdEntReasmMaxSize,
+        juniIpAdEntAdminStatus,
+        juniIpAdEntArpRspEnable,
+        juniIpAdEntProxyArpRspEnable,
+        juniIpAdEntDirectedBcastEnable,
+        juniIpAdEntIcmpRedirectEnable,
+        juniIpAdEntIcmpMaskReplyEnable,
+        juniIpAdEntIcmpUnreachEnable,
+        juniIpAdEntMtu,
+        juniIpAdEntIrdpEnable,
+        juniIpAdEntAccessRouteEnable,
+        juniIpAdEntAccessRouteHost,
+        juniIpAdEntIsSecondary,
+        juniIpAdEntUnnumInheritNumIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP address capabilities in a
+        Juniper product."
+    ::= { juniIpGroups 13 }                                        -- JUNOSe 5.0
+
+juniIpInterfaceDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpIfLoopback,
+        juniIpIfLoopbackUid }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of deprecated objects for managing IP interface
+        capabilities in a Juniper product.  This group may continue to be
+        support on some products."
+    ::= { juniIpGroups 14 }                                        -- JUNOSe 5.0
+
+juniIpAddressDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpAdEntIgmpEnable,
+        juniIpAdEntUnnumLoopbackIfIndex }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of deprecated objects for managing IP address capabilities
+        in a Juniper product.  This group may continue to be support on some
+        products."
+    ::= { juniIpGroups 15 }                                        -- JUNOSe 5.0
+
+juniIpInterfaceGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+        juniIpIfRouterIndex,
+        juniIpIfInheritNum,
+        juniIpIfInheritNumUid,
+        juniIpIfAnalyzerMode,
+        juniIpIfAutoConfigure,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the
+        juniIpIfTcpMss object was added."
+    ::= { juniIpGroups 16 }                                        -- JUNOSe 5.1
+
+juniIpIfSummaryGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpIfSummaryTotalIntf,
+        juniIpIfSummaryTotalIntfUp,
+        juniIpIfSummaryTotalIntfDown,
+        juniIpIfSummaryTotalIntfProtUp,
+        juniIpIfSummaryTotalIntfProtDown,
+        juniIpIfSummaryTotalIntfProtNotPresent }
+    STATUS      current
+    DESCRIPTION
+        "A collection of IP Interface Summary Statistics."
+    ::= { juniIpGroups 17 }                                        -- JUNOSe 5.1
+
+juniIpInterfaceGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+        juniIpIfRouterIndex,
+        juniIpIfInheritNum,
+        juniIpIfInheritNumUid,
+        juniIpIfAnalyzerMode,
+        juniIpIfAutoConfigure,
+        juniIpIfTcpMss,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP interface capabilities
+        in a Juniper product.  This group became obsolete when the
+        juniIpIfInitSeqPrefOper and juniIpIfInitSeqPrefAdmin objects were added."
+    ::= { juniIpGroups 18 }                                        -- JUNOSe 5.2
+
+juniIpGlobalGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIpDebounceTime,
+        juniIpRouterId,
+        juniIpSourceRoutingAdminStatus,
+        juniIpBgpCommunityNewFormat,
+        juniIpBgpAsConfedSetNewFormat }
+    STATUS      current
+    DESCRIPTION
+        "A collection of IP global objects for managing instances of IP in a
+        Juniper product."
+    ::= { juniIpGroups 19 } 
+
+juniIpRouteGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteTableLimit,
+        juniIpRouteTableWarnPercent,
+        juniIpRouteTableWarnOnly,
+        juniIpRouteTableWarnThreshold,
+        juniIpRouteStaticDest,
+        juniIpRouteStaticMask,
+        juniIpRouteStaticPref,
+        juniIpRouteStaticNextHop,
+        juniIpRouteStaticRowStatus,
+        juniIpRouteStaticIfIndex,
+        juniIpRouteStaticStatus,
+        juniIpRouteStaticNextHopAS,
+        juniIpRouteStaticMetric,
+        juniIpRouteStaticTag,
+
+        juniIpCidrRoutePref,
+        juniIpCidrRouteArea,
+        juniIpCidrRouteTag }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP routing capabilities in a
+        Juniper product."
+    ::= { juniIpGroups 20 }                                        -- JUNOSe 6.1
+
+juniIpNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniIpRouteTableTrapRouteLimitExceeded,
+        juniIpRouteTableTrapRouteLimitRemove,
+        juniIpRouteTableTrapWarnThresholdExceeded }
+    STATUS      obsolete
+    DESCRIPTION
+        "The management notifications pertaining to IP Route Table state changes."
+    ::= { juniIpGroups 21 }                                   -- JUNOSe 6.1
+
+juniIpNotificationGroup1  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniIpRouteTableTrapRouteLimitExceeded,
+        juniIpRouteTableTrapRouteLimitRemove,
+        juniIpRouteTableTrapWarnThresholdExceeded,
+        juniIpTrapSaValidationFailure }
+    STATUS      current
+    DESCRIPTION
+        "The management notifications pertaining to IP."
+    ::= { juniIpGroups 22 }                                   -- JUNOSe 7.0
+
+juniIpMIBNotificationObjectsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpIfSaValFailSrcIpAddr,
+        juniIpIfSaValFailDestIpAddr }
+    STATUS      current
+    DESCRIPTION
+        "The management notification objects pertaining to IP."
+    ::= { juniIpGroups 23 }                                   -- JUNOSe 7.0
+
+juniIpRouteSummaryGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteSummaryUnicastTotalRoutes,
+        juniIpRouteSummaryUnicastTotalBytes,
+        juniIpRouteSummaryUnicastIsisRoutes,
+        juniIpRouteSummaryUnicastIsisLevel1Routes,
+        juniIpRouteSummaryUnicastIsisLevel2Routes,
+        juniIpRouteSummaryUnicastRipRoutes,
+        juniIpRouteSummaryUnicastStaticRoutes,
+        juniIpRouteSummaryUnicastConnectedRoutes,
+        juniIpRouteSummaryUnicastBgpRoutes,
+        juniIpRouteSummaryUnicastOspfRoutes,      
+        juniIpRouteSummaryUnicastIntraAreaOspfRoutes,
+        juniIpRouteSummaryUnicastOtherInternalRoutes,
+        juniIpRouteSummaryUnicastExternalOspfRoutes,
+        juniIpRouteSummaryUnicastInterAreaOspfRoutes,
+        juniIpRouteSummaryUnicastAccessRoutes,
+        juniIpRouteSummaryUnicastIntCreatedAccessHostRoutes,
+        juniIpRouteSummaryUnicastIntDialoutRoutes,
+	juniIpRouteSummaryUnicastRouteMemoryActive,
+        juniIpRouteSummaryUnicastLastRouteAddedOrDeletedIP,
+        juniIpRouteSummaryUnicastLastRouteAddedOrDeletedMask,
+        juniIpRouteSummaryUnicastLastRouteAddedOrDeletedClient,
+        juniIpRouteSummaryUnicastLastRouteAddedOrDeletedDate,
+        juniIpRouteSummaryMulticastTotalRoutes,
+        juniIpRouteSummaryMulticastTotalBytes,
+        juniIpRouteSummaryMulticastIsisRoutes,
+        juniIpRouteSummaryMulticastLevel1IsisRoutes,
+        juniIpRouteSummaryMulticastLevel2IsisRoutes,
+        juniIpRouteSummaryMulticastRipRoutes,
+        juniIpRouteSummaryMulticastStaticRoutes,
+        juniIpRouteSummaryMulticastConnectedRoutes,
+        juniIpRouteSummaryMulticastBgpRoutes,
+        juniIpRouteSummaryMulticastOspfRoutes,
+        juniIpRouteSummaryMulticastIntraAreaOspfRoutes,
+        juniIpRouteSummaryMulticastInterAreaOspfRoutes,
+        juniIpRouteSummaryMulticastExternalOspfRoutes,
+        juniIpRouteSummaryMulticastOtherInternalRoutes,
+        juniIpRouteSummaryMulticastAccessRoutes,
+        juniIpRouteSummaryMulticastIntCreatedAccessHostRoutes,
+        juniIpRouteSummaryMultiastIntDialoutRoutes,
+	juniIpRouteSummaryMulticastRouteMemoryActive,
+        juniIpRouteSummaryMulticastLastRouteAddedOrDeletedIP,
+        juniIpRouteSummaryMulticastLastRouteAddedOrDeletedMask,
+        juniIpRouteSummaryMulticastLastRouteAddedOrDeletedClient,
+        juniIpRouteSummaryMulticastLastRouteAddedOrDeletedDate }
+    STATUS      current
+    DESCRIPTION
+        "The management notifications pertaining to IP Route Table state changes."
+    ::= { juniIpGroups 24 }                                   -- JUNOSe 7.0
+    
+juniIpRouteStaticBFDGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteStaticBfdEnable,
+    	juniIpRouteStaticBfdMinRxInterval,
+    	juniIpRouteStaticBfdMinTxInterval,
+    	juniIpRouteStaticBfdMultiplier
+ }
+    STATUS      current
+    DESCRIPTION
+        "The management notifications pertaining to IP Route Table state changes."
+    ::= { juniIpGroups 25 }     
+    
+juniIpInterfaceGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+        juniIpIfRouterIndex,
+        juniIpIfInheritNum,
+        juniIpIfInheritNumUid,
+        juniIpIfAnalyzerMode,
+        juniIpIfAutoConfigure,
+        juniIpIfTcpMss,
+        juniIpIfInitSeqPrefOper,
+        juniIpIfInitSeqPrefAdmin,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects for managing IP interface capabilities in a
+        Juniper product."
+    ::= { juniIpGroups 26 }                                      -- JUNOSe 7.3.2
+
+juniIpInterfaceGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniIpNextIfIndex,
+
+        juniIpIfRowStatus,
+        juniIpIfLowerIfIndex,
+        juniIpIfType,
+        juniIpIfTypeId,
+        juniIpIfSAValidationEnable,
+        juniIpIfCreationType,
+        juniIpIfProfileId,
+        juniIpIfAlwaysUp,
+        juniIpIfDebounceTime,
+        juniIpIfForwarding,
+        juniIpIfForceFragmentation,
+        juniIpIfSharesLowerUid,
+        juniIpIfFilterOptions,
+        juniIpIfName,
+        juniIpIfArpTimeout,
+        juniIpIfAdminSpeed,
+        juniIpIfMultipathMode,
+        juniIpIfSharedNhAddr,
+        juniIpIfSharedNhRouterId,
+        juniIpIfPrimaryIpAddress,
+        juniIpIfPrimaryIpMask,
+        juniIpIfOperDebounceTime,
+        juniIpIfRouterIndex,
+        juniIpIfInheritNum,
+        juniIpIfInheritNumUid,
+        juniIpIfAnalyzerMode,
+        juniIpIfAutoConfigure,
+        juniIpIfTcpMss,
+        juniIpIfInitSeqPrefOper,
+        juniIpIfInitSeqPrefAdmin,
+		juniIpIfArpSpoofCheck,
+
+        juniIpIfStatsInPackets,
+        juniIpIfStatsInOctets,
+        juniIpIfStatsInPoliciedPackets,
+        juniIpIfStatsInPoliciedOctets,
+        juniIpIfStatsInErrorPackets,
+        juniIpIfStatsInSpoofedPackets,
+        juniIpIfStatsOutForwardedPackets,
+        juniIpIfStatsOutForwardedOctets,
+        juniIpIfStatsOutSchedDropPackets,
+        juniIpIfStatsOutSchedDropOctets,
+        juniIpIfStatsOutPoliciedPackets,
+        juniIpIfStatsOutPoliciedOctets,
+
+        juniIpIfAssocIpIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP interface capabilities in a
+        Juniper product."
+    ::= { juniIpGroups 27 }                                      -- JUNOSe 9.3
+
+END

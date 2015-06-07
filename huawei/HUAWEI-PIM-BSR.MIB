@@ -1,0 +1,217 @@
+-- ============================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-PIM-BSR-MIB.my , this Mib module for management of 
+--              the Bootstrap Router (Bsr) mechanism for PIM routers.
+-- Reference:  
+-- Version: V1.0
+-- History:
+--    created by wangyanwei 63315 2007-04-16
+--    
+-- ============================================================================
+
+   HUAWEI-PIM-BSR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE,
+       NOTIFICATION-TYPE,
+       mib-2, Unsigned32, TimeTicks     FROM SNMPv2-SMI
+       RowStatus, TruthValue            FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP,
+       NOTIFICATION-GROUP               FROM SNMPv2-CONF
+       InetAddressType,       
+       InetAddressPrefixLength,
+       InetAddress,
+       InetZoneIndex                    FROM INET-ADDRESS-MIB
+       hwDatacomm                       FROM HUAWEI-MIB;      
+    
+   hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
+
+   hwPimBsrMib MODULE-IDENTITY
+    LAST-UPDATED "200704160000Z" -- 16 April 2007
+    ORGANIZATION "Huawei Technologies co.,Ltd."
+    CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+    DESCRIPTION
+            "The Mib module for management of IP Multicast, including
+            multicast routing, data forwarding, and data reception.
+            Huawei Technologies co.,Ltd . Supplementary information may
+            be available at:
+            http://www.huawei.com" 
+    REVISION "200704160000Z" -- 16 April 2007
+    DESCRIPTION 
+            "The initial revision of this Mib module."
+    ::= { hwMcast 2 }
+   
+
+   hwPimBsrObjects         OBJECT IDENTIFIER ::= { hwPimBsrMib 1 }
+   
+
+   hwPimBsrConformance OBJECT IDENTIFIER ::= { hwPimBsrMib 2 }
+   hwPimBsrCompliances OBJECT IDENTIFIER ::= { hwPimBsrConformance 1 }
+   hwPimBsrGroups      OBJECT IDENTIFIER ::= { hwPimBsrConformance 2 }
+
+
+   hwPimBsrElectedBsrRpSetTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF HwPimBsrElectedBsrRpSetEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (conceptual) table listing Bsr-specific information
+               about PIM group mappings learned via C-RP advertisements
+               or created locally using configurations. This table is
+               maintained only on the Elected Bsr.
+
+               An Elected Bsr uses this table to create Bootstrap
+               Messages after applying a local policy to include some
+               or all of the group mappings in this table."
+
+       ::= { hwPimBsrObjects 2 }
+
+   hwPimBsrElectedBsrRpSetEntry OBJECT-TYPE
+       SYNTAX     HwPimBsrElectedBsrRpSetEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+                hwPimBsrElectedBsrRpSetTable."
+       INDEX      { hwPimBsrElectedBsrGrpMappingAddrType,
+                    hwPimBsrElectedBsrGrpMappingGrpAddr,
+                    hwPimBsrElectedBsrGrpMappingGrpPrefixLen,
+                    hwPimBsrElectedBsrGrpMappingRPAddr }
+       ::= { hwPimBsrElectedBsrRpSetTable 1 }
+
+   HwPimBsrElectedBsrRpSetEntry ::= SEQUENCE {
+       hwPimBsrElectedBsrGrpMappingAddrType      InetAddressType,
+       hwPimBsrElectedBsrGrpMappingGrpAddr       InetAddress,
+       hwPimBsrElectedBsrGrpMappingGrpPrefixLen  InetAddressPrefixLength,
+       hwPimBsrElectedBsrGrpMappingRPAddr        InetAddress,
+       hwPimBsrElectedBsrRpSetPriority           Unsigned32,
+       hwPimBsrElectedBsrRpSetHoldtime           Unsigned32,
+       hwPimBsrElectedBsrRpSetExpiryTime         TimeTicks,
+       hwPimBsrElectedBsrRpSetGrpBidir           TruthValue
+   }
+
+   hwPimBsrElectedBsrGrpMappingAddrType OBJECT-TYPE
+       SYNTAX     InetAddressType
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The Inet address type of the IP multicast group
+               prefix."
+       ::= { hwPimBsrElectedBsrRpSetEntry 2 }
+
+   hwPimBsrElectedBsrGrpMappingGrpAddr OBJECT-TYPE
+       SYNTAX     InetAddress (SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP multicast group address which, when combined
+               with hwPimBsrElectedBsrGrpMappingGrpAddr, gives the
+               group prefix for this mapping.  The InetAddressType is
+               given by the hwPimBsrElectedBsrGrpMappingAddrType object.
+
+               This address object is only significant up to
+               hwPimBsrElectedBsrGrpMappingGrpAddr bits. The
+               remainder of the address bits are zero.  This is
+               especially important for this field, which is part of
+               the index of this entry.  Any non-zero bits would
+               signify an entirely different entry."
+       ::= { hwPimBsrElectedBsrRpSetEntry 3 }
+
+   hwPimBsrElectedBsrGrpMappingGrpPrefixLen OBJECT-TYPE
+       SYNTAX     InetAddressPrefixLength (4..128)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The multicast group prefix length that, when combined
+               with hwPimBsrElectedBsrGrpMappingGrpAddr, gives the group
+               prefix for this mapping.  The InetAddressType is given by
+               the hwPimBsrElectedBsrGrpMappingAddrType object.  If
+               hwPimBsrElectedBsrGrpMappingAddrType is 'ipv4' or 'ipv4z',
+               this object must be in the range 4..32.  If
+               hwPimBsrElectedBsrGrpMappingAddrType is 'ipv6' or 'ipv6z',
+               this object must be in the range 8..128."
+       ::= { hwPimBsrElectedBsrRpSetEntry 4 }
+
+   hwPimBsrElectedBsrGrpMappingRPAddr OBJECT-TYPE
+       SYNTAX     InetAddress (SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP address of the RP to be used for groups within
+               this group prefix. The InetAddressType is given by the
+               hwPimBsrElectedBsrGrpMappingAddrType object."
+       ::= { hwPimBsrElectedBsrRpSetEntry 5 }
+
+   hwPimBsrElectedBsrRpSetPriority OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..255)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The priority for RP. Numerically higher values for
+               this object indicate lower priorities, with the value
+               zero denoting the highest priority."
+       REFERENCE "I-D.ietf-pim-sm-Bsr section 4.1"
+       ::= { hwPimBsrElectedBsrRpSetEntry 6 }
+
+   hwPimBsrElectedBsrRpSetHoldtime OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..65535)
+       UNITS      "seconds"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The holdtime for RP"
+       REFERENCE "I-D.ietf-pim-sm-Bsr section 4.1"
+       ::= { hwPimBsrElectedBsrRpSetEntry 7 }
+
+   hwPimBsrElectedBsrRpSetExpiryTime OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The minimum time remaining before this entry will be
+               aged out.  The value zero indicates that this entry will
+               never be aged out."
+       ::= { hwPimBsrElectedBsrRpSetEntry 8 }
+
+   hwPimBsrElectedBsrRpSetGrpBidir OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "If this object is TRUE, this group range with this
+               RP is a BIDIR-PIM group range. If it is set to FALSE,
+               it is a PIM-SM group range."
+       ::= { hwPimBsrElectedBsrRpSetEntry 9 }
+
+
+   hwPimBsrCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "The compliance statement for PIM routers that implement
+               the Bootstrap Router (Bsr) mechanism."
+       MODULE  -- this module
+       MANDATORY-GROUPS { hwPimBsrObjectGroup }
+
+       ::= { hwPimBsrCompliances 1 }
+
+
+   hwPimBsrObjectGroup OBJECT-GROUP
+       OBJECTS { hwPimBsrElectedBsrRpSetPriority,
+                 hwPimBsrElectedBsrRpSetHoldtime,
+                 hwPimBsrElectedBsrRpSetExpiryTime,
+                 hwPimBsrElectedBsrRpSetGrpBidir }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects for managing the Bootstrap
+               Router (Bsr) mechanism for PIM routers."
+       ::= { hwPimBsrGroups 1 }
+       
+   END

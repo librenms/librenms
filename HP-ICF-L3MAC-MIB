@@ -1,0 +1,111 @@
+HP-ICF-L3MAC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hpSwitch            
+            FROM HP-ICF-OID            
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus,PhysAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex, ifRcvAddressEntry
+            FROM IF-MIB
+        hpicfCommon
+            FROM HP-ICF-OID;
+        
+    hpicfL3MacConfigMIB MODULE-IDENTITY
+        LAST-UPDATED "200608081600Z"  -- August 08, 2006
+        ORGANIZATION "Hewlett Packard Company,
+                      ProCurve Networking Business"
+        CONTACT-INFO "Hewlett Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes extension objects to the 
+	              per-interface MAC address configuration for devices in
+		      the HP Integrated Communication Facility product line."
+
+        REVISION     "200608081600Z"  -- August 08, 2006
+        DESCRIPTION  "Initial version."
+        ::= { hpSwitch 36 }
+
+-- **********************************************************************
+-- L3-MAC-CONFIG MIB Groups
+-- **********************************************************************
+
+    hpicfL3MacConfigObjects  OBJECT IDENTIFIER ::= {hpicfL3MacConfigMIB 1}
+    hpicfL3MacConfigConformance OBJECT IDENTIFIER ::= { hpicfL3MacConfigMIB 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfL3MacConfigIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfL3MacConfigIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains l3-mac configuration information 
+	            of each vlan interface."
+        ::= { hpicfL3MacConfigObjects 1 }
+
+    hpicfL3MacConfigIfEntry OBJECT-TYPE
+        SYNTAX      HpicfL3MacConfigIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hpicfL3MacConfigIfEntry contains the 
+	             l3-mac feature specific configuration information. 
+		     This table augments the ifRcvAddressTable."        
+        AUGMENTS    { ifRcvAddressEntry }
+        ::= { hpicfL3MacConfigIfTable 1 }
+
+    HpicfL3MacConfigIfEntry ::=
+        SEQUENCE {
+            hpicfL3MacConfigIfAdvTimer  INTEGER
+        }
+
+
+    hpicfL3MacConfigIfAdvTimer OBJECT-TYPE
+        SYNTAX      INTEGER  (0..255)                   
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Timeout in seconds when an advertisement pkt will be sent 
+                     out with the ifRcvAddressAddress of this entry as the source 
+                     mac so that the downstream switches learn this mac-address."
+        DEFVAL { 60 }
+        ::= { hpicfL3MacConfigIfEntry 1 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfL3MacConfigMIBCompliances  OBJECT IDENTIFIER ::= { hpicfL3MacConfigConformance 1 }
+    hpicfL3MacConfigMIBGroups       OBJECT IDENTIFIER ::= { hpicfL3MacConfigConformance 2 }
+
+-- ......................................................................
+-- Compliance statements
+-- ......................................................................
+
+    hpicfL3MacConfigMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                     L3-Mac feature and implementing the HP-ICF-L3MAC-MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfL3MacConfigGroup }
+
+            GROUP       hpicfL3MacConfigGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that run L3-Mac feature"
+        ::= { hpicfL3MacConfigMIBCompliances 1 }
+
+-- ......................................................................
+-- Conformance Groups
+-- ......................................................................
+
+    hpicfL3MacConfigGroup OBJECT-GROUP
+        OBJECTS     { hpicfL3MacConfigIfAdvTimer }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support
+                    L3-Mac feature on HP routers."
+        ::= { hpicfL3MacConfigMIBGroups 1 }
+
+END

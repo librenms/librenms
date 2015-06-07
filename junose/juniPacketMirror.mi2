@@ -1,0 +1,559 @@
+-- *****************************************************************************
+-- Juniper-PACKET-MIRROR-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for Packet Mirroring Management
+--
+-- Copyright (c) 2005-2009 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PACKET-MIRROR-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE, Unsigned32, IpAddress, Counter64,
+    Gauge32
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus, DisplayString, DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero, ifIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniPacketMirrorMIB  MODULE-IDENTITY
+    LAST-UPDATED "200910280940Z"  -- 28-Oct-09 03:10 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The Packet Mirror MIB for the Juniper Networks enterprise."
+    -- Revision History                 
+    REVISION    "200910280940Z"  -- 28-Oct-09 03:10 PM EST  - JUNOSe 11.1
+    DESCRIPTION
+        "Added support for additional mirror trigger types."
+    REVISION    "200607192057Z"  -- 19-Jul-06 04:57 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Added new traps for LAES-2006-014R1 LI specification."                    
+    REVISION    "200506301803Z"  -- 30-Jun-05 02:03 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 77 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+juniPacketMirrorTrapEnables OBJECT IDENTIFIER ::= { juniPacketMirrorMIB 2 }
+juniPacketMirrorTraps       OBJECT IDENTIFIER ::= { juniPacketMirrorMIB 3 }
+juniPacketMirrorTrapPrefix  OBJECT IDENTIFIER ::= { juniPacketMirrorTraps 0 }
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Trap Definitions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniPacketMirrorTrapEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable packet mirroring traps."
+    DEFVAL    { false }
+    ::= { juniPacketMirrorTrapEnables 1 }
+
+juniPacketMirrorRadiusBasedMirroringFailure NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorUserName,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorErrorCause,
+         juniPacketMirrorApplicationName,
+         juniPacketMirrorErrorString }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorRadiusBasedMirroringFailure Trap indicates that 
+          packet mirroring operation failed in RADIUS based mirroring
+          configuration."
+        ::= { juniPacketMirrorTrapPrefix 1 }
+
+juniPacketMirrorCliTriggerBasedMirroringFailure NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorErrorCause,
+         juniPacketMirrorApplicationName,
+         juniPacketMirrorErrorString }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorCliTriggerBasedMirroringFailure Trap indicates that 
+          packet mirroring operation failed in CLI trigger based mirroring
+          configuration."
+        ::= { juniPacketMirrorTrapPrefix 2 }
+
+juniPacketMirrorInterfaceDeleted NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorInterfaceDeleted Trap indicates that the interface
+          that was being mirrored is now deleted."
+        ::= { juniPacketMirrorTrapPrefix 3 }
+
+juniPacketMirrorAnalyzerUnreachable NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorAnalyzerAddress,
+         juniPacketMirrorRouterId }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorAnalyzerUnreachable Trap indicates that an analyzer
+          is now unreachable."
+        ::= { juniPacketMirrorTrapPrefix 4 }
+
+juniPacketMirrorSessionStart NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection,
+         juniPacketMirrorTargetIpAddress,
+         juniPacketMirrorAnalyzerAddress }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionStart Trap indicates that an access (targeIp = 0)
+          or packet (targetIp != 0) mirroring session has started."
+        ::= { juniPacketMirrorTrapPrefix 5 }
+
+juniPacketMirrorSessionEnd NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection,
+         juniPacketMirrorTargetIpAddress,
+         juniPacketMirrorAnalyzerAddress,
+         juniPacketMirrorTerminationReason }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionEnd Trap indicates that an access or packet
+          mirroring session has ended, depending on the analyzer interpretation
+          of juniPacketMirrorTerminationReason."
+        ::= { juniPacketMirrorTrapPrefix 6 }
+
+juniPacketMirrorInterfaceSessionActivated NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection,
+         juniPacketMirrorTargetIpAddress,
+         juniPacketMirrorAnalyzerAddress }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionActivated Trap indicates that a packet
+          mirroring session on an existing interface has started."
+        ::= { juniPacketMirrorTrapPrefix 7 }
+
+juniPacketMirrorInterfaceSessionDeactivated NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection,
+         juniPacketMirrorTargetIpAddress,
+         juniPacketMirrorAnalyzerAddress }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionDeactivated Trap indicates that a data
+          mirroring session on an existing interface has ended."
+        ::= { juniPacketMirrorTrapPrefix 8 }
+ 
+juniPacketMirrorSessionReject NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionReject Trap indicates that a user session
+          on a mirrored interface was not authorized."
+        ::= { juniPacketMirrorTrapPrefix 9 }
+
+juniPacketMirrorSessionFailed NOTIFICATION-TYPE
+     OBJECTS {
+         juniPacketMirrorDateAndTime,
+         juniPacketMirrorConfigurationSource,
+         juniPacketMirrorTriggerType,
+         juniPacketMirrorTrigger,
+         juniPacketMirrorRouterId,
+         juniPacketMirrorIdentifier,
+         juniPacketMirrorSessionIdentifier,
+         juniPacketMirrorPolicyName,
+         juniPacketMirrorPolicyId,
+         juniPacketMirrorDirection,
+         juniPacketMirrorTargetIpAddress,
+         juniPacketMirrorAnalyzerAddress,
+         juniPacketMirrorTerminationReason }
+     STATUS       current
+     DESCRIPTION
+         "The juniPacketMirrorSessionFailed Trap indicates that a mirroring
+          access or packet session failed, depending on the analyzer interpretation
+          of juniPacketMirrorTerminationReason."
+        ::= { juniPacketMirrorTrapPrefix 10 }
+ 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPacketMirrorNotificationObjects  OBJECT IDENTIFIER ::= { juniPacketMirrorTraps 1 }
+
+juniPacketMirrorIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The mirror identifier."
+    ::= { juniPacketMirrorNotificationObjects 1 }
+
+juniPacketMirrorSessionIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The session identifier."
+    ::= { juniPacketMirrorNotificationObjects 2 }
+
+juniPacketMirrorTrigger OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The trigger that caused mirroring."
+    ::= { juniPacketMirrorNotificationObjects 3 }
+
+juniPacketMirrorTriggerType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    interfaceString(0),
+                    ipAddress(1),
+                    nasPortId(2),
+                    username(3),
+                    callingStationId(4),
+                    acctSessionId(5),
+                    dhcpOption82(6),
+                    agentCircuitId(7),
+                    agentRemoteId(8) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The trigger type."
+    ::= { juniPacketMirrorNotificationObjects 4 }
+
+juniPacketMirrorConfigurationSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    radiusLogin(0),
+                    radiusCoa(1),
+                    cliTrigger(2),
+                    cliStatic(3) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The configuration source of this mirroring."
+    ::= { juniPacketMirrorNotificationObjects 5 }
+
+juniPacketMirrorErrorCause OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    genericFailure(0),
+                    noResourcesAvailable(1),
+                    memoryExhausted(2),
+                    noSuchName(3),
+                    invalidAnalyzerAddress(4),
+                    noSuchUserOrInterface(5),
+                    featureNotSupported(6),
+                    missingOrInvalidAttribute(7),
+                    routerMismatch(8),
+                    nameLengthExceeded(9)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The error cause."
+    ::= { juniPacketMirrorNotificationObjects 6 }
+
+juniPacketMirrorErrorString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The error string as reported by the application in the E-Series."
+    ::= { juniPacketMirrorNotificationObjects 7 }
+
+juniPacketMirrorApplicationName OBJECT-TYPE
+    SYNTAX      INTEGER { policyManager(0) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of application in the E-Series reporting the trap."
+    ::= { juniPacketMirrorNotificationObjects 8 }
+
+juniPacketMirrorAnalyzerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of analyzer."
+    ::= { juniPacketMirrorNotificationObjects 9 }
+
+juniPacketMirrorUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The login name of the user who's traffic is being mirrored."
+    ::= { juniPacketMirrorNotificationObjects 10 }
+
+juniPacketMirrorPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..40))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The secure policy name."
+    ::= { juniPacketMirrorNotificationObjects 11 }
+
+juniPacketMirrorPolicyId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The secure policy UID."
+    ::= { juniPacketMirrorNotificationObjects 12 }
+
+juniPacketMirrorDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time of event."
+    ::= { juniPacketMirrorNotificationObjects 13 }
+
+juniPacketMirrorRouterId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user or interface router UID in the E-Series."
+    ::= { juniPacketMirrorNotificationObjects 14 }
+
+juniPacketMirrorDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ingress(0),
+                    egress(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The mirroring direction."
+    ::= { juniPacketMirrorNotificationObjects 15 }
+
+juniPacketMirrorTargetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP address of the mirrored interface."
+    ::= { juniPacketMirrorNotificationObjects 16 }
+
+juniPacketMirrorTerminationReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    genericFailure(0),
+                    userRequest(1),
+                    lostCarrier(2),
+                    lostService(3),
+                    idleTimeout(4),
+                    sessionTimeout(5),
+                    adminReset(6),
+                    adminReboot(7),
+                    portError(8),
+                    nasError(9),
+                    nasRequest0(10),
+                    nasReboot1(11),
+                    portUnneeded(12),
+                    portPreempted(13),
+                    portSuspended(14),
+                    serviceUnavailable(15),
+                    callback(16),
+                    userError(17),
+                    hostRequest(18),
+                    supplicantRestart(19),
+                    reauthenticationFailure(20),
+                    portReinitialized(21),
+                    portAdministrativelyDisabled(22)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason for ending a mirroring session which the analyzer may
+         interpret as an access or packet session event."
+    ::= { juniPacketMirrorNotificationObjects 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPacketMirrorConformance     OBJECT IDENTIFIER ::= { juniPacketMirrorMIB 4 }
+juniPacketMirrorCompliances     OBJECT IDENTIFIER ::= { juniPacketMirrorConformance 1 }
+juniPacketMirrorGroups          OBJECT IDENTIFIER ::= { juniPacketMirrorConformance 2 }
+
+--
+-- compliance statements
+--
+juniPacketMirrorCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Compliance statement for entities which implement the Juniper
+         Packet Mirror MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPacketMirrorNotificationGroup,
+            juniPacketMirrorNotificationObjectsGroup }
+    ::= { juniPacketMirrorCompliances 1 }                           -- JUNOSe 7.2
+
+
+--
+-- units of conformance
+--
+juniPacketMirrorNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniPacketMirrorRadiusBasedMirroringFailure,
+        juniPacketMirrorCliTriggerBasedMirroringFailure,
+        juniPacketMirrorInterfaceDeleted,
+        juniPacketMirrorAnalyzerUnreachable }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated collection of objects for Packet Mirror notifications in a
+         Juniper product after new objects were added to comply with LAES draft
+         for lawful intercept LAES-2006-014."
+    ::= { juniPacketMirrorGroups 1 }                                -- JUNOSe 7.2
+
+juniPacketMirrorNotificationObjectsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPacketMirrorIdentifier,
+        juniPacketMirrorSessionIdentifier,
+        juniPacketMirrorTrigger,
+        juniPacketMirrorTriggerType,
+        juniPacketMirrorConfigurationSource,
+        juniPacketMirrorErrorCause,
+        juniPacketMirrorErrorString,
+        juniPacketMirrorApplicationName,
+        juniPacketMirrorAnalyzerAddress,
+        juniPacketMirrorUserName,
+        juniPacketMirrorPolicyName,
+        juniPacketMirrorPolicyId,
+        juniPacketMirrorDateAndTime,
+        juniPacketMirrorRouterId,
+        juniPacketMirrorDirection }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated collection of objects for Packet Mirror notifications in a
+         Juniper product after new objects were added to comply with LAES draft
+         for lawful intercept LAES-2006-014."
+    ::= { juniPacketMirrorGroups 2 }                                -- JUNOSe 7.2
+
+juniPacketMirrorNotificationGroup2  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniPacketMirrorRadiusBasedMirroringFailure,
+        juniPacketMirrorCliTriggerBasedMirroringFailure,
+        juniPacketMirrorInterfaceDeleted,
+        juniPacketMirrorAnalyzerUnreachable,
+        juniPacketMirrorSessionStart,
+        juniPacketMirrorSessionEnd,
+        juniPacketMirrorInterfaceSessionActivated,
+        juniPacketMirrorInterfaceSessionDeactivated,
+        juniPacketMirrorSessionReject,
+        juniPacketMirrorSessionFailed }
+    STATUS      current
+    DESCRIPTION
+        "Collection of objects for Packet Mirror notifications in a Juniper
+         product."
+    ::= { juniPacketMirrorGroups 3 }                                -- JUNOSe 7.3
+
+juniPacketMirrorNotificationObjectsGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPacketMirrorIdentifier,
+        juniPacketMirrorSessionIdentifier,
+        juniPacketMirrorTrigger,
+        juniPacketMirrorTriggerType,
+        juniPacketMirrorConfigurationSource,
+        juniPacketMirrorErrorCause,
+        juniPacketMirrorErrorString,
+        juniPacketMirrorApplicationName,
+        juniPacketMirrorAnalyzerAddress,
+        juniPacketMirrorUserName,
+        juniPacketMirrorPolicyName,
+        juniPacketMirrorPolicyId,
+        juniPacketMirrorDateAndTime,
+        juniPacketMirrorRouterId,
+        juniPacketMirrorDirection,
+        juniPacketMirrorTargetIpAddress,
+        juniPacketMirrorTerminationReason }
+    STATUS      current
+    DESCRIPTION
+        "Collection of objects for Packet Mirror notifications in a Juniper
+         product."
+    ::= { juniPacketMirrorGroups 4 }                                -- JUNOSe 7.3
+
+END

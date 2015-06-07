@@ -1,0 +1,81 @@
+	DEVBASE-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY, IpAddress
+			FROM SNMPv2-SMI
+		DisplayString, MacAddress
+			FROM SNMPv2-TC
+		device
+			FROM ANIROOT-MIB;
+
+-- Device Mib (Common to BSU/SU)
+
+aniDevBase  MODULE-IDENTITY
+	LAST-UPDATED "0105091130Z"      -- Wed May 9 11:30:00 PDT 2001
+	ORGANIZATION "Aperto Networks"
+	CONTACT-INFO
+	  "       
+	  Postal:  Aperto Networks Inc
+		   1637 S Main Street 
+		   Milpitas, California 95035
+	  Tel:	   +1 408 719 9977
+	  "       
+	DESCRIPTION
+	"This group gives some basic information about the device 
+	 (BSU or SU). 
+	 All objects within this group are applicable to both the devices. 
+	"
+	::= { device 1 }
+
+aniDevProductName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The model number of the device.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevBase 1 }
+
+aniDevLanIpAddr OBJECT-TYPE 
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The Lan IP Address of the device."
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevBase 2 }
+
+aniDevLanSubnetMask  OBJECT-TYPE 
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The subnet mask of the device."
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevBase 3 }
+
+aniDevDefaultGateway  OBJECT-TYPE	
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The Gateway IP address.
+	    On BSU, this refers to the Lan Gateway address.
+	    On SU, this refers to the Wireless Gateway address.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevBase 4 }
+
+aniDevMacAddr OBJECT-TYPE 
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The Mac Address of the device."
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevBase 5 }
+
+END
+
+

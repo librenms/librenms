@@ -1,0 +1,1300 @@
+CISCOSB-Physicaldescription-MIB DEFINITIONS ::= BEGIN
+
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+--
+-- 30-Jan-2004 Add rlPhdUnitGenParamTable
+-- 30-Jan-2004 Add rlPhdUnitEnvParamTable
+-- 24-Feb-2004 Add rlPhdStackOrderTopUnit
+-- 24-Feb-2004 Add rlPhdStackOrderBottomUnit
+-- 24-Feb-2004 Add rlPhdStackOrderPermutation
+-- 21-Apr-2005 Add rlPhdPortsTable switch description between:
+--                  rlPhdPortsModuleNumber && rlPhdPortsStackUnit due to EWS need
+-- 27-Apr-2005 Add rlStackLinkChange trap.
+-- 16-May-2005 Add rlPhdNumberOfPoeUnits
+-- 02-Jun-2005 Add field to rlPhDUnitEnvParamTable: rlPhdUnitEnvParamUpTime
+-- 25-Jul-2005 Add rlPhdPhyLedTimeout and rlPhdPhyLedStackUnit
+-- 03-Aug-2005 Remove boundary for unit number field, checked by box
+--                    this is done coz different products use different stack size
+-- 05-Sep-2005 Add rlCascadeTable
+-- 31-Oct-2005 Add rlCascadeAfterResetTable
+-- 14-Nov-2005 Change rlPhdUnitGenParamSerialNum to read-write
+-- 16-May-2006 Add field rlCascadeUnitId to rlCascadeEntry
+-- 14-Jan-2007 rlPhdModuleType was moved to a separated text file
+-- 15-Jan-2007 Devided file appolo.txt to a few files
+--             Renamed file appolo.txt to ralan-mib.mib
+-- 23-Jul-2012 IdanS: Add rlPhdUnitGenParamRegistrationDone and rlPhdUnitGenParamRegistrationSuppressed to RlPhdUnitGenParamEntry
+-- 09-Oct-2012 yahal: Add rlPhdUnitEnvParamMonitorAutoRecoveryEnable & rlPhdUnitEnvParamMonitorTemperatureStatus & rlPhdUnitEnvParamMonitorTemperatureStatus
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks,
+    NOTIFICATION-TYPE                                       FROM SNMPv2-SMI
+    DisplayString, PhysAddress, RowStatus, TruthValue       FROM SNMPv2-TC
+    JackType                                                FROM MAU-MIB
+    switch001, rndNotifications                             FROM CISCOSB-MIB
+    RlEnvMonState                                           FROM CISCOSB-HWENVIROMENT
+    EntitySensorStatus, EntitySensorValue                   FROM ENTITY-SENSOR-MIB
+    InterfaceIndexOrZero,ifIndex,InterfaceIndex             FROM IF-MIB
+    rndErrorDesc, rndErrorSeverity                          FROM CISCOSB-DEVICEPARAMS-MIB;
+
+rlPhysicalDescription  MODULE-IDENTITY
+                       LAST-UPDATED "200602120000Z"
+                       ORGANIZATION "Cisco Systems, Inc."
+
+                       CONTACT-INFO
+                       "Postal: 170 West Tasman Drive
+                       San Jose , CA 95134-1706
+                       USA
+
+                       
+                       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                       DESCRIPTION
+                            "The private MIB module definition for physical
+                             device configuration."
+                       REVISION "200602120000Z"
+                       DESCRIPTION
+                            "Removed TRAP-TYPE from IMPORTS."
+                       REVISION "200310180000Z"
+                       DESCRIPTION
+                            "Initial version of this MIB."
+                       ::= { switch001 53 }
+
+CascadePortState ::= INTEGER {
+   error                (0),
+   init                 (1),
+   down                 (2),
+   active               (3),
+   standby              (4)
+}
+
+CascadePortSpeed ::= INTEGER {
+   port-speed-10M                     (0),
+   port-speed-100M                    (1),
+   port-speed-1G                      (2),
+   port-speed-10G                     (3),
+   port-speed-12G                     (4),
+   port-speed-2500M                   (5),
+   port-speed-5G                      (6),
+   port-speed-13600M                  (7),
+   port-speed-20G                     (8),
+   port-speed-40G                     (9),
+   port-speed-16G                     (10),
+   port-speed-15G                     (11),
+   port-speed-75G                     (12),
+   port-speed-100G                    (13),
+   unknown                            (14)
+}
+
+
+
+rlPhdMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 3.
+         1: original version
+         2: a. new tables
+                 rlPhdModuleHotSwapTable
+                 rlPhdStackOrderTable
+            b. new scalars
+                 rlPhdStackReorder
+                 rlPhdNumberOfUnits
+                 rlPhdMaxNumberOfUnits
+         3: a. new field rlPhdModuleRole of rlPhdModuleTable
+            b. new scalars
+                 rlPhdForceMasterUnit
+         4: a. new fields rlPhdModuleConnect1 and rlPhdModuleConnect2
+               of rlPhdModuleTable.
+         5: a. Prefix rlPhD were replaced by prefix rlPhd
+            b. fields rlPhdModuleConnect1 and rlPhdModuleConnect2 are
+               moved from rlPhdModuleTable to rlPhdStackTable.
+            c. new fiels rlPhdStackSofrwareVer, rlPhdStackProductID and
+               rlPhdStackMacAddr of rlPhdStackTable.
+            d. new scalars
+                 rlPhdStackReloadUnit
+            e. new scalars
+                 rlPhdStackOrderTopUnit
+                 rlPhdStackOrderBottomUnit
+                 rlPhdStackOrderPermutation"
+    ::= { rlPhysicalDescription 1 }
+
+rlPhdModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing it in this
+         module"
+    ::= { rlPhysicalDescription 2 }
+
+rlPhdModuleEntry OBJECT-TYPE
+    SYNTAX      RlPhdModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a module (board)"
+    INDEX  { rlPhdModuleStackUnit, rlPhdModuleIndex}
+    ::= { rlPhdModuleTable 1 }
+
+RlPhdModuleEntry ::= SEQUENCE {
+    rlPhdModuleStackUnit     INTEGER,
+    rlPhdModuleIndex         INTEGER,
+    rlPhdModuleType          INTEGER,
+    rlPhdModuleStartingPort  INTEGER,
+    rlPhdModuleNumberOfPorts INTEGER,
+    rlPhdModuleRow           INTEGER,
+    rlPhdModuleColumn        INTEGER,
+    rlPhdModuleRole          INTEGER
+}
+
+rlPhdModuleStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the stack unit"
+    ::= { rlPhdModuleEntry 1 }
+
+rlPhdModuleIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the module in its stack unit"
+    ::= { rlPhdModuleEntry 2 }
+
+rlPhdModuleType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The index for each module type"
+    ::= { rlPhdModuleEntry 3 }
+
+rlPhdModuleStartingPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimal number of the port residing on this module."
+    ::= { rlPhdModuleEntry 4 }
+
+rlPhdModuleNumberOfPorts OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ports residing on this module."
+    ::= { rlPhdModuleEntry 5}
+
+rlPhdModuleRow OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which row (the uppermost being numbered 1 and the highest row
+             number asigned to the lowest row) this module resides within the
+         chassis of its stack unit."
+    ::= { rlPhdModuleEntry 6 }
+
+rlPhdModuleColumn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which column (the leftmost being numbered 1 and the highest column
+         number asigned to the rightmost column) this module resides within the
+         chassis of its stack unit."
+    ::= { rlPhdModuleEntry 7 }
+
+rlPhdModuleRole OBJECT-TYPE
+    SYNTAX INTEGER {
+        standalone(1),
+        master(2),
+        backup(3),
+        slave(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module role in the stack."
+   DEFVAL { standalone }
+    ::= { rlPhdModuleEntry 8 }
+
+rlPhdPortsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Lists the physical or physical-related attributes of ports"
+    ::= { rlPhysicalDescription 3 }
+
+rlPhdPortsEntry OBJECT-TYPE
+    SYNTAX      RlPhdPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each port, a entry describing attributes which are either
+        physical or are derived from the features of the device hardware"
+    INDEX  { rlPhdPortsIfIndex }
+   ::= { rlPhdPortsTable 1 }
+
+RlPhdPortsEntry ::= SEQUENCE {
+    rlPhdPortsIfIndex       INTEGER,
+    rlPhdPortsIfIndexName   DisplayString(SIZE(1..20)),
+    rlPhdPortsMediaType     INTEGER,
+    rlPhdPortsStackUnit     INTEGER,
+    rlPhdPortsModuleNumber  INTEGER,
+    rlPhdPortsRow           INTEGER,
+    rlPhdPortsColumn        INTEGER,
+    rlPhdConnectorType      JackType,
+    rlPhdPortHaul           INTEGER
+
+ }
+
+rlPhdPortsIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The L2 interface number associated with this port."
+    ::= { rlPhdPortsEntry 1 }
+
+rlPhdPortsIfIndexName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The L2 interface number associated with this port, in string format
+        based on the overall hardware architecture of the device (i.e., for
+        monolithic devices just numbers, devices composed of modules (boards,
+        cards) or stackable devices composed of monolithic units in form
+        <module /stack unit number> - <port number on current module /stack
+        unit number>, stackable devices in which each unit is composed of
+        modules
+             <stack unit number> - <module number> - <port number>"
+    ::= { rlPhdPortsEntry 2 }
+
+rlPhdPortsMediaType OBJECT-TYPE
+    SYNTAX      INTEGER {copper(1), optic-fiber(2), combo(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The media type of this port."
+    ::= { rlPhdPortsEntry 3 }
+
+rlPhdPortsStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of the slot to which this port belongs."
+    ::= { rlPhdPortsEntry 4 }
+
+rlPhdPortsModuleNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of the stack unit to which this port resides in."
+    ::= { rlPhdPortsEntry 5 }
+
+rlPhdPortsRow OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "On which row (the uppermost being numbered 1 and the highest row
+        number asigned to the lowest row) this port resides within its
+        module."
+    ::= { rlPhdPortsEntry 6 }
+
+rlPhdPortsColumn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "On which column (the leftmost being numbered 1 and the highest column
+        number asigned to the rightmost column) this this port resides within its
+        module."
+    ::= { rlPhdPortsEntry 7 }
+
+rlPhdConnectorType OBJECT-TYPE
+    SYNTAX          JackType
+    MAX-ACCESS  read-only
+    STATUS          current
+    DESCRIPTION
+       "Type of connector."
+    ::= { rlPhdPortsEntry 8 }
+
+ rlPhdPortHaul OBJECT-TYPE
+    SYNTAX  INTEGER {
+        not-relevant(1),
+               short(2),
+                long(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Distance supported by this port."
+    ::= { rlPhdPortsEntry 9 }
+
+rlPhdStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each stack unit there is an entry describing it in this table"
+    ::= { rlPhysicalDescription 4 }
+
+rlPhdStackEntry OBJECT-TYPE
+    SYNTAX      RlPhdStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a stack unit"
+    INDEX  { rlPhdStackUnit }
+    ::= { rlPhdStackTable 1 }
+
+RlPhdStackEntry ::= SEQUENCE {
+    rlPhdStackUnit          INTEGER,
+    rlPhdStackType          INTEGER,
+    rlPhdStackConnect1      INTEGER,
+    rlPhdStackConnect2      INTEGER,
+    rlPhdStackSofrwareVer   DisplayString,
+    rlPhdStackProductID     DisplayString,
+    rlPhdStackMacAddr       PhysAddress
+}
+
+rlPhdStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The stack unit described by this entry."
+    ::= { rlPhdStackEntry 1 }
+
+rlPhdStackType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the stack unit described by this entry:
+            1 - box 3202
+            2 - box LG
+            3 - bcm
+            4 - prestera"
+    ::= { rlPhdStackEntry 2 }
+
+rlPhdStackConnect1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unit number connected to the Hyper GLink left side connection -
+         0 means not connected; other integer indicates the unit number."
+    DEFVAL { 0 }
+    ::= { rlPhdStackEntry 3 }
+
+rlPhdStackConnect2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unit number connected to the Hyper GLink right side connection -
+         0 means not connected; other integer indicates the unit number."
+    DEFVAL { 0 }
+    ::= { rlPhdStackEntry 4 }
+
+rlPhdStackSofrwareVer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The Software version of the unit."
+    ::= { rlPhdStackEntry 5 }
+
+rlPhdStackProductID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The Product ID of the unit."
+    ::= { rlPhdStackEntry 6 }
+
+rlPhdStackMacAddr OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The physical (MAC) address of the unit."
+    ::= { rlPhdStackEntry 7 }
+
+rlPhdModuleHotSwapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdModuleHotSwapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing its Hot Swap
+         status"
+    ::= { rlPhysicalDescription 5 }
+
+rlPhdModuleHotSwapEntry OBJECT-TYPE
+    SYNTAX      RlPhdModuleHotSwapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a module (board) Hot Swap
+         status"
+    INDEX  { rlPhdModuleStackUnit, rlPhdModuleIndex}
+    ::= { rlPhdModuleHotSwapTable 1 }
+
+RlPhdModuleHotSwapEntry ::= SEQUENCE {
+    rlPhdModuleHotSwapAdminStatus   INTEGER,
+    rlPhdModuleHotSwapOperStatus    INTEGER
+}
+
+rlPhdModuleHotSwapAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The desired state of the module.  The off(1) state indicates
+         that the module is not used and its rlPhdModuleHotSwapOperStatus
+         is always off(2).
+         The on{1) state indicates that the module may be used and its
+         rlPhdModuleHotSwapOperStatus will be on(1) if it presents and
+         off(2) if it does not present."
+    DEFVAL { on }
+    ::=  { rlPhdModuleHotSwapEntry 1 }
+
+rlPhdModuleHotSwapOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Hot Swap state of the module.
+         If rlPhdModuleHotSwapAdminStatus is down(2) then
+         rlPhdModuleHotSwapOperStatus should be down(2).  If
+         rlPhdModuleHotSwapAdminStatus is changed to up(1) then
+         rlPhdModuleHotSwapOperStatus should change to
+         up(1) if the module presents; it should remain in the down(2) state if
+         and only if the module does not present."
+    ::=  { rlPhdModuleHotSwapEntry 2 }
+
+rlPhdStackOrderTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdStackOrderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table enables the user to configure the order
+         of the stack units as displayed on his GUI.
+         The order of the entries in this table corresponds
+         to the last configured order. If the stack units order was
+         never configured, the order will be the same as in the rlPhdStackTable."
+    ::= { rlPhysicalDescription 6 }
+
+rlPhdStackOrderEntry OBJECT-TYPE
+    SYNTAX      RlPhdStackOrderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a stack unit in the position desired by the user"
+    INDEX  { rlPhdStackOrderCurrentUnitPosition }
+    ::= { rlPhdStackOrderTable 1 }
+
+RlPhdStackOrderEntry ::= SEQUENCE {
+    rlPhdStackOrderCurrentUnitPosition INTEGER,
+    rlPhdStackOrderDesiredUnitPosition INTEGER,
+    rlPhdStackOrderUnitIndex           INTEGER,
+    rlPhdStackOrderUnitType            INTEGER
+}
+
+rlPhdStackOrderCurrentUnitPosition OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The current stack unit position."
+    ::= { rlPhdStackOrderEntry 1 }
+
+rlPhdStackOrderDesiredUnitPosition OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The desired stack unit position. Note that setting this MIB
+         object will take effect only after setting the rlPhdStackReorder MIB
+         object below. After setting this MIB object and until a further change
+         of at least one instance of the rlPhdStackOrderDesiredUnitPosition object,
+         the values of the rlPhdStackOrderCurrentUnitPosition objectinstance and
+         the corresponding rlPhdStackOrderDesiredUnitPosition object instance
+         will be the same."
+    ::= { rlPhdStackOrderEntry 2 }
+
+rlPhdStackOrderUnitIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the original unit index, i.e. has the same value as rlPhdStackUnit
+         above."
+    ::= { rlPhdStackOrderEntry 3 }
+
+rlPhdStackOrderUnitType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the stack unit described by this entry. It has the same value
+         as rlPhdStackType above. This information is duplicated here only for easier
+         retrieval by the device manager."
+    ::= { rlPhdStackOrderEntry 4 }
+
+rlPhdStackReorder OBJECT-TYPE
+    SYNTAX      INTEGER {reorder(1)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this MIB object will cause the settings of the
+         rlPhdStackOrderDesiredUnitPosition MIB object instances to take effect.
+         After setting this MIB object and until a further change
+         of at least one instance of the rlPhdStackOrderDesiredUnitPosition object,
+         the values of the rlPhdStackOrderCurrentUnitPosition objectinstance and
+         the corresponding rlPhdStackOrderDesiredUnitPosition object instance
+         will be the same."
+   ::= { rlPhysicalDescription 7 }
+
+rlPhdNumberOfUnits OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current number of units in the stack."
+   ::= { rlPhysicalDescription 8 }
+
+rlPhdMaxNumberOfUnits OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the maximum number of units in the stack."
+   ::= { rlPhysicalDescription 9 }
+
+rlPhdForceMasterUnit OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Force unit to be master."
+    ::= { rlPhysicalDescription 10 }
+
+-- The following scalar isn't suported and will be removed
+rlPhdStackFixedUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determine which unit will be on bottom/top of list
+         on Show-List command(see ."
+    ::= { rlPhysicalDescription 11 }
+
+-- The following scalar isn't suported and will be removed
+rlPhdStackFixedUnitLocation OBJECT-TYPE
+    SYNTAX INTEGER{
+        bottom(1),
+        top(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determine the bottom/top object in the stack table."
+    ::= { rlPhysicalDescription 12 }
+
+rlPhdStackReloadUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset a specific unit."
+    ::= { rlPhysicalDescription 13 }
+
+rlPhdUnitGenParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdUnitGenParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing it in this
+         module"
+    ::= { rlPhysicalDescription 14 }
+
+rlPhdUnitGenParamEntry OBJECT-TYPE
+    SYNTAX      RlPhdUnitGenParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a module (board)"
+    INDEX  { rlPhdUnitGenParamStackUnit}
+    ::= { rlPhdUnitGenParamTable 1 }
+
+RlPhdUnitGenParamEntry ::= SEQUENCE {
+    rlPhdUnitGenParamStackUnit       INTEGER,
+    rlPhdUnitGenParamSoftwareVersion DisplayString,
+    rlPhdUnitGenParamFirmwareVersion DisplayString,
+    rlPhdUnitGenParamHardwareVersion DisplayString,
+    rlPhdUnitGenParamSerialNum       DisplayString,
+    rlPhdUnitGenParamAssetTag        DisplayString,
+    rlPhdUnitGenParamServiceTag      DisplayString,
+    rlPhdUnitGenParamSoftwareDate    DisplayString,
+    rlPhdUnitGenParamFirmwareDate    DisplayString,
+    rlPhdUnitGenParamManufacturer    DisplayString,
+    rlPhdUnitGenParamModelName       DisplayString,
+    rlPhdUnitGenParamMd5ChksumBoot   DisplayString,
+    rlPhdUnitGenParamMd5ChksumImage1 DisplayString,
+    rlPhdUnitGenParamMd5ChksumImage2 DisplayString,
+    rlPhdUnitGenParamRegistrationDone          TruthValue,
+    rlPhdUnitGenParamRegistrationSuppressed    TruthValue
+}
+
+rlPhdUnitGenParamStackUnit OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The index of the stack unit to which this conceptual row corresponds."
+       ::= { rlPhdUnitGenParamEntry 1 }
+
+rlPhdUnitGenParamSoftwareVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Serial number of the product."
+       ::= { rlPhdUnitGenParamEntry 2 }
+
+rlPhdUnitGenParamFirmwareVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Serial number of the product."
+       ::= { rlPhdUnitGenParamEntry 3 }
+
+rlPhdUnitGenParamHardwareVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Serial number of the product."
+       ::= { rlPhdUnitGenParamEntry 4 }
+
+rlPhdUnitGenParamSerialNum OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Serial number of the product."
+       ::= { rlPhdUnitGenParamEntry 5 }
+
+rlPhdUnitGenParamAssetTag OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Serial number of the product."
+       ::= { rlPhdUnitGenParamEntry 6 }
+
+rlPhdUnitGenParamServiceTag OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Asset tag of the product."
+       ::= { rlPhdUnitGenParamEntry 7 }
+
+rlPhdUnitGenParamSoftwareDate OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Date of product's software."
+       ::= { rlPhdUnitGenParamEntry 8 }
+
+rlPhdUnitGenParamFirmwareDate OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Date of product's firmware."
+       ::= { rlPhdUnitGenParamEntry 9 }
+
+rlPhdUnitGenParamManufacturer OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Product's Manufacturer."
+       ::= { rlPhdUnitGenParamEntry 10 }
+
+rlPhdUnitGenParamModelName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Model Name."
+       ::= { rlPhdUnitGenParamEntry 11 }
+
+rlPhdUnitGenParamMd5ChksumBoot  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "MD5 Checksum for Boot"
+       ::= { rlPhdUnitGenParamEntry 12 }
+
+rlPhdUnitGenParamMd5ChksumImage1 OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "MD5 Checksum for Image 1"
+       ::= { rlPhdUnitGenParamEntry 13 }
+
+rlPhdUnitGenParamMd5ChksumImage2 OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "MD5 Checksum for Image 2"
+       ::= { rlPhdUnitGenParamEntry 14 }
+
+rlPhdUnitGenParamRegistrationDone OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Registration Done."
+       ::= { rlPhdUnitGenParamEntry 15 }
+
+rlPhdUnitGenParamRegistrationSuppressed OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Registration Suppressed."
+       ::= { rlPhdUnitGenParamEntry 16 }
+
+rlPhdUnitEnvParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdUnitEnvParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing it in this
+         module"
+    ::= { rlPhysicalDescription 15 }
+
+rlPhdUnitEnvParamEntry OBJECT-TYPE
+    SYNTAX      RlPhdUnitEnvParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a module (board)"
+    INDEX  { rlPhdUnitEnvParamStackUnit}
+    ::= { rlPhdUnitEnvParamTable 1 }
+
+RlPhdUnitEnvParamEntry ::= SEQUENCE {
+    rlPhdUnitEnvParamStackUnit                                     INTEGER,
+    rlPhdUnitEnvParamMainPSStatus                                  RlEnvMonState,
+    rlPhdUnitEnvParamRedundantPSStatus                             RlEnvMonState,
+    rlPhdUnitEnvParamFan1Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan2Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan3Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan4Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan5Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamTempSensorValue                               EntitySensorValue,
+    rlPhdUnitEnvParamTempSensorStatus                              EntitySensorStatus,
+    rlPhdUnitEnvParamUpTime                                        TimeTicks,
+    rlPhdUnitEnvParamMonitorAutoRecoveryEnable                     TruthValue,
+    rlPhdUnitEnvParamMonitorTemperatureStatus                      INTEGER,
+    rlPhdUnitEnvParamMonitorOperStatus                             TruthValue
+}
+
+rlPhdUnitEnvParamStackUnit OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The index of the stack unit to which this conceptual row corresponds.
+                    Note that the index will be the same index as the index
+                    of a 'chassis' physical entity in the entity MIB of the product."
+       ::= { rlPhdUnitEnvParamEntry 1 }
+
+rlPhdUnitEnvParamMainPSStatus OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the main PS being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 2 }
+
+rlPhdUnitEnvParamRedundantPSStatus OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the redundant PS being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 3 }
+
+rlPhdUnitEnvParamFan1Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 1 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 4 }
+
+rlPhdUnitEnvParamFan2Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 2 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 5 }
+
+rlPhdUnitEnvParamFan3Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 3 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 6 }
+
+rlPhdUnitEnvParamFan4Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 4 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 7 }
+
+rlPhdUnitEnvParamFan5Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 5 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 8 }
+
+rlPhdUnitEnvParamTempSensorValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Current value for the Sensor being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 9 }
+
+rlPhdUnitEnvParamTempSensorStatus OBJECT-TYPE
+        SYNTAX     EntitySensorStatus
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Status value for the Sensor being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 10 }
+
+rlPhdUnitEnvParamUpTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Up time of the unit in 100th of second (sec/100)."
+        ::= { rlPhdUnitEnvParamEntry 11 }
+
+rlPhdUnitEnvParamMonitorAutoRecoveryEnable OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+               "Disable environment automatic recovery option"
+        ::= { rlPhdUnitEnvParamEntry 12 }
+
+rlPhdUnitEnvParamMonitorTemperatureStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        overTemperatureThreshold(2),
+        overCriticalTemperatureThreshold(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Display environment monitoring chassis temperature status"
+        ::= { rlPhdUnitEnvParamEntry 13 }
+
+rlPhdUnitEnvParamMonitorOperStatus OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Display environment automatic recovery current status (active/not active)"
+        ::= { rlPhdUnitEnvParamEntry 14 }
+
+rlPhdStackOrderTopUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the Top unit for the stack order command"
+    ::= { rlPhysicalDescription 16 }
+
+rlPhdStackOrderBottomUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the Bottom unit for the stack order command"
+    ::= { rlPhysicalDescription 17 }
+rlPhdStackOrderPermutation OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds stack permutation"
+    ::= { rlPhysicalDescription 18 }
+
+rlPhdNumberOfPoeUnits OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current number of poe units in the stack."
+   ::= { rlPhysicalDescription 19 }
+
+rlPhdPoeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdPoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing it in this
+         module"
+    ::= { rlPhysicalDescription 20 }
+
+rlPhdPoeEntry OBJECT-TYPE
+    SYNTAX      RlPhdPoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a module (board)"
+    INDEX  { rlPhdPoeStackUnit }
+    ::= { rlPhdPoeTable 1 }
+
+RlPhdPoeEntry ::= SEQUENCE {
+    rlPhdPoeStackUnit       INTEGER,
+    rlPhdPoePresent         INTEGER
+}
+
+rlPhdPoeStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The stack unit to which this module belongs."
+    ::= { rlPhdPoeEntry 1 }
+
+rlPhdPoePresent OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the PoE module.  The no(1) state indicates
+         that the PoE module is not present. The yes{2) state indicates that the
+         PoE module is present."
+    ::=  { rlPhdPoeEntry 2 }
+
+-- The light unit scalars
+rlPhdPhyLedStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the unit number for the stack light command"
+    ::= { rlPhysicalDescription 21 }
+
+rlPhdPhyLedTimeout OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the timeout for the stack light command.
+         May be in the range 2..60 sec. (default - 5 sec.), if the timeout = 0
+         - all units return to normal state."
+    ::= { rlPhysicalDescription 22 }
+
+rlCascadeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCascadeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each cascaded port for stacking unit there is an entry describing it in this table"
+    ::= { rlPhysicalDescription 23 }
+
+rlCascadeEntry OBJECT-TYPE
+    SYNTAX      RlCascadeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies a cascaded link information in a unit"
+    INDEX  { ifIndex }
+    ::= { rlCascadeTable 1 }
+
+RlCascadeEntry ::= SEQUENCE {
+    rlCascadeNeighborIfIndex   InterfaceIndexOrZero,
+    rlCascadeNeighborUnit              INTEGER,
+    rlCascadeTrunkId                   INTEGER,
+    rlCascadeUnitId                    INTEGER,
+    rlCascadePortSpeed                 CascadePortSpeed,
+    rlCascadePortState                 CascadePortState
+}
+
+rlCascadeNeighborIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a stacking port in the neighbor unit -
+         0 means not connected; other integer indicates the IfIndex."
+    ::= { rlCascadeEntry 1 }
+
+rlCascadeNeighborUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unit number of the neighbor unit -
+         0 means not connected; other integer indicates the unit number."
+    ::= { rlCascadeEntry 2 }
+
+rlCascadeTrunkId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The id of the trunk, the stacking port is member,
+         zero if the port is not member of trunk."
+    ::= { rlCascadeEntry 3 }
+
+rlCascadeUnitId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unit number matching the current ifIndex"
+    ::= { rlCascadeEntry 4 }
+
+rlCascadePortSpeed OBJECT-TYPE
+    SYNTAX      CascadePortSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port speed"
+    ::= { rlCascadeEntry 5 }
+
+rlCascadePortState OBJECT-TYPE
+    SYNTAX      CascadePortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port state according to cascade LAG state machine"
+    ::= { rlCascadeEntry 6 }
+
+rlCascadeAfterResetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCascadeAfterResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each cascaded port for stacking unit there is an entry describing it in this table after reset"
+    ::= { rlPhysicalDescription 24 }
+
+rlCascadeAfterResetEntry OBJECT-TYPE
+    SYNTAX      RlCascadeAfterResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry of this table specifies a cascaded port information in a unit after reset"
+    INDEX  { rlCascadeIfIndexAfterReset }
+    ::= { rlCascadeAfterResetTable 1 }
+
+RlCascadeAfterResetEntry ::= SEQUENCE {
+    rlCascadeIfIndexAfterReset          InterfaceIndex,
+    rlCascadeTrunkIdAfterReset          INTEGER,
+    rlCascadeRowStatus                  RowStatus
+}
+
+rlCascadeIfIndexAfterReset OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a stacking port  after reset."
+    ::= { rlCascadeAfterResetEntry 1 }
+
+rlCascadeTrunkIdAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Id of the trunk, the stacking port will be member after reset,
+         zero if the port is not member of trunk."
+    ::= { rlCascadeAfterResetEntry 2 }
+
+rlCascadeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        "This object indicates the status of this entry."
+    ::= { rlCascadeAfterResetEntry 3 }
+
+
+-- Stack MIB Trap Definitions
+
+rlStackUnitRemoved NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that a unit was removed from the stack."
+    ::= { rndNotifications 186 }
+
+rlStackConfigChangedRingChain NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that the configuration of the stack has changed.
+        - from ring to chain
+        - from chain to ring."
+
+    ::= { rndNotifications 187 }
+
+rlStackBackupUnitRemoved NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that the backup unit was removed from the stack."
+    ::= { rndNotifications 188 }
+
+rlStackMasterSwitchover NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that a new master was elected.
+         The old maste is the backup now. "
+    ::= { rndNotifications 189 }
+
+rlStackUnitDifferentSwVersion NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that the new unit added to the stack has
+         different software version than the master."
+    ::= { rndNotifications 190 }
+
+rlStackDuplicateUnitNotJoin NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that a new unit with duplicated unit id was
+         added to the stack - but it will not join the stack."
+    ::= { rndNotifications 191 }
+
+rlStackLinkChange NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating that Link has change in one of the Stacking Ports."
+    ::= { rndNotifications 195 }
+
+
+----------------------
+-- rlPhdUnitStackTable
+----------------------
+
+StackPortType  ::= INTEGER {
+   port-type-100M    (0),
+   port-type-1G      (1),
+   port-type-5G      (2),
+   port-type-10G     (3)
+}
+
+ConnectionType ::= INTEGER {
+    copper          (1),
+    combo-copper    (2),
+    combo-fiber     (3),
+    fiber           (4),
+    direct-attached (5)
+}
+
+
+rlPhdUnitStackPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdUnitStackPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing information required for stack port.
+         The index for the table is ifindex; the ports that represented in that table are
+         operational stack ports or ports that can be stack ports after reset"
+    ::= { rlPhysicalDescription 25}
+
+rlPhdUnitStackPortEntry OBJECT-TYPE
+    SYNTAX      RlPhdUnitStackPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in rlPhdUnitStackPortTable "
+    INDEX { rlPhdModuleStackUnit, ifIndex }
+    ::= { rlPhdUnitStackPortTable 1 }
+
+
+RlPhdUnitStackPortEntry::= SEQUENCE {
+    rlPhdUnitStackPortName              DisplayString,
+    rlPhdUnitStackPortType              StackPortType,
+    rlPhdUnitStackPortConnectionType    ConnectionType,
+    rlPhdUnitStackPortColumn            INTEGER,
+    rlPhdUnitStackPortRow               INTEGER
+}
+
+rlPhdUnitStackPortName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stack port name"
+    ::= { rlPhdUnitStackPortEntry 1 }
+
+rlPhdUnitStackPortType OBJECT-TYPE
+    SYNTAX      StackPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stack port type"
+    ::= { rlPhdUnitStackPortEntry 2 }
+
+rlPhdUnitStackPortConnectionType OBJECT-TYPE
+    SYNTAX      ConnectionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational connection type
+        (copper(1), combo-copper(2), combo-fiber(3), fiber(4), direct-Attached(5))"
+    ::= { rlPhdUnitStackPortEntry 3 }
+
+rlPhdUnitStackPortRow OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which row (the uppermost being numbered 1 and the highest row
+             number assigned to the lowest row) this actual/candidate cascade
+             port resides within the chassis of its stack unit."
+    ::= { rlPhdUnitStackPortEntry 4 }
+
+rlPhdUnitStackPortColumn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "On which column (the leftmost being numbered 1 and the highest column
+         number assigned to the rightmost column) this actual/candidate cascade
+             port resides within the chassis of its stack unit."
+    ::= { rlPhdUnitStackPortEntry 5 }
+
+END

@@ -1,0 +1,4262 @@
+CISCOSB-POLICY-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB POLICY MIB
+-- Version:    7.46
+-- Date:       04 Jan 2007
+--
+-- 07-Oct-2003 Added to RlPolicyQosMode service
+-- 07-Oct-2003 Added rlPolicyRulesDownloadMarker
+-- 07-Oct-2003 Added rlPolicyDscpVptTable
+-- 27-Jan-2005 Added cos-dscp to RlPolicyTrustTypes
+-- 07-Feb-2005 Added rlPolicyFlowClassificationOffsetsGroupUseVPTId and
+--                   rlPolicyFlowClassificationOffsetsGroupUseEtherTypeId To
+--                   rlPolicyFlowClassificationOffsetsTable
+--            Added rlPolicyClassifierVPTID And
+--                  rlPolicyClassifierEtherTypeID To
+--                  rlPolicyClassifierTable
+--            Added Vpt and Ethertype support to rlPolicyClassifierAdditionalCriteriaSupported
+-- 14-Mar-2005 Added  rlPolicyPortCfgPortRateLimitStatus,rlPolicyPortCfgCirPortRateLimit
+--                      rlPolicyPortCfgCbsPortRateLimit to rlPolicyPortConfigurationTable
+-- 14-Apr-2005 Added rlPolicyDefaultForwardingProtocol to rlPolicyDefaultForwardingTable
+-- 17-Apr-2005 Added rlPolicyDscpToDpTable
+-- 29-May-2005 Changed default value of rlPolicyClassifierEtherTypeID to 1501 (=minimum etherType value)
+-- 08-Apr-2006 Added branch rlPolicyStatistics and following tables:
+-- 20-May-2006 Added branch rlPolicyClassifierUtilization
+-- 08-May-2006 Added rlPolicyFlowClassificationOffsetsGroupUseInnerVlanId To rlPolicyFlowClassificationOffsetsTable
+--             Added rlPolicyClassifierInnerVID To rlPolicyClassifierTable
+--            Added Inner vlan id support to rlPolicyClassifierAdditionalCriteriaSupported
+-- 05-Jul-2006 Added rlPolicyVlanConfigurationTable
+-- 18-Sep-2006 Added rlPolicyIsTCAvailable scalar
+-- 04-Jan-2007 Added the new fields rlPolicyRulesTimeRange1 and rlPolicyRulesTimeRange2
+--             Added subnote rlPolicyTimeBasedAcl
+-- 23-Apr-2007 Added IPv6 ACL support
+-- 09-Jul-2008 Change range of rlPolicyClassifierEtherTypeID to support virtual
+--             IPv4 and IPv6 ethertypes (originated from IP/IPv6 ACL rule of
+--             "permit/deny any any any" and not from ethertype field in MAC ACL)
+-- 18-Jan-2008 Add rlPolicyClassifierUtilizationRulesNumber  to rlPolicyClassifierUtilizationEntry
+-- 01-Jun-2009 Added the new fields rlPolicyRulesSrcPortRangeStart, rlPolicyRulesSrcPortRangeEnd,
+--             rlPolicyRulesDestPortRangeStart, rlPolicyRulesDestPortRangeEnd
+-- 18-Aug-2009 Removed Time Based Tables : code moved to general TimeBasedInfrastrucure
+-- 19-Jan-2011 Removed 3rd party mentions
+
+IMPORTS
+    OBJECT-TYPE, IpAddress, Unsigned32,Counter32, zeroDotZero,
+    MODULE-IDENTITY,Counter64                   FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus,
+    RowPointer, DisplayString                   FROM SNMPv2-TC
+    InterfaceIndexOrZero, InterfaceIndex        FROM IF-MIB
+    diffServClassifierEntry                     FROM DIFF-SERV-MIB
+    Percents, VlanPriority, switch001           FROM CISCOSB-MIB
+    PortList, VlanId                            FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
+
+
+InterfaceType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Interface type."
+    SYNTAX  INTEGER {
+        vlan(1),
+        port(2)
+}
+StatisticsCntrNumOfBitsType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The counter can be of different sizes - 32 bit, 48 bit, 64 bit. Maximum is 64."
+   SYNTAX INTEGER {
+      uint32(32),
+      uint48(48),
+      uint64(64)
+
+
+}
+
+StatisticsDPType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Drop preceedence type."
+   SYNTAX INTEGER {
+      green(1),
+      yellow(2),
+      red(3)
+}
+
+StatisticsClearActionType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Clear action, value for clear scalar."
+   SYNTAX INTEGER {
+      noaction(1),
+      action(2)
+}
+
+StatisticsCntrType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The counter can be of different types, depends on actions adhered to
+                    rules that the counter is working on."
+   SYNTAX INTEGER {
+      statisticsCntrTypeSetDSCP(1),
+      statisticsCntrTypeDeny(2)
+}
+
+ rlPolicy MODULE-IDENTITY
+          LAST-UPDATED "200606260000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition generic traffic policy in CISCOSB devices."
+          REVISION "200503140000Z"
+          DESCRIPTION
+                  "Initial V2 version of this MIB."
+          REVISION "200502070000Z"
+          DESCRIPTION
+                  "Added  rlPolicyPortCfgPortRateLimitStatus,rlPolicyPortCfgCirPortRateLimit
+                   rlPolicyPortCfgCbsPortRateLimit to rlPolicyPortConfigurationTable"
+          REVISION "200501270000Z"
+          DESCRIPTION
+                  "Added rlPolicyFlowClassificationOffsetsGroupUseVPTId and
+                         rlPolicyFlowClassificationOffsetsGroupUseEtherTypeId To
+                         rlPolicyFlowClassificationOffsetsTable
+                   Added rlPolicyClassifierVPTID And
+                         rlPolicyClassifierEtherTypeID To
+                         rlPolicyClassifierTable
+                   Added Vpt and Ethertype support to rlPolicyClassifierAdditionalCriteriaSupported
+                   Added rlPolicyFlowClassificationOffsetsGroupUseInnerVlanId To
+                         rlPolicyFlowClassificationOffsetsTable
+                   Added rlPolicyClassifierInnerVID To
+                         rlPolicyClassifierTable
+                   Added Inner vlan id support to rlPolicyClassifierAdditionalCriteriaSupported"
+          REVISION "200310070000Z"
+          DESCRIPTION
+                  "Added cos-dscp to RlPolicyTrustTypes."
+          REVISION "200309220000Z"
+          DESCRIPTION
+                  "Add to RlPolicyQosMode service ,Add rlPolicyRulesDownloadMarker,Added rlPolicyDscpVptTable  ."
+          REVISION "200504140000Z"
+          DESCRIPTION
+                  "Added rlPolicyDefaultForwardingProtocol to rlPolicyDefaultForwardingTable"
+          REVISION "200504170000Z"
+          DESCRIPTION
+                  "Added rlPolicyDscpToDpTable"
+          REVISION "200604080000Z"
+          DESCRIPTION
+                  "Added branch rlPolicyStatistics"
+          REVISION "200605200000Z"
+          DESCRIPTION
+                  "Added branch rlPolicyClassifierUtilization"
+          REVISION "200606260000Z"
+          DESCRIPTION
+                  "Added rlPolicyVlanConfigurationTable"
+          ::= { switch001 59 }
+
+
+RlPolicyGroupType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 3 classifier types for which offset bytes can
+         be specified. For Ip and Ipx, the offsets indicated are relative
+         to the beginning of the L3 data (IP options field is skipped).  For
+         the Bridged type, the offsets are relative to L2 (and any 802.1D tag
+         is skipped).
+         A value of notUsed is applied, if the classifier uses one set of
+         offsets for bridge, IP and IPX"
+    SYNTAX  INTEGER {
+        bridged(1),
+        routedIp(2),
+        routedIpx(3),
+        notUsed(4)
+}
+
+RlPolicyClassifierDiffservIfType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies port's type to which a classifier is applied. It is
+         only used for the DiffServ mode. For the non-DiffServ mode
+         the normal value may be used."
+    SYNTAX  INTEGER {
+        normal(1),
+        allBoundaryPorts(2),
+        allInteriorPorts(3)
+}
+
+
+RlPolicyTrustTypes ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Configure the port trust state
+        cos     - Classifies ingress packets with the packet CoS values.
+                  For untagged packets, the port default CoS is used.
+        dscp    - Classifies ingress packets with the packet DSCP values.
+                  For non-ip tagged packets, the packet CoS value is used
+                  with the Cos-to-DSCP table .For non-IP untagged packets,
+                  the default port CoS is used with the Cos-to-DSCP table
+        tcp-udp - v750 deprecated.
+                  port to dscp - Classifies ingress packets with the packet
+                  destination port values. For non-ip tagged packets, the packet CoS
+                  value is used with the Cos-to-DSCP table. For non-IP untagged packets,
+                  the default port CoS is used with the Cos-to-DSCP table.
+        none    - v750 deprecated.
+                  802.1p is disabled for this port and the packet gets best effort queue.
+        cos-dscp- Classifies ingress packets with the packet DSCP values.
+                  For non-ip tagged packets, the packet CoS value is used
+                  with the Cos-to-Queue table .For non-IP untagged packets,
+                  the default port CoS is used with the Cos-to-Queue table
+        "
+    SYNTAX  INTEGER {
+        cos(1),
+        dscp(2),
+--v750 deprecated        tcp-udp(3),
+--v750 deprecatd - implemented by "disable mode" in globalQosMode        none(4),
+        cos-dscp(3)
+
+}
+
+RlPolicyQosMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "The user can set the system to operate either in the Basic mode or in the Advanced mode.
+          The setting of the mode applies to all ports in the system.
+          configuring the system to work in the advanced mode,
+          all setting for the basic mode are not in affect.
+          For example, 802.1p is not available when operating in the advanced mode.
+          When changing from basic mode to advanced mode and then back to basic mode,
+          the user assignments in the basic mode are restored.
+          Same for moving from advanced to basic and back again to advanced mode,
+          here again the user assignments are kept.
+          The different modes are mutually exclusive, i.e., only one can be
+          active at a given time. For example, when configuring the system to work
+          in the advanced mode, all setting for the basic mode are not in affect.
+          This means that 802.1p is not available when operating in the advanced mode.
+          When changing between modes (Basic, Advanced, Service, none), some of
+          the user settings are reset to their default values. Specifically:
+          1. When changing from the advanced mode to any other mode,
+             the CCL definitions are lost.
+          2. When changing from any mode to any other mode, the interface assignments:
+             associated Policy map, trust mode of the Basic mode, shaper and scheduler
+             settings are lost.
+          3. When changing from service mode to any other mode, all service mode
+             settings are lost.
+          4. When changing to service mode, ACL are lost. The user is prompted if
+             he wants to whether to import his active ACLs to the service mode.
+          5. All other user configurations are kept.
+          When the system is configured to the Basic mode and the user changes the
+          trust mode, the CCL assignment per port and the shaper settings are reset
+          to their default values."
+
+
+    SYNTAX  INTEGER {
+        disable(1),
+        basic(2),
+        advanced(3)
+}
+
+
+L4ProtType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "specify to Layer 4 protocol type for which the port number will refer
+          at the rlPolicyTcpUdpPortDscpTable."
+
+    SYNTAX  INTEGER {
+        tcp(1),
+        udp(2)
+}
+
+
+
+RlPolicyTimeBasedAclWeekPeriodicList  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION  "Bitmap that includes days of week.
+                 Each bit in the bitmap associated with corresponding day of the week."
+    SYNTAX      BITS {
+            monday(0),
+            tuesday(1),
+            wednesday(2),
+            thursday(3),
+            friday(4),
+            saturday(5),
+            sunday(6)
+}
+
+RlPolicyRulesActionDropType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The Action Drop Type."
+   SYNTAX INTEGER {
+      hardDrop(1),
+      softDrop(2)
+}
+
+RlPolicyMarkVlanAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the mark vlan action type in the class map table.
+      1 - noMark - No vlan marking
+      2 - mark  - mark vlan tagged.
+      3 - markNestedVlan - add vlan tag to the packet. "
+    SYNTAX  INTEGER {
+        noMark(1),
+        mark(2),
+        markNestedVlan(3)
+    }
+RlPolicyRedirectAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the packet redirection options.
+     Redirection is applied only on permitted packets.
+      1 - disabled  - no redirect
+      2 - trap - trap to local_host (CPU)
+      3 - redirectToInterface - redirect to a output interface (port, trunk or vlan)
+      4 - redirectToAllPorts - redirect to all ports, exept the ingress port.
+      5 - mirror - forward the packet and sent a copy to local_host (CPU)
+      6 - analyzerPort - forward the packet and sent a copy to egress port.
+      7 - loopback - redirect the packet the the port it was recieved.
+      8 - redirectToPortGroup - send to group of ports, defined in rlUserAssignedVidxTable table.
+      9 - mirror_and_redirectToInterface - send the packet to interface and send a copy to local_host(CPU)
+      10 -mirror_and_redirectToInterfacesGroup - send the packet to group of ports and send a copy to local_host(CPU)  "
+    SYNTAX  INTEGER {
+        disabled(1),
+        trap(2),
+        redirectToInterface(3),
+        redirectToAllPorts(4),
+        mirror(5),
+        analyzerPort(6),
+        loopback(7),
+        redirectToPortGroup(8),
+        mirrorAndRedirectToInterface(9),
+        mirrorAndRedirectToInterfacesGroup(10)
+    }
+
+rlPolicyMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 14
+         1 - original version
+         2 - two new fields
+                rlPolicyActionChangeDscpNonConform
+                rlPolicyActionNewDscpNonConform
+             were added.
+         3 - added support new policy features
+                QoS modes: basic and advanced
+                support for trusted mode  operations
+                mapping tables for trusted ports
+                dscp, tcpUdp, mutation, remarking.
+         4 - I) added support to service mode.
+             II)DSCP to VPT mapping table
+             III) download marker
+         5 - Added cos-Dscp to RlPolicyTrustTypes
+         6 - Added rlPolicyFlowClassificationOffsetsGroupUseVPTId and
+                   rlPolicyFlowClassificationOffsetsGroupUseEtherTypeId To
+                   rlPolicyFlowClassificationOffsetsTable
+             Added rlPolicyClassifierVPTID And
+                   rlPolicyClassifierEtherTypeID To
+                   rlPolicyClassifierTable
+             Added Vpt and Ethertype support to rlPolicyClassifierAdditionalCriteriaSupported
+         7 - Added  rlPolicyPortCfgPortRateLimitStatus,rlPolicyPortCfgCirPortRateLimit
+                    rlPolicyPortCfgCbsPortRateLimit to rlPolicyPortConfigurationTable
+         8 - Added  rlPolicyDefaultForwardingProtocol to rlPolicyDefaultForwardingTable
+             Added rlPolicyDscpToDpTable
+         9 - Add statistics
+         10 - Add classifier utilization
+         11 -Added rlPolicyFlowClassificationOffsetsGroupUseInnerVlanId To
+                 rlPolicyFlowClassificationOffsetsTable
+             Added rlPolicyClassifierInnerVID To
+                 rlPolicyClassifierTable
+             Added Inner vlan id support to rlPolicyClassifierAdditionalCriteriaSupported
+         12 - Added rlPolicyVlanConfigurationTable
+         13 - Added rlPolicyIsTCAvailable scalar
+         14 - Added rlPolicyCPUSafeGuardEnable"
+    ::= { rlPolicy 1 }
+
+-- Groups:
+--      rlPolicyClassifier
+--      rlPolicyRules
+--      rlPolicyMeterClass
+--      rlPolicyAction
+--      rlPolicyServiceClass
+--      rlPolicyDiffServ
+--      rlPolicyMapping
+--      rlPolicyGlobalParams
+--      rlPolicyMapping
+--      rlPolicyDefaultForwardingTable
+--      rlPolicyStatistics
+--      rlPolicyClassifierUtilization
+--------------
+-- Classifier
+--
+rlPolicyClassifier OBJECT IDENTIFIER ::= { rlPolicy 2 }
+
+--
+-- Platform parameters variables
+--
+rlPolicyClassifierPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyClassifier 1 }
+
+rlPolicyFlowClassificationOffsetsGroupScheme OBJECT-TYPE
+    SYNTAX INTEGER {
+        allOffsetsPermitted(1),
+        singleFlowClassificationOffsetGroupsForIpIpxBridge(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Some platforms allow Policy statements to examine all packet
+         offsets(Opal); other platforms require specification of specific
+         byte offsets for routedIp packets, another set of offsets for
+         routedIpx, a third set for bridge."
+    ::= { rlPolicyClassifierPlatDependParams 1 }
+
+rlPolicyNumberOfOffsetsPerFlowClassificationOffsetGroup OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "For platforms which require an FCOG, indicates the maximum
+         number of byte offsets specifiable for each offset group."
+    ::= { rlPolicyClassifierPlatDependParams 2 }
+
+rlPolicyFlowClassificationOffsetGroupMaximumOffset OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the maximum value of a byte offset in a
+         Flow Classification Offset Group. If 0, there is no limit."
+    ::= { rlPolicyClassifierPlatDependParams 3 }
+
+rlPolicyNumberOfOffsetsPerOmpcGroup OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "indicates the maximum number of byte offsets
+         specifiable for each Ompc offset group."
+    ::= { rlPolicyClassifierPlatDependParams 4 }
+
+rlPolicyOmpcMaximumOffset OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the maximum value of a byte offset in a
+         Ompc Group. If 0, there is no limit."
+    ::= { rlPolicyClassifierPlatDependParams 5 }
+
+rlPolicyOMPCPermittedOperators OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "A bit mask indicating which operators are permissable in an OMPC:
+          ----------
+          |87654321|
+          ----------
+          1 - equal operator permitted
+          2 - not-equal operator permitted
+          3 - greater-than operator permitted
+          4 - less-than operator permitted"
+    ::= { rlPolicyClassifierPlatDependParams 6 }
+
+rlPolicyMaxOMPCLengthForBiggerSmallerOperation OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the maximal permissible length of an OMPC using
+         bigger' or 'smaller' condition. If 0, there is no limit."
+    ::= { rlPolicyClassifierPlatDependParams 7 }
+
+rlPolicyClassifierAdditionalCriteriaSupported OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1))
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+      "A bit mask indicating which additional Criteria may be supported
+       by the classifier:
+          ----------
+          |87654321|
+          ----------
+          1 - input port supported
+          2 - output port supported
+          3 - VLAN ID for bridging supported
+          4 - VPT ID for bridging supported
+          5 - EtherType ID for bridging supported
+          6 - Inner VLAN ID for bridging supported"
+    ::= { rlPolicyClassifierPlatDependParams 8 }
+
+rlPolicyClassifierAdditionalCriteriaUsedInOffsetCount OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "Indicates whether the additional FCOG or Classifier criteria
+         (ie. inPort, outPort VID count towards the maximum number of offsets
+         ie. whether using inPort in the FCOG reduces the maximum number of
+         offsets available."
+    ::= { rlPolicyClassifierPlatDependParams 9 }
+
+rlPolicyClassifierPermittedOffsetTypes OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "A bit mask indicating which offset types are supported by the
+         platform for FCOG and OMPC definitions:
+            ----------
+            |87654321|
+            ----------
+            1 - L2 offsets supported
+            2 - L3 offsets supported"
+    ::= { rlPolicyClassifierPlatDependParams 10 }
+
+rlPolicyClassifierOMPCActions OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bit mask indicating which operation could be performed with OPMC
+            ----------
+            |87654321|
+            ----------
+            1 - equal,
+            2 - notEqual,
+            3 - bigger,
+            4 - smaller."
+    ::= { rlPolicyClassifierPlatDependParams 11 }
+
+--
+--Flow Classification Offsets Table
+--
+rlPolicyFlowClassificationOffsetsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyFlowClassificationOffsetsGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies the byte offsets that the platform can use for
+         policy decisions.  This table is used for platforms
+         which impose limitations on choosing the OMPCs for classification.
+         If the platform does not impose any limitations, the value of
+         rlPolicyFlowClassificationOffsetsGroupScheme is allOffsetsPermitted.
+         Each entry in the table specifies a combination of byte offsets
+         which can be used to specify flow classification.  A rule may
+         use a subset of the bytes of its Offset Group.
+         The maximum value for each offset is given by
+         rlPolicyFlowClassificationOffsetGroupMaximumOffset.
+         The maximum number of offsets per Offset Group is given by
+         rlPolicyNumberOfOffsetsPerFlowClassificationOffsetGroup."
+    ::= { rlPolicyClassifier 2 }
+
+rlPolicyFlowClassificationOffsetsGroupEntry OBJECT-TYPE
+    SYNTAX RlPolicyFlowClassificationOffsetsGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The flow classification offset table entry includes the
+         following parameters"
+    INDEX { rlPolicyFlowClassificationOffsetsGroupType }
+    ::= { rlPolicyFlowClassificationOffsetsTable 1 }
+
+RlPolicyFlowClassificationOffsetsGroupEntry ::= SEQUENCE {
+    rlPolicyFlowClassificationOffsetsGroupType                  RlPolicyGroupType,
+    rlPolicyFlowClassificationOffsetsGroupOffset                OBJECT IDENTIFIER,
+    rlPolicyFlowClassificationOffsetsGroupOffsetType            OBJECT IDENTIFIER,
+    rlPolicyFlowClassificationOffsetsGroupMask                  OCTET STRING,
+    rlPolicyFlowClassificationOffsetsGroupUseInputInterface     TruthValue,
+    rlPolicyFlowClassificationOffsetsGroupUseOutputInterface    TruthValue,
+    rlPolicyFlowClassificationOffsetsGroupUseVlanId             TruthValue,
+    rlPolicyFlowClassificationOffsetsGroupStatus                RowStatus,
+    rlPolicyFlowClassificationOffsetsGroupUseVPTId              TruthValue,
+    rlPolicyFlowClassificationOffsetsGroupUseEtherTypeId        TruthValue,
+    rlPolicyFlowClassificationOffsetsGroupUseInnerVlanId        TruthValue
+}
+
+rlPolicyFlowClassificationOffsetsGroupType OBJECT-TYPE
+    SYNTAX RlPolicyGroupType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies a classifier type for which offset bytes can be specified."
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 1 }
+
+rlPolicyFlowClassificationOffsetsGroupOffset OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The list of offsets to be included in the Flow Classification Offset
+         Group are specified as subidentifiers in the OID(after the first 2
+         bytes which must be 1.1). The maximal number of permissible offsets
+         is given by rlPolicyNumberOfOffsetsPerFlowClassificationOffsetGroup.
+         The maximal value that an offset can have is
+         rlPolicyFlowClassificationOffsetGroupMaximumOffset."
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 2 }
+
+rlPolicyFlowClassificationOffsetsGroupOffsetType OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the corresponding byte denotes an offset from beginning
+         of L2, from the beginning of L3 IPv4 packet data or from the beginning
+         of L3 IPv6 packet data.
+         Each byte in the OID contains either:
+            (1) - L2 offset
+            (2) - L3 Offset
+            (3) - L3 IPv6 Offset"
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 3 }
+
+rlPolicyFlowClassificationOffsetsGroupMask OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The list of masks corresponding to the offsets to be included in the
+         Flow Classification Offset Group are specified as bytes in the
+         OID(after the first 2 bytes which must be 1.1)."
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 4 }
+
+rlPolicyFlowClassificationOffsetsGroupUseInputInterface OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the Input Interface Index is usable
+         in Policy Rule definitions."
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 5 }
+
+rlPolicyFlowClassificationOffsetsGroupUseOutputInterface OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the Output Interface Index(ie.
+         routing/bridging decision) is usable in Policy Rule definitions"
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 6 }
+
+rlPolicyFlowClassificationOffsetsGroupUseVlanId OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the VlanId is usable in Policy Rule
+         definitions for bridged packets"
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 7 }
+
+rlPolicyFlowClassificationOffsetsGroupStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 8 }
+
+rlPolicyFlowClassificationOffsetsGroupUseVPTId OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the VPT is usable in Policy Rule
+         definitions for bridged packets"
+    DEFVAL{ false }
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 9 }
+
+rlPolicyFlowClassificationOffsetsGroupUseEtherTypeId OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the EtherType is usable in Policy Rule
+         definitions for bridged packets"
+    DEFVAL{ false }
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 10 }
+
+rlPolicyFlowClassificationOffsetsGroupUseInnerVlanId OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the inner VlanId is usable in Policy Rule
+         definitions for bridged packets"
+    DEFVAL{ false }
+    ::= { rlPolicyFlowClassificationOffsetsGroupEntry 11 }
+
+
+--
+--  Ompc Table
+--
+rlPolicyOMPCTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlPolicyOMPCEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+         "The table of OMPC statements."
+  ::= { rlPolicyClassifier 3 }
+
+rlPolicyOMPCEntry OBJECT-TYPE
+    SYNTAX  RlPolicyOMPCEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each classification statement consists of the following parameters"
+    INDEX  { rlPolicyOMPCGroupType, rlPolicyOMPCIndex }
+    ::= { rlPolicyOMPCTable 1 }
+
+RlPolicyOMPCEntry ::= SEQUENCE {
+    rlPolicyOMPCGroupType       RlPolicyGroupType,
+    rlPolicyOMPCIndex           INTEGER,
+    rlPolicyOMPCOffset          INTEGER,
+    rlPolicyOMPCOffsetType      INTEGER,
+    rlPolicyOMPCMask            OCTET STRING,
+    rlPolicyOMPCPattern         OCTET STRING,
+    rlPolicyOMPCCondition       INTEGER,
+    rlPolicyOMPCDescription     DisplayString,
+    rlPolicyOMPCStatus          RowStatus
+}
+
+rlPolicyOMPCGroupType OBJECT-TYPE
+    SYNTAX RlPolicyGroupType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies a classifier type for which offset bytes can be specified."
+    ::= { rlPolicyOMPCEntry 1 }
+
+rlPolicyOMPCIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Index into the OMPC  Table. "
+    ::= { rlPolicyOMPCEntry 2 }
+
+rlPolicyOMPCOffset OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the offset within the frame (in bytes) from the layer
+         according to rlPolicyGroupType. The limitation of this field is
+         according to the rlPolicyFlowClassificationOffsetGroupMaximumOffset
+         parameter if this OMPC is used by an entry in the
+         rlPolicyClassifierTable whose rlPolicyClassifierType is a protocol
+         for which predefined offsets in rlPolicyFlowClassificationOffsetsTable
+         are required.
+         rlPolicyRequiredOffsetGroups indicates for which protocols there is
+         such a requirement."
+    ::= { rlPolicyOMPCEntry 3 }
+
+rlPolicyOMPCOffsetType OBJECT-TYPE
+    SYNTAX INTEGER {
+        l2(1),
+        l3(2),
+        l3-ipv6(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the offset should be interpreted as relative to the
+         beginning of L2 or the beginning of L3"
+    ::= { rlPolicyOMPCEntry 4 }
+
+rlPolicyOMPCMask OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies which bits  of the rlPolicyOMPCPattern field are
+         significant for packet comparison. The length of the mask,
+         in case of 'bigger' or 'smaller' rlPolicyOMPCCondition,
+         is limited by rlPolicyMaxOMPCLengthForBiggerSmallerOperation."
+    ::= { rlPolicyOMPCEntry 5 }
+
+rlPolicyOMPCPattern OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Describes the mask field. The length of this object must be equal
+        to the length of rlPolicyOMPCMask."
+    ::= { rlPolicyOMPCEntry 6 }
+
+rlPolicyOMPCCondition OBJECT-TYPE
+    SYNTAX INTEGER {
+       equal(1),
+       notEqual(2),
+       bigger(3),
+       smaller(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "These define the operation carried out on the two 'operands'
+        (frame and pattern), i.e. Bigger means that frame bits should be
+        bigger than pattern bits. The permitted values are according to
+        rlPolicyOMPCPermittedOperators parameter, if this OMPC is used by
+        an entry in the rlPolicyClassifierTable whose rlPolicyClassifierType
+        is a protocol for which predefined offsets in
+        rlPolicyFlowClassificationOffsetsTable are required.
+        rlPolicyRequiredOffsetGroups indicates for which protocols there is
+        such a requirement."
+    DEFVAL{ equal }
+    ::= { rlPolicyOMPCEntry 7 }
+
+rlPolicyOMPCDescription OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "Free text specifing the nature of this OMPC."
+    ::= { rlPolicyOMPCEntry 8 }
+
+rlPolicyOMPCStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete an entry from this table."
+    ::= { rlPolicyOMPCEntry 9 }
+
+--
+--  Classifier Table
+--
+rlPolicyClassifierTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyClassifierEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of Classifier statement."
+    ::= { rlPolicyClassifier 4 }
+
+rlPolicyClassifierEntry OBJECT-TYPE
+    SYNTAX  RlPolicyClassifierEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Classifiers can be of the ingress, egress, or post-routing phase
+         varieties.
+         Each multifield classification statement consists of the
+         following parameters."
+    INDEX  { rlPolicyClassifierType, rlPolicyClassifierListIndex, rlPolicyClassifierSubListIndex, rlPolicyClassifierIndex }
+    ::= { rlPolicyClassifierTable 1 }
+
+RlPolicyClassifierEntry ::= SEQUENCE {
+    rlPolicyClassifierType              RlPolicyGroupType,
+    rlPolicyClassifierListIndex         INTEGER,
+    rlPolicyClassifierSubListIndex      INTEGER,
+    rlPolicyClassifierIndex             INTEGER,
+    rlPolicyClassifierOmpcList          OBJECT IDENTIFIER,
+    rlPolicyClassifierInIfIndex         InterfaceIndexOrZero,
+    rlPolicyClassifierOutIfIndex        InterfaceIndexOrZero,
+    rlPolicyClassifierVID               INTEGER,
+    rlPolicyClassifierDiffservInIfType  RlPolicyClassifierDiffservIfType,
+    rlPolicyClassifierDiffservOutIfType RlPolicyClassifierDiffservIfType,
+    rlPolicyClassifierStatus            RowStatus,
+    rlPolicyClassifierInIfIndexList     PortList,
+    rlPolicyClassifierOutIfIndexList    PortList,
+    rlPolicyClassifierVPTID             INTEGER,
+    rlPolicyClassifierVPTIDMask         INTEGER,
+    rlPolicyClassifierEtherTypeID       INTEGER,
+    rlPolicyClassifierInnerVID          INTEGER
+}
+
+rlPolicyClassifierType OBJECT-TYPE
+    SYNTAX  RlPolicyGroupType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies a classifier type for which offset bytes can be specified."
+    ::= { rlPolicyClassifierEntry 1 }
+
+rlPolicyClassifierListIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "List Index into the Classifier Table."
+    ::= { rlPolicyClassifierEntry 2 }
+
+rlPolicyClassifierSubListIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "SubList Index into the Classifier Table."
+    ::= { rlPolicyClassifierEntry 3 }
+
+rlPolicyClassifierIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Index into the Classifier Table."
+    ::= { rlPolicyClassifierEntry 4 }
+
+rlPolicyClassifierOmpcList OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The list of OMPCs to check with this Classifier. Each
+         subidentifier together with rlPolicyClassifierType specify one OMPC."
+    ::= { rlPolicyClassifierEntry 5 }
+
+rlPolicyClassifierInIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Input interface index to be compared with received packet,
+         a value of 0 denotes that the classifier is applied to all ports."
+    DEFVAL{ 0 }
+    ::= { rlPolicyClassifierEntry 6 }
+
+rlPolicyClassifierOutIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Output interface index to be compared with sent packet,
+         a value of 0 denotes that the classifier is applied to all ports."
+    DEFVAL { 0 }
+    ::= { rlPolicyClassifierEntry 7 }
+
+rlPolicyClassifierVID OBJECT-TYPE
+    SYNTAX  INTEGER (0..4095)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "VLAN ID, used only for bridged traffic. "
+    DEFVAL{ 0 }
+    ::= { rlPolicyClassifierEntry 8 }
+
+rlPolicyClassifierDiffservInIfType OBJECT-TYPE
+    SYNTAX  RlPolicyClassifierDiffservIfType
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "For a classifier used by the Diffserv Rules table.  Enables
+         specification of a classifier that should apply to all
+         Diffserv boundary ports or all Diffserv Interior ports.
+         If normal is specified, the rlPolicyClassifierInIfIndex field
+         is used as it is in the non-diffserv case.  If allBoundary or
+         allInterior is selected, rlPolicyClassifierInIfIndex is ignored"
+        DEFVAL { normal }
+    ::= { rlPolicyClassifierEntry 9 }
+
+rlPolicyClassifierDiffservOutIfType OBJECT-TYPE
+    SYNTAX  RlPolicyClassifierDiffservIfType
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "For a classifier used by the Diffserv Rules table.  Enables
+         specification of a classifier that should apply to outbound
+         traffic on all Diffserv boundary ports or all Diffserv Interior
+         ports.
+         If normal is specified, the rlPolicyClassifierOutIfIndex field
+         is used as it is in the non-diffserv case.  If allBoundary or
+         allInterior is selected, rlPolicyClassifierOutIfIndex is ignored"
+    DEFVAL { normal }
+    ::= { rlPolicyClassifierEntry 10 }
+
+rlPolicyClassifierStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlPolicyClassifierEntry 11 }
+
+
+rlPolicyClassifierInIfIndexList OBJECT-TYPE
+    SYNTAX  PortList
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "allow to define list of ports for the specific classifier
+         for ingress classification. if rlPolicyClassifierInIfIndex equal to zero
+         then the following list should be reffered , if the list is empty we refer
+         to ALL Ports"
+    ::= { rlPolicyClassifierEntry 12 }
+
+rlPolicyClassifierOutIfIndexList OBJECT-TYPE
+    SYNTAX  PortList
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "allow to define list of ports for the specific classifier
+         for egress classification. if rlPolicyClassifierOutIfIndex equal to zero
+         then the following list should be reffered , if the list is empty we refer
+         to ALL Ports"
+    ::= { rlPolicyClassifierEntry 13 }
+
+
+    rlPolicyClassifierVPTID OBJECT-TYPE
+    SYNTAX  INTEGER (0..8)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "VPT ID - user priority tag to be compared with .
+      8 is used to indicate not used value for this classifier"
+    DEFVAL{ 8 }
+    ::= { rlPolicyClassifierEntry 14 }
+
+
+    rlPolicyClassifierVPTIDMask OBJECT-TYPE
+    SYNTAX  INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "VPT ID Mask ,mask the user priority field .
+      0 is the default indicate Mask all compared with any VPT value"
+    DEFVAL{ 0 }
+    ::= { rlPolicyClassifierEntry 15 }
+
+    rlPolicyClassifierEtherTypeID OBJECT-TYPE
+    SYNTAX  INTEGER (1499..65536)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "EtherType ID, to be compared with.
+      65535 is used to indicate not used value for this classifier
+      1499 is uded to indicate IPv4 ethertype that is originated from IPv4 ACL with permit/deny any any any
+      1500 is uded to indicate IPv6 ethertype that is originated from IPv6 ACL with permit/deny any any any"
+    DEFVAL{ 65536 }
+    ::= { rlPolicyClassifierEntry 16}
+
+rlPolicyClassifierInnerVID OBJECT-TYPE
+    SYNTAX  INTEGER (0..4095)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "INNER VLAN ID, used only for double tagged traffic. "
+    DEFVAL{ 0 }
+    ::= { rlPolicyClassifierEntry 17 }
+----------------------------
+--  Rules Class
+--
+rlPolicyRules OBJECT IDENTIFIER ::= { rlPolicy 3 }
+
+rlPolicyRulesPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyRules 1 }
+
+rlPolicyDroppedPacketCountSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the dropped packets counter in the
+         rlPolicyRulesTable is supported."
+    ::= { rlPolicyRulesPlatDependParams 1 }
+
+rlPolicyFilterActionOptions OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bit mask indicating which operation could be perform
+            ----------
+            |87654321|
+            ----------
+            1 - block,
+            2 - blockAndTrap,
+            3 - permitAndTrap,
+            4 - permit."
+    ::= { rlPolicyRulesPlatDependParams 2 }
+
+rlPolicyIngressMeteringSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether the platform supports metering in inbound packet
+         rules."
+    ::= { rlPolicyRulesPlatDependParams 3 }
+
+rlPolicyEgressMeteringSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether the platform supports metering on outbound packet
+         rules (for Diffserv)."
+    ::= { rlPolicyRulesPlatDependParams 4 }
+
+--------------
+-- Rules Table
+--
+rlPolicyRulesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyRulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of rules and Rules statements applied to all incoming traffic
+         at the post-routing phase - ie. both the inPort and outPort are
+         available for classification
+         When Diffserv is not in effect(ie. IPX, bridging, or IP when the global option
+         for Diffserv is off), certain table parameters are not available(see
+         below). The DiffServ option is enabled or disabled by setting
+         rlDiffservModeEnabled."
+    ::= { rlPolicyRules 2 }
+
+rlPolicyRulesEntry OBJECT-TYPE
+    SYNTAX  RlPolicyRulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each multifield classification statement consists of the following
+         parameters."
+    INDEX  { rlPolicyRulesTableType,
+             rlPolicyRulesInterfaceDirection,
+             rlPolicyRulesListIndex,
+             rlPolicyRulesSubListIndex,
+             rlPolicyRulesIndex }
+    ::= { rlPolicyRulesTable 1 }
+
+RlPolicyRulesEntry ::= SEQUENCE  {
+    rlPolicyRulesTableType              RlPolicyGroupType,
+    rlPolicyRulesInterfaceDirection     INTEGER,
+    rlPolicyRulesListIndex              INTEGER,
+    rlPolicyRulesSubListIndex           INTEGER,
+    rlPolicyRulesIndex                  INTEGER,
+    rlPolicyRulesFilteringAction        INTEGER,
+    rlPolicyRulesDroppedPackets         Counter32,
+    rlPolicyRulesFurtherRefPointer      INTEGER,
+    rlPolicyRulesDescription            DisplayString,
+    rlPolicyRulesStatus                 RowStatus,
+    rlPolicyRulesCounterIdx             INTEGER,
+    rlPolicyRulesCounter                Counter32,
+    rlPolicyRulesActionPointer          INTEGER,
+    rlPolicyRulesTimeRange1             INTEGER,
+    rlPolicyRulesTimeRange2             INTEGER,
+    rlPolicyRulesSrcPortRangeStart      INTEGER,
+    rlPolicyRulesSrcPortRangeEnd        INTEGER,
+    rlPolicyRulesDestPortRangeStart     INTEGER,
+    rlPolicyRulesDestPortRangeEnd       INTEGER,
+    rlPolicyRulesActionDropType         RlPolicyRulesActionDropType
+
+
+}
+
+rlPolicyRulesTableType OBJECT-TYPE
+    SYNTAX  RlPolicyGroupType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies a classifier type for which offset bytes can be specified."
+    ::= { rlPolicyRulesEntry 1 }
+
+rlPolicyRulesInterfaceDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+        inbound(1),     -- ingress interface / ingress metering support
+        outbound(2),    -- egress interface / egress metering support
+        none(3)         -- no Metering support
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies the direction for this entry on the
+         interface. 'inbound' traffic is operated on during
+         receipt, while 'outbound' traffic is operated on prior
+         to transmission.
+         Based on the metering support:
+         inbound available while the ingress metering supported,
+         outbound available while egress metering supported,
+         and none while no metering supported."
+    ::= { rlPolicyRulesEntry 2 }
+
+rlPolicyRulesListIndex OBJECT-TYPE
+    SYNTAX   INTEGER (1..2147483647)
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Enumerates the rule list entry."
+    ::= { rlPolicyRulesEntry 3 }
+
+rlPolicyRulesSubListIndex OBJECT-TYPE
+    SYNTAX   INTEGER (1..2147483647)
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Enumerates the rule sub-list entry."
+    ::= { rlPolicyRulesEntry 4 }
+
+rlPolicyRulesIndex OBJECT-TYPE
+    SYNTAX   INTEGER (1..2147483647)
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Enumerates the rule index entry."
+    ::= { rlPolicyRulesEntry 5 }
+
+
+rlPolicyRulesFilteringAction OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        block(1),
+        blockAndTrap(2),
+        permitAndTrap(3),
+        permit(4),
+        blockAndDisablePort(5),
+        blockTrapAndDisablePort(6),
+        blockAndLogInput(7),
+        permitAndLogInput(8)
+  }
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "Specifies the action for the filter.
+         Values 1-10 reserved for the System filtering implemetation;
+         Values starting from 11 may be used for user definition about
+         future application."
+    DEFVAL { permit }
+    ::= { rlPolicyRulesEntry 6}
+
+rlPolicyRulesDroppedPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets blocked by this filtering rule."
+    ::= { rlPolicyRulesEntry 7 }
+
+rlPolicyRulesFurtherRefPointer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This further reference indicate on the entry at the metering or
+                 action table, based on the supported features. The
+                 rlPolicyRulesFurtherRefPointer points on the metering table if the
+                 metering feature is supported, if not this fields points on the
+                 Action table"
+    ::= { rlPolicyRulesEntry 8 }
+
+rlPolicyRulesDescription OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "Free text specifing the nature of this Rule."
+    ::= { rlPolicyRulesEntry 9 }
+
+rlPolicyRulesStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Row status of the Rules entry."
+    ::= { rlPolicyRulesEntry 10 }
+
+rlPolicyRulesCounterIdx OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If not zero, perform counting of matched packets ."
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 11 }
+
+rlPolicyRulesCounter OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets that matched this filtering rule."
+    ::= { rlPolicyRulesEntry 12 }
+
+rlPolicyRulesActionPointer  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This further reference indicate on the entry at the
+             action table, The rlPolicyRulesActionPointer points on the action
+             table if the aggregate metering feature is supported,or
+             if meter is not belong to data path. "
+    ::= { rlPolicyRulesEntry 13 }
+
+
+rlPolicyRulesTimeRange1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Time range of the first ACL. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 14 }
+
+rlPolicyRulesTimeRange2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Time range of the second ACL. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 15 }
+
+rlPolicyRulesSrcPortRangeStart OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Start port of port range for source port. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 16 }
+
+rlPolicyRulesSrcPortRangeEnd OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "End port of port range for source port. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 17 }
+
+rlPolicyRulesDestPortRangeStart OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Start port of port range for destination port. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 18 }
+
+rlPolicyRulesDestPortRangeEnd OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "End port of port range for destination port. "
+    DEFVAL { 0 }
+    ::= { rlPolicyRulesEntry 19 }
+
+rlPolicyRulesActionDropType OBJECT-TYPE
+    SYNTAX RlPolicyRulesActionDropType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This field is valid only if rlPolicyRulesFilteringAction is
+        not permit. Used to distinguish between Hard and Soft drop."
+    DEFVAL { hardDrop }
+    ::= { rlPolicyRulesEntry 20 }
+
+
+
+------------------------
+-- Rules download marker
+--
+rlPolicyRulesDownloadMarker OBJECT-TYPE
+    SYNTAX  INTEGER {
+        start(1),
+        finish(2),
+        finishCombined(3),
+        undo(4),
+        deleteStart(5),
+        deleteFinish(6)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates when rules download or removing starts and terminates."
+    ::= { rlPolicyRules 3 }
+
+
+
+------------------
+--  Metering Class
+--
+rlPolicyMeterClass OBJECT IDENTIFIER ::= { rlPolicy 4 }
+
+rlPolicyMeterPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyMeterClass 1 }
+
+rlPolicyMeterDepth OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates how many meters can be chained in succession (ie. so
+         that if the first meter fails, the second can be examined).
+         The final meter in a sequence is always 'always-conform', so if
+         the value of this parameter is 2, the platform that supports a
+         single meter and then a second marking/action for meter failure."
+    ::= { rlPolicyMeterPlatDependParams 1 }
+
+------------
+--  Metering Class Table
+--
+rlPolicyMeterClassTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyMeteringClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table defines the Metering classes for the system."
+    ::= { rlPolicyMeterClass 2 }
+
+rlPolicyMeteringClassEntry OBJECT-TYPE
+    SYNTAX  RlPolicyMeteringClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each statement consists of the following parameters"
+    INDEX  { rlPolicyMeteringClassIndex }
+    ::= { rlPolicyMeterClassTable 1 }
+
+RlPolicyMeteringClassEntry ::= SEQUENCE  {
+    rlPolicyMeteringClassIndex                      INTEGER,
+    rlPolicyMeteringClassAlwaysConform              TruthValue,
+    rlPolicyMeteringClassAggregateMeterRate         INTEGER,
+    rlPolicyMeteringClassAggregateMeterBurstSize    INTEGER,
+    rlPolicyMeteringClassPerSessionMeteringRate     INTEGER,
+    rlPolicyMeteringClassMaxSessionLimit            INTEGER,
+    rlPolicyMeteringClassActionPointer              INTEGER,
+    rlPolicyMeteringClassFailMeterPointer           INTEGER,
+    rlPolicyMeteringClassStatus                     RowStatus,
+    rlPolicyMeteringCounterEnable                   TruthValue,
+    rlPolicyMeteringClassInProfileCounter           Counter32,
+    rlPolicyMeteringClassOutProfileCounter          Counter32
+}
+
+rlPolicyMeteringClassIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This enumerates the table entry."
+    ::= { rlPolicyMeteringClassEntry 1 }
+
+rlPolicyMeteringClassAlwaysConform OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If true, the meter always accepts all traffic; its
+         rate is effectively infinite. In such a case, the token
+         bucket defined by the MeterRate and Burst-Size
+         parameters is ignored.
+         also used when there isn't metering support."
+    DEFVAL { true }
+    ::= { rlPolicyMeteringClassEntry 2 }
+
+rlPolicyMeteringClassAggregateMeterRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "kbps"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The rate in kilobytes/second of traffic considered within the
+         bandwidth allocated for this policy entry."
+    DEFVAL { 0 }
+    ::= { rlPolicyMeteringClassEntry 3 }
+
+rlPolicyMeteringClassAggregateMeterBurstSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "bytes"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Burst Size parameter for the aggregate meter leaky bucket.  A
+         value of 0 means that the device should choose the Burst Size
+         that it thinks is most suitable for the rule.
+         The interval can be derived from (burstSizex8/Rate)."
+    DEFVAL { 0 }
+    ::= { rlPolicyMeteringClassEntry 4 }
+
+rlPolicyMeteringClassPerSessionMeteringRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "kbps"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A Quantitative Appliction policy rule where each individual
+         session requires a guaranteed minimum bandwidth.
+         Specifies the Ingress traffic flow meter per session
+         indicate a bandwidth limit to be applied to each individual session
+         Value 0 at rlPolicyMeteringClassPerSessionMetering
+         and rlPolicyMeteringClassMaxSessionLimit
+         is interpreted to mean no sepecific requarment and
+         the aggregate metering will be done by the system decision.
+         The rate in kilobytes/second"
+     DEFVAL { 0 }
+    ::= { rlPolicyMeteringClassEntry 5 }
+
+rlPolicyMeteringClassMaxSessionLimit OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate a the maximum number of session for a sepecific rule
+         to guarante minimum bandwidth.
+         Value 0 at rlPolicyMeteringClassPerSessionMetering
+         and rlPolicyMeteringClassMaxSessionLimit
+         is interpreted to mean no sepecific requarment and
+         the aggregate metering will be done by the system decision."
+    DEFVAL { 0 }
+    ::= { rlPolicyMeteringClassEntry 6 }
+
+rlPolicyMeteringClassActionPointer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the index in the rlPolicyActionTable to be
+         accessed for packets that are in-profile.
+         Value 0 is interpreted to mean no action.
+         A non-zero value may be specified only for RoutedIp
+         packets in Diffserv mode."
+    ::= { rlPolicyMeteringClassEntry 7 }
+
+rlPolicyMeteringClassFailMeterPointer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies an index in the rlPolicyMeterClassTable. This
+         is the meter that is to be used if the packet is out-of-profile
+         relative to the current meter.
+         If non-Diffserv mode, this field is not used.
+         If the current meter is AlwaysConform, this field is not used."
+    DEFVAL { 0 }
+    ::= { rlPolicyMeteringClassEntry 8 }
+
+rlPolicyMeteringClassStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlPolicyMeteringClassEntry 9 }
+
+
+rlPolicyMeteringCounterEnable  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable metering counter for the meter entry."
+    DEFVAL { false }
+    ::= { rlPolicyMeteringClassEntry 10 }
+
+rlPolicyMeteringClassInProfileCounter OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "meter counter for packets that are in profile ."
+    ::= { rlPolicyMeteringClassEntry 11 }
+
+rlPolicyMeteringClassOutProfileCounter OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "meter counter for packets that are out of profile"
+    ::= { rlPolicyMeteringClassEntry 12 }
+
+
+
+------------
+-- Action
+---
+rlPolicyAction OBJECT IDENTIFIER ::= { rlPolicy 5 }
+
+rlPolicyActionPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyAction 1 }
+
+rlPolicyActionMREDSupported OBJECT-TYPE
+    SYNTAX INTEGER {
+        supported(1),
+        notSupported(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the platform supports setting MRED characteristics
+         in the packet action"
+    ::= { rlPolicyActionPlatDependParams 1 }
+
+rlPolicyActionDroppedPacketCountSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the platform can maintain a count of
+         packets Marked for drop by a particular action."
+    ::= { rlPolicyActionPlatDependParams 2 }
+
+rlPolicyActionDroppedDropPrecedenceSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the platform support at drop precedence."
+    ::= { rlPolicyActionPlatDependParams 3 }
+
+rlPolicyActionInProfileDropPrecedence OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bit mask indicating which drop precedence supported
+            ----------
+            |87654321|
+            ----------
+            1 - low,
+            2 - medium,
+            3 - high,
+            4 - drop"
+    ::= { rlPolicyActionPlatDependParams 4 }
+
+rlPolicyActionOutProfileDropPrecedence OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bit mask indicating which drop precedence supported
+            ----------
+            |87654321|
+            ----------
+            1 - low,
+            2 - medium,
+            3 - high,
+            4 - drop"
+    ::= { rlPolicyActionPlatDependParams 5 }
+
+rlPolicyActionDscpSupport OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "Indicates whether the platform support at DSCP filed modification."
+    ::= { rlPolicyActionPlatDependParams 6 }
+
+rlPolicyActionDsQueueManagmentSupported OBJECT-TYPE
+    SYNTAX INTEGER {
+        supported(1),
+        notSupported(2)
+    }
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "Indicates whether the platform supports at Q managment for implementation,
+        mred, randomDrop used by the min/max threshold"
+    ::= { rlPolicyActionPlatDependParams 7 }
+
+--
+--  Action Table
+--
+rlPolicyActionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table defines the Actions for packets that pass the meter table
+         ie. the characteristics that are assigned to packets before they
+         reach the scheduler.
+         When Diffserv is not in effect(ie. IPX, bridging, or IP when the global option
+         for Diffserv is off), certain table parameters are not available(see
+         below). The DiffServ option is enabled or disabled by setting
+         rlDiffservModeEnabled."
+    ::= { rlPolicyAction 2 }
+
+rlPolicyActionEntry OBJECT-TYPE
+    SYNTAX  RlPolicyActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each multifield classification statement consists of the following
+         parameters"
+    INDEX  { rlPolicyActionIndex }
+    ::= { rlPolicyActionTable 1 }
+
+RlPolicyActionEntry ::=  SEQUENCE  {
+    rlPolicyActionIndex                         INTEGER,
+    rlPolicyActionNewDscp                       INTEGER,
+    rlPolicyActionChangeDscp                    TruthValue,
+    rlPolicyActionMinThreshold                  INTEGER,
+    rlPolicyActionMaxThreshold                  INTEGER,
+    rlPolicyActionDropPolicy                    INTEGER,
+    rlPolicyActionDroppedPackets                Counter32,
+    rlPolicyActionNonDsInProfileDropPrecedence  INTEGER,
+    rlPolicyActionNonDsOutProfileDropPrecedence INTEGER,
+    rlPolicyActionChangeVpt                     TruthValue,
+    rlPolicyActionNewVpt                        INTEGER,
+    rlPolicyActionServiceClassPointer           INTEGER,
+    rlPolicyActionStatus                        RowStatus,
+    rlPolicyActionChangeDscpNonConform          TruthValue,
+    rlPolicyActionChangeNewDscpNonConform       INTEGER,
+    rlPolicyActionAdvancedTrustMode             TruthValue,
+    rlPolicyActionNewIpPrecedence               INTEGER,
+    rlPolicyActionChangeIpPrecedence            TruthValue,
+    rlPolicyActionReDirect                      RlPolicyRedirectAction,
+    rlPolicyActionNewInterface                  InterfaceIndexOrZero,
+    rlPolicyActionChangeVidAction               RlPolicyMarkVlanAction,
+    rlPolicyActionNewVid                        INTEGER,
+    rlPolicyActionTrapTypeId                    INTEGER,
+    rlPolicyActionAddTunnel                     Unsigned32
+}
+
+rlPolicyActionIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This enumerates the Action entry."
+    ::= { rlPolicyActionEntry 1 }
+
+rlPolicyActionNewDscp OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the new DSCP with which the packet should
+         be marked"
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 2 }
+
+rlPolicyActionChangeDscp OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If true, the packet is re-marked with the value indicated by
+         newDscp above. If false, the packet's DSCP value is not changed"
+    DEFVAL{ false }
+    ::= { rlPolicyActionEntry 3 }
+
+rlPolicyActionMinThreshold OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The min-threshold is the queue depth that a random
+         drop process will seek to manage the queue's depth to.
+         This object is in the action table rather than the
+         queue table because Differentiated Services PHBs, such
+         as the Assured Service, permit differently classified
+         traffic to have different drop parameters even though
+         they occupy the same queue."
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 4 }
+
+rlPolicyActionMaxThreshold OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The max-threshold is the maximum permissible queue
+         depth. In tail drop scenarios, the queue will drop if a
+         packet is presented to it and it is instantaneously
+         full by this measure. In random drop scenarios, the
+         queue will drop if a packet is presented to it and the
+         average queue depth exceeds the max-threshold.
+         This object is in the action table rather than the
+         queue table because Differentiated Services PHBs, such
+         as the Assured Service, permit differently classified
+         traffic to have different drop parameters even though
+         they occupy the same queue."
+    DEFVAL { 0 }
+    ::= { rlPolicyActionEntry 5 }
+
+rlPolicyActionDropPolicy OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        alwaysDrop (2), -- Disallowed traffic
+        tailDrop(3),    -- Fixed Queue Size
+        randomDrop(4)   -- MRED w/thresholds per class
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        ""
+    DEFVAL{ other }
+    ::= { rlPolicyActionEntry 6 }
+
+rlPolicyActionDroppedPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets dropped by this action"
+    ::= { rlPolicyActionEntry 7 }
+
+rlPolicyActionNonDsInProfileDropPrecedence OBJECT-TYPE
+    SYNTAX  INTEGER {
+        low(1),
+        medium(2),
+        high(3),
+        drop(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This paramer is used at non diffserv mode to attached the drop precedence
+         for packet InProfile (metering), only if there is a support for drop precedence
+         and with what level."
+    DEFVAL{ low }
+    ::= { rlPolicyActionEntry 8}
+
+rlPolicyActionNonDsOutProfileDropPrecedence OBJECT-TYPE
+    SYNTAX  INTEGER {
+        low(1),
+        medium(2),
+        high(3),
+        drop(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This paramer is used at non diffserv mode to attached the drop precedence
+         for packet OutProfile (metering), only if there is a support for drop precedence
+         and with what level."
+    DEFVAL{ low }
+    ::= { rlPolicyActionEntry 9}
+
+rlPolicyActionChangeVpt OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Routed packets that run through the Rules receive VPT as define at the
+              service class they attached to, bridge packets receive through the
+              802.1p operation unless we define to change the VPT for those packets."
+           DEFVAL { false }
+    ::= { rlPolicyActionEntry 10 }
+
+rlPolicyActionNewVpt OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 7)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Priority Tag that will be written to packets ."
+     DEFVAL { 0 }
+    ::= { rlPolicyActionEntry 11 }
+
+rlPolicyActionServiceClassPointer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the index in rlPolicyServiceClassTable denoting
+         the service class to which the packet should be assigned
+         after the action specified in this entry is carried out.
+         A value of 0 means that no Service class is assigned.  A
+         value of 0 is legal only for routedIp packets in Diffserv
+         mode on Inbound processing."
+    ::= { rlPolicyActionEntry 12}
+
+rlPolicyActionStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of the table entry"
+    ::= { rlPolicyActionEntry 13}
+
+rlPolicyActionChangeDscpNonConform OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If true, the packet is re-marked with the value indicated by
+         newDscp for non conforming packets.
+         If false, the packet's DSCP value is not changed"
+    DEFVAL{ false }
+    ::= { rlPolicyActionEntry 14 }
+
+rlPolicyActionChangeNewDscpNonConform OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the new DSCP with which the packet should
+         be marked"
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 15 }
+
+rlPolicyActionAdvancedTrustMode OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates if egress queue is assigned for packets match
+        rule according to global trust mode or note."
+    DEFVAL{ false }
+    ::= { rlPolicyActionEntry 16 }
+
+rlPolicyActionNewIpPrecedence OBJECT-TYPE
+    SYNTAX  INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the new Ip- Precedence with which the packet should
+         be marked"
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 17 }
+
+rlPolicyActionChangeIpPrecedence OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If true, the packet is re-marked with the value indicated by
+         newIpPrecedence above. If false, the packet's DSCP value is not changed"
+    DEFVAL{ false }
+    ::= { rlPolicyActionEntry 18 }
+
+
+rlPolicyActionReDirect OBJECT-TYPE
+    SYNTAX  RlPolicyRedirectAction
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified the redirection action/"
+    DEFVAL{ disabled }
+    ::= { rlPolicyActionEntry 19 }
+
+rlPolicyActionNewInterface OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Relevant if rlQosClassMapRedirect is either
+        'redirectToInterface' or 'analyzerPort'.
+        Specified the output interface the packet is redireted to or
+        the port that gets copy of the packet in addition to the port
+        it was farwarded. "
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 20 }
+
+rlPolicyActionChangeVidAction OBJECT-TYPE
+    SYNTAX  RlPolicyMarkVlanAction
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If 'mark', than the classified
+         traffic will be remarked with new VLAN id.
+         If 'disabled' VLAN id is not changed.
+         If markNestedVlan, if the egress interface defined as
+         VLAN tagged member then a new VLAN tag is added  to the packet."
+    DEFVAL{ noMark }
+    ::= { rlPolicyActionEntry 21 }
+
+rlPolicyActionNewVid OBJECT-TYPE
+    SYNTAX  INTEGER(0..4095)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If rlPolicyActionChangeVid is true,
+         specify the new Vlan id to assigned to the packet"
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 22 }
+
+rlPolicyActionTrapTypeId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+     "If now zero, Indicates the trap type id the matched packets arrives with,
+      relevant when RedirectAction is trap or mirror."
+    DEFVAL{ 0}
+    ::= { rlPolicyActionEntry 23 }
+
+rlPolicyActionAddTunnel OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If not zero - Tunnel is added to matched packets."
+    DEFVAL{ 0 }
+    ::= { rlPolicyActionEntry 24 }
+
+-------------------
+-- Service Class
+-------------------
+rlPolicyServiceClass OBJECT IDENTIFIER ::= { rlPolicy 6 }
+
+rlPolicyServiceClassPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyServiceClass 1 }
+
+rlPolicyNumberOfServiceClassesSupported OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates the number of service classes supported on each
+         port of the platform.  Service classes can be neither
+         created nor destroyed."
+    ::= { rlPolicyServiceClassPlatDependParams 1 }
+
+rlPolicyBoundedPriorityQueueSupport OBJECT-TYPE
+    SYNTAX INTEGER {
+        supported(1),
+        notSupported(2)
+    }
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "Indicates whether the platform supports setting an upper limit
+         to the bandwidth of traffic transmitted on queues operating in
+         Strict Priority mode."
+    ::= { rlPolicyServiceClassPlatDependParams 2 }
+
+rlPolicyDefaultServiceClass OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates which service class is default one for packets whose COS is undetermined."
+    ::= { rlPolicyServiceClass 2 }
+
+rlPolicyActiveServiceClassTable OBJECT-TYPE
+    SYNTAX INTEGER {
+                active(1),
+        notActive(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the Service Class table preform active action
+        (usuarlly after set of entries at the service class tentative table).
+         Specifies the current status of a table, there could be two options,
+         tentative/active table. only the tentative table is the read-write
+         and the active table is read-only. at set to activeAction the
+         tentative table will be copied to the active table."
+    ::= { rlPolicyServiceClass 3 }
+
+--
+--  Service Class Table
+--
+rlPolicyServiceClassTentativeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyServiceClassTentativeEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table defines the service classes for the system ie. the queue
+         discipline and weight characteristics that are implemented on each
+         port unless the user configures a port specific value in ....
+         The total number of service classes defined can not exceed
+         rlPolicyNumberOfTransmitQueuesPerPort."
+    ::= { rlPolicyServiceClass 4 }
+
+rlPolicyServiceClassTentativeEntry OBJECT-TYPE
+    SYNTAX  RlPolicyServiceClassTentativeEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+         "Each multifield classification statement consists of the following
+          parameters"
+    INDEX  { rlPolicyServiceClassTentativeIndex }
+    ::= { rlPolicyServiceClassTentativeTable 1 }
+
+RlPolicyServiceClassTentativeEntry ::=  SEQUENCE  {
+    rlPolicyServiceClassTentativeIndex          INTEGER,
+    rlPolicyServiceClassTentativeName           DisplayString,
+    rlPolicyServiceClassTentativePhbType        INTEGER,
+    rlPolicyServiceClassTentativeMinRate        INTEGER,
+    rlPolicyServiceClassTentativeMaxRate        INTEGER,
+    rlPolicyServiceClassTentativePriority       INTEGER,
+    rlPolicyServiceClassTentative8021DPri       INTEGER,
+    rlPolicyServiceClassTentativeStatus         RowStatus,
+    rlPolicyServiceClassTentativeTdThersholdDp0 INTEGER,
+    rlPolicyServiceClassTentativeTdThersholdDp1 INTEGER,
+    rlPolicyServiceClassTentativeTdThersholdDp2 INTEGER,
+    rlPolicyServiceClassTentativeRedMinDp0      INTEGER,
+    rlPolicyServiceClassTentativeRedMaxDp0      INTEGER,
+    rlPolicyServiceClassTentativeRedProbDp0     INTEGER,
+    rlPolicyServiceClassTentativeRedMinDp1      INTEGER,
+    rlPolicyServiceClassTentativeRedMaxDp1      INTEGER,
+    rlPolicyServiceClassTentativeRedProbDp1     INTEGER,
+    rlPolicyServiceClassTentativeRedMinDp2      INTEGER,
+    rlPolicyServiceClassTentativeRedMaxDp2      INTEGER,
+    rlPolicyServiceClassTentativeRedProbDp2     INTEGER,
+    rlPolicyServiceClassTentativeRedQweight     INTEGER,
+    rlPolicyServiceClassTentativeShaperStatus   TruthValue,
+    rlPolicyServiceClassTentativeCirQueueShaper INTEGER,
+    rlPolicyServiceClassTentativeCbsQueueShaper INTEGER
+
+}
+
+rlPolicyServiceClassTentativeIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This enumerates the ServiceClass Tentative entry."
+    ::= { rlPolicyServiceClassTentativeEntry 1 }
+
+rlPolicyServiceClassTentativeName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The name given by the system administrator to the class."
+    ::= { rlPolicyServiceClassTentativeEntry 2 }
+
+rlPolicyServiceClassTentativePhbType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        expeditedForwarding(1),
+        assuredForwarding(2),
+        bestEffort(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the type of Diffserv per-hop behaviour that this service
+         class is intended to support. This object can be set by the user
+         only in DiffServ mode (i.e. rlDiffservModeEnabled = enabled)."
+    DEFVAL { bestEffort }
+    ::= { rlPolicyServiceClassTentativeEntry 3 }
+
+rlPolicyServiceClassTentativeMinRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies either the minimum throughput of the queue as a percentage
+         of the throughput of  each output port on which the service class is
+         implemented.  If zero, there is no minimum rate. This field can not
+         be set by the user if rlDiffservModeEnabled = disabled and
+         rlPolicyServiceClassPriority > 0 or rlDiffservModeEnabled = enabled
+         and rlPolicyServiceClassPhbType = expeditedForwarding."
+    ::= { rlPolicyServiceClassTentativeEntry 4 }
+
+rlPolicyServiceClassTentativeMaxRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies either the upper limit on the throughput of the queue as a
+         percentage of the throughput of  each output port on which the service
+         class is implemented.  If zero, there is no maximum rate.
+         This field can not be set by the user
+         if rlDiffservModeEnabled = disabled and
+         rlPolicyServiceClassPriority = 0 or
+         rlDiffservModeEnabled = enabled and
+         rlPolicyServiceClassPhbType != expeditedForwarding or
+         rlBoundedPriorityQueueSupport = notSupported."
+    ::= { rlPolicyServiceClassTentativeEntry 5 }
+
+rlPolicyServiceClassTentativePriority OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If non-zero, this service class will operate as a priority service
+         class with the specified priority value.  This object can not be set
+         in Diffserv mode (i.e. rlDiffservModeEnabled = enabled), in which case
+         rlServiceClassPhbType should be used instead. It can't be set when
+         rlBoundedPriorityQueueSupport = notSupported as well."
+    ::= { rlPolicyServiceClassTentativeEntry 6 }
+
+rlPolicyServiceClassTentative8021DPri OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 7)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "802.1D Priority Tag that will be written to routed packets and
+         untagged bridged packets transmitted with this service class."
+    ::= { rlPolicyServiceClassTentativeEntry 7 }
+
+rlPolicyServiceClassTentativeStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Status of this entry."
+    ::= { rlPolicyServiceClassTentativeEntry 8 }
+
+rlPolicyServiceClassTentativeTdThersholdDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 9 }
+
+rlPolicyServiceClassTentativeTdThersholdDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 10 }
+
+rlPolicyServiceClassTentativeTdThersholdDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 11 }
+
+rlPolicyServiceClassTentativeRedMinDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 12 }
+
+rlPolicyServiceClassTentativeRedMaxDp0 OBJECT-TYPE
+    SYNTAX INTEGER  (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 13 }
+
+rlPolicyServiceClassTentativeRedProbDp0 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 0."
+    ::= { rlPolicyServiceClassTentativeEntry 14 }
+
+rlPolicyServiceClassTentativeRedMinDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 15 }
+
+rlPolicyServiceClassTentativeRedMaxDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 16 }
+
+rlPolicyServiceClassTentativeRedProbDp1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 1."
+    ::= { rlPolicyServiceClassTentativeEntry 17 }
+
+rlPolicyServiceClassTentativeRedMinDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2.
+         UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 18 }
+
+rlPolicyServiceClassTentativeRedMaxDp2 OBJECT-TYPE
+    SYNTAX INTEGER  (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassTentativeEntry 19 }
+
+rlPolicyServiceClassTentativeRedProbDp2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 2."
+    ::= { rlPolicyServiceClassTentativeEntry 20 }
+
+rlPolicyServiceClassTentativeRedQweight OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "additional parameter for the WRED algorithem supporting
+        the Queue weight exponentail factor"
+    ::= { rlPolicyServiceClassTentativeEntry 21 }
+
+rlPolicyServiceClassTentativeShaperStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If there is shaper on the Queue"
+    ::= { rlPolicyServiceClassTentativeEntry 22 }
+
+rlPolicyServiceClassTentativeCirQueueShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CIR for the Queue shaper.
+         N/A when the shper is disabled.
+         UNITS bps bits per second"
+    ::= { rlPolicyServiceClassTentativeEntry 23 }
+
+rlPolicyServiceClassTentativeCbsQueueShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CBS for the Queue shaper.
+         N/A when the shper is disabled.
+         UNITS bytes"
+    ::= { rlPolicyServiceClassTentativeEntry 24 }
+
+
+
+
+
+rlPolicyServiceClassActiveTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyServiceClassActiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table defines the service classes for the system ie. the queue
+         discipline and weight characteristics that are implemented on each
+         port unless the user configures a port specific value in ....
+         The total number of service classes defined can not exceed
+         rlPolicyNumberOfTransmitQueuesPerPort."
+    ::= { rlPolicyServiceClass 5 }
+
+rlPolicyServiceClassActiveEntry OBJECT-TYPE
+    SYNTAX  RlPolicyServiceClassActiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+         "Each multifield classification statement consists of the following
+          parameters"
+    INDEX  { rlPolicyServiceClassActiveIndex }
+    ::= { rlPolicyServiceClassActiveTable 1 }
+
+RlPolicyServiceClassActiveEntry ::=  SEQUENCE  {
+    rlPolicyServiceClassActiveIndex          INTEGER,
+    rlPolicyServiceClassActiveName           DisplayString,
+    rlPolicyServiceClassActivePhbType        INTEGER,
+    rlPolicyServiceClassActiveMinRate        INTEGER,
+    rlPolicyServiceClassActiveMaxRate        INTEGER,
+    rlPolicyServiceClassActivePriority       INTEGER,
+    rlPolicyServiceClassActive8021DPri       INTEGER,
+    rlPolicyServiceClassActiveTdThersholdDp0 INTEGER,
+    rlPolicyServiceClassActiveTdThersholdDp1 INTEGER,
+    rlPolicyServiceClassActiveTdThersholdDp2 INTEGER,
+    rlPolicyServiceClassActiveRedMinDp0      INTEGER,
+    rlPolicyServiceClassActiveRedMaxDp0      INTEGER,
+    rlPolicyServiceClassActiveRedProbDp0     INTEGER,
+    rlPolicyServiceClassActiveRedMinDp1      INTEGER,
+    rlPolicyServiceClassActiveRedMaxDp1      INTEGER,
+    rlPolicyServiceClassActiveRedProbDp1     INTEGER,
+    rlPolicyServiceClassActiveRedMinDp2      INTEGER,
+    rlPolicyServiceClassActiveRedMaxDp2      INTEGER,
+    rlPolicyServiceClassActiveRedProbDp2     INTEGER,
+    rlPolicyServiceClassActiveRedQweight     INTEGER,
+    rlPolicyServiceClassActiveShaperStatus   TruthValue,
+    rlPolicyServiceClassActiveCirQueueShaper INTEGER,
+    rlPolicyServiceClassActiveCbsQueueShaper INTEGER
+   }
+
+rlPolicyServiceClassActiveIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This enumerates the ServiceClass Active entry."
+    ::= { rlPolicyServiceClassActiveEntry 1 }
+
+rlPolicyServiceClassActiveName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The name given by the system administrator to the class."
+    ::= { rlPolicyServiceClassActiveEntry 2 }
+
+rlPolicyServiceClassActivePhbType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        expeditedForwarding(1),
+        assuredForwarding(2),
+        bestEffort(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates the type of Diffserv per-hop behaviour that this service
+         class is intended to support. This object can be set by the user
+         only in DiffServ mode (i.e. rlDiffservModeEnabled = enabled)."
+    DEFVAL { bestEffort }
+    ::= { rlPolicyServiceClassActiveEntry 3 }
+
+rlPolicyServiceClassActiveMinRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies either the minimum throughput of the queue as a percentage
+         of the throughput of  each output port on which the service class is
+         implemented.  If zero, there is no minimum rate. This field can not
+         be set by the user if rlDiffservModeEnabled = disabled and
+         rlPolicyServiceClassPriority > 0 or rlDiffservModeEnabled = enabled
+         and rlPolicyServiceClassPhbType = expeditedForwarding."
+    ::= { rlPolicyServiceClassActiveEntry 4 }
+
+rlPolicyServiceClassActiveMaxRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies either the upper limit on the throughput of the queue as a
+         percentage of the throughput of  each output port on which the service
+         class is implemented.  If zero, there is no maximum rate.
+         This field can not be set by the user
+         if rlDiffservModeEnabled = disabled and
+         rlPolicyServiceClassPriority = 0 or
+         rlDiffservModeEnabled = enabled and
+         rlPolicyServiceClassPhbType != expeditedForwarding or
+         rlBoundedPriorityQueueSupport = notSupported."
+    ::= { rlPolicyServiceClassActiveEntry 5 }
+
+rlPolicyServiceClassActivePriority OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If non-zero, this service class will operate as a priority service
+         class with the specified priority value.  This object can not be set
+         in Diffserv mode (i.e. rlDiffservModeEnabled = enabled), in which case
+         rlServiceClassPhbType should be used instead. It can't be set when
+         rlBoundedPriorityQueueSupport = notSupported as well."
+    ::= { rlPolicyServiceClassActiveEntry 6 }
+
+rlPolicyServiceClassActive8021DPri OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 7)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "802.1D Priority Tag that will be written to routed packets and
+         untagged bridged packets transmitted with this service class."
+    ::= { rlPolicyServiceClassActiveEntry 7 }
+
+rlPolicyServiceClassActiveTdThersholdDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 8 }
+
+rlPolicyServiceClassActiveTdThersholdDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 9 }
+
+rlPolicyServiceClassActiveTdThersholdDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 10 }
+
+rlPolicyServiceClassActiveRedMinDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 11 }
+
+rlPolicyServiceClassActiveRedMaxDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 12 }
+
+rlPolicyServiceClassActiveRedProbDp0 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 0."
+    ::= { rlPolicyServiceClassActiveEntry 13 }
+
+rlPolicyServiceClassActiveRedMinDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 14 }
+
+rlPolicyServiceClassActiveRedMaxDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 15 }
+
+rlPolicyServiceClassActiveRedProbDp1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 1."
+    ::= { rlPolicyServiceClassActiveEntry 16 }
+
+rlPolicyServiceClassActiveRedMinDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 17 }
+
+rlPolicyServiceClassActiveRedMaxDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyServiceClassActiveEntry 18 }
+
+rlPolicyServiceClassActiveRedProbDp2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 2."
+    ::= { rlPolicyServiceClassActiveEntry 19 }
+
+
+rlPolicyServiceClassActiveRedQweight OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "additional parameter for the WRED algorithem supporting
+        the Queue weight exponentail factor"
+    ::= { rlPolicyServiceClassActiveEntry 20 }
+
+rlPolicyServiceClassActiveShaperStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If there is shaper on the Queue"
+    ::= { rlPolicyServiceClassActiveEntry 21 }
+
+rlPolicyServiceClassActiveCirQueueShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The CIR for the queue shaper.
+         N/A when the shper is disabled
+         UNITS bps bits per second"
+    ::= { rlPolicyServiceClassActiveEntry 22 }
+
+rlPolicyServiceClassActiveCbsQueueShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The CBS for the queue shaper.
+         N/A when the shper is disabled.
+         UNITS bytes"
+    ::= { rlPolicyServiceClassActiveEntry 23 }
+
+
+
+
+--
+-- Port configuration table.
+--
+rlPolicyPortConfigurationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table enables the network administrator to fine-tune
+         the bandwidth given to each service class on each port.
+         The values in this table will thus override those of the
+         rlServiceClassTable (THIS TABLE IS MANAGE FROM 3SW). "
+    ::= { rlPolicyServiceClass 6 }
+
+rlPolicyPortCfgEntry OBJECT-TYPE
+    SYNTAX  RlPolicyPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Configuration parameters for each port/service class."
+    INDEX  { rlPolicyPortCfgIfIndex  }
+    ::= { rlPolicyPortConfigurationTable 1 }
+
+RlPolicyPortCfgEntry ::= SEQUENCE {
+    rlPolicyPortCfgIfIndex                 InterfaceIndex,
+    rlPolicyPortCfgMinimalBandwidth        OBJECT IDENTIFIER,
+    rlPolicyPortCfgMaximalBandwidth        OBJECT IDENTIFIER,
+    rlPolicyPortCfgStatus                  RowStatus,
+    rlpolicyDropProfilePointer             INTEGER,
+    rlPolicyPortCfgQueueShaperStatus       OBJECT IDENTIFIER,
+    rlPolicyPortCfgCirQueueShaper          OBJECT IDENTIFIER,
+    rlPolicyPortCfgCbsQueueShaper          OBJECT IDENTIFIER,
+    rlPolicyPortCfgPortShaperStatus        TruthValue,
+    rlPolicyPortCfgCirPortShaper           INTEGER,
+    rlPolicyPortCfgCbsPortShaper           INTEGER,
+    rlPolicyPortCfgPortRateLimitStatus     TruthValue,
+    rlPolicyPortCfgCirPortRateLimit        INTEGER,
+    rlPolicyPortCfgCbsPortRateLimit        INTEGER
+   }
+
+rlPolicyPortCfgIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Interface index."
+    ::= { rlPolicyPortCfgEntry 1 }
+
+rlPolicyPortCfgMinimalBandwidth  OBJECT-TYPE
+    SYNTAX   OBJECT IDENTIFIER
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "The list of objects contain parameters at Precents type for the minimal bandwidth
+         to this port/service class at WWR . The OID length is based on the number of the
+         service class number,  every OID define parameter of service class."
+    ::= { rlPolicyPortCfgEntry 2 }
+
+rlPolicyPortCfgMaximalBandwidth OBJECT-TYPE
+    SYNTAX   OBJECT IDENTIFIER
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+         "The list of objects contain parameters at Precents type for the maximal bandwidth
+         to this port/service class at SP . The OID length is based on the number of the
+         service class number,  every OID define parameter of service class."
+    ::= { rlPolicyPortCfgEntry 3 }
+
+rlPolicyPortCfgStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Status of this entry."
+    ::= { rlPolicyPortCfgEntry 4 }
+
+
+rlpolicyDropProfilePointer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "pointing to drop algorithem profile.
+        the profile describs the drop algorithem
+        (tail, red)and params"
+    ::= { rlPolicyPortCfgEntry 5 }
+
+
+
+rlPolicyPortCfgQueueShaperStatus OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If there is shaper on the Queue"
+    ::= { rlPolicyPortCfgEntry 6 }
+
+rlPolicyPortCfgCirQueueShaper OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CIR for the Queue shaper.
+         N/A when the shper is disabled
+         UNITS bps bits per second"
+    ::= { rlPolicyPortCfgEntry 7 }
+
+rlPolicyPortCfgCbsQueueShaper OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CBS for the Queue shaper.
+         N/A when the shper is disabled.
+         UNITS bytes"
+    ::= { rlPolicyPortCfgEntry 8 }
+
+rlPolicyPortCfgPortShaperStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If there is shaper on the port"
+    ::= { rlPolicyPortCfgEntry 9 }
+
+rlPolicyPortCfgCirPortShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CIR for the port shaper.
+         N/A when the shper is disabled
+         UNITS bps bits per second"
+    ::= { rlPolicyPortCfgEntry 10 }
+
+rlPolicyPortCfgCbsPortShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CBS for the port shaper.
+         N/A when the shper is disabled.
+         UNITS bytes"
+    ::= { rlPolicyPortCfgEntry 11 }
+
+rlPolicyPortCfgPortRateLimitStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If there is Rate Limit on the port"
+    DEFVAL { false }
+    ::= { rlPolicyPortCfgEntry 12 }
+
+rlPolicyPortCfgCirPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CIR for the port Rate limit.
+         N/A when the Rate limit is disabled
+         UNITS bps bits per second"
+    DEFVAL { 0 }
+    ::= { rlPolicyPortCfgEntry 13 }
+
+rlPolicyPortCfgCbsPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CBS for the port Rate Limit.
+         N/A when the Rate Limit is disabled.
+         UNITS bytes"
+    DEFVAL { 0 }
+    ::= { rlPolicyPortCfgEntry 14 }
+
+
+--
+-- drop profile table.
+--
+
+
+rlPolicyDropProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyDropProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " this table defines drop profile
+          which describ the queue's drop
+          algorithems"
+
+
+
+    ::= { rlPolicyServiceClass 7 }
+
+rlPolicyDropProfileEntry OBJECT-TYPE
+    SYNTAX  RlPolicyDropProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Configuration parameters for each port/service class."
+    INDEX  { rlPolicyDropProfileIndex,rlPolicyDropProfileQueueNumber}
+    ::= { rlPolicyDropProfileTable 1 }
+
+RlPolicyDropProfileEntry ::= SEQUENCE {
+    rlPolicyDropProfileIndex                   INTEGER,
+    rlPolicyDropProfileQueueNumber             INTEGER,
+    rlPolicyDropProfileTdThersholdDp0          INTEGER,
+    rlPolicyDropProfileTdThersholdDp1          INTEGER,
+    rlPolicyDropProfileTdThersholdDp2          INTEGER,
+    rlPolicyDropProfileRedMinDp0               INTEGER,
+    rlPolicyDropProfileRedMaxDp0               INTEGER,
+    rlPolicyDropProfileRedProbDp0              INTEGER,
+    rlPolicyDropProfileRedMinDp1               INTEGER,
+    rlPolicyDropProfileRedMaxDp1               INTEGER,
+    rlPolicyDropProfileRedProbDp1              INTEGER,
+    rlPolicyDropProfileRedMinDp2               INTEGER,
+    rlPolicyDropProfileRedMaxDp2               INTEGER,
+    rlPolicyDropProfileRedProbDp2              INTEGER,
+    rlPolicyDropProfileRedQweight              INTEGER,
+    rlPolicyDropProfileStatus                  RowStatus
+    }
+
+rlPolicyDropProfileIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Interface index."
+    ::= { rlPolicyDropProfileEntry 1 }
+
+rlPolicyDropProfileQueueNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Interface Queue number."
+    ::= { rlPolicyDropProfileEntry 2 }
+
+
+
+
+rlPolicyDropProfileTdThersholdDp0 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 0.
+        UNITS  percent 0-100"
+    ::= { rlPolicyDropProfileEntry 3 }
+
+rlPolicyDropProfileTdThersholdDp1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 4 }
+
+rlPolicyDropProfileTdThersholdDp2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 5 }
+
+rlPolicyDropProfileRedMinDp0 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 0.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 6 }
+
+rlPolicyDropProfileRedMaxDp0 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 0.
+        UNITS percent 0-100 0-100"
+    ::= { rlPolicyDropProfileEntry 7 }
+
+rlPolicyDropProfileRedProbDp0 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 0."
+    ::= { rlPolicyDropProfileEntry 8 }
+
+rlPolicyDropProfileRedMinDp1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 9 }
+
+rlPolicyDropProfileRedMaxDp1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 1.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 10 }
+
+rlPolicyDropProfileRedProbDp1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 1."
+    ::= { rlPolicyDropProfileEntry 11 }
+
+rlPolicyDropProfileRedMinDp2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 12 }
+
+rlPolicyDropProfileRedMaxDp2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 2.
+        UNITS percent 0-100"
+    ::= { rlPolicyDropProfileEntry 13 }
+
+rlPolicyDropProfileRedProbDp2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 2."
+    ::= { rlPolicyDropProfileEntry 14 }
+
+rlPolicyDropProfileRedQweight OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "additional parameter for the WRED algorithem supporting
+        the Queue weight exponentail factor"
+    ::= { rlPolicyDropProfileEntry 15 }
+
+rlPolicyDropProfileStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Status of this entry."
+    ::= { rlPolicyDropProfileEntry 16 }
+
+--
+-- Vlan Configuration table.
+--
+
+rlPolicyVlanConfigurationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPolicyVlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table enables the network administrator to fine-tune
+         the rate limit given to each vlan.
+         The values in this table will thus override those of the
+         rlQosIfPolicyTable (THIS TABLE IS MANAGED FROM 3SW). "
+    ::= { rlPolicyServiceClass 8 }
+
+rlPolicyVlanCfgEntry OBJECT-TYPE
+    SYNTAX  RlPolicyVlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Configuration parameters for each vlan."
+    INDEX  { rlPolicyVlanCfgVlanId  }
+    ::= { rlPolicyVlanConfigurationTable 1 }
+
+RlPolicyVlanCfgEntry ::= SEQUENCE {
+    rlPolicyVlanCfgVlanId                      VlanId,
+    rlPolicyVlanCfgPortRateLimitStatus         TruthValue,
+    rlPolicyVlanCfgCirPortRateLimit            INTEGER,
+    rlPolicyVlanCfgCbsPortRateLimit            INTEGER,
+    rlPolicyVlanCfgStatus                      RowStatus
+   }
+
+rlPolicyVlanCfgVlanId OBJECT-TYPE
+    SYNTAX  VlanId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Interface index."
+    ::= { rlPolicyVlanCfgEntry 1 }
+
+
+rlPolicyVlanCfgPortRateLimitStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If there is Rate Limit on the vlan"
+    DEFVAL { false }
+    ::= { rlPolicyVlanCfgEntry 2 }
+
+rlPolicyVlanCfgCirPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CIR for the port Rate limit.
+         N/A when the Rate limit is disabled
+         UNITS bps bits per second"
+    ::= { rlPolicyVlanCfgEntry 3 }
+
+rlPolicyVlanCfgCbsPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The CBS for the port Rate Limit.
+         N/A when the Rate Limit is disabled.
+         UNITS bytes"
+    ::= { rlPolicyVlanCfgEntry 4 }
+
+
+rlPolicyVlanCfgStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Status of this entry."
+    ::= { rlPolicyVlanCfgEntry 5 }
+
+------------
+-- DiffServ
+---
+rlPolicyDiffServ OBJECT IDENTIFIER ::= { rlPolicy 7 }
+
+rlPolicyDiffServPlatDependParams OBJECT IDENTIFIER ::= { rlPolicyDiffServ 1 }
+
+rlDiffservModeSupported OBJECT-TYPE
+    SYNTAX INTEGER {
+        supported(1),
+        notSupported(2)
+    }
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "Indicates whether Diffserv mode is supported on the platform."
+    ::= { rlPolicyDiffServPlatDependParams 1 }
+
+rlDiffservModeEnabled OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates whether Diffserv mode is currently enabled."
+    ::= { rlPolicyDiffServ 2 }
+
+--
+-- Diffserv Boundary / Interior port table for DiffServ mode
+--
+rlDiffservBoundaryTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlDiffservBoundaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether a port is considered a boundary or an interior
+         node of  the Diffserv domain"
+    ::= { rlPolicyDiffServ 3 }
+
+rlDiffservBoundaryEntry OBJECT-TYPE
+    SYNTAX  RlDiffservBoundaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each boundary/interior ports table entry consists of the following
+         parameters"
+    INDEX  { rlDiffservBoundaryIfIndex }
+    ::= { rlDiffservBoundaryTable 1 }
+
+RlDiffservBoundaryEntry ::=   SEQUENCE  {
+    rlDiffservBoundaryIfIndex    INTEGER,
+    rlDiffservBoundaryPortType   INTEGER,
+    rlDiffservBoundaryStatus     RowStatus
+}
+
+rlDiffservBoundaryIfIndex OBJECT-TYPE
+    SYNTAX   INTEGER (1..2147483647)
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+         "The Interface index whose type is being defined"
+    ::= { rlDiffservBoundaryEntry 1 }
+
+rlDiffservBoundaryPortType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        boundary(1),
+        interior(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+         "The boundary status of the port."
+    DEFVAL { boundary }
+    ::= { rlDiffservBoundaryEntry 2 }
+
+rlDiffservBoundaryStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Status of this entry."
+    ::= { rlDiffservBoundaryEntry 3 }
+
+--
+-- Global Params
+--
+rlPolicyGlobalParams OBJECT IDENTIFIER  ::= { rlPolicy 9 }
+
+rlPolicyGlobalOperationEnabled OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates whether Policy is currently enabled."
+    DEFVAL{ disabled }
+    ::= { rlPolicyGlobalParams 1 }
+
+
+rlPolicyGlobalDefaultForwarding OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether or not the unmach traffic
+        is forwarded or blocked."
+    ::= { rlPolicyGlobalParams 2 }
+
+rlPolicyGlobalAdminTrapfrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "define the the min number of seconds between successive traps.
+         0 means no traps will be sent, uints in Sec"
+    DEFVAL { 0 }
+    ::= { rlPolicyGlobalParams 3 }
+
+rlPolicyGlobalOperTrapElapsedTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "show the time out elaps from the last trap sent
+        uints in Sec."
+    ::= { rlPolicyGlobalParams 4 }
+
+
+rlPolicyGlobalQosMode OBJECT-TYPE
+    SYNTAX  RlPolicyQosMode
+    MAX-ACCESS  read-write
+    STATUS  deprecated
+    DESCRIPTION
+        "V750 DEPRECATED - replaced with rlPolicyGlobalQosMode field in rlPolicyQosModeGlobalCfg table.
+        user can set the system to operate either in the Basic mode or in the Advanced mode"
+    ::= { rlPolicyGlobalParams 5 }
+
+
+
+rlPolicyGlobalTrustMode OBJECT-TYPE
+    SYNTAX RlPolicyTrustTypes
+    MAX-ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+        "V750 DEPRECATED - replaced with rlPolicyGlobalTrustMode field in rlPolicyQosModeGlobalCfg table.
+        Global Trust state. the value refered to Basic mode and specify
+        the trust mode the device is support. all phisical ports are trusted  "
+    ::= { rlPolicyGlobalParams 6 }
+
+
+--
+-- Global Params for Qos mib
+--
+
+
+rlPolicyGlobalDeviceQosOperationTypes OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(1),
+        basic(2),
+        advanced(3),
+        all(4),
+        notSupported(5)
+}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if the system support basic
+         or advanced mode  or Both basic and Advanced"
+    ::= { rlPolicyGlobalParams 7 }
+
+
+rlPolicyGlobalDscpMutationSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "mutation over the ingress packet dscp field
+         supported for the device."
+    ::= { rlPolicyGlobalParams 8 }
+
+rlPolicyGlobalClassifyIpPrecedenceSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "Indicates if the system support
+         classification according ip precedence
+         most significant 3 bits in the TOS byte"
+    ::= { rlPolicyGlobalParams 9 }
+
+
+
+rlPolicyGlobalDeviceShapingTypeSupported OBJECT-TYPE
+    SYNTAX INTEGER {
+        portShaper(1),
+        queueShaper(2),
+        portAndQueueShaper(3),
+        notSupported(4)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the shaper shaper type supported for the device"
+    ::= { rlPolicyGlobalParams 10 }
+
+
+rlPolicyGlobalDscpRemarkingSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if dscp remarking
+         supported for the device"
+    ::= { rlPolicyGlobalParams 11 }
+
+
+rlPolicyGlobalqueueSchedulerPerDeviceOrPort OBJECT-TYPE
+    SYNTAX INTEGER {
+        device(1),
+        port(2)}
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "indicates if the system support scheduling
+         configuration per port or per device.
+         device (1 ) or port (2)"
+    ::= { rlPolicyGlobalParams 12 }
+
+
+---
+--- policy mapping
+---
+rlPolicyMapping OBJECT IDENTIFIER ::= { rlPolicy 10 }
+
+
+
+---  Policy DSCP to ServiceClass mapping
+
+rlPolicyDscpServiceClassTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDscpServiceClassEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         to ServiceClass map table"
+    ::= { rlPolicyMapping 1 }
+
+rlPolicyDscpServiceClassEntry OBJECT-TYPE
+    SYNTAX RlPolicyDscpServiceClassEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The ServiceClass assigned to a Dscp value.
+         The index is DSCP represent by rlPolicyDscpIndex"
+    INDEX { rlPolicyDscpIndex }
+    ::= { rlPolicyDscpServiceClassTable 1 }
+
+RlPolicyDscpServiceClassEntry::= SEQUENCE {
+        rlPolicyDscpIndex                       INTEGER,
+        rlPolicyServiceClassValue               INTEGER,
+        rlPolicyDscpServiceClassStatus          RowStatus
+    }
+
+
+rlPolicyDscpIndex OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DSCP value."
+    ::= { rlPolicyDscpServiceClassEntry 1 }
+
+rlPolicyServiceClassValue OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "ServiceClass value."
+    ::= { rlPolicyDscpServiceClassEntry 2 }
+
+    rlPolicyDscpServiceClassStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDscpServiceClassEntry 3 }
+
+-- Policy TCP-UDP port to Service Class map
+
+rlPolicyTcpUdpPortServiceClassTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyTcpUdpPortServiceClassEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION
+        "This table specifies TCP/UDP
+         Port to ServiceClass map table"
+    ::= { rlPolicyMapping 2 }
+
+rlPolicyTcpUdpPortServiceClassEntry OBJECT-TYPE
+    SYNTAX RlPolicyTcpUdpPortServiceClassEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION
+        "Each entry in this table describes The
+         ServiceClass Value.
+         The index is TCP/UDP port represent by rlPolicyTcpUdpPort"
+    INDEX { rlPolicyProtocolType , rlPolicyTcpUdpPort  }
+    ::= { rlPolicyTcpUdpPortServiceClassTable 1 }
+
+RlPolicyTcpUdpPortServiceClassEntry::= SEQUENCE {
+        rlPolicyProtocolType                             L4ProtType,
+        rlPolicyTcpUdpPort                               INTEGER,
+        rlPolicyMappedServiceClass                             INTEGER,
+        rlPolicyTcpUdpPortServiceClassStatus                     RowStatus
+    }
+
+rlPolicyProtocolType OBJECT-TYPE
+    SYNTAX L4ProtType
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "TCP/UDP port type. "
+    ::= { rlPolicyTcpUdpPortServiceClassEntry 1 }
+
+rlPolicyTcpUdpPort OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "TCP/UDP port number. "
+    ::= { rlPolicyTcpUdpPortServiceClassEntry 2 }
+
+
+
+rlPolicyMappedServiceClass OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+        "ServiceClass value."
+    ::= { rlPolicyTcpUdpPortServiceClassEntry 3 }
+
+rlPolicyTcpUdpPortServiceClassStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyTcpUdpPortServiceClassEntry 4 }
+
+
+-- Policy ServiceClass Remark mapping
+
+
+
+rlPolicyDscpRemarkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDscpRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         Remark table"
+    ::= { rlPolicyMapping 3 }
+
+rlPolicyDscpRemarkEntry OBJECT-TYPE
+    SYNTAX RlPolicyDscpRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DSCP for the packet.
+         The index is Old DSCP represent by rlPolicyOldDscp"
+    INDEX { rlPolicyRmOldDscp }
+    ::= { rlPolicyDscpRemarkTable 1 }
+
+RlPolicyDscpRemarkEntry::= SEQUENCE {
+        rlPolicyRmOldDscp                INTEGER,
+        rlPolicyRmNewDscp                INTEGER,
+        rlPolicyDscpRemarkStatus        RowStatus
+    }
+
+rlPolicyRmOldDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Old DSCP."
+    ::= { rlPolicyDscpRemarkEntry 1 }
+
+rlPolicyRmNewDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "New DSCP."
+    ::= { rlPolicyDscpRemarkEntry 2 }
+
+
+rlPolicyDscpRemarkStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDscpRemarkEntry 3 }
+
+
+-- Policy DSCP Mutation Table
+
+
+rlPolicyDscpMutationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDscpMutationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         Mutation table"
+    ::= { rlPolicyMapping 4 }
+
+rlPolicyDscpMutationEntry OBJECT-TYPE
+    SYNTAX RlPolicyDscpMutationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DSCP for the packet.
+         The index is Old DSCP represent by rlPolicyOldDscp"
+    INDEX { rlPolicyOldDscp }
+    ::= { rlPolicyDscpMutationTable 1 }
+
+RlPolicyDscpMutationEntry::= SEQUENCE {
+        rlPolicyOldDscp                INTEGER,
+        rlPolicyNewDscp                INTEGER,
+        rlPolicyDscpMutationStatus     RowStatus
+    }
+
+rlPolicyOldDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Old DSCP."
+    ::= { rlPolicyDscpMutationEntry 1 }
+
+rlPolicyNewDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "New DSCP."
+    ::= { rlPolicyDscpMutationEntry 2 }
+
+
+rlPolicyDscpMutationStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDscpMutationEntry 3 }
+
+
+
+-- Policy Port set per trust mode table
+
+
+rlPolicyTrustModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyTrustModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the port state for the trusted basic mode"
+    ::= { rlPolicyMapping 5 }
+
+rlPolicyTrustModeEntry OBJECT-TYPE
+    SYNTAX RlPolicyTrustModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "describes the ports status  that belongs to the global trusted state "
+    INDEX { rlPolicyTrustModePortNumber }
+    ::= { rlPolicyTrustModeTable 1 }
+
+RlPolicyTrustModeEntry::= SEQUENCE {
+        rlPolicyTrustModePortNumber    INTEGER,
+        rlPolicyTrustModePortState     INTEGER
+    }
+
+rlPolicyTrustModePortNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "phisical port number ."
+    ::= { rlPolicyTrustModeEntry 1 }
+
+rlPolicyTrustModePortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "the port state for the trusted mode.
+        the port can be enabled or disabled for the basic trust mode "
+    ::= { rlPolicyTrustModeEntry 2 }
+
+---  Policy DSCP to VPT mapping
+
+rlPolicyDscpVptTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDscpVptEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP to VPT map table"
+    ::= { rlPolicyMapping 6 }
+
+rlPolicyDscpVptEntry OBJECT-TYPE
+    SYNTAX RlPolicyDscpVptEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The VPT assigned to a Dscp value.
+         The index is DSCP represent by rlPolicyDscpValue."
+    INDEX { rlPolicyDscpValue }
+    ::= { rlPolicyDscpVptTable 1 }
+
+RlPolicyDscpVptEntry::= SEQUENCE {
+        rlPolicyDscpValue                       INTEGER,
+        rlPolicyVptValue                        INTEGER,
+        rlPolicyDscpVptStatus                   RowStatus
+    }
+
+
+rlPolicyDscpValue OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DSCP value."
+    ::= { rlPolicyDscpVptEntry 1 }
+
+rlPolicyVptValue OBJECT-TYPE
+    SYNTAX INTEGER(0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VPT value."
+    ::= { rlPolicyDscpVptEntry 2 }
+
+rlPolicyDscpVptStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDscpVptEntry 3 }
+
+
+-- Policy DSCP to DP Table
+
+
+rlPolicyDscpToDpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDscpToDpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         To Dp table"
+    ::= { rlPolicyMapping 7 }
+
+rlPolicyDscpToDpEntry OBJECT-TYPE
+    SYNTAX RlPolicyDscpToDpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DP for the packet.
+         The index is DSCP represent by rlPolicyDscp"
+    INDEX { rlPolicyDscp }
+    ::= { rlPolicyDscpToDpTable 1 }
+
+RlPolicyDscpToDpEntry::= SEQUENCE {
+        rlPolicyDscp               INTEGER,
+        rlPolicyDp                 INTEGER,
+        rlPolicyDscpToDpStatus     RowStatus
+    }
+
+rlPolicyDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packet DSCP."
+    ::= { rlPolicyDscpToDpEntry 1 }
+
+rlPolicyDp OBJECT-TYPE
+    SYNTAX INTEGER(0..2)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "New DP."
+    ::= { rlPolicyDscpToDpEntry 2 }
+
+
+rlPolicyDscpToDpStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDscpToDpEntry 3 }
+
+
+
+-- Policy Default Forwarding  Table
+
+
+rlPolicyDefaultForwardingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyDefaultForwardingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The default forwarding
+         values : permit or deny for list of specific ports , vlans"
+    ::= { rlPolicy 11 }
+
+rlPolicyDefaultForwardingEntry OBJECT-TYPE
+    SYNTAX RlPolicyDefaultForwardingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Since the table is search to find match according to first match
+         Entries with specific protocol should be set before entries for entire layer."
+    INDEX { rlPolicyDefaultForwardingIndex }
+    ::= { rlPolicyDefaultForwardingTable 1 }
+
+RlPolicyDefaultForwardingEntry::= SEQUENCE {
+        rlPolicyDefaultForwardingIndex              INTEGER,
+        rlPolicyDefaultForwardingPortList           PortList,
+        rlPolicyDefaultForwardingVlanId1To1024      VlanList1,
+        rlPolicyDefaultForwardingVlanId1025To2048   VlanList2,
+        rlPolicyDefaultForwardingVlanId2049To3072   VlanList3,
+        rlPolicyDefaultForwardingVlanId3073To4096   VlanList4,
+        rlPolicyDefaultForwardingLayer              INTEGER,
+        rlPolicyDefaultForwardingAction             INTEGER,
+        rlPolicyDefaultForwardingStatus             RowStatus,
+        rlPolicyDefaultForwardingProtocol           INTEGER
+    }
+
+rlPolicyDefaultForwardingIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Default Forwarding Index."
+    ::= { rlPolicyDefaultForwardingEntry 1 }
+
+rlPolicyDefaultForwardingPortList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Default Forwarding Port List."
+    ::= { rlPolicyDefaultForwardingEntry 2 }
+
+
+rlPolicyDefaultForwardingVlanId1To1024 OBJECT-TYPE
+    SYNTAX  VlanList1
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding VlanId List 1."
+    ::= { rlPolicyDefaultForwardingEntry 3 }
+
+rlPolicyDefaultForwardingVlanId1025To2048 OBJECT-TYPE
+    SYNTAX  VlanList2
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding VlanId List 2."
+    ::= { rlPolicyDefaultForwardingEntry 4 }
+
+rlPolicyDefaultForwardingVlanId2049To3072 OBJECT-TYPE
+    SYNTAX  VlanList3
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding VlanId List 3."
+    ::= { rlPolicyDefaultForwardingEntry 5 }
+
+rlPolicyDefaultForwardingVlanId3073To4096 OBJECT-TYPE
+    SYNTAX  VlanList4
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding VlanId List 4."
+    ::= { rlPolicyDefaultForwardingEntry 6 }
+
+rlPolicyDefaultForwardingLayer OBJECT-TYPE
+    SYNTAX INTEGER {
+        l2(1),
+        l3(2),
+        l3-ipv6(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding Action specify layer l2 l3 l3-ipv6"
+    ::= { rlPolicyDefaultForwardingEntry 7 }
+
+rlPolicyDefaultForwardingAction OBJECT-TYPE
+    SYNTAX  INTEGER{
+        permit(1),
+        deny(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Default Forwarding Action specify permit or deny "
+    ::= { rlPolicyDefaultForwardingEntry 8 }
+
+rlPolicyDefaultForwardingStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlPolicyDefaultForwardingEntry 9 }
+
+rlPolicyDefaultForwardingProtocol OBJECT-TYPE
+    SYNTAX  INTEGER {
+        bpdu(1),
+        icmpv6(2),
+        none(255)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The protocol type to be applied with the default action."
+   DEFVAL{255}
+    ::= { rlPolicyDefaultForwardingEntry 10 }
+
+rlPolicyStatistics
+        OBJECT IDENTIFIER ::= { rlPolicy 12 }
+
+rlPolicyPortPolicyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyPortPolicyStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics counter for policies with specific actions"
+    ::= { rlPolicyStatistics 1}
+
+rlPolicyPortPolicyStatisticsEntry OBJECT-TYPE
+    SYNTAX RlPolicyPortPolicyStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per port.
+        The index is port represent by rlIfIndex.
+        In each entry represents counter, it's type , it's size and whether it's enabled. "
+    INDEX { rlPolicyPortPolicyStatisticsIfIndex,rlPolicyPortPolicyStatisticsCntrType }
+    ::= { rlPolicyPortPolicyStatisticsTable 1 }
+
+RlPolicyPortPolicyStatisticsEntry::= SEQUENCE {
+        rlPolicyPortPolicyStatisticsIfIndex               INTEGER,
+        rlPolicyPortPolicyStatisticsCntrType              StatisticsCntrType,
+        rlPolicyPolicyStatisticsCntrSize                  StatisticsCntrNumOfBitsType,
+        rlPolicyPolicyStatisticsEnableCounting            TruthValue,
+        rlPolicyPolicyStatisticsCounterValue              Counter64
+
+    }
+
+rlPolicyPortPolicyStatisticsIfIndex     OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Interface index."
+    ::= { rlPolicyPortPolicyStatisticsEntry 1 }
+
+rlPolicyPortPolicyStatisticsCntrType     OBJECT-TYPE
+    SYNTAX StatisticsCntrType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter type."
+    ::= { rlPolicyPortPolicyStatisticsEntry 2 }
+
+rlPolicyPolicyStatisticsCntrSize     OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits."
+    ::= { rlPolicyPortPolicyStatisticsEntry 3 }
+
+rlPolicyPolicyStatisticsEnableCounting OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication whether the counter is enabled."
+    DEFVAL { false }
+    ::= { rlPolicyPortPolicyStatisticsEntry 4 }
+
+rlPolicyPolicyStatisticsCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " Counter value. "
+    ::= { rlPolicyPortPolicyStatisticsEntry 5 }
+
+
+rlPolicyOutQueueStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyOutQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per any permutation of
+        Port/VLAN/Queue/Drop Precedence . Each of the above can a group off 'All'.
+        The index is port represent by  rlPolicyOutQueueStatisticsCountrID.
+        In each entry there are fields representing
+        whether the counter is enabled and counters value. "
+    ::= { rlPolicyStatistics 2 }
+
+rlPolicyOutQueueStatisticsEntry OBJECT-TYPE
+    SYNTAX RlPolicyOutQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry includes port, vlan, queue, drop precedence and counter value."
+    INDEX { rlPolicyOutQueueStatisticsCountrID }
+    ::= { rlPolicyOutQueueStatisticsTable 1 }
+
+RlPolicyOutQueueStatisticsEntry::= SEQUENCE {
+       rlPolicyOutQueueStatisticsCountrID                   INTEGER,
+       rlPolicyOutQueueStatisticsIfIndexList                PortList,
+       rlPolicyOutQueueStatisticsPortAll                    TruthValue,
+       rlPolicyOutQueueStatisticsVlan                       INTEGER,
+       rlPolicyOutQueueStatisticsVlanAll                    TruthValue,
+       rlPolicyOutQueueStatisticsQueue                      INTEGER,
+       rlPolicyOutQueueStatisticsQueueAll                   TruthValue,
+       rlPolicyOutQueueStatisticsDP                         StatisticsDPType,
+       rlPolicyOutQueueStatisticsDPAll                      TruthValue,
+       rlPolicyOutQueueStatisticsCounterTailDropValue       Counter64,
+       rlPolicyOutQueueStatisticsCounterAllValue            Counter64,
+       rlPolicyOutQueueStatisticsCntrNumOfBits              StatisticsCntrNumOfBitsType,
+       rlPolicyOutQueueStatisticsStatus                     RowStatus
+    }
+
+rlPolicyOutQueueStatisticsCountrID OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter id, the key of the table."
+    ::= { rlPolicyOutQueueStatisticsEntry 1 }
+
+rlPolicyOutQueueStatisticsIfIndexList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Port for which the flow is counted."
+    ::= { rlPolicyOutQueueStatisticsEntry 2 }
+
+rlPolicyOutQueueStatisticsPortAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the port is configured as range of all the ports"
+    DEFVAL { false }
+    ::= { rlPolicyOutQueueStatisticsEntry 3}
+
+rlPolicyOutQueueStatisticsVlan OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VLAN for which the flow is counted."
+    ::= { rlPolicyOutQueueStatisticsEntry 4 }
+
+rlPolicyOutQueueStatisticsVlanAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the Vlan is configured as range of all the Vlans"
+    DEFVAL { false }
+    ::= { rlPolicyOutQueueStatisticsEntry 5}
+
+rlPolicyOutQueueStatisticsQueue OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Queue for which the flow is counted."
+    ::= { rlPolicyOutQueueStatisticsEntry 6 }
+
+rlPolicyOutQueueStatisticsQueueAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the Queue is configured as range of all the Queues"
+    DEFVAL { false }
+    ::= { rlPolicyOutQueueStatisticsEntry 7}
+
+rlPolicyOutQueueStatisticsDP OBJECT-TYPE
+    SYNTAX StatisticsDPType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Drop Precedence for which the flow is counted."
+    ::= { rlPolicyOutQueueStatisticsEntry 8 }
+
+rlPolicyOutQueueStatisticsDPAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the DP is configured as range of all the DPs"
+    DEFVAL { false }
+    ::= { rlPolicyOutQueueStatisticsEntry 9}
+
+rlPolicyOutQueueStatisticsCounterTailDropValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The counter for tail dropped value."
+    ::= { rlPolicyOutQueueStatisticsEntry 10 }
+
+rlPolicyOutQueueStatisticsCounterAllValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The counter for all traffic value."
+    ::= { rlPolicyOutQueueStatisticsEntry 11 }
+
+rlPolicyOutQueueStatisticsCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for the counter."
+    ::= { rlPolicyOutQueueStatisticsEntry 12 }
+
+rlPolicyOutQueueStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlPolicyOutQueueStatisticsEntry 13 }
+
+-- Global Counter for statistics
+
+rlPolicyGlobalStatisticsCntrsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyGlobalStatisticsCntrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics global counters  for specific rules for
+         all ports that they are connected to "
+    ::= { rlPolicyStatistics 3 }
+
+rlPolicyGlobalStatisticsCntrsEntry OBJECT-TYPE
+    SYNTAX RlPolicyGlobalStatisticsCntrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents global counter."
+    INDEX {rlPolicyGlobalStatisticsCntrsType}
+    ::= { rlPolicyGlobalStatisticsCntrsTable 1 }
+
+RlPolicyGlobalStatisticsCntrsEntry::= SEQUENCE {
+       rlPolicyGlobalStatisticsCntrsType            StatisticsCntrType,
+       rlPolicyGlobalStatisticsCntrsNumOfBits       StatisticsCntrNumOfBitsType,
+       rlPolicyGlobalStatisticsCntrsCounterValue    Counter64,
+       rlPolicyGlobalStatisticsStatus               RowStatus
+}
+
+rlPolicyGlobalStatisticsCntrsType          OBJECT-TYPE
+    SYNTAX StatisticsCntrType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter type."
+    ::= { rlPolicyGlobalStatisticsCntrsEntry 1 }
+
+rlPolicyGlobalStatisticsCntrsNumOfBits          OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits."
+    ::= { rlPolicyGlobalStatisticsCntrsEntry 2 }
+
+rlPolicyGlobalStatisticsCntrsCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter value."
+    ::= { rlPolicyGlobalStatisticsCntrsEntry 3 }
+
+rlPolicyGlobalStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlPolicyGlobalStatisticsCntrsEntry 4 }
+
+    -- clear scalar
+
+rlPolicyClearCounters OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar indicates to clear all the counters."
+    ::= { rlPolicyStatistics 4 }
+
+-- ********************
+-- Classifier Utilization Table
+-- ********************
+    rlPolicyClassifierUtilization OBJECT IDENTIFIER
+      ::= { rlPolicy 13 }
+
+
+    rlPolicyClassifierUtilizationTable OBJECT-TYPE
+      SYNTAX         SEQUENCE OF RlPolicyClassifierUtilizationEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A table containing Classifier utilization information.
+           Each row represents objects for a particular Unit
+           present in this system."
+      ::= { rlPolicyClassifierUtilization 1 }
+
+    rlPolicyClassifierUtilizationEntry OBJECT-TYPE
+      SYNTAX         RlPolicyClassifierUtilizationEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A Single entry containing Classifier utilization information."
+      INDEX          { rlPolicyClassifierUtilizationUnitId }
+      ::= { rlPolicyClassifierUtilizationTable 1 }
+
+    RlPolicyClassifierUtilizationEntry ::= SEQUENCE {
+      rlPolicyClassifierUtilizationUnitId            Unsigned32,
+      rlPolicyClassifierUtilizationPercent           Unsigned32,
+      rlPolicyClassifierUtilizationRulesNumber       Unsigned32
+    }
+
+     rlPolicyClassifierUtilizationUnitId OBJECT-TYPE
+      SYNTAX         Unsigned32  (1..4294967295)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "The Unit ID of this Classifier. must be unique per entry.
+            This is an index into the table."
+      ::= { rlPolicyClassifierUtilizationEntry 1 }
+
+
+    rlPolicyClassifierUtilizationPercent OBJECT-TYPE
+      SYNTAX         Unsigned32  (0..100)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The classifier utilization percentage. "
+      DEFVAL { 0 }
+      ::= { rlPolicyClassifierUtilizationEntry 2 }
+
+    rlPolicyClassifierUtilizationRulesNumber OBJECT-TYPE
+      SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The classifier utilization number of used rules, in short rules resolution."
+      DEFVAL { 0 }
+      ::= { rlPolicyClassifierUtilizationEntry 3 }
+
+    -- reserved tcs scalar
+
+    rlPolicyIsTCAvailable OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This scalar indicates the number of currently reserved amount
+             of traffic conditioners."
+        ::= { rlPolicy 14 }
+
+rlPolicyCPUSafeGuardEnable OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar enables/disables CPU Safeguard."
+    ::= { rlPolicy 15 }
+
+rlPolicyQosModeGlobalCfgTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPolicyQosModeGlobalCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table responsible to set the global qos mode configuration:
+        qos mode, qos trust mode, and if port are trusted by default in qos advanced
+        mode."
+    ::= { rlPolicy 16 }
+
+rlPolicyQosModeGlobalCfgEntry OBJECT-TYPE
+    SYNTAX RlPolicyQosModeGlobalCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table responsible to set the global qos mode configuration:
+        qos mode, qos trust mode, and if port are trusted by default in qos advanced
+        mode.
+        Current implemnetaion assumes only one entry exist."
+    INDEX { rlPolicyGlobalIndex}
+    ::= { rlPolicyQosModeGlobalCfgTable 1 }
+
+RlPolicyQosModeGlobalCfgEntry ::= SEQUENCE {
+    rlPolicyGlobalIndex                  INTEGER,
+    rlPolicyGlobalQoSMode                RlPolicyQosMode,
+    rlPolicyBasicGlobalTrustMode         RlPolicyTrustTypes,
+    rlPolicyAdvcGlobalTrustMode          RlPolicyTrustTypes,
+    rlPolicyPortTrustAdvancedMode        TruthValue,
+    rlPolicyDscpMutationEnable           TruthValue,
+    rlPolicyModeGlobalCfgStatus          RowStatus
+    }
+
+rlPolicyGlobalIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry index - currenly only one entry can exist, indexes hard coded with value '1'."
+    ::= { rlPolicyQosModeGlobalCfgEntry 1 }
+
+rlPolicyGlobalQoSMode OBJECT-TYPE
+    SYNTAX     RlPolicyQosMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlPolicyCliQosMode.
+        Defines the global qos operation mode: disable, basic or advnaced. "
+    ::= { rlPolicyQosModeGlobalCfgEntry 2 }
+
+rlPolicyBasicGlobalTrustMode OBJECT-TYPE
+    SYNTAX     RlPolicyTrustTypes
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlPolicyCliBasicModeCfg.
+        Defines the global qos trust operation mode when qos mode is basic. "
+    ::= { rlPolicyQosModeGlobalCfgEntry 3 }
+
+rlPolicyAdvcGlobalTrustMode OBJECT-TYPE
+    SYNTAX     RlPolicyTrustTypes
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlPolicyCliBasicModeCfg.
+        Defines the global qos trust operation mode when qos mode is advanced. "
+    ::= { rlPolicyQosModeGlobalCfgEntry 4 }
+
+rlPolicyPortTrustAdvancedMode OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field specified whether ports are set to trused or not-trusted by
+        default when switching to qos advanced mode."
+    DEFVAL{ false }
+    ::= { rlPolicyQosModeGlobalCfgEntry 5 }
+
+rlPolicyDscpMutationEnable  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This field indicates if dscp to dscp mutation mode is enable.
+        It can be set to true in the following terms:
+        1.rlQosGlobalTrustMode is in {dscp, vpt-dscp} ( rlQosGlobalQoSMode must be basic or advanced)
+        2.if rlQosGlobalQoSMode is advanced then rlQoSPortTrustAdvancedMode must be set to true."
+    DEFVAL{ false }
+    ::= { rlPolicyQosModeGlobalCfgEntry 6}
+
+rlPolicyModeGlobalCfgStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This status of entry action.
+        In current implementation only one entry exist, therefor only status = active is
+        acceptable."
+    ::= { rlPolicyQosModeGlobalCfgEntry 7 }
+
+
+END
+
+

@@ -1,0 +1,31 @@
+WATCHGUARD-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+        enterprises         FROM SNMPv2-SMI;
+
+
+    watchguard OBJECT IDENTIFIER ::= { enterprises 3097 }
+
+    wgProducts OBJECT IDENTIFIER ::= { watchguard 1 }
+    fbXSeries OBJECT IDENTIFIER ::= { wgProducts 4 }
+
+    -- fbX series
+    fbX500     OBJECT IDENTIFIER ::= { fbXSeries 1 }
+    fbX550e    OBJECT IDENTIFIER ::= { fbXSeries 2 }
+    fbX700     OBJECT IDENTIFIER ::= { fbXSeries 3 }
+    fbX750e    OBJECT IDENTIFIER ::= { fbXSeries 4 }
+    fbX750e-4  OBJECT IDENTIFIER ::= { fbXSeries 5 }
+    fbX1000    OBJECT IDENTIFIER ::= { fbXSeries 6 }
+    fbX1250e   OBJECT IDENTIFIER ::= { fbXSeries 7 }
+    fbX1250e-4 OBJECT IDENTIFIER ::= { fbXSeries 8 }
+    fbX2500    OBJECT IDENTIFIER ::= { fbXSeries 9 }
+    fbX5000    OBJECT IDENTIFIER ::= { fbXSeries 10 }
+    fbX5500e   OBJECT IDENTIFIER ::= { fbXSeries 11 }
+    fbX6000    OBJECT IDENTIFIER ::= { fbXSeries 12 }
+    fbX6500e   OBJECT IDENTIFIER ::= { fbXSeries 13 }
+    fbX8000    OBJECT IDENTIFIER ::= { fbXSeries 14 }
+    fbX8500e   OBJECT IDENTIFIER ::= { fbXSeries 15 }
+    fbX8500e-F OBJECT IDENTIFIER ::= { fbXSeries 16 }
+
+END

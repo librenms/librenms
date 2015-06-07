@@ -1,0 +1,123 @@
+--==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Hierarchy Quality Of Service MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+--
+-- ==================================================================
+    HUAWEI-L2TP-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            DisplayString            
+                FROM SNMPv2-TC            
+            Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI;
+    
+    
+        hwL2TPExt MODULE-IDENTITY 
+            LAST-UPDATED "200610301046Z"
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "Huawei Technologies co.,Ltd. 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            http://www.huawei.com
+            Zip:100085
+            "
+            DESCRIPTION 
+                " L2TP extended property used by Huawei Technologies Co., Ltd."
+            ::= { hwDatacomm 137 }
+       
+--
+-- Node definitions
+--
+    
+        hwL2TPStatistic OBJECT IDENTIFIER ::= { hwL2TPExt 1 }
+        
+        hwL2TPSessionStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2TPSessionStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of L2TP session statistic information."
+            ::= { hwL2TPStatistic 1 }
+        
+        hwL2TPSessionStatEntry OBJECT-TYPE
+            SYNTAX HwL2TPSessionStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                L2TP Session Statistic Information Entry
+                "
+            INDEX { hwL2TPSessionIndex }
+            ::= { hwL2TPSessionStatTable 1 }
+        
+        HwL2TPSessionStatEntry ::=
+            SEQUENCE { 
+                hwL2TPSessionIndex
+                    Integer32,
+                hwL2TPSessionStatUpPkts
+                    Counter64,
+                hwL2TPSessionStatUpBytes
+                    Counter64,
+                hwL2TPSessionStatDownPkts
+                    Counter64,
+                hwL2TPSessionStatDownBytes
+                    Counter64
+             }
+
+        hwL2TPSessionIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " User's Session number "
+            ::= { hwL2TPSessionStatEntry 1 }
+        
+        hwL2TPSessionStatUpPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Upstream packets of a L2TP session "
+            ::= { hwL2TPSessionStatEntry 2 }
+        
+        hwL2TPSessionStatUpBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Upstream bytes of a L2TP session "
+            ::= { hwL2TPSessionStatEntry 3 }
+        
+        hwL2TPSessionStatDownPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               " Downstream packtes of a L2TP session "
+            ::= { hwL2TPSessionStatEntry 4 }
+        
+        hwL2TPSessionStatDownBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               " Downstream bytes of a L2TP session "
+            ::= { hwL2TPSessionStatEntry 5 }    
+             
+    END
+
+--
+-- HUAWEI-L2TP-EXT-MIB.mib
+--

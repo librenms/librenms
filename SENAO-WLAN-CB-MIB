@@ -1,0 +1,548 @@
+-- *****************************************************************
+-- NCB-8610 Private MIB
+--
+-- Sept. 2006, Greg Lin
+--
+-- Copyright (c) 2006 by Senao Technology Co., Ltd.
+-- All rights reserved.
+--
+-- Note: This MIB file is modification 3220 private MIB.
+--       It modify SNMPv2 to SNMPv1 syntax.  
+--
+-- Date: 2006-09-20
+-- *****************************************************************
+
+--SENAO-NCB8610-MIB { iso(1) org(3) dod(6) internet(1) private(4) Enterprises(1) Senao(14125) }
+
+--module definition
+
+
+SENAO-WLAN-CB-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, IpAddress              FROM RFC1155-SMI
+        DisplayString, PhysAddress          FROM RFC1213-MIB
+        OBJECT-TYPE                         FROM RFC-1212
+        TRAP-TYPE                           FROM RFC-1215
+        mgmt, NetworkAddress, IpAddress, Counter, Gauge,
+        TimeTicks                           FROM RFC1155-SMI;
+
+
+-- SENAO-Private-MIB DEFINITIONS --
+   senaoMIB                  OBJECT IDENTIFIER ::= { enterprises 14125 }
+
+
+-- SENAO-RFC1213-MIB DEFINITIONS --
+   senaoRFC1213Group      							 OBJECT IDENTIFIER ::= { senaoMIB 1 }
+   
+-- SENAO-Private-MIB DEFINITIONS --
+   statusInformationGroup          OBJECT IDENTIFIER ::= { senaoMIB 2 }
+   countersGroup                   OBJECT IDENTIFIER ::= { senaoMIB 3 }
+   privacySettingsGroup            OBJECT IDENTIFIER ::= { senaoMIB 4 }
+   systemSettingsGroup             OBJECT IDENTIFIER ::= { senaoMIB 5 }
+   webAdministratorSettingsGroup   OBJECT IDENTIFIER ::= { senaoMIB 6 }
+   
+
+
+-- SENAO-RFC1213-MIB DEFINITIONS --
+   ip           OBJECT IDENTIFIER ::= { senaoRFC1213Group  1 }
+   icmp         OBJECT IDENTIFIER ::= { senaoRFC1213Group  2 }
+   tcp          OBJECT IDENTIFIER ::= { senaoRFC1213Group  3 }
+   udp          OBJECT IDENTIFIER ::= { senaoRFC1213Group  4 }
+   
+   
+-- SENAO-Private-MIB DEFINITIONS --
+-- [ statusInformationGroup ] [1] --
+
+  connectedToSSID OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+      "This attribute reflects the Service Set ID.
+      This value may be modified by an external management 
+      entity and used by the local SME to make decisions 
+      about the Scanning process. The connectedToSSID
+      length is limit between 1~ 32 characters.
+      @GET-FUNC=get_statusInfo_group
+      @SET-FUNC=set_statusInfo_group"     
+  ::= { statusInformationGroup 1 }
+  
+  usingChannel  OBJECT-TYPE
+    SYNTAX  INTEGER  
+            {
+              -- Note: the SNMPv1 does not support channel array so chang channelX
+              channel1 (1),
+              channel2 (2),
+              channel3 (3),
+              channel4 (4),
+              channel5 (5),
+              channel6 (6),
+              channel7 (7),
+              channel8 (8),
+              channel9 (9),
+              channel10 (10),
+              channel11 (11)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The operating frequency channel. Valid numbers
+      are as defind in ISO/IEC 8802-11:1999, 15.4.6.2.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 2 }
+
+   
+-- (CB)                
+  clientBridgeMACAddress OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The purpose of clientBridgeMACAddress is to allow a manager to identify
+      a station for its own purposes.  This attribute provides
+      for that eventuality while keeping the true MAC address
+      independent.  Its syntax is MAC address and default value
+      is the station's assigned, unique MAC address.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 3 }
+
+
+  currentIPAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION  
+      "The IP address of this device used over its Ethernet
+      interface in Routing mode or Bridge interface in Bridgeing mode.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 4 }
+    
+-- (CB)
+  linkUpIndicator OBJECT-TYPE
+    SYNTAX  INTEGER 
+            -- Error: number enumeration contains zero value in SMIv1 MIB
+            --{
+            --    offLine(0),
+            --    onLine(1)
+            --}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The operated state of the wireless interface. The
+      onLine(1) state indicates that this device connected 
+      to Access Point.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 5 }
+  
+  clientSignalStrength OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION  
+      "A device-dependent measure of the signal strength(%) of the
+      most recently received packet from this Station.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 6 }
+  
+    clientAssociationTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION  
+      "The time since this device connected to Access Point.
+      @GET-FUNC=get_statusInfo_group"
+  ::= { statusInformationGroup 7 }
+  
+  currentTXPower OBJECT-TYPE
+    SYNTAX INTEGER  
+            {
+              -- Transmit Power Level
+              high (1),
+              medium (2),
+              low (3)
+            }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION  
+      "The Transmit Power of this device used.
+      @GET-FUNC=get_statusInfo_group
+      @SET-FUNC=set_statusInfo_group"
+  ::= { statusInformationGroup 8 }
+  
+
+              
+                  
+
+
+-- [ countersGroup ] [2] --
+  
+  receivedPacketsGoodCount OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of good packets received on the radio interface, 
+      including unicast, broadcast and multicast packets.
+      @GET-FUNC=get_counters_group"
+  ::= { countersGroup 1 }
+                
+  receivedPacketsBadCount OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of inbound bad packets of the radio interface
+      were chosen to be discarded even though no errors had been 
+      detected to prevent their being received. One possible reason 
+      for discarding such a packet could be to free up buffer space. 
+      Another reason would be exceeding their maximum time-to-live.
+      @GET-FUNC=get_counters_group"
+  ::= { countersGroup 2 }    
+    
+    
+  sendPacketsGoodCount OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of good packets transmitted on the radio interface, 
+      including unicast, broadcast and multicast packets.
+      @GET-FUNC=get_counters_group"
+  ::= { countersGroup 3 }
+
+                
+  sendPacketsBadCount OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of outbound bad packets of the radio interface
+      were chosen to be discarded even though no errors had been 
+      detected to prevent their being transmitted. One possible reason 
+      for discarding such a packet could be to free up buffer space. 
+      Another reason would be exceeding their maximum time-to-live.
+      @GET-FUNC=get_counters_group"
+  ::= { countersGroup 4 }    
+
+
+-- [ privacySettingsGroup ] [3] --
+
+  wepEnabled OBJECT-TYPE
+    SYNTAX INTEGER
+           {
+              disable(1),
+              enable(2)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "When this attribute is enable, it shall indicate that the IEEE
+      802.11 WEP mechanism is used for transmitting frames of type
+      Data. The default value of this attribute shall be disable.
+      @GET-FUNC=get_privacy_group
+      @SET-FUNC=set_privacy_group"
+  ::= { privacySettingsGroup 1 }
+    
+
+  wepKeyLength  OBJECT-TYPE
+    SYNTAX INTEGER
+           {
+             key-64bits(1),
+             key-128bits(2)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The length of WEP key that is used for transmitting and received 
+      frames of type Data. The value of 0 denotes WEP64bit Hex. Key;
+      1 stands for WEP128bit Hex. Key
+      @GET-FUNC=get_privacy_group
+      @SET-FUNC=set_privacy_group"
+  ::= { privacySettingsGroup 2 }
+
+    
+  wepKeyNumber  OBJECT-TYPE
+    SYNTAX INTEGER 
+    	   {
+	   	wep-key1(1),
+	   	wep-key2(2),
+	   	wep-key3(3),
+	   	wep-key4(4)
+	   }    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "This attribute shall indicate the use of the first,
+      second, third, or fourth element of the WEPDefaultKeys
+      array when set to values of 1, 2, 3, or 4.  The
+      default value of this attribute shall be 0.
+      @GET-FUNC=get_privacy_group
+      @SET-FUNC=set_privacy_group"
+      -- REFERENCE "IEEE Std 802.11-1997, 8.3.2"
+  ::= { privacySettingsGroup 3 }
+    
+    
+  wepKey OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A WEP secret key value. 10 Hex. Keys for WEP 64Bits/26 Hex. Keys for WEP128Bits.
+      @GET-FUNC=get_privacy_group
+      @SET-FUNC=set_privacy_group"
+  ::= { privacySettingsGroup 4 }
+
+
+
+-- [ systemSettingsGroup ] [4] --
+         
+  operationMode OBJECT-TYPE
+    SYNTAX  INTEGER 
+            {
+              bridge(1),
+              ap-wds(2)
+            }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This defines the type of role of a wireless device.  
+      The device types are:
+      Bridge(1)         -- Bridge 
+      AP+WDS(2)         -- Access Point+WDS
+      @GET-FUNC=get_system_group"
+  ::= { systemSettingsGroup 1 }
+
+  ipAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION  
+      "The IP address of this device used over its Ethernet
+      interface in CB mode. The IP address must NOT set 
+      [x.x.x.0] or [x,x.x.255].
+      @GET-FUNC=get_system_group
+      @SET-FUNC=set_system_group"
+  ::= { systemSettingsGroup 2 }
+
+    
+  subnetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Network mask used by the IP entity when accessing
+      devices through any of its Ethernet interface in Routing mode 
+      or Bridge interface in Bridgeing mode.
+      The value of subnet mask must set to 0, 128, 192, 224, 240, 248, 252, 254, 255.
+      @GET-FUNC=get_system_group
+      @SET-FUNC=set_system_group"
+  ::= { systemSettingsGroup 3 } 
+
+
+  ipGateway OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION  
+      "The IP address of this device's Gateway.
+      The value of IP Gateway must NOT set to 0 or 255
+      @GET-FUNC=get_system_group
+      @SET-FUNC=set_system_group"
+  ::= { systemSettingsGroup 4 }           
+
+
+  deviceName OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The description name of this device.
+      The deviceName length is limit between
+      1~32 characters.
+      @GET-FUNC=get_system_group
+      @SET-FUNC=set_system_group"
+  ::= { systemSettingsGroup 5 }
+
+
+--  desiredSSID OBJECT-TYPE
+--    SYNTAX OCTET STRING
+--    ACCESS read-write
+--    STATUS mandatory
+--    DESCRIPTION
+--      "The Preferred Service Set ID used in the most recent MLME_Scan.request. 
+--      This value may be modified by an external management entity and used by 
+--      the local SME to make decisions about the Scanning process.
+--      @GET-FUNC=get_system_group
+--      @SET-FUNC=set_system_group"
+--  ::= { systemSettingsGroup 6 }
+  
+  saveReboot OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Save and Reboot System
+      The save Reboot value must set to 1 when you enable this function.
+      @GET-FUNC=get_system_group
+      @SET-FUNC=set_system_group"
+  ::= { systemSettingsGroup 6 }
+
+  
+  
+
+
+
+  
+-- [ webAdministratorSettingsGroup ] [5] --
+
+  userName OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "User Name assigned to the system for use when
+      authenticating with Web browser. The username length 
+      limit is 15 characters.
+      @GET-FUNC=get_webAdmin_group
+      @SET-FUNC=set_webAdmin_group"
+  ::= { webAdministratorSettingsGroup 1}
+
+  password OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "User Password assigned to the system
+      for use when authenticating with Web browser. The 
+      password length limit is 15 characters.
+      @GET-FUNC=get_webAdmin_group
+      @SET-FUNC=set_webAdmin_group"
+  ::= { webAdministratorSettingsGroup 2}
+
+  
+-- SENAO-RFC1213-MIB DEFINITIONS --
+-- the IP group
+
+-- Implementation of the IP group is mandatory for all
+-- systems.
+
+
+ipInReceives OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of input datagrams received from
+            interfaces, including those received in error.
+            @GET-FUNC=get_ip_row"
+    ::= { ip 1 }
+
+
+ipForwDatagrams OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The number of input datagrams for which this
+            entity was not their final IP destination, as a
+            result of which an attempt was made to find a
+            route to forward them to that final destination.
+            In entities which do not act as IP Gateways, this
+            counter will include only those packets which were
+            Source-Routed via this entity, and the Source-
+            Route option processing was successful.
+            @GET-FUNC=get_ip_row"
+    ::= { ip 2 }
+
+
+-- the ICMP group
+
+-- Implementation of the ICMP group is mandatory for all
+-- systems.
+
+icmpInMsgs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of ICMP messages which the
+            entity received.  Note that this counter includes
+            all those counted by icmpInErrors.
+            @GET-FUNC=get_icmp_row"
+    ::= { icmp 1 }
+
+
+
+icmpOutMsgs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of ICMP messages which this
+            entity attempted to send.  Note that this counter
+            includes all those counted by icmpOutErrors.
+            @GET-FUNC=get_icmp_row"
+    ::= { icmp 2 }
+
+
+-- the TCP group
+
+-- Implementation of the TCP group is mandatory for all
+-- systems that implement the TCP.
+
+-- Note that instances of object types that represent
+-- information about a particular TCP connection are
+-- transient; they persist only as long as the connection
+-- in question.
+
+
+tcpInSegs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of segments received, including
+            those received in error.  This count includes
+            segments received on currently established
+            connections.
+            @GET-FUNC=get_tcp_row"
+    ::= { tcp 1 }
+
+tcpOutSegs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of segments sent, including
+            those on current connections but excluding those
+            containing only retransmitted octets.
+            @GET-FUNC=get_tcp_row"
+    ::= { tcp 2 }
+    
+
+-- the UDP group
+
+-- Implementation of the UDP group is mandatory for all
+-- systems which implement the UDP.
+
+udpInDatagrams OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of UDP datagrams delivered to
+            UDP users.
+            @GET-FUNC=get_udp_row"
+    ::= { udp 1 }
+
+udpOutDatagrams OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of UDP datagrams sent from this
+            entity.
+            @GET-FUNC=get_udp_row"
+    ::= { udp 2 }
+END

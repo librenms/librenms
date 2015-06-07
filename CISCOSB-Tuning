@@ -1,0 +1,2172 @@
+CISCOSB-Tuning DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Tuning Private Extension
+-- Version:    7.40
+-- Date:       05 July 2005
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    Unsigned32,
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress                 FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
+    VlanList1, VlanList2, VlanList3, VlanList4              FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
+
+rsTunning  MODULE-IDENTITY
+           LAST-UPDATED "200602120000Z"
+           ORGANIZATION "Cisco Systems, Inc."
+
+           CONTACT-INFO
+           "Postal: 170 West Tasman Drive
+           San Jose , CA 95134-1706
+           USA
+
+           
+           Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+           DESCRIPTION
+                "The private MIB module definition for switch001 device tuning MIB."
+           REVISION "200903030000Z"
+           DESCRIPTION
+                    "Added rlHostParamType, rlHostParamUINT, rlHostParamOctetString, rlHostParamIpAddress and rlHostParamObjectId."
+           REVISION "200602120000Z"
+           DESCRIPTION
+                    "Editorial changes to support new MIB compilers."
+           REVISION "200406010000Z"
+           DESCRIPTION
+                "Initial version of this MIB."
+           ::= { switch001 29 }
+
+
+rsHighPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable indicates the time interval the forwarding task inside the
+      RS works in High Priority Mode."
+    ::=  { rsTunning 1  }
+
+rsLowPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable indicates the time interval the forwarding task inside the
+      RS works in Low Priority Mode."
+    ::=  { rsTunning 2  }
+
+rsDbgLevel OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable indicates the debug level the Router Server works.
+       the range of this variable is 1..100 "
+    ::=  { rsTunning 3  }
+
+rsDiagnosticsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF  RsDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The diagnostics table of the agent"
+    ::=  { rsTunning 4 }
+
+rsDiagnosticsEntry OBJECT-TYPE
+    SYNTAX      RsDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rsDiagnosticsRequestId }
+    ::= { rsDiagnosticsTable 1}
+
+RsDiagnosticsEntry ::= SEQUENCE {
+    rsDiagnosticsRequestId  INTEGER,
+    rsDiagnosticsCode       INTEGER,
+    rsDiagnosticsLocation   INTEGER,
+    rsDiagnosticsText       DisplayString
+}
+
+rsDiagnosticsRequestId OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS read-only
+   STATUS       current
+   DESCRIPTION
+      "The request id of the rejected SNMP request whose diagnostics are
+       specified by this entry. If  request  id  0xFFFFFFFF is given,
+       the diagnostic of the last  rejected SNMP
+       request sent  by the querying NMS is returned."
+   ::= {rsDiagnosticsEntry 1}
+
+rsDiagnosticsCode OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "The code of the rejected the SNMP request whose diagnostics are
+         specified by this entry. This code may be used to find out the reason
+         for rejection if the diagnostic text is unavailable."
+    ::= {rsDiagnosticsEntry 2}
+
+rsDiagnosticsLocation OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+    "The internal location in the SW rejecting the SNMP request whose
+     diagnostics are specified by this entry. This information is available
+     for debugging purposes only and will be returned in GET requests only if
+     rsDbgLevel >= 99.  "
+    ::= {rsDiagnosticsEntry 3}
+
+rsDiagnosticsText OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..160))
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "The diagnostic text of the rejected SNMP request whose diagnostics are
+         specified by this entry."
+    ::= {rsDiagnosticsEntry 4}
+
+rsConfirmMessagTab  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable  enables the operator to confirm all the message in the
+       event Message Table."
+    ::=  { rsTunning 5 }
+
+eventMessageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EventMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Event Message table of the agent"
+     ::= { rsTunning 6 }
+
+eventMessageEntry  OBJECT-TYPE
+    SYNTAX      EventMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX { eventNum }
+    ::= {eventMessageTable 1}
+
+EventMessageEntry  ::= SEQUENCE {
+    eventNum        INTEGER,
+    eventDesc       DisplayString
+}
+
+eventNum OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS read-only
+   STATUS       current
+   DESCRIPTION
+      "The event number,the index of this table."
+   ::= {eventMessageEntry 1}
+
+eventDesc  OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS read-only
+   STATUS       current
+   DESCRIPTION
+      "The event discription, this text will include time and severity."
+  ::= {eventMessageEntry 2}
+
+reaTunning OBJECT IDENTIFIER ::= { rsTunning 7 }
+
+reaIpForwardEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    MAX-ACCESS  read-write
+        STATUS  current
+    DESCRIPTION
+      "The Platform will perform fast IP forwarding if only if this
+       variable's value is enable."
+    ::=  { reaTunning 4 }
+
+reaIpxForwardEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    MAX-ACCESS  read-write
+        STATUS  current
+    DESCRIPTION
+      "The Platform will perform fast IPX forwarding if only if this
+       variable's value is enable."
+    ::=  { reaTunning 5 }
+
+rsMaxEntriesTuning OBJECT IDENTIFIER ::= { rsTunning 8 }
+
+rsMaxBridgeForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 1}
+
+rsMaxBrgFrwEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in bridge forwarding table."
+    ::=  { rsMaxBridgeForwardingEntriesTuning 1 }
+
+rsMaxBrgFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in bridge forwarding table."
+    ::=  { rsMaxBridgeForwardingEntriesTuning 2 }
+
+rsMaxIpForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 2}
+
+rsMaxIpFrwEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in Ip forwarding table."
+    ::=  { rsMaxIpForwardingEntriesTuning 1 }
+
+rsMaxIpFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in Ip forwarding table."
+    ::=  { rsMaxIpForwardingEntriesTuning 2 }
+
+rsMaxArpEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 3}
+
+rsMaxArpEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in Arp forwarding table."
+    ::=  { rsMaxArpEntriesTuning 1 }
+
+rsMaxArpEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in Arp forwarding table."
+    ::=  { rsMaxArpEntriesTuning 2 }
+
+rsMaxIpxForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 4}
+
+rsMaxIpxFrwEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in Ipx forwarding table."
+    ::=  { rsMaxIpxForwardingEntriesTuning 1 }
+
+rsMaxIpxFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in Ipx forwarding table."
+    ::=  { rsMaxIpxForwardingEntriesTuning 2 }
+
+rsMaxIpxSapEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 5}
+
+rsMaxIpxSapEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in IpxSap table."
+    ::=  { rsMaxIpxSapEntriesTuning 1 }
+
+rsMaxIpxSapEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in IpxSap table."
+    ::=  { rsMaxIpxSapEntriesTuning 2 }
+
+rsMaxDspClntEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 6}
+
+rsMaxDspClntEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspClntEntriesTuning 1 }
+
+rsMaxDspClntEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspClntEntriesTuning 2 }
+
+-- Obsolete
+-- rsMaxZeroHopRoutEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 7}
+
+-- Obsolete
+-- rsMaxDspFrmEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 8}
+
+rsMaxIpFftEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 9}
+
+rsMaxIpSFftEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal size of one IP SFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 1 }
+
+rsMaxIpSFftEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of one IP SFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 2 }
+
+rsMaxIpNFftEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal size of one IP NFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 3 }
+
+rsMaxIpNFftEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of one IP NFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 4 }
+
+rsMaxIpSFftSysEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current maximal size of the SYSTEM IP SFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 5 }
+
+rsMaxIpSFftSysEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of the SYSTEM IP SFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 6 }
+
+rsMaxIpNFftSysEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current maximal size of the SYSTEM IP NFFT Table."
+    ::= { rsMaxIpFftEntriesTuning 7 }
+
+rsMaxIpNFftSysEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal size of the SYSTEM IP NFFT Table."
+   ::= { rsMaxIpFftEntriesTuning 8 }
+
+rsMaxIpNextHopEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal size of one IP NextHop Table."
+    ::= { rsMaxIpFftEntriesTuning 9 }
+
+rsMaxIpNextHopEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of one NextHop Table."
+    ::= { rsMaxIpFftEntriesTuning 10 }
+
+rsMaxIpxFftEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 10}
+
+rsMaxIpxSFftEntries OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-only
+   STATUS       current
+   DESCRIPTION
+      "The current maximal size of one IPX SFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 1 }
+
+rsMaxIpxSFftEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal size of one IPX SFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 2 }
+
+rsMaxIpxNFftEntries OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-only
+   STATUS       current
+   DESCRIPTION
+      "The current maximal size of one IPX NFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 3 }
+
+rsMaxIpxNFftEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal size of one IPX NFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 4 }
+
+rsMaxIpxSFftSysEntries OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-only
+   STATUS       current
+   DESCRIPTION
+      "The current maximal size of the SYSTEM IPX SFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 5 }
+
+rsMaxIpxSFftSysEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal size of the SYSTEM IPX SFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 6 }
+
+rsMaxIpxNFftSysEntries OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-only
+   STATUS       current
+   DESCRIPTION
+      "The current maximal size of the SYSTEM IPX NFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 7 }
+
+rsMaxIpxNFftSysEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal size of the SYSTEM IPX NFFT Table."
+   ::= { rsMaxIpxFftEntriesTuning 8 }
+
+rsMaxDhcpTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 11}
+
+rsMaxDhcpConns OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximal number of DHCP connections."
+    ::= { rsMaxDhcpTuning 1 }
+
+rsMaxDhcpConnsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset)  maximal number of DHCP connections."
+    ::= { rsMaxDhcpTuning 2 }
+
+-- obsolete
+-- rsMaxDhcpClients OBJECT-TYPE
+-- ::= { rsMaxDhcpTuning 3 }
+
+rsMaxIpmTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 12}
+
+rsMaxIpmFftEntriesTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 1 }
+
+rsMaxIpmFftEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal number of the IPM FFT Tables."
+   ::= { rsMaxIpmFftEntriesTuning 1 }
+
+rsMaxIpmFftEntriesAfterReset OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The future (after reset) maximal number of the IPM FFT Tables."
+   ::= { rsMaxIpmFftEntriesTuning 2 }
+
+rsIpmFftAging OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+      "The aging timeout of the IPM FFT Tables."
+   ::= { rsMaxIpmFftEntriesTuning 3 }
+
+rsMaxIgmpTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 2 }
+
+rsMaxIgmpInterfaceEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the IGMP Neighbor Table."
+    ::=  { rsMaxIgmpTuning 1 }
+
+rsMaxIgmpInterfaceEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the IGMP Neighbor Table."
+    ::=  { rsMaxIgmpTuning 2 }
+
+rsMaxIgmpCacheEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the IGMP Cache Table."
+    ::=  { rsMaxIgmpTuning 3 }
+
+rsMaxIgmpCacheEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the IGMP Cache Table."
+    ::=  { rsMaxIgmpTuning 4 }
+
+rsMaxPimTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 3 }
+
+rsMaxPimNeighborEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the PIM Neighbor Table."
+    ::=  { rsMaxPimTuning 1 }
+
+rsMaxPimNeighborEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the PIM Neighbor Table."
+    ::=  { rsMaxPimTuning 2 }
+
+rsMaxPimRouteEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the PIM Route Table."
+    ::=  { rsMaxPimTuning 3 }
+
+rsMaxPimRouteEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the PIM Route Table."
+    ::=  { rsMaxPimTuning 4 }
+
+rsMaxPimRouteNextHopEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the PIM Route Next Hop Table."
+    ::=  { rsMaxPimTuning 5 }
+
+rsMaxPimRouteNextHopEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the PIM Route Next Hop Table."
+    ::=  { rsMaxPimTuning 6 }
+
+rsMaxPimInterfaceEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of interfaces in the PIM Interface Table."
+    ::=  { rsMaxPimTuning 7 }
+
+rsMaxPimInterfaceEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of interfaces in the PIM Interface Table."
+    ::=  { rsMaxPimTuning 8 }
+
+rsMaxDvmrpTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 4 }
+
+rsMaxDvmrpNeighborEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the Dvmrp Neighbor Table."
+    ::=  { rsMaxDvmrpTuning 1 }
+
+rsMaxDvmrpNeighborEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the Dvmrp Neighbor Table."
+    ::=  { rsMaxDvmrpTuning 2 }
+
+rsMaxDvmrpRouteEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the Dvmrp Route Table."
+    ::=  { rsMaxDvmrpTuning 3 }
+
+rsMaxDvmrpRouteEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the Dvmrp Route Table."
+    ::=  { rsMaxDvmrpTuning 4 }
+
+rsMaxDvmrpMRouteEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the Dvmrp Multicast Route Table."
+    ::=  { rsMaxDvmrpTuning 5 }
+
+rsMaxDvmrpMRouteEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the Dvmrp Multicast Route Table."
+    ::=  { rsMaxDvmrpTuning 6 }
+
+rsMaxDvmrpInterfaceEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of interfaces in the Dvmrp Interface Table."
+    ::=  { rsMaxDvmrpTuning 7 }
+
+rsMaxDvmrpInterfaceEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of interfaces in the Dvmrp Interface Table."
+    ::=  { rsMaxDvmrpTuning 8 }
+
+rsMaxPigmpTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 5 }
+
+rsMaxPigmpRouteEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the IGMP Proxy Routing Table."
+    ::=  { rsMaxPigmpTuning 1 }
+
+rsMaxPigmpRouteEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the IGMP Proxy Routing Table."
+    ::=  { rsMaxPigmpTuning 2 }
+
+  rsMaxPimSmTuning OBJECT IDENTIFIER ::= { rsMaxIpmTuning 6}
+
+rsMaxPimSmNeighborEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in the PIM Neighbor Table."
+    ::=  { rsMaxPimSmTuning 1 }
+
+rsMaxPimSmNeighborEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in the PIM Neighbor Table."
+    ::=  { rsMaxPimSmTuning 2 }
+
+ rsMaxPimSmRouteEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in the PIM Route Table."
+    ::=  { rsMaxPimSmTuning 3 }
+
+rsMaxPimSmRouteEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in the PIM Route Table."
+    ::=  { rsMaxPimSmTuning 4 }
+
+rsMaxPimSmInterfaceEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in the PIM Interface Table."
+    ::=  { rsMaxPimSmTuning 5 }
+
+rsMaxPimSmInterfaceEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in the PIM Interface Table."
+    ::=  { rsMaxPimSmTuning 6 }
+
+rsMaxPimSmRPSetEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 7 }
+
+
+rsMaxPimSmRPSetEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 8 }
+
+rsMaxPimSmCRPEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 9 }
+
+
+rsMaxPimSmCRPEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 10 }
+
+rsMaxNumberRpAddresesInGroupRange OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of rp addresses per group range  in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 11 }
+
+rsMaxNumberRpAddresesInGroupRangeAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of rp addresses per group range  in the RPSet Table."
+    ::=  { rsMaxPimSmTuning 12 }
+
+rsMaxRmonTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 13}
+
+rsMaxRmonLogEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in RMON Log table."
+    ::=  { rsMaxRmonTuning 1 }
+
+rsMaxRmonLogEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in RMON Log table."
+    ::=  { rsMaxRmonTuning 2 }
+
+rsMaxRmonEtherHistoryEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of entries in RMON EtherHistory table."
+    ::=  { rsMaxRmonTuning 3 }
+
+rsMaxRmonEtherHistoryEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future maximal number of entries in RMON EtherHistory table."
+    ::=  { rsMaxRmonTuning 4 }
+
+rsMaxIgmpSnoopTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 14}
+
+rsMaxIgmpSnoopGroupEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries in the IGMP Snooping group table."
+    ::= { rsMaxIgmpSnoopTuning  1 }
+
+rsMaxIgmpSnoopGroupEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the IGMP Snooping group table."
+    ::= { rsMaxIgmpSnoopTuning  2 }
+
+rsMaxVlansTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 15}
+
+rsMaxVlansEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries in the VLANs table."
+    ::= { rsMaxVlansTuning  1 }
+
+rsMaxVlansEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the VLANs table."
+    ::= { rsMaxVlansTuning  2 }
+
+rsMaxPolicyTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 16 }
+
+rsMaxPolicyMaxRulesEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the Policy Route Table."
+    ::=  { rsMaxPolicyTuning 1 }
+
+rsMaxPolicyMaxRulesEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the Policy Route Table."
+    ::=  { rsMaxPolicyTuning 2 }
+
+rsMaxPolicySimpleMibMaxRulesEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the Policy SimpleMib Table."
+    ::=  { rsMaxPolicyTuning 3 }
+
+rsMaxPolicySimpleMibMaxRulesEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the Policy SimpleMib Table."
+    ::=  { rsMaxPolicyTuning 4 }
+
+rsMaxPolicySimpleMibMaxProfilesEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of entries in the profile Policy SimpleMib Table."
+    ::=  { rsMaxPolicyTuning 5 }
+
+rsMaxPolicySimpleMibMaxProfilesEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of entries in the profile Policy SimpleMib Table."
+    ::=  { rsMaxPolicyTuning 6 }
+
+rsMaxGvrpVlansTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 17}
+
+rsMaxGvrpVlans OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of VLANs that can participant in Gvrp."
+    ::= { rsMaxGvrpVlansTuning  1 }
+
+rsMaxGvrpVlansAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of VLANs that can participant in Gvrp."
+    ::= { rsMaxGvrpVlansTuning  2 }
+
+rsMaxTraceRouteTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 18 }
+
+rsMaxTraceRouteControlEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of trace route control entries."
+    ::= { rsMaxTraceRouteTuning  1 }
+
+rsMaxTraceRouteControlEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximum number of trace route control entries."
+    ::= { rsMaxTraceRouteTuning  2 }
+
+rsMaxTraceRouteProbeHistoryEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of trace route probe history entries."
+    ::= { rsMaxTraceRouteTuning  3 }
+
+rsMaxTraceRouteProbeHistoryEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximum number of trace route probe history entries."
+    ::= { rsMaxTraceRouteTuning  4 }
+
+rsMaxSnmpTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 19 }
+
+rsMaxSnmpCommunityEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of snmpCommunityTable entries."
+    ::= { rsMaxSnmpTuning 1 }
+
+rsMaxSnmpCommunityEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximum number of snmpCommunityTable entries."
+    DEFVAL  { 16 }
+    ::= { rsMaxSnmpTuning 2 }
+
+rsMaxSocketTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 20 }
+
+rsMaxNumberOfSockets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal number of sockets."
+    ::=  { rsMaxSocketTuning 1}
+
+rsMaxNumberOfSocketsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future Maximal number of sockets."
+    ::=  { rsMaxSocketTuning 2 }
+
+rsMaxSizeOfSocketDataPool OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximal size of socket data pool."
+    ::=  { rsMaxSocketTuning 3}
+
+rsMaxSizeOfSocketDataPoolAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future Maximal size of socket data pool."
+    ::=  { rsMaxSocketTuning 4 }
+
+rsMaxIpRouteTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 21}
+
+rsMaxIpPrefixes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of IP prefixes that router supports."
+    ::=  { rsMaxIpRouteTuning 1 }
+
+rsMaxIpPrefixesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of IP prefixes that router supports. "
+    ::=  { rsMaxIpRouteTuning 2 }
+
+rsMaxIpNextHopSetTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 22}
+
+rsMaxIpNextHopSetEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of NextHops that may be
+       used for forwarding for a destinaton."
+    ::=  { rsMaxIpNextHopSetTuning 1 }
+
+rsMaxIpNextHopSetEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of NextHops that may be
+       used for forwarding for a destinaton. "
+    ::=  { rsMaxIpNextHopSetTuning 2 }
+
+rsMaxIpEcmpTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 23}
+
+rsMaxIpEcmpEntrySize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximum number of ECMP Sets for forwarding."
+    ::=  { rsMaxIpEcmpTuning 1 }
+
+rsMaxIpEcmpEntrySizeAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximum number of ECMP Sets for forwarding. "
+    ::=  { rsMaxIpEcmpTuning 2 }
+
+rsMaxdot1xEapRequestTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 24 }
+
+rsMaxdot1xEapRequestEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of eap request packets entries that
+         can be retransmitted."
+    ::= { rsMaxdot1xEapRequestTuning  1 }
+
+rsMaxdot1xEapRequestEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximum number of eap request packets entries that
+         can be retransmitted."
+    ::= { rsMaxdot1xEapRequestTuning  2 }
+
+rsMaxIpInterfaceTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 25}
+
+rsMaxIpInterfaces OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of IP interfaces.
+       Applies to inBand IP interfaces."
+    ::=  { rsMaxIpInterfaceTuning 1 }
+
+rsMaxIpInterfacesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of IP interfaces.
+       Applies to inBand IP interfaces."
+    ::=  { rsMaxIpInterfaceTuning 2 }
+
+rsMaxIpv6FftEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 26}
+
+rsMaxIpv6SFftEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal size of one IPV6 SFFT Table."
+    ::= { rsMaxIpv6FftEntriesTuning 1 }
+
+rsMaxIpv6SFftEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of one IPV6 SFFT Table."
+    ::= { rsMaxIpv6FftEntriesTuning 2 }
+
+rsMaxIpv6SFftSysEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current maximal size of the SYSTEM IPV6 SFFT Table."
+    ::= { rsMaxIpv6FftEntriesTuning 3 }
+
+rsMaxIpv6SFftSysEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of the SYSTEM IPV6 SFFT Table."
+    ::= { rsMaxIpv6FftEntriesTuning 4 }
+
+rsMaxIpv6Prefixes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of IPV6 prefixes that router supports."
+    ::=  { rsMaxIpv6FftEntriesTuning 5 }
+
+rsMaxIpv6PrefixesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of IPV6 prefixes that router supports. "
+    ::=  { rsMaxIpv6FftEntriesTuning 6 }
+
+rsMaxIpv6NextHopEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current maximal size of one IPV6 NextHop Table."
+    ::= { rsMaxIpv6FftEntriesTuning 7 }
+
+rsMaxIpv6NextHopEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The future (after reset) maximal size of one NextHop Table."
+    ::= { rsMaxIpv6FftEntriesTuning 8 }
+
+rsMaxIpv6NextHopSetEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of NextHops that may be
+       used for forwarding for a destinaton."
+    ::=  { rsMaxIpv6FftEntriesTuning 9 }
+
+rsMaxIpv6NextHopSetEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of NextHops that may be
+       used for forwarding for a destinaton. "
+    ::=  { rsMaxIpv6FftEntriesTuning 10 }
+
+rsMaxIpv6GlobalAddresses OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal global number of IPV6 addresses."
+    ::=  { rsMaxIpv6FftEntriesTuning 11 }
+
+rsMaxIpv6GlobalAddressesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal global number of IPV6 addresses. "
+    ::=  { rsMaxIpv6FftEntriesTuning 12 }
+
+rsMaxArpTunnelStartEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal global number of tunnel start and ARP entries.
+       Tunnel start refer to tunnel remote station"
+    ::=  { rsMaxIpv6FftEntriesTuning 13 }
+
+rsMaxArpTunnelStartEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal global number of tunnel start and ARP entries.
+       Tunnel start refer to tunnel remote station"
+    ::=  { rsMaxIpv6FftEntriesTuning 14 }
+
+
+
+rsMaxIpv6InterfaceTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 27}
+
+rsMaxIpv6Interfaces OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of IPV6 interfaces.
+       Applies to inBand IPV6 interfaces."
+    ::=  { rsMaxIpv6InterfaceTuning 1 }
+
+rsMaxIpv6InterfacesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of IPV6 interfaces.
+       Applies to inBand IPV6 interfaces."
+    ::=  { rsMaxIpv6InterfaceTuning 2 }
+
+rsMaxIpv6AddrPerInterfaces OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Maximal number of IPV6 Addresses per interfaces."
+    ::=  { rsMaxIpv6InterfaceTuning 3 }
+
+rsMaxIpv6AddrPerInterfacesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "FutureMaximal number of IPV6 Addresses per interfaces."
+    ::=  { rsMaxIpv6InterfaceTuning 4 }
+
+rsMaxIpRoutesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 28}
+
+rsMaxIpv4Routes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv4 routers supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 1 }
+
+rsMaxIpv4RoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv4 routers supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 2 }
+
+rsMaxIpv6Routes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv6 routers supported by
+       the IPv6 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 3 }
+
+rsMaxIpv6RoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv6 routers supported by
+       the IPv6 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 4 }
+
+rsMaxIpmv4Routes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv4 routers ((*,G) and (S,G))
+       supported by the IPv4 Multicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 5 }
+
+rsMaxIpmv4RoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv4 routers ((*,G) and (S,G))
+       supported by the IPv4 Multicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 6 }
+
+rsMaxIpmv6Routes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv6 routers ((*,G) and (S,G))
+       supported by the IPv6 Multicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 7 }
+
+rsMaxIpmv6RoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv6 routers ((*,G) and (S,G))
+       supported by the IPv6 Multicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 8 }
+
+-- Obsolete
+-- rsFftAgingTuning OBJECT IDENTIFIER ::= { rsTunning 9 }
+
+-- Obsolete
+-- rsFftNetworkTuning OBJECT IDENTIFIER ::= { rsTunning 10 }
+
+rsTcpTuning OBJECT IDENTIFIER ::= { rsTunning 11 }
+
+rsTcpMemoryPoolSizeAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The size of the memory pool that the tcp will allocate after reset.
+         The memory pool is used for sending packets"
+    ::= { rsTcpTuning 1 }
+
+rsTcpMemoryPoolSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of the memory pool that the tcp uses currently.
+         The memory pool is used for sending packets"
+    ::= { rsTcpTuning 2 }
+
+rsRadiusTuning OBJECT IDENTIFIER ::= { rsTunning 12 }
+
+rsRadiusMemoryPoolSizeAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The size of the memory pool that radius will allocate after reset.
+         The memory pool is used for attributes"
+    ::= { rsRadiusTuning 1 }
+
+rsRadiusMemoryPoolSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of the memory pool that radius uses currently.
+         The memory pool is used for attributes"
+    ::= { rsRadiusTuning  2 }
+
+rlSyslogTuning OBJECT IDENTIFIER ::= { rsTunning 13 }
+
+rlSyslogFilePercentToDeleteWhenCompacting OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the flash file which is used by reports becomes full,
+         a certain percentage of the old messages on flash are deleted.
+         This is the current value."
+::= { rlSyslogTuning 3}
+
+rlSyslogFilePercentToDeleteWhenCompactingAfterReset OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the flash file which is used by reports becomes full,
+         a certain percentage of the old messages on flash are deleted.
+         This is the value after reset."
+::= { rlSyslogTuning 4}
+
+rlSyslogCacheSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of memory cache of last errors reported.
+         This cache is cyclic.  This is the current value."
+    ::= { rlSyslogTuning 5 }
+
+rlSyslogCacheSizeAfterReset OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The size of memory cache of last errors reported.
+         This cache is cyclic.  This is the value after reset."
+    ::= { rlSyslogTuning 6 }
+
+rlMngInfTuning OBJECT IDENTIFIER ::= { rsTunning 14 }
+
+rlMaxNumberOfAccessRules OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "The Maximum number of rules per Access List that can be defined"
+::= { rlMngInfTuning 1}
+
+rlMaxNumberOfAccessRulesAfterReset OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+                "The Maximum number of rules per Access List for after reset tuning"
+::= { rlMngInfTuning 2}
+
+-- obsolete
+-- rlSshTuning OBJECT IDENTIFIER ::= { rsTunning 15 }
+
+-- rlSshMaxAuthorizedKeysAfterReset OBJECT-TYPE
+--    SYNTAX      INTEGER
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--        "The maximum amount of authorized user keys the SSH deamon will store
+--        after reset."
+--    ::= { rlSshTuning 1 }
+
+-- rlSshMaxAuthorizedKeys OBJECT-TYPE
+--    SYNTAX      INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The maximum amount of authorized user keys the SSH deamon stores
+--        currently."
+--    ::= { rlSshTuning  2 }
+
+rsDiagnosticTextSource OBJECT-TYPE
+    SYNTAX      INTEGER {fromCLI(1), fromDiagnosticsTable(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source from which SNMP diagnostics message texts should be
+         taken."
+    DEFVAL { fromCLI }
+   ::= { rsTunning 16 }
+
+rsMultiSession OBJECT IDENTIFIER ::= { rsTunning 17 }
+
+rsMultiSessionMaxSessionsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of terminal sessions (serial, telnet and ssh)
+        available after reset."
+    ::= { rsMultiSession 1 }
+
+rsMultiSessionMaxSessions OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of terminal sessions (serial, telnet and ssh)
+        available."
+    ::= { rsMultiSession  2 }
+
+rlDnsClTuning OBJECT IDENTIFIER ::= { rsTunning 18 }
+
+rlMaxDnsClCacheRREntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximal number of DNS client cache entries."
+    ::= { rlDnsClTuning 1 }
+
+rlMaxDnsClCacheRREntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximal number of DNS client cache
+       entries."
+    ::= { rlDnsClTuning 2 }
+
+rlMaxDnsClNCacheErrEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximal number of DNS client negative cache entries."
+    ::= { rlDnsClTuning 3 }
+
+rlMaxDnsClNCacheErrEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximal number of DNS client negative cache
+       entries."
+    ::= { rlDnsClTuning 4 }
+
+rlMaxDnsClNamesEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximal number of DNS client static names entries."
+    ::= { rlDnsClTuning 5 }
+
+rlMaxDnsClNamesEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximal number of DNS client static names
+       entries."
+    ::= { rlDnsClTuning 6 }
+
+
+-- table to show tuning : limits curent and after reset values
+rlTuningParamsTable    OBJECT-TYPE
+   SYNTAX       SEQUENCE  OF RlTuningParamsEntry
+   MAX-ACCESS  not-accessible
+   STATUS       current
+   DESCRIPTION
+    "table to show tuning : limits curent and after reset values."
+   ::=  { rsTunning 19 }
+
+rlTuningParamsEntry OBJECT-TYPE
+   SYNTAX       RlTuningParamsEntry
+   MAX-ACCESS  not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines the contents of each line in the rlTuningParamsTable table."
+   INDEX   { IMPLIED rlTuningParamsName }
+   ::=  { rlTuningParamsTable 1 }
+
+RlTuningParamsEntry ::= SEQUENCE {
+        rlTuningParamsName                         DisplayString,
+        rlTuningParamsCurrentValue                 INTEGER,
+        rlTuningParamsAfterResetValue              INTEGER,
+        rlTuningParamsDefaultValue                 INTEGER,
+        rlTuningParamsMinimalValue                 INTEGER,
+        rlTuningParamsMaximalValue                 INTEGER
+    }
+
+rlTuningParamsName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the rlTuningParamsTable.
+          name of current value Mib for this entry. "
+    ::= {  rlTuningParamsEntry 1  }
+
+rlTuningParamsCurrentValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable current value used in this run by the system."
+    ::= {  rlTuningParamsEntry 2  }
+
+rlTuningParamsAfterResetValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable value that will be used in next run by the system.
+          i.e. the value will be effective after next reboot"
+    ::= {  rlTuningParamsEntry 3  }
+
+rlTuningParamsDefaultValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable value that is used by the system as default."
+    ::= {  rlTuningParamsEntry 4  }
+
+rlTuningParamsMinimalValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable value indicate minimum value.
+          this is the lower limit for editing the value after reset."
+    ::= {  rlTuningParamsEntry 5  }
+
+rlTuningParamsMaximalValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable value indicate maximum value.
+          This is the upper limit for editing the value after reset."
+    ::= {  rlTuningParamsEntry 6  }
+
+rlHostParamTable    OBJECT-TYPE
+   SYNTAX       SEQUENCE  OF RlHostParamEntry
+   MAX-ACCESS  not-accessible
+   STATUS       current
+   DESCRIPTION
+    "table to show tuning : limits curent and after reset values."
+   ::=  { rsTunning 20}
+
+rlHostParamEntry OBJECT-TYPE
+   SYNTAX       RlHostParamEntry
+   MAX-ACCESS  not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines the contents of each line in the rlHostParamTable table."
+   INDEX   { IMPLIED rlHostParamName }
+   ::=  { rlHostParamTable 1 }
+
+RlHostParamEntry ::= SEQUENCE {
+    rlHostParamName                  DisplayString,
+    rlHostParamValue                 INTEGER,
+    rlHostParamType                  INTEGER,
+    rlHostParamUINT                  Unsigned32,
+    rlHostParamOctetString           OCTET STRING,
+    rlHostParamIpAddress             IpAddress,
+    rlHostParamObjectId              OBJECT IDENTIFIER
+
+}
+
+rlHostParamName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the rlHostParamTable.
+          name of current value Mib for this entry. "
+    ::= {  rlHostParamEntry 1  }
+
+rlHostParamValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the current INTEGER value used in this run by the system.
+          Applicable only if rlHostParamType has 'int' value"
+    ::= {  rlHostParamEntry 2  }
+
+rlHostParamType OBJECT-TYPE
+    SYNTAX      INTEGER { int(1),
+                          uint(2),
+                          octetString(3),
+                          ipV4address(4),
+                          ipV6address(5),
+                          ipV6zAddress(6),
+                          inetAddress(7),
+                          macAddress(8),
+                          objectIdentifier(9),
+                          displayString(10),
+                          truthValue(11),
+                          portlist(12)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the type of this host parameter.
+          int             - the value will be appear in the rlHostParamValue instance of this conceptual row.
+          uint            - the value will be appear in the rlHostParamUINT instance of this conceptual row.
+          octetString     - the value will be appear in the rlHostParamOctetString instance of this conceptual row.
+          ipV4address     - the value will be appear in the rlHostParamIpAddress instance of this conceptual row.
+          ipV6address     - the value will be appear in the rlHostParamOctetString instance of this conceptual row,
+                            to be interpreted as indicated in INET-ADDRESS-MIB.
+          ipV6zAddress    - the value will be appear in the rlHostParamOctetString instance of this conceptual row,
+                            to be interpreted as indicated in INET-ADDRESS-MIB.
+          inetAddress     - the inet address type will be appear in the rlHostParamUINT instance and
+                            inet address itself will be appear in the rlHostParamOctetString instance of
+                            this conceptual row, to be interpreted as indicated in INET-ADDRESS-MIB.
+          macAddress      - the value will be appear in the rlHostParamOctetString instance of this conceptual row,
+                            to be interpreted as in SNMPv2-TC.
+          objectIdentifier - the value the value will be appear in the rlHostParamObjectId instance of this conceptual
+                            row.
+          displayString   - the value will be appear in the rlHostParamOctetString instance of this conceptual row,
+                            to be interpreted as in SNMPv2-TC.
+          truthValue      - the value will be appear in the rlHostParamUINT instance of this conceptual row,
+                            to be interpreted as in SNMPv2-TC.
+          portlist        - the value will be appear in the rlHostParamOctetString instance of this conceptual row,
+                            to be interpreted as in Q-BRIDGE-MIB.
+          "
+    ::= {  rlHostParamEntry 3  }
+
+rlHostParamUINT OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the current UINT value used in this run by the system.
+          Applicable only if rlHostParamType has 'uint', inetAddress or truthValue value"
+    ::= {  rlHostParamEntry 4  }
+
+
+ rlHostParamOctetString OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the current OCTET STRING value used in this run by the system.
+          Applicable only if rlHostParamType has octetString, ipV6address, ipV6zAddress, inetAddress, macAddress or
+          displayString value"
+    ::= {  rlHostParamEntry 5  }
+
+
+ rlHostParamIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the current IpAddress value used in this run by the system.
+          Applicable only if rlHostParamType has ipV4address value"
+    ::= {  rlHostParamEntry 6  }
+
+
+ rlHostParamObjectId OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the current OBJECT IDENTIFIER value used in this run by the system.
+          Applicable only if rlHostParamType has objectIdentifier value"
+    ::= {  rlHostParamEntry 7 }
+
+-- OSPF Tuning
+
+rlOspfTuning OBJECT IDENTIFIER ::= { rsTunning 21 }
+
+rlMaxOspfInterfaces OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of ospf interfaces."
+    ::= { rlOspfTuning 1 }
+
+rlMaxOspfInterfacesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of ospf interfaces."
+    ::= { rlOspfTuning 2 }
+
+rlMaxOspfAreas OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of ospf areas."
+    ::= { rlOspfTuning 3 }
+
+rlMaxOspfAreasAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of ospf areas."
+    ::= { rlOspfTuning 4 }
+
+rlMaxOspfNeighbors OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of ospf neighbors."
+    ::= { rlOspfTuning 5 }
+
+rlMaxOspfNeighborsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of ospf neighbors."
+    ::= { rlOspfTuning 6 }
+
+rlMaxOspfAbrPerArea OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of ABR in ospf area."
+    ::= { rlOspfTuning 7 }
+
+rlMaxOspfAbrPerAreaAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of ABR in ospf area."
+    ::= { rlOspfTuning 8 }
+
+rlMaxOspfNetsInAs OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of networks in AS."
+    ::= { rlOspfTuning 9 }
+
+rlMaxOspfNetsInAsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of networks in AS."
+    ::= { rlOspfTuning 10 }
+
+rlVlanTuning OBJECT IDENTIFIER ::= { rsTunning 22 }
+
+rlVlanDefaultVID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The default vlan vid."
+    ::= { rlVlanTuning 1 }
+
+rlVlanDefaultVIDAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The default vlan vid after rest"
+    ::= { rlVlanTuning 2 }
+
+rlVlanUsageForbiddenListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlVlanUsageForbiddenListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The list of vlan IDs that forbidden for internal usage."
+    ::= { rlVlanTuning 3 }
+
+rlVlanUsageForbiddenListEntry OBJECT-TYPE
+    SYNTAX      RlVlanUsageForbiddenListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Statical created by local or network management VLAN list"
+    INDEX   {rlVlanUsageForbiddenListIndex}
+    ::= { rlVlanUsageForbiddenListTable 1 }
+
+RlVlanUsageForbiddenListEntry ::=SEQUENCE {
+    rlVlanUsageForbiddenListIndex            INTEGER,
+    rlVlanUsageForbiddenList1to1024          VlanList1,
+    rlVlanUsageForbiddenList1025to2048       VlanList2,
+    rlVlanUsageForbiddenList2049to3072       VlanList3,
+    rlVlanUsageForbiddenList3073to4094       VlanList4
+
+}
+
+rlVlanUsageForbiddenListIndex  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "An index is entrie's sequence."
+   DEFVAL{0}
+   ::= { rlVlanUsageForbiddenListEntry 1}
+
+rlVlanUsageForbiddenList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A list of staticaly created vlans from 1 to 1024."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListEntry 2}
+
+rlVlanUsageForbiddenList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 1025 to 2048."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListEntry 3}
+
+rlVlanUsageForbiddenList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 2049 to 3072."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListEntry 4}
+
+rlVlanUsageForbiddenList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 3073 to 4094."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListEntry 5}
+
+
+rlVlanUsageForbiddenListAfterResetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlVlanUsageForbiddenListAfterResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The list of vlan IDs that forbidden for internal usage.
+                 The configuration applied after the system reset."
+    ::= { rlVlanTuning 4 }
+
+rlVlanUsageForbiddenListAfterResetEntry  OBJECT-TYPE
+    SYNTAX      RlVlanUsageForbiddenListAfterResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Staticly created by local or network management vlan list"
+    INDEX   {rlVlanUsageForbiddenListAfterResetIndex}
+    ::= { rlVlanUsageForbiddenListAfterResetTable 1 }
+
+RlVlanUsageForbiddenListAfterResetEntry ::=SEQUENCE {
+    rlVlanUsageForbiddenListAfterResetIndex            INTEGER,
+    rlVlanUsageForbiddenListAfterReset1to1024          VlanList1,
+    rlVlanUsageForbiddenListAfterReset1025to2048       VlanList2,
+    rlVlanUsageForbiddenListAfterReset2049to3072       VlanList3,
+    rlVlanUsageForbiddenListAfterReset3073to4094       VlanList4
+
+}
+
+rlVlanUsageForbiddenListAfterResetIndex  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "An index is entrie's sequence."
+   DEFVAL{0}
+   ::= { rlVlanUsageForbiddenListAfterResetEntry 1}
+
+rlVlanUsageForbiddenListAfterReset1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "A list of staticaly created vlans from 1 to 1024."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListAfterResetEntry 2}
+
+rlVlanUsageForbiddenListAfterReset1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 1025 to 2048."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListAfterResetEntry 3}
+
+rlVlanUsageForbiddenListAfterReset2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 2049 to 3072."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListAfterResetEntry 4}
+
+rlVlanUsageForbiddenListAfterReset3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "A list of according to the type field created vlans from 3073 to 4094."
+   DEFVAL {'00'H}
+   ::= { rlVlanUsageForbiddenListAfterResetEntry 5}
+
+
+rlDependendFeaturesEnableTuning OBJECT IDENTIFIER ::= { rsTunning 23 }
+rlDependendFeaturesEnabled OBJECT-TYPE
+    SYNTAX      BITS {
+        ipV4routingEnabled(0),
+                              -- ipV4 router is active
+        policyBasedVlanEnabled(1),
+                              -- policy based VLAN feature
+                              -- is enabled.
+        qualityOfServiceEnables(2),
+                              -- QOS feature is enabled.
+        iscsiEnabled(3)
+                              -- iSCSI feature is enabled.
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Current set of running features.
+        These features combinations may limit by
+          A. The same resource (such as ASIC module).
+          B. limitation of product or logic for combination
+          System limit is for up to 5 features
+          First implemented with 3."
+    ::= { rlDependendFeaturesEnableTuning 1 }
+
+rlDependendFeaturesEnabledAfterReset OBJECT-TYPE
+    SYNTAX      BITS {
+        ipV4routingEnabled(0),
+                              -- ipV4 router is active
+        policyBasedVlanEnabled(1),
+                              -- policy based VLAN feature
+                              -- is enabled.
+        qualityOfServiceEnables(2),
+                              -- QOS feature is enabled.
+        iscsiEnabled(3)
+                              -- iSCSI feature is enabled.
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Next system load (after reset) set of running features.
+        These features combinations limited by
+          A. The same resource (such as ASIC module).
+          B. Limitation of product or logic for combination (one feature override the other).
+          C. Per product some or all features status may not be changed.
+        System limit is for up to 5 features
+        First implemented with 3."
+    ::= { rlDependendFeaturesEnableTuning 2 }
+
+-- IP DHCP snooping Tuning
+
+rlIpDhcpSnoopingTuning OBJECT IDENTIFIER ::= { rsTunning 24 }
+
+rlMaxIpDhcpSnoopingEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current maximum number of DHCP snooping entries."
+    ::= { rlIpDhcpSnoopingTuning 1 }
+
+rlMaxIpDhcpSnoopingEntriesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The future (after reset) maximum number of DHCP snooping entries."
+    ::= { rlIpDhcpSnoopingTuning 2 }
+
+-- ISCSI snooping Tuning
+
+rlIscsiSnoopTuning OBJECT IDENTIFIER ::= { rsTunning 25 }
+
+rlIscsiSnoopMaxNumOfConnections OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Defines the presetly effective upper limit of iSCSI connections number
+       the device guarantees to support"
+    ::= { rlIscsiSnoopTuning 1 }
+
+rlIscsiSnoopMaxNumOfConnectionsAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Defines the upper limit of iSCSI connections number
+       the device will have to support following the looming System reset"
+    ::= { rlIscsiSnoopTuning 2 }
+
+
+-- DHCP server Tuning
+
+rlDhcpServerTuning OBJECT IDENTIFIER ::= { rsTunning 26 }
+
+rlDhcpSrvMaxAllocatedAddresses OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Defines the maximal number of allocated addresses by DHCP server"
+    ::= { rlDhcpServerTuning 1 }
+
+rlDhcpSrvMaxAllocatedAddressesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Defines the maximal number of allocated addresses by DHCP server activated after reset"
+    ::= { rlDhcpServerTuning 2 }
+
+
+-- bridge hash chain length tuning
+
+rlBrgMacHashChainLen OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Current depth of the MAC address hashing Table"
+    ::= { rsTunning 27 }
+
+rlBrgMacHashChainLenAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Defines the depth in step of 4, of the MAC address hashing Table after reset.
+       The mac chain length is the scalar value multiplied by 4."
+    ::= { rsTunning 28 }
+
+-- bridge hash function tuning
+
+rlBrgMacHashFunction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        macSqnVlanSqn(0),
+        macRndVlanSqn(1),
+        macSqnVlanRnd(2),
+        macRndVlanRnd(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Current depth of the MAC address hashing Table"
+    ::= { rsTunning 29 }
+
+
+
+
+rlBrgMacHashFunctionAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER{
+        macSqnVlanSqn(0),
+        macRndVlanSqn(1),
+        macSqnVlanRnd(2),
+        macRndVlanRnd(3)
+    }    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Defines hash function
+      vlan random mac random
+      vlan sequntial mac sequential
+      vlan sequential mac random
+      vlan random mac sequntial"
+    ::= { rsTunning 30 }
+
+-- next OBJECT IDENTIFIER ::= { rsTunning 31 }
+
+END
+

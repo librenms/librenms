@@ -1,0 +1,3899 @@
+TIMETRA-MPLS-MIB DEFINITIONS ::= BEGIN
+                                                                        
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, 
+        Unsigned32, IpAddress, Counter64,
+        Counter32, Integer32                            FROM SNMPv2-SMI
+ 
+        MODULE-COMPLIANCE, OBJECT-GROUP, 
+        NOTIFICATION-GROUP                              FROM SNMPv2-CONF
+
+        RowStatus, RowPointer,
+        TruthValue, TimeStamp,
+        TimeInterval, TestAndIncr,
+        TEXTUAL-CONVENTION                              FROM SNMPv2-TC
+
+        InterfaceIndexOrZero                            FROM IF-MIB
+
+        InetAddressIPv6                                 FROM INET-ADDRESS-MIB
+
+        MplsLabel, MplsLSPID,
+        mplsXCLspId                                     FROM MPLS-LSR-MIB
+
+        mplsTunnelIndex, mplsTunnelInstance,
+        mplsTunnelIngressLSRId, mplsTunnelARHopEntry    FROM MPLS-TE-MIB
+
+        TmnxAdminState, TmnxOperState, 
+        TNamedItem, TNamedItemOrEmpty, 
+        TmnxActionType, TmnxVRtrMplsLspID               FROM TIMETRA-TC-MIB
+             
+        timetraSRMIBModules, tmnxSRObjs, 
+        tmnxSRNotifyPrefix, tmnxSRConfs                 FROM TIMETRA-GLOBAL-MIB
+        
+        vRtrID, vRtrIfIndex                             FROM TIMETRA-VRTR-MIB
+        ;
+
+timetraMplsMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "0801010000Z"
+        ORGANIZATION    "Alcatel"
+        CONTACT-INFO    
+            "Alcatel 7x50 Support
+             Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the 
+        MPLS extensions for the Alcatel 7x50 device.
+         
+        Copyright 2003-2008 Alcatel-Lucent. All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Alcatel's
+        proprietary intellectual property.  Alcatel retains 
+        all title and ownership in the Specification, including any 
+        revisions.
+
+        Alcatel grants all interested parties a non-exclusive 
+        license to use and distribute an unmodified copy of this 
+        Specification in connection with management of Alcatel 
+        products, and without fee, provided this copyright notice and 
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Alcatel 
+        makes no warranty, either express or implied, as to the use, 
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "0801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0603230000Z"   
+        DESCRIPTION     "Rev 4.0                23 Mar 2006 00:00
+                         4.0 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0508310000Z"   
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0501240000Z"   
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0009070000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                         1.0 Release of the TIMETRA-MPLS-MIB."
+
+        REVISION        "0008140000Z"
+        DESCRIPTION     "Rev 0.1                14 Aug 2000 00:00
+                         Initial version of the TIMETRA-MPLS-MIB."
+
+        ::= { timetraSRMIBModules 6 }
+        
+tmnxMplsObjs            OBJECT IDENTIFIER ::= { tmnxSRObjs 6 }
+tmnxMplsConformance     OBJECT IDENTIFIER ::= { tmnxSRConfs 6 }
+tmnxMplsNotifyPrefix   OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
+    tmnxMplsNotifications   OBJECT IDENTIFIER ::= { tmnxMplsNotifyPrefix 0 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  MPLS extensions
+--
+
+
+--  Textual Conventions
+
+TmnxMplsLspFailCode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "TmnxMplsLspFailCode is an enumerated integer that defines the  
+         reason for LSP Path and LSP Crossconnect failure."
+    SYNTAX    INTEGER {
+                  noError (0),
+                  admissionControlError (1),
+                  noRouteToDestination (2),
+                  trafficControlSystemError (3),
+                  routingError (4), 
+                  noResourcesAvailable (5),
+                  badNode (6),
+                  routingLoop (7),
+                  labelAllocationError (8),
+                  badL3PID (9),
+                  tunnelLocallyRepaired (10),
+                  unknownObjectClass (11),
+                  unknownCType (12),
+                  noEgressMplsInterface (13),
+                  noEgressRsvpInterface (14),
+                  looseHopsInFRRLsp (15),
+                  unknown (16),
+                  retryExceeded (17),
+                  noCspfRouteOwner (18),
+                  noCspfRouteToDestination (19),
+                  hopLimitExceeded (20),
+                  looseHopsInManualBypassLsp (21),
+                  emptyPathInManualBypassLsp (22),
+                  lspFlowControlled (23),
+                  srlgSecondaryNotDisjoint (24),
+                  srlgPrimaryCspfDisabled (25),
+                  srlgPrimaryPathDown (26)
+                  }
+
+TmnxMplsLabelOwner ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "TmnxMplsLabelOwner is an enumerated integer that specifies
+        the module that owns a particular MPLS label."
+    SYNTAX    INTEGER {       
+                  none (0),
+                  rsvp (1),
+                  tldp (2),
+                  ildp (3),
+                  svcmgr (4),
+                  bgp (5),
+                  mirror (6),
+                  static (7),
+                  vprn (8)
+              }  
+
+TmnxMplsOperDownReasonCode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "TmnxMplsOperDownReasonCode is an enumerated integer that specifies 
+         the reason that the MPLS instance is operationally down."
+    SYNTAX    INTEGER {
+                  operUp (0),             -- Operationally up
+                  adminDown (1),          -- Administratively down
+                  noResources (2),        -- No resources available
+                  systemIpDown (3),       -- System IP interface is 
+                                          -- operationally down
+                  iomFailure (4),         -- Iom failure
+                  clearDown (5)           -- Clear command in progress  
+              } 
+--
+--  The Virtual Router MPLS Labeled Switch Path (LSP) Table
+--
+vRtrMplsLspTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspTable has an entry for each Labeled Switch
+         Path (LSP) configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 1 }
+
+vRtrMplsLspEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Labeled Switch Path (LSP) configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspName to have been assigned a valid value."
+    INDEX { vRtrID, vRtrMplsLspIndex }
+    ::= { vRtrMplsLspTable 1 }
+
+VRtrMplsLspEntry ::= SEQUENCE {
+    vRtrMplsLspIndex                    TmnxVRtrMplsLspID,
+    vRtrMplsLspRowStatus                RowStatus,
+    vRtrMplsLspLastChange               TimeStamp,
+    vRtrMplsLspName                     TNamedItemOrEmpty,
+    vRtrMplsLspAdminState               TmnxAdminState,
+    vRtrMplsLspOperState                TmnxOperState,
+    vRtrMplsLspFromAddr                 IpAddress,
+    vRtrMplsLspToAddr                   IpAddress,
+    vRtrMplsLspType                     INTEGER,
+    vRtrMplsLspOutSegIndx               Integer32,
+    vRtrMplsLspRetryTimer               Unsigned32,
+    vRtrMplsLspRetryLimit               Unsigned32,
+    vRtrMplsLspMetric                   Unsigned32,
+    vRtrMplsLspDecrementTtl             TruthValue,
+    vRtrMplsLspCspf                     TruthValue,
+    vRtrMplsLspFastReroute              TruthValue,
+    vRtrMplsLspFRHopLimit               Unsigned32,
+    vRtrMplsLspFRBandwidth              Unsigned32,
+    vRtrMplsLspClassOfService           TNamedItemOrEmpty,
+    vRtrMplsLspSetupPriority            Unsigned32,
+    vRtrMplsLspHoldPriority             Unsigned32,
+    vRtrMplsLspRecord                   TruthValue,
+    vRtrMplsLspPreference               Unsigned32,
+    vRtrMplsLspBandwidth                Integer32,
+    vRtrMplsLspBwProtect                TruthValue,
+    vRtrMplsLspHopLimit                 Unsigned32,                
+    vRtrMplsLspNegotiatedMTU            Unsigned32,
+    vRtrMplsLspRsvpResvStyle            INTEGER,
+    vRtrMplsLspRsvpAdspec               TruthValue,
+    vRtrMplsLspFRMethod                 INTEGER,
+    vRtrMplsLspFRNodeProtect            TruthValue,
+    vRtrMplsLspAdminGroupInclude        Unsigned32,
+    vRtrMplsLspAdminGroupExclude        Unsigned32,
+    vRtrMplsLspAdaptive                 TruthValue,
+    vRtrMplsLspInheritance              Unsigned32,
+    vRtrMplsLspOptimizeTimer            Unsigned32,
+    vRtrMplsLspOperFastReroute          TruthValue,
+    vRtrMplsLspFRObject                 TruthValue,
+    vRtrMplsLspHoldTimer                Unsigned32,
+    vRtrMplsLspCspfTeMetricEnabled      TruthValue
+}
+
+vRtrMplsLspIndex OBJECT-TYPE
+    SYNTAX      TmnxVRtrMplsLspID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The unique value which identifies this Labeled Switch
+         Path (LSP) for this virtual router in the Alcatel 7x50 
+         SR system.  It is a unique value among entries with the 
+         same value of vRtrID."
+    ::= { vRtrMplsLspEntry 1 }
+
+vRtrMplsLspRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspName must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspEntry 2 }
+
+vRtrMplsLspLastChange       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspEntry 3 }
+
+vRtrMplsLspName     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Administrative name for this Labeled Switch Path.
+         The vRtrMplsLspName must be unique within a virtual
+         router instance."
+    ::= { vRtrMplsLspEntry 4 }
+
+vRtrMplsLspAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for this LSP."
+    DEFVAL { inService }
+    ::= { vRtrMplsLspEntry 5 }
+
+vRtrMplsLspOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of this LSP."
+    ::= { vRtrMplsLspEntry 6 }
+
+vRtrMplsLspFromAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IP address of this LSP.  If vRtrMplsLspFromAddr has not
+         been explicitly set, the system IP address will be used."
+    ::= { vRtrMplsLspEntry 7 }
+
+vRtrMplsLspToAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IP address of this LSP.  This LSP will not be
+         signaled until vRtrMplsLspToAddr is explicitly set."
+    ::= { vRtrMplsLspEntry 8 }
+       
+vRtrMplsLspType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (1),
+                    dynamic (2),
+                    static (3),
+                    bypass-only (4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspType object is an enumerated value that indicates
+         whether the label value is statically or dynamically assigned or
+         whether the LSP will be used exclusively for bypass protection."
+    DEFVAL { dynamic }
+    ::= { vRtrMplsLspEntry 9 }
+
+vRtrMplsLspOutSegIndx   OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspOutSegIndx is the index value of the entry in 
+         the mplsOutSegmentTable associated with this vRtrMplsLspEntry
+         when vRtrMplsLspType is 'static'.  If vRtrMplsLspType is
+         'dynamic', the value of this object will be zero (0)."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 10 }
+        
+vRtrMplsLspRetryTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspRetryTimer specifies the time in seconds
+         the software will wait before attempting the establish the
+         failed LSP."
+    DEFVAL { 30 }
+    ::= { vRtrMplsLspEntry 11 }
+        
+vRtrMplsLspRetryLimit      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspRetryLimit specifies the number of
+         attempts the software should make to reestablish a failed LSP
+         before the LSP is disabled.  A value of 0 indicates that an
+         infinite number of retry attempts should be made."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 12 }
+
+vRtrMplsLspMetric       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspMetric specifies the metric for this
+         LSP which is used to select an LSP among a set of LSPs which are
+         destined to the same egress 7x50 router.  The LSP with the lowest
+         metric will be selected.
+
+         In LDP-over-RSVP, LDP performs a lookup in the Routing Table 
+         Manager (RTM) which provides the next hop to the destination PE 
+         and the advertising router (ABR or destination PE itself).  If the
+         advertising router matches the targeted LDP peer, LDP then 
+         performs a second lookup for the advertising router in the Tunnel 
+         Table Manager (TTM). This lookup returns the best RSVP LSP to use
+         to forward packets for an LDP FEC learned through the targeted 
+         LDP session.  The lookup returns the LSP with the lowest metric.
+         If multiple LSPs have the same metric, then the result of the 
+         lookup will be to select the first one available in the TTM."
+    DEFVAL { 1 }
+    ::= { vRtrMplsLspEntry 13 }
+        
+vRtrMplsLspDecrementTtl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspDecrementTtl is 'true', the ingress 
+         ESR writes the TTL of the IP packet into the label and each 
+         transit ESR decrements the TTL in the label.  At the egress ESR 
+         the TTL value from the label is written into the IP packet.
+         
+         When the value of vRtrMplsLspDecrementTtl is 'false', the ingress
+         ESR ignores the IP packet TTL and writes the value of 255 into the
+         label; and the egress ESR does not write the label's TTL into the
+         IP packet."
+    DEFVAL { true }
+    ::= { vRtrMplsLspEntry 14 }
+
+vRtrMplsLspCspf         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspCspf is 'true', CSPF computation
+         for constrained-path LSP is enabled.  When the value of
+         vRtrMplsLspCspf is 'false' CSPF computation is disabled."
+    DEFVAL { false }
+    ::= { vRtrMplsLspEntry 15 }
+        
+vRtrMplsLspFastReroute  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspFastReroute is 'true', fast reroute
+         is enabled.  A pre-computed detour LSP is created from each node
+         in the primary path of this LSP.  In case of a failure of a link 
+         or LSP between two nodes, traffic is immediately rerouted on the
+         pre-computed detour LSP thus avoiding packet loss.  Each node
+         along the primary path of the LSP tries to establish a detour LSP 
+         as follows:  Each upstream node will setup a detour LSP that
+         avoids only the immediate downstream node and merges back onto
+         the actual path of the LSP as soon as possible.  The detour LSP
+         may take one or more hops (upto the value of vRtrMplsLspFRHopLimit)
+         before merging back onto the main LSP path.
+         
+         When the upstream node detects a downstream link or node failure,
+         it immediately send traffic for that LSP on the detour path and
+         at the same time signals back to the ingress ESR about the
+         failure.
+         
+         Fast reroute applies only to the primary path of this LSP.
+         No configuration is required on the transit hops of the LSP.
+         The ingress ESR will signal all intermediate ESRs using RSVP
+         to setup their detours.
+         
+         When the value of vRtrMplsLspFastReroute is 'false', fast
+         rerouting is disabled."
+    DEFVAL { false }
+    ::= { vRtrMplsLspEntry 16 }
+        
+vRtrMplsLspFRHopLimit   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspFRHopLimit specifies the total number
+         of hops a detour LSP can take before merging back onto the
+         main LSP path."
+    DEFVAL { 16 }
+    ::= { vRtrMplsLspEntry 17 }
+        
+vRtrMplsLspFRBandwidth  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "mega-bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspFRBandwidth specified the amount of
+         bandwidth in mega-bits per second (Mbps) to be reserved for the
+         detour LSP. A value of zero (0) indicates that no bandwidth
+         is reserved."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 18 }
+          
+vRtrMplsLspClassOfService   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the class of service value to be assigned to all
+         packets on the LSP is specified with vRtrMplsLspClassOfService.
+         The EXP bits in the MPLS header are set based on the global
+         mapping table that specified the mapping between the forwarding
+         class and the EXP bits.  When class of service is specified,
+         all packets will be marked with the same EXP bits that match
+         the vRtrMplsLspClassOfService name in the mapping table.
+         
+         An empty string, ''H, specifies no class of service.  Packets
+         are assigned EXP bits based on the same mapping table, however
+         each packet is marked with EXP bits based on the forwarding
+         class from which it is serviced.
+         
+         When the value of vRtrMplsLspPathCosSource is set to 'inherit',
+         the value of vRtrMplsLspClassOfService is applied to that
+         specific LSP/path."
+    DEFVAL { ''H }
+    ::= { vRtrMplsLspEntry 19 }
+        
+vRtrMplsLspSetupPriority    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspSetupPriority specifies the setup priority
+         to use when insufficient bandwidth is available to setup a LSP.
+         The setup priority is compared against the hold priority of
+         existing LSPs.  If the setup priority is higher than the hold
+         priority of the established LSPs, this LSP may preempt the other
+         LSPs.  A value of zero (0) is the highest priority and a value
+         of seven (7) is the lowest priority.
+         
+         When the value of vRtrMplsLspPathSetupPriority is set to '-1',
+         the value of vRtrMplsLspSetupPriority is applied to that specific
+         LSP/path."
+    DEFVAL { 7 }
+    ::= { vRtrMplsLspEntry 20 }
+        
+vRtrMplsLspHoldPriority     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspHoldPriority specifies the hold priority
+         to use when insufficient bandwidth is available to setup a LSP.
+         The setup priority is compared against the hold priority of
+         existing LSPs.  If the setup priority is higher than the hold
+         priority of the established LSPs, this LSP may preempt the other
+         LSPs.  A value of zero (0) is the highest priority and a value
+         of seven (7) is the lowest priority.
+         
+         When the value of vRtrMplsLspPathHoldPriority is set to '-1',
+         the value of vRtrMplsLspHoldPriority is applied to that specific
+         LSP/path."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 21 }
+
+vRtrMplsLspRecord       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspRecord is 'true', recording of all
+         the hops that a LSP traverses is enabled.
+         
+         When the value of vRtrMplsLspRecord is 'false, recording of all
+         the hops that a LSP traverses is disabled."
+    DEFVAL { true }
+    ::= { vRtrMplsLspEntry 22 }       
+
+vRtrMplsLspPreference   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPreference specifies the preference for
+         the LSP.  This value is used for load balancing between multiple
+         LSPs that exist between the same ingress and egress routers.
+         By default, traffic is load balanced among the LSPs, since all
+         LSPs have the same preference.  To prefer one LSP over another,
+         change the preference value for that LSP.  The LSP with the
+         lowest preference is used.
+         
+         When the value of vRtrMplsLspPathPreference is set to zero (0),
+         the value of vRtrMplsLspPreference is applied to that specific
+         LSP/path."
+    DEFVAL { 7 }
+    ::= { vRtrMplsLspEntry 23 }
+
+vRtrMplsLspBandwidth    OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "mega-bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspBandwidth specifies the amount of
+         bandwidth in mega-bits per second (Mbps) to be reserved for the LSP.
+         A value of zero (0) indicates that no bandwidth is reserved.
+         
+         When vRtrMplsLspPathBandwidth is set to -1, the value of
+         vRtrMplsLspBandwidth is applied to that specific LSP/path."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 24 }
+        
+vRtrMplsLspBwProtect    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsLspBwProtect has a value of 'true', bandwidth
+         protection is enabled on a LSP.  LSPs that reserve bandwidth
+         will be used for EF services where customers need guaranteed
+         bandwidth.  It is expected that multiple EF services will be
+         assigned to a single LSP.  When bandwidth protection is
+         enabled on an LSP, each time this LSP is used for a certain
+         service the bandwidth allocated on that service is deducted
+         from the bandwidth reserved for the LSP.  Once the bandwidth is
+         exhausted on the LSP, the ESR will provide feedback to the
+         provider indicating that this LSP has exhausted its resources."
+    DEFVAL { false }
+    ::= { vRtrMplsLspEntry 25 }
+        
+vRtrMplsLspHopLimit     OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspHopLimit specifies the maximum number
+         of hops that a LSP will traverse including the ingress and
+         egress ESRs.  A LSP will not be setup if the hop limit is
+         exceeded.
+         
+         When the value of vRtrMplsLspPathHopLimit is set to zero (0),
+         the value of vRtrMplsLspHopLimit is applied to that specific
+         LSP/path."
+    DEFVAL { 255 }
+    ::= { vRtrMplsLspEntry 26 }
+
+vRtrMplsLspNegotiatedMTU     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspNegotiatedMTU specifies the size 
+         for the Maximum transmission unit (MTU) that is negotiated
+         during LSP establishment."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 27 }
+
+vRtrMplsLspRsvpResvStyle    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    se (1),
+                    ff (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The value of vRtrMplsLspRsvpResvStyle specifies the reservation 
+             style for RSVP. The reservation style can be set to 'Shared- 
+             Explicit' (se) or 'Fixed-Filter' (ff)."
+    DEFVAL { se }
+    ::= { vRtrMplsLspEntry 28 }
+
+vRtrMplsLspRsvpAdspec   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspRsvpAdspec is 'true', the ADSPEC
+         object will be included in RSVP messages. 
+         When the value of vRtrMplsLspRsvpAdspec is 'false', the ADSPEC
+         object will not be included in RSVP messages."
+    DEFVAL { false }
+    ::= { vRtrMplsLspEntry 29 }
+
+vRtrMplsLspFRMethod    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    oneToOneBackup(1),
+                    facilityBackup(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The value of vRtrMplsLspFRMethod specifies the fast reroute 
+             method used. 
+             
+             In the 'One-to-one Backup' method, a backup LSP is established 
+             which will intersect the original LSP somewhere downstream
+             of the point of link or node failure. For each LSP that is 
+             backed up, a separate backup LSP is established.
+             
+             In the 'Facility Backup' method, instead of creating a separate
+             LSP for every LSP that is to be backed up, a single LSP is 
+             created which serves as a backup for a set of LSPs. Such an LSP
+             tunnel is called a 'bypass tunnel'."
+    DEFVAL { oneToOneBackup }
+    ::= { vRtrMplsLspEntry 30 }
+
+vRtrMplsLspFRNodeProtect   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of vRtrMplsLspFRNodeProtect to 'true' enables
+         node protection i.e. protection against the failure of a node on
+         the LSP. 
+
+         Setting the value to 'false' disables node protection."
+    DEFVAL { true }
+    ::= { vRtrMplsLspEntry 31 }
+
+vRtrMplsLspAdminGroupInclude   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAdminGroupInclude is a bit-map that
+         specifies a list of admin groups that should be included when
+         this LSP is setup. If bit 'n' is set, then the admin group 
+         with value 'n' is included for this LSP. This implies that 
+         each link that this LSP goes through must be associated with  
+         at least one of the admin groups in the include list.
+
+         By default, all admin groups are in the include list."
+    DEFVAL { '00000000'H }
+    ::= { vRtrMplsLspEntry 32 }
+
+vRtrMplsLspAdminGroupExclude   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAdminGroupExclude is a bit-map that
+         specifies a list of admin groups that should be excluded when
+         this LSP is setup. If bit 'n' is set, then the admin group 
+         with value 'n' is excluded for this LSP. This implies that 
+         each link that this LSP goes through must not be associated
+         with any of the admin groups in the exclude list.
+
+         By default, no admin groups are in the exclude list."
+    DEFVAL { '00000000'H }
+    ::= { vRtrMplsLspEntry 33 }
+
+vRtrMplsLspAdaptive   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of vRtrMplsLspAdaptive to 'true' enables
+         make-before-break functionality for the LSP. When the attributes
+         of an already established LSP are changed, either through manual 
+         configuration or due to a change in network topology, 
+         make-before-break functionality ensures that the resources of 
+         the existing LSP will not be released until a new path (with the
+         same LSP Id) has been established and traffic flowing over the 
+         existing path is seamlessly transferred to the new path.
+         
+         Setting the value to 'false' disables make-before-break 
+         functionality."
+    DEFVAL { true }
+    ::= { vRtrMplsLspEntry 34 }
+
+vRtrMplsLspInheritance   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For each writable object in this row that can be configured to
+         inherit its value from the corresponding object in the 
+         vRtrMplsGeneralTable, there is bit within vRtrMplsLspInheritance
+         that controls whether to inherit the operational value of the
+         object or use the administratively set value. 
+
+         This object is a bit-mask, with the following positions:
+
+         vRtrMplsLspOptimizeTimer                0x1
+         vRtrMplsLspFRObject                     0x2
+
+         When the bit for an object is set to one, then the object's 
+         administrative and operational value are whatever the DEFVAL 
+         or most recently SET value is.
+         
+         When the bit for an object is set to zero, then the object's 
+         administrative and operational value are inherited from the 
+         corresponding object in vRtrMplsGeneralTable."
+    DEFVAL { 0 } -- by default inherit everything from vRtrMplsGeneralTable
+    ::= { vRtrMplsLspEntry 35 }
+
+vRtrMplsLspOptimizeTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspOptimizeTimer specifies the time, in 
+         seconds, the software will wait before attempting to re-optimize
+         the LSP.
+
+         When CSPF is enabled, changes in the network topology may cause
+         the existing path of a loose-hop LSP to become sub-optimal. Such
+         LSPs can be re-optimized and re-routed through more optimal paths
+         by recalculating the path for the LSP at periodic intervals. This
+         interval is controlled by the optimize timer.
+         
+         A value of 0 indicates that optimization has been disabled.
+
+         When the vRtrMplsLspOptimizeTimer bit in vRtrMplsLspInheritance
+         is cleared (0), the value returned in the GET request is inherited 
+         from vRtrMplsGeneralOptimizeTimer."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspEntry 36 }
+
+vRtrMplsLspOperFastReroute  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspOperFastReroute specifies whether the
+         operational LSP has fast reroute enabled or disabled. 
+
+         When make-before-break functionality for the LSP is enabled and
+         if the fast reroute setting is changed, the resources for the 
+         existing LSP will not be released until a new path with the new 
+         attribute settings has been established. While a new path is 
+         being signaled, the administrative value and the operational 
+         values of fast reroute setting for the LSP may differ. The value
+         of vRtrMplsLspFastReroute specifies the setting used for the new
+         LSP path trying to be established whereas the value of 
+         vRtrMplsLspOperFastReroute specifies the setting for the existing 
+         LSP path."
+    ::= { vRtrMplsLspEntry 37 }
+
+vRtrMplsLspFRObject  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspFRObject specifies whether fast reroute,
+         for LSPs using 'Facility Backup', is signalled with or without
+         the fast reroute object. The value of vRtrMplsLspFRObject is
+         ignored if fast reroute is disabled for the LSP or if the LSP
+         is using 'One-to-one Backup'.
+
+         When the vRtrMplsLspFRObject bit in vRtrMplsLspInheritance is 
+         cleared (0), the value returned in the GET request is inherited 
+         from vRtrMplsGeneralFRObject."
+    DEFVAL { true }
+    ::= { vRtrMplsLspEntry 38 }
+
+vRtrMplsLspHoldTimer  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspHoldTimer specifies the time, in 
+         seconds, for which the ingress node holds a bit before 
+         programming its data plane and declaring the lsp up to  
+         the service module. 
+        
+         The value of vRtrMplsLspHoldTimer is inherited from 
+         the value of vRtrMplsGeneralHoldTimer."
+    DEFVAL { 1 }
+    ::= { vRtrMplsLspEntry 39 }     
+
+vRtrMplsLspCspfTeMetricEnabled         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspCspfTeMetricEnabled specifies whether the TE 
+         metric would be used for the purpose of the LSP path computation by CSPF.
+         When the value of this object is 'false', the IGP metric is used to 
+         compute the path of the LSP by CSPF."
+    DEFVAL { false }
+    ::= { vRtrMplsLspEntry 40 }
+
+--
+--  The Virtual Router MPLS Labeled Switch Path (LSP) Statistics Table
+--
+--  Augmentation of the vRtrMplsLspTable.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship 
+--  between the base table, vRtrMplsLspTable, and the augmenting table, 
+--  vRtrMplsLspStatTable. This in effect extends the vRtrMplsLspTable 
+--  with additional columns.  
+--  Creation (or deletion) of a row in the vRtrMplsLspTable results in 
+--  the same fate for the row in the vRtrMplsLspStatTable.
+--
+
+vRtrMplsLspStatTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspStatTable has an entry for each Labeled Switch
+         Path (LSP) configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 2 }
+
+vRtrMplsLspStatEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLspStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a collection of statistics for a
+         Labeled Switch Path (LSP) configured for a virtual router in 
+         the system.  
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS { vRtrMplsLspEntry }
+    ::= { vRtrMplsLspStatTable 1 }
+
+VRtrMplsLspStatEntry ::= SEQUENCE {
+    vRtrMplsLspOctets                   Counter64,
+    vRtrMplsLspPackets                  Counter64,
+    vRtrMplsLspAge                      TimeInterval,
+    vRtrMplsLspTimeUp                   TimeInterval,
+    vRtrMplsLspTimeDown                 TimeInterval,
+    vRtrMplsLspPrimaryTimeUp            TimeInterval,
+    vRtrMplsLspTransitions              Counter32,
+    vRtrMplsLspLastTransition           TimeInterval,
+    vRtrMplsLspPathChanges              Counter32,
+    vRtrMplsLspLastPathChange           TimeInterval,
+    vRtrMplsLspConfiguredPaths          Integer32,
+    vRtrMplsLspStandbyPaths             Integer32,
+    vRtrMplsLspOperationalPaths         Integer32
+}
+
+vRtrMplsLspOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets that have been forwarded over current 
+         LSP active path. The number reported is not realtime, may 
+         be subject to several minutes delay.  The delay is controllable
+         by MPLS statistics gathering interval, which by default is 
+         once every 5 minutes.  If MPLS statistics gathering is not
+         enabled, this number will not increment."
+    ::= { vRtrMplsLspStatEntry 1 }
+
+vRtrMplsLspPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that have been forwarded over current 
+         LSP active path. The number reported is not realtime, may 
+         be subject to several minutes delay.  The delay is controllable
+         by MPLS statistics gathering interval, which by default is 
+         once every 5 minutes.  If MPLS statistics gathering is not
+         enabled, this number will not increment."
+    ::= { vRtrMplsLspStatEntry 2 }
+
+vRtrMplsLspAge OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The age (i.e., time from creation till now) of this LSP in 
+         10-millisecond periods."
+    ::= { vRtrMplsLspStatEntry 3 }
+
+vRtrMplsLspTimeUp OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this LSP has been
+         been operational.  For example, the percentage up time can be 
+         determined by computing (vRtrMplsLspTimeUp/vRtrMplsLspAge * 100 %)."
+    ::= { vRtrMplsLspStatEntry 4 }
+
+vRtrMplsLspTimeDown OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this LSP has not 
+         been operational."
+    ::= { vRtrMplsLspStatEntry 5 }
+
+vRtrMplsLspPrimaryTimeUp OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this LSP's primary 
+         path has been operational.  For example, the percentage 
+         contribution of the primary path to the operational time is 
+         given by (vRtrMplsLspPrimaryTimeUp/vRtrMplsLspTimeUp * 100) %."
+    ::= { vRtrMplsLspStatEntry 6 }
+
+vRtrMplsLspTransitions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of state transitions (up -> down and down -> up) 
+         this LSP has undergone."
+    ::= { vRtrMplsLspStatEntry 7 }
+
+vRtrMplsLspLastTransition OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time in 10-millisecond units since the last transition 
+         occurred on this LSP."
+    ::= { vRtrMplsLspStatEntry 8 }
+
+vRtrMplsLspPathChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of path changes this LSP has had. For every path 
+         change (path down, path up, path change), a corresponding 
+         syslog/trap (if enabled) is generated for it."
+    ::= { vRtrMplsLspStatEntry 9 }
+
+vRtrMplsLspLastPathChange OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time in 10-millisecond units since the last change 
+         occurred on this LSP."
+    ::= { vRtrMplsLspStatEntry 10 }
+
+vRtrMplsLspConfiguredPaths OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of paths configured for this LSP."
+    ::= { vRtrMplsLspStatEntry 11 }
+
+vRtrMplsLspStandbyPaths OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of standby paths configured for this LSP."
+    ::= { vRtrMplsLspStatEntry 12 }
+
+vRtrMplsLspOperationalPaths OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of operational paths for this LSP. This includes
+         the path currently active, as well as operational standby 
+         paths."
+    ::= { vRtrMplsLspStatEntry 13 }
+
+
+--
+--  Virtual Router MPLS LSP to Path Mapping Table
+--
+
+vRtrMplsLspPathTableSpinlock OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "voluntary serialization control for vRtrMplsLspPathTable.  
+         Primarily used by SNMP manager to coordinate changes to 
+         vRtrMplsLspPathInheritance."
+    DEFVAL { 0 }
+    ::= { tmnxMplsObjs 3 }
+
+vRtrMplsLspPathTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathTable provides an association between an
+         LSP and a path.  An LSP can have more than one path association,
+         but only one of those paths can be specified as the primary
+         path type.  Paths are defined in as Tunnel entries in the
+         mplsTunnelTable in the MPLS-TE-MIB."
+    ::= { tmnxMplsObjs 4 }
+
+vRtrMplsLspPathEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLspPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an association between a Labeled Switch
+         Path (LSP) in the vRtrMplsLspTable and a path (or tunnel) entry in
+         the mplsTunnelTable.  Entries in this table can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspPathType to have been assigned a valid value."
+    INDEX { vRtrID, vRtrMplsLspIndex, mplsTunnelIndex, mplsTunnelInstance,
+            mplsTunnelIngressLSRId }
+    ::= { vRtrMplsLspPathTable 1 }
+
+VRtrMplsLspPathEntry ::= SEQUENCE {
+    vRtrMplsLspPathRowStatus              RowStatus,
+    vRtrMplsLspPathLastChange             TimeStamp,
+    vRtrMplsLspPathType                   INTEGER,
+    vRtrMplsLspPathCos                    INTEGER,
+    vRtrMplsLspPathProperties             BITS,
+    vRtrMplsLspPathBandwidth              Integer32,
+    vRtrMplsLspPathBwProtect              TruthValue,
+    vRtrMplsLspPathState                  INTEGER,
+    vRtrMplsLspPathPreference             INTEGER,
+    vRtrMplsLspPathCosSource              TruthValue,
+    vRtrMplsLspPathClassOfService         TNamedItemOrEmpty,
+    vRtrMplsLspPathSetupPriority          Unsigned32,
+    vRtrMplsLspPathHoldPriority           Unsigned32,
+    vRtrMplsLspPathRecord                 INTEGER,
+    vRtrMplsLspPathHopLimit               Unsigned32,
+    vRtrMplsLspPathSharing                TruthValue,
+    vRtrMplsLspPathAdminState             TmnxAdminState,
+    vRtrMplsLspPathOperState              TmnxOperState,
+    vRtrMplsLspPathInheritance            Unsigned32,
+    vRtrMplsLspPathLspId                  MplsLSPID,
+    vRtrMplsLspPathRetryTimeRemaining     Unsigned32,
+    vRtrMplsLspPathTunnelARHopListIndex   Integer32,
+    vRtrMplsLspPathNegotiatedMTU          Unsigned32,
+    vRtrMplsLspPathFailCode               TmnxMplsLspFailCode,
+    vRtrMplsLspPathFailNodeAddr           IpAddress,
+    vRtrMplsLspPathAdminGroupInclude      Unsigned32,
+    vRtrMplsLspPathAdminGroupExclude      Unsigned32,
+    vRtrMplsLspPathAdaptive               TruthValue,
+    vRtrMplsLspPathOptimizeTimer          Unsigned32,
+    vRtrMplsLspPathNextOptimize           Unsigned32,
+    vRtrMplsLspPathOperBandwidth          Integer32,
+    vRtrMplsLspPathMBBState               INTEGER,
+    vRtrMplsLspPathResignal               TmnxActionType,
+    vRtrMplsLspPathTunnelCRHopListIndex   Integer32,
+    vRtrMplsLspPathOperMTU                Unsigned32,
+    vRtrMplsLspPathRecordLabel            INTEGER
+}
+
+vRtrMplsLspPathRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspPathTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspPathType must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspPathEntry 1 }
+
+vRtrMplsLspPathLastChange       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspPathEntry 2 }
+
+vRtrMplsLspPathType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other (1),
+                    primary (2),
+                    standby (3),
+                    secondary (4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is an enum that represents the role this
+         path is taking within this LSP."
+    ::= { vRtrMplsLspPathEntry 3 }
+
+vRtrMplsLspPathCos      OBJECT-TYPE
+    SYNTAX      INTEGER (0..7 | 255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured Class Of Service (COS) for this path.  If
+         the value is between 0 and 7 inclusive, this value
+         will be inserted in the 3 bit COS field in the label.
+         If the value is 255, the value in the COS field of
+         the label will depend on other factors."
+    DEFVAL { 255 }
+    ::= { vRtrMplsLspPathEntry 4 }
+
+vRtrMplsLspPathProperties   OBJECT-TYPE
+    SYNTAX      BITS {
+                    record-route (0),
+                    adaptive (1),
+                    cspf (2),
+                    mergeable (3),
+                    fast-reroute (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of configured properties for this path expressed
+         as a bit map.  For example, if the path is an adaptive
+         path, the bit corresponding to bit value 1 is set."
+    ::= { vRtrMplsLspPathEntry 5 }
+
+vRtrMplsLspPathBandwidth    OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "mega-bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBandwidth specifies the amount
+         of bandwidth in mega-bits per seconds (Mbps) to be reserved
+         for this LSP path.  A value of zero (0) indicates that no
+         bandwidth is reserved."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspPathEntry 6 }
+
+vRtrMplsLspPathBwProtect    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsLspPathBwProtect has a value of 'true', bandwidth
+         protection is enabled on a LSP.  LSPs that reserve bandwidth
+         will be used for EF services where customers need guaranteed
+         bandwidth.  It is expected that multiple EF services will be
+         assigned to a single LSP.  When bandwidth protection is
+         enabled on an LSP, each time this LSP is used for a certain
+         service the bandwidth allocated on that service is deducted
+         from the bandwidth reserved for the LSP.  Once the bandwidth is
+         exhausted on the LSP, the ESR will provide feedback to the
+         provider indicating that this LSP has exhausted its resources."
+    DEFVAL { false }
+    ::= { vRtrMplsLspPathEntry 7 }
+
+vRtrMplsLspPathState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (1),
+                    active (2),
+                    inactive (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current working state of this path within this LSP."
+    DEFVAL { unknown }
+    ::= { vRtrMplsLspPathEntry 8 }
+
+vRtrMplsLspPathPreference   OBJECT-TYPE
+    SYNTAX      INTEGER (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When there is no path in the LSP with vRtrMplsLspPathType
+         value of 'primary', 'secondary' type paths of this LSP 
+         with the same value of vRtrMplsLspPathPreference are used
+         for load sharing.  When a 'primary' type path exists in
+         the LSP, vRtrMplsLspPathPreference is used to denote at
+         which priority one 'secondary' path will supercede another
+         when the 'primary' fails. 1 indicates the highest priority 
+         value.
+         
+         When the vRtrMplsLspPathPreference bit in 
+         vRtrMplsLspPathInheritance is cleared (0), the value returned 
+         to a GET request is inherited from vRtrMplsLspPreference."
+    DEFVAL { 7 }
+    ::= { vRtrMplsLspPathEntry 9 }
+
+vRtrMplsLspPathCosSource        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsLspPathCosSource is set to 'true', the value of
+         vRtrMplsLspPathClassOfService overrides vRtrMplsLspClassOfService.
+         When 'false', the value of vRtrMplsLspClassOfService is used."
+    DEFVAL { false }
+    ::= { vRtrMplsLspPathEntry 10 }
+
+vRtrMplsLspPathClassOfService   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the class of service value to be assigned to all
+         packets on the LSP is specified with vRtrMplsLspPathClassOfService.
+         The EXP bits in the MPLS header are set based on the global
+         mapping table that specified the mapping between the forwarding
+         class and the EXP bits.  When class of service is specified,
+         all packets will be marked with the same EXP bits that match
+         the vRtrMplsLspPathClassOfService name in the mapping table.
+         
+         An empty string, ''H, specifies no class of service.  Packets
+         are assigned EXP bits based on the same mapping table, however
+         each packet is marked with EXP bits based on the forwarding
+         class from which it is serviced."
+    DEFVAL { ''H }
+    ::= { vRtrMplsLspPathEntry 11 }
+        
+vRtrMplsLspPathSetupPriority    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathSetupPriority specifies the setup 
+         priority to use when insufficient bandwidth is available to setup 
+         a LSP.  The setup priority is compared against the hold priority of
+         existing LSPs.  If the setup priority is higher than the hold
+         priority of the established LSPs, this LSP may preempt the other
+         LSPs.  A value of zero (0) is the highest priority and a value
+         of seven (7) is the lowest priority.
+         
+         When the vRtrMplsLspPathHopLimit bit in vRtrMplsLspPathInheritance 
+         is cleared (0), the value returned to a GET request is inherited 
+         from vRtrMplsLspHopLimit."
+    DEFVAL { 7 }
+    ::= { vRtrMplsLspPathEntry 12 }
+        
+vRtrMplsLspPathHoldPriority     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathHoldPriority specifies the hold 
+         priority to use when insufficient bandwidth is available to setup 
+         a LSP.  The setup priority is compared against the hold priority of
+         existing LSPs.  If the setup priority is higher than the hold
+         priority of the established LSPs, this LSP may preempt the other
+         LSPs.  A value of zero (0) is the highest priority and a value
+         of seven (7) is the lowest priority.
+         
+         When the vRtrMplsLspPathHopLimit bit in vRtrMplsLspPathInheritance 
+         is cleared (0), the value returned to a GET request is inherited 
+         from vRtrMplsLspHopLimit."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspPathEntry 13 }
+
+vRtrMplsLspPathRecord       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    record (1),
+                    noRecord (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspPathRecord is 'record', recording of 
+         all the hops that a LSP traverses is enabled.
+         
+         When the value of vRtrMplsLspPathRecord is 'noRecord', recording 
+         of all the hops that a LSP traverses is disabled."
+    DEFVAL { record }
+    ::= { vRtrMplsLspPathEntry 14 }       
+
+vRtrMplsLspPathHopLimit     OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathHopLimit specifies the maximum number
+         of hops that a LSP will traverse including the ingress and
+         egress ESRs.  A LSP will not be setup if the hop limit is
+         exceeded.  
+         
+         When the vRtrMplsLspPathHopLimit bit in vRtrMplsLspPathInheritance 
+         is cleared (0), the value returned to a GET request is inherited 
+         from vRtrMplsLspHopLimit."
+    DEFVAL { 255 }
+    ::= { vRtrMplsLspPathEntry 15 }
+
+vRtrMplsLspPathSharing  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsLspPathSharing has a value of 'true', path-sharing
+         is enabled for the secondary path.  Path-sharing is used to
+         control the hops of the secondary path.
+         
+         When vRtrMplsLspPathSharing have a value of 'false', CSPF attempts
+         to find a path for the secondary that does not include any node
+         or link that is common to the active primary path.
+         
+         This variable is valid only if vRtrMplsLspPathType is set to
+         'secondary'."
+    DEFVAL { false }
+    ::= { vRtrMplsLspPathEntry 16 }
+
+vRtrMplsLspPathAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for this LSP path."
+    DEFVAL { inService }
+    ::= { vRtrMplsLspPathEntry 17 }
+
+vRtrMplsLspPathOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of this LSP path."
+    ::= { vRtrMplsLspPathEntry 18 }
+
+vRtrMplsLspPathInheritance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For each writable object in this row that can be configured to
+         inherit its value from its corresponding object in the 
+         vRtrMplsLspTable, controls whether to inherit the operational value 
+         of that object, or use the administratively set value.
+        
+         This object is a bit-mask, with the following positions:
+
+         vRtrMplsLspPathBandwidth               0x10
+         vRtrMplsLspPathPreference              0x80
+         vRtrMplsLspPathSetupPriority          0x400
+         vRtrMplsLspPathHoldPriority           0x800
+         vRtrMplsLspPathHopLimit              0x2000
+         vRtrMplsLspPathAdminGroupInclude    0x20000
+         vRtrMplsLspPathAdminGroupExclude    0x40000
+         vRtrMplsLspPathAdaptive             0x80000
+         vRtrMplsLspPathOptimizeTimer       0x100000
+
+         When the bit for an object is set to one, then the
+         object's administrative and operational value are whatever
+         the DEFVAL or most recently SET value is.
+        
+         When the bit for an object is set to zero, then the
+         object's administrative and operational value are inherited
+         from the corresponding object in vRtrMplsLspTable."
+    DEFVAL { 0 } -- by default inherit everything from vRtrMplsLspTable
+    ::= { vRtrMplsLspPathEntry 19 }
+
+vRtrMplsLspPathLspId OBJECT-TYPE
+    SYNTAX      MplsLSPID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value identifies the label switched path that
+         is signaled for this entry."
+    ::= { vRtrMplsLspPathEntry 20 }
+
+vRtrMplsLspPathRetryTimeRemaining       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time in 10-millisecond units to signal this path."
+    ::= { vRtrMplsLspPathEntry 21 }
+
+vRtrMplsLspPathTunnelARHopListIndex   OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary index into the mplsTunnelARHopTable identifying a
+         particular recorded hop list. A value of 0 implies that there
+         is no recored hop list associated with this LSP path."
+    ::= { vRtrMplsLspPathEntry 22 }
+
+vRtrMplsLspPathNegotiatedMTU     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathNegotiatedMTU specifies the size 
+         for the Maximum transmission unit (MTU) that is negotiated
+         during establishment of this LSP Path."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspPathEntry 23 }
+
+vRtrMplsLspPathFailCode     OBJECT-TYPE
+    SYNTAX      TmnxMplsLspFailCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathFailCode specifies the reason code
+         for LSP Path failure. A value of 0 indicates that no failure 
+         has occurred."
+    ::= { vRtrMplsLspPathEntry 24 }
+
+vRtrMplsLspPathFailNodeAddr     OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathFailNodeAddr specifies the IP address
+         of the node in the LSP path at which the LSP path failed. When 
+         no failure has occurred, this value is 0."
+    ::= { vRtrMplsLspPathEntry 25 }
+
+vRtrMplsLspPathAdminGroupInclude   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathAdminGroupInclude is a bit-map that
+         specifies a list of admin groups that should be included when
+         this LSP path is setup. If bit 'n' is set, then the admin group 
+         with value 'n' is included for this LSP path. This implies that 
+         each link that this LSP path goes through must be associated with  
+         at least one of the admin groups in the include list.
+
+         When the vRtrMplsLspPathAdminGroupInclude bit in 
+         vRtrMplsLspPathInheritance is cleared (0), the value returned 
+         to a GET request is inherited from vRtrMplsLspAdminGroupInclude."
+    DEFVAL { '00000000'H }
+    ::= { vRtrMplsLspPathEntry 26 }
+
+vRtrMplsLspPathAdminGroupExclude   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathAdminGroupExclude is a bit-map that
+         specifies a list of admin groups that should be excluded when
+         this LSP path is setup. If bit 'n' is set, then the admin group 
+         with value 'n' is excluded for this LSP path. This implies that 
+         each link that this LSP path goes through must not be associated
+         with any of the admin groups in the exclude list.
+
+         When the vRtrMplsLspPathAdminGroupExclude bit in 
+         vRtrMplsLspPathInheritance is cleared (0), the value returned 
+         to a GET request is inherited from vRtrMplsLspAdminGroupExclude."
+    DEFVAL { '00000000'H }
+    ::= { vRtrMplsLspPathEntry 27 }
+
+vRtrMplsLspPathAdaptive   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of vRtrMplsLspPathAdaptive to 'true', enables
+         make-before-break functionality for the LSP path.          
+         
+         Setting the value to 'false', disables make-before-break 
+         functionality for the path.
+
+         When the vRtrMplsLspPathAdaptive bit in vRtrMplsLspPathInheritance 
+         is cleared (0), the value returned to a GET request is inherited 
+         from vRtrMplsLspAdaptive."
+    DEFVAL { true }
+    ::= { vRtrMplsLspPathEntry 28 }
+
+vRtrMplsLspPathOptimizeTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOptimizeTimer specifies the time, in 
+         seconds, the software will wait before attempting to re-optimize
+         the LSP path.
+
+         When CSPF is enabled, changes in the network topology may cause
+         the existing path of a loose-hop LSP to become sub-optimal. Such
+         LSPs can be re-optimized and re-routed through more optimal paths
+         by recalculating the path for the LSP at periodic intervals. This
+         interval is controlled by the optimize timer.
+         
+         A value of 0 indicates that optimization has been disabled.
+
+         When the vRtrMplsLspPathOptimizeTimer bit in 
+         vRtrMplsLspPathInheritance is cleared (0), the value returned in
+         the GET request is inherited from vRtrMplsLspOptimizeTimer."
+    DEFVAL { 0 }
+    ::= { vRtrMplsLspPathEntry 29 }
+
+vRtrMplsLspPathNextOptimize   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathNextOptimize specifies the current value
+         of the optimize timer. This is the time, in seconds, remaining till
+         the optimize timer will expire and optimization will be started for
+         the LSP path."
+    ::= { vRtrMplsLspPathEntry 30 }
+
+vRtrMplsLspPathOperBandwidth  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "mega-bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperBandwidth specifies the amount of
+         bandwidth in mega-bits per seconds (Mbps) that has been reserved
+         for the operational LSP path.
+
+         When make-before-break functionality for the LSP is enabled and 
+         if the path bandwidth is changed, the resources allocated to the 
+         existing LSP paths will not be released until a new path with 
+         the new bandwidth settings has been established. While a new path 
+         is being signaled, the administrative value and the operational 
+         values of the path bandwidth may differ. The value of 
+         vRtrMplsLspPathBandwidth specifies the bandwidth requirements for 
+         the new LSP path trying to be established whereas the value of 
+         vRtrMplsLspPathOperBandwidth specifies the bandwidth reserved 
+         for the existing LSP path."
+    ::= { vRtrMplsLspPathEntry 31 }
+
+vRtrMplsLspPathMBBState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    success (2), 
+                    inProgress (3),
+                    fail (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathMBBState specifies the state of the 
+         most recent invocation of the make-before-break functionality. 
+
+         Possible states are:
+
+         none (1)        - no make-before-break invoked 
+         success (2)     - make-before-break successful
+         inProgress (3)  - make-before-break in progress 
+         fail (4)        - make-before-break failed."
+    ::= { vRtrMplsLspPathEntry 32 }
+
+vRtrMplsLspPathResignal   OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of vRtrMplsLspPathResignal to 'doAction' triggers
+         the re-signaling of the LSP path. 
+
+         If the LSP path is operationally down either due to network failure
+         or due to the retry attempts count being exceeded, setting this 
+         variable to 'doAction' will initiate the signaling for the path. A 
+         make-before-break signaling for the path will be initiated if the 
+         LSP is operationally up but the make-before-break retry attempts 
+         count was exceeded. Make-before-break signaling will also be 
+         initiated for any LSP that is operationally up. This may be used 
+         to cause a loose-hop LSP to be optimized. 
+
+         If a re-signal is triggered while a re-signaling is already in 
+         progress, the old transient state will be destroyed and a new 
+         transaction being triggered.
+         
+         An SNMP GET request on this object should return 'notApplicable'."
+    ::= { vRtrMplsLspPathEntry 33 }
+
+vRtrMplsLspPathTunnelCRHopListIndex   OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary index into the vRtrMplsTunnelCHopTable identifying a
+         particular computed hop list. A value of 0 implies that there
+         is no computed hop list associated with this LSP path."
+    ::= { vRtrMplsLspPathEntry 34 }
+
+vRtrMplsLspPathOperMTU     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperMTU specifies the size 
+         for the Maximum transmission unit (MTU) that is currently
+         operation for this LSP Path."
+    ::= { vRtrMplsLspPathEntry 35 }
+
+vRtrMplsLspPathRecordLabel       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    record (1),
+                    noRecord (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspPathRecordLabel is 'record', 
+         recording of labels at each node that a LSP traverses is 
+         enabled.
+         
+         When the value of vRtrMplsLspPathRecordLabel is 'noRecord', 
+         recording of labels at each node that a LSP traverses is 
+         disabled."
+    DEFVAL { record }
+    ::= { vRtrMplsLspPathEntry 36 }  
+    
+--
+--  The Virtual Router MPLS LSP Path Statistics Table
+--
+--  Augmentation of the vRtrMplsLspPathTable.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship 
+--  between the base table, vRtrMplsLspPathTable, and the augmenting table, 
+--  vRtrMplsLspPathStatTable. This in effect extends the vRtrMplsLspPathTable
+--  with additional columns.  
+--  Creation (or deletion) of a row in the vRtrMplsLspPathTable results in 
+--  the same fate for the row in the vRtrMplsLspPathStatTable.
+--
+
+vRtrMplsLspPathStatTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspPathStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathStatTable has an entry for an association 
+         between a Labeled Switch Path (LSP) in the vRtrMplsLspTable 
+         and a path (or tunnel) entry in the mplsTunnelTable."
+    ::= { tmnxMplsObjs 5 }
+
+vRtrMplsLspPathStatEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLspPathStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a collection of statistics for 
+         an association between a Labeled Switch Path (LSP) in the 
+         vRtrMplsLspTable and a path (or tunnel) entry in the 
+         mplsTunnelTable. 
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS { vRtrMplsLspPathEntry }
+    ::= { vRtrMplsLspPathStatTable 1 }
+
+VRtrMplsLspPathStatEntry ::= SEQUENCE {
+    vRtrMplsLspPathTimeUp                 TimeInterval,
+    vRtrMplsLspPathTimeDown               TimeInterval,
+    vRtrMplsLspPathRetryAttempts          Unsigned32,
+    vRtrMplsLspPathTransitionCount        Counter32,
+    vRtrMplsLspPathCspfQueries            Counter32
+}
+
+vRtrMplsLspPathTimeUp   OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this LSP path has
+         been operational.  For example, the percentage up time can be
+         determined by computing (vRtrMplsLspPathTimeUp/vRtrMplsLspAge * 100 %)."
+    ::= { vRtrMplsLspPathStatEntry 1 }
+        
+vRtrMplsLspPathTimeDown OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this LSP Path has 
+         not been operational."
+    ::= { vRtrMplsLspPathStatEntry 2 }
+
+vRtrMplsLspPathRetryAttempts       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unsuccessful attempts which have been made to 
+         signal this path. As soon as the path gets signalled, this is
+         set to 0."
+    ::= { vRtrMplsLspPathStatEntry 3 }
+
+vRtrMplsLspPathTransitionCount    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrMplsLspPathTransitionCount maintains the number
+         of transitions that have occurred for this LSP."
+    ::= { vRtrMplsLspPathStatEntry 4 }
+
+vRtrMplsLspPathCspfQueries     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathCspfQueries specifies the number 
+         of CSPF queries that have been made for this LSP path."
+    ::= { vRtrMplsLspPathStatEntry 5 }
+
+
+--
+--  Virtual Router MPLS LSP to Cross-connect Mapping Table
+--
+
+vRtrMplsXCTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsXCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has an entry for each mplsXCEntry
+         in the mplsXCTable.  It serves as an another
+         indirect index to the mplsXCTable."
+    ::= { tmnxMplsObjs 6 }
+
+vRtrMplsXCEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsXCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents the indices
+         to be used to search the mplsXCTable."
+    INDEX { mplsXCLspId }
+
+    ::= { vRtrMplsXCTable 1 }
+
+VRtrMplsXCEntry ::= SEQUENCE {
+    vRtrMplsXCIndex                 Integer32,
+    vRtrMplsInSegmentIfIndex        InterfaceIndexOrZero,
+    vRtrMplsInSegmentLabel          MplsLabel,
+    vRtrMplsOutSegmentIndex         Integer32,
+    vRtrMplsERHopTunnelIndex        Integer32, 
+    vRtrMplsARHopTunnelIndex        Integer32, 
+    vRtrMplsRsvpSessionIndex        Unsigned32,
+    vRtrMplsXCFailCode              TmnxMplsLspFailCode,
+    vRtrMplsXCCHopTableIndex        Integer32
+}
+
+vRtrMplsXCIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index of the mplsXCTable. It represents 
+         mplsXCIndex, a field of the mplsXCTable."
+    ::= { vRtrMplsXCEntry 1 }
+
+vRtrMplsInSegmentIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index of the mplsXCTable.  It represents
+         mplsInSegmentIfIndex of the mplsInSegmentTable." 
+    ::= { vRtrMplsXCEntry 2 }
+
+vRtrMplsInSegmentLabel OBJECT-TYPE
+    SYNTAX      MplsLabel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index of the mplsXCTable. It represents 
+         mplsInSegmentLabel of the mplsInSegmentTable."
+    ::= { vRtrMplsXCEntry 3 }
+
+vRtrMplsOutSegmentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index of the mplsXCTable. It represents 
+         mplsOutSegmentIndex of the mplsOutSegmentTable."
+    ::= { vRtrMplsXCEntry 4 }
+
+vRtrMplsERHopTunnelIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary index into the mplsTunnelHopTable identifying a particular
+         recorded hop list (stores ERO in LSR)."
+    ::= { vRtrMplsXCEntry 5 }
+
+vRtrMplsARHopTunnelIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary index into the mplsTunnelARHopTable identifying a particular
+         recorded hop list (stores RRO in LSR)."
+    ::= { vRtrMplsXCEntry 6 }
+
+vRtrMplsRsvpSessionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index into the vRtrRsvpSessionTable identifying a particular RSVP 
+         session."
+    ::= { vRtrMplsXCEntry 7 }
+
+vRtrMplsXCFailCode     OBJECT-TYPE
+    SYNTAX      TmnxMplsLspFailCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsXCFailCode specifies the reason code for
+         cross-connect failure. A value of 0 indicates that no failure 
+         occurred."
+    ::= { vRtrMplsXCEntry 8 }
+            
+vRtrMplsXCCHopTableIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the vRtrMplsTunnelCHopTable entries that specify 
+         the hops for the CSPF path for a detour LSP for this tunnel."
+    ::= { vRtrMplsXCEntry 9 }
+
+
+--
+--  Virtual Router MPLS General Table
+--
+
+vRtrMplsGeneralTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsGeneralTable contains objects for general control and
+         management of an MPLS protocol instance within a virtual router."
+    ::= { tmnxMplsObjs 7 }
+
+vRtrMplsGeneralEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an instance of the MPLS protocol running
+         within a virtual router.  Entries in this table cannot be 
+         created and deleted via SNMP SET operations.  An entry in this table
+         is created by the agent when vRtrMplsStatus in the vRtrConfTable is
+         set to 'create'.  The entry is destroyed when vRtrMplsStatus is set
+         to 'delete'"
+    INDEX { vRtrID }
+    ::= { vRtrMplsGeneralTable 1 }
+
+VRtrMplsGeneralEntry ::= SEQUENCE {
+    vRtrMplsGeneralLastChange          TimeStamp,
+    vRtrMplsGeneralAdminState          TmnxAdminState,
+    vRtrMplsGeneralOperState           TmnxOperState,
+    vRtrMplsGeneralPropagateTtl        TruthValue,
+    vRtrMplsGeneralTE                  INTEGER,
+    vRtrMplsGeneralNewLspIndex         TestAndIncr,
+    vRtrMplsGeneralOptimizeTimer       Unsigned32,
+    vRtrMplsGeneralFRObject            TruthValue,
+    vRtrMplsGeneralResignalTimer       Unsigned32,
+    vRtrMplsGeneralHoldTimer           Unsigned32,
+    vRtrMplsGeneralDynamicBypass       TruthValue,
+    vRtrMplsGeneralNextResignal        Unsigned32,
+    vRtrMplsGeneralOperDownReason      TmnxMplsOperDownReasonCode,
+    vRtrMplsGeneralSrlgFrr             TruthValue,
+    vRtrMplsGeneralSrlgFrrStrict       TruthValue
+}
+
+vRtrMplsGeneralLastChange       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsGeneralEntry 1 }
+
+vRtrMplsGeneralAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsGeneralAdminState is set to 'inService', the agent
+         attempts to enable the MPLS protocol instance on this router.
+         
+         When vRtrMplsGeneralAdminState is set to 'outOfService', the
+         agent attempts to disable the MPLS protocol instance on this
+         router."
+    DEFVAL { inService }
+    ::= { vRtrMplsGeneralEntry 2 }
+                   
+vRtrMplsGeneralOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsGeneralOperState indicates the current operating state
+         of this MPLS protocol instance on this router."
+    ::= { vRtrMplsGeneralEntry 3 }
+             
+vRtrMplsGeneralPropagateTtl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrMplsGeneralPropagateTtl is set to 'true', for all LSPs,
+         the ingress ESR writes the TTL of the IP packet in the label and 
+         each transit ESR decrements the TTL in the label.  At the egress 
+         ESR the TTL value from the label is written into the IP packet.
+         
+         When vRtrMplsGeneralPropagateTtl is set to 'false', the ingress
+         ESR ignores the IP packet TTl and writes the value of 255 into
+         the label, while the egress ESR does not write the label TTL
+         into the IP packet.  This assumes that all ESRs have been
+         configured to have vRtrMplsGeneralPropagateTtl set to 'false',
+         or this may result in unpredictable behavior."
+    DEFVAL { true }
+    ::= { vRtrMplsGeneralEntry 4 }
+        
+vRtrMplsGeneralTE       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    bgp (2),
+                    bgpigp (3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralTE specifies the type of traffic
+         engineering used with this MPLS instance."
+    DEFVAL { none }
+    ::= { vRtrMplsGeneralEntry 5 }
+
+vRtrMplsGeneralNewLspIndex  OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to assign values to vRtrMplsLspIndex as
+         described in 'Textual Conventions for SNMPv2'.  The network
+         manager reads the object, and then writes the value back
+         in the SET request that creates a new instance of 
+         vRtrMplsLspEntry.  If the SET fails with the code 
+         'inconsistentValue', then the process must be repeated.  
+         If the the SET succeeds, then the object is incremented 
+         and the new instance is created according to the manager's 
+         directions."
+    ::= { vRtrMplsGeneralEntry 6 }
+
+vRtrMplsGeneralOptimizeTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralOptimizeTimer specifies the time, in 
+         seconds, the software will wait before attempting to re-optimize
+         the LSPs.
+
+         When CSPF is enabled, changes in the network topology may cause
+         the existing path of a loose-hop LSP to become sub-optimal. Such
+         LSPs can be re-optimized and re-routed through more optimal paths
+         by recalculating the path for the LSP at periodic intervals. This
+         interval is controlled by the optimize timer.
+         
+         A value of 0 indicates that optimization has been disabled.
+
+         The value for vRtrMplsGeneralOptimizeTimer is by default inherited 
+         by all LSPs and their paths."
+    DEFVAL { 0 }
+    ::= { vRtrMplsGeneralEntry 7 }
+
+vRtrMplsGeneralFRObject   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralFRObject specifies whether fast reroute, 
+         for LSPs using 'Facility Backup', is signalled with or without the
+         fast reroute object. The value of vRtrMplsGeneralFRObject is ignored
+         if fast reroute is disabled for the LSP or if the LSP is using
+         'One-to-one Backup'.
+
+         The value for vRtrMplsGeneralFRObject is by default inherited by
+         all LSPs."
+    DEFVAL { true }
+    ::= { vRtrMplsGeneralEntry 8 }
+
+vRtrMplsGeneralResignalTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|30..10080)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralResignalTimer specifies the value 
+         for the LSP resignal timer, that is the time, in minutes, the 
+         software will wait before attempting to resignal the LSPs. 
+
+         When the resignal timer expires, if the new recorded hop list
+         (RRO) for an LSP has a better metric than the current recorded 
+         hop list, an attempt will be made to resignal that LSP using
+         the make-before-break mechanism. If the attempt to resignal
+         an LSP fails, the LSP will continue to use the existing path 
+         and a resignal will be attempted the next time the timer expires.
+         
+         A value of 0 for the resignal timer indicates that timer-based
+         LSP resignalling has been disabled."
+    DEFVAL { 0 }
+    ::= { vRtrMplsGeneralEntry 9 }
+
+vRtrMplsGeneralHoldTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralHoldTimer specifies the time, in 
+        seconds, for which the ingress node holds a bit before 
+        programming its data plane and declaring the lsp up to 
+        the service module. 
+        
+        A value of 0 indicates that the hold timer has been disabled."       
+    DEFVAL { 1 }
+    ::= { vRtrMplsGeneralEntry 10 }
+
+vRtrMplsGeneralDynamicBypass   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralDynamicBypass specifies whether 
+         dynamic bypass tunnels are enabled.  
+
+         By default, dynamic bypass tunnels are enabled."
+    DEFVAL { true }
+    ::= { vRtrMplsGeneralEntry 11 }
+
+vRtrMplsGeneralNextResignal   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralNextResignal indicates the time 
+        remaining, in minutes, for the vRtrMplsGeneralResignalTimer to expire."
+    ::= { vRtrMplsGeneralEntry 12 }
+
+vRtrMplsGeneralOperDownReason   OBJECT-TYPE
+    SYNTAX      TmnxMplsOperDownReasonCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralOperDownReason indicates the reason 
+         due to which the MPLS instance is operationally down." 
+    ::= { vRtrMplsGeneralEntry 13 }
+
+vRtrMplsGeneralSrlgFrr   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralSrlgFrr specifies whether Shared Risk
+         Link Group (SRLG) constraint will be used in the computation of 
+         FRR bypass or detour to be associated with any primary LSP path 
+         on the system.  When the value of vRtrMplsGeneralSrlgFrr is 
+         'true' the use of SRLG constraint is enabled. 
+
+         By default, the use of SRLG constraint is disabled."
+    DEFVAL { false }
+    ::= { vRtrMplsGeneralEntry 14 }
+
+vRtrMplsGeneralSrlgFrrStrict   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralSrlgFrrStrict specifies whether 
+         to associate the LSP with a bypass or signal a detour if a 
+         bypass or detour satisfies all other constraints except the SRLG 
+         constraints.  When the value of vRtrMplsGeneralSrlgFrrStrict is
+         'true' and a path that meets SRLG constraints is not found, the 
+         bypass or detour is not setup. If this value is set to 'true'
+         when vRtrMplsGeneralSrlgFrr is set to 'false', vRtrMplsGeneralSrlgFrr
+         is set to 'true' also.
+
+         By default, the value of vRtrMplsGeneralSrlgFrrStrict is 'false'."
+    DEFVAL { false }
+    ::= { vRtrMplsGeneralEntry 15 }
+
+--
+--  Virtual Router MPLS General Statistics Table
+--
+--  Augmentation of the vRtrMplsGeneralTable.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship 
+--  between the base table, vRtrMplsGeneralTable, and the augmenting table, 
+--  vRtrMplsGeneralStatTable. This in effect extends the vRtrMplsGeneralTable
+--  with additional columns.  
+--  Creation (or deletion) of a row in the vRtrMplsGeneralTable results in 
+--  the same fate for the row in the vRtrMplsGeneralStatTable.
+--
+
+vRtrMplsGeneralStatTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsGeneralStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsGeneralStatTable contains statistics for an MPLS 
+         protocol instance within a virtual router."
+    ::= { tmnxMplsObjs 8 }
+
+vRtrMplsGeneralStatEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsGeneralStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a collection of statistics for an 
+         instance of the MPLS protocol running within a virtual router.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS { vRtrMplsGeneralEntry }
+    ::= { vRtrMplsGeneralStatTable 1 }
+
+VRtrMplsGeneralStatEntry ::= SEQUENCE {
+    vRtrMplsGeneralStaticLspOriginate  Counter32,
+    vRtrMplsGeneralStaticLspTransit    Counter32,
+    vRtrMplsGeneralStaticLspTerminate  Counter32,
+    vRtrMplsGeneralDynamicLspOriginate Counter32,
+    vRtrMplsGeneralDynamicLspTransit   Counter32,
+    vRtrMplsGeneralDynamicLspTerminate Counter32,
+    vRtrMplsGeneralDetourLspOriginate  Counter32,
+    vRtrMplsGeneralDetourLspTransit    Counter32,
+    vRtrMplsGeneralDetourLspTerminate  Counter32
+}
+
+vRtrMplsGeneralStaticLspOriginate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of static LSPs that originate
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 1 }
+
+vRtrMplsGeneralStaticLspTransit    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of static LSPs that transit 
+         through this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 2 }
+
+vRtrMplsGeneralStaticLspTerminate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of static LSPs that terminate
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 3 }
+
+vRtrMplsGeneralDynamicLspOriginate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of dynamic LSPs that originate 
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 4 }
+
+vRtrMplsGeneralDynamicLspTransit    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of dynamic LSPs that transit
+         through this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 5 }
+
+vRtrMplsGeneralDynamicLspTerminate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of dynamic LSPs that terminate 
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 6 }
+
+vRtrMplsGeneralDetourLspOriginate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of detour LSPs that originate
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 7 }
+
+vRtrMplsGeneralDetourLspTransit    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of detour LSPs that transit
+         through this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 8 }
+
+vRtrMplsGeneralDetourLspTerminate  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of detour LSPs that terminate
+         at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 9 }
+
+
+--
+--  Virtual Router MPLS Interface Table
+--
+
+vRtrMplsIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsIfTable has an entry for each router interface 
+         configured for MPLS in the system."
+    ::= { tmnxMplsObjs 9 }
+
+vRtrMplsIfEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an interface on this virtual router
+         that participates in the MPLS protocol.  A row cannot be created
+         or deleted via SNMP SET requests.  A row with default attribute
+         values is created by setting the vRtrIfEntry attribute, 
+         vRtrIfMplsStatus, to 'create'.  A row is removed if 
+         vRtrIfMplsStatus is set to 'delete'.  However, an attempt to 
+         destroy a row will fail if vRtrMplsIfAdminState has
+         not first been set to 'outOfService'."
+    INDEX { vRtrID, vRtrIfIndex }
+    ::= { vRtrMplsIfTable 1 }
+
+VRtrMplsIfEntry ::= SEQUENCE {
+    vRtrMplsIfAdminState        TmnxAdminState,
+    vRtrMplsIfOperState         TmnxOperState,
+    vRtrMplsIfAdminGroup        Unsigned32,
+    vRtrMplsIfTeMetric          Unsigned32
+}
+
+vRtrMplsIfAdminState OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for the MPLS protocol
+         running on this MPLS interface."
+    DEFVAL { outOfService }
+    ::= { vRtrMplsIfEntry 1 }
+
+vRtrMplsIfOperState  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the current status of the MPLS protocol
+         running on this MPLS interface."
+    ::= { vRtrMplsIfEntry 2 }
+
+vRtrMplsIfAdminGroup  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsIfAdminGroup is a bit-map that identifies the
+         admin groups to which the interface belongs. If bit 'n' is set,
+         then the interface belongs to the admin group with value 'n'. 
+         
+         By default, the interface does not belong to any admin groups."
+    DEFVAL { '00000000'H }
+    ::= { vRtrMplsIfEntry 3 }
+
+vRtrMplsIfTeMetric  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|1..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        
+        "The value of vRtrMplsIfTeMetric specifies the traffic engineering metric
+         for this interface. The TE metric is exchanged in addition to the IGP 
+         metric by the IGPs. Depending on the value configured for 
+         vRtrMplsLspCspfTeMetricEnabled, either the TE metric or the native 
+         IGP metric is used in CSPF computations of the LSP paths. The maximum 
+         value that can be configured is a 24 bit value."
+    DEFVAL { 0 }
+    ::= { vRtrMplsIfEntry 4 }
+
+--
+--   Virtual Router MPLS Interface Statistics Table
+--
+--  Augmentation of the vRtrMplsIfTable.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship 
+--  between the base table, vRtrMplsIfTable, and the augmenting table, 
+--  vRtrMplsIfStatTable. This in effect extends the vRtrMplsIfTable 
+--  with additional columns.  
+--  Creation (or deletion) of a row in the vRtrMplsIfTable results in 
+--  the same fate for the row in the vRtrMplsIfStatTable.
+--
+
+vRtrMplsIfStatTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsIfStatTable has an entry for each router interface 
+         configured for MPLS in the system."
+    ::= { tmnxMplsObjs 10 }
+
+vRtrMplsIfStatEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a collection of statistics for an
+         interface on this virtual router that participates in the 
+         MPLS protocol.  
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS { vRtrMplsIfEntry }
+    ::= { vRtrMplsIfStatTable 1 }
+
+VRtrMplsIfStatEntry ::= SEQUENCE {
+    vRtrMplsIfTxPktCount        Counter64,
+    vRtrMplsIfRxPktCount        Counter64,
+    vRtrMplsIfTxOctetCount      Counter64,
+    vRtrMplsIfRxOctetCount      Counter64
+}
+
+vRtrMplsIfTxPktCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS labeled packets transmitted from this
+         interface."
+    ::= { vRtrMplsIfStatEntry 1 }
+
+vRtrMplsIfRxPktCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS labeled packets received on this
+         interface."
+    ::= { vRtrMplsIfStatEntry 2 }
+
+vRtrMplsIfTxOctetCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes in MPLS labeled packets transmitted
+         on this interface."
+    ::= { vRtrMplsIfStatEntry 3 }
+
+vRtrMplsIfRxOctetCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes in MPLS labeled packets received on
+         this interface."
+    ::= { vRtrMplsIfStatEntry 4 }
+
+--
+--   Virtual Router MPLS Tunnel AR Hop Table
+--
+--  Augmentation of the mplsTunnelARHopEntry.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship 
+--  between the base table, mplsTunnelARHopEntry, and the augmenting table, 
+--  vRtrMplsTunnelARHopTable. This in effect extends the mplsTunnelARHopEntry
+--  with additional columns.  
+--  Creation (or deletion) of a row in the mplsTunnelARHopEntry results in 
+--  the same fate for the row in the vRtrMplsTunnelARHopTable.
+--
+
+vRtrMplsTunnelARHopTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTunnelARHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTunnelARHopTable augments the mplsTunnelARHopEntry  
+         in the MPLS-TE-MIB."
+    ::= { tmnxMplsObjs 11 }
+
+vRtrMplsTunnelARHopEntry OBJECT-TYPE
+    SYNTAX      VRtrMplsTunnelARHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row entry in this table corresponds to a row entry in the 
+         mplsTunnelARHopTable and adds to the information contained in 
+         that table"
+    AUGMENTS { mplsTunnelARHopEntry }
+    ::= { vRtrMplsTunnelARHopTable 1 }
+
+VRtrMplsTunnelARHopEntry ::= SEQUENCE {
+    vRtrMplsTunnelARHopProtection       BITS,
+    vRtrMplsTunnelARHopRecordLabel      MplsLabel,
+    vRtrMplsTunnelARHopRouterId         IpAddress
+}
+
+vRtrMplsTunnelARHopProtection OBJECT-TYPE
+    SYNTAX      BITS {
+                    localAvailable (0),
+                    localInUse (1),
+                    bandwidthProtected (2),
+                    nodeProtected (3)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the 'localAvailable' bit is set, it indicates that the link 
+         downstream of this node has been protected by means of a local
+         repair mechanism. This mechanism can be either the one-to-one 
+         backup method or the facility backup method.
+         
+         If the 'localInUse' bit is set, then it indicates that the local
+         protection mechanism is being used to maintain this tunnel.
+
+         If the 'bandwidthProtected' bit is set, then it indicates that 
+         the backup path is guaranteed to provide the desired bandwidth.
+         
+         If the 'nodeProtected' bit is set, then it indicates that the
+         backup path provides protection against the failure of the next
+         LSR along the LSP."
+    ::= { vRtrMplsTunnelARHopEntry 1 }    
+
+vRtrMplsTunnelARHopRecordLabel OBJECT-TYPE
+    SYNTAX      MplsLabel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If label recording is enabled, vRtrMplsTunnelARHopRecordLabel 
+         specifies the label that is advertised to the previous hop in 
+         the hop list. If label recording is disabled, 
+         vRtrMplsTunnelARHopRecordLabel will have a value of 4294967295"
+    ::= { vRtrMplsTunnelARHopEntry 2 }  
+  
+vRtrMplsTunnelARHopRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsTunnelARHopRouterId specifies the router ID of the node
+         corresponding to this hop."
+    ::= { vRtrMplsTunnelARHopEntry 3 }    
+
+--
+--   Virtual Router MPLS CSPF Tunnel Hop Table
+--
+
+vRtrMplsTunnelCHopTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTunnelCHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTunnelCHopTable is used to hold the CSPF
+         path for a detour LSP. Each entry indicates a single
+         hop.
+
+         Primary index is the vRtrMplsTunnelCHopListIndex which associates 
+         multiple entries (hops) in the vRtrMplsTunnelCHopTable to a single 
+         mplsTunnelEntry specified in the mplsTunnelTable.
+
+         The first row in the table is the first hop after the
+         origination point of the tunnel."
+    ::= { tmnxMplsObjs 12 } 
+
+vRtrMplsTunnelCHopEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsTunnelCHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents a CSPF tunnel hop.
+         Entries are created and deleted by the system."
+    INDEX { vRtrMplsTunnelCHopListIndex, vRtrMplsTunnelCHopIndex }
+    ::= { vRtrMplsTunnelCHopTable 1 }
+
+VRtrMplsTunnelCHopEntry ::= SEQUENCE {
+    vRtrMplsTunnelCHopListIndex          Integer32,
+    vRtrMplsTunnelCHopIndex              Integer32,
+    vRtrMplsTunnelCHopAddrType           INTEGER,
+    vRtrMplsTunnelCHopIpv4Addr           IpAddress,
+    vRtrMplsTunnelCHopIpv4PrefixLen      INTEGER,
+    vRtrMplsTunnelCHopIpv6Addr           InetAddressIPv6,
+    vRtrMplsTunnelCHopIpv6PrefixLen      INTEGER,
+    vRtrMplsTunnelCHopAsNumber           INTEGER,
+    vRtrMplsTunnelCHopLspId              MplsLSPID,
+    vRtrMplsTunnelCHopStrictOrLoose      INTEGER
+}
+
+vRtrMplsTunnelCHopListIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Primary index into this table identifying a particular explicit route
+         object."
+    ::= { vRtrMplsTunnelCHopEntry 1 }
+
+vRtrMplsTunnelCHopIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Secondary index into this table identifying a particular hop."
+    ::= { vRtrMplsTunnelCHopEntry 2 }
+
+vRtrMplsTunnelCHopAddrType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ipV4(1),
+                    ipV6(2),
+                    asNumber(3),
+                    lspid(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the address type of this tunnel hop."
+    DEFVAL { ipV4 }
+    ::= { vRtrMplsTunnelCHopEntry 3 }
+
+vRtrMplsTunnelCHopIpv4Addr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If vRtrMplsTunnelCHopAddrType is set to ipV4(1), then this value will
+         contain the IPv4 address of this hop. This object is otherwise 
+         insignificant and should contain a value of 0."
+    ::= { vRtrMplsTunnelCHopEntry 4 }
+
+vRtrMplsTunnelCHopIpv4PrefixLen OBJECT-TYPE
+    SYNTAX      INTEGER (1..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If vRtrMplsTunnelCHopAddrType is ipV4(1), then the prefix length for 
+         this hop's IPv4 address is contained herein. This object is otherwise
+         insignificant and should contain a value of 0."
+    ::= { vRtrMplsTunnelCHopEntry 5 }
+
+vRtrMplsTunnelCHopIpv6Addr OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the vRtrMplsTunnelCHopAddrType is set to ipV6(2), then this 
+         variable contains the IPv6 address of this hop. This object is 
+         otherwise insignificant and should contain a value of 0."
+    ::= { vRtrMplsTunnelCHopEntry 6 }
+
+vRtrMplsTunnelCHopIpv6PrefixLen OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If vRtrMplsTunnelCHopAddrType is set to ipV6(2), this value will 
+         contain the prefix length for this hop's IPv6 address. This object is
+         otherwise insignificant and should contain a value of 0."
+    ::= { vRtrMplsTunnelCHopEntry 7 }
+
+vRtrMplsTunnelCHopAsNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If vRtrMplsTunnelCHopAddrType is set to asNumber(3), then this value 
+         will contain the AS number of this hop. This object is otherwise     
+         insignificant and should contain a value of 0 to indicate this fact."
+    ::= { vRtrMplsTunnelCHopEntry 8 }
+
+vRtrMplsTunnelCHopLspId OBJECT-TYPE
+    SYNTAX      MplsLSPID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If vRtrMplsTunnelCHopAddrType is set to lspid(4), then this value will
+         contain the LSPID of a tunnel of this hop. The present tunnel being 
+         configured is tunneled through this hop (using label stacking). This 
+         object is otherwise insignificant and should contain a value of 0 to
+         indicate this fact."
+    ::= { vRtrMplsTunnelCHopEntry 9 }
+
+vRtrMplsTunnelCHopStrictOrLoose OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    strict(1),
+                    loose(2)
+                } 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes whether this tunnel hop is routed in a strict or loose 
+         fashion."
+    ::= { vRtrMplsTunnelCHopEntry 10 }
+   
+--
+--  Virtual Router MPLS Administrative Group Table
+--
+
+vRtrMplsAdminGroupTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsAdminGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsAdminGroupTable has an entry for each administrative
+         group configured for the virtual router in the system. 
+         
+         Administrative groups are resource constructs that define a link
+         color or resource class. They provide the ability to classify 
+         network resources (links) into groups or colors based on zones, 
+         geographic location, link location, etc. By doing so, network
+         administrators are able to do more granular traffic engineering
+         of LSPs."
+    ::= { tmnxMplsObjs 13 }
+
+vRtrMplsAdminGroupEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsAdminGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsAdminGroupTable represents an 
+         administrative group which is simply a mapping between a group
+         name (an ASCII string) and a group value (a number in the range
+         0 to 31).
+         
+         Entries in this table are created and deleted via SNMP SET 
+         operations. An entry is created by setting the value of 
+         vRtrMplsAdminGroupRowStatus to 'createAndWait'. The row status
+         for this entry can be set to active only once the value of 
+         vRtrMplsAdminGroupValue has been set to a valid number in the
+         range 0 to 31. The entry is destroyed when 
+         vRtrMplsAdminGroupRowStatus is set to 'destroy'."
+    INDEX { vRtrID, IMPLIED vRtrMplsAdminGroupName }
+    ::= { vRtrMplsAdminGroupTable 1 }
+
+VRtrMplsAdminGroupEntry ::= SEQUENCE {
+     vRtrMplsAdminGroupName          TNamedItem,
+     vRtrMplsAdminGroupRowStatus     RowStatus,
+     vRtrMplsAdminGroupValue         Integer32
+}
+
+vRtrMplsAdminGroupName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsAdminGroupName uniquely identifies the
+         name of the administrative group within a virtual router 
+         instance."
+    ::= { vRtrMplsAdminGroupEntry 1 }
+
+vRtrMplsAdminGroupRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsAdminGroupRowStatus is used to create, delete or 
+         control entries in the vRtrMplsAdminGroupTable. To create 
+         a row entry, the row status should be set to 'createAndWait'. 
+         Before the row can be placed into the 'active' state, 
+         vRtrMplsAdminGroupValue must be set to a value between 0 
+         and 31. To delete a row entry, the row status should be set
+         to 'destroy'"
+    ::= { vRtrMplsAdminGroupEntry 2 }
+
+vRtrMplsAdminGroupValue    OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..31)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsAdminGroupValue specifies the group value
+         associated with this administrative group. This value is unique 
+         within a virtual router instance.
+
+         A value of -1 indicates that the group value for this entry has
+         not been set."
+    ::= { vRtrMplsAdminGroupEntry 3 }
+
+--
+--  Virtual Router MPLS Fate Sharing Group Table
+--
+
+vRtrMplsFSGroupTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFSGroupTable has an entry for each group that is 
+         a part of the fate sharing database configured for the virtual 
+         router in the system. 
+         
+         A fate sharing group is used to define a group of links and 
+         nodes in the network that share common risk attributes. To
+         minimize a single point of failure, backup paths can be created
+         that not only avoid the nodes and links of the primary path but
+         also any other nodes and links that share risk with the nodes 
+         and links of the primary path."
+    ::= { tmnxMplsObjs 14 }
+
+vRtrMplsFSGroupEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsFSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsFSGroupTable represents a 
+         fate sharing group which is a database of nodes and links 
+         that share common risk attributes.
+         
+         Entries in this table are created and deleted via SNMP SET 
+         operations. An entry is created by setting the value of 
+         vRtrMplsFSGroupRowStatus to 'createAndGo'. An entry can 
+         be deleted by setting vRtrMplsFSGroupRowStatus to 'destroy'."
+    INDEX { vRtrID, vRtrMplsFSGroupName }
+    ::= { vRtrMplsFSGroupTable 1 }
+
+VRtrMplsFSGroupEntry ::= SEQUENCE {
+     vRtrMplsFSGroupName          TNamedItem,
+     vRtrMplsFSGroupRowStatus     RowStatus,
+     vRtrMplsFSGroupCost          Unsigned32
+}
+
+vRtrMplsFSGroupName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFSGroupName uniquely identifies the
+         name of the fate sharing group within a virtual router 
+         instance."
+    ::= { vRtrMplsFSGroupEntry 1 }
+
+vRtrMplsFSGroupRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsFSGroupRowStatus is used to create, delete or 
+         control entries in the vRtrMplsFSGroupTable. To create 
+         a row entry, the row status should be set to 'createAndGo'. 
+         To delete a row entry, the row status should be set to
+         'destroy'"
+    ::= { vRtrMplsFSGroupEntry 2 }
+
+vRtrMplsFSGroupCost    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFSGroupCost specifies the cost assigned 
+         to the fate sharing group. This cost is applied to all nodes 
+         and links that are part of this group and used for CSPF 
+         calculations. The higher the cost of the node or link, the 
+         lesser its chance of being selected as part of the path."
+    DEFVAL { 1 }
+    ::= { vRtrMplsFSGroupEntry 3 }
+
+--
+--  Virtual Router MPLS Fate Sharing Group Params Table
+--
+
+vRtrMplsFSGroupParamsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFSGroupParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFSGroupParamsTable has an entry for each node
+         or link that is part of a fate sharing group on this virtual 
+         router."
+    ::= { tmnxMplsObjs 15 }
+
+vRtrMplsFSGroupParamsEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsFSGroupParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsFSGroupParamsTable represents
+         either a node or a link that is a part of a fate sharing group
+         defined in the vRtrMplsFSGroupTable.
+         
+         Entries in this table are created and deleted via SNMP SET 
+         operations. An entry is created by setting the value of 
+         vRtrMplsFSGroupParamsRowStatus to 'createAndGo'. An entry 
+         can be deleted by setting vRtrMplsFSGroupParamsRowStatus to
+         'destroy'.
+         
+         To configure a node to be part of the group, create an entry
+         in this table with vRtrMplsFSGroupParamsFromAddr set to a 
+         valid non-zero IP address and vRtrMplsFSGroupParamsToAddr set
+         to 0. To configure a link to be part of the group, create an
+         entry in this table with both vRtrMplsFSGroupParamsFromAddr
+         and vRtrMplsFSGroupParamsToAddr set to valid non-zero IP 
+         addresses."
+    INDEX { vRtrID, 
+            vRtrMplsFSGroupName, 
+            vRtrMplsFSGroupParamsFromAddr,
+            vRtrMplsFSGroupParamsToAddr }
+    ::= { vRtrMplsFSGroupParamsTable 1 }
+
+VRtrMplsFSGroupParamsEntry ::= SEQUENCE {
+     vRtrMplsFSGroupParamsFromAddr      IpAddress,
+     vRtrMplsFSGroupParamsToAddr        IpAddress,
+     vRtrMplsFSGroupParamsRowStatus     RowStatus
+}
+
+vRtrMplsFSGroupParamsFromAddr    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFSGroupParamsFromAddr along with the 
+         value of vRtrMplsFSGroupParamsToAddr uniquely identifies a 
+         link or node within a fate sharing group. 
+
+         This value must be non-zero for all row entries whether it
+         represents a node or a link."
+    ::= { vRtrMplsFSGroupParamsEntry 1 }
+
+vRtrMplsFSGroupParamsToAddr    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFSGroupParamsToAddr along with the 
+         value of vRtrMplsFSGroupParamsFromAddr uniquely identifies 
+         a link or node within a fate sharing group. 
+         
+         This value must be 0 for row entries that represent a node
+         and must be non-zero for row entries that represent a link."
+    ::= { vRtrMplsFSGroupParamsEntry 2 }
+
+vRtrMplsFSGroupParamsRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsFSGroupParamsRowStatus is used to create, delete or 
+         control entries in the vRtrMplsFSGroupParamsTable. To create 
+         a row entry, the row status should be set to 'createAndGo'. 
+         To delete a row entry, the row status should be set to
+         'destroy'"
+    ::= { vRtrMplsFSGroupParamsEntry 3 }
+
+--
+--  MPLS Label Range Table
+--
+
+vRtrMplsLabelRangeTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLabelRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLabelRangeTable has an entry for each type of
+         label, the minimum and maximum value in the label range and 
+         information on total available and aging labels in each range.
+         
+         This is a read-only table."
+    ::= { tmnxMplsObjs 17 }
+
+vRtrMplsLabelRangeEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLabelRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsLabelRangeTable represents 
+         a type of label. Each entry contains the label range used 
+         by that label type and the number of aging and allocated 
+         labels in the range."
+    INDEX { vRtrMplsLabelType } 
+    ::= { vRtrMplsLabelRangeTable 1 }
+
+VRtrMplsLabelRangeEntry ::= SEQUENCE {
+     vRtrMplsLabelType                  INTEGER,
+     vRtrMplsLabelRangeMin              Unsigned32,
+     vRtrMplsLabelRangeMax              Unsigned32,
+     vRtrMplsLabelRangeAging            Unsigned32,    
+     vRtrMplsLabelRangeAvailable        Unsigned32
+}
+
+vRtrMplsLabelType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   staticLsp (1),
+                   staticSvc (2),
+                   dynamic (3)
+               }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLabelType specifies the type of
+        label and is the index for this table."
+    ::= { vRtrMplsLabelRangeEntry 1 }
+
+vRtrMplsLabelRangeMin    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLabelRangeMin specifies the minimum
+        label value in the range for a particular label type."
+    ::= { vRtrMplsLabelRangeEntry 2 }
+
+vRtrMplsLabelRangeMax    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLabelRangeMax specifies the maximum
+        label value in the range for a particular label type."
+    ::= { vRtrMplsLabelRangeEntry 3 }
+
+vRtrMplsLabelRangeAging    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLabelRangeAging represents the 
+        number of labels that are currently allocated and aging."
+    ::= { vRtrMplsLabelRangeEntry 4 }
+
+vRtrMplsLabelRangeAvailable    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLabelRangeAvailable represents the 
+        number of labels that are currently available for each 
+        label type."
+    ::= { vRtrMplsLabelRangeEntry 5 }
+
+--
+--  MPLS Static LSP Label Table
+--
+
+vRtrMplsStaticLSPLabelTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsStaticLSPLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsStaticLSPLabelTable has an entry for each allocated 
+        label that is part of the static LSP label range. This is a 
+        read-only table." 
+    ::= { tmnxMplsObjs 18 }
+
+vRtrMplsStaticLSPLabelEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsStaticLSPLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsStaticLSPLabelTable represents 
+         a label of type static LSP that is currently allocated.
+         The entry includes information about the current owner
+         for that label."
+         
+    INDEX { vRtrMplsStaticLSPLabel } 
+    ::= { vRtrMplsStaticLSPLabelTable 1 }
+
+VRtrMplsStaticLSPLabelEntry ::= SEQUENCE {
+     vRtrMplsStaticLSPLabel             MplsLabel,
+     vRtrMplsStaticLSPLabelOwner        TmnxMplsLabelOwner
+}
+
+vRtrMplsStaticLSPLabel    OBJECT-TYPE
+    SYNTAX      MplsLabel (32..1023)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsStaticLSPLabel specifies the label
+        value."
+    ::= { vRtrMplsStaticLSPLabelEntry 1 }
+
+vRtrMplsStaticLSPLabelOwner    OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOwner 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsStaticLSPLabelOwner specifies the owner
+        for the label value vRtrMplsStaticLSPLabel."
+    ::= { vRtrMplsStaticLSPLabelEntry 2 }
+
+--
+--  MPLS Static Service Label Table
+--
+
+vRtrMplsStaticSvcLabelTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsStaticSvcLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsStaticSvcLabelTable has an entry for each allocated 
+        label that is part of the static service label range. This 
+        is a read-only table." 
+    ::= { tmnxMplsObjs 19 }
+
+vRtrMplsStaticSvcLabelEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsStaticSvcLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrMplsStaticSvcLabelTable represents 
+         a label of type static-svc that is currently allocated.
+         The entry includes information about the current owner
+         for that label."
+         
+    INDEX { vRtrMplsStaticSvcLabel } 
+    ::= { vRtrMplsStaticSvcLabelTable 1 }
+
+VRtrMplsStaticSvcLabelEntry ::= SEQUENCE {
+     vRtrMplsStaticSvcLabel             MplsLabel,
+     vRtrMplsStaticSvcLabelOwner        TmnxMplsLabelOwner
+}
+
+vRtrMplsStaticSvcLabel    OBJECT-TYPE
+    SYNTAX      MplsLabel (2048..18431)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsStaticSvcLabel specifies the label
+        value."
+    ::= { vRtrMplsStaticSvcLabelEntry 1 }
+
+vRtrMplsStaticSvcLabelOwner    OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOwner   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsStaticSvcLabelOwner specifies 
+        the owner for the label value vRtrMplsStaticSvcLabel."
+    DEFVAL { none }
+    ::= { vRtrMplsStaticSvcLabelEntry 2 }
+
+--
+--  Virtual Router MPLS SRLG group Table
+--
+vRtrMplsSrlgGrpTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsSrlgGrpTableLastChanged indicates the
+         sysUpTime at the time of the last modification to 
+         vRtrMplsSrlgGrpTable by adding, deleting an entry or change
+         to a writable object in the table.
+
+         If no changes were made to the table since the last 
+         re-initialization of the local network management subsystem, 
+         then this object contains a zero value."
+    ::= { tmnxMplsObjs 20 } 
+ 
+vRtrMplsSrlgGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsSrlgGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsSrlgGrpTable has an entry for each Shared Risk Link 
+         Groups (SRLG) group configured for MPLS in the system."
+    ::= { tmnxMplsObjs 21 }
+
+vRtrMplsSrlgGrpEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsSrlgGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a SRLG group on this virtual router
+         that participates in the MPLS protocol.  A row can be created
+         or deleted via SNMP SET requests." 
+    INDEX { vRtrID, IMPLIED vRtrMplsSrlgGrpName }
+    ::= { vRtrMplsSrlgGrpTable 1 }
+
+VRtrMplsSrlgGrpEntry ::= SEQUENCE {
+    vRtrMplsSrlgGrpName                  TNamedItem,
+    vRtrMplsSrlgGrpRowStatus             RowStatus,
+    vRtrMplsSrlgGrpLastChanged           TimeStamp,
+    vRtrMplsSrlgGrpValue                 Unsigned32                          
+}
+
+vRtrMplsSrlgGrpName  OBJECT-TYPE
+    SYNTAX     TNamedItem
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The value of vRtrMplsSrlgGrpName indicates the SRLG group name."
+    ::= { vRtrMplsSrlgGrpEntry 1 }
+
+vRtrMplsSrlgGrpRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsSrlgGrpRowStatus is used to create, delete or 
+         control entries in the vRtrMplsSrlgGrpTable.  A value must 
+         also be set for vRtrMplsSrlgGrpValue before the row entry can
+         transition to the 'active' state."
+    ::= { vRtrMplsSrlgGrpEntry 2 }
+
+vRtrMplsSrlgGrpLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsSrlgGrpLastChanged indicates the timestamp of 
+         last change to this row in vRtrMplsSrlgGrpTable."
+    ::= { vRtrMplsSrlgGrpEntry 3 }
+
+vRtrMplsSrlgGrpValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsSrlgGrpValue specifies the group value 
+         associated with vRtrMplsSrlgGrpName.  This value is unique 
+         within a virtual router instance.
+
+         At the time of row creation, a value for vRtrMplsSrlgGrpValue 
+         must be specified or else row creation would fail."
+    ::= { vRtrMplsSrlgGrpEntry 4 }
+
+--
+--  Virtual Router MPLS Interface SRLG Group Table
+--
+vRtrMplsIfSrlgGrpTblLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsIfSrlgGrpTblLastChanged indicates the
+         sysUpTime at the time of the last modification to 
+         vRtrMplsIfSrlgGrpTable by adding, deleting an entry or change
+         to a writable object in the table.
+
+         If no changes were made to the table since the last 
+         re-initialization of the local network management subsystem, 
+         then this object contains a zero value."
+    ::= { tmnxMplsObjs 22 } 
+
+vRtrMplsIfSrlgGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsIfSrlgGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsIfSrlgGrpTable has an entry for each Shared Risk 
+         Link Group (SRLG) groups associated with a router interface 
+         configured for MPLS in the system."
+    ::= { tmnxMplsObjs 23 }
+
+vRtrMplsIfSrlgGrpEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsIfSrlgGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an SRLG group associated with a interface
+         on this virtual router that participates in the MPLS protocol.
+  
+         A row can be created or deleted via SNMP SET requests."
+    INDEX { vRtrID, vRtrIfIndex, IMPLIED vRtrMplsIfSrlgGrpName }
+    ::= { vRtrMplsIfSrlgGrpTable 1 }
+
+VRtrMplsIfSrlgGrpEntry ::= SEQUENCE {
+    vRtrMplsIfSrlgGrpName              TNamedItem,
+    vRtrMplsIfSrlgGrpRowStatus         RowStatus,
+    vRtrMplsIfSrlgGrpLastChanged       TimeStamp    
+}
+
+vRtrMplsIfSrlgGrpName OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsIfSrlgGrpName indicates the SRLG group name."
+    ::= { vRtrMplsIfSrlgGrpEntry 1 }
+
+vRtrMplsIfSrlgGrpRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsIfSrlgGrpRowStatus is used to create, delete or 
+         control entries in the vRtrMplsIfSrlgGrpTable."
+    ::= { vRtrMplsIfSrlgGrpEntry 2 }
+
+vRtrMplsIfSrlgGrpLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsIfSrlgGrpLastChanged indicates the timestamp
+         of last change to this row in vRtrMplsIfSrlgGrpTable."
+    ::= { vRtrMplsIfSrlgGrpEntry 3 }
+
+--
+-- Notification Information
+--
+tmnxMplsNotificationlObjects OBJECT IDENTIFIER ::= { tmnxMplsObjs 16 }
+
+-- Trap control objects
+--
+
+vRtrMplsLspNotificationReasonCode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noError(0),
+                    noPathIsOperational(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by vRtrMplsLspDown, the value indicates the reason for the 
+         LSP going down."
+    ::= { tmnxMplsNotificationlObjects 1 }
+
+vRtrMplsLspPathNotificationReasonCode  OBJECT-TYPE
+    SYNTAX      TmnxMplsLspFailCode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by vRtrMplsLspPathDown, the value indicates the reason for the 
+         LSP path going down."
+    ::= { tmnxMplsNotificationlObjects 2 }
+
+vRtrMplsNotifyRow  OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "used by Alcatel 7x50 SR series MPLS Configuration change 
+         Notifications, the object ID indicates the MPLS table and entry."
+    ::= { tmnxMplsNotificationlObjects 3 }
+
+
+--
+-- Notification Definitions
+--
+
+vRtrMplsStateChange NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrMplsGeneralAdminState,
+                  vRtrMplsGeneralOperState }
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when the MPLS
+         module changes state"
+    ::= { tmnxMplsNotifications 1 }
+
+vRtrMplsIfStateChange NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrIfIndex,
+                  vRtrMplsIfAdminState,
+                  vRtrMplsIfOperState }
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when the MPLS
+         interface changes state"
+    ::= { tmnxMplsNotifications 2 }
+  
+vRtrMplsLspUp NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrMplsLspIndex,
+                  vRtrMplsLspAdminState,
+                  vRtrMplsLspOperState }
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when a LSP transitions
+         to the 'inService' state from any other state."
+    ::= { tmnxMplsNotifications 3 }
+  
+vRtrMplsLspDown NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrMplsLspIndex,
+                  vRtrMplsLspAdminState,
+                  vRtrMplsLspOperState,
+                  vRtrMplsLspNotificationReasonCode }
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when a LSP transitions
+         out of 'inService' state to any other state."
+    ::= { tmnxMplsNotifications 4 }
+
+vRtrMplsLspPathUp NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrMplsLspIndex,
+                  mplsTunnelIndex,
+                  mplsTunnelInstance,
+                  mplsTunnelIngressLSRId,
+                  vRtrMplsLspPathAdminState,
+                  vRtrMplsLspPathOperState }
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when a LSP Path transitions
+         to the 'inService' state from any other state."
+    ::= { tmnxMplsNotifications 5 }
+  
+vRtrMplsLspPathDown NOTIFICATION-TYPE
+    OBJECTS     { vRtrID,
+                  vRtrMplsLspIndex,
+                  mplsTunnelIndex,
+                  mplsTunnelInstance,
+                  mplsTunnelIngressLSRId,
+                  vRtrMplsLspPathAdminState,
+                  vRtrMplsLspPathOperState,
+--  ALCATEL CHANG
+--                vRtrMplsLspPathNotificationReasonCode}
+                  vRtrMplsLspPathNotificationReasonCode }
+--  ALCATEL CHANG
+    STATUS      current
+    DESCRIPTION
+        "This Notification is generated when a LSP Path transitions
+         out of 'inService' state to any other state."
+    ::= { tmnxMplsNotifications 6 }
+
+vRtrMplsLspPathRerouted NOTIFICATION-TYPE
+    OBJECTS     { vRtrMplsLspPathAdminState,
+                  vRtrMplsLspPathOperState }
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathRerouted notification is generated when 
+         an LSP Path is rerouted."
+    ::= { tmnxMplsNotifications 7 }
+
+vRtrMplsLspPathResignaled NOTIFICATION-TYPE
+    OBJECTS     { vRtrMplsLspPathAdminState,
+                  vRtrMplsLspPathOperState }
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathResignaled notification is generated when 
+         an LSP Path is resignaled."
+    ::= { tmnxMplsNotifications 8 }
+
+--
+-- Conformance Information
+--
+tmnxMplsCompliances OBJECT IDENTIFIER ::= { tmnxMplsConformance 1 }
+tmnxMplsGroups      OBJECT IDENTIFIER ::= { tmnxMplsConformance 2 }
+
+-- compliance statements
+
+-- tmnxMplsCompliance  MODULE-COMPLIANCE
+--    ::= { tmnxMplsCompliances 1 }
+
+-- tmnxMplsR2r1Compliance  MODULE-COMPLIANCE
+--    ::= { tmnxMplsCompliances 2 }
+
+tmnxMplsV3v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended MPLS
+             on Alcatel 7x50 SR series systems 3.0 Release."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 
+            tmnxMplsGlobalR2r1Group,
+            tmnxMplsLspR2r1Group,
+            tmnxMplsLspPathGroup,
+            tmnxMplsXCGroup,
+            tmnxMplsIfGroup,
+            tmnxMplsTunnelARHopGroup,
+            tmnxMplsTunnelCHopGroup,
+            tmnxMplsAdminGroupGroup,
+            -- tmnxMplsFSGroupGroup,
+            tmnxMplsNotificationR2r1Group,
+            tmnxMplsLabelRangeGroup
+        }
+    ::= { tmnxMplsCompliances 3 }
+
+tmnxMplsV5v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended MPLS
+             on Alcatel 7xxx SR series systems 5.0 Release."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 
+            tmnxMplsGlobalV5v0Group,
+            tmnxMplsLspV5v0Group,
+            tmnxMplsLspPathGroup,
+            tmnxMplsXCGroup,
+            tmnxMplsIfGroup,
+            tmnxMplsTunnelARHopGroup,
+            tmnxMplsTunnelCHopGroup,
+            tmnxMplsAdminGroupGroup,
+            -- tmnxMplsFSGroupGroup,
+            tmnxMplsNotificationR2r1Group,
+            tmnxMplsLabelRangeGroup
+        }
+    ::= { tmnxMplsCompliances 4 }
+
+tmnxMplsV6v0Compliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for management of extended MPLS
+             on Alcatel 7xxx SR series systems 6.0 Release."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 
+            tmnxMplsGlobalV6v0Group,
+            tmnxMplsLspV5v0Group,
+            tmnxMplsLspPathGroup,
+            tmnxMplsXCGroup,
+            tmnxMplsIfGroup,
+            tmnxMplsTunnelARHopGroup,
+            tmnxMplsTunnelCHopGroup,
+            tmnxMplsAdminGroupGroup,
+            -- tmnxMplsFSGroupGroup,
+            tmnxMplsNotificationR2r1Group,
+            tmnxMplsLabelRangeGroup,
+            tmnxMplsSrlgV6v0Group,
+            tmnxMplsIfV6v0Group,
+            tmnxMplsLspV6v0Group
+        }
+    ::= { tmnxMplsCompliances 5 }
+
+
+-- units of conformance
+
+-- tmnxMplsGlobalGroup   OBJECT-GROUP
+--    ::= { tmnxMplsGroups 1 }
+
+-- tmnxMplsLspGroup   OBJECT-GROUP
+--    ::= { tmnxMplsGroups 2 }
+
+tmnxMplsLspPathGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsLspPathTableSpinlock,
+                vRtrMplsLspPathRowStatus,
+                vRtrMplsLspPathLastChange,
+                vRtrMplsLspPathType,
+                vRtrMplsLspPathCos,
+                vRtrMplsLspPathProperties,
+                vRtrMplsLspPathBandwidth,
+                vRtrMplsLspPathBwProtect,
+                vRtrMplsLspPathState,
+                vRtrMplsLspPathPreference,
+                vRtrMplsLspPathCosSource,
+                vRtrMplsLspPathClassOfService,
+                vRtrMplsLspPathSetupPriority,
+                vRtrMplsLspPathHoldPriority,
+                vRtrMplsLspPathRecord,
+                vRtrMplsLspPathHopLimit,
+                vRtrMplsLspPathSharing,
+                vRtrMplsLspPathAdminState,
+                vRtrMplsLspPathOperState,
+                vRtrMplsLspPathInheritance,
+                vRtrMplsLspPathLspId,
+                vRtrMplsLspPathRetryTimeRemaining,
+                vRtrMplsLspPathTunnelARHopListIndex,
+                vRtrMplsLspPathNegotiatedMTU,
+                vRtrMplsLspPathFailCode,
+                vRtrMplsLspPathFailNodeAddr,
+                vRtrMplsLspPathAdminGroupInclude,
+                vRtrMplsLspPathAdminGroupExclude,
+                vRtrMplsLspPathAdaptive,
+                vRtrMplsLspPathOptimizeTimer,
+                vRtrMplsLspPathNextOptimize,
+                vRtrMplsLspPathOperBandwidth,
+                vRtrMplsLspPathMBBState,
+                vRtrMplsLspPathResignal,
+                vRtrMplsLspPathTunnelCRHopListIndex,
+                vRtrMplsLspPathOperMTU,
+                vRtrMplsLspPathRecordLabel,
+                vRtrMplsLspPathTimeUp,
+                vRtrMplsLspPathTimeDown,
+                vRtrMplsLspPathRetryAttempts,
+                vRtrMplsLspPathTransitionCount,
+                vRtrMplsLspPathCspfQueries
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS LSP
+         to path mapping on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 3 }
+
+tmnxMplsXCGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsXCIndex,
+                vRtrMplsInSegmentIfIndex,
+                vRtrMplsInSegmentLabel,
+                vRtrMplsOutSegmentIndex,
+                vRtrMplsERHopTunnelIndex,
+                vRtrMplsARHopTunnelIndex,
+                vRtrMplsRsvpSessionIndex,
+                vRtrMplsXCFailCode,
+                vRtrMplsXCCHopTableIndex
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS LSP
+         to cross-connection mapping on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 4 }
+
+tmnxMplsIfGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsIfAdminState,
+                vRtrMplsIfOperState,
+                vRtrMplsIfAdminGroup,
+                vRtrMplsIfTxPktCount,
+                vRtrMplsIfRxPktCount,
+                vRtrMplsIfTxOctetCount,
+                vRtrMplsIfRxOctetCount
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         interfaces on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 5 }
+
+tmnxMplsTunnelARHopGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsTunnelARHopProtection,
+                vRtrMplsTunnelARHopRecordLabel,
+                vRtrMplsTunnelARHopRouterId
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         Tunnel AR hops on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 6 }
+
+tmnxMplsTunnelCHopGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsTunnelCHopAddrType,
+                vRtrMplsTunnelCHopIpv4Addr,
+                vRtrMplsTunnelCHopIpv4PrefixLen,
+                vRtrMplsTunnelCHopIpv6Addr,
+                vRtrMplsTunnelCHopIpv6PrefixLen,
+                vRtrMplsTunnelCHopAsNumber,
+                vRtrMplsTunnelCHopLspId,
+                vRtrMplsTunnelCHopStrictOrLoose
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         CSPF Tunnel hops on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 7 }
+
+tmnxMplsAdminGroupGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsAdminGroupRowStatus,
+                vRtrMplsAdminGroupValue
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         administrative groups on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 8 }
+
+tmnxMplsFSGroupGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsFSGroupRowStatus,
+                vRtrMplsFSGroupCost,
+                vRtrMplsFSGroupParamsRowStatus
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         fate sharing groups on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 9 }
+
+tmnxMplsNotifyObjsGroup   OBJECT-GROUP
+    OBJECTS {   vRtrMplsLspNotificationReasonCode,
+                vRtrMplsLspPathNotificationReasonCode,
+                vRtrMplsNotifyRow,
+                vRtrMplsLspIndex
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting extended MPLS notifications 
+         on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 10 }
+
+-- tmnxMplsNotificationGroup NOTIFICATION-GROUP
+--    ::= { tmnxMplsGroups 11 }
+
+tmnxMplsGlobalR2r1Group   OBJECT-GROUP
+    OBJECTS {   vRtrMplsGeneralLastChange,
+                vRtrMplsGeneralAdminState,
+                vRtrMplsGeneralOperState,
+                vRtrMplsGeneralPropagateTtl,
+                vRtrMplsGeneralTE,
+                vRtrMplsGeneralNewLspIndex,
+                vRtrMplsGeneralOptimizeTimer,
+                vRtrMplsGeneralFRObject,
+                vRtrMplsGeneralResignalTimer,
+                vRtrMplsGeneralStaticLspOriginate,
+                vRtrMplsGeneralStaticLspTransit,
+                vRtrMplsGeneralStaticLspTerminate,
+                vRtrMplsGeneralDynamicLspOriginate,
+                vRtrMplsGeneralDynamicLspTransit,
+                vRtrMplsGeneralDynamicLspTerminate,
+                vRtrMplsGeneralDetourLspOriginate,
+                vRtrMplsGeneralDetourLspTransit,
+                vRtrMplsGeneralDetourLspTerminate
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting general management of extended MPLS
+         on Alcatel 7x50 SR series systems 2.1 Release."
+    ::= { tmnxMplsGroups 12 }
+
+tmnxMplsLspR2r1Group   OBJECT-GROUP
+    OBJECTS {   vRtrMplsLspRowStatus,
+                vRtrMplsLspLastChange,
+                vRtrMplsLspName,
+                vRtrMplsLspAdminState,
+                vRtrMplsLspOperState,
+                vRtrMplsLspFromAddr,
+                vRtrMplsLspToAddr,
+                vRtrMplsLspType,
+                vRtrMplsLspOutSegIndx,
+                vRtrMplsLspRetryTimer,
+                vRtrMplsLspRetryLimit,
+                vRtrMplsLspMetric,
+                vRtrMplsLspDecrementTtl,
+                vRtrMplsLspCspf,
+                vRtrMplsLspFastReroute,
+                vRtrMplsLspFRHopLimit,
+                vRtrMplsLspFRBandwidth,
+                vRtrMplsLspClassOfService,
+                vRtrMplsLspSetupPriority,
+                vRtrMplsLspHoldPriority,
+                vRtrMplsLspRecord,
+                vRtrMplsLspPreference,
+                vRtrMplsLspBandwidth,
+                vRtrMplsLspBwProtect,
+                vRtrMplsLspHopLimit,
+                vRtrMplsLspNegotiatedMTU,
+                vRtrMplsLspRsvpResvStyle,
+                vRtrMplsLspRsvpAdspec,
+                vRtrMplsLspFRMethod,
+                vRtrMplsLspFRNodeProtect,
+                vRtrMplsLspAdminGroupInclude,
+                vRtrMplsLspAdminGroupExclude,
+                vRtrMplsLspAdaptive,
+                vRtrMplsLspInheritance,
+                vRtrMplsLspOptimizeTimer,
+                vRtrMplsLspOperFastReroute,
+                vRtrMplsLspFRObject,
+                vRtrMplsLspOctets,
+                vRtrMplsLspPackets,
+                vRtrMplsLspAge,
+                vRtrMplsLspTimeUp,
+                vRtrMplsLspTimeDown,
+                vRtrMplsLspPrimaryTimeUp,
+                vRtrMplsLspTransitions,
+                vRtrMplsLspLastTransition,
+                vRtrMplsLspPathChanges,
+                vRtrMplsLspLastPathChange,
+                vRtrMplsLspConfiguredPaths,
+                vRtrMplsLspStandbyPaths,
+                vRtrMplsLspOperationalPaths
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS LSPs 
+         on Alcatel 7x50 SR series systems 2.1 Release."
+    ::= { tmnxMplsGroups 13 }
+
+tmnxMplsNotificationR2r1Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   vRtrMplsStateChange,
+                        vRtrMplsIfStateChange,
+                        vRtrMplsLspUp,
+                        vRtrMplsLspDown,
+                        vRtrMplsLspPathUp,
+                        vRtrMplsLspPathDown,
+                        vRtrMplsLspPathRerouted,
+                        vRtrMplsLspPathResignaled
+                    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the extended MPLS feature
+         on Alcatel 7x50 SR series systems 2.1 Release."
+    ::= { tmnxMplsGroups 14 }
+
+tmnxMplsLabelRangeGroup     OBJECT-GROUP
+    OBJECTS {   vRtrMplsLabelRangeMin,
+                vRtrMplsLabelRangeMax,
+                vRtrMplsLabelRangeAging,
+                vRtrMplsLabelRangeAvailable,
+                vRtrMplsStaticLSPLabelOwner,
+                vRtrMplsStaticSvcLabelOwner
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS 
+         label ranges on Alcatel 7x50 SR series systems."
+    ::= { tmnxMplsGroups 15 }
+
+tmnxMplsGlobalV5v0Group   OBJECT-GROUP
+    OBJECTS {   vRtrMplsGeneralLastChange,
+                vRtrMplsGeneralAdminState,
+                vRtrMplsGeneralOperState,
+                vRtrMplsGeneralPropagateTtl,
+                vRtrMplsGeneralTE,
+                vRtrMplsGeneralNewLspIndex,
+                vRtrMplsGeneralOptimizeTimer,
+                vRtrMplsGeneralFRObject,
+                vRtrMplsGeneralResignalTimer,
+                vRtrMplsGeneralStaticLspOriginate,
+                vRtrMplsGeneralStaticLspTransit,
+                vRtrMplsGeneralStaticLspTerminate,
+                vRtrMplsGeneralDynamicLspOriginate,
+                vRtrMplsGeneralDynamicLspTransit,
+                vRtrMplsGeneralDynamicLspTerminate,
+                vRtrMplsGeneralDetourLspOriginate,
+                vRtrMplsGeneralDetourLspTransit,
+                vRtrMplsGeneralDetourLspTerminate,
+                vRtrMplsGeneralHoldTimer,
+                vRtrMplsGeneralDynamicBypass
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting general management of extended MPLS
+         on Alcatel 7x50 SR series systems 5.0 Release."
+    ::= { tmnxMplsGroups 16 }
+
+tmnxMplsLspV5v0Group   OBJECT-GROUP
+    OBJECTS {   vRtrMplsLspRowStatus,
+                vRtrMplsLspLastChange,
+                vRtrMplsLspName,
+                vRtrMplsLspAdminState,
+                vRtrMplsLspOperState,
+                vRtrMplsLspFromAddr,
+                vRtrMplsLspToAddr,
+                vRtrMplsLspType,
+                vRtrMplsLspOutSegIndx,
+                vRtrMplsLspRetryTimer,
+                vRtrMplsLspRetryLimit,
+                vRtrMplsLspMetric,
+                vRtrMplsLspDecrementTtl,
+                vRtrMplsLspCspf,
+                vRtrMplsLspFastReroute,
+                vRtrMplsLspFRHopLimit,
+                vRtrMplsLspFRBandwidth,
+                vRtrMplsLspClassOfService,
+                vRtrMplsLspSetupPriority,
+                vRtrMplsLspHoldPriority,
+                vRtrMplsLspRecord,
+                vRtrMplsLspPreference,
+                vRtrMplsLspBandwidth,
+                vRtrMplsLspBwProtect,
+                vRtrMplsLspHopLimit,
+                vRtrMplsLspNegotiatedMTU,
+                vRtrMplsLspRsvpResvStyle,
+                vRtrMplsLspRsvpAdspec,
+                vRtrMplsLspFRMethod,
+                vRtrMplsLspFRNodeProtect,
+                vRtrMplsLspAdminGroupInclude,
+                vRtrMplsLspAdminGroupExclude,
+                vRtrMplsLspAdaptive,
+                vRtrMplsLspInheritance,
+                vRtrMplsLspOptimizeTimer,
+                vRtrMplsLspOperFastReroute,
+                vRtrMplsLspFRObject,
+                vRtrMplsLspOctets,
+                vRtrMplsLspPackets,
+                vRtrMplsLspAge,
+                vRtrMplsLspTimeUp,
+                vRtrMplsLspTimeDown,
+                vRtrMplsLspPrimaryTimeUp,
+                vRtrMplsLspTransitions,
+                vRtrMplsLspLastTransition,
+                vRtrMplsLspPathChanges,
+                vRtrMplsLspLastPathChange,
+                vRtrMplsLspConfiguredPaths,
+                vRtrMplsLspStandbyPaths,
+                vRtrMplsLspOperationalPaths,
+                vRtrMplsLspHoldTimer
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS LSPs 
+         on Alcatel 7x50 SR series systems 5.0 Release."
+    ::= { tmnxMplsGroups 17 }
+
+tmnxMplsGlobalV6v0Group   OBJECT-GROUP
+    OBJECTS {   vRtrMplsGeneralLastChange,
+                vRtrMplsGeneralAdminState,
+                vRtrMplsGeneralOperState,
+                vRtrMplsGeneralPropagateTtl,
+                vRtrMplsGeneralTE,
+                vRtrMplsGeneralNewLspIndex,
+                vRtrMplsGeneralOptimizeTimer,
+                vRtrMplsGeneralFRObject,
+                vRtrMplsGeneralResignalTimer,
+                vRtrMplsGeneralStaticLspOriginate,
+                vRtrMplsGeneralStaticLspTransit,
+                vRtrMplsGeneralStaticLspTerminate,
+                vRtrMplsGeneralDynamicLspOriginate,
+                vRtrMplsGeneralDynamicLspTransit,
+                vRtrMplsGeneralDynamicLspTerminate,
+                vRtrMplsGeneralDetourLspOriginate,
+                vRtrMplsGeneralDetourLspTransit,
+                vRtrMplsGeneralDetourLspTerminate,
+                vRtrMplsGeneralHoldTimer,
+                vRtrMplsGeneralDynamicBypass,
+                vRtrMplsGeneralNextResignal,
+                vRtrMplsGeneralOperDownReason,
+                vRtrMplsGeneralSrlgFrr,
+                vRtrMplsGeneralSrlgFrrStrict
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting general management of extended MPLS
+         on Alcatel 7x50 SR series systems 6.0 Release."
+    ::= { tmnxMplsGroups 18 }
+
+tmnxMplsSrlgV6v0Group     OBJECT-GROUP
+    OBJECTS {   vRtrMplsSrlgGrpTableLastChanged,
+                vRtrMplsSrlgGrpRowStatus,
+                vRtrMplsSrlgGrpLastChanged,
+                vRtrMplsSrlgGrpValue,
+                vRtrMplsIfSrlgGrpTblLastChanged,
+                vRtrMplsIfSrlgGrpRowStatus,
+                vRtrMplsIfSrlgGrpLastChanged
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SRLG on Alcatel 
+         7xxx SR series systems release 6.0."
+    ::= { tmnxMplsGroups 19 }
+
+tmnxMplsIfV6v0Group     OBJECT-GROUP
+    OBJECTS {   vRtrMplsIfTeMetric
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Te metric feature on 
+         extended MPLS interfaces on 6.0 release Alcatel 7xxx SR series systems."
+    ::= { tmnxMplsGroups 21 }
+
+tmnxMplsLspV6v0Group   OBJECT-GROUP
+    OBJECTS {
+             vRtrMplsLspCspfTeMetricEnabled
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Te metric feature extended
+         MPLS LSPs on 6.0 release Alcatel 7xxx SR series systems."
+    ::= { tmnxMplsGroups 22 }
+
+END
+

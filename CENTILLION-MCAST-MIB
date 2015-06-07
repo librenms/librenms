@@ -1,0 +1,424 @@
+-- SECTION 1: Top Level Definitions
+
+CENTILLION-MCAST-MIB DEFINITIONS ::= BEGIN
+
+-- Centillion VLAN MIB Release 2.0.1
+-- Revision 05/05/98 
+ 
+-- Copyright 1998 Bay Networks, Inc.
+-- All rights reserved.
+-- This Bay Networks SNMP Management Information Base Specification
+-- (Specification) embodies Bay Networks' confidential and
+-- proprietary intellectual property. Bay Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+ 
+-- This Specification is supplied "AS IS," and Bay Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+ 
+ 
+-- Imports
+
+IMPORTS
+        OBJECT-TYPE FROM RFC-1212
+        IpAddress FROM RFC1155-SMI
+        Boolean, EnableIndicator, StatusIndicator, 
+	PortId, CardId, sysConfig FROM CENTILLION-ROOT-MIB;
+
+-- Textual Conventions
+ 
+--
+-- C100/BH switches support Virtual LAN,
+-- which are identified by a unique VLAN identifier
+-- as specified by this textual convention.
+-- This VLAN identifier corresponds to the lower 12
+-- bits in the IEEE VLAN field:
+
+VlanId ::= INTEGER (1..4095)
+
+-- Groups
+
+vlan OBJECT IDENTIFIER ::= { sysConfig 31 }
+
+
+-- SECTION 2:  VLAN Multicast configuration/information table
+
+vlanMcastProtocolGroup OBJECT IDENTIFIER ::= { vlan 1 }
+
+-- SECTION 3: VLAN IGMP Protocol Group
+
+vlanIGMPProtocolGroup  OBJECT IDENTIFIER ::= { vlanMcastProtocolGroup 1 }
+
+-- SECTION 4: VLAN igmp configuration table
+
+vlanIGMPConfig OBJECT IDENTIFIER ::= { vlanIGMPProtocolGroup 1 }
+
+-- SECTION 5:  IGMP configuration table 
+
+igmpGeneralConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IgmpGeneralConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP general configuration table which includes
+               pseudo query, IRAP query configuration, and maximum 
+               number of groups supported in this VLAN."
+        ::= { vlanIGMPConfig 1 }
+ 
+igmpGeneralConfigEntry OBJECT-TYPE
+        SYNTAX  IgmpGeneralConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP general configuration entry.
+               Each entry is indexed by a vlan id.
+               An example to create the entry is:
+               set igmpGeneralConfigIgmpSupport.3=I2 and
+                   igmpGeneralConfigMaxGroup.3=I20  to
+                   a switch ip address. 
+               (where 3 is vlan Id; 2 is enabled; 20 is maximum  
+                multicast groups to be supported for this vlan. "
+        INDEX { igmpGeneralConfigVlanId }
+        ::= { igmpGeneralConfigTable 1 }
+ 
+ 
+IgmpGeneralConfigEntry ::= SEQUENCE {
+        igmpGeneralConfigVlanId
+             VlanId,
+        igmpGeneralConfigPseudoQuery
+             EnableIndicator,
+	igmpGeneralConfigIrapQuery
+	     EnableIndicator,	
+        igmpGeneralConfigIgmpSupport
+             EnableIndicator,
+        igmpGeneralConfigMaxGroup
+             INTEGER
+        }
+
+igmpGeneralConfigVlanId OBJECT-TYPE
+        SYNTAX  VlanId
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The unique VLAN identifier of this IGMP configuration
+              entry. "
+        ::= { igmpGeneralConfigEntry 1 }
+ 
+igmpGeneralConfigPseudoQuery  OBJECT-TYPE
+        SYNTAX  EnableIndicator
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "In the absence of a true IGMP router, the switch may be
+              configured to issue general queries. This provides the 
+	      capability for multicast pruning with an isoloated subnet.
+              The mode defaults to disabled in a VLAN configured for
+              IGMP support"
+        ::= { igmpGeneralConfigEntry 2 }
+
+igmpGeneralConfigIrapQuery  OBJECT-TYPE
+        SYNTAX  EnableIndicator
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+	     "Control whether IGMP Router Advertisement Protocol 
+              messages will be used to determine the existence of 
+              a router in a remote switch. Default is 'enabled'."
+        ::= { igmpGeneralConfigEntry 3 }
+
+igmpGeneralConfigIgmpSupport OBJECT-TYPE
+        SYNTAX  EnableIndicator
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             " When 'enabled' is specified, it indicates that the IGMP
+               is supported  in this VLAN."
+
+                
+        ::= { igmpGeneralConfigEntry 4 }
+ 
+igmpGeneralConfigMaxGroup  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             " The maximum number of multicast groups supported in 
+	       this VLAN.  If the VLAN supports only manually 
+	       configured multicast groups, then the value of this
+               field equals the length of the IGMP multicast group
+               if the multicast group is an inclusive set.
+               A value of 0 indicates that IGMP multicasting is not
+	       supported in this VLAN"
+        ::= { igmpGeneralConfigEntry 5 }
+ 
+
+igmpTimerConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF IgmpTimerConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+	      "IP IGMP Multicast timer configuration table"
+	::= { vlanIGMPConfig 2 } 	 
+
+igmpTimerConfigEntry OBJECT-TYPE
+	SYNTAX  IgmpTimerConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP Multicast timer configuration entry.  
+               Each entry is indexed by a vlan id. This entry will
+               be created when the corresponding igmpGeneralConfigEntry
+               is created. All the values of the mibs in this entry 
+               will be set to default  at the time of creation. "
+	INDEX { igmpTimerConfigVlanId }
+        ::= { igmpTimerConfigTable 1 } 
+
+
+IgmpTimerConfigEntry ::= SEQUENCE {
+	igmpTimerConfigVlanId
+	     VlanId,
+	igmpTimerConfigTimerRobustness
+	     INTEGER,
+	igmpTimerConfigQueryInterval
+	     INTEGER,
+	igmpTimerConfigQueryResponse
+	     INTEGER
+        }
+
+igmpTimerConfigVlanId OBJECT-TYPE
+	SYNTAX  VlanId
+	ACCESS  read-only 
+	STATUS  mandatory
+	DESCRIPTION
+             "The unique VLAN identifier of this multicast timer 
+              configuration entry."
+	::= { igmpTimerConfigEntry 1 }
+
+
+igmpTimerConfigTimerRobustness OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "The robustness variable for the multicast group. 
+              A value of zero indicates the default value should
+              be taken. If the value specified is non-zero, it should
+              be equal or greater than 2"
+        DEFVAL { 2 }
+        ::= { igmpTimerConfigEntry 2 }
+
+igmpTimerConfigQueryInterval OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "The query interval configured for the multicast group.
+              A value of zero indicates the default value should be 
+              used. The value should be less than 0xffff"
+        DEFVAL { 125 }
+        ::= { igmpTimerConfigEntry 3 }
+
+igmpTimerConfigQueryResponse OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "The response interval configured for the multicast group. 
+              A value of zero indicates the default value should be used. 
+	      The value should be less than 0xffff. "
+        DEFVAL { 100 }
+        ::= { igmpTimerConfigEntry 4 }
+
+
+--
+--  The multicast group address table
+--
+
+igmpGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IgmpGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP Multicast group address configuration table. "
+        ::= { vlanIGMPConfig 3 }
+ 
+igmpGroupEntry OBJECT-TYPE
+        SYNTAX  IgmpGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP Multicast group configuration entry.
+               Each entry is indexed by  igmpGroupVlanId, 
+               igmpGroupStatic, and igmpGroupAddress"
+        INDEX { igmpGroupVlanId, igmpGroupStatic, igmpGroupAddress}
+        ::= { igmpGroupTable 1 }
+
+IgmpGroupEntry ::= SEQUENCE {
+        igmpGroupVlanId
+             VlanId,  
+        igmpGroupStatic
+             Boolean,
+        igmpGroupAddress
+             IpAddress,
+        igmpGroupIncluded
+             INTEGER,
+        igmpGroupStatus
+             StatusIndicator
+        }
+
+igmpGroupVlanId OBJECT-TYPE
+        SYNTAX  VlanId
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The unique VLAN identifier of this IGMP multicast group 
+	      address entry. "
+        ::= { igmpGroupEntry 1 }
+
+igmpGroupStatic OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             " Indicates whether the IGMP multicast group was created 
+               statically(TRUE) by a management entity, or dynamically 
+               learned"
+        ::= { igmpGroupEntry 2 }
+
+igmpGroupAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The multicast group address(Class D). The range is from
+              224.0.0.0 to 239.255.255.255. The addresses from
+              224.0.0.0 to 224.0.0.255 are reserved IP multicast addresses."
+        ::= { igmpGroupEntry 3 }
+
+igmpGroupIncluded OBJECT-TYPE
+        SYNTAX  INTEGER {
+             included(1),
+             excluded(2)
+             }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "Indicates the multicast addresses are to be included or
+	      excluded from the group. Dynamic entries are always included
+              and can not be modified, while static entries may be
+              either included or excluded. For each VLAN, it only 
+              allows to configure either 'included' as static or
+              'excluded' as static. "
+        ::= { igmpGroupEntry 4 }
+
+igmpGroupStatus OBJECT-TYPE
+        SYNTAX  StatusIndicator
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "The status of this multicast group entry: 'valid' and
+	      'invalid'. This object enables the user to add or delete 
+	      this multicast group. Setting the status as 'valid' is to
+	      add the entry; otherwise as 'invalid' is to delete the 
+              entry.
+              An example to create an multicast group entry is:
+              set igmpGroupStatus.3.1.224.0.0.1= valid
+              where 3: vlan id; 1: static; 224.0.0.1: multicast group IP 
+              address"
+        ::= { igmpGroupEntry 5 }
+
+--
+--  The multicast router port table
+--
+ 
+igmpRouterPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IgmpRouterPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP Multicast router port table. It contains a list of
+	       the ports containing configured IGMP routers. These 
+	       ports initialize the IPrDtag and IPmDtag for the group."
+        ::= { vlanIGMPConfig 4 }
+ 
+igmpRouterPortEntry OBJECT-TYPE
+        SYNTAX  IgmpRouterPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+              "IP IGMP Multicast router port entry. Each entry is 
+               indexed by igmpRouterPortVlanId, igmpRouterPortStatic,
+               igmpRouterPortCard, igmpRouterPortPort"
+        INDEX { igmpRouterPortVlanId, igmpRouterPortStatic,
+                igmpRouterPortCard, igmpRouterPortPort}
+        ::= { igmpRouterPortTable 1 }
+ 
+IgmpRouterPortEntry ::= SEQUENCE {
+        igmpRouterPortVlanId
+             VlanId,
+        igmpRouterPortStatic
+             Boolean,
+        igmpRouterPortCard
+	     CardId,
+        igmpRouterPortPort
+	     PortId,
+        igmpRouterPortStatus
+	     StatusIndicator
+        }
+
+
+igmpRouterPortVlanId OBJECT-TYPE
+        SYNTAX  VlanId
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The unique VLAN identifier of this IGMP multicast 
+	      router port entry. "
+        ::= { igmpRouterPortEntry 1 }
+
+igmpRouterPortStatic OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             " Indicates whether the IGMP multicast router port was 
+               created statically(TRUE) by a management entity, or 
+	       dynamically learned. "
+        ::= { igmpRouterPortEntry 2 }
+
+igmpRouterPortCard OBJECT-TYPE
+        SYNTAX  CardId
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The card id of this multicast router port entry. "
+        ::= { igmpRouterPortEntry 3 }
+
+igmpRouterPortPort OBJECT-TYPE
+        SYNTAX  PortId
+        ACCESS  read-only 
+        STATUS  mandatory
+        DESCRIPTION
+             "The port id of this multicast router port entry. "
+        ::= { igmpRouterPortEntry 4 }
+
+igmpRouterPortStatus OBJECT-TYPE
+        SYNTAX  StatusIndicator
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+             "The status of this multicast router port entry: 'valid'
+	      and 'invalid'. This object enables the user to add or 
+	      delete this multicast group. Setting the status as 'valid'
+	      is to add the entry; otherwise as 'invalid' is to delete
+	      the entry. 
+              An example to create an multicast router port entry is:
+              set igmpRouterPortStatus.3.1.5.2 = valid
+              where 3: vlan id; 1: static; 5.2 : card/port that is 
+	      connected with igmp router"
+        ::= { igmpRouterPortEntry 5 }
+
+
+END
+

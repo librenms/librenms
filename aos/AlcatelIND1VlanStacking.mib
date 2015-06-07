@@ -1,0 +1,382 @@
+
+ALCATEL-IND1-VLAN-STACKING-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY, 
+                OBJECT-IDENTITY,
+		OBJECT-TYPE, 
+                Integer32		        FROM SNMPv2-SMI
+		OBJECT-GROUP, 
+                MODULE-COMPLIANCE	        FROM SNMPv2-CONF
+		softentIND1VlanStackingMgt	FROM ALCATEL-IND1-BASE
+		RowStatus			FROM SNMPv2-TC 
+		InterfaceIndex 			FROM IF-MIB
+		;
+
+        alcatelIND1VLANStackingMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+                "Please consult with Customer Service to ensure the most appropriate
+                version of this document is used with the products in question:
+ 	
+				                   Alcatel-Lucent, Enterprise Solutions Division
+			                    (Formerly Alcatel Internetworking, Incorporated)
+				                         26801 West Agoura Road
+			 	                       Agoura Hills, CA  91301-5122
+			      		                United States Of America
+	
+                Telephone:	    North America	+1 800 995 2696
+				                        Latin America 	+1 877 919 9526
+                                Europe		+31 23 556 0100
+                                Asia		+65 394 7933
+                                All Other	+1 818 878 4507
+	
+                Electronic Mail:	support@ind.alcatel.com
+                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                DESCRIPTION
+                "The parameters for configuration of the VLAN Stacking feature, 
+                including the association between ports and svlans.
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect, special, or
+                consequential damages whatsoever arising from or related to this 
+                document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with 
+                management of the products for which it is intended to be used.
+
+                               Copyright (C) 1995-2006 Alcatel-Lucent
+	                                 ALL RIGHTS RESERVED WORLDWIDE"
+		::= { softentIND1VlanStackingMgt 1}
+
+
+alcatelIND1VLANStackingMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Stacking Managed Objects."
+     	::= { alcatelIND1VLANStackingMIB 1 }
+
+alcatelIND1VLANStackingMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Stacking Conformance Information."
+    	::= { alcatelIND1VLANStackingMIB 2 }
+
+alcatelIND1VLANStackingMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Stacking Units Of Conformance."
+     	::= { alcatelIND1VLANStackingMIBConformance 1 }
+
+alcatelIND1VLANStackingMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Stacking Compliance Statements."
+    	 ::= { alcatelIND1VLANStackingMIBConformance 2 }
+
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The VLAN Stacking Port Table 
+
+     alaVlanStackingPort OBJECT IDENTIFIER ::= { alcatelIND1VLANStackingMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVstkPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaVstkPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains port-specific information for the VLAN Stacking feature. 
+        An entry in this table is created when a port is configured with VLAN stacking 
+        capability, OR when a port is configured with a specific vendor ethertype, a particular 
+        bridge protocol action."
+        ::= { alaVlanStackingPort 1 }
+
+alaVstkPortEntry  OBJECT-TYPE
+        SYNTAX  AlaVstkPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A VLAN Stacking port entry."
+        INDEX   { alaVstkPortNumber }
+        ::= { alaVstkPortTable 1 }
+
+AlaVstkPortEntry ::= SEQUENCE 
+        {
+                alaVstkPortNumber		InterfaceIndex,
+		alaVstkPortType			INTEGER,
+		alaVstkPortVendorTpid		Integer32,
+		alaVstkPortBpduTreatment	INTEGER, 
+		alaVstkPortAcceptFrameType	INTEGER,
+		alaVstkPortLookupMiss		INTEGER,
+		alaVstkPortDefaultSvlan		INTEGER,
+		alaVstkPortRowStatus		RowStatus,
+		alaVstkPortLegacyStpBpdu	INTEGER
+        }
+
+alaVstkPortNumber OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The  port ifindex of the port for which this entry contains 
+        VLAN Stacking management information. "
+        ::= { alaVstkPortEntry 1 }
+
+alaVstkPortType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                userCustomer (1),
+                userProvider (2),
+                network (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The type of this VLAN Stacking port. User-customer (1) is  a VLAN Stacking 
+        user port connected to customer network. User-provider (2) is a VLAN Stacking
+        user port used to run provider management traffic. Network (2) indicates a network 
+        facing port."
+        DEFVAL { userCustomer }
+        ::= { alaVstkPortEntry 2 }
+
+alaVstkPortVendorTpid  OBJECT-TYPE
+        SYNTAX  Integer32 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The TPID for this port. It is used for the incoming data
+        traffic parsing and it is substituted to the 802.1Q standard Tpid for 
+        the outgoing data traffic. This is used for compatibility with other vendor 
+        equipment. The default value is the standard value 0x88a8."
+        DEFVAL { 34984 }
+        ::= { alaVstkPortEntry 3 }
+
+alaVstkPortBpduTreatment  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                flooded (1),
+                dropped (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The customer bpdu treatment for this port. It defines the type of 
+        processing  applied to the user's bridge protocol data unit. 
+        The bridge protocol treatment (flooded) floods any user's bridge protocol data unit 
+        to all user ports and network ports on the same SVLAN.
+        The bridge protocol (dropped) drops any user's bridge protocol data unit."
+        DEFVAL { flooded }
+        ::= { alaVstkPortEntry 4 }
+
+alaVstkPortAcceptFrameType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                tagged (1),
+                untagged (2),
+                all (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The acceptable frame types on this port." 
+        DEFVAL { all }
+        ::= { alaVstkPortEntry 5 }
+
+alaVstkPortLookupMiss  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                drop (1),
+                default (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Treatment of tagged packets upon vlan lookup miss. Drop (1) means that on lookup
+        miss the packets will be dropped. Default (2) means that on lookup miss the
+        default SVLAN for that port will be used to tunnel the packets. 
+        This is significant only for user port."
+        DEFVAL { default }
+        ::= { alaVstkPortEntry 6 }
+
+alaVstkPortDefaultSvlan  OBJECT-TYPE
+        SYNTAX  INTEGER (1..4094)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The default svlan of this port."
+        ::= { alaVstkPortEntry 7 }
+
+alaVstkPortRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry.  The supported value supported for set are 
+        createAndGo (4) and destroy(6), to create or remove a vlan-stacking port."
+        ::= { alaVstkPortEntry 8 }	
+
+alaVstkPortLegacyStpBpdu  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The legacy STP BPDU treatment for this port. It defines the type of processing 
+         applied to STP legacy BPDUs on network ports. Legacy BPDU refer to conventional/customer
+         BPDUs with MAC address 01:80:c2:00:00:00 and its processing on network ports can be 
+         enabled/disabled by this object.By default the value is disabled i.e 
+         provider MAC BPDU with MAC address 01:80:c2:00:00:08 would be processed at network ports."
+        DEFVAL { disable }
+        ::= { alaVstkPortEntry 9 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The VLAN Stacking svlan/port association Table 
+
+    alaVlanStackingSvlanPort OBJECT IDENTIFIER ::= { alcatelIND1VLANStackingMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVstkSvlanPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaVstkSvlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains svlan/ipmvlan-port association for the VLAN Stacking feature."
+        ::= { alaVlanStackingSvlanPort 1 }
+        
+alaVstkSvlanPortEntry  OBJECT-TYPE
+        SYNTAX  AlaVstkSvlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The svlan/ipmvlan-port association."
+        INDEX   { alaVstkSvlanPortSvlanNumber, alaVstkSvlanPortPortNumber,
+                alaVstkSvlanPortCvlanNumber}
+        ::= { alaVstkSvlanPortTable 1 }
+        
+AlaVstkSvlanPortEntry ::=   SEQUENCE 
+        {
+                alaVstkSvlanPortSvlanNumber		INTEGER,
+		alaVstkSvlanPortPortNumber		InterfaceIndex,
+                alaVstkSvlanPortCvlanNumber		INTEGER,
+                alaVstkSvlanPortMode		INTEGER,
+		alaVstkSvlanPortRowStatus		RowStatus
+        }
+
+alaVstkSvlanPortSvlanNumber  OBJECT-TYPE
+        SYNTAX  INTEGER (1..4094)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number identifying the svlan/ipmvlan."
+        ::= { alaVstkSvlanPortEntry 1 }
+
+alaVstkSvlanPortPortNumber OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The port ifindex of the port associated to the svlan/ipmvlan."
+        ::= { alaVstkSvlanPortEntry 2 }
+
+alaVstkSvlanPortCvlanNumber  OBJECT-TYPE
+        SYNTAX  INTEGER (1..4094)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The customer vlan id associated to the svlan/ipmvlan."
+        ::= { alaVstkSvlanPortEntry 3 }
+
+alaVstkSvlanPortMode  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        {
+        	doubleTag (1),
+        	translate (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The vlan stacking mode: double tagging (1) or vlan translation/mapping (2).
+	Only translation mode is valid in case of IPM Vlans"
+        ::= { alaVstkSvlanPortEntry 4 }
+        
+alaVstkSvlanPortRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry.  The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove an 
+        svlan-port association."
+        ::= { alaVstkSvlanPortEntry 5 }	
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1VLANStackingMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "Compliance statement for VLAN Stacking."
+        MODULE  MANDATORY-GROUPS
+                {
+                        vlanStackingPortGroup,
+        		vlanStackingSvlanPortGroup
+                }
+        ::= { alcatelIND1VLANStackingMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+vlanStackingPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVstkPortNumber,	   --  The VLAN Stacking Port Table 
+                alaVstkPortType,
+                alaVstkPortVendorTpid,
+                alaVstkPortBpduTreatment,
+                alaVstkPortAcceptFrameType,
+                alaVstkPortLookupMiss,
+                alaVstkPortDefaultSvlan,
+                alaVstkPortRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of VLAN Stacking Ports."
+        ::= { alcatelIND1VLANStackingMIBGroups 1 }
+
+vlanStackingSvlanPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVstkSvlanPortSvlanNumber,
+	    	alaVstkSvlanPortPortNumber,
+                alaVstkSvlanPortCvlanNumber,
+                alaVstkSvlanPortMode,
+	    	alaVstkSvlanPortRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for svlan-port associations."
+        ::= { alcatelIND1VLANStackingMIBGroups 2 }
+		
+END
+

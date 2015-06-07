@@ -1,0 +1,398 @@
+CISCOSB-POE-MIB DEFINITIONS ::= BEGIN
+
+-- Title:               CISCOSB LOCALIZATION ROS
+--                      This Private MIB is enhancement for rfc3621.txt - Power Ethernet Mib
+-- Version:             7.60
+-- Date:                28 Nov 2005
+
+IMPORTS
+    switch001                           FROM CISCOSB-MIB
+    DisplayString, TruthValue           FROM SNMPv2-TC
+    OBJECT-TYPE, MODULE-IDENTITY        FROM SNMPv2-SMI;
+
+
+rlPoe    MODULE-IDENTITY
+         LAST-UPDATED "200911260000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "Add a new field in the PoE MIB to indicate Max power allocation allowed"
+         REVISION "201006020000Z"
+         DESCRIPTION
+                "The private MIB module definition for Power Over Ethernet."
+         REVISION "200911260000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 108 }
+
+rlPethPsePortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPethPsePortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        " The table listing additional information for Power Over Ethernet ports."
+    ::= {rlPoe 1 }
+
+rlPethPsePortEntry  OBJECT-TYPE
+    SYNTAX      RlPethPsePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlPethPsePortTable."
+    INDEX    { rlPethPsePortGroupIndex , rlPethPsePortIndex  }
+    ::= {rlPethPsePortTable  1 }
+
+RlPethPsePortEntry ::= SEQUENCE {
+    rlPethPsePortGroupIndex             INTEGER,
+    rlPethPsePortIndex                  INTEGER,
+    rlPethPsePortOutputVoltage          INTEGER,
+    rlPethPsePortOutputCurrent          INTEGER,
+    rlPethPsePortOutputPower            INTEGER,
+    rlPethPsePortPowerLimit             INTEGER,
+    rlPethPsePortStatus                 INTEGER,
+    rlPethPsePortStatusDescription      DisplayString,
+    rlPethPsePortOperPowerLimit         INTEGER,
+    rlPethPsePortSupportPoePlus         TruthValue,
+    rlPethPsePortTimeRangeName          DisplayString,
+    rlPethPsePortOperStatus             TruthValue,
+    rlPethPsePortMaxPowerAllocAllowed   INTEGER,
+    rlPethPsePortSupportPoe             TruthValue
+}
+
+rlPethPsePortGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the group
+         containing the port to which a power Ethernet PSE is
+         connected.  Group means box in the stack, module in a
+         rack and the value 1 MUST be used for non-modular devices.
+         Furthermore, the same value MUST be used in this variable,
+         pethMainPseGroupIndex, and pethNotificationControlGroupIndex
+         to refer to a given box in a stack or module in the rack."
+    ::= { rlPethPsePortEntry 1 }
+
+rlPethPsePortIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the power Ethernet PSE
+         port within group pethPsePortGroupIndex to which the
+         power Ethernet PSE entry is connected."
+    ::= { rlPethPsePortEntry 2 }
+
+rlPethPsePortOutputVoltage OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates on the output voltage level in milli volts from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 3 }
+
+rlPethPsePortOutputCurrent OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates on the output current level in milli amper from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 4 }
+
+rlPethPsePortOutputPower OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates on the output power level in milli watts from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 5 }
+
+rlPethPsePortPowerLimit OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates on the user configured power level in milli watts which is available from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 6 }
+
+rlPethPsePortStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates on the hardware status of rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 7 }
+
+rlPethPsePortStatusDescription OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the description of the hardware status of rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 8 }
+
+rlPethPsePortOperPowerLimit OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the maximum power level in milli watts which is available from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 9 }
+
+rlPethPsePortSupportPoePlus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates if the port supports poe plus."
+    ::= { rlPethPsePortEntry 10 }
+
+rlPethPsePortTimeRangeName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to bind PoE port to time range."
+    ::= { rlPethPsePortEntry 11 }
+
+rlPethPsePortOperStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This Read-Only variable indicates PoE port current status affected by time range active/inactive and admin status."
+    ::= { rlPethPsePortEntry 12 }
+
+rlPethPsePortMaxPowerAllocAllowed OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the maximum power allocation allowed per port (including wire power loses) in milli-watts which is available from rlPethPsePortIndex."
+    ::= { rlPethPsePortEntry 13 }
+
+rlPethPsePortSupportPoe OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates if the port is a poe port"
+    ::= { rlPethPsePortEntry 14 }
+
+rlPethMainPseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPethMainPseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        " The table listing additional read - only information for Power Over Ethernet."
+    ::= {rlPoe 2 }
+
+rlPethMainPseEntry  OBJECT-TYPE
+    SYNTAX      RlPethMainPseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlPethMainPseTable."
+    INDEX    { rlPethMainPseGroupIndex }
+    ::= {rlPethMainPseTable  1 }
+
+RlPethMainPseEntry ::= SEQUENCE {
+    rlPethMainPseGroupIndex          INTEGER,
+    rlPethMainPseSwVersion           DisplayString,
+    rlPethMainPseHwVersion           DisplayString,
+    rlPethMainPseHwType              INTEGER,
+    rlPethMainPsePowerGuardBand      INTEGER
+
+}
+
+rlPethMainPseGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the group
+         containing the port to which a power Ethernet PSE is
+         connected.  Group means box in the stack, module in a
+         rack and the value 1 MUST be used for non-modular devices.
+         Furthermore, the same value MUST be used in this variable,
+         pethMainPseGroupIndex, and pethNotificationControlGroupIndex
+         to refer to a given box in a stack or module in the rack."
+    ::= { rlPethMainPseEntry 1 }
+
+rlPethMainPseSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the MCU SW version."
+    ::= { rlPethMainPseEntry 2 }
+
+rlPethMainPseHwVersion OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the MCU HW version."
+    ::= { rlPethMainPseEntry 3 }
+
+rlPethMainPseHwType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enhanced(1),
+        plus(2),
+        auto(3),
+        nonPoe(4),
+        enhancedPlus(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the MCU HW type (enhanced, plus, none)."
+    ::= { rlPethMainPseEntry 4 }
+
+rlPethMainPsePowerGuardBand OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the guard band in [W] for not connecting
+         additional ports."
+    ::= { rlPethMainPseEntry 5 }
+
+rlPethPowerPseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPethPowerPseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        " The table listing additional read-write information for Power Over Ethernet."
+    ::= {rlPoe 3 }
+
+rlPethPowerPseEntry  OBJECT-TYPE
+    SYNTAX      RlPethPowerPseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlPethPowerPseTable."
+    INDEX    { rlPethPowerPseGroupIndex }
+    ::= {rlPethPowerPseTable  1 }
+
+RlPethPowerPseEntry ::= SEQUENCE {
+    rlPethPowerPseGroupIndex          INTEGER,
+    rlPethPowerPsePower               INTEGER,
+    rlPethPowerPseRpsPower            INTEGER,
+    rlPethPowerPsePowerManagementMode INTEGER,
+    rlPethPowerPsedisconnectMethod    INTEGER,
+    rlPethPowerPseTemperatureSensor   INTEGER,
+    rlPethPowerPseInrushTestEnabled   INTEGER,
+    rlPethPowerPseLegacyDisabled      INTEGER
+}
+
+rlPethPowerPseGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the group
+         containing the port to which a power Ethernet PSE is
+         connected.  Group means box in the stack, module in a
+         rack and the value 1 MUST be used for non-modular devices.
+         Furthermore, the same value MUST be used in this variable,
+         PethPowerPseGroupIndex, and pethNotificationControlGroupIndex
+         to refer to a given box in a stack or module in the rack."
+    ::= { rlPethPowerPseEntry 1 }
+
+
+-- depricated
+rlPethPowerPsePower OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(0),
+        ps1(1),
+        ps2(2),
+        ps3(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the maximum power in [W] supplied by PSE."
+    ::= { rlPethPowerPseEntry 2 }
+
+-- depricated
+rlPethPowerPseRpsPower OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(0),
+        rps1(1),
+        rps2(2),
+        rps3(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the maximum power in [W] supplied by PSE + RPS."
+    ::= { rlPethPowerPseEntry 3 }
+
+rlPethPowerPsePowerManagementMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        portlimit(0),
+        classlimit(5),
+        maxlimit(6)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies power management mode."
+    ::= { rlPethPowerPseEntry 4 }
+
+rlPethPowerPsedisconnectMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+        lowestpriority(0),
+        nextport(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies disconnect method. "
+    ::= { rlPethPowerPseEntry 5 }
+
+rlPethPowerPseTemperatureSensor OBJECT-TYPE
+    SYNTAX      INTEGER (-200..200)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the pd temperature sensor. "
+    ::= { rlPethPowerPseEntry 6 }
+
+rlPethPowerPseInrushTestEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(0),
+        disabled(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies if HW inrush test will be disabled.
+        by default HW inrush test is enabled."
+    ::= { rlPethPowerPseEntry 7 }
+
+rlPethPowerPseLegacyDisabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(0),
+        disabled(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies poe Legacy global configuration mode"
+    ::= { rlPethPowerPseEntry 8 }
+
+
+
+
+END
+

@@ -1,0 +1,505 @@
+CISCOSB-EMBWEB-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB EMBWEB ROS
+--                       Private EMBWEB MIB
+-- Version:              7.45
+-- Date:                 28 Sep 2006
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress FROM SNMPv2-SMI
+    TruthValue, DisplayString, RowStatus    FROM SNMPv2-TC;
+
+rlEmbWeb MODULE-IDENTITY
+         LAST-UPDATED "200607030000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "This private MIB module adds MIBs to EMBWEB (Embedded Web Server)."
+         REVISION "200607030000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 66 }
+
+RlEmbWebProtocol ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Embedde Web Protocol"
+     SYNTAX INTEGER {
+        default(1),
+        http(2),
+        https(3)
+     }
+
+RlEmbWebEnabled ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Embedde Web Service Support Enabled/Disabled"
+     SYNTAX INTEGER {
+        default(1),
+        false(2),
+        true(3)
+     }
+
+
+rlEmWebMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Embedded web version, the current version is 2."
+    ::= { rlEmbWeb 1 }
+
+rlEmWebWebSite OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Link for the vendor web site used to retrive information."
+    ::= { rlEmbWeb 2 }
+
+rlEmWebSecurityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlEmWebSecurityEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Security Table whose entry is composed of username and
+         Password, group and access privileges for each user.
+         The access privileges can be one or more of none, read-files,
+         read-write, and super."
+    ::= { rlEmbWeb 3 }
+
+rlEmWebSecurityEntry OBJECT-TYPE
+    SYNTAX  RlEmWebSecurityEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlEmWebSecurityUserName }
+    ::= { rlEmWebSecurityTable 1 }
+
+RlEmWebSecurityEntry ::= SEQUENCE {
+    rlEmWebSecurityUserName     DisplayString,
+    rlEmWebSecurityPassword     DisplayString,
+    rlEmWebSecurityAccess       INTEGER,
+    rlEmWebSecurityIpAddr       IpAddress,
+    rlEmWebSecurityPort         INTEGER,
+    rlEmWebSecuritySnmpVersion  INTEGER,
+    rlEmWebSecurityStatus       RowStatus
+}
+
+rlEmWebSecurityUserName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The User name."
+    ::=  { rlEmWebSecurityEntry 1 }
+
+rlEmWebSecurityPassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The User password."
+    ::=  { rlEmWebSecurityEntry 2 }
+
+rlEmWebSecurityAccess OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        readOnly(2),
+        readWrite(3),
+        super(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Access rights for this user ."
+    ::= { rlEmWebSecurityEntry 3 }
+
+rlEmWebSecurityIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "IP Address to send the traps to.0 means doesn't want
+         to receive traps."
+    ::= { rlEmWebSecurityEntry 4 }
+
+rlEmWebSecurityPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Port to send the traps to."
+    ::= { rlEmWebSecurityEntry 5 }
+
+rlEmWebSecuritySnmpVersion OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ver1(1),
+        ver2(2),
+        ver3(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "SNMP version supported by this user. For the agent use."
+    ::= { rlEmWebSecurityEntry 6 }
+
+rlEmWebSecurityStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of the security table entry. It's used to delete an entry"
+    ::= { rlEmWebSecurityEntry 7 }
+
+rlEmWebCloseTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable defines the maximum time period
+         in seconds that a TCP connection can stay open
+         without depending on the TCP timeout mechanism"
+    DEFVAL  { 30 }
+    ::= { rlEmbWeb 5 }
+
+rlEmWebReceiveTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable defines the maximum time period
+         in seconds that a TCP connection can wait for
+         data which hasn't arrived "
+    DEFVAL  { 30 }
+    ::= { rlEmbWeb 6 }
+
+rlEmWebMaxIdleTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..3932159)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable defines the maximum HTTP Idle time
+         period in seconds for a TCP connection.If another request
+         isn't made at this period, the connection is closed.
+         The value 0 is supported as 'no timeout'."
+    DEFVAL  { 600 }
+    ::= { rlEmbWeb 7 }
+
+rlEmWebSetEWSfilesStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        opened (1),
+        closed (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable sets the status of the embedded Web Server
+        files to either closed or opened."
+    DEFVAL  { opened }
+    ::= { rlEmbWeb 8 }
+
+rlEmbeddedWebApplied OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies if the device supports Embedded WEB:
+                true  - suppotrs
+                false - does not support"
+    ::= { rlEmbWeb 9 }
+
+rlEmWebHttpPort OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the TCP port the embedded web uses for HTTP sessions."
+    ::= { rlEmbWeb 10 }
+
+rlEmWebHttpEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable HTTP sessions"
+    ::= { rlEmbWeb 11 }
+
+rlEmWebHttpsPort OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the TCP port the embedded web uses for HTTPS sessions."
+    ::= { rlEmbWeb 12 }
+
+rlEmWebHttpsEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable HTTPS sessions"
+    ::= { rlEmbWeb 13 }
+
+rlEmWebCertificateCountryName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(2))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of country name field that will appear when a new certificate is generated."
+    ::= { rlEmbWeb 14 }
+
+rlEmWebCertificateStateOrProvinceName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of state or province name field that will appear when a new certificate is generated."
+    ::= { rlEmbWeb 15 }
+
+
+rlEmWebCertificateLocalityName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of locality field that will appear when a new certificate is generated."
+    ::= { rlEmbWeb 16 }
+
+
+rlEmWebCertificateOrganizationName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of organization field that will appear when a new certificate is generated."
+    ::= { rlEmbWeb 17 }
+
+rlEmWebCertificateCommonName OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of common name field that will appear when a new certificate is generated."
+    ::= { rlEmbWeb 19 }
+
+rlEmWebCertificateRegenerate OBJECT-TYPE
+    SYNTAX  INTEGER {
+       noAction(0),
+       regenerateCertificate(1),
+       regenerateRsaKeyAndCertificate(2)
+     }
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting to a regenerateCertificate causes a new certifiacte to be generated and to be used for all new sessions."
+    ::= { rlEmbWeb 20 }
+
+
+rlEmWebRsaKeyLength OBJECT-TYPE
+    SYNTAX  INTEGER (512..2048)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the RSA key size that will be created when rlEmWebRegenerateCertificateAndKey will be
+         set to regenerateCertificateAndKey."
+    ::= { rlEmbWeb 21 }
+
+ rlEmWebDebug OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "MIB variable for setting debug information."
+    ::= { rlEmbWeb 22  }
+
+rlEmWebURL OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The URL through which the EWS of this device can be accessed."
+    ::= { rlEmbWeb 23 }
+
+rlEmWebDisplayNonPresentEntities OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the EWS is required to display non-present entities
+         (like non-present ports, IP addresses on non-present ports etc.) on it's screens."
+    ::= { rlEmbWeb 24 }
+
+rlEmWebCertificateExists OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether a certificate has been generated."
+    ::= { rlEmbWeb 25 }
+
+
+rlEmWebHttpsActiveCertificateId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "By setting this scalar https is notified that the certificate and key with this index
+        should be used for new https sessions. Even if the certifcate or key doesn't exist yet
+        the operation will succeed."
+    ::= { rlEmbWeb  26 }
+
+rlEmWebExtraPort OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the TCP port the embedded web uses for The Extra Port sessions."
+    ::= { rlEmbWeb 27 }
+
+rlEmWebExtraPortType OBJECT-TYPE
+    SYNTAX  INTEGER {
+       http(0),
+       https(1)
+     }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Extra Port Type HTTP/HTTPS for all sessions."
+    ::= { rlEmbWeb 28 }
+
+rlEmWebMaxHttpsIdleTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..3932159)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable defines the maximum HTTPS Idle time
+         period in seconds for a web connection.If another request
+         isn't made at this period, the connection is closed.
+         The value 0 is supported as 'no timeout'."
+    DEFVAL  { 600 }
+    ::= { rlEmbWeb 29 }
+
+rlEmWebServiceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlEmWebServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "."
+    ::= { rlEmbWeb 30 }
+
+rlEmWebServiceEntry OBJECT-TYPE
+    SYNTAX  RlEmWebServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlEmWebServiceId }
+    ::= { rlEmWebServiceTable 1 }
+
+RlEmWebServiceEntry ::= SEQUENCE {
+    rlEmWebServiceId             INTEGER,
+    rlEmWebServiceName           DisplayString,
+    rlEmWebServiceEnable         RlEmbWebEnabled,
+    rlEmWebServicePort           INTEGER,
+    rlEmWebServiceMaxUsers       INTEGER,
+    rlEmWebServiceProtocol       RlEmbWebProtocol,
+    rlEmWebServiceCertificateId  INTEGER,
+    rlEmWebServiceMaxIdleTimeOut INTEGER
+}
+
+rlEmWebServiceId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The Service Id."
+    ::=  { rlEmWebServiceEntry 1 }
+
+rlEmWebServiceName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service name"
+    DEFVAL  { ''H }
+    ::=  { rlEmWebServiceEntry 2 }
+
+rlEmWebServiceEnable  OBJECT-TYPE
+    SYNTAX  RlEmbWebEnabled
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the service is enabled or not. if set to 'default' will
+         the service to go back to its initialization default status."
+    DEFVAL  { default }
+    ::=  { rlEmWebServiceEntry 3 }
+
+rlEmWebServicePort OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether the TCP port on which service is listening.
+         value 0 will set the service to it's default port"
+    DEFVAL  { 0 }
+    ::=  { rlEmWebServiceEntry 4 }
+
+rlEmWebServiceMaxUsers OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximal number of users for this service."
+    DEFVAL  { 0 }
+    ::=  { rlEmWebServiceEntry 5 }
+
+rlEmWebServiceProtocol OBJECT-TYPE
+    SYNTAX  RlEmbWebProtocol
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the protocol that the service operates on. Note that the
+         general HTTP service can have only the http value and the general HTTPS
+         service can have only the https value.
+         setting the field to 'default' will cause the service to go back to it's
+         initialization settings."
+    DEFVAL  { default }
+    ::=  { rlEmWebServiceEntry 6 }
+
+rlEmWebServiceCertificateId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicates the certificate used by the service if rlEmWebServiceProtocol is
+         https. A value of 0 indicates that a certificate has not been assigned to
+         this service. setting this field to 1000 will cause the service to go
+         back to it's initialization value."
+    DEFVAL  { 1000 }
+    ::=  { rlEmWebServiceEntry 7 }
+
+rlEmWebServiceMaxIdleTimeOut OBJECT-TYPE
+    SYNTAX  INTEGER (0..3932160)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable defines the maximum Idle time period in seconds for a TCP connection.
+         If another request isn't made at this period, the connection is closed.
+         The value 0 is supported as 'no timeout'.setting this field to 3932160
+         will cause the service to go back to it's initialization value."
+    DEFVAL  { 3932160 }
+    ::=  { rlEmWebServiceEntry 8 }
+
+END
+

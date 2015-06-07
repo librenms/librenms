@@ -1,0 +1,117 @@
+CISCOSB-1-BONJOUR-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+-- Version:    7.46
+-- Date:       24 Mar 2009
+-- 24-Mar-2009  Added rlBonjourServiceTable
+
+IMPORTS
+    OBJECT-TYPE, Counter32               FROM SNMPv2-SMI
+    TruthValue, DisplayString, RowStatus FROM SNMPv2-TC
+    switch001                            FROM CISCOSB-MIB;
+
+rlCustom1BonjourService MODULE-IDENTITY
+        LAST-UPDATED "200903240000Z"  -- March 24, 2009
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION   "Added: rlCustom1BonjourServiceTable - the private MIB module
+                       definition for Bonjour services."
+        REVISION "200903240000Z"
+        DESCRIPTION
+                 "Initial revision"
+        ::= { switch001 143 }
+
+
+rlCustom1BonjourServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCustom1BonjourServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies Bonjour services table information"
+    ::= { rlCustom1BonjourService 1 }
+
+rlCustom1BonjourServiceEntry OBJECT-TYPE
+    SYNTAX RlCustom1BonjourServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one Service of Bonjour Element.
+         The information includes: Service name, service port number, service enable, service can be changed the row status.
+         The index is string name of the service and represent by rlBonjourServiceTypeName"
+    INDEX { IMPLIED rlCustom1BonjourServiceTypeName }
+    ::= { rlCustom1BonjourServiceTable 1 }
+
+RlCustom1BonjourServiceEntry ::= SEQUENCE {
+    rlCustom1BonjourServiceTypeName    DisplayString,
+    rlCustom1BonjourServiceTransport   INTEGER,
+    rlCustom1BonjourServicePort        INTEGER,
+    rlCustom1BonjourServiceEnable      TruthValue,
+    rlCustom1BonjourServiceOptions     BITS,
+    rlCustom1BonjourServiceStatus      RowStatus
+    }
+
+rlCustom1BonjourServiceTypeName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(2..14))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Bonjour Service Type name."
+    ::= { rlCustom1BonjourServiceEntry 1 }
+
+    rlCustom1BonjourServiceTransport OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                  udp(1),
+                                  tcp(2)
+   }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "A value indicating the service transport."
+    ::= { rlCustom1BonjourServiceEntry 2 }
+
+
+rlCustom1BonjourServicePort OBJECT-TYPE
+    SYNTAX          INTEGER (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "A value indicating protocol port number."
+    ::= { rlCustom1BonjourServiceEntry 3 }
+
+rlCustom1BonjourServiceEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Bonjour Service type enabled {true} or Disabled {false}."
+    ::= { rlCustom1BonjourServiceEntry 4 }
+
+rlCustom1BonjourServiceOptions OBJECT-TYPE
+    SYNTAX       BITS {
+            serviceCanBeDeleted(0),
+            serviceCanBeDisabled(1),
+            portCanBeConfigured(2)    }
+
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Bonjour Service type can be change Yes {true} or No {false}."
+    ::= { rlCustom1BonjourServiceEntry 5 }
+
+rlCustom1BonjourServiceStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlCustom1BonjourServiceEntry 6 }
+
+END

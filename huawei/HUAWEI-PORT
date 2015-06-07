@@ -1,0 +1,1540 @@
+-- ==================================================================
+-- Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI PORT MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2007-10-21 publish
+-- ==================================================================
+          
+    HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            InterfaceIndex
+                FROM IF-MIB              
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY ,Counter64           
+                FROM SNMPv2-SMI
+            DisplayString,TruthValue,RowStatus   
+                FROM SNMPv2-TC
+            EnabledStatus
+            	FROM P-BRIDGE-MIB;
+                      
+          hwPortMIB MODULE-IDENTITY 
+          LAST-UPDATED "200710210930Z"
+          ORGANIZATION 
+              "Huawei Technologies Co.,Ltd."
+          CONTACT-INFO 
+              "VRP Team Huawei Technologies Co.,Ltd.
+              Huawei Bld.,NO.3 Xinxi Rd., 
+              Shang-Di Information Industry Base,
+              Hai-Dian District Beijing P.R. China
+              http://www.huawei.com
+              Zip:100085
+              "  
+          DESCRIPTION 
+              "The private mib file includes the general extent 
+              information of the device.hwDatacomm(157).hwPortMIB"  
+          ::= { hwDatacomm 157 }
+          
+                            
+      hwPortMIBObjects OBJECT IDENTIFIER ::= { hwPortMIB 1 }
+      
+      hwEthernet OBJECT IDENTIFIER ::= { hwPortMIBObjects 1 }
+            
+      hwEthernetTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwEthernetEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the physical attributes of the Ethernet interface.
+              This table lists the physical attributes of various Ethernet interfaces."
+          ::= { hwEthernet 1 }
+            
+      hwEthernetEntry OBJECT-TYPE
+          SYNTAX HwEthernetEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Indicates the physical attributes of the Ethernet interface.
+              This table lists the physical attributes of various Ethernet interfaces." 
+          INDEX  { hwEthernetIfIndex }    
+          ::= { hwEthernetTable 1 }           
+    
+      HwEthernetEntry  ::= 
+          SEQUENCE{
+              hwEthernetIfIndex
+                  InterfaceIndex,   
+              hwEthernetLoopback             
+                  INTEGER,
+              hwEthernetPortType   
+                  INTEGER,
+              hwEthernetSpeedSet     
+                  INTEGER,               
+              hwEthernetDuplex 
+                  INTEGER,
+              hwEthernetNegotiation
+                  EnabledStatus,
+              hwEthernetPortTypeOperate   
+                  INTEGER,
+              hwEthernetClock
+                  INTEGER,                  
+              hwEthernetFlagJ0Mode
+                  INTEGER,
+              hwEthernetFlagJ0Value              
+                  Integer32,
+              hwEthernetFlagJ0Trace              
+                  OCTET STRING,
+              hwEthernetFlagJ1Mode              
+                  INTEGER,
+              hwEthernetFlagJ1Value              
+                  Integer32,
+              hwEthernetFlagJ1Trace              
+                  OCTET STRING,
+              hwEthernetFlagC2Value     
+                  Integer32,
+              hwEthernetUpHoldTime
+                  Integer32,
+              hwEthernetDownHoldTime                      
+                  Integer32,
+              hwEthernetSubinterfaceStatisticEnable
+                  EnabledStatus
+                  }                  
+
+      hwEthernetIfIndex OBJECT-TYPE
+          SYNTAX InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Interface index(es) of port(s) present on the device ."
+          ::= { hwEthernetEntry 1 }
+          
+      hwEthernetLoopback OBJECT-TYPE
+          SYNTAX INTEGER{
+                     otherLoop(1),
+                     stopLoopback(2),
+                     local(3),
+                     remote(4)
+                     }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "The local loopback of an Ethernet interface is used to test the interface itself.
+            If an interface works in a normal situation, disable the local loopback.
+            By default, stopLoopback is used."
+          
+          ::= { hwEthernetEntry 11 }
+
+      hwEthernetPortType OBJECT-TYPE
+          SYNTAX INTEGER{
+                   other(1),
+                   copper(2),
+                   fiber(3)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "Indicates the type of the Ethernet interface: an optical interface or an electrical interface."
+          ::= { hwEthernetEntry 12 }
+          
+      hwEthernetSpeedSet OBJECT-TYPE
+          SYNTAX INTEGER{
+                   other(1),
+                   speed10(2),
+                   speed100(3),
+                   speed1000(4),
+                   speed10000(5)
+                   }     
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+             "Indicates the speed of the Ethernet interface. This parameter takes effect only on some Ethernet
+              electrical interfaces rather than optical interfaces. The parameter can be 10 M, 100 M, 1000 M, 
+              10000 M."
+          ::= { hwEthernetEntry 13 }
+
+      hwEthernetDuplex OBJECT-TYPE
+          SYNTAX INTEGER{
+                   full(1),
+                   half(2)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the duplex mode of the Ethernet interface. An electrical Ethernet interface can
+              work in half-duplex mode or full-duplex mode. An optical Ethernet can work only in full-duplex mode." 
+          ::= { hwEthernetEntry 14 }
+
+      hwEthernetNegotiation OBJECT-TYPE
+          SYNTAX EnabledStatus
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the auto-negotiation mode of the Ethernet electrical interface. By default, auto-negotiation is enabled.
+               The three objects, hwEthernetSpeedSet, hwEthernetDuplex, and hwEthernetNegotiation are associated with each other.
+               If the auto-negotiation of hwEthernetNegotiation is enabled, the values of hwEthernetSpeedSet and hwEthernetDuplex are auto-negotiated.
+               If hwEthernetSpeedSet is set to a certain value, hwEthernetDuplex is modified to the default value full,
+               and hwEthernetNegotiation is automatically changed to disable. If the auto-negotiation of hwEthernetNegotiation is
+               enabled, hwEthernetDuplex cannot be set."          
+          ::= { hwEthernetEntry 15 }
+
+      hwEthernetPortTypeOperate OBJECT-TYPE
+          SYNTAX INTEGER{
+                   other(1),
+                   copper(2),
+                   fiber100(3),
+                   fiber1000(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "Indicates the link type of the Ethernet interface. The type can be optical link or electrical link.
+            This parameter takes effect only on specific Ethernet interfaces."
+          ::= { hwEthernetEntry 16 }
+          
+      hwEthernetClock OBJECT-TYPE
+          SYNTAX INTEGER{
+                   master(1),
+                   slave(2)
+                   }    
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the mode of the clock. The mode can be master or slave.
+              By default, the mode of a clock is slave. This parameter takes effect only on the WAN board."
+          ::= { hwEthernetEntry 20 }
+
+      hwEthernetFlagJ0Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j01ByteMode(1),
+                   j016ByteMode(2),
+                   j064ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Before the 10 GE WAN board processes packets, the overhead byte must be configured on the interface.
+              The overhead byte for the SDH frame, j0: Set section trace byte
+              The default value is j016ByteMode(2)£ºhwEthernetFlagJ0Trace £ºNetEngine"
+          ::= { hwEthernetEntry 21 }
+      
+      hwEthernetFlagJ0Value OBJECT-TYPE
+          SYNTAX Integer32(0..255)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "j01ByteMode Value. When hwEthernetFlagJ0Mode is set to j01ByteMode, this parameter takes effect."
+          ::= { hwEthernetEntry 22 }
+          
+      hwEthernetFlagJ0Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Set section trace byte.
+              When hwEthernetFlagJ0Mode is set to j016ByteMode or j064ByteOrNullMode, this variable takes effect.
+              When hwEthernetFlagJ0Mode is set to j016ByteMode, this variable is up to 15 characters trace byte.
+              When hwEthernetFlagJ0Mode is set to j064ByteOrNullMode, this variable is up to 64 characters trace byte."
+          ::= { hwEthernetEntry 23 }
+
+      hwEthernetFlagJ1Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j11ByteMode(1),
+                   j116ByteMode(2),
+                   j164ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame. j1£ºsets path trace byte.
+              The default value is j116ByteMode(2) hwEthernetFlagJ1Trace NetEngine."           
+          ::= { hwEthernetEntry 24 }
+
+      hwEthernetFlagJ1Value OBJECT-TYPE
+          SYNTAX Integer32(0..255)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "j11ByteMode Value. When hwEthernetFlagJ1Mode is set to j11ByteMode, this parameter takes effect."
+          ::= { hwEthernetEntry 25 }
+
+      hwEthernetFlagJ1Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Set path trace byte.
+              When hwEthernetFlagJ1Mode is set to j116ByteMode or j164ByteOrNullMode, this variable takes effect.
+              When hwEthernetFlagJ1Mode is set to j116ByteMode, this variable is up to 15 characters trace byte.
+              When hwEthernetFlagJ1Mode is set to j164ByteOrNullMode, this variable is up to 64 characters trace byte."
+          ::= { hwEthernetEntry 26 }
+
+      hwEthernetFlagC2Value OBJECT-TYPE
+          SYNTAX Integer32 (0..255) 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame.
+              c2: indicates the signal label byte. It is a hexdecimal value ranging from 00 to FF.
+              The default value is 0x02."
+          ::= { hwEthernetEntry 27 }
+
+      hwEthernetUpHoldTime OBJECT-TYPE
+          SYNTAX Integer32(0..3000)  
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the response time to the event that the port turns Up. The units of hwEthernetUpHoldTime is millisecond."
+          ::= { hwEthernetEntry 31 }
+
+      hwEthernetDownHoldTime OBJECT-TYPE
+          SYNTAX Integer32 (0..1000) 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the response time to the event that the port turns Down. The units of hwEthernetDownHoldTime is millisecond."
+          ::= { hwEthernetEntry 32 }
+
+      hwEthernetSubinterfaceStatisticEnable OBJECT-TYPE
+          SYNTAX EnabledStatus
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Enable the statistical function of the sub-interface."
+          ::= { hwEthernetEntry 33 }
+                       
+      
+      hwPos OBJECT IDENTIFIER ::= { hwPortMIBObjects 2 }
+      
+      hwPosTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwPosEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the physical attributes of the POS interface.
+              This table lists the physical attributes of the POS interface."
+          ::= { hwPos 1 }
+            
+      hwPosEntry OBJECT-TYPE
+          SYNTAX HwPosEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Indicates the physical attributes of the POS interface.
+              This table lists the physical attributes of the POS interface." 
+          INDEX  { hwPosIfIndex }    
+          ::= { hwPosTable 1 }           
+    
+      HwPosEntry  ::= 
+          SEQUENCE{
+              hwPosIfIndex
+                  InterfaceIndex,   
+              hwPosLinkProtocol
+                  INTEGER,
+              hwPosFrameFormat
+                  INTEGER,
+              hwPosLoopback
+                  INTEGER,
+              hwPosScramble     
+                  EnabledStatus,
+              hwPosClock     
+                  INTEGER,                  
+              hwPosCrcVerifyCode     
+                  INTEGER,
+              hwPosFlagJ0Mode     
+                  INTEGER,
+              hwPosFlagJ0Value     
+                  Integer32, 
+              hwPosFlagJ0Trace
+                  OCTET STRING,
+              hwPosFlagJ1Mode     
+                  INTEGER,
+              hwPosFlagJ1Value     
+                  Integer32,
+              hwPosFlagJ1Trace
+                  OCTET STRING,
+              hwPosFlagC2Value     
+                  Integer32
+                  }
+          
+      hwPosIfIndex OBJECT-TYPE
+         SYNTAX InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Interface index(es) of port(s) present on the device ."
+          ::= { hwPosEntry 1 }
+
+      hwPosLinkProtocol OBJECT-TYPE
+          SYNTAX INTEGER {
+                   ietf(1),
+                   nonstandard(2),
+                   hdlc(3),
+                   ppp(4)
+               }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "Indicates the link layer protocol of the POS interface.
+            By default, on a POS interface, PPP serves as the link layer protocol."
+          ::= { hwPosEntry 11 }
+          
+      hwPosFrameFormat OBJECT-TYPE
+          SYNTAX INTEGER{
+                   sonet(1),
+                   sdh(2)
+                   }          
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the frame type of the POS interface.
+          By default, the frame type of the POS interface is SDH.
+          This variable identifies whether a SONET or a SDH signal is used across this interface."
+          ::= { hwPosEntry 12 }
+
+      hwPosLoopback OBJECT-TYPE
+          SYNTAX INTEGER{
+                     otherLoop(1),
+                     stopLoopback(2),
+                     local(3),
+                     remote(4)
+                     }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "The local loopback of a POS interface is used to test the interface itself.
+            If an interface works in a normal situation, disable the local loopback.
+            By default, stopLoopback is used."
+          ::= { hwPosEntry 13 }
+                       
+      hwPosScramble OBJECT-TYPE
+          SYNTAX EnabledStatus   
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the scramble function of payload. By default, the scramble function of payload is enabled."
+          ::= { hwPosEntry 14 }
+
+      hwPosClock OBJECT-TYPE
+          SYNTAX INTEGER{
+                   master(1),
+                   slave(2)
+                   }    
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates whether the clock is in master mode or slave mode.
+              By default, the clock is in slave mode."
+          ::= { hwPosEntry 15 }
+
+      hwPosCrcVerifyCode OBJECT-TYPE
+          SYNTAX INTEGER{
+                   crc16(1),
+                   crc32(2)
+                   } 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the length of the CRC verity code. The default value is 32."
+          ::= { hwPosEntry 16 }
+
+      hwPosFlagJ0Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j01ByteMode(1),
+                   j016ByteMode(2),
+                   j064ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame. j0: sets section trace byte.
+              The default value is j016ByteMode(2);hwPosFlagJ0Trace £ºNetEngine."
+          ::= { hwPosEntry 21 }
+
+      hwPosFlagJ0Value OBJECT-TYPE
+          SYNTAX Integer32(0..127)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the value of j01ByteMode. When hwPosFlagJ0Mode is set to j01ByteMode, hwPosFlagJ0Value takes effect."
+          ::= { hwPosEntry 22 }
+          
+      hwPosFlagJ0Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Set section trace byte.
+              When hwPosFlagJ0Mode is set to j016ByteMode or j064ByteOrNullMode, this variable takes effect.
+              When hwPosFlagJ0Mode is set to j016ByteMode, the value of this variable is up to 15 characters trace byte.
+              When hwPosFlagJ0Mode is set to j064ByteOrNullMode, the value of this variable is up to 64 characters trace byte."
+          ::= { hwPosEntry 23 }
+
+      hwPosFlagJ1Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j11ByteMode(1),
+                   j116ByteMode(2),
+                   j164ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame. j1: sets path trace byte.
+              The default value is j116ByteMode(2);hwPosFlagJ1Trace £ºNetEngine."
+          ::= { hwPosEntry 24 }
+
+      hwPosFlagJ1Value OBJECT-TYPE
+          SYNTAX Integer32(0..127)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the value of j11ByteMode. When hwPosFlagJ1Mode is set to j11ByteMode, hwPosFlagJ1Value takes effect."
+          ::= { hwPosEntry 25 }
+          
+      hwPosFlagJ1Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Set path trace byte.
+              When hwPosFlagJ1Mode is set to j116ByteMode or j164ByteOrNullMode, this variable takes effect.
+              When hwPosFlagJ1Mode is set to j116ByteMode, this variable is up to 15 characters trace byte.
+              When hwPosFlagJ1Mode is set to j164ByteOrNullMode, this variable is up to 64 characters trace byte."
+          ::= { hwPosEntry 26 }
+          
+      hwPosFlagC2Value OBJECT-TYPE
+          SYNTAX Integer32(0..255) 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame.
+              c2: indicates the signal label byte. It is a hexdecimal value ranging from 00 to FF.
+              The default value is 0x02."
+          ::= { hwPosEntry 27 }
+
+      
+      hwCpos OBJECT IDENTIFIER ::= { hwPortMIBObjects 3 }
+      
+      hwCposTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwCposEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the physical attributes of the CPOS interface.
+              This table lists the physical attributes of the CPOS interface."
+          ::= { hwCpos 1 }
+            
+      hwCposEntry OBJECT-TYPE
+          SYNTAX HwCposEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Indicates the physical attributes of the CPOS interface.
+              This table lists the physical attributes of the CPOS interface." 
+          INDEX  { hwCposIfIndex }    
+          ::= { hwCposTable 1 }           
+    
+      HwCposEntry  ::= 
+          SEQUENCE{
+              hwCposIfIndex
+                  InterfaceIndex, 
+              hwCposIfType         
+                  INTEGER,  
+              hwCposClock         
+                  INTEGER,
+              hwCposFrameFormat         
+                  INTEGER,
+              hwCposMultiplex   
+                  INTEGER,                  
+              hwCposLoopback
+                  INTEGER,
+              hwCposFlagJ0Mode              
+                  INTEGER,
+              hwCposFlagJ0Value     
+                  Integer32, 
+              hwCposFlagJ0Trace
+                  OCTET STRING,
+              hwCposFlagJ1Mode     
+                  INTEGER,
+              hwCposFlagJ1Value     
+                  Integer32,
+              hwCposFlagJ1Trace
+                  OCTET STRING,
+              hwCposFlagC2Value     
+                  Integer32
+                  }
+          
+      hwCposIfIndex OBJECT-TYPE
+         SYNTAX InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Interface index(es) of port(s) present on the device ."
+          ::= { hwCposEntry 1 }
+
+      hwCposClock OBJECT-TYPE
+          SYNTAX INTEGER{
+                   master(1),
+                   slave(2)
+                   } 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates whether the clock is in master mode or slave mode.
+              By default, the clock is in slave mode."
+          ::= { hwCposEntry 11 }
+          
+      hwCposIfType OBJECT-TYPE
+          SYNTAX INTEGER{
+                   stm1(1),
+                   stm16(2)
+                   } 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the interface type."
+          ::= { hwCposEntry 12 }          
+ 
+      hwCposFrameFormat OBJECT-TYPE
+          SYNTAX INTEGER{
+                   sonet(1),
+                   sdh(2)
+                   }          
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the frame type of the CPOS interface. By default, the frame type of the CPOS interface is SDH."
+          ::= { hwCposEntry 13 }
+                                 
+      hwCposMultiplex OBJECT-TYPE
+          SYNTAX INTEGER{
+                   au3(1),
+                   au4(2)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "Indicates the multiplex mode of the AUG. By default, the multiplex mode of the AUG is au-4."
+          ::= { hwCposEntry 14 }
+
+      hwCposLoopback OBJECT-TYPE
+          SYNTAX INTEGER{
+                     otherloop(1),
+                     stopLoopback(2),
+                     local(3),
+                     remote(4)
+                     }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the loopback function of the CPOS interface. By default, the loopback function is disabled."
+          ::= { hwCposEntry 15 }
+
+      hwCposFlagJ0Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j01ByteMode(1),
+                   j016ByteMode(2),
+                   j064ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame. j0: sets section trace byte.
+              The default value is j016ByteMode(2);hwCposFlagJ0Trace NetEngine."
+          ::= { hwCposEntry 21 }
+
+      hwCposFlagJ0Value OBJECT-TYPE
+          SYNTAX Integer32(0..127)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "j01ByteMode Value . When hwCposFlagJ0Mode is set to j01ByteMode, hwCposFlagJ0Value takes effect."
+          ::= { hwCposEntry 22 }
+          
+      hwCposFlagJ0Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Set section trace byte.
+              When hwCposFlagJ0Mode is set to j016ByteMode or j064ByteOrNullMode, this variable takes effect.
+              When hwCposFlagJ0Mode is set to j016ByteMode, this variable is up to 15 characters trace byte.
+              When hwCposFlagJ0Mode is set to j064ByteOrNullMode, this variable is up to 64 characters trace byte."
+          ::= { hwCposEntry 23 }
+
+      hwCposFlagJ1Mode OBJECT-TYPE
+          SYNTAX INTEGER{ 
+                   j11ByteMode(1),
+                   j116ByteMode(2),
+                   j164ByteOrNullMode(3),
+                   peer(4)
+                   }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame. j1: sets path trace byte.
+              The default value is j116ByteMode(2);hwCposFlagJ1Trace NetEngine."
+          ::= { hwCposEntry 24 }
+
+      hwCposFlagJ1Value OBJECT-TYPE
+          SYNTAX Integer32(0..127)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the value of j11ByteMode. When hwCposFlagJ1Mode is set to j11ByteMode, hwCposFlagJ1Value takes effect."
+          ::= { hwCposEntry 25 }
+          
+      hwCposFlagJ1Trace OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..64))
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+             "Set path trace byte.
+              When hwCposFlagJ1Mode is set to j116ByteMode or j164ByteOrNullMode, this variable takes effect.
+              When hwCposFlagJ1Mode is set to j116ByteMode, this variable is a string up to 15 characters trace byte.
+              When hwCposFlagJ1Mode is set to j164ByteOrNullMode, this variable is a string up to 64 characters trace byte."
+          ::= { hwCposEntry 26 }
+
+      hwCposFlagC2Value OBJECT-TYPE
+          SYNTAX Integer32(0..255) 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the overhead byte of the SDH frame.
+              c2: indicates the signal label byte. It is a hexdecimal value ranging from 00 to FF.
+              The default value is 22(0x16)."
+          ::= { hwCposEntry 27 }
+                
+      
+      hwDs0ChannelBundle OBJECT IDENTIFIER ::= { hwPortMIBObjects 4 }
+--
+-- hwDs0ChannelBundleTable table
+--
+      hwDs0ChannelBundleTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwDs0ChannelBundleEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table is used to bundle timeslots of CE1/CT1 interfaces."
+          ::= { hwDs0ChannelBundle 1 }
+
+      hwDs0ChannelBundleEntry       OBJECT-TYPE
+          SYNTAX      HwDs0ChannelBundleEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table is used to bundle timeslots of CE1/CT1 interfaces."
+          INDEX       { hwDs0ChannelBundleParentIfIndex, hwDs0ChannelBundleDs1ChannelId, hwDs0ChannelBundleId }
+          ::= { hwDs0ChannelBundleTable 1 }
+
+      HwDs0ChannelBundleEntry ::=
+          SEQUENCE { 
+              hwDs0ChannelBundleParentIfIndex      InterfaceIndex,
+              hwDs0ChannelBundleDs1ChannelId      Integer32,
+              hwDs0ChannelBundleId                 Integer32,
+              hwDs0ChannelBundleIfIndex            InterfaceIndex,              
+              hwDs0ChannelBundleTimeSlots          OCTET STRING,
+              hwDs0ChannelBundleSpeed              INTEGER,
+              hwDs0ChannelBundleRowStatus          RowStatus
+          }  
+         
+         hwDs0ChannelBundleParentIfIndex    OBJECT-TYPE
+          SYNTAX      InterfaceIndex 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index of the parent interface."
+          ::= { hwDs0ChannelBundleEntry 1 }
+ 
+       hwDs0ChannelBundleDs1ChannelId    OBJECT-TYPE
+          SYNTAX      Integer32 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the channel ID."
+          ::= { hwDs0ChannelBundleEntry 2 }          
+         
+      hwDs0ChannelBundleId    OBJECT-TYPE
+          SYNTAX      Integer32(0..30)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index number of the channel set."
+          ::= { hwDs0ChannelBundleEntry 3 }          
+             
+
+      hwDs0ChannelBundleIfIndex     OBJECT-TYPE
+          SYNTAX      InterfaceIndex
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index of the serial interface formed by the timeslot binding."
+          ::= { hwDs0ChannelBundleEntry 11 }
+
+      hwDs0ChannelBundleTimeSlots    OBJECT-TYPE
+          SYNTAX      OCTET STRING (SIZE (0..61))
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the number of the range of the timeslot to be bound.
+               The value is an integer ranging from 0 to 31. Multiple timeslots are
+               separated by ','. The range of timeslot is expressed by using '-'.
+               For E1 card mode:
+               If the timeslots are '0-31', it means unframed format,  
+               If the timeslots are '0-30', it means framed format,  
+               For T1 card mode:
+               If the timeslots are '0-23', it means unframed format,  
+               If the timeslots are '0-22', it means framed format,
+               and hwDs0ChannelBundleDs1ChannelId and hwDs0ChannelBundleId should be zero."
+          ::= { hwDs0ChannelBundleEntry 12 }
+
+      hwDs0ChannelBundleSpeed    OBJECT-TYPE
+          SYNTAX      INTEGER {
+                          s56 (1),
+                          s64 (2)
+                      }
+          UNITS       "kilo bytes"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Configures the mode to configure the timeslots.
+               If the parameter 56 k is selected, the timeslots are bound in the mode of N x 56 kbit/s.
+               If the parameter 64 k is selected, the timeslots are bound in the mode of N x 64 kbit/s.
+               The default value is 64kbit/s."
+          DEFVAL      { 64 }
+          ::= { hwDs0ChannelBundleEntry 13 }
+
+      hwDs0ChannelBundleRowStatus  OBJECT-TYPE
+          SYNTAX RowStatus
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+              "This variable is used to create or delete an object."
+          ::= { hwDs0ChannelBundleEntry 51 }
+      
+      
+      hwDs1 OBJECT IDENTIFIER ::= { hwPortMIBObjects 5 }
+--
+-- hwDs1Table table
+--
+      hwDs1Table OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwDs1Entry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table lists all E1/CE1 interfaces or T1/CT1 interfaces.
+              After the mode of E3/CE3 interfaces or T3/CT3 interfaces is set to channelized, this table can be used
+              to create E1/CE1, or T1/CT1, or E3/CE3, or T3/CT3 interfaces."
+          ::= { hwDs1 1 }
+
+      hwDs1Entry       OBJECT-TYPE
+          SYNTAX      HwDs1Entry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table lists all E1/CE1 interfaces or T1/CT1 interfaces.
+              After the mode of E3/CE3 interfaces or T3/CT3 interfaces is set to channelized, this table can be used
+              to create E1/CE1, or T1/CT1, or E3/CE3, or T3/CT3 interfaces."
+          INDEX       { hwDs1ParentIfIndex, hwDs1ChannelId, hwDs1IfIndex }
+          ::= { hwDs1Table 1 }
+
+      HwDs1Entry ::=
+          SEQUENCE {
+              hwDs1ParentIfIndex               InterfaceIndex,
+              hwDs1ChannelId                   Integer32,
+              hwDs1IfIndex                     InterfaceIndex,
+              hwDs1ChannelType                 INTEGER,
+              hwDs1IfType                      INTEGER,
+              hwDs1Channelized                 TruthValue,
+              hwDs1CodeType                    INTEGER,
+              hwDs1Clock                       INTEGER,
+              hwDs1FrameFormat                 INTEGER,
+              hwDs1Cable                       INTEGER,       
+              hwDs1Loopback                    INTEGER,              
+              hwDs1RowStatus                   RowStatus
+          }
+
+      hwDs1ParentIfIndex    OBJECT-TYPE
+          SYNTAX      InterfaceIndex 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index of the parent interface."
+          ::= { hwDs1Entry 1 }
+
+      hwDs1ChannelId    OBJECT-TYPE
+          SYNTAX      Integer32(0..63) 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the channel ID."
+          ::= { hwDs1Entry 2 }  
+          
+       hwDs1IfIndex    OBJECT-TYPE
+          SYNTAX      InterfaceIndex
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the interface index."
+          ::= { hwDs1Entry 3 }
+
+      hwDs1ChannelType    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                            t1 (1),
+                            e1 (2)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the interface type. The type can be E1/CE1 or T1/CT1."
+          ::= { hwDs1Entry 11 }
+          
+      hwDs1IfType    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                            e3    (1),
+                            t3    (2),
+                            cpos  (3),
+                            atm   (4),
+                            none  (255)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the interface tyep.
+               e3: is multiplexed by CE3 interfaces.
+               t3: is multiplexed by CT3 interfaces.
+               cpos: is multiplexed by CPOS interfaces.
+               atm: is multiplexed by ATM interfaces.
+               none: indicates the physical interface.
+               
+               default:none"
+          DEFVAL      { none }
+          ::= { hwDs1Entry 12 }          
+
+      hwDs1Channelized    OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the working mode of the interface.
+               true: indicates the channelized mode.
+               false: indicates the clear channel mode.
+               The default is true."
+          DEFVAL      { true }
+          ::= { hwDs1Entry 13 }
+
+      hwDs1CodeType    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           ami    (1),
+                           hdb3   (2),
+                           b8zs   (3)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the code type of the interface.
+               ami: is short for Alternate Mark Inversion.
+               hdb3: is short for High Density Bipolar of Order 3.
+               b8zs: is short for Bipolar with 8-Zero Substitution."
+          DEFVAL      { hdb3 }
+          ::= { hwDs1Entry 14 }
+
+      hwDs1Clock    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           master  (1),
+                           slave   (2)
+                      } 
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the clock mode of the interface.
+               master: indicates that the clock works in master mode and uses the internal clock signal.
+               slave: indicates that the clock works in slave mode and uses the line clock signal."
+          ::= { hwDs1Entry 15 }
+
+      hwDs1FrameFormat    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           esf     (1),
+                           sf      (2),
+                           noCrc4   (3),
+                           crc     (4)
+                      } 
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the frame format of the interface.
+               crc4: indicates that the frame format is CRC4.
+               no-crc4: indicates that the frame format is no-CRC4.
+               sf: indicates that the frame format is Super Frame.
+               esf: indicates that the frame format is Extended Super Frame.
+               By default, the frame format of an E1 interface is no-crc4.
+               By default, the frame format of a T1 interface is esf."
+          ::= { hwDs1Entry 16 }
+
+      hwDs1Cable    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                         long     (1),
+                         short    (2)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "The cable command takes effect only if the E1 interface card uses 75-ohm coaxial cable.
+               The default is short. If no cable is connected, this parameter is displayed as null."
+          DEFVAL      { short }
+          ::= { hwDs1Entry 17 }                     
+
+      hwDs1Loopback    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           local   (1),
+                           remote  (2),
+                           payload (3),
+                           cell    (4),
+                           none    (255)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Enable the loopback function of the interface.
+               local: enables the local loopback on the interface.
+               remote: enables the remote loopback on the interface.
+               payload: enables the remote payload loopback on the interface.
+               cell: enables the local cell loopback. The local cell loopback is used to test the local physical chip." 
+          DEFVAL      { none }
+          ::= { hwDs1Entry 18 }          
+    
+      hwDs1RowStatus  OBJECT-TYPE
+          SYNTAX RowStatus
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+              "This variable is used to create or delete an object."
+          ::= { hwDs1Entry 51 }
+      
+      
+      hwDs3 OBJECT IDENTIFIER ::= { hwPortMIBObjects 6 }
+--
+-- hwDs3Table Table 
+-- 
+      hwDs3Table OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwDs3Entry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table lists all E3/CE3 interfaces or all T3/CT3 interfaces."
+          ::= { hwDs3 1 }
+
+      hwDs3Entry       OBJECT-TYPE
+          SYNTAX      HwDs3Entry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table lists all E3/CE3 interfaces or all T3/CT3 interfaces."
+          INDEX       { hwDs3ParentIfIndex, hwDs3ChannelId, hwDs3IfIndex }
+          ::= { hwDs3Table 1 }
+
+      HwDs3Entry ::=
+          SEQUENCE {
+              hwDs3ParentIfIndex               InterfaceIndex,
+ 	      hwDs3ChannelId                   Integer32,
+              hwDs3IfIndex                     InterfaceIndex,
+              hwDs3ChannelType                 INTEGER,
+              hwDs3IfType                      INTEGER,
+              hwDs3Channelized                 TruthValue,
+              hwDs3Clock                       INTEGER,
+              hwDs3FrameFormat                 INTEGER,   
+              hwDs3Scramble                    TruthValue,
+              hwDs3Cable                       INTEGER,
+              hwDs3NationalBit                 INTEGER,
+              hwDs3Loopback                    INTEGER, 
+              hwDs3CreateSerial                TruthValue,
+              hwDs3RowStatus                   RowStatus
+          }
+
+      hwDs3ParentIfIndex    OBJECT-TYPE
+          SYNTAX      InterfaceIndex 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index of the parent interface."
+          ::= { hwDs3Entry 1 }
+
+      hwDs3ChannelId    OBJECT-TYPE
+          SYNTAX      Integer32(0..3) 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the index of the parent interface."
+          ::= { hwDs3Entry 2 }
+
+      hwDs3IfIndex    OBJECT-TYPE
+          SYNTAX      InterfaceIndex
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the interface index."
+          ::= { hwDs3Entry 3 }
+
+      hwDs3ChannelType    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                             t3  (1),
+                             e3  (2)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the interface type. The type can be E3/CE3 or T3/CT3."
+          ::= { hwDs3Entry 11 }
+          
+      hwDs3IfType    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                            cpos  (1),
+                            none  (255)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the parent interface type of the interface.
+               cpos: is multiplexed by CPOS interfaces.
+               none: indicates the interface is a physical interface.
+               The default is none."
+          DEFVAL      { none }
+          ::= { hwDs3Entry 12 }           
+
+      hwDs3Channelized    OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the working mode of the interface.
+               true: indicates the channelized mode.
+               false: indicates the clear channel mode.
+               The default is true."
+          DEFVAL      { true }
+          ::= { hwDs3Entry 13 }
+
+      hwDs3Clock    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           master  (1),
+                           slave   (2)
+                       } 
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the clock mode of the interface.
+               master: indicates that the clock works in master mode and uses the internal clock signal.
+               slave: indicates that the clock works in slave mode and uses the line clock signal."
+          ::= { hwDs3Entry 14 }
+
+      hwDs3FrameFormat    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           g832Adm   (1),
+                           g751Adm   (2),
+                           g751Plcp  (3),
+                           cbitAdm   (4),
+                           cbitPlcp  (5),
+                           m23Adm    (6),
+                           m23Plcp   (7)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the frame format of the interface."
+          ::= { hwDs3Entry 15 }
+
+      hwDs3Scramble     OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the scramble function of the interface.
+               true: enables the scramble function.
+               false: disables the scramble function.
+               The default is false."
+          DEFVAL      { false }
+          ::= { hwDs3Entry 16 }
+
+      hwDs3Cable    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                         long     (1),
+                         short    (2)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "The cable command takes effect only if the E3 interface card uses 75-ohm coaxial cable.
+               The default is short. If no cable is connected, this parameter is displayed as null."
+               DEFVAL      { short }
+          ::= { hwDs3Entry 17 }                        
+
+      hwDs3NationalBit    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           n0   (1),
+                           n1   (2)
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Indicates the national bit of the E3/CE3 interface.
+               n0: indicates the national bit is 0 and the interface supports only the communication within a country.
+               n1: indicates the national bit is 1 and the interface supports the international communication.  "
+          DEFVAL      { n0 }        
+          ::= { hwDs3Entry 18 }
+
+      hwDs3Loopback    OBJECT-TYPE
+          SYNTAX      INTEGER{
+                           local   (1),
+                           remote  (2),
+                           payload (3),
+                           cell    (4),
+                           none    (255) 
+                      }
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Enable the loopback function of the interface.
+               local: enables the local loopback on the interface.
+               remote: enables the remote loopback on the interface.
+               payload: enables the remote payload loopback on the interface.
+               cell: enables the local cell loopback. The local cell loopback is used to test the local physical chip." 
+          DEFVAL      { none }        
+          ::= { hwDs3Entry 19 }  
+          
+      hwDs3CreateSerial    OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "Create serial interface from Ds3 interface.
+              True create serial interface.
+              False  destroy serial interface.
+               "
+          DEFVAL      { false }        
+          ::= { hwDs3Entry 20 }
+
+      hwDs3RowStatus  OBJECT-TYPE
+          SYNTAX RowStatus
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+              "This variable is used to create or delete an object."
+          ::= { hwDs3Entry 51 }
+      
+      
+      hwBundleSerial OBJECT IDENTIFIER ::= { hwPortMIBObjects 7 }
+--
+-- hwBundleSerialTable Table 
+--           
+      hwBundleSerialTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwBundleSerialEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the attribute of the serial interface formed by timeslots.
+              This table lists the physical attributes of the serial interface."
+          ::= { hwBundleSerial 1 }
+            
+      hwBundleSerialEntry OBJECT-TYPE
+          SYNTAX HwBundleSerialEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+                "Indicates the attribute of the serial interface formed by timeslots.
+                This table lists the physical attributes of the serial interface."
+          INDEX  { hwBundleSerialIfIndex }    
+          ::= { hwBundleSerialTable 1 }           
+    
+      HwBundleSerialEntry  ::= 
+          SEQUENCE{
+              hwBundleSerialIfIndex
+                  InterfaceIndex,   
+              hwBundleSerialLinkProtocol
+                  INTEGER,
+              hwBundleSerialTimerHold     
+                  Integer32,                 
+              hwBundleSerialLoopback
+                  TruthValue,
+              hwBundleSerialCrcVerifyCode
+                  INTEGER                                     
+                  }
+          
+      hwBundleSerialIfIndex OBJECT-TYPE
+         SYNTAX InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Interface index(es) of serial(s) present on the device ."
+          ::= { hwBundleSerialEntry 1 }
+
+      hwBundleSerialLinkProtocol OBJECT-TYPE
+         SYNTAX INTEGER {
+                   ietf(1),
+                   nonstandard(2),
+                   hdlc(3),
+                   ppp(4),
+                   lapb(5),
+                   atm(6),
+                   tdm(7)
+               }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "The link-protocol of interface. The serial(s) always use PPP as its link-protocol for default."
+          ::= { hwBundleSerialEntry 11 }
+          
+      hwBundleSerialTimerHold OBJECT-TYPE
+          SYNTAX Integer32(0..32767)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the interval for sending Keepalive packets from the serial interface to the peer.
+              The default is 10 seconds."
+          ::= { hwBundleSerialEntry 12 }                 
+      
+      hwBundleSerialLoopback OBJECT-TYPE
+          SYNTAX TruthValue
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "true: enables the loopback on the serial interface.
+               false: disables the loopback on the serial interface.
+               By default, the loopback on the serial interface is disabled."
+          DEFVAL      { false }
+          ::= { hwBundleSerialEntry 13 }
+          
+      hwBundleSerialCrcVerifyCode OBJECT-TYPE
+          SYNTAX INTEGER{
+                   crc16(1),
+                   crc32(2)
+                   } 
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "Indicates the length of the CRC verify code. The default is 32."
+          ::= { hwBundleSerialEntry 14 }             
+          
+      hwPortConformance OBJECT IDENTIFIER ::= { hwPortMIB 11 }
+    
+      hwPortCompliances OBJECT IDENTIFIER ::= { hwPortConformance 1 }
+        
+      hwPortCompliance MODULE-COMPLIANCE
+          STATUS current
+          DESCRIPTION 
+              "The compliance statement for systems supporting 
+              the HUAWEI-PORT-MIB."
+          MODULE 
+              MANDATORY-GROUPS { hwEthernetObjectGroup, hwPosObjectGroup, hwCposObjectGroup, hwBundleSerialObjectGroup,
+                                 hwDs0ChannelBundleObjectGroup, hwDs1ObjectGroup, hwDs3ObjectGroup }
+          ::= { hwPortCompliances 1 }
+
+      hwPortGroups OBJECT IDENTIFIER ::= { hwPortConformance 2 }
+
+      hwEthernetObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwEthernetLoopback             
+                  ,
+              hwEthernetPortType   
+                  ,
+              hwEthernetSpeedSet     
+                  ,               
+              hwEthernetDuplex 
+                  ,
+              hwEthernetNegotiation
+                  ,
+              hwEthernetPortTypeOperate
+                  ,
+              hwEthernetClock
+                  ,                  
+              hwEthernetFlagJ0Mode
+                  ,
+              hwEthernetFlagJ0Value              
+                  ,
+              hwEthernetFlagJ0Trace              
+                  ,
+              hwEthernetFlagJ1Mode              
+                  ,
+              hwEthernetFlagJ1Value              
+                  ,
+              hwEthernetFlagJ1Trace              
+                  ,
+              hwEthernetFlagC2Value     
+                  ,
+              hwEthernetUpHoldTime
+                  ,
+              hwEthernetDownHoldTime                      
+                  ,
+              hwEthernetSubinterfaceStatisticEnable
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 1 }
+          
+      hwPosObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwPosLinkProtocol
+                  ,
+              hwPosFrameFormat
+                  ,
+              hwPosLoopback
+                  ,
+              hwPosScramble     
+                  ,
+              hwPosClock     
+                  ,                  
+              hwPosCrcVerifyCode     
+                  ,
+              hwPosFlagJ0Mode     
+                  ,
+              hwPosFlagJ0Value     
+                  , 
+              hwPosFlagJ0Trace
+                  ,
+              hwPosFlagJ1Mode     
+                  ,
+              hwPosFlagJ1Value     
+                  ,
+              hwPosFlagJ1Trace
+                  ,
+              hwPosFlagC2Value     
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 2 }
+              
+      hwCposObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwCposFrameFormat         
+                  ,
+              hwCposMultiplex   
+                  ,
+              hwCposClock         
+                  ,         
+              hwCposIfType
+                  ,         
+              hwCposLoopback
+                  ,
+              hwCposFlagJ0Mode              
+                  ,
+              hwCposFlagJ0Value     
+                  , 
+              hwCposFlagJ0Trace
+                  ,
+              hwCposFlagJ1Mode     
+                  ,
+              hwCposFlagJ1Value     
+                  ,
+              hwCposFlagJ1Trace
+                  ,
+              hwCposFlagC2Value     
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 3 }
+          
+      hwDs0ChannelBundleObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwDs0ChannelBundleIfIndex   
+                  ,
+              hwDs0ChannelBundleTimeSlots         
+                  ,                  
+              hwDs0ChannelBundleSpeed  
+                  ,
+              hwDs0ChannelBundleRowStatus  
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 4 }   
+          
+      hwDs1ObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwDs1ChannelType 
+                  , 
+              hwDs1IfType       
+                  ,
+              hwDs1Channelized   
+                  ,
+              hwDs1CodeType         
+                  ,                  
+              hwDs1Clock
+                  ,
+              hwDs1FrameFormat              
+                  , 
+              hwDs1Cable
+                  ,
+              hwDs1Loopback                
+                  ,                  
+              hwDs1RowStatus
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 5 }  
+          
+      hwDs3ObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwDs3ChannelType 
+                  ,
+              hwDs3IfType  
+                  ,
+              hwDs3Channelized         
+                  ,                  
+              hwDs3Clock
+                  ,
+              hwDs3FrameFormat              
+                  ,
+              hwDs3Scramble     
+                  , 
+              hwDs3Cable               
+                  ,
+              hwDs3NationalBit
+                  ,
+              hwDs3Loopback
+                  , 
+              hwDs3CreateSerial
+                  ,
+              hwDs3RowStatus 
+                  
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 6 }                          
+          
+      hwBundleSerialObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwBundleSerialLinkProtocol   
+                  ,
+              hwBundleSerialTimerHold      
+                  ,
+              hwBundleSerialCrcVerifyCode
+                  ,
+              hwBundleSerialLoopback    
+                 
+                  }
+          STATUS current   	
+          DESCRIPTION 
+              "The Port attribute group."
+          ::= { hwPortGroups 7 }  
+                    
+END
+
+--
+-- HUAWEI-PORT-MIB.mib

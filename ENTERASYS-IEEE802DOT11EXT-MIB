@@ -1,0 +1,713 @@
+ENTERASYS-IEEE802DOT11EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ 
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    TruthValue, MacAddress,
+    AutonomousType                              FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF 
+    SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB 
+    ifIndex                                     FROM IF-MIB           
+    EnabledStatus                               FROM P-BRIDGE-MIB     
+    dot11WEPDefaultKeyIndex                     FROM IEEE802dot11-MIB 
+    etsysModules                                FROM ENTERASYS-MIB-NAMES;
+                         
+etsysDot11ExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200203071945Z"  -- Thu Mar  7 19:45 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+   
+     DESCRIPTION
+        "This mib module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks enterprise OID as an extension 
+         to the IEEE802Dot11 MIB.
+         
+         This Enterasys Networks Proprietary MIB was designed to be 
+         used for read-write access to configuration objects not provided
+         by IEEE802.11 MIB, or any other standard MIB."
+            
+    REVISION "200203071945Z"  -- Thu Mar  7 19:45 GMT 2002
+    DESCRIPTION
+       "Removed some comments so that it would compile."
+
+    REVISION "200105081800Z"
+    DESCRIPTION
+       "The initial version of this MIB module"
+
+    ::= { etsysModules 9 }
+       
+-- ----------------------------------------------------------------------------
+-- MIB Objects
+-- ----------------------------------------------------------------------------
+
+etsysDot11ExtObjects        OBJECT IDENTIFIER ::= { etsysDot11ExtMIB 1 }
+     
+etsysDot11ExtLinkTest       OBJECT IDENTIFIER ::= { etsysDot11ExtObjects 1 }           
+etsysDot11ExtGeneral        OBJECT IDENTIFIER ::= { etsysDot11ExtObjects 2 }
+etsysDot11ExtBldg           OBJECT IDENTIFIER ::= { etsysDot11ExtObjects 3 }
+etsysDot11ExtWEP            OBJECT IDENTIFIER ::= { etsysDot11ExtObjects 4 }
+etsysDot11ExtEffect         OBJECT IDENTIFIER ::= { etsysDot11ExtObjects 5 }
+                    
+-- ----------------------------------------------------------------------------
+  
+etsysDot11ExtLinkTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtLinkTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects to test the link between a 
+             requester (entity which sends out the management request 
+             message) and a responder (entity which responds with 
+             the appropriate management response message). An entity
+             could be either an Access Point(AP) or a station (STA)."
+                 
+        ::= {  etsysDot11ExtLinkTest 1 }
+
+etsysDot11ExtLinkTestEntry OBJECT-TYPE
+        SYNTAX EtsysDot11ExtLinkTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the LinkTest Table.  
+             By means of message transmission between requester
+             and responder, the communication quality between the 
+             two stations can be determined. The requester and 
+             responder can be any combination of AP and STA except
+             STA to STA in an Infrastructure Network (network which 
+             has at least one AP present."
+             
+        INDEX {ifIndex}
+    
+        ::= {  etsysDot11ExtLinkTestTable 1 }
+
+EtsysDot11ExtLinkTestEntry ::=
+        SEQUENCE {
+                    etsysDot11ExtLTRemoteStationMAC            MacAddress,
+                    etsysDot11ExtLTRemoteStationName           SnmpAdminString,              
+                    etsysDot11ExtLTTrigger                     INTEGER,
+                    etsysDot11ExtLTRemoteContents              OCTET STRING           
+         }  
+  
+ 
+    etsysDot11ExtLTRemoteStationMAC OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The MAC address for the remote station to participate
+                 in the Link Test.
+
+                 To initiate a search for a participating station, write the
+                 broadcast address (FF-FF-FF-FF-FF-FF) to this variable."
+
+        ::= { etsysDot11ExtLinkTestEntry 1 }
+
+    etsysDot11ExtLTRemoteStationName OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The wireless station name of the remote station
+                 participating in the Link Test."
+
+        ::= { etsysDot11ExtLinkTestEntry 2 }
+
+    etsysDot11ExtLTTrigger OBJECT-TYPE
+        SYNTAX  INTEGER (1..1)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Writing a 1 to this variable causes a single Link Test 
+                 request message to be sent to the remote station."
+
+        ::= { etsysDot11ExtLinkTestEntry 3 }
+
+    
+    etsysDot11ExtLTRemoteContents OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE  (84))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The exact byte-by-byte contents of the Link Test packet returned by
+                 the remote station."
+
+        ::= { etsysDot11ExtLinkTestEntry 4 }
+
+etsysDot11ExtGeneralTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtGeneralEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains all the objects that must be 
+            configured on every radio card installed in the 
+            Access Point regardless of the operating mode in use."
+    
+        ::= {  etsysDot11ExtGeneral 1 }
+
+etsysDot11ExtGeneralEntry OBJECT-TYPE
+        SYNTAX EtsysDot11ExtGeneralEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the Dot11General Table.  
+             This allows for multiple instances of radio cards 
+             in the Access Point."
+
+        INDEX {ifIndex}
+    
+        ::= {  etsysDot11ExtGeneralTable 1 }
+
+EtsysDot11ExtGeneralEntry ::=
+        SEQUENCE {   
+                    etsysDot11ExtPCCardType                INTEGER,
+                    etsysDot11ExtPCCardVersions            SnmpAdminString, 
+                    etsysDot11ExtBridgeMode                INTEGER,
+                    etsysDot11ExtResetOptions              INTEGER,
+                    etsysDot11ExtSystemScale               INTEGER,
+                    etsysDot11ExtSecureAccess              EnabledStatus,
+                    etsysDot11ExtMulticastTxRate           INTEGER,
+                    etsysDot11ExtIntraBSSRelay             EnabledStatus,
+                    etsysDot11ExtStationName               SnmpAdminString
+         }  
+                     
+                  
+    etsysDot11ExtPCCardType OBJECT-TYPE
+        SYNTAX  INTEGER  {                              
+                        none(1), 
+                        deprecatedValue1(2),
+                        deprecatedValue2(3),
+                        deprecatedValue3(4),
+                        ds80211b(5),    -- IEEE 802.11 2.4Ghz DS 11Mb card 
+                        ds80211a(6),    -- IEEE 802.11 2.4Ghz DS 54Mb card   
+                        unknown(15)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The type of PC card inserted in the Access Point."
+        
+        ::= { etsysDot11ExtGeneralEntry 1 }
+
+
+    etsysDot11ExtPCCardVersions OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..80))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specifies the version identifiers for the PC card.
+                 This will indicate both the Hardware and the Firmware
+                 versions."
+
+        ::= { etsysDot11ExtGeneralEntry 2 }
+
+    etsysDot11ExtBridgeMode OBJECT-TYPE
+        SYNTAX  INTEGER  {                                 
+                        workgroup(1),
+                        lanToLanEndpoint(2),            
+                        lanToLanMultipoint(3)      
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "CURRENT Access Point bridge mode state.  
+                 
+                 In workgroup mode all communications between clients 
+                 passes through the Access Point.
+                 
+                 LAN-to-LAN mode is the improved name for 802.11.  
+                 LAN-to-LAN used to be called full-bridge pre-802.11.
+                 This mode is a method of connecting two wired LAN's 
+                 via a wireless link, also referred to as Point-to-Point 
+                 mode.
+                             
+                 LAN-to-LAN-HUB mode allows the interconnection of multiple 
+                 (ie. more than two) wired LAN's via wireless links, also 
+                 referred to as Point-to-MultiPoint mode. 
+                 
+                 When operating in multimode the Access Point can simultaneously 
+                 operate in both workgroup mode and either Point-to-Point or
+                 Point-to-MultiPoint modes.
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+                                          
+                                                     
+        ::= { etsysDot11ExtGeneralEntry 3 }
+       
+    etsysDot11ExtResetOptions   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        noReset (0),
+                        resetRadioCardIfNecessary (1),
+                        resetRadioCardRegardless (2)
+                }       
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "noReset (0)
+                  No reset is performed. A 'get' on this object always returns 
+                  this value.
+                 
+                  resetRadioCardIfNecessary (1)
+                  Some parameters can only be given to the card at initialization
+                  time, and if any of these are changed, a card reset will be 
+                  necessary for them to go into place. The card will be reset at 
+                  this time if any of those parameters have indeed been changed.
+                  
+                  resetRadioCardRegardless (2)                  
+                  Forces the radio card to reset, even if no radio card 
+                  parameters have been changed."
+
+            ::= { etsysDot11ExtGeneralEntry 4 }
+
+    
+    etsysDot11ExtSystemScale OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        low(1),
+                        medium(2),
+                        high(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Specifies the CURRENT Access Point density in the 
+                 Extended Service Set (ESS).
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+                 
+
+        ::= { etsysDot11ExtGeneralEntry 5 }
+
+    etsysDot11ExtSecureAccess OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "When this mode is set to enabled, the AP will only associate
+                 with stations that have the same network name as the AP.
+                 When this mode is set to disabled, a station with the
+                 network name of ANY is allowed to associate.
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+                
+        ::= { etsysDot11ExtGeneralEntry 6 }
+        
+    etsysDot11ExtMulticastTxRate OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                            fixed1Mbit(1),
+                            fixed2Mbit(2),
+                            fixedMediumRate(3),
+                            fixedHighRate(4)
+                }           
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This value specifies the Multicast data transmission 
+                 rate of the AP. It is implemented when cards that operate
+                 faster than the 2Mbit 802.11 standard are inserted.
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+
+        ::= { etsysDot11ExtGeneralEntry 7 }
+
+    etsysDot11ExtIntraBSSRelay OBJECT-TYPE
+        SYNTAX  EnabledStatus     
+        MAX-ACCESS  read-write
+        STATUS  current        
+        DESCRIPTION
+                "When this mode is enabled the AP entity within the PC Card will
+                 relay frames to destined for stations associated with it and will NOT
+                 forward them to the bridging entity within the AP.
+                 When this mode is set to disabled, the AP entity within the PC Card 
+                 will not relay frames from wireless client(s) to station(s) associated with it, 
+                 instead forwards frames to the bridging entity within the AP.
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+
+        ::= { etsysDot11ExtGeneralEntry 8 }   
+ 
+    etsysDot11ExtStationName OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..20))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "DURABLE:
+                The wireless station name sent out as part of
+                the beacon messages.  Valid only when a DS card
+                is inserted in the Access Point."
+
+        ::= { etsysDot11ExtGeneralEntry 9 }
+
+
+-- ----------------------------------------------------------------------------
+-- 802.11 Building-to-Building section.
+-- ---------------------------------------------------------------------------- 
+
+etsysDot11ExtBldgTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtBldgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the objects required to enable
+             the Access Point to operate in Point-to-MultiPoint mode."
+    
+        ::= {  etsysDot11ExtBldg 1 }
+
+etsysDot11ExtBldgEntry OBJECT-TYPE
+        SYNTAX EtsysDot11ExtBldgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+
+            "An Entry (conceptual row) in the Dot11Bldg Table.
+             A collection of objects containing information for activating 
+             and using the Access Point in Point-to-MultiPoint mode."
+
+        INDEX {ifIndex}
+    
+        ::= {  etsysDot11ExtBldgTable 1 }
+
+EtsysDot11ExtBldgEntry ::=
+        SEQUENCE {       
+                    etsysDot11ExtBldgRemoteMAC1        MacAddress,                    
+                    etsysDot11ExtBldgRemoteMAC2        MacAddress,
+                    etsysDot11ExtBldgRemoteMAC3        MacAddress,
+                    etsysDot11ExtBldgRemoteMAC4        MacAddress,
+                    etsysDot11ExtBldgRemoteMAC5        MacAddress,
+                    etsysDot11ExtBldgRemoteMAC6        MacAddress,
+                    etsysDot11ExtBldgMPActivationKey   OCTET STRING                                          
+         }  
+
+    etsysDot11ExtBldgRemoteMAC1 OBJECT-TYPE          
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."     
+             
+        ::= { etsysDot11ExtBldgEntry 1 }
+         
+
+    etsysDot11ExtBldgRemoteMAC2 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."
+
+        ::= { etsysDot11ExtBldgEntry 2 }
+
+    etsysDot11ExtBldgRemoteMAC3 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."
+
+
+        ::= { etsysDot11ExtBldgEntry 3 }
+
+    etsysDot11ExtBldgRemoteMAC4 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."
+
+        ::= { etsysDot11ExtBldgEntry 4 }
+
+    etsysDot11ExtBldgRemoteMAC5 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."
+
+        ::= { etsysDot11ExtBldgEntry 5 }
+
+    etsysDot11ExtBldgRemoteMAC6 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The MAC address for the remote station participating
+             in a 802.11 Building-to-Building link.
+             
+             This object must be saved across a system reset and/or a 
+             power cycle."
+
+        ::= { etsysDot11ExtBldgEntry 6 }
+ 
+    etsysDot11ExtBldgMPActivationKey OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))
+        MAX-ACCESS  read-write
+        STATUS  current        
+        DESCRIPTION
+               "Point-to-multipoint bridge mode requires an activation 
+                key to enable. A valid multipoint activation key must
+                be entered as a string of ACSCII characters translating
+                to the binary HEX value of the key before the Access Point 
+                will accept the point-to-multipoint bridge mode setting.
+              
+                Returns SNMP_BAD_VALUE if validation fails.
+                
+                This object must be saved across a system reset and/or a 
+                power cycle."
+
+        ::= { etsysDot11ExtBldgEntry 7 }
+
+       
+etsysDot11ExtWEPDefaultKeysTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtWEPDefaultKeysEntry       
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for WEP default keys.  This table shall
+            contain the four WEP default secret key values
+            corresponding to the four possible KeyID values.  The WEP
+            default secret keys are logically WRITE-ONLY.  Attempts to
+            read the entries in this table shall return unsuccessful
+            status and a value of null. The default value of each WEP 
+            default key shall be null."
+
+        REFERENCE "IEEE Std 802.11-1997, 8.3.2"
+    
+        ::= {   etsysDot11ExtWEP 1 }
+ 
+etsysDot11ExtWEPDefaultKeysEntry OBJECT-TYPE 
+        SYNTAX EtsysDot11ExtWEPDefaultKeysEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the WEP Default Keys Table.
+             A collection of objects containing information used to
+             determine if a WEPkey as been defined and if so, the 
+             value of the WEPkey."
+
+        INDEX {ifIndex, dot11WEPDefaultKeyIndex }           
+        
+        ::= {  etsysDot11ExtWEPDefaultKeysTable  1 }
+
+EtsysDot11ExtWEPDefaultKeysEntry ::= 
+        SEQUENCE  {
+                    etsysDot11ExtWEPKeyDefined            TruthValue,
+                    etsysDot11ExtWEPKeyValue              OCTET STRING
+                         }
+
+    etsysDot11ExtWEPKeyDefined OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state column used for determining if an
+             encryption key is set (true) or not (false), 
+             false is the default value."
+                    
+        ::= {  etsysDot11ExtWEPDefaultKeysEntry 1 }
+
+    etsysDot11ExtWEPKeyValue OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(5|13))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "A WEP default secret key value. For 40-bit encryption
+                 use 5 printable characters or 10 HEX digits. For 128-bit 
+                 encryption use 13 printable characters or 26 HEX digits.
+                 
+                 This object must be saved across a system reset and/or a 
+                 power cycle."
+          
+        ::= {  etsysDot11ExtWEPDefaultKeysEntry 2 }  
+ 
+ 
+etsysDot11ExtWEPEnhancedTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtWEPEnhancedEntry       
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for WEP default keys.  This table shall
+            contain the four WEP default secret key values
+            corresponding to the four possible KeyID values.  The WEP
+            default secret keys are logically WRITE-ONLY.  Attempts to
+            read the entries in this table shall return unsuccessful
+            status and a value of null. The default value of each WEP 
+            default key shall be null."
+
+        REFERENCE "IEEE Std 802.11-1997, 8.3.2"
+    
+        ::= {   etsysDot11ExtWEP 2 }
+ 
+etsysDot11ExtWEPEnhancedEntry OBJECT-TYPE 
+        SYNTAX EtsysDot11ExtWEPEnhancedEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the WEP Default Keys Table.
+             A collection of objects containing information used to
+             determine if a WEPkey as been defined and if so, the 
+             value of the WEPkey."
+
+        INDEX {ifIndex }           
+        
+        ::= {  etsysDot11ExtWEPEnhancedTable  1 }
+
+EtsysDot11ExtWEPEnhancedEntry ::= 
+        SEQUENCE  {
+                  etsysDot11ExtWEPEnhancedImplemented   TruthValue
+        }
+
+    etsysDot11ExtWEPEnhancedImplemented OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This value indicates whether the AP is capable of Enhanced
+                 Wireless Equivalent Privacy (WEP), using 128-bit keys."
+
+        ::= { etsysDot11ExtWEPEnhancedEntry 1 }
+
+
+etsysDot11ExtOIDNotInEffectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysDot11ExtOIDNotInEffectEntry       
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " This table will be used to determine which wireless
+              parameters have been modified but are not yet in effect.
+              These parameters will not take effect until a reset has been 
+              performed."
+                
+        ::= { etsysDot11ExtEffect 1 }                 
+ 
+etsysDot11ExtOIDNotInEffectEntry OBJECT-TYPE 
+        SYNTAX EtsysDot11ExtOIDNotInEffectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            "
+
+        INDEX { ifIndex, etsysDot11ExtOIDIndex }           
+        
+        ::= {  etsysDot11ExtOIDNotInEffectTable  1 }
+
+EtsysDot11ExtOIDNotInEffectEntry ::= 
+        SEQUENCE  {  
+                    etsysDot11ExtOIDIndex          AutonomousType,
+                    etsysDot11ExtOIDNotInEffect    TruthValue        
+        }
+     
+            
+     etsysDot11ExtOIDIndex OBJECT-TYPE
+        SYNTAX AutonomousType
+        MAX-ACCESS not-accessible         
+        STATUS current
+        DESCRIPTION
+            " This object will keep a list of OIDS"
+               -- Fix this descriptions later     
+        ::= {  etsysDot11ExtOIDNotInEffectEntry 1 }
+     
+     etsysDot11ExtOIDNotInEffect  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " This object specifies if the OID being accesed currently
+            has been changed but is not in effect."
+            -- Fix this descriptions later 
+        ::= {  etsysDot11ExtOIDNotInEffectEntry 2 }
+
+
+      
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysDot11ExtConformance OBJECT IDENTIFIER ::= { etsysDot11ExtMIB 2 }
+etsysDot11ExtGroups      OBJECT IDENTIFIER ::= { etsysDot11ExtConformance 1 }
+etsysDot11ExtCompliances OBJECT IDENTIFIER ::= { etsysDot11ExtConformance 2 }
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysDot11ExtBaseGroup OBJECT-GROUP
+    OBJECTS {   
+                etsysDot11ExtLTRemoteStationMAC,
+                etsysDot11ExtLTRemoteStationName,
+                etsysDot11ExtLTTrigger,
+                etsysDot11ExtLTRemoteContents,
+                etsysDot11ExtSystemScale,
+                etsysDot11ExtSecureAccess,
+                etsysDot11ExtMulticastTxRate,
+                etsysDot11ExtIntraBSSRelay,
+                etsysDot11ExtPCCardType,    
+                etsysDot11ExtPCCardVersions,               
+                etsysDot11ExtBridgeMode, 
+                etsysDot11ExtResetOptions,
+                etsysDot11ExtStationName, 
+                etsysDot11ExtBldgRemoteMAC1,               
+                etsysDot11ExtBldgRemoteMAC2,
+                etsysDot11ExtBldgRemoteMAC3,
+                etsysDot11ExtBldgRemoteMAC4,
+                etsysDot11ExtBldgRemoteMAC5,
+                etsysDot11ExtBldgRemoteMAC6,
+                etsysDot11ExtBldgMPActivationKey, 
+                etsysDot11ExtWEPKeyDefined,
+                etsysDot11ExtWEPKeyValue, 
+                etsysDot11ExtWEPEnhancedImplemented,
+                etsysDot11ExtOIDNotInEffect                                
+            }
+    STATUS      current
+    DESCRIPTION
+        "The basic etsysDot11Ext stuff."
+    
+    ::= { etsysDot11ExtGroups 1 }
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysDot11ExtCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support 
+         802Dot11 extensions."
+
+    MODULE
+        MANDATORY-GROUPS { etsysDot11ExtBaseGroup }
+
+    ::= { etsysDot11ExtCompliances 1 }
+
+END 

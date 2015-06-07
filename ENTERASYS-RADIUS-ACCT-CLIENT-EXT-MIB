@@ -1,0 +1,450 @@
+ENTERASYS-RADIUS-ACCT-CLIENT-EXT-MIB DEFINITIONS ::= BEGIN
+
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Network's RADIUS Accounting Client MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright July, 2002-2004 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE          FROM SNMPv2-SMI
+    Integer32                             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF
+    TruthValue, RowStatus                 FROM SNMPv2-TC
+    InetAddressType, InetAddress          FROM INET-ADDRESS-MIB
+    etsysModules                          FROM ENTERASYS-MIB-NAMES;
+
+etsysRadiusAcctClientMIB MODULE-IDENTITY
+    LAST-UPDATED "200411121523Z"  -- Fri Nov 12 15:23 GMT 2004
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         the client side of the Remote Access Dialin User Service 
+         (RADIUS) Accounting protocol (RFC2866).
+          
+         This MIB provides read-write access to configuration objects
+         not provided in the standard RADIUS Accounting Client 
+         MIB (RFC2620).  However, the write capability must only
+         be supported for SNMPv3, or other SNMP versions with 
+         adequately strong security.
+
+         Security concerns include Object ID verification, source
+         address verification and timeliness verification."
+
+    REVISION "200411121523Z"  -- Fri Nov 12 15:23 GMT 2004
+    DESCRIPTION 
+        "Removed the UNITS clause from the
+         etsysRadiusAcctClientServerRetries object."
+
+    REVISION "200409091437Z"  -- Thu Sep  9 14:37 GMT 2004
+    DESCRIPTION 
+        "Added UNITS clauses to a number of objects that are expressed
+         in seconds, and DEFVAL clauses for the
+         etsysRadiusAcctClientUpdateInterval and
+         etsysRadiusAcctClientIntervalMinimum objects."
+
+    REVISION "200408301555Z"  -- Mon Aug 30 15:55 GMT 2004
+    DESCRIPTION 
+        "In the columnar objects in etsysRadiusAcctClientServerTable,
+         changed the MAX-ACCESS clauses of the read-write objects to
+         read-create, added DEFVAL clauses to a number of the objects,
+         and modified the DESCRIPTION clause for the RowStatus object
+         to resolve a conflict between the syntax and the description.
+         Deprecated the etsysRadiusAcctClientServerClearTime object.
+         Changed a number of objects with SYNTAX clauses of INTEGER
+         to Integer32."
+
+    REVISION "200408251503Z"  -- Wed Aug 25 15:03 GMT 2004
+    DESCRIPTION 
+        "Changed etsysRadiusClientMIBCompliance to
+         etsysRadiusAcctClientMIBCompliance due to
+         a conflict with the etsysRadiusAcctClientMIB."
+
+    REVISION "200209131930Z"  -- Fri Sep 13 19:30 GMT 2002
+    DESCRIPTION 
+        "The Initial version of this MIB module."
+
+    ::= { etsysModules 27 }
+
+
+-- ------------------------------------
+-- MIB Objects
+-- ------------------------------------
+
+etsysRadiusAcctClientMIBObjects
+        OBJECT IDENTIFIER ::= { etsysRadiusAcctClientMIB 1 }
+
+etsysRadiusAcctClientEnable OBJECT-TYPE
+    SYNTAX         INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object indicates whether or not RADIUS Accounting
+         is enabled or disabled. This parameter value is maintained
+         across system reboots."
+    DEFVAL { disable }
+    ::= { etsysRadiusAcctClientMIBObjects 1 }
+
+etsysRadiusAcctClientUpdateInterval OBJECT-TYPE
+    SYNTAX         Integer32 (0..2147483647)
+    UNITS          "seconds"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This indicates how many seconds elapse between accounting
+         interim updates. This parameter value is maintained across 
+         system reboots.  A value of zero means no Interim Updates.
+         If the value is less than etsysRadiusAcctClientIntervalMinimum,
+         the etsysRadiusAcctClientIntervalMinimum value will be used
+         for the update interval time.  If RADIUS Accounting is not 
+         enabled, this object is ignored.  Note that Accounting 
+         Interim Updates are not issued by the RADIUS Accounting 
+         Client, unless so requested by the RADIUS Server in an Access 
+         Accept packet."
+    DEFVAL { 1800 }
+    ::= { etsysRadiusAcctClientMIBObjects 2 }
+
+etsysRadiusAcctClientIntervalMinimum OBJECT-TYPE
+    SYNTAX         Integer32 (60..2147483647)
+    UNITS          "seconds"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This indicates the minimum value in seconds between 
+         accounting interim updates supported by the managed
+         entity. This parameter value is maintained across 
+         system reboots.  If RADIUS Accounting is not enabled, 
+         this object is ignored."
+    DEFVAL { 600 }
+    ::= { etsysRadiusAcctClientMIBObjects 3 }
+
+etsysRadiusAcctClientServerTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF EtsysRadiusAcctClientServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS Accounting 
+         servers."
+    ::= { etsysRadiusAcctClientMIBObjects 4 }
+
+etsysRadiusAcctClientServerEntry OBJECT-TYPE
+    SYNTAX         EtsysRadiusAcctClientServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS
+         Accounting server with which the client shares
+         a secret. If RADIUS Accounting is not enabled, this 
+         table is ignored.
+
+         All created conceptual rows are non-volatile and as such
+         must be maintained upon restart of the agent."
+    INDEX      { etsysRadiusAcctClientServerIndex }
+    ::= { etsysRadiusAcctClientServerTable 1 }
+
+EtsysRadiusAcctClientServerEntry ::=
+    SEQUENCE {
+        etsysRadiusAcctClientServerIndex          Integer32,
+        etsysRadiusAcctClientServerAddressType    InetAddressType,
+        etsysRadiusAcctClientServerAddress        InetAddress,
+        etsysRadiusAcctClientServerPortNumber     Integer32,
+        etsysRadiusAcctClientServerSecret         OCTET STRING,
+        etsysRadiusAcctClientServerSecretEntered  TruthValue,
+        etsysRadiusAcctClientServerRetryTimeout   Integer32,
+        etsysRadiusAcctClientServerRetries        Integer32,
+        etsysRadiusAcctClientServerClearTime      Integer32,
+        etsysRadiusAcctClientServerStatus         RowStatus
+    }
+
+etsysRadiusAcctClientServerIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..2147483647)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A number uniquely identifying each conceptual row
+         in the etsysRadiusAcctClientServerTable.
+   
+         In the event of an agent restart, the same value
+         of etsysRadiusAcctClientServerIndex must be used to 
+         identify each conceptual row in 
+         etsysRadiusAcctClientServerTable as was used prior 
+         to the restart."
+    ::= { etsysRadiusAcctClientServerEntry 1 }
+
+etsysRadiusAcctClientServerAddressType OBJECT-TYPE
+    SYNTAX         InetAddressType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The type of Internet address by which the 
+         RADIUS Accounting server is reachable."
+    DEFVAL { ipv4 }
+    ::= { etsysRadiusAcctClientServerEntry 2 }
+
+etsysRadiusAcctClientServerAddress OBJECT-TYPE
+    SYNTAX         InetAddress (SIZE(1..64))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The Internet address for the RADIUS Accounting
+         server.  Note that implementations must limit
+         themselves to a single entry in this table per 
+         reachable server.
+
+         The etsysRadiusAcctClientServerAddress may not be
+         empty due to the SIZE restriction.  Also the size 
+         of a DNS name is limited to 64 characters.
+
+         This parameter value is maintained across system 
+         reboots."
+    ::= { etsysRadiusAcctClientServerEntry 3 }
+
+etsysRadiusAcctClientServerPortNumber  OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The UDP port number (1-65535) the client is using
+         to send requests to this server.  The officially
+         assigned port number for RADIUS Accounting is 1813.
+         This parameter value is maintained across system 
+         reboots."
+    DEFVAL {  1813  }     
+    ::= { etsysRadiusAcctClientServerEntry 4 }
+
+etsysRadiusAcctClientServerSecret  OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0..255))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object is the secret shared between the RADIUS 
+         Accounting server and RADIUS client.  This 
+         parameter value is maintained across system reboots.
+         While the 'official' MAX-ACCESS for this object is
+         read-create, all security-conscious implementations
+         will 'lie' on a read, and return a null-string, or
+         something else that is fairly innocuous.  The 
+         ability to read back passwords and secret 
+         encryption keys is generally a Bad Thing (tm)."
+    ::= { etsysRadiusAcctClientServerEntry 5 }
+
+etsysRadiusAcctClientServerSecretEntered  OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This indicates the existence of a shared secret."
+    ::= { etsysRadiusAcctClientServerEntry 6 }
+
+etsysRadiusAcctClientServerRetryTimeout OBJECT-TYPE
+    SYNTAX         Integer32 (2..10)
+    UNITS          "seconds"
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The number of seconds to wait for a RADIUS Accounting
+         Server to respond to a request.  This parameter value
+         is maintained across system reboots."
+    DEFVAL { 5 }
+    ::= { etsysRadiusAcctClientServerEntry 7 }
+
+etsysRadiusAcctClientServerRetries OBJECT-TYPE
+    SYNTAX         Integer32 (0..20)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The number of times to resend an accounting packet
+         if a RADIUS Accounting Server does not respond to a 
+         request.  This parameter value is maintained across 
+         system reboots."
+    DEFVAL { 2 }
+    ::= { etsysRadiusAcctClientServerEntry 8 }
+
+etsysRadiusAcctClientServerClearTime OBJECT-TYPE
+    SYNTAX         Integer32 (1..2147483647)
+    MAX-ACCESS     read-create
+    STATUS         deprecated
+    DESCRIPTION   
+        "On a read, this value indicates the number of seconds 
+         since the counters, as defined in the IETF standard
+         RADIUS Accounting Client MIB (RFC2618), were cleared.  
+
+         On a write, the client counters will be cleared and
+         the clear time will be set to zero."
+    ::= { etsysRadiusAcctClientServerEntry 9 }
+
+etsysRadiusAcctClientServerStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION   
+        "Lets users create and delete RADIUS Accounting
+         server entries on systems that support this 
+         capability.
+
+         Rules
+
+            1. When creating a RADIUS Accounting Client, it 
+               is up to the management station to determine a 
+               suitable etsysRadiusAcctClientServerIndex.
+               To facilitate interoperability, agents should not 
+               put any restrictions on the 
+               etsysRadiusAcctClientServerIndex beyond the 
+               obvious ones that it be valid and unused.
+
+            2. Before a new row can become 'active', values
+               must be supplied for the columnar objects
+               etsysRadiusAcctClientClientServerAddress,
+               and etsysRadiusAcctClientServerSecret.
+
+            3. The value of etsysRadiusAcctClientServerStatus
+               must be set to 'notInService' in order to modify
+               a writable object in the same conceptual row.
+
+            4. etsysRadiusAcctClientServer entries whose 
+               status is 'notReady' or 'notInService' will 
+               not be used for Accounting."
+    ::= { etsysRadiusAcctClientServerEntry 10 }
+
+
+-- ------------------------------------
+-- Conformance information
+-- ------------------------------------
+
+etsysRadiusAcctClientMIBConformance
+       OBJECT IDENTIFIER ::= { etsysRadiusAcctClientMIB 2 }
+
+etsysRadiusAcctClientMIBCompliances
+       OBJECT IDENTIFIER ::= { etsysRadiusAcctClientMIBConformance 1 }
+
+etsysRadiusAcctClientMIBGroups
+       OBJECT IDENTIFIER ::= { etsysRadiusAcctClientMIBConformance 2 }
+
+
+-- ------------------------------------
+-- Units of conformance
+-- ------------------------------------
+
+etsysRadiusAcctClientMIBGroup OBJECT-GROUP
+     OBJECTS { etsysRadiusAcctClientEnable,
+               etsysRadiusAcctClientUpdateInterval,
+               etsysRadiusAcctClientIntervalMinimum,
+               etsysRadiusAcctClientServerAddressType,
+               etsysRadiusAcctClientServerAddress,
+               etsysRadiusAcctClientServerPortNumber,
+               etsysRadiusAcctClientServerSecret,
+               etsysRadiusAcctClientServerSecretEntered,
+               etsysRadiusAcctClientServerRetryTimeout,
+               etsysRadiusAcctClientServerRetries,
+               etsysRadiusAcctClientServerClearTime,
+               etsysRadiusAcctClientServerStatus
+             }
+     STATUS  deprecated
+     DESCRIPTION
+         "The basic collection of objects providing a proprietary
+          extension to the standard RADIUS Client MIB. 
+  
+          This MIB provides read-write access to configuration 
+          objects not provided in the standard RADIUS Accounting Client 
+          MIB (RFC2618).  However, the write capability must only
+          be supported for SNMPv3, or other SNMP versions with 
+          adequately strong security."
+     ::= { etsysRadiusAcctClientMIBGroups 1 }
+
+etsysRadiusAcctClientMIBGroupV2 OBJECT-GROUP
+     OBJECTS { etsysRadiusAcctClientEnable,
+               etsysRadiusAcctClientUpdateInterval,
+               etsysRadiusAcctClientIntervalMinimum,
+               etsysRadiusAcctClientServerAddressType,
+               etsysRadiusAcctClientServerAddress,
+               etsysRadiusAcctClientServerPortNumber,
+               etsysRadiusAcctClientServerSecret,
+               etsysRadiusAcctClientServerSecretEntered,
+               etsysRadiusAcctClientServerRetryTimeout,
+               etsysRadiusAcctClientServerRetries,
+               etsysRadiusAcctClientServerStatus
+             }
+     STATUS  current
+     DESCRIPTION
+         "The basic collection of objects providing a proprietary
+          extension to the standard RADIUS Client MIB. 
+
+          etsysRadiusAcctClientServerClearTime was deprecated in
+          this group."
+     ::= { etsysRadiusAcctClientMIBGroups 2 }
+
+
+-- ------------------------------------
+-- Compliance statements
+-- ------------------------------------
+
+-- The following object name conflicts with one in the
+-- etsysRadiusAuthClientMIB
+-- 
+-- etsysRadiusClientMIBCompliance MODULE-COMPLIANCE
+--      STATUS  current
+--      DESCRIPTION
+--          "The compliance statement for Accounting clients
+--           implementing the RADIUS Accounting Client MIB."
+--      MODULE   - this module
+--          MANDATORY-GROUPS { etsysRadiusAcctClientMIBGroup }
+-- 
+--      ::= { etsysRadiusAcctClientMIBCompliances 1 }
+
+etsysRadiusAcctClientMIBCompliance MODULE-COMPLIANCE
+     STATUS  deprecated
+     DESCRIPTION
+         "The compliance statement for Accounting clients
+          implementing the RADIUS Accounting Client MIB."
+     MODULE  -- this module
+         MANDATORY-GROUPS { etsysRadiusAcctClientMIBGroup }
+
+     ::= { etsysRadiusAcctClientMIBCompliances 2 }
+
+etsysRadiusAcctClientMIBComplianceV2 MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+         "The compliance statement for Accounting clients
+          implementing the RADIUS Accounting Client MIB."
+     MODULE  -- this module
+         MANDATORY-GROUPS { etsysRadiusAcctClientMIBGroupV2 }
+
+     ::= { etsysRadiusAcctClientMIBCompliances 3 }
+
+END

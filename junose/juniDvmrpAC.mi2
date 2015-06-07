@@ -1,0 +1,150 @@
+
+-- *****************************************************************************
+-- Juniper-DVMRP-CONF
+--
+-- SNMP Agent Capabilities definitions for the DVMRP MIBs.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-DVMRP-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniDvmrpAgent  MODULE-IDENTITY
+    LAST-UPDATED "200301162101Z"  -- 16-Jan-03 04:01 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the DVMRP component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200301162101Z"  -- 16-Jan-03 04:01 PM EST  - JUNOSe5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added support for unicast routing and the interface announce list
+         name."
+    REVISION    "200111302024Z"  -- 30-Nov-01 03:24 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 12 }
+
+
+-- *****************************************************************************
+-- DVMRP SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniDvmrpAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the DVMRP component of the JUNOSe SNMP agent.  This
+        version of the DVMRP component was supported in JUNOSe 3.0 thru 4.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DVMRP application in
+        JUNOSe.  These capabilities became obsolete when new objects were added
+        to the Juniper-DVMRP-MIB."
+    SUPPORTS    DVMRP-STD-MIB-JUNI
+        INCLUDES {
+            junidDvmrpGeneralGroup,
+            junidDvmrpInterfaceGroup,
+            junidDvmrpNeighborGroup,
+            junidDvmrpRoutingGroup,
+            junidDvmrpSecurityGroup,
+            junidDvmrpTreeGroup }
+        VARIATION   junidDvmrpInterfaceLocalAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "This object's value is assigned by the JUNOSe system.
+                Therefore, it must not be supplied when creating an interface
+                and cannot be modified via SNMP.
+
+                It is read as the IP address assigned to the interface or the IP
+                address associated with the loopback interface for an unnumbered
+                interface."
+        VARIATION   junidDvmrpInterfaceMetric
+            DESCRIPTION
+                "The JUNOSe system supports both a metric in and a metric out;
+                this object is used to manage metric in; to manage metric out
+                see Juniper-DVMRP-MIB.juniDvmrpInterfaceMetricOffsetOut."
+        VARIATION   junidDvmrpInterfaceInterfaceKey
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported on the JUNOSe system.  Therefore,
+                it must not be supplied when creating an interface."
+        VARIATION   junidDvmrpInterfaceInterfaceKeyVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported on the JUNOSe system.  Therefore,
+                it must not be supplied when creating an interface."
+    SUPPORTS    Juniper-DVMRP-MIB
+        INCLUDES {
+            juniDvmrpBaseGroup,
+            juniDvmrpAclDistNbrGroup,
+            juniDvmrpInterfaceGroup,
+            juniDvmrpSourceGroup }
+    ::= { juniDvmrpAgent 1 }
+
+juniDvmrpAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the DVMRP component of the JUNOSe SNMP agent.  This
+        version of the DVMRP component is supported in JUNOSe 5.0 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DVMRP application in
+        JUNOSe."
+    SUPPORTS    DVMRP-STD-MIB-JUNI
+        INCLUDES {
+            junidDvmrpGeneralGroup,
+            junidDvmrpInterfaceGroup,
+            junidDvmrpNeighborGroup,
+            junidDvmrpRoutingGroup,
+            junidDvmrpSecurityGroup,
+            junidDvmrpTreeGroup }
+        VARIATION   junidDvmrpInterfaceLocalAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "This object's value is assigned by the JUNOSe system.
+                Therefore, it must not be supplied when creating an interface
+                and cannot be modified via SNMP.
+                It is read as the IP address assigned to the interface or the IP
+                address associated with the loopback interface for an unnumbered
+                interface."
+        VARIATION   junidDvmrpInterfaceMetric
+            DESCRIPTION
+                "The JUNOSe system supports both a metric in and a metric out;
+                this object is used to manage metric in; to manage metric out
+                see Juniper-DVMRP-MIB.juniDvmrpInterfaceMetricOffsetOut."
+        VARIATION   junidDvmrpInterfaceInterfaceKey
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported on the JUNOSe system.  Therefore,
+                it must not be supplied when creating an interface."
+        VARIATION   junidDvmrpInterfaceInterfaceKeyVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported on the JUNOSe system.  Therefore,
+                it must not be supplied when creating an interface."
+    SUPPORTS    Juniper-DVMRP-MIB
+        INCLUDES  {
+            juniDvmrpBaseGroup2,
+            juniDvmrpAclDistNbrGroup,
+            juniDvmrpInterfaceGroup2,
+            juniDvmrpSourceGroup }
+    ::= { juniDvmrpAgent 2 }
+
+END

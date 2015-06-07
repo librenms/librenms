@@ -1,0 +1,2178 @@
+       HP-ICF-GENERIC-RPTR DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32,
+           OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           MacAddress, DisplayString, RowStatus, TimeStamp
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, hpicfGenericRepeater, icfHub,
+           hpicfGenRptrTrapsPrefix
+               FROM HP-ICF-OID;
+
+       hpicfGenRptrMib MODULE-IDENTITY
+            LAST-UPDATED "200306092237Z"  -- June 9, 2003
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module contains object definitions that
+                    are common to all repeater devices in the HP 
+                    Integrated Communication Facility product 
+                    line."
+
+            REVISION     "200306092237Z"  -- June 9, 2003
+            DESCRIPTION  "Added learnLimitedContinuous mode to 
+                          hpSecPtLearnMode."
+
+            REVISION     "200011030717Z"  -- November 3, 2000
+            DESCRIPTION  "Deprecate hpSecPtPreventEavesdrop.  Update
+                         division name."
+
+            REVISION     "9807230103Z"  -- July 23, 1998
+            DESCRIPTION
+                    "Added the hpicfGenRptrBridgeGroup.  Updated
+                    compliances."
+            REVISION     "9703060337Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added the hpicfGenRptrSwitchConfigGroup.  Added
+                    NOTIFICATION-GROUP information."
+            REVISION     "9609100228Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB.  Added the hpicfGenRptrInfoGroup, the
+                    hpicfGenRptrBkpLinkGroup, and the
+                    hpicfGenRptrPortMappingGroup."
+            REVISION     "9510232347Z"  -- October 23, 1995
+            DESCRIPTION
+                    "Version of MIB module that added support for
+                    the HPJ2413A and HPJ2415A 100VG hubs, and the
+                    HPJ2414B agent module.  Added the
+                    hpicfGenRptrSecPtGroup."
+            REVISION     "9501180000Z"  -- January 18, 1995
+            DESCRIPTION
+                   "Version of MIB module that added support for
+                   the HPJ2410A 100VG repeater and the HPJ2414A
+                   agent module.  Added the hpicfGenRptrBasicGroup."
+            REVISION     "9307090000Z"  -- July 9, 1993
+            DESCRIPTION
+                    "Initial version of this MIB module.  Released
+                    with the HPJ2355A hub."
+           ::= { hpicfObjectModules 8 }
+
+
+       hpGRpBasic
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 1 }
+
+       hpGRpBasicGlobal
+           OBJECT IDENTIFIER ::= { hpGRpBasic 1 }
+
+       hpGRpSelfHealEnable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This flag controls whether or not the device will
+                   send self healing packets.  Self healing packets are
+                   normally sent once per second by the agent when no
+                   other traffic is present.  When there is no traffic
+                   present on a network, there is no way to detect
+                   cabling problems (or the repair of cabling problems)
+                   and status LEDs are not always correct.
+
+                   Enabling this flag allows the agent to detect cabling
+                   problems on an idle network.  This flag can be
+                   disabled if self healing packets are not wanted.
+
+                   On the 100BaseVG-AnyLAN SNMP/Bridge card, these
+                   packets are addressed to a unique unused unicast
+                   station address which has been reserved by HP for
+                   this purpose.  On 802.3 repeaters, these packets are
+                   self addressed.
+
+                   On an 802.3 repeater, this flag MUST be enabled when
+                   using the Robust Port Healing feature.  Without
+                   Robust Port Healing either a good transmit or a good
+                   receive will reconnect an autopartitioned port.  With
+                   Robust Port Healing the criteria is more restrictive
+                   and only a good transmit will heal a segmented port.
+                   If all ports are segmented, the repeater will not
+                   repeat anything until the agent transmits a self
+                   healing packet and reconnects the autopartitioned
+                   ports."
+           ::= { hpGRpBasicGlobal 1 }
+
+
+       hpGRpRepeaterTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpGRpRepeaterEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table containing generic information about the
+                   current logical repeaters in this managed system."
+           ::= { hpGRpBasicGlobal 2 }
+
+       hpGRpRepeaterEntry OBJECT-TYPE
+           SYNTAX     HpGRpRepeaterEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, containing information about
+                   a single logical repeater."
+           INDEX      { hpGRpRepeaterIndex }
+           ::= { hpGRpRepeaterTable 1 }
+
+       HpGRpRepeaterEntry ::=
+           SEQUENCE {
+               hpGRpRepeaterIndex              Integer32,
+               hpGRpRepeaterIfIndex            Integer32,
+               hpGRpRepeaterName               DisplayString,
+               hpGRpRepeaterVlanIndex          Integer32
+           }
+
+       hpGRpRepeaterIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object uniquely identifies the logical repeater
+                   in the managed system for which this entry contains
+                   information.  This object will have the same value
+                   as the corresponding 'repeater index' object in the
+                   media-specific repeater MIB for this repeater.  Note
+                   that it will also have the same value as the
+                   instance of the Entity MIB's entLogicalIndex for
+                   the entry in the entLogicalTable that represents
+                   this repeater."
+           ::= { hpGRpRepeaterEntry 1 }
+
+       hpGRpRepeaterIfIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The interface on the agent that is used to transmit
+                   and receive packets through this repeater.  The
+                   ifEntry identified by this value is the same entry
+                   identified by the same value of the ifIndex object.
+                   The value zero indicates that the agent has no
+                   interface through which it can send and receive
+                   packets on this repeater."
+           ::= { hpGRpRepeaterEntry 2 }
+
+       hpGRpRepeaterName OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..16))
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "A friendly name for this repeater.  Management
+                   applications can use this to configure a user
+                   friendly name for this logical repeater."
+           ::= { hpGRpRepeaterEntry 3 }
+
+       hpGRpRepeaterVlanIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The virtual LAN that this repeater is on.  Note that
+                   setting this object does not affect the operation of
+                   the repeater in any way.  It is a 'notepad' for
+                   management applications to allow them to record
+                   which VLAN on a connected switch this logical
+                   repeater is connected to."
+           ::= { hpGRpRepeaterEntry 4 }
+
+
+       -- The Generic Repeater Security group.
+
+       hubSecurity           OBJECT IDENTIFIER ::= { icfHub 10 }
+
+       hubSecurePortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubSecurePortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "Table containing security configuration for each
+                   port."
+           ::= { hubSecurity 1 }
+
+       hubSecurePortEntry OBJECT-TYPE
+           SYNTAX     HubSecurePortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hubSecurePortTable, containing
+                   the security configuration for a single port."
+           INDEX      { hubSecPtGroupIndex, hubSecPtPortIndex }
+           ::= { hubSecurePortTable 1 }
+
+       HubSecurePortEntry ::=
+           SEQUENCE {
+               hubSecPtGroupIndex              Integer32,
+               hubSecPtPortIndex               Integer32,
+               hubSecPtSecurityAddress         MacAddress,
+               hubSecPtAuthorizedAddress       MacAddress,
+               hubSecPtPreventEavesdrop        INTEGER,
+               hubSecPtAlarmEnable             INTEGER,
+               hubSecPtIntrusionFlag           INTEGER
+           }
+
+       hubSecPtGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the
+                   port for which this entry contains security
+                   configuration information."
+           ::= { hubSecurePortEntry 1 }
+
+       hubSecPtPortIndex  OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group
+                   for which this entry contains security
+                   configuration information."
+           ::= { hubSecurePortEntry 2 }
+
+       hubSecPtSecurityAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The desired authorized MAC address for this port.
+                   This can be either a regular station address to
+                   configure a specific address, or it can be one of
+                   the following special values to specify the
+                   address learning method:
+                       FFFF-FFFF-FFFE: learnOnce.  First source MAC
+                           address heard on this port becomes the
+                           authorized address.  Setting this value
+                           initiates learning of a new authorized
+                           address.  When a new authorized address is
+                           learned, it will be stored in nonvolatile
+                           memory.  This variable will return
+                           learnOnceConditionally to a GET operation
+                           after it has been set to this value.
+                       FFFF-FFFF-FFFD: learnOnceConditionally.  This
+                           option will initiate learning of a new
+                           authorized address only if the previous
+                           hubSecPtSecurityAddress was set to a
+                           specific address or learnContinuous.  No
+                           action will be performed if the previous
+                           value was already learnOnceConditionally.
+                       FFFF-FFFF-FFFC: learnContinuous.  Any address
+                           heard becomes the new authorized address.
+                           When a new address is learned, it may
+                           cause an alarm, but it does not store
+                           anything in nonvolatile memory."
+           ::= { hubSecurePortEntry 3 }
+
+       hubSecPtAuthorizedAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The MAC address of the station authorized to be
+                   on this port.  This address could either have been
+                   configured by specifying a regular station address
+                   for hubSecPtSecurityAddress, or it could have been
+                   learned by the agent if hubSecPtSecurityAddress
+                   was set to one of the special values listed above.
+                   Once the agent has learned an authorized address,
+                   it will be saved across powerfails, unless the
+                   agent was configured for learnContinuous mode."
+           ::= { hubSecurePortEntry 4 }
+
+       hubSecPtPreventEavesdrop OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "If enabled, unicast packets not addressed to the
+                   authorized address for this port will be
+                   scrambled."
+           ::= { hubSecurePortEntry 5 }
+
+       hubSecPtAlarmEnable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "If enabled, the agent will generate an
+                   intrusionTrap if a packet is received on this port
+                   with a source MAC address that is different from
+                   the hubSecPtAuthorizedAddress for this port."
+           ::= { hubSecurePortEntry 6 }
+
+       hubSecPtIntrusionFlag OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          intrusion(1),
+                          noIntrusion(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This flag indicates if an intrusion has occurred
+                   on this port.  The Security LED on the hub will
+                   blink if any instance of this flag has the value
+                   intrusion.  Setting this flag to noIntrusion will
+                   turn off the Security LED if no other ports have
+                   this flag set to intrusion.  An intrusion will
+                   only cause an alarm and an intrusion log entry if
+                   this flag is equal to noIntrusion."
+           ::= { hubSecurePortEntry 7 }
+
+       hubIntruderLogTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubIntruderLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table contains a record of the twenty most
+                   recent port security violations.  The first entry
+                   in the table is the oldest."
+           ::= { hubSecurity 2 }
+
+       hubIntruderLogEntry OBJECT-TYPE
+           SYNTAX     HubIntruderLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A row in the hubIntruderLogTable containing
+                   information about a single port security
+                   violation."
+           INDEX     { hubIntruderIndex }
+           ::= { hubIntruderLogTable 1 }
+
+       HubIntruderLogEntry ::=
+           SEQUENCE {
+               hubIntruderIndex                Integer32,
+               hubIntruderGroup                Integer32,
+               hubIntruderPort                 Integer32,
+               hubIntruderAddress              MacAddress,
+               hubIntruderTime                 TimeStamp,
+               hubIntruderType                 INTEGER,
+               hubIntruderTrainingViolation    INTEGER
+           }
+
+       hubIntruderIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..20)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The index of this entry in the intruder log
+                   table.  Index 1 will always contain the oldest
+                   entry.  If the table is full when a new intrusion
+                   occurs, the new entry becomes index 20, and all
+                   earlier entries are shifted down by one entry,
+                   removing the old index 1."
+           ::= { hubIntruderLogEntry 1 }
+
+       hubIntruderGroup OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the
+                   port on which this intrusion occurred."
+           ::= { hubIntruderLogEntry 2 }
+
+       hubIntruderPort  OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group
+                   on which this intrusion occurred.  A port number
+                   of zero indicates that this entry is unused and
+                   the values for the other variables in this entry
+                   are undefined."
+           ::= { hubIntruderLogEntry 3 }
+
+       hubIntruderAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object contains the source MAC address of
+                   the intruder."
+           ::= { hubIntruderLogEntry 4 }
+
+       hubIntruderTime OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The value of sysUpTime when the intrusion
+                   occurred.  This will be zero if the agent has been
+                   reset since the intruder was detected, since
+                   sysUpTime could be misinterpreted in that case."
+           ::= { hubIntruderLogEntry 5 }
+
+       hubIntruderType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          address(1),
+                          training(2),
+                          both(3),
+                          none(4)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the type of violation that
+                   occured: address, training, or both.  The
+                   hubIntruderTrainingViolation object will indicate
+                   additional information, if any, on the type of
+                   training violation.  This object will be equal to
+                   'none' if this log entry is unused.  Note that
+                   the values 'training' and 'both' are only valid
+                   for 802.12 ports."
+           ::= { hubIntruderLogEntry  6 }
+
+       hubIntruderTrainingViolation  OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noViolation(1),
+                          promiscuousViolation(2),
+                          repeaterViolation(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object indicates the type of training
+                   violation.  Note that for 802.3 ports,
+                   this object will always be equal to 'noViolation'.
+                   This object will be equal to 'noViolation' if this
+                   log entry is unused."
+           ::= { hubIntruderLogEntry  7 }
+
+
+       hpSecurePortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpSecurePortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "Table containing security configuration
+                   for each port, where security for multiple
+                   MAC addresses per port is desired (e.g.,
+                   switch systems)."
+           ::= { hubSecurity 3 }
+
+       hpSecurePortEntry OBJECT-TYPE
+           SYNTAX     HpSecurePortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpSecurePortTable, containing
+                   the security configuration for a single port."
+           INDEX      { hpSecPtGroupIndex, hpSecPtPortIndex }
+           ::= { hpSecurePortTable 1 }
+
+       HpSecurePortEntry ::=
+           SEQUENCE {
+               hpSecPtGroupIndex              Integer32,
+               hpSecPtPortIndex               Integer32,
+               hpSecPtAddressLimit            Integer32,
+               hpSecPtLearnMode               INTEGER,
+               hpSecPtPreventEavesdrop        INTEGER,
+               hpSecPtAlarmEnable             INTEGER,
+               hpSecPtIntrusionFlag           INTEGER
+           }
+
+       hpSecPtGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the
+                   port for which this entry contains security
+                   configuration information.  On repeater systems,
+                   this can be used to identify a specific repeater
+                   within a managed stack of repeaters.  On switch
+                   systems, stacked or unstacked, this value is
+                   always one."
+           ::= { hpSecurePortEntry 1 }
+
+       hpSecPtPortIndex  OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group
+                   for which this entry contains security
+                   configuration information.  On a switch system,
+                   this index corresponds to the ifIndex of the port."
+           ::= { hpSecurePortEntry 2 }
+
+       hpSecPtAddressLimit OBJECT-TYPE
+           SYNTAX     Integer32 (1..32)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the maximum number of
+                   MAC addresses learned on this port when the
+                   hpSecPtLearnMode is set to learnFirstN or
+                   learnFirstNConditionally.  Changing the limit
+                   while in these modes clears any addresses for
+                   this port in the hpSecureAuthAddrTable.
+                   This limit does not apply when the learn mode
+                   is set to configureSpecific."
+           ::= { hpSecurePortEntry 3 }
+
+       hpSecPtLearnMode OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          learnContinuous(1),
+                          learnFirstN(2),
+                          learnFirstNConditionally(3),
+                          configureSpecific(4),
+                          learn8021xAuthorized(5),
+                          learnLimitedContinuous(6)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the learning mode of the port.
+                   The modes are as follows:
+                       LearnContinuous.  The port can learn all new MAC
+                           addresses.  When a new address is learned,
+                           it is stored in a manner such that it can
+                           be retrieved from the hpSecureAuthAddrTable.
+                           Changing the mode to this value clears any
+                           existing addresses for this port in the
+                           hpSecureAuthAddrTable.
+                       learnFirstN.  First N source MAC addresses heard
+                           on this port become the authorized addresses.
+                           N is configured in hpSecPtAddressLimit.
+                           Setting this value initiates learning of up
+                           to N new authorized addresses.  When a new
+                           authorized address is learned, it will be
+                           stored in the hpSecureAuthAddrTable.  When
+                           the table has reached its limit N for this
+                           port, any new source MAC addresses received
+                           on the port constitutes an intrusion.  See
+                           hpSecPtAlarmEnable for possible responses
+                           to the intrusion.  This variable will return
+                           learnFirstNConditionally to a GET operation
+                           after it has been set to this value.
+                       learnFirstNConditionally.  This option will
+                           initiate learning of up to N new authorized  
+                           addresses only if the previous hpSecPtLearnMode
+                           was not set to learnFirstN or learnFirstN-
+                           Conditionally.  N is configured in
+                           hpSecPtAddressLimit.
+                       configureSpecific.  The port will not learn any
+                           addresses.  Rather, specific authorized
+                           MAC addresses for this port are explicitly
+                           configured via the hpSecureCfgAddrTable.
+                           These addresses are also stored in the
+                           hpSecureAuthAddrTable.  Any source MAC
+                           address received on this port other than
+                           those configured, constitutes an intrusion.
+                           See hpSecPtAlarmEnable for possible responses.
+                       learn8021xAuthorized.  The port will learn only MAC
+                           address of a client authorized by 802.1X 
+                           authenticator.
+                       learnLimitedContinuous.  First N source MAC addresses
+                           heard on this port become the authorized addresses.
+                           N is specified by the hpSecPtAddressLimit
+                           object.  When a new authorized address is learned, it
+                           will be stored in the hpSecureAuthAddrTable.  When
+                           the table has reached its limit N for this port, any
+                           new source MAC addresses received on the port
+                           constitutes an intrusion.   See hpSecPtAlarmEnable
+                           for possible responses.  The authorized addresses in
+                           this mode will age out of the system, therefore the
+                           list of authorized addresses can be dynamic over 
+                           time."
+           ::= { hpSecurePortEntry 4 }
+
+       hpSecPtPreventEavesdrop OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "If enabled on a switch, outbound unknown unicast
+                   packets will not be forwarded out this port.  If
+                   enabled on a repeater, outbound unknown unicast
+                   packets for this port will be scrambled."
+           ::= { hpSecurePortEntry 5 }
+
+       hpSecPtAlarmEnable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          disable(1),
+                          sendTrap(2),
+                          sendTrapAndDisablePort(3)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the action taken when an
+                   intrusion occurs.  See hpSecPtLearnMode for what
+                   constitutes an intrusion.
+                       disable.  No trap is sent and the port
+                           remains enabled.
+                       SendTrap.  If the hpSecPtIntrusionFlag is
+                           set to noIntrusion, the agent will generate
+                           an intrusionTrap.
+                       SendTrapAndDisablePort.  If the hpSecPtIntru-
+                           sionFlag is set to noIntrusion, the agent
+                           generate an intrusionTrap and disable
+                           the port.  This value does not apply to
+                           repeaters."
+           ::= { hpSecurePortEntry 6 }
+
+       hpSecPtIntrusionFlag OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          intrusion(1),
+                          noIntrusion(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This flag indicates if an intrusion has occured
+                   on this port.  Security-related LED(s) on the
+                   device will blink if any instance of this flag
+                   has the value intrusion.  Setting this flag to
+                   noIntrusion will turn off the appropriate LED(s).
+                   An intrusion will only cause an alarm and an
+                   intrusion log entry if this flag is equal to
+                   noIntrusion.  On a switch, packets causing
+                   intrusions will be not be forwarded."
+           ::= { hpSecurePortEntry 7 }
+
+       hpSecureCfgAddrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpSecureCfgAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "Table containing multiple configured authorized
+                   addresses per port.  Facilitates security
+                   for ports whose hpSecPtLearnMode is set to
+                   configureSpecific."
+           ::= { hubSecurity 4 }
+
+       hpSecureCfgAddrEntry OBJECT-TYPE
+           SYNTAX     HpSecureCfgAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpSecureCfgAddrTable, containing
+                   the configured authorized address for a single
+                   port.  Entries are stored in nonvolatile memory
+                   when either the hpSecPtrLearnMode for the port
+                   is changed to configureSpecific, or a new entry
+                   is configured while hpSecPtrLearnMode for the
+                   port is currently set to configureSpecific."
+           INDEX      { hpSecCfgAddrGroupIndex,
+                        hpSecCfgAddrPortIndex,
+                        hpSecCfgAddress}
+           ::= { hpSecureCfgAddrTable 1 }
+
+       HpSecureCfgAddrEntry ::=
+           SEQUENCE {
+               hpSecCfgAddrGroupIndex       Integer32,
+               hpSecCfgAddrPortIndex        Integer32,
+               hpSecCfgAddress              MacAddress,
+               hpSecCfgStatus               RowStatus
+           }
+
+       hpSecCfgAddrGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the
+                   port for which this entry contains the configured
+                   authorized address.  On repeater systems,
+                   this can be used to identify a specific repeater
+                   within a managed stack of repeaters.  On switch
+                   systems, stacked or unstacked, this value is
+                   always one."
+           ::= { hpSecureCfgAddrEntry 1 }
+
+       hpSecCfgAddrPortIndex  OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group
+                   for which this entry contains the configured
+                   authorized address.  On a switch, this index
+                   corresponds to the ifIndex of the port."
+           ::= { hpSecureCfgAddrEntry 2 }
+
+       hpSecCfgAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A specific authorized MAC address for this port
+                   configured by a management station."
+           ::= { hpSecureCfgAddrEntry 3 }
+
+       hpSecCfgStatus OBJECT-TYPE
+           SYNTAX       RowStatus
+           MAX-ACCESS   read-create
+           STATUS       current
+           DESCRIPTION
+                   "The row status of a hpSecureCfgAddrEntry."
+           ::= { hpSecureCfgAddrEntry 4 }
+
+
+       hpSecureAuthAddrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpSecureAuthAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "Table containing the authorized addresses for
+                   each port.  An authorized address is an address
+                   learned while the hpSecPtLearnMode for the port
+                   is set to learnContinuous, learnFirstN, 
+                   learnLimitedContinuous, or learnFirstNConditionally;  
+                   or an address in the hpSecureCfgAddrTable when the 
+                   hpSecPtLearnMode for the port is set to configureSpecific.
+                   On a switch, for ports whose hpSecPtLearnMode
+                   is set to learnContinuous or learnLimitedContinuous, 
+                   this table may return MAC address information based 
+                   on the switch's 802.1d forwarding database."
+           ::= { hubSecurity 5 }
+
+       hpSecureAuthAddrEntry OBJECT-TYPE
+           SYNTAX     HpSecureAuthAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpSecureAuthAddrTable,
+                   containing the authorized address for a single
+                   port.  Entries are stored in nonvolatile memory
+                   except when the port's hpSecPtLearnMode is set
+                   to learnContinuous or learnLimitedContinuous."
+
+           INDEX      { hpSecAuthAddrGroupIndex,
+                        hpSecAuthAddrPortIndex,
+                        hpSecAuthAddress }
+           ::= { hpSecureAuthAddrTable 1 }
+
+       HpSecureAuthAddrEntry ::=
+           SEQUENCE {
+               hpSecAuthAddrGroupIndex       Integer32,
+               hpSecAuthAddrPortIndex        Integer32,
+               hpSecAuthAddress              MacAddress
+           }
+
+       hpSecAuthAddrGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the
+                   port for which this entry contains authorized
+                   address information.  On repeater systems,
+                   this can be used to identify a specific repeater
+                   within a managed stack of repeaters.  On switch
+                   systems, stacked or unstacked, this value is
+                   always one."
+           ::= { hpSecureAuthAddrEntry 1 }
+
+       hpSecAuthAddrPortIndex  OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group
+                   for which this entry contains authorized
+                   address information.  On a switch, this index
+                   corresponds to ifIndex of the port."
+           ::= { hpSecureAuthAddrEntry 2 }
+
+       hpSecAuthAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The MAC address of the station authorized to be
+                   on this port.  See hpSecureAuthAddrTable for
+                   the definition of 'authorized address'."
+           ::= { hpSecureAuthAddrEntry 3 }
+
+
+
+       -- The Generic Repeater backup links group
+
+       hpicfGRpBackupLinks
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 2 }
+
+       hpicfBackupLinkNextIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "A currently unassigned value of
+                   hpicfBackupLinkIndex.  The value 0 indicates that no
+                   unassigned values are available.
+
+                   In order to cause a non-zero value of this object to
+                   be assigned for use as the hpicfBackupLinkIndex of a
+                   future backup link configuration, it must be
+                   successfully modified by a set operation.  When
+                   modified by a set operation, the new value must
+                   precisely match the value presently held by the
+                   object.  If not, the management protocol set
+                   operation will fail.
+
+                   Immediately after the completion of a successful set
+                   operation, the agent must modify the value of this
+                   object.  The algorithm for modifying the value is
+                   implementation-dependent, and may use a subset of
+                   values within the legal range.  However, the agent
+                   must guarantee that the new value is not assigned to
+                   any in-use value of hpicfBackupLinkIndex.
+
+                   A management station creates a new backup link using
+                   this algorithm:
+
+                      - issue a management protocol retrieval operation
+                        to obtain the value of hpicfBackupLinkNextIndex;
+                        if the retrieved value is zero, a new backup
+                        link cannot be created at this time;
+
+                      - issue a management protocol set operation for
+                        hpicfBackupLinkNextIndex, supplying the same
+                        value as obtained in the previous step;
+
+                      - if the set operation succeeds, use the supplied
+                        value as the hpicfBackupLinkIndex of the new
+                        backup link; if the set operation fails, go back
+                        to the first step and obtain a new value for
+                        hpicfBackupLinkNextIndex;
+
+                      - issue a management protocol set operation to
+                        create an instance of the hpicfBackupLinkStatus
+                        object setting its value to 'createAndGo' or
+                        'createAndWait' (as specified in the description
+                        of the RowStatus textual convention).
+
+                    Note that the set of hpicfBackupLinkNextIndex and
+                    the instance of hpicfBackupLinkStatus may occur in
+                    the same set operation if desired."
+           ::= { hpicfGRpBackupLinks 1 }
+
+       hpicfBackupLinkTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfBackupLinkEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of backup link configuration entries.  For
+                   a given backup link, the agent will periodically send
+                   a test packet to the device at the specified address.
+                   If no response is received after a configured number
+                   of test packets are sent, the agent will enable the
+                   backup port and disable the primary port, and will
+                   stop sending periodic test packets.  After the agent
+                   has switched to the backup link, the primary port
+                   will need to explicitly be re-enabled via management
+                   action in order to return to using the primary port.
+
+                   At any time, a management station can examine the
+                   associated instance of the hpicfBackupLinkState
+                   object to determine if the backup port is currently
+                   in use.
+
+                   The backup link algorithm enables and disables the
+                   backup port by modifying the instance of the
+                   rptrPortAdminStatus object corresponding to that
+                   port.  After the backup port has been enabled by the
+                   backup link algorithm, if the primary port is
+                   subsequently enabled via management action, the
+                   backup port will be turned off and the periodic
+                   test packets will resume.
+
+                   When a row of this table is activated, the backup
+                   port will be disabled, the primary port will be
+                   enabled, and the periodic test packets will be sent.
+                   The time between test packets is configurable using
+                   the associated instance of the
+                   hpicfBackupLinkTestTime object.  The number of
+                   failures needed to switch to the backup port is
+                   configurable using the associated instance of the
+                   hpicfBackupLinkConsecFailures object.  The backup
+                   link function can be disabled by setting the relevant
+                   instance of the hpicfBackupLinkStatus object to
+                   either 'notInService' or 'destroy'.
+
+                   Note that the primary port for a backup link must
+                   be mapped to a repeater segment that the agent is
+                   capable of transmitting through.  In addition, a
+                   given port cannot be used in more than one active
+                   backup link at the same time."
+           ::= { hpicfGRpBackupLinks 2 }
+
+       hpicfBackupLinkEntry OBJECT-TYPE
+           SYNTAX     HpicfBackupLinkEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A row in the table, containing information about a
+                   single backup link."
+           INDEX      { hpicfBackupLinkIndex }
+           ::= { hpicfBackupLinkTable 1 }
+
+       HpicfBackupLinkEntry ::=
+           SEQUENCE {
+               hpicfBackupLinkIndex            Integer32,
+               hpicfBackupLinkPrimaryGroup     Integer32,
+               hpicfBackupLinkPrimaryPort      Integer32,
+               hpicfBackupLinkBackupGroup      Integer32,
+               hpicfBackupLinkBackupPort       Integer32,
+               hpicfBackupLinkAddress          MacAddress,
+               hpicfBackupLinkTestTime         Integer32,
+               hpicfBackupLinkConsecFailures   Integer32,
+               hpicfBackupLinkState            INTEGER,
+               hpicfBackupLinkFailEventIndex   Integer32,
+               hpicfBackupLinkStatus           RowStatus
+           }
+
+       hpicfBackupLinkIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The value of this object uniquely identifies this
+                   backup link."
+           ::= { hpicfBackupLinkEntry 1 }
+
+       hpicfBackupLinkPrimaryGroup OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The group containing the primary port for this
+                   backup link."
+           ::= { hpicfBackupLinkEntry 2 }
+
+       hpicfBackupLinkPrimaryPort OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The port number within the group of the primary port
+                   for this backup link."
+           ::= { hpicfBackupLinkEntry 3 }
+
+       hpicfBackupLinkBackupGroup OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The group containing the backup port for this
+                   backup link."
+           ::= { hpicfBackupLinkEntry 4 }
+
+       hpicfBackupLinkBackupPort OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The port number within the group of the backup port
+                   for this backup link."
+           ::= { hpicfBackupLinkEntry 5 }
+
+       hpicfBackupLinkAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The MAC address of the device to which periodic
+                   test packets are sent in order to determine if the
+                   primary link is operational."
+           ::= { hpicfBackupLinkEntry 6 }
+
+       hpicfBackupLinkTestTime OBJECT-TYPE
+           SYNTAX     Integer32 (1..15)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The frequency, in seconds, between sending periodic
+                   test packets.  The test packet response timeout is
+                   fixed at 500ms."
+           DEFVAL     { 1 }
+           ::= { hpicfBackupLinkEntry 7 }
+
+       hpicfBackupLinkConsecFailures OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The number of consecutive test packet failures which
+                   will cause the agent to switch to the backup port
+                   (i.e., backup port turned on, primary port turned
+                   off).  A value of one is generally not recommended
+                   and will cause the backup link to be enabled upon
+                   the first failure."
+           DEFVAL     { 2 } 
+           ::= { hpicfBackupLinkEntry 8 }
+
+       hpicfBackupLinkState OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          notActive(1),
+                          usingPrimary(2),
+                          usingBackup(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The current state of this backup link.  One of the
+                   following values:
+
+                       notActive    - backup link not running because
+                                      this row has not yet been made
+                                      active
+                       usingPrimary - backup link is running and using
+                                      the primary port
+                       usingBackup  - backup link test has failed; the
+                                      primary port has been disabled 
+                                      and the backup port has been
+                                      enabled"
+           ::= { hpicfBackupLinkEntry 9 }
+
+       hpicfBackupLinkFailEventIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The index of the eventEntry in the RMON MIB that
+                   will be triggered whenever the value of
+                   hpicfBackupLinkState changes from 'usingPrimary' to
+                   'usingBackup'.  The eventEntry identified by a
+                   particular value of this index is the same as
+                   identified by the same value of the eventIndex
+                   object.  If there is no corresponding entry in the
+                   eventTable, then no association exists.  In
+                   particular, if this value is zero, no associated
+                   event will be generated, as zero is not a valid
+                   event index."
+           ::= { hpicfBackupLinkEntry 10 }
+
+       hpicfBackupLinkStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The status of this entry.  This object may not be
+                   set to 'active' unless the corresponding instance of
+                   hpicfBackupLinkAddress has been set to a valid
+                   unicast address, the corresponding instances of
+                   hpicfBackupLinkPrimaryGroup,
+                   hpicfBackupLinkPrimaryPort,
+                   hpicfBackupLinkBackupGroup, and
+                   hpicfBackupLinkBackupPort have been configured to
+                   refer to two existing ports and that those ports are
+                   not used in any other active backup link
+                   configuration, and the primary port is mapped to a
+                   repeater segment which the agent is capable of
+                   transmitting through."
+           ::= { hpicfBackupLinkEntry 11 }
+
+
+       -- The generic repeater port mapping group
+
+       hpGRpPortMapping 
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 3 }
+
+       hpGRpPMSegmentTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpGRpPMSegmentEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table for configuring segment-to-repeater mapping
+                   for repeater segments in this managed system."
+           ::= { hpGRpPortMapping 1 }
+
+       hpGRpPMSegmentEntry OBJECT-TYPE
+           SYNTAX     HpGRpPMSegmentEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, containing mapping
+                   information about a single repeater segment."
+           INDEX      { hpGRpPMSegmentIndex }
+           ::= { hpGRpPMSegmentTable 1 }
+
+       HpGRpPMSegmentEntry ::=
+           SEQUENCE {
+               hpGRpPMSegmentIndex             Integer32,
+               hpGRpPMCurrentRptrIndex         Integer32
+           }
+
+       hpGRpPMSegmentIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The value of an instance of this object uniquely
+                   identifies a physical repeater segment in this
+                   managed system.  The value of an instance of this
+                   object will be equal to the instance of the Entity
+                   MIB's entPhysicalIndex for the entry in the
+                   entPhysicalTable that represents this segment."
+           ::= { hpGRpPMSegmentEntry 1 }
+
+       hpGRpPMCurrentRptrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The index of the repeater that this segment is
+                   currently connected to.  Changing this value has the
+                   effect of moving all ports on this segment to a
+                   different repeater.  The hpGRpPMSegAllowedRptrTable
+                   should be consulted to determine which repeaters
+                   this segment can be connected to."
+           ::= { hpGRpPMSegmentEntry 3 }
+
+
+       hpGRpPMSegAllowedRptrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpGRpPMSegAllowedRptrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table is used to inform a management
+                   application about which repeaters a physical segment
+                   is able to be connected to.  There is one row in this
+                   table for each allowable segment-to-repeater
+                   connection."
+           ::= { hpGRpPortMapping 2 }
+
+       hpGRpPMSegAllowedRptrEntry OBJECT-TYPE
+           SYNTAX     HpGRpPMSegAllowedRptrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A row in the table, containing a single allowable
+                   segment-to-repeater connection.  The presence of a
+                   row indicates that the segment identified by
+                   hpGRpPMSegmentIndex can be mapped to the repeater
+                   identified by hpGRpPMSegAllowedRptrIndex."
+           INDEX      { hpGRpPMSegmentIndex,
+                        hpGRpPMSegAllowedRptrIndex }
+           ::= { hpGRpPMSegAllowedRptrTable 1 }
+
+       HpGRpPMSegAllowedRptrEntry ::=
+           SEQUENCE {
+               hpGRpPMSegAllowedRptrIndex      Integer32
+           }
+
+       hpGRpPMSegAllowedRptrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The repeater index that identifies a repeater that
+                   this segment is able to be connected to."
+           ::= { hpGRpPMSegAllowedRptrEntry 1 }
+
+
+       hpGRpPMPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpGRpPMPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table for configuring port-to-repeater mapping
+                   for repeater ports in this managed system."
+           ::= { hpGRpPortMapping 3 }
+
+       hpGRpPMPortEntry OBJECT-TYPE
+           SYNTAX     HpGRpPMPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, containing mapping
+                   information about a single repeater port."
+           INDEX      { hpGRpPMPortGroupIndex, hpGRpPMPortIndex }
+           ::= { hpGRpPMPortTable 1 }
+
+       HpGRpPMPortEntry ::=
+           SEQUENCE {
+               hpGRpPMPortGroupIndex           Integer32,
+               hpGRpPMPortIndex                Integer32,
+               hpGRpPMPortEntPhysicalIndex     Integer32,
+               hpGRpPMPortCurrentRptrIndex     Integer32
+           }
+
+       hpGRpPMPortGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The group containing the port for which this entry
+                   contains mapping information."
+           ::= { hpGRpPMPortEntry 1 }
+
+       hpGRpPMPortIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The port within the group for which this entry
+                   contains mapping information."
+           ::= { hpGRpPMPortEntry 2 }
+
+       hpGRpPMPortEntPhysicalIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object indicates which entry in the Entity
+                   MIB's entPhysicalTable represents this port.  The
+                   entPhysicalEntry identified by this value is the
+                   same entry identified by the same value of the
+                   entPhysicalIndex object."
+           ::= { hpGRpPMPortEntry 3 }
+
+       hpGRpPMPortCurrentRptrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The index of the repeater that this port is
+                   currently mapped to.  Changing this value has the
+                   effect of moving this port to a different repeater.
+                   The hpGRpPMPortAllowedRptrTable should be consulted
+                   to determine which repeaters this port can be mapped
+                   to.  A value of zero indicates that this port is
+                   currently not a member of any repeater."
+           ::= { hpGRpPMPortEntry 4 }
+
+
+       hpGRpPMPortAllowedRptrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpGRpPMPortAllowedRptrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table is used to inform a management
+                   application about which repeaters a logical port is
+                   able to be mapped to.  There is one row in this table
+                   for each allowable port to repeater mapping."
+           ::= { hpGRpPortMapping 4 }
+
+       hpGRpPMPortAllowedRptrEntry OBJECT-TYPE
+           SYNTAX     HpGRpPMPortAllowedRptrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A row in the table, containing a single allowable
+                   port to repeater mapping.  The presence of a row
+                   indicates that the port identified by
+                   hpGRpPMPortGroupIndex, hpGRpPMPortIndex can be
+                   mapped to the repeater identified by
+                   hpGRpPMPortAllowedRptrIndex."
+           INDEX      { hpGRpPMPortGroupIndex, hpGRpPMPortIndex,
+                        hpGRpPMPortAllowedRptrIndex }
+           ::= { hpGRpPMPortAllowedRptrTable 1 }
+
+       HpGRpPMPortAllowedRptrEntry ::=
+           SEQUENCE {
+               hpGRpPMPortAllowedRptrIndex     Integer32
+           }
+
+       hpGRpPMPortAllowedRptrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The repeater index that identifies a repeater that
+                   this port is able to be mapped to."
+           ::= { hpGRpPMPortAllowedRptrEntry 1 }
+
+
+       -- The generic repeater load balancing group
+
+       hpGRpLoadBalancing
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 4 }
+
+       hpGRpPortMapAutoConfigEnable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "If this object has the value 'enabled', when a
+                   switch is discovered in the stack, the repeater
+                   ports will be evenly distributed across the repeater
+                   segments if they had not previously been assigned
+                   to segments (in other words, if they are in their
+                   default state).  If this object has the value
+                   'disabled', this automatic distribution of ports
+                   will not occur."
+           ::= { hpGRpLoadBalancing 1 }
+
+       hpGRpLoadBalanceNow OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          cantUndo(1),
+                          balancing(2),
+                          completed(3),
+                          undoLast(4)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "Setting this object to 'balancing' will cause the
+                   agent to distribute ports in the stack across the
+                   repeater segments, attempting to balance the
+                   traffic load on each segment.  When the agent has
+                   finished the load balancing, it will set the value
+                   of this object to 'completed'.  Setting this object
+                   to 'undoLast' will cause the agent to return all of
+                   the ports to the segment they were on before the
+                   last load balancing.  This object will have the
+                   value of 'cantUndo' if there has been no load
+                   balancing since the last agent reset or if the last
+                   load balancing has already been undone.  This object
+                   can only be set to 'undoLast' when its current value
+                   is 'completed'."
+           ::= { hpGRpLoadBalancing 2 }
+
+       hpGRpLastLoadBalanceTime OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object contains the value of sysUpTime for
+                   the last time the hpGRPLoadBalanceNow object was
+                   set to 'balancing'.  If load balancing has not been
+                   performed since the last agent reset, this object
+                   will have the value 0."
+           ::= { hpGRpLoadBalancing 3 }
+
+
+       -- Objects for configuring internal and external switches
+       -- for switching between repeater segments in a repeater
+       -- system.
+
+       hpicfGRpSwitchConfig
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 5 }
+
+       hpicfGRpSwitchTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfGRpSwitchEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of switches, both internal and external,
+                   connected to ports in this repeater system.
+                   Typically, internal switches are added by the agent
+                   and cannot be removed by a management operation.
+                   External switches may be added or removed by
+                   management operations using the hpicfGRpSwitchStatus
+                   object."
+           ::= { hpicfGRpSwitchConfig 1 }
+
+       hpicfGRpSwitchEntry OBJECT-TYPE
+           SYNTAX     HpicfGRpSwitchEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, representing a single
+                   attached switch."
+           INDEX      { hpicfGRpSwitchIndex }
+           ::= { hpicfGRpSwitchTable 1 }
+
+       HpicfGRpSwitchEntry ::=
+           SEQUENCE {
+               hpicfGRpSwitchIndex             Integer32,
+               hpicfGRpSwitchType              INTEGER,
+               hpicfGRpSwitchEntPhysicalIndex  Integer32,
+               hpicfGRpSwitchLinkCount         Integer32,
+               hpicfGRpSwitchStatus            RowStatus
+           }
+
+       hpicfGRpSwitchIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..31)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An index used to uniquely identify this switch."
+           ::= { hpicfGRpSwitchEntry 1 }
+
+       hpicfGRpSwitchType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          internal(1),
+                          external(2)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object indicates whether this switch is an
+                   internal switch card or a switch external to the
+                   repeater system.  This object will always be equal
+                   to 'external' for rows that are created using
+                   hpicfGRpSwitchStatus.  For internal switches, the
+                   type of internal switch can be determined by
+                   examining the relevant instance of the
+                   entPhysicalType object."
+           ::= { hpicfGRpSwitchEntry 2 }
+
+       hpicfGRpSwitchEntPhysicalIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "For an internal switch, this object is the index
+                   in the entPhysicalTable for the internal switch
+                   card.  For an external switch, the value of this
+                   object will be zero."
+           ::= { hpicfGRpSwitchEntry 3 }
+
+       hpicfGRpSwitchLinkCount OBJECT-TYPE
+           SYNTAX     Integer32 (0..255)
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The number of links from this switch's ports to
+                   repeater ports in this repeater system.  For internal
+                   switches, this object cannot be modified by a network
+                   management operation.  For an external switch, when
+                   this object is set, a number of rows will be added to
+                   the hpicfGRpSwitchLinkTable equal to the value of
+                   this object.  The values of hpicfGRpSwitchLinkIndex
+                   will be numbered from 1 to the value of this object.
+
+                   An instance of this object may not be modified if
+                   the corresponding instance of the
+                   hpicfGRpSwitchStatus object would be equal to
+                   'active' both before and after the modification
+                   attempt."
+           ::= { hpicfGRpSwitchEntry 4 }
+
+       hpicfGRpSwitchStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The status of this hpicfGRpSwitchEntry.
+
+                   An entry may not exist in the active state unless
+                   the associated instance of the
+                   hpicfGRpSwitchLinkCount has been set to a non-zero
+                   value, and all associated instances of the
+                   hpicfGRpSwitchLinkRptrGroup and
+                   hpicfGRpSwitchLinkRptrPort objects have been set to
+                   non-zero values.
+
+                   If this object is set to 'destroy', all associated
+                   entries in the hpicfGRpSwitchLinkTable shall be
+                   deleted."
+           ::= { hpicfGRpSwitchEntry 5 }
+
+
+       hpicfGRpSwitchLinkTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfGRpSwitchLinkEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of links to switch ports for both internal
+                   and external switches that are connected to repeater
+                   ports in this repeater system."
+           ::= { hpicfGRpSwitchConfig 2 }
+
+       hpicfGRpSwitchLinkEntry OBJECT-TYPE
+           SYNTAX     HpicfGRpSwitchLinkEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, representing a single link
+                   to a switch port."
+           INDEX      { hpicfGRpSwitchIndex,
+                        hpicfGRpSwitchLinkIndex }
+           ::= { hpicfGRpSwitchLinkTable 1 }
+
+       HpicfGRpSwitchLinkEntry ::=
+           SEQUENCE {
+               hpicfGRpSwitchLinkIndex         Integer32,
+               hpicfGRpSwitchLinkRptrGroup     Integer32,
+               hpicfGRpSwitchLinkRptrPort      Integer32,
+               hpicfGRpSwitchLinkState         INTEGER
+           }
+
+       hpicfGRpSwitchLinkIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..255)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An identifier that uniquely identifies this switch
+                   link among all of the links associated with this
+                   switch.  The values of this object are numbered
+                   consecutively from 1 to the value of the instance
+                   of the hpicfGRpSwitchLinkCount associated with this
+                   switch."
+           ::= { hpicfGRpSwitchLinkEntry 1 }
+
+       hpicfGRpSwitchLinkRptrGroup OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The group containing the repeater port to which this
+                   switch link is attached.  For internal switches, this
+                   object may not be modified by a network management
+                   operation.  For external switches, an instance of
+                   this object will be created with the value of zero.
+                   It must be modified to a non-zero value corresponding
+                   to a known repeater group index before the instance
+                   of the hpicfGRpSwitchStatus object associated with
+                   this switch can be set to 'active'.
+
+                   An instance of this object may not be modified if
+                   the instance of the hpicfGRpSwitchStatus object
+                   associated with this switch would be equal to
+                   'active' both before and after the modification
+                   attempt."
+           ::= { hpicfGRpSwitchLinkEntry 2 }
+
+       hpicfGRpSwitchLinkRptrPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The repeater port within the group to which this
+                   switch link is attached.  For internal switches, this
+                   object may not be modified by a network management
+                   operation.  For external switches, an instance of
+                   this object will be created with the value of zero.
+                   It must be modified to a non-zero value corresponding
+                   to a known repeater port index before the instance
+                   of the hpicfGRpSwitchStatus object associated with
+                   this switch can be set to 'active'.
+
+                   An instance of this object may not be modified if
+                   the instance of the hpicfGRpSwitchStatus object
+                   associated with this switch would be equal to
+                   'active' both before and after the modification
+                   attempt."
+           ::= { hpicfGRpSwitchLinkEntry 3 }
+
+       hpicfGRpSwitchLinkState OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          active(1),
+                          redundant(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object indicates whether this switch link is
+                   enabled ('active') or disabled ('redundant') due to
+                   one of the following:
+
+                       - There are more links to this switch than there
+                         are repeater segments.
+                       - The agent detected a switching loop.
+                       - The link is intended as a backup connection for
+                         other links on this switch.
+
+                   There can only be one active link to the switch from
+                   each repeater segment, otherwise you will have a
+                   switching loop.  Therefore, if more than one switch
+                   link is connected to repeater ports on the same
+                   repeater segment, only one of them may have the value
+                   'active'.  All of the others must have the value
+                   'redundant."
+           ::= { hpicfGRpSwitchLinkEntry 4 }
+
+
+       hpicfGRpCurrentPrimarySwitch OBJECT-TYPE
+           SYNTAX     Integer32 (0..31)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                  "The hpicfGRpSwitchIndex of the switch that is
+                  currently the primary switch for this stack.  The
+                  automatic port-to-segment distribution feature will
+                  make decisions based on which switch is the primary
+                  switch.  A value of 0 indicates that there are no
+                  internal switches in the system, and no external
+                  switches have been configured."
+           ::= { hpicfGRpSwitchConfig 3 }
+
+       hpicfGRpDesiredPrimarySwitch OBJECT-TYPE
+           SYNTAX     Integer32 (0..31)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                  "The hpicfGRpSwitchIndex of the switch that the
+                  network administrator wants to be the primary switch
+                  for this stack.  If the value of this object is zero,
+                  the agent will select the primary switch.  Note that
+                  the agent may choose to use a different switch as the
+                  primary switch if it is unable to locate the switch
+                  identified by this object."
+           ::= { hpicfGRpSwitchConfig 4 }
+
+
+       -- Objects for configuring an internal bridge for
+       -- bridging between repeater segments in a repeater
+       -- system.
+
+       hpicfGRpBridge
+           OBJECT IDENTIFIER ::= { hpicfGenericRepeater 6 }
+
+       hpGRpBridgeAdminStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   ""
+           ::= { hpicfGRpBridge 1 }
+
+
+       -- Generic repeater notifications
+
+       hpicfIntrusionTrap NOTIFICATION-TYPE
+           OBJECTS    { hubIntruderGroup, hubIntruderPort,
+                        hubIntruderAddress, hubIntruderType,
+                        hubIntruderTrainingViolation  }
+           STATUS     current
+           DESCRIPTION
+                   "The hpicfIntrusionTrap signifies that a port
+                   security violation has been detected on a port which
+                   has the hubSecPtAlarmEnable flag set to 'enabled'.
+                   or hpSecPtrIntrusionResponse set to 'SendTrap' 
+                   or 'SendTrapAndDisablePort'.
+                   hubIntruderGroup identifies the group containing the
+                   port on which this intrusion occurred.
+                   hubIntruderPort identifies the port within the group
+                   on which this intrusion occurred.  hubIntruderAddress
+                   contains the souce MAC address of the intruder.
+                   hubIntruderType identifies the type of violation that
+                   occured: address, training, or both.  If the
+                   violation is of type 'training', the
+                   hubIntruderTrainingViolation object will indicate
+                   additional information on the type of violation."
+           ::= { hpicfGenRptrTrapsPrefix 1 }
+
+       hpicfBackupLinkTrap NOTIFICATION-TYPE
+           OBJECTS    { hpicfBackupLinkState }
+           STATUS     current
+           DESCRIPTION
+                   "The hpicfBackupLinkTrap signifies that the primary
+                   link for a backup link configuration has failed, and
+                   the agent has switched over to using the backup link.
+                   The instance of the hpicfBackupLinkState for the
+                   backup link configuration that experienced the
+                   primary link failure is included in the trap."
+           ::= { hpicfGenRptrTrapsPrefix 2 }
+
+
+       -- conformance information
+
+       hpicfGenRptrConformance
+           OBJECT IDENTIFIER ::= { hpicfGenRptrMib 1 }
+
+       hpicfGenRptrCompliances
+           OBJECT IDENTIFIER ::= { hpicfGenRptrConformance 1 }
+       hpicfGenRptrGroups
+           OBJECT IDENTIFIER ::= { hpicfGenRptrConformance 2 }
+
+
+       -- compliance statements
+
+       hpicfHubSecurityCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   The compliance statement for agents implementing
+                   per-port security in a single-repeater 802.3
+                   repeater system."
+           MODULE
+               MANDATORY-GROUPS { hpicfHubSecurityGroup }
+
+           ::= { hpicfGenRptrCompliances 1 }
+
+       hpicfGenRptrBasicCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   The compliance statement for agents implementing
+                   management for a single repeater."
+           MODULE
+               MANDATORY-GROUPS { hpicfGenRptrBasicGroup }
+
+               GROUP      hpicfGenRptrSecPtGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrSecNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               OBJECT     hubSecPtPreventEavesdrop
+               MIN-ACCESS read-only
+               DESCRIPTION
+                       "100VG hubs implement this object as read-only,
+                       since eavesdrop prevention is controlled by
+                       whether or not a port is allowed to train as
+                       promiscuous."
+
+           ::= { hpicfGenRptrCompliances 2 }
+
+       hpicfGenRptrSecurityCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   The compliance statement for AdvanceStack 100VG
+                   slaves implementing security."
+           MODULE
+               MANDATORY-GROUPS { hpicfGenRptrSecPtGroup,
+                                  hpicfGenRptrSecNotifyGroup }
+
+               OBJECT     hubSecPtPreventEavesdrop
+               MIN-ACCESS read-only
+               DESCRIPTION
+                       "100VG hubs implement this object as read-only,
+                       since eavesdrop prevention is controlled by
+                       whether or not a port is allowed to train as
+                       promiscuous."
+
+           ::= { hpicfGenRptrCompliances 3 }
+
+       hpicfGenRptrCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   The compliance statement for HP managed repeater
+                   systems."
+           MODULE
+               MANDATORY-GROUPS { hpicfGenRptrBasicGroup,
+                                  hpicfGenRptrInfoGroup }
+
+               GROUP      hpicfGenRptrSecPtGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrSecNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrBkpLinkGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrBkpLinkNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrPortMappingGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support moving segments or ports between
+                       logical repeaters."
+
+               GROUP      hpicfGenRptrLoadBalanceGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that have multiple repeater segments and an
+                       internal switch card and that support load
+                       balancing between segments."
+
+               OBJECT     hubSecPtPreventEavesdrop
+               MIN-ACCESS read-only
+               DESCRIPTION
+                       "100VG hubs implement this object as read-only,
+                       since eavesdrop prevention is controlled by
+                       whether or not a port is allowed to train as
+                       promiscuous."
+
+           ::= { hpicfGenRptrCompliances 4 }
+
+       hpicfGenRptrCompliance2 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for HP managed repeater
+                   systems."
+           MODULE
+               MANDATORY-GROUPS { hpicfGenRptrBasicGroup,
+                                  hpicfGenRptrInfoGroup }
+
+               GROUP      hpicfGenRptrSecPtGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrSecNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrBkpLinkGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrBkpLinkNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrPortMappingGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support moving segments or ports between
+                       logical repeaters."
+
+               GROUP      hpicfGenRptrLoadBalanceGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that have multiple repeater segments, that can
+                       support internal switch cards and/or
+                       configuration of external switch links, and that
+                       support load balancing between segments."
+
+               GROUP      hpicfGenRptrSwitchConfigGroup
+               DESCRIPTION
+                       "This group should be implemented for repeaters
+                       that have multiple repeater segments and support
+                       internal switch cards and/or configuration of
+                       external switch links."
+
+               OBJECT     hubSecPtPreventEavesdrop
+               MIN-ACCESS read-only
+               DESCRIPTION
+                       "100VG hubs implement this object as read-only,
+                       since eavesdrop prevention is controlled by
+                       whether or not a port is allowed to train as
+                       promiscuous."
+
+           ::= { hpicfGenRptrCompliances 5 }
+
+       hpicfGenRptrCompliance3 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for HP managed repeater
+                   systems."
+           MODULE
+               MANDATORY-GROUPS { hpicfGenRptrBasicGroup }
+
+               GROUP      hpicfGenRptrInfoGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support multiple repeater segments 
+                       running at the same speed."
+
+               GROUP      hpicfGenRptrSecPtGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfSecPtGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security with multiple
+                       authorized addresses per port."
+
+               GROUP      hpicfGenRptrSecNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support per-port security."
+
+               GROUP      hpicfGenRptrBkpLinkGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrBkpLinkNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support backup link functionality."
+
+               GROUP      hpicfGenRptrPortMappingGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that support moving segments or ports between
+                       logical repeaters."
+
+               GROUP      hpicfGenRptrLoadBalanceGroup
+               DESCRIPTION
+                       "This group should be implemented for devices
+                       that have multiple repeater segments, that can
+                       support internal switch cards and/or
+                       configuration of external switch links, and that
+                       support load balancing between segments."
+
+               GROUP      hpicfGenRptrSwitchConfigGroup
+               DESCRIPTION
+                       "This group should be implemented for repeaters
+                       that have multiple repeater segments and support
+                       internal switch cards and/or configuration of
+                       external switch links."
+
+               GROUP      hpicfGenRptrBridgeGroup
+               DESCRIPTION
+                       "This group should be implemented for repeater
+                       systems that have an internal unmanaged bridge."
+
+               OBJECT     hubSecPtPreventEavesdrop
+               MIN-ACCESS read-only
+               DESCRIPTION
+                       "100VG hubs implement this object as read-only,
+                       since eavesdrop prevention is controlled by
+                       whether or not a port is allowed to train as
+                       promiscuous."
+
+           ::= { hpicfGenRptrCompliances 6 }
+
+       hpicfGenRptrMultiSecOnlyCompliance MODULE-COMPLIANCE
+           STATUS      deprecated
+           DESCRIPTION "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                       The compliance statement for non-repeater devices
+                       that implement per-port security with multiple
+                       authorized address per port."
+           MODULE
+               MANDATORY-GROUPS { hpicfSecPtGroup }
+
+           ::= { hpicfGenRptrCompliances 7 }
+
+       hpicfGenRptrMultiSecOnlyCompliance2 MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION
+                   "The updated compliance statement for non-repeater
+                   devices that implement per-port security with multiple
+                   authorized address per port."
+           MODULE
+               MANDATORY-GROUPS { hpicfSecPtGroup2 }
+
+           ::= { hpicfGenRptrCompliances 8 }
+
+
+       -- units of conformance
+
+
+       hpicfHubSecurityGroup OBJECT-GROUP
+           OBJECTS    { hubSecPtGroupIndex,
+                        hubSecPtPortIndex,
+                        hubSecPtSecurityAddress,
+                        hubSecPtAuthorizedAddress,
+                        hubSecPtPreventEavesdrop,
+                        hubSecPtAlarmEnable,
+                        hubSecPtIntrusionFlag,
+                        hubIntruderIndex,
+                        hubIntruderGroup,
+                        hubIntruderPort,
+                        hubIntruderAddress,
+                        hubIntruderTime
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects for managing per-port
+                   security violations for a managed 802.3 repeater
+                   system."
+           ::= { hpicfGenRptrGroups 1 }
+
+       hpicfGenRptrBasicGroup OBJECT-GROUP
+           OBJECTS    { hpGRpSelfHealEnable }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for basic configuration
+                   of a system containing repeaters."
+           ::= { hpicfGenRptrGroups 2 }
+
+       hpicfGenRptrSecPtGroup OBJECT-GROUP
+           OBJECTS    { hubSecPtGroupIndex,
+                        hubSecPtPortIndex,
+                        hubSecPtSecurityAddress,
+                        hubSecPtAuthorizedAddress,
+                        hubSecPtPreventEavesdrop,
+                        hubSecPtAlarmEnable,
+                        hubSecPtIntrusionFlag,
+                        hubIntruderIndex,
+                        hubIntruderGroup,
+                        hubIntruderPort,
+                        hubIntruderAddress,
+                        hubIntruderTime,
+                        hubIntruderType,
+                        hubIntruderTrainingViolation
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing per-port
+                   security in a managed repeater system."
+           ::= { hpicfGenRptrGroups 3 }
+
+       hpicfGenRptrInfoGroup OBJECT-GROUP
+           OBJECTS    { hpGRpRepeaterIfIndex,
+                        hpGRpRepeaterName,
+                        hpGRpRepeaterVlanIndex
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects providing information
+                   about logical repeaters in a system."
+           ::= { hpicfGenRptrGroups 4 }
+
+       hpicfGenRptrBkpLinkGroup OBJECT-GROUP
+           OBJECTS    { hpicfBackupLinkNextIndex,
+                        hpicfBackupLinkPrimaryGroup,
+                        hpicfBackupLinkPrimaryPort,
+                        hpicfBackupLinkBackupGroup,
+                        hpicfBackupLinkBackupPort,
+                        hpicfBackupLinkAddress,
+                        hpicfBackupLinkTestTime,
+                        hpicfBackupLinkConsecFailures,
+                        hpicfBackupLinkState,
+                        hpicfBackupLinkFailEventIndex,
+                        hpicfBackupLinkStatus
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for configuring backup
+                   links in a managed repeater system."
+           ::= { hpicfGenRptrGroups 5 }
+
+       hpicfGenRptrPortMappingGroup OBJECT-GROUP
+           OBJECTS    { hpGRpPMCurrentRptrIndex,
+                        hpGRpPMSegAllowedRptrIndex,
+                        hpGRpPMPortEntPhysicalIndex,
+                        hpGRpPMPortCurrentRptrIndex,
+                        hpGRpPMPortAllowedRptrIndex,
+                        hpGRpPortMapAutoConfigEnable
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for mapping repeater
+                   segments and repeater ports to logical repeaters."
+           ::= { hpicfGenRptrGroups 6 }
+
+       hpicfGenRptrLoadBalanceGroup OBJECT-GROUP
+           OBJECTS    { hpGRpLoadBalanceNow,
+                        hpGRpLastLoadBalanceTime
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing segment
+                   load balancing on multisegment repeaters with
+                   internal switches."
+           ::= { hpicfGenRptrGroups 7 }
+
+       hpicfGenRptrSwitchConfigGroup OBJECT-GROUP
+           OBJECTS    { hpicfGRpSwitchType,
+                        hpicfGRpSwitchEntPhysicalIndex,
+                        hpicfGRpSwitchLinkCount,
+                        hpicfGRpSwitchStatus,
+                        hpicfGRpSwitchLinkRptrGroup,
+                        hpicfGRpSwitchLinkRptrPort,
+                        hpicfGRpSwitchLinkState,
+                        hpicfGRpCurrentPrimarySwitch,
+                        hpicfGRpDesiredPrimarySwitch
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of Objects for configuring internal and
+                   external switches for switching between repeater
+                   segments in a repeater system."
+           ::= { hpicfGenRptrGroups 8 }
+
+       hpicfGenRptrSecNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfIntrusionTrap }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   per-port security violations."
+           ::= { hpicfGenRptrGroups 9 }
+
+       hpicfGenRptrBkpLinkNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfBackupLinkTrap }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   state changes on a backup link."
+           ::= { hpicfGenRptrGroups 10 }
+
+       hpicfSecPtGroup OBJECT-GROUP
+           OBJECTS    { hpSecPtAddressLimit,
+                        hpSecPtLearnMode,
+                        hpSecPtPreventEavesdrop,
+                        hpSecPtAlarmEnable,
+                        hpSecPtIntrusionFlag,
+                        hpSecCfgStatus,
+                        hpSecAuthAddress,
+                        hubIntruderIndex,
+                        hubIntruderGroup,
+                        hubIntruderPort,
+                        hubIntruderAddress,
+                        hubIntruderTime,
+                        hubIntruderType,
+                        hubIntruderTrainingViolation
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects for managing per-port
+                   security in a managed repeater or switch system."
+           ::= { hpicfGenRptrGroups 11 }
+
+       hpicfGenRptrBridgeGroup OBJECT-GROUP
+           OBJECTS    { hpGRpBridgeAdminStatus }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for basic configuration
+                   of repeater system containing internal bridging."
+           ::= { hpicfGenRptrGroups 12 }
+
+       hpicfSecPtGroup2 OBJECT-GROUP
+           OBJECTS    { hpSecPtAddressLimit,
+                        hpSecPtLearnMode,
+                        hpSecPtAlarmEnable,
+                        hpSecPtIntrusionFlag,
+                        hpSecCfgStatus,
+                        hpSecAuthAddress,
+                        hubIntruderIndex,
+                        hubIntruderGroup,
+                        hubIntruderPort,
+                        hubIntruderAddress,
+                        hubIntruderTime,
+                        hubIntruderType,
+                        hubIntruderTrainingViolation
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing per-port
+                   security in a managed repeater or switch system."
+           ::= { hpicfGenRptrGroups 13 }
+
+       END
+

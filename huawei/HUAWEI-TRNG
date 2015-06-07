@@ -1,0 +1,363 @@
+-- =====================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Timerange MIB Definition
+-- Reference:   Huawei Enterprise MIB
+-- Version:     V1.0
+-- History:
+--              Yang Hongjie,2003-04-11,Initial Version
+-- =====================================================================
+HUAWEI-TRNG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue, DateAndTime, RowStatus            
+            FROM SNMPv2-TC;
+    
+    -- 1.3.6.1.4.1.2011.5.25.13
+    hwTRNG MODULE-IDENTITY 
+        LAST-UPDATED "200304110000Z"        -- April 11, 2003 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "The HUAWEI-TRNG-MIB contains the objects to
+            configure the system absolute and periodic time-range, 
+            and query the current configration and status of time range.
+            This module mib objects includes hwTrngCreateTimerangeTable, 
+            hwTrngAbsoluteTable, hwTrngPeriodicTable and hwTRNGMibConformance.
+            To restrict some actions are valid or invalid at some moment,
+            time range need to be configrated on the device. time range is
+            a period of time composed of a start time and a end time. "
+            
+        REVISION "200304110000Z"        -- April 11, 2003 at 00:00 GMT
+        DESCRIPTION 
+            "200304110000Z--The initial revision of this MIB module."
+        ::= { hwDatacomm 13 }
+
+    --
+    -- Node definitions
+    --
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1
+    hwTRNGMibObjects OBJECT IDENTIFIER ::= { hwTRNG 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1
+    hwTrngCreateTimerangeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngCreateTimerangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines time range table to creat time ranges."
+        ::= { hwTRNGMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1
+    hwTrngCreateTimerangeEntry OBJECT-TYPE
+        SYNTAX HwTrngCreateTimerangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines the entries of time range."
+        INDEX { hwTrngIndex }
+        ::= { hwTrngCreateTimerangeTable 1 }
+    
+    HwTrngCreateTimerangeEntry ::=
+        SEQUENCE { 
+            hwTrngIndex
+                Integer32,
+            hwTrngName
+                OCTET STRING,
+            hwTrngValidFlag
+                TruthValue,
+            hwTrngCreateRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.1
+    hwTrngIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of the time range."
+        ::= { hwTrngCreateTimerangeEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.2
+    hwTrngName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "the name of the time range."
+        ::= { hwTrngCreateTimerangeEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.3
+    hwTrngValidFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range is valid or invalid.
+            If it is valid, then When the current time is in the time range, 
+            the time range takes effect."
+        ::= { hwTrngCreateTimerangeEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.4
+    hwTrngCreateRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { hwTrngCreateTimerangeEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2
+    hwTrngAbsoluteTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngAbsoluteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Creats absoluteness time item of the time range.
+            Absolute time means specific time and date, being valid only once."
+        ::= { hwTRNGMibObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1
+    hwTrngAbsoluteEntry OBJECT-TYPE
+        SYNTAX HwTrngAbsoluteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines the entries of hwTrngAbsoluteTable"
+        INDEX { hwTrngAbsoluteNameIndex, hwTrngAbsoluteSubIndex }
+        ::= { hwTrngAbsoluteTable 1 }
+
+    HwTrngAbsoluteEntry ::=
+        SEQUENCE { 
+            hwTrngAbsoluteNameIndex
+                Integer32,
+            hwTrngAbsoluteSubIndex
+                Integer32,
+            hwTimerangeAbsoluteStartTime
+                DateAndTime,
+            hwTimerangeAbsoluteEndTime
+                DateAndTime,
+            hwTimerangeAbsolueRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.1
+    hwTrngAbsoluteNameIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of the time range."
+        ::= { hwTrngAbsoluteEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.2
+    hwTrngAbsoluteSubIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..12)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The subitem index of the time range."
+        ::= { hwTrngAbsoluteEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.3
+    hwTimerangeAbsoluteStartTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The start time of the time range."
+        ::= { hwTrngAbsoluteEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.4
+    hwTimerangeAbsoluteEndTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create            
+        STATUS current
+        DESCRIPTION
+            "The end time of the time range."
+        ::= { hwTrngAbsoluteEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.5
+    hwTimerangeAbsolueRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this conceptual row.
+            "
+        ::= { hwTrngAbsoluteEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3
+    hwTrngPeriodicTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngPeriodicEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Creats periodic time item of the TimeRange.
+            Periodic time means An interval of time 
+            characterized by the occurrence of a certain date."
+        ::= { hwTRNGMibObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1
+    hwTrngPeriodicEntry OBJECT-TYPE
+        SYNTAX HwTrngPeriodicEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines the entries of hwTrngPeriodicTable"
+        INDEX { hwTrngPeriodicNameIndex, hwTrngPeriodicSubIndex }
+        ::= { hwTrngPeriodicTable 1 }
+
+    HwTrngPeriodicEntry ::=
+        SEQUENCE { 
+            hwTrngPeriodicNameIndex
+                Integer32,
+            hwTrngPeriodicSubIndex
+                Integer32,
+            hwTrngPeriodicDayofWeek
+                Integer32,
+            hwTimerangePeriodicStartTime
+                DateAndTime,
+            hwTimerangePeriodicEndTime
+                DateAndTime,
+            hwTimerangePeriodicRowStatus
+                RowStatus
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.1
+    hwTrngPeriodicNameIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of The time range."
+        ::= { hwTrngPeriodicEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.2
+    hwTrngPeriodicSubIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The sub-item index of The time range."
+        ::= { hwTrngPeriodicEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.3
+    hwTrngPeriodicDayofWeek OBJECT-TYPE
+        SYNTAX Integer32 (0..127)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The day of a week."
+        ::= { hwTrngPeriodicEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.4
+    hwTimerangePeriodicStartTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Start time. Its display hint is:2d-1d-1d,1d:1d:1d.1d,1a1d:1d.
+            In the periodic time-range,the value of '2d-1d-1d' is invalid,
+            and It is suggested to set the value of '2d-1d-1d' for 
+            '0000-00-00'."
+        ::= { hwTrngPeriodicEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.5
+    hwTimerangePeriodicEndTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "End time,Its display hint is:2d-1d-1d,1d:1d:1d.1d,1a1d:1d.
+            In the periodic time-range,the value of '2d-1d-1d' is invalid,
+            and It is suggested to set the value of '2d-1d-1d' for 
+            '0000-00-00'."
+        ::= { hwTrngPeriodicEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.6
+    hwTimerangePeriodicRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Now only realizing CreateAndGo and Destroy"
+        ::= { hwTrngPeriodicEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.3
+    hwTRNGMibConformance OBJECT IDENTIFIER ::= { hwTRNG 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.3.1
+    hwTRNGMibCompliances OBJECT IDENTIFIER ::= { hwTRNGMibConformance 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.3.1.1
+    hwTRNGMibCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which 
+            implement the Huawei Time-range MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwTRNGGroup }
+            OBJECT hwTrngCreateRowStatus
+        SYNTAX INTEGER
+            {
+            active(1),
+            createAndGo(4),
+            destroy(6)
+            }
+        DESCRIPTION 
+            "The status of creatAndWaite, notInservice and notReady are not required."
+        OBJECT hwTimerangeAbsolueRowStatus
+        SYNTAX INTEGER
+            {
+            active(1),
+            createAndGo(4),
+            destory(6)
+            }
+        DESCRIPTION 
+            "The status of creatAndWaite, notInservice and notReady are not required."
+        OBJECT hwTimerangePeriodicRowStatus
+        SYNTAX INTEGER
+            {
+            active(1),
+            createAndGo(4),
+            destory(6)
+            }
+        DESCRIPTION 
+            "The status of creatAndWaite, notInservice and notReady are not required."
+        ::= { hwTRNGMibCompliances 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.2
+    hwTRNGMibGroups OBJECT IDENTIFIER ::= { hwTRNGMibConformance 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.2.1
+    hwTRNGGroup OBJECT-GROUP
+        OBJECTS { hwTrngName, hwTrngValidFlag, hwTrngCreateRowStatus, hwTimerangeAbsoluteStartTime, hwTimerangeAbsoluteEndTime, 
+            hwTimerangeAbsolueRowStatus, hwTrngPeriodicDayofWeek, hwTimerangePeriodicStartTime, hwTimerangePeriodicEndTime, hwTimerangePeriodicRowStatus
+            }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing mandatory time-range information."
+        ::= { hwTRNGMibGroups 1 }
+
+END

@@ -1,0 +1,1142 @@
+-- ==================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:  HUAWEI LAN Switch RRPP MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2006-02-20 Created by Gurongwei 50539       
+-- V1.1 2006-06-07 Modify by xingxing 51692
+-- V1.2 2006-07-07 Modify by zhouyun 60016423   
+-- V1.3 2006-09-11 Modify by zhouyun 60016423       
+-- V1.4 2006-12-29 Modify by zhouyun 60016423 
+-- V1.5 2007-8-2   Modify by jianglian 60019048    
+--      2008-6-5   Modify by yanjiajun 130005
+-- ==================================================================
+
+    HUAWEI-RRPP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC
+            InterfaceIndex 
+                   FROM IF-MIB       
+            VlanId
+                FROM Q-BRIDGE-MIB;
+
+    
+    
+        hwRrpp MODULE-IDENTITY 
+            LAST-UPDATED "200607130000Z"        
+            ORGANIZATION 
+                "Huawei Technologies Co. Ltd."
+            CONTACT-INFO 
+                "Platform Team Huawei Technologies Co. Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085"
+            DESCRIPTION 
+                "The RRPP (Rapid Ring Protection protocol) provides
+                fast protection switching to layer 2 switches 
+                interconnected in an Ethernet ring topology.  When
+                a link in the ring breaks, the RRPP can recover the
+                data path quickly.  Its protection switching is 
+                similar to what can be achieved with the Spanning 
+                Tree Protocol (STP), but the converging time is less
+                than a second after link failure.
+                This MIB defines management information used on 
+                products which support RRPP."
+            ::= { hwDatacomm 113 }
+
+        EnabledStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "A simple status value for the object."
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+        hwRrppScalarGroup OBJECT IDENTIFIER ::= { hwRrpp 1 }
+
+        
+        hwRrppEnableStatus OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicating whether the RRPP is enabled on this switch."
+            ::= { hwRrppScalarGroup 1 }
+
+
+             hwRrppLinkupDelayTime OBJECT-TYPE
+                 SYNTAX Integer32 (0..10)
+                 MAX-ACCESS read-write
+                 STATUS current
+                 DESCRIPTION
+                        "This value indicates the delay when ports change to Up ."
+                 DEFVAL { '0'b }
+                ::= { hwRrppScalarGroup 2 }
+
+
+            
+    
+        
+        hwRrppTables OBJECT IDENTIFIER ::= { hwRrpp 2 }
+
+        
+        hwRrppDomainTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRrppDomainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about configurations
+                and status of a RRPP domain."
+            ::= { hwRrppTables 1 }
+
+        
+        hwRrppDomainEntry OBJECT-TYPE
+            SYNTAX HwRrppDomainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP domain."
+            INDEX { hwRrppDomainID }
+            ::= { hwRrppDomainTable 1 }
+
+        
+        HwRrppDomainEntry ::=
+            SEQUENCE { 
+                hwRrppDomainID
+                    INTEGER,
+                hwRrppDomainControlVlanID
+                    INTEGER,
+                   hwRrppDomainProtectedVlan
+                        OCTET STRING,
+                hwRrppDomainHelloTime
+                    INTEGER,
+                hwRrppDomainFailTime
+                    INTEGER,
+                hwRrppDomainRowStatus
+                    RowStatus,
+                hwRrppDomainResetStatistics
+                    INTEGER,
+                hwRrppMulSubRingProtection
+                    EnabledStatus
+             }
+             
+        hwRrppDomainID OBJECT-TYPE
+            SYNTAX INTEGER (1..8)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An index uniquely identifies a RRPP domain,
+                which ranges from 1~8.
+                This value can't be modified after created."
+            ::= { hwRrppDomainEntry 1 }
+
+        
+        hwRrppDomainControlVlanID OBJECT-TYPE
+            SYNTAX INTEGER (1..4093 | 65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Index of the control VLAN specified to a domain. 
+                The value 65535 indicates the control VLAN has 
+                not been configured. 
+                The VLAN assigned to a RRPP Domain must not have
+                been created.
+                This value can't be modified after created."
+            DEFVAL { 65535 }
+            ::= { hwRrppDomainEntry 2 }    
+            
+        hwRrppDomainHelloTime OBJECT-TYPE
+            SYNTAX INTEGER (1..10)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value indicates the interval between two hello
+                packets sent by master-node, and its unit is second.
+                The value ranges from 1s~10s."
+            DEFVAL { 1 }
+            ::= { hwRrppDomainEntry 3 }
+
+        
+        hwRrppDomainFailTime OBJECT-TYPE
+            SYNTAX INTEGER (3..30)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The expiration value of the fail-period timer and its unit
+                is second.  If not receiving hello packets before this
+                expires, the master-node considers the ring is broken.
+                The value of this node ranging from 3s~30s must not be
+                less than triple hwRrppDomainHelloTime's value."
+            DEFVAL { 3 }
+            ::= { hwRrppDomainEntry 4 }
+
+        
+        hwRrppDomainRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation,
+                deletion and modification of rows, which support active
+                status and CreatAndGo, destroy operation."
+            ::= { hwRrppDomainEntry 5 }        
+        hwRrppDomainResetStatistics OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                cleared(1),
+                unused(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Clears the statistics of packets received and sent on the current domain."
+            ::= { hwRrppDomainEntry 6 }
+       hwRrppMulSubRingProtection OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicating whether the rrpp mul-sub-ring protection is enabled on this switch."
+            ::= { hwRrppDomainEntry 7 }
+
+        hwRrppDomainProtectedVlan OBJECT-TYPE
+              SYNTAX OCTET STRING (SIZE (0..48))
+              MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+                    "Information about the instances bound to a domain.
+                     The value ranges from 0 to 48. Both the ID and the number of the instances can be obtained through the value."
+             ::= { hwRrppDomainEntry 8 }
+
+        hwRrppRingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRrppRingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about configurations
+                and status of a RRPP Ring."
+            ::= { hwRrppTables 2 }
+
+        
+        hwRrppRingEntry OBJECT-TYPE
+            SYNTAX HwRrppRingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP Ring."
+            INDEX { hwRrppDomainID, hwRrppRingID }
+            ::= { hwRrppRingTable 1 }
+
+        
+        HwRrppRingEntry ::=
+            SEQUENCE { 
+                hwRrppRingID
+                    INTEGER,
+                hwRrppRingEnableStatus
+                    EnabledStatus,
+                hwRrppRingActive
+                    INTEGER,
+                hwRrppRingState
+                    INTEGER,
+                hwRrppRingNodeMode
+                    INTEGER,
+                hwRrppRingPrimaryPort
+                    InterfaceIndex,
+                hwRrppRingSecondaryPort
+                    InterfaceIndex,
+                hwRrppRingLevel
+                    INTEGER,
+                hwRrppRingRowStatus
+                    RowStatus,
+                hwRrppRingResetStatistics
+                    INTEGER
+             }
+
+        hwRrppRingID OBJECT-TYPE
+            SYNTAX INTEGER (1..64)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An index uniquely identifies a RRPP Ring,
+                which ranges from 1~64.
+                This value can't be modified after created."
+            ::= { hwRrppRingEntry 1 }
+
+        
+        hwRrppRingEnableStatus OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicating whether the RRPP is enabled on this Ring.
+                NOTE: If major-ring and sub-ring(s) of a domain 
+                coexist on a switch, major-ring must be enabled 
+                before sub-ring is enabled.  And sub-ring must be 
+                disabled before major-ring is disabled."
+            ::= { hwRrppRingEntry 2 }
+
+        
+        hwRrppRingActive OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                active(1),
+                inactive(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "As both hwRrppEnableStatus and hwRrppRingEnableStatus
+                are enabled, the ring is activated.  Whereas either of
+                the two items is disabled, the ring is inactive."
+            ::= { hwRrppRingEntry 3 }
+
+        
+        hwRrppRingState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                                     health(2),
+                                     fault(3),
+                complete(4),
+                failed(5),
+                                     linkup(6),
+                                     linkdown(7),
+                                     preforwarding(8),
+                                     linkupnotify(9),
+                                     linkdownnotify(10),
+                                     preforwardnotify(11)                                     
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status (i.e. unknown, health or fault) of the Ethernet
+                ring."
+            ::= { hwRrppRingEntry 4 }
+
+        
+        hwRrppRingNodeMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                master(1),
+                transit(2),
+                edge(3),
+                assistantEdge(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There are four RRPP node modes for the switch on a RRPP 
+                ring, such as master, transit, edge and assistant-edge.
+                Each RRPP ring has a single designated master-node.  All
+                other nodes except edge-node and assistant-edge-node on
+                that ring are referred to as transit-nodes.
+                The node mode of edge and assistant-edge should be
+                configured only on sub-ring.  When there is a common link
+                between a sub-ring and its major-ring, the node mode of 
+                the sub-ring must be edge or assistant-edge, and they must
+                be configured in pairs.
+                If node mode is designated as edge or assistant-edge,
+                several points should be noticed:
+                Major-ring must be created before a sub-ring is created;
+                Major-ring can't be deleted unless all its sub-rings are
+                deleted;
+                The node mode of the switch on major-ring must be
+                transit;
+                Major-ring and sub-ring must have only a common port.
+                This value can't be modified after created."
+            ::= { hwRrppRingEntry 5 }
+
+        
+        hwRrppRingPrimaryPort OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the switch is a master-node or transit-node, this value
+                is ifIndex of the primary port; otherwise, if the switch is an 
+                edge-node or assistant-edge-node, this value is ifIndex of the common
+                port.
+                This value is 0, if the port doesn't exist.  
+                This value can't be modified after created."
+            ::= { hwRrppRingEntry 6 }
+
+        
+        hwRrppRingSecondaryPort OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the switch is a master-node or transit-node, this value
+                is ifIndex of the secondary port; otherwise, if the switch is
+                an edge-node or assistant-edge-node, this value is ifIndex of the edge
+                port.
+                This value is 0, if the port doesn't exist.  
+                This value can't be modified after created."
+            ::= { hwRrppRingEntry 7 }
+
+        
+        hwRrppRingLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                majorRing(0),
+                subRing(1)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Level of a ring.  This field should be set 0 on major-ring
+                and 1 on the sub-ring.
+                This value can't be modified after created."
+            ::= { hwRrppRingEntry 8 }
+
+        
+        hwRrppRingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation,
+                deletion and modification of rows, which support active
+                status and CreatAndGo, destroy operation.
+                To create a new row, hwRrppRingNodeMode,
+                hwRrppRingPrimaryPort, hwRrppRingSecondaryPort and
+                hwRrppRingLevel must be specified."
+            ::= { hwRrppRingEntry 9 }
+        hwRrppRingResetStatistics OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                cleared(1),
+                unused(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Clears the statistics of packets received and sent on the current ring."
+            ::= { hwRrppRingEntry 10 }
+
+        hwRrppPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRrppPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about configurations and
+                status of a RRPP port."
+            ::= { hwRrppTables 3 }
+
+        
+        hwRrppPortEntry OBJECT-TYPE
+            SYNTAX HwRrppPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP port."
+            INDEX { hwRrppDomainID, hwRrppRingID, hwRrppPortID }
+            ::= { hwRrppPortTable 1 }
+
+        
+        HwRrppPortEntry ::=
+            SEQUENCE { 
+                hwRrppPortID
+                    InterfaceIndex,
+                hwRrppPortType
+                    INTEGER,
+                hwRrppPortRole
+                    INTEGER,
+                hwRrppPortState
+                    INTEGER,
+                hwRrppPortRXError
+                    Counter32,
+                hwRrppPortRXHello
+                    Counter32,
+                hwRrppPortRXLinkUp
+                    Counter32,
+                hwRrppPortRXLinkDown
+                    Counter32,
+                hwRrppPortRXCommonFlush
+                    Counter32,
+                hwRrppPortRXCompleteFlush
+                    Counter32,
+                hwRrppPortRXEdgeHello
+                    Counter32,
+                hwRrppPortRXMajorFault
+                    Counter32,
+                hwRrppPortTXError
+                    Counter32,
+                hwRrppPortTXHello
+                    Counter32,
+                hwRrppPortTXLinkUp
+                    Counter32,
+                hwRrppPortTXLinkDown
+                    Counter32,
+                hwRrppPortTXCommonFlush
+                    Counter32,
+                hwRrppPortTXCompleteFlush
+                    Counter32,
+                hwRrppPortTXEdgeHello
+                    Counter32,
+                hwRrppPortTXMajorFault
+                    Counter32
+             }
+
+        hwRrppPortID OBJECT-TYPE
+            SYNTAX InterfaceIndex 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logical index of the interface index."
+            ::= { hwRrppPortEntry 1 }
+
+        
+        hwRrppPortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                fe(1),
+                ge(2),
+                ve(3),
+                ethtrunk(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface type of the RRPP port.
+                (i.e. FE, GE, VE or Eth-Trunk port)."
+            ::= { hwRrppPortEntry 2 }
+
+        hwRrppPortRole OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                primary(1),
+                secondary(2),
+                common(3),
+                edge(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The RRPP role of the port.
+                (i.e. primary, secondary, common or edge port)."
+            ::= { hwRrppPortEntry 3 }
+
+        
+        hwRrppPortState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                unblocked(2),
+                blocked(3),
+                down(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "State of RRPP port, including unknown, unblocked, blocked
+                and down."
+            ::= { hwRrppPortEntry 4 }
+
+        
+        hwRrppPortRXError OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of illegal RRPP packets received from
+                this port."
+            ::= { hwRrppPortEntry 5 }
+
+        
+        hwRrppPortRXHello OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of hello packets received from
+                this port on specified ring."
+            ::= { hwRrppPortEntry 6 }
+
+        
+        hwRrppPortRXLinkUp OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of link-up packets received
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 7 }
+
+        hwRrppPortRXLinkDown OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of link-down packets received
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 8 }
+
+        hwRrppPortRXCommonFlush OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of common-flush packets received from
+                this port on specified ring.
+                Instruction
+                When master-node receives valid link-down packets
+                or link-up packets, it will send common-flush packets, 
+                instructing the other nodes on the ring to flush their
+                forwarding database.
+                When the nodes except master-node receive common-flush,
+                they will flush forwarding database.  If there is any
+                port blocked on that node, it won't be unblocked."
+            ::= { hwRrppPortEntry 9 }
+
+        hwRrppPortRXCompleteFlush OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of complete-flush packets received
+                from this port on specified ring.
+                Instruction
+                When the ring recovers, master-node will receive its own
+                hello packets.  It will send complete-flush packets, 
+                instructing the other nodes on the ring to flush their
+                forwarding database.
+                When the nodes except master-node receive complete-flush,
+                they will flush forwarding database.  If there is any port 
+                blocked on that node, it will be unblocked."
+            ::= { hwRrppPortEntry 10 }
+     
+        hwRrppPortRXEdgeHello OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of edge-hello packets received
+                from this port on specified ring.
+                Instruction
+                When edge-node sends edge-hello packets, 
+                assistantEdge-node will receive its own edge-hello
+                packets from the common link and the master ring."
+            ::= { hwRrppPortEntry 11 }
+    
+        hwRrppPortRXMajorFault OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of major-fault packets received
+                from this port on specified ring.
+                Instruction
+                When assistantEdge can't receive edge-hello packets
+                in the specified fault-time, 
+                assistantEdge-node will send its own major-fault
+                packets from the edge port around the sub ring.
+                Edge-node will receive the major-fault packets from 
+                its edge port. Then Edge-node will block its edge port."
+            ::= { hwRrppPortEntry 12 }
+    
+        hwRrppPortTXError OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of RRPP packets failed to send out of
+                this port."
+            ::= { hwRrppPortEntry 13 }
+
+        hwRrppPortTXHello OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of hello packets sent from
+                this port on specified ring."
+            ::= { hwRrppPortEntry 14 }
+
+        hwRrppPortTXLinkUp OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of link-up packets sent
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 15 }
+
+        hwRrppPortTXLinkDown OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of link-down packets sent
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 16 }
+
+        hwRrppPortTXCommonFlush OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of common-flush packets sent from
+                this port on specified ring."
+            ::= { hwRrppPortEntry 17 }
+
+        hwRrppPortTXCompleteFlush OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of complete-flush packets sent
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 18 }
+    
+        hwRrppPortTXEdgeHello OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of edge-hello packets sent
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 19 }
+
+        hwRrppPortTXMajorFault OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of major-fault packets sent
+                from this port on specified ring."
+            ::= { hwRrppPortEntry 20 }
+
+        hwRrppTrackInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWRrppTrackInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about tracking port."
+            ::= { hwRrppTables 4 }
+        
+        hwRrppTrackInterfaceEntry OBJECT-TYPE
+            SYNTAX HWRrppTrackInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP track interface."
+            INDEX { hwRrppDomainID, hwRrppRingID, hwRrppTrackInterfaceID }
+            ::= { hwRrppTrackInterfaceTable 1 }
+
+        HWRrppTrackInterfaceEntry ::=
+            SEQUENCE { 
+                    hwRrppTrackInterfaceID
+                    InterfaceIndex,
+                    hwRrppTrackRowStatus
+                    RowStatus                
+             }
+             
+        hwRrppTrackInterfaceID OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logical index of track interface."
+            ::= { hwRrppTrackInterfaceEntry 1 }
+        hwRrppTrackRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation,
+                deletion and modification of rows, which support active
+                status and CreatAndGo, destroy operation."
+            ::= { hwRrppTrackInterfaceEntry 2 }
+
+
+
+        hwRrppRingGroupTable OBJECT-TYPE
+                 SYNTAX SEQUENCE OF HwRrppRingGroupEntry
+                 MAX-ACCESS not-accessible
+                 STATUS current
+                 DESCRIPTION
+                    "A table containing information about an RRPP ring group and created without the domain or ring."
+                  ::= { hwRrppTables 5 }
+
+
+             hwRrppRingGroupEntry OBJECT-TYPE
+                 SYNTAX HwRrppRingGroupEntry
+                 MAX-ACCESS not-accessible
+                 STATUS current
+                 DESCRIPTION
+                     "Detailed information about a specified RRPP ring group."
+                 INDEX { hwRrppRingGroupID }
+                  ::= { hwRrppRingGroupTable 1 }
+            
+             HwRrppRingGroupEntry ::=
+                   SEQUENCE {
+                           hwRrppRingGroupID
+                                Integer32,
+                           hwRrppRingGroupRowStatus
+                                RowStatus
+                          }
+
+                 hwRrppRingGroupID OBJECT-TYPE
+                 SYNTAX Integer32 (1..16)
+                 MAX-ACCESS not-accessible
+                 STATUS current
+               DESCRIPTION
+                   "index of  the RRPP ring group,
+                     which ranges from 1~16.
+                     This value can't be modified after created"
+                   ::= { hwRrppRingGroupEntry 1 }
+
+                   
+                hwRrppRingGroupRowStatus OBJECT-TYPE
+                 SYNTAX RowStatus
+                 MAX-ACCESS read-create
+                 STATUS current
+                 DESCRIPTION
+                      "Row status in the ring group configuration table.
+                        hwRrppRingGroupID must be specified to create a row."
+                 ::= { hwRrppRingGroupEntry 2 }
+
+
+
+
+               hwRrppRingGroupMemberTable OBJECT-TYPE
+                  SYNTAX SEQUENCE OF HwRrppRingGroupMemberEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                     "A table containing information about the configurations and status of an RRPP ring."
+                  ::= { hwRrppTables 6 }
+
+                hwRrppRingGroupMemberEntry OBJECT-TYPE
+                 SYNTAX HwRrppRingGroupMemberEntry
+                   MAX-ACCESS not-accessible
+                   STATUS current
+                  DESCRIPTION
+                        "Detailed information about a specified RRPP ring group."
+                 INDEX { hwRrppRingGroupID, hwRrppRingGroupMemberDomainID, hwRrppRingGroupMemberRingID }
+                 ::= { hwRrppRingGroupMemberTable 1 }
+
+                 HwRrppRingGroupMemberEntry ::=
+                   SEQUENCE {
+                           hwRrppRingGroupMemberDomainID
+                                Integer32,
+                           hwRrppRingGroupMemberRingID
+                                Integer32,
+                           hwRrppRingGroupIsEdgeHelloProcess
+                                EnabledStatus,
+                           hwRrppRingGroupMemberRowStatus
+                                RowStatus
+                          }
+             
+
+                hwRrppRingGroupMemberDomainID OBJECT-TYPE
+                 SYNTAX Integer32 (1..8)
+                 MAX-ACCESS not-accessible
+                 STATUS current
+                  DESCRIPTION
+                 "Index, namely, domain ID of the members of a ring group, which ranges from 1 to 8.
+                  This  value cannot be modified after created"
+               ::= { hwRrppRingGroupMemberEntry 1 }
+ 
+
+               hwRrppRingGroupMemberRingID OBJECT-TYPE
+                SYNTAX Integer32 (1..64)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "Index, namely, ring ID of the members of a ring group, which ranges from 1 to 64.
+                    This value cannot be modified after created."
+               ::= { hwRrppRingGroupMemberEntry 2 }
+
+              
+            hwRrppRingGroupIsEdgeHelloProcess OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                   "Flag carried in the sent edge-Hello Packet.
+                    This value can be modified after created."
+                ::= { hwRrppRingGroupMemberEntry 3 }
+
+
+
+           hwRrppRingGroupMemberRowStatus OBJECT-TYPE
+               SYNTAX RowStatus
+                MAX-ACCESS read-create
+               STATUS current
+              DESCRIPTION
+        "Row status in the ring group configuration table.
+         hwRrppRingGroupMemberDomainID, hwRrppRingGroupMemberRingID, 
+         and hwRrppRingGroupIsEdgeHelloSender must be specified to create a row."
+    ::= { hwRrppRingGroupMemberEntry 4 }
+
+
+
+
+
+                  
+          hwRrppSnoopingTable OBJECT IDENTIFIER ::= { hwRrpp 3 }
+
+        
+        hwRrppSnoopingInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRrppSnoopingInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about RRPP snooping enable interface."
+            ::= { hwRrppSnoopingTable 1 }
+        
+        hwRrppSnoopingInterfaceEntry OBJECT-TYPE
+            SYNTAX HwRrppSnoopingInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP snooping enable interface."
+            INDEX { hwRrppSnoopingInterfaceId }
+            ::= { hwRrppSnoopingInterfaceTable 1 }
+            
+        HwRrppSnoopingInterfaceEntry ::=
+            SEQUENCE { 
+                    hwRrppSnoopingInterfaceId
+                    InterfaceIndex,
+                    hwRrppSnoopingVsiName
+                    OCTET STRING,
+                    hwRrppSnoopingVlanId
+                    VlanId,
+                    hwRrppSnoopingEnableStatus
+                    EnabledStatus,                    
+                    hwRrppSnoopingRowStatus
+                    RowStatus                
+             }
+                          
+        hwRrppSnoopingInterfaceId OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logical index of the interface index."
+            ::= { hwRrppSnoopingInterfaceEntry 1 }
+        
+        hwRrppSnoopingVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of VSI which the interface was binding to."
+            ::= { hwRrppSnoopingInterfaceEntry 2 }
+            
+        hwRrppSnoopingVlanId OBJECT-TYPE
+            SYNTAX VlanId
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VLAN which the intertace added to."
+            ::= { hwRrppSnoopingInterfaceEntry 3 }
+                     
+        hwRrppSnoopingEnableStatus OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicating whether the RRPP snooping is enabled on this switch."
+            ::= { hwRrppSnoopingInterfaceEntry 4 }
+
+         hwRrppSnoopingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation,
+                deletion and modification of rows, which support active
+                status and CreatAndGo, destroy operation."
+            ::= { hwRrppSnoopingInterfaceEntry 5 }
+        
+        hwRrppSnoopingVsiTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRrppSnoopingVsiEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about RRPP snooping relating interface."
+            ::= { hwRrppSnoopingTable 2 }
+        
+        hwRrppSnoopingVsiEntry OBJECT-TYPE
+            SYNTAX HwRrppSnoopingVsiEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified RRPP snooping relating interface."
+            INDEX { hwRrppSnoopingVsiInterfaceId,  hwVsiName}
+            ::= { hwRrppSnoopingVsiTable 1 }
+            
+        HwRrppSnoopingVsiEntry ::=
+            SEQUENCE { 
+                    hwRrppSnoopingVsiInterfaceId
+                    InterfaceIndex,
+                    hwVsiName
+                    OCTET STRING,                    
+                    hwRrppSnoopingVsiRowStatus
+                    RowStatus                
+             }
+                          
+        hwRrppSnoopingVsiInterfaceId OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logical index of the interface index."
+            ::= { hwRrppSnoopingVsiEntry 1 }
+        
+        hwVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The name of VSI."
+            ::= { hwRrppSnoopingVsiEntry 2 }
+                                 
+         hwRrppSnoopingVsiRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation,
+                deletion and modification of rows, which support active
+                status and CreatAndGo, destroy operation."
+            ::= { hwRrppSnoopingVsiEntry 3 }
+
+        
+        hwRrppNotifications OBJECT IDENTIFIER ::= { hwRrpp 4 }
+
+        hwRrppRingRecover NOTIFICATION-TYPE
+            OBJECTS { hwRrppRingState }
+            STATUS current
+            DESCRIPTION 
+                "Trap message is generated by master-node on
+                the ring when the ring recovers from fault."
+            ::= { hwRrppNotifications 1 }
+
+        hwRrppRingFail NOTIFICATION-TYPE
+            OBJECTS { hwRrppRingState }
+            STATUS current
+            DESCRIPTION 
+                "Trap message is generated by master-node on
+                the ring when the ring fails."
+            ::= { hwRrppNotifications 2 }
+
+        hwRrppMultiMaster NOTIFICATION-TYPE
+            OBJECTS { hwRrppRingNodeMode }
+            STATUS current
+            DESCRIPTION 
+                "Trap message is generated by master-node when
+                it detects there are more than one master-node
+                on the ring."
+            ::= { hwRrppNotifications 3 }
+            
+        hwRrppTrackInterfaceDown NOTIFICATION-TYPE
+            OBJECTS { hwRrppTrackRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Trap message is generated by RRPP node when 
+                the track interface tracked BFD down."
+            ::= { hwRrppNotifications 4 }
+            
+        hwRrppTrackInterfaceUp NOTIFICATION-TYPE
+            OBJECTS { hwRrppTrackRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Trap message is generated by RRPP node when 
+                the track interface tracked BFD up."
+            ::= { hwRrppNotifications 5 }
+
+        hwRrppMibGroup OBJECT IDENTIFIER ::= { hwRrpp 5 }
+
+        hwRrppGlobalGroup OBJECT-GROUP
+            OBJECTS { hwRrppEnableStatus, hwRrppLinkupDelayTime }
+            STATUS current
+            DESCRIPTION 
+                "The RRPP global group."
+            ::= { hwRrppMibGroup 1 }
+
+        hwRrppDomainGroup OBJECT-GROUP
+            OBJECTS { hwRrppDomainControlVlanID,hwRrppDomainHelloTime, hwRrppDomainFailTime, hwRrppDomainRowStatus,hwRrppDomainResetStatistics, hwRrppMulSubRingProtection, hwRrppDomainProtectedVlan }
+            STATUS current
+            DESCRIPTION 
+                "The RRPP domain group."
+            ::= { hwRrppMibGroup 2 }
+
+        hwRrppRingGroup OBJECT-GROUP
+            OBJECTS { hwRrppRingEnableStatus, hwRrppRingActive, hwRrppRingState, hwRrppRingNodeMode, hwRrppRingPrimaryPort, 
+                hwRrppRingSecondaryPort, hwRrppRingLevel, hwRrppRingRowStatus,hwRrppRingResetStatistics }
+            STATUS current
+            DESCRIPTION 
+                "The RRPP ring group."
+            ::= { hwRrppMibGroup 3 }
+
+        hwRrppPortGroup OBJECT-GROUP
+            OBJECTS { hwRrppPortType, hwRrppPortRole, hwRrppPortState, hwRrppPortRXError, hwRrppPortRXHello, 
+                hwRrppPortRXLinkUp, hwRrppPortRXLinkDown, hwRrppPortRXCommonFlush, hwRrppPortRXCompleteFlush, hwRrppPortRXEdgeHello, 
+                hwRrppPortRXMajorFault, hwRrppPortTXError, hwRrppPortTXHello, hwRrppPortTXLinkUp, hwRrppPortTXLinkDown, 
+                hwRrppPortTXCommonFlush, hwRrppPortTXCompleteFlush, hwRrppPortTXEdgeHello, hwRrppPortTXMajorFault }
+            STATUS current
+            DESCRIPTION 
+                "The RRPP port group."
+            ::= { hwRrppMibGroup 4 }
+            
+        hwRrppTrackInterfaceGroup OBJECT-GROUP
+            OBJECTS { hwRrppTrackRowStatus }
+            STATUS current
+            DESCRIPTION
+                 "The RRPP Track Interface group."
+            ::= { hwRrppMibGroup 5 }   
+
+            
+           hwRrppRingGroupGroup OBJECT-GROUP
+            OBJECTS {hwRrppRingGroupRowStatus }
+            STATUS current
+            DESCRIPTION
+                 "The RRPP RingGroup group."
+            ::= { hwRrppMibGroup 6 }   
+
+           hwRrppRingGroupMemberGroup OBJECT-GROUP
+            OBJECTS {hwRrppRingGroupIsEdgeHelloProcess,hwRrppRingGroupMemberRowStatus }
+            STATUS current
+            DESCRIPTION
+                 "The RRPP RingGroupMember group."
+            ::= { hwRrppMibGroup 7 }   
+              
+        hwRrppSnoopingInterfaceGroup OBJECT-GROUP
+            OBJECTS { hwRrppSnoopingVsiName, hwRrppSnoopingVlanId, hwRrppSnoopingEnableStatus, hwRrppSnoopingRowStatus }
+            STATUS current
+            DESCRIPTION
+                 "The RRPP Snooping enable Interface group."
+            ::= { hwRrppMibGroup 8 }     
+        
+        hwRrppSnoopingVsiGroup OBJECT-GROUP
+            OBJECTS { hwRrppSnoopingVsiRowStatus }
+            STATUS current
+            DESCRIPTION
+                 "The RRPP Snooping associate vsi group."
+            ::= { hwRrppMibGroup 9 } 
+        
+        hwRrppNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwRrppRingRecover, hwRrppRingFail, hwRrppMultiMaster, hwRrppTrackInterfaceDown, hwRrppTrackInterfaceUp}
+            STATUS current
+            DESCRIPTION 
+                "The notification group."
+            ::= { hwRrppMibGroup 10 }
+
+        
+    
+    END

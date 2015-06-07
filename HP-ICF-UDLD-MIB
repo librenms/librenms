@@ -1,0 +1,326 @@
+HP-ICF-UDLD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, 
+    Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    MacAddress, TimeInterval
+        FROM SNMPv2-TC
+    ifIndex
+            FROM IF-MIB
+    hpSwitch
+        FROM HP-ICF-OID;
+
+hpicfUdldMIB MODULE-IDENTITY
+    LAST-UPDATED "200604100000Z"   --April 10, 2006
+    ORGANIZATION "Hewlett-Packard Company   
+                  ProCurve Networking Business"
+    CONTACT-INFO "Hewlett-Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION  "This MIB module describes objects to configure 
+		              the Unidirectional Link Detection (UDLD) feature."
+    REVISION     "200604100000Z"
+    DESCRIPTION  "Initial revision."
+
+    ::= { hpSwitch 33 }
+
+-- **********************************************************************
+-- The UDLD MIB Groups
+-- **********************************************************************
+hpicfUdldNotifications  OBJECT IDENTIFIER ::= { hpicfUdldMIB 0 }
+hpicfUdldObjects        OBJECT IDENTIFIER ::= { hpicfUdldMIB 1 }
+hpicfUdldConformance    OBJECT IDENTIFIER ::= { hpicfUdldMIB 2 }
+ 
+-- **********************************************************************
+-- The UDLD MIB Objects
+-- **********************************************************************
+hpicfUdldConfig           OBJECT IDENTIFIER ::= { hpicfUdldObjects 1 } 
+hpicfUdldStats            OBJECT IDENTIFIER ::= { hpicfUdldObjects 2 }
+                                                                     
+                                                                    
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+hpicfUdldConfigTimeInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The interval in seconds at which the UDLD enabled ports exchange 
+                 proprietary pulse packet. Here 10 is 1 sec, 11 is 1.1 sec,
+                 and so on. The default value for hpicfUdldConfigTimeInterval 
+                 object is 5 seconds."
+
+    DEFVAL      { 50 } -- five second
+
+    ::= { hpicfUdldConfig 1 }
+
+hpicfUdldConfigMaxRetries OBJECT-TYPE
+    SYNTAX      Unsigned32  (3..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Maximum number of retries to wait for a response.  
+                The default value for hpicfUdldConfigMaxRetries object is
+                4."
+                 
+    DEFVAL      { 4 }
+    ::= { hpicfUdldConfig 2 }
+
+-- Start of hpicfUdldPortConfigTable ************************************
+
+hpicfUdldPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUdldPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The table that controls UDLD status on individual ports."
+    ::= { hpicfUdldConfig 3 }
+
+hpicfUdldPortConfigEntry OBJECT-TYPE
+    SYNTAX      HpicfUdldPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the hpicfUdldPortConfigTable."
+    INDEX       { ifIndex }
+    ::= { hpicfUdldPortConfigTable 1 }
+
+HpicfUdldPortConfigEntry ::= SEQUENCE {
+    hpicfUdldPortAdminStatus    INTEGER,
+    hpicfUdldPortVlanId         Integer32
+  }
+  
+hpicfUdldPortAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER { 
+       enable(1), 
+       disable(2)
+    }
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION "The hpicfUdldPortAdminStatus can be enabled/disabled
+                The value enable(1) means that UDLD is enabled.
+                the value disable(2) means that UDLD is disabled."
+    ::= { hpicfUdldPortConfigEntry 1 }
+
+hpicfUdldPortVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The vlan id associated with tagged UDLD control
+                packets. The value of 0 indicates that UDLD control
+                packets are untagged."
+    ::= { hpicfUdldPortConfigEntry 2 }   
+
+-- End of hpicfUdldPortConfigTable **************************************     
+
+
+--
+--  *********************************************************** 
+--
+--                   UDLD   S T A T S 
+--
+--  *********************************************************** 
+--
+      
+hpicfUdldPortStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUdldPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+            "A table containing UDLD statistics for
+            individual ports."
+          
+    ::= { hpicfUdldStats 1 }  
+ 
+hpicfUdldPortStatsEntry   OBJECT-TYPE
+     SYNTAX      HpicfUdldPortStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "UDLD statistics for a particular physical port."  
+     INDEX  { ifIndex }
+     ::= { hpicfUdldPortStatsTable 1 } 
+   
+HpicfUdldPortStatsEntry  ::= SEQUENCE {      
+      hpicfUdldStatsPortCurrentState     INTEGER,
+      hpicfUdldStatsPortNeighborMAC      MacAddress,
+      hpicfUdldStatsPortNeighborPort     Integer32,             
+      hpicfUdldStatsPortTotalTx          Counter32,            
+      hpicfUdldStatsPortTotalRx          Counter32,           
+      hpicfUdldStatsPortNumStateChange   Counter32,          
+      hpicfUdldStatsPortStatus           Integer32       
+}
+
+hpicfUdldStatsPortCurrentState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                unknown(0),  
+                offline(1),
+                failure(2),
+                up(3)
+                } 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The desired status of UDLD on a port.
+
+             If the associated hpicfUdldStatsPortCurrentState object has a
+             value of 'offline(1)', then the port or udld is administratively
+             disabled.
+ 
+             If the associated hpicfUdldStatsPortCurrentState object has a
+             value of 'failure(2)', then the port and udld are administratively
+             enabled, but udld packets are not being received successfully.
+             Link may or may not be present.
+ 
+             If the associated hpicfUdldStatsPortCurrentState object has a
+             value of 'up(3)', then udld is enabled and udld packets
+             are being received successfully in both directions."
+             
+ 
+    ::= { hpicfUdldPortStatsEntry 1 } 
+
+hpicfUdldStatsPortNeighborMAC   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The MAC address of the adjacent switch."
+    ::= { hpicfUdldPortStatsEntry 2 } 
+
+hpicfUdldStatsPortNeighborPort   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The port number of the adjacent switch."
+    ::= { hpicfUdldPortStatsEntry 3 } 
+
+hpicfUdldStatsPortTotalTx   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of UDLD control packets sent from this port."
+    ::= { hpicfUdldPortStatsEntry 4 }     
+    
+hpicfUdldStatsPortTotalRx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of UDLD control packets received on this port."
+    ::= { hpicfUdldPortStatsEntry 5 } 
+
+hpicfUdldStatsPortNumStateChange   OBJECT-TYPE
+    SYNTAX      Counter32                  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The number of state transitions."
+    ::= { hpicfUdldPortStatsEntry 6 } 
+
+hpicfUdldStatsPortStatus   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The  value of this object indicates whether the port is
+            blocked by UDLD or not."
+    ::= { hpicfUdldPortStatsEntry 7 }     
+    
+--
+-- ***********************************************************
+-- 
+--        UDLD M I B   N O T I F I C A T I O N S
+-- 
+-- *********************************************************** 
+--
+ 
+
+hpicfUdldNotificationPrefix OBJECT IDENTIFIER ::= { hpicfUdldNotifications 0 }
+    
+hpicfUdldLinkfault NOTIFICATION-TYPE
+    OBJECTS   { ifIndex }
+    STATUS      current
+    DESCRIPTION "This notification is generated when the link failure
+                 occurs."
+    ::= { hpicfUdldNotificationPrefix 1 }
+
+hpicfUdldLinkUp NOTIFICATION-TYPE
+    OBJECTS   { ifIndex }
+    STATUS      current
+    DESCRIPTION "This notification is generated when UDLD link goes
+                 from down to up."
+    ::= { hpicfUdldNotificationPrefix 2 }
+
+--
+-- ***********************************************************
+-- 
+--           UDLD  M I B   C O N F O R M A N C E 
+-- 
+-- *********************************************************** 
+--
+ 
+hpicfUdldCompliances    OBJECT IDENTIFIER ::= { hpicfUdldConformance 1 }  
+hpicfUdldGroups         OBJECT IDENTIFIER ::= { hpicfUdldConformance 2 } 
+
+-- compliance statements
+
+hpicfUdldCompliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            the UDLD MIB."
+    MODULE  -- this module
+      MANDATORY-GROUPS { 
+                           hpicfUdldPortConfigGroup, 
+                           hpicfUdldPortStatsGroup, 
+                           hpicfUdldNotificationGroup
+                       }
+      GROUP hpicfUdldNotificationGroup
+      DESCRIPTION "The notifications used for signalling link failure."
+    ::= { hpicfUdldCompliances 1 }
+
+-- MIB groupings
+
+hpicfUdldPortConfigGroup    OBJECT-GROUP
+    OBJECTS { 
+        hpicfUdldConfigTimeInterval,
+        hpicfUdldConfigMaxRetries,
+        hpicfUdldPortAdminStatus,
+        hpicfUdldPortVlanId
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            UDLD implementation behavior.
+
+            This group is mandatory for ports which implement the UDLD."
+    ::= { hpicfUdldGroups 1 }
+
+hpicfUdldPortStatsGroup    OBJECT-GROUP
+    OBJECTS {
+        hpicfUdldStatsPortCurrentState,
+        hpicfUdldStatsPortNeighborMAC,
+        hpicfUdldStatsPortNeighborPort,              
+        hpicfUdldStatsPortTotalTx,              
+        hpicfUdldStatsPortTotalRx,           
+        hpicfUdldStatsPortNumStateChange,
+        hpicfUdldStatsPortStatus
+     }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent UDLD
+            statistics.
+
+            This group is mandatory for ports which implement the UDLD."
+    ::= { hpicfUdldGroups 2 }
+
+ hpicfUdldNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hpicfUdldLinkfault,hpicfUdldLinkUp }
+    STATUS      current
+    DESCRIPTION "Notification used for signaling change in Link state."
+    ::= { hpicfUdldGroups 3 }
+
+END

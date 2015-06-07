@@ -1,0 +1,118 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-IPTN-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+    HUAWEI-BRAS-IPTN-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwBRASMib            
+                FROM HUAWEI-MIB
+            IpAddress
+                FROM SNMPv2-SMI    
+            TruthValue            
+                FROM SNMPv2-TC    
+            InterfaceIndex 
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI;
+    
+        hwBRASIPTN MODULE-IDENTITY 
+            LAST-UPDATED "200403031508Z"
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd.
+                "
+              CONTACT-INFO 
+                    "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                     
+                    Http://www.huawei.com                                       
+                    E-mail:support@huawei.com "
+            
+                DESCRIPTION 
+                    "The MIB contains objects of module IPTN."
+        ::= { hwBRASMib 8 }
+    
+        hwIPTNMibObjects OBJECT IDENTIFIER ::= { hwBRASIPTN 1 }
+        
+        hwIptnInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF hwIptnEnableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IPTN enable table.
+                "
+            ::= { hwIPTNMibObjects 1 }
+        
+        hwIptnEnableEntry OBJECT-TYPE
+            SYNTAX hwIptnEnableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwIptnIfIndex }
+            ::= { hwIptnInterfaceTable 1 }
+        
+        hwIptnEnableEntry ::=
+            SEQUENCE { 
+                hwIptnIfIndex
+                    InterfaceIndex,
+                hwIptnEnableFlag
+                    TruthValue
+                }
+    
+            hwIptnIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IPTN IfIndex."
+            ::= { hwIptnEnableEntry 1 }
+    
+        hwIptnEnableFlag OBJECT-TYPE
+                        SYNTAX     TruthValue
+                        MAX-ACCESS read-write
+                        STATUS     current
+                        DESCRIPTION
+                                 "Whether IPTN is enabled or not."
+                        DEFVAL    { false } ::= { hwIptnEnableEntry 2 }
+                        
+        --  ============== conformance information ==============
+        hwIptnConformance OBJECT IDENTIFIER ::= { hwBRASIPTN 2 }
+        
+        
+        hwIptnCompliances OBJECT IDENTIFIER ::= { hwIptnConformance 1 }
+        hwIptnCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwIptnInterfaceGroup }  
+                                               
+              ::= { hwIptnCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwIptnInterfaceGroups OBJECT IDENTIFIER ::= { hwIptnConformance 2 } 
+        
+        hwIptnInterfaceGroup OBJECT-GROUP
+            OBJECTS { hwIptnIfIndex, hwIptnEnableFlag }       
+            STATUS current
+            DESCRIPTION 
+                "The IPTN interface group."
+            ::= { hwIptnInterfaceGroups 1 }
+             
+                    
+        --  ============== conformance information define end ==============
+    END
+

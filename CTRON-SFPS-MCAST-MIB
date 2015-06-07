@@ -1,0 +1,794 @@
+CTRON-SFPS-MCAST-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-mcast-mib.txt
+--  Revision: 0.0.05
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+      IpAddress, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsMcastCnx, sfpsMcastCnxAPI, sfpsMcastIPRouter,
+        sfpsMcastIPReceiverInfoBase, sfpsMcastIPRIBApi, sfpsMcastConfigApi,
+        sfpsMcastIPSenderInfoBase, sfpsMcastIPSIBApi
+
+                        FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+--HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+--  SFPS Multicast Connection Table
+
+sfpsMcastCnxDestination   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The multicast destination MAC address."
+        ::= { sfpsMcastCnx 1 }
+
+sfpsMcastCnxSource   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source MAC address."
+        ::= { sfpsMcastCnx 2 }
+
+sfpsMcastCnxSenderSw   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the switch that the sender is on."
+        ::= { sfpsMcastCnx 3 }
+
+sfpsMcastCnxInPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Local upstream port for flow."
+        ::= { sfpsMcastCnx 4 }
+
+sfpsMcastCnxOutPorts   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Local downstream port(s) for flow."
+        ::= { sfpsMcastCnx 5 }
+
+sfpsMcastCnxGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Net layer ID of multicast group"
+        ::= { sfpsMcastCnx 6 }
+
+sfpsMcastCnxTTL   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Scope vlaue for this flow"
+        ::= { sfpsMcastCnx 7 }
+
+sfpsMcastCnxAge   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Age of local connection"
+        ::= { sfpsMcastCnx 8 }
+
+sfpsMcastCnxStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                filter(1),
+                inActive(2),
+                remote(4),
+                netFilter(5),
+                dying(8),
+                static(16),
+                staticFilter(17),
+                staticInactive(18)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Local connection status (bitwise)"
+        ::= { sfpsMcastCnx 9 }
+
+sfpsMcastCnxNextSw   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the next switch."
+        ::= { sfpsMcastCnx 10 }
+
+
+--  Multicast Cnx API
+
+sfpsMcastCnxAPIDestination   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Multicast destination MAC"
+        ::= { sfpsMcastCnxAPI 1 }
+
+sfpsMcastCnxAPISource   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Multicast sender MAC"
+        ::= { sfpsMcastCnxAPI 2 }
+
+sfpsMcastCnxAPISenderSw   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Mac of switch where sender is"
+        ::= { sfpsMcastCnxAPI 3 }
+
+sfpsMcastCnxAPIInPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Local upstream port for flow"
+        ::= { sfpsMcastCnxAPI 4 }
+
+sfpsMcastCnxAPIOutPort   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Local downstream port(s) for flow"
+        ::= { sfpsMcastCnxAPI 5 }
+
+sfpsMcastCnxAPIGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Net layer ID of multicast group"
+        ::= { sfpsMcastCnxAPI 6 }
+
+sfpsMcastCnxAPITTL   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Scope value for this flow"
+        ::= { sfpsMcastCnxAPI 7 }
+
+sfpsMcastCnxAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                addFilter(2),
+                addPort(3),
+                delPort(4),
+                addCnx(5),
+                delCnx(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take"
+        ::= { sfpsMcastCnxAPI 8 }
+
+sfpsMcastCnxAPIFilters   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of local multicast filters"
+        ::= { sfpsMcastCnxAPI 9 }
+
+sfpsMcastCnxAPINonFilters   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of local multicast connections"
+        ::= { sfpsMcastCnxAPI 10 }
+
+-- SFPS Multicast IP Router Table
+
+sfpsMcastIPRouterTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsMcastIPRouterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                ""
+       ::= { sfpsMcastIPRouter 1 }
+
+sfpsMcastIPRouterEntry    OBJECT-TYPE
+        SYNTAX  SfpsMcastIPRouterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               ""
+        INDEX   { sfpsMcastIPRouterIfNum  }
+       ::= { sfpsMcastIPRouterTable 1 }
+
+SfpsMcastIPRouterEntry
+    ::=         SEQUENCE {
+                sfpsMcastIPRouterIfNum          INTEGER,
+                sfpsMcastIPRouterVlanId         INTEGER,
+                sfpsMcastIPRouterRouterIP       IpAddress,
+                sfpsMcastIPRouterTTL            INTEGER
+        }
+
+sfpsMcastIPRouterIfNum   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port where multicast router is attached"
+        ::= { sfpsMcastIPRouterEntry 1 }
+
+sfpsMcastIPRouterVlanId   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPRouterEntry 2 }
+
+sfpsMcastIPRouterRouterIP   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of attached multicast router"
+        ::= { sfpsMcastIPRouterEntry 3 }
+
+sfpsMcastIPRouterTTL   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Scope vlaue for this router"
+        ::= { sfpsMcastIPRouterEntry 4 }
+
+-- SFPS Multicast IP Router API
+
+
+sfpsMcastIPRouterAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                portMap(2),
+                portUnmap(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take"
+        ::= { sfpsMcastIPRouter 2 }
+
+sfpsMcastIPRouterAPIIFNum   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Port where multicast router is attached"
+        ::= { sfpsMcastIPRouter 3 }
+
+sfpsMcastIPRouterAPIRouterIP   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of attached multicast router"
+        ::= { sfpsMcastIPRouter 4 }
+
+sfpsMcastIPRouterAPITTLScope   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                subnet(1),
+                vacinity(4),
+                site(16),
+                region(64),
+                world(128),
+                worldLimited(192),
+                unrestricted(255)
+        }
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Scope value for this router"
+        ::= { sfpsMcastIPRouter 5 }
+
+sfpsMcastIPRouterAPIVlanId   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPRouter 6 }
+
+
+--  SFPS Multicast IP Receiver Information Base 
+
+sfpsMcastIPRIBTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsMcastIPRIBEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                ""
+       ::= { sfpsMcastIPReceiverInfoBase 1 }
+
+sfpsMcastIPRIBEntry    OBJECT-TYPE
+        SYNTAX  SfpsMcastIPRIBEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               ""
+        INDEX   { sfpsMcastIPRIBGroup }
+       ::= { sfpsMcastIPRIBTable 1 }
+
+SfpsMcastIPRIBEntry
+    ::= SEQUENCE {
+                sfpsMcastIPRIBGroup        IpAddress,
+                sfpsMcastIPRIBOrigin       INTEGER,
+                sfpsMcastIPRIBInclusion    INTEGER,
+                sfpsMcastIPRIBRcvPorts     OCTET STRING,
+                sfpsMcastIPRIBAge          INTEGER
+        }
+
+sfpsMcastIPRIBGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPRIBEntry 1 }
+
+sfpsMcastIPRIBOrigin   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                local(2),
+                router(3),
+                igmp(4),
+                netMgt(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Origin"
+        ::= { sfpsMcastIPRIBEntry 2 }
+
+sfpsMcastIPRIBInclusion   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                include(1),
+                exclude(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPRIBEntry 3 }
+
+sfpsMcastIPRIBRcvPorts   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Mask Object string"
+        ::= { sfpsMcastIPRIBEntry 4 }
+
+sfpsMcastIPRIBAge   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "CF time ticks"
+        ::= { sfpsMcastIPRIBEntry 5 }
+
+--  SFPS Multicast IP Receiver Information Base API
+
+sfpsMcastIPRIBApiGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "CF IP address IP multicast group address"
+        ::= { sfpsMcastIPRIBApi 1 }
+
+sfpsMcastIPRIBApiPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number, -1 means all ports"
+        ::= { sfpsMcastIPRIBApi 2 }
+
+sfpsMcastIPRIBApiVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                includePort(1),
+                undoInclude(2),
+                excludePort(3),
+                undoExclude(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take"
+        ::= { sfpsMcastIPRIBApi 3 }
+
+--  SFPS Multicast Configuration API
+
+sfpsMcastConfigApiSenderTableSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the number of entries that are allocated in the 
+                 multicast connection table at startup.  Changing the
+                 value will not take effect until blade is reset.
+                 Values can be set between 0 and 2048."
+        ::= { sfpsMcastConfigApi 1 }
+
+sfpsMcastConfigApiMaxNonFilters   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This number is currently not used.  Its future purpose
+                 may be to control the number of multi-outport connections
+                 in use.  Values can be set between 0 and 2048."
+        ::= { sfpsMcastConfigApi 2 }
+
+sfpsMcastConfigApiRDRetryBuffs   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This number determines the number of packet objects that 
+                 will be allocated by the reliable control packet transport
+                 agent.  The packet object does not allocate space for the
+                 packet, it just manages the packet delivery machine.
+                 Each increment of this oid allocates space for 128
+                 packet management objects which are 82 bytes in size.
+                 Therefore each increment allocates about 10k of memory. 
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 3 }
+
+sfpsMcastConfigApiRDPktBuffs   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This number determines the number of packet buffers that 
+                 will be allocated by the reliable control packet transport
+                 agent.  Each increment of this oid allocates space for 128
+                 packets which are 512 bytes in size.
+                 Therefore each increment allocates about 65k of memory. 
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 4 }
+
+sfpsMcastConfigApiPendingMaps   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the number of delayed connection mappings that
+                 will be maintained while waiting for topology changes
+                 to be propagated or while waiting for interswitch
+                 resolve.  The effect of this setting is most evident
+                 when a link or switch is lost thru which may multicast
+                 connections were passing.  An attempt to reconnect is made
+                 after the delay specified in MC_CONFIG_API_REMAP_DELAY.  
+                 Only the number of MC_CONFIG_API_PENDING_MAPS will be 
+                 deferred. If you lose 100 connections and this number is
+                 set to 20,  at best you'll reconnect 20 streams after the
+                 delay.  The rest of the connections will be reestablished 
+                 after the receivers respond to sender announcements which 
+                 happen every MC_CONFIG_API_REFRESH_INTERVAL interval.
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 5 }
+
+sfpsMcastConfigApiSndrAgeOut   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the interval in seconds that the age timer
+                 runs.  It is used to determine if a sender is still 
+                 sending.  After one age out interval, the sender is
+                 placed in a dying state and the local switch starts to
+                 listen for traffic from that sender on a specific
+                 destination.  If any traffic is received, the sender
+                 if placed back in a non-dying state.  If no traffic
+                 is seen before the second age interval, the sender is
+                 considered dead and the corresponding connection tree
+                 for that da/sa connection is removed throughout the
+                 domain. Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 6 }
+
+sfpsMcastConfigApiRefreshInterval   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the interval at which sender announcements will be
+                transmitted by the switch that the sender is locally 
+                attached.  All sender refreshes will occur within 12 seconds.
+                If this number is set to 60, 1/2 of the senders will
+                be announced every 60 seconds.  If this number is 30,
+                1/4 of the senders will be announced every 30 seconds.
+                If the number of senders grows, the refresh interval
+                may have to be adjusted shorter.  The fine tuning is
+                to determine which is better, fewer-bigger announcements,
+                or more-smaller announcements.
+                Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 7 }
+
+sfpsMcastConfigApiSndersPerAncmt   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the number of sender announcements that will be
+                 made before the thread is released.
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 8 }
+
+sfpsMcastConfigApiDebugLog   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This value enables or disables extensive information
+                 logging in IGMP and MCAST generics.  It is used in
+                 conjunction with the EventLogClient log flags.  This
+                 value should be 0 unless extensive diagnostic information
+                 is required.  This value is not persistent.
+                 This setting takes effect immediately."
+        ::= { sfpsMcastConfigApi 9 }
+
+sfpsMcastConfigApiStaticTblSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the number of static entries that can be made to
+                 the sender database (multicast connection table). 
+                 Typically there would be no entries in this table.
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 10 }
+
+sfpsMcastConfigApiMcribSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the number of static entries that can be made to
+                 the receiver database.  Typically there would be 
+                 very few entries in this table.
+                 Value will not take effect until blade is reset."
+        ::= { sfpsMcastConfigApi 11 }
+
+sfpsMcastConfigApiMcastMode   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                doNoVlanChecking(1),
+                doSomeVlanChecking(2),
+                checkAll(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Multicast operates in three vlan checking modes.
+                Mode 1 - Do no vlan checking.  The sender and 
+                        receivers do not have to be on the same vlan.
+                        Multicast connections in this mode disregard
+                        whether or not the sender or receiver is in a
+                        secure or open vlan.
+                Mode 2 - Do some vlan checking.  This mode allows
+                        connections to be established between any
+                        sender/receivers on any vlan except for groups
+                        using the 224.0.0.x range of ip multicast
+                        addresses.  These addresses are used for the
+                        most part by routers which should only be
+                        communicating to each other when they are
+                        in the same vlan.  Mode 2 restricts routers
+                        to have the same port based vlan membership.
+                Mode 3 - Check all.  The sender and receivers have
+                        to be members of the same port based vlan.
+                        This setting takes effect immediately.  No existing
+                        connections will be torn down. "
+        ::= { sfpsMcastConfigApi 12 }
+
+sfpsMcastConfigApiRemapDelay   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "When attempting to obtain a path from receiver to sender,
+                a wait is sometimes incurred when pending on a switch
+                resolve response.  Additionally, when topology events
+                occur that cause a redirection of the connection tree,
+                time must be allowed for the topology agents in the 
+                domain to be notified before a new path can be
+                requested.  This is the number of seconds that will
+                elaspe before remapping will be attempted.
+                This setting takes effect immediately.  "
+        ::= { sfpsMcastConfigApi 13 }
+
+sfpsMcastConfigApiQHighLimit   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The default for the High Query Rate is 100"
+        ::= { sfpsMcastConfigApi 14 }
+
+sfpsMcastConfigApiQLowLimit   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The default for the low query rate is 20 "
+        ::= { sfpsMcastConfigApi 15 }
+
+
+sfpsMcastConfigApiDynamicQuery   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The default for the dynamic query is 1 (enabled)"
+        ::= { sfpsMcastConfigApi 16 }
+
+
+
+-- SFPS Multicast IP Sender Information Base Table
+
+sfpsMcastIPSIBTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsMcastIPSIBEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                ""
+       ::= { sfpsMcastIPSenderInfoBase 1 }
+
+sfpsMcastIPSIBEntry    OBJECT-TYPE
+        SYNTAX  SfpsMcastIPSIBEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               ""
+        INDEX   { sfpsMcastIPSIBGroup, sfpsMcastIPSIBSender  }
+       ::= { sfpsMcastIPSIBTable 1 }
+
+SfpsMcastIPSIBEntry
+    ::= SEQUENCE {
+                sfpsMcastIPSIBGroup        IpAddress,
+                sfpsMcastIPSIBSender       OCTET STRING,
+                sfpsMcastIPSIBInclusion    INTEGER,
+                sfpsMcastIPSIBAge          INTEGER
+        }
+
+sfpsMcastIPSIBGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBEntry 1 }
+
+sfpsMcastIPSIBSender   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBEntry 2 }
+
+sfpsMcastIPSIBInclusion   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        include(1),
+                        exclude(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBEntry 3 }
+
+sfpsMcastIPSIBAge   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBEntry 4 }
+
+
+-- Ip Multicast Sender Information Base API
+
+sfpsMcastIPSibApiGroup   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBApi 1 }
+
+sfpsMcastIPSibApiSender   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBApi 2 }
+
+sfpsMcastIPSibApiVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        includeSender(1),
+                        undoInclude(2),
+                        excludeSender(3),
+                        undoExclude(4),
+                        reset(5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastIPSIBApi 3 }
+
+END 

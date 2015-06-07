@@ -1,0 +1,263 @@
+ALCATEL-IND1-RDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+	DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1RDP
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1RouterDiscoveryProtocolMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of Router Discovery Protocol global configuration parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, o
+r
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2003 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1RDP 1 }
+
+alcatelIND1RDPMIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1RouterDiscoveryProtocolMIB 1 }
+alaRDPConfig    OBJECT IDENTIFIER ::= { alcatelIND1RDPMIBObjects 1 }
+
+
+alaRDPStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+         	enabled     (1),
+         	disabled    (2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the status of Routing Discovery Protocol"
+    DEFVAL     { disabled }
+    ::= {alaRDPConfig 1 }
+
+
+alaRDPIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaRDPIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of addressing information relevant to this
+            entity's IP addresses."
+    ::= { alaRDPConfig 20 }
+
+alaRDPIfEntry OBJECT-TYPE
+    SYNTAX      AlaRDPIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The addressing information for one of this entity's IP
+            addresses."
+    INDEX      { alaRDPIfAddr }
+    ::= { alaRDPIfTable 1 }
+
+AlaRDPIfEntry ::= SEQUENCE {
+        alaRDPIfAddr          IpAddress,
+        alaRDPIfStatus       INTEGER,
+        alaRDPIfAdvtAddress       IpAddress,
+        alaRDPIfMaxAdvtInterval     Unsigned32,
+        alaRDPIfMinAdvtInterval     Unsigned32,
+        alaRDPIfAdvLifeTime     Unsigned32,
+        alaRDPIfPrefLevel     Integer32,
+        alaRDPIfRowStatus	RowStatus,
+		alaRDPIfName       DisplayString,
+		alaRDPIPIfStatus			INTEGER, 
+		alaRDPVrrpStatus			INTEGER
+    }
+
+
+alaRDPIfAddr    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Interface IP Address of this Router."
+    ::= {alaRDPIfEntry 1 }
+    
+alaRDPIfStatus       OBJECT-TYPE
+    SYNTAX     INTEGER {
+         	enabled     (1),
+         	disabled    (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+		"Indicates the status of the RDP interface"
+    DEFVAL     { disabled }
+    ::= {alaRDPIfEntry 2 }
+ 
+ alaRDPIfAdvtAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Default advertisement Address is 224.0.0.1"
+    ::= {alaRDPIfEntry 3 }   
+
+ alaRDPIfMaxAdvtInterval       OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Maximum advertisement interval is in seconds"
+    DEFVAL     { 600 }
+    ::= {alaRDPIfEntry 4 }
+   
+alaRDPIfMinAdvtInterval       OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Minimum advertisement interval in seconds: 0.75 * alaRDPIfMaxAdvtInterval"
+    ::= {alaRDPIfEntry 5 }
+
+alaRDPIfAdvLifeTime       OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Advertisement Lifetime in seconds: 3 * alaRDPIfMaxAdvtInterval"
+    ::= {alaRDPIfEntry 6 }
+        
+alaRDPIfPrefLevel       OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Preference level for each IP address advertised on the interface: 0"
+    DEFVAL     { 0 }
+    ::= {alaRDPIfEntry  7}    
+
+alaRDPIfRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+          "The status of this table entry."
+    DEFVAL        { notInService }
+    ::= { alaRDPIfEntry 8}            
+	
+alaRDPIfName OBJECT-TYPE
+	SYNTAX  		DisplayString	
+	MAX-ACCESS   	read-only
+	STATUS   		current
+	DESCRIPTION
+		"The user defined name used to identify the IP interface"
+	::= { alaRDPIfEntry 9 }
+
+alaRDPIPIfStatus       OBJECT-TYPE
+    SYNTAX     INTEGER {
+         	enabled     (1),
+         	disabled    (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+		"Indicates the status of the IP interface"
+    DEFVAL     { disabled }
+    ::= {alaRDPIfEntry 10 }
+ 
+alaRDPVrrpStatus       OBJECT-TYPE
+    SYNTAX     INTEGER {
+         	enabled     (1),
+         	disabled    (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+		"Indicates the status of the VRRP interface"
+    DEFVAL     { disabled }
+    ::= {alaRDPIfEntry 11 }
+	
+
+-- conformance information
+
+alcatelIND1RDPMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1RouterDiscoveryProtocolMIB 2 }
+alcatelIND1RDPMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1RDPMIBConformance 1 }
+alcatelIND1RDPMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1RDPMIBConformance 2 }
+
+-- compliance statements
+
+alcatelIND1RDPMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for router discovery protocol task
+             and implementing the ALCATEL-IND1-RDP MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaRDPConfigMIBGroup }
+
+    ::= { alcatelIND1RDPMIBCompliances 1 }
+
+-- units of conformance
+
+alaRDPConfigMIBGroup OBJECT-GROUP
+    OBJECTS {        
+    	alaRDPStatus,
+    	alaRDPIfAddr,
+    	alaRDPIfStatus,
+        alaRDPIfAdvtAddress,
+        alaRDPIfMaxAdvtInterval,
+        alaRDPIfMinAdvtInterval,
+        alaRDPIfAdvLifeTime,
+        alaRDPIfPrefLevel,
+        alaRDPIfRowStatus,
+		alaRDPIfName,  
+		alaRDPIPIfStatus, 
+		alaRDPVrrpStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of RDP."
+    ::= { alcatelIND1RDPMIBGroups 1 }
+
+END

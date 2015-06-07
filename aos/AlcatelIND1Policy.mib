@@ -1,0 +1,991 @@
+ALCATEL-IND1-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	OBJECT-IDENTITY,
+	Counter32,
+	Integer32,
+	TimeTicks,
+	IpAddress			     FROM SNMPv2-SMI
+
+	RowStatus,
+	TEXTUAL-CONVENTION,
+	DisplayString            FROM SNMPv2-TC
+
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP       FROM SNMPv2-CONF
+
+	softentIND1Policy,
+	policyManagerTraps       FROM ALCATEL-IND1-BASE;
+
+--
+-- Module Identity
+--
+
+alcatelIND1PolicyMIB MODULE-IDENTITY
+        LAST-UPDATED    "200704030000Z"
+        ORGANIZATION    "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+         
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+        
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+        
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Configuration and monitoring of policy manager parameters
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+        ::= { softentIND1Policy 1 }
+
+
+--
+-- Object roots used in this MIB
+--
+        alcatelIND1PolicyMIBObjects OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"Branch for policy manager application objects"
+		::= { alcatelIND1PolicyMIB 1 }
+
+		alcatelIND1PolicyMIBConformance OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"Branch for policy manager application conformance information"
+		::= { alcatelIND1PolicyMIB 2 }
+
+		alcatelIND1PolicyMIBGroups OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"Branch for policy manager application units of conformance"
+		::= { alcatelIND1PolicyMIBConformance 1 }
+
+		alcatelIND1PolicyMIBCompliances OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"Branch for policy manager application compliance statements"
+		::= { alcatelIND1PolicyMIBConformance 2 }
+
+--
+-- Textual Conventions
+--
+
+-- The policyEventCodes represents all possible policy events 
+
+        PolicyEventCodes ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "The policyEventCodes TC describes all possible policy events
+             and should be used for NMS correlation."
+        SYNTAX INTEGER {
+                     pyEventInitLog(1),
+                     pyEventLdapInit(2),
+                     pyEventLdapSearch(3),
+                     pyEventTooManyRequests(4),
+                     pyEventServerStateChange(5),
+                     pyEventLdapSyntaxSourceAddr(6),
+                     pyEventLdapSyntaxDestAddr(7),
+                     pyEventLdapSyntaxInDSByte(8),
+                     pyEventLdapSyntaxRecDSByte(9),
+                     pyEventLdapSyntaxPVPMonth(10),
+                     pyEventLdapSyntaxPVPDoW(11),
+                     pyEventLdapSyntaxPVPToD(12),
+                     pyEventLdapSyntaxPVPTime(13),
+                     pyEventLdapSyntaxSPort(14),
+                     pyEventLdapSyntaxDPort(15),
+                     pyEventLdapReferenceTP(16),
+                     pyEventLdapReferencePVP(17),
+                     pyEventInternalCodeError(18),
+                     pyEventLdapSelectError(19),
+                     pyEventLdapReferenceXYLAN(20),
+                     pyEventDebugMemoryAlloc(21),
+                     pyEventDebugMemoryFree(22),
+                     pyEventPolicyCacheFlushed(23),
+                     pyEventLdapServerDefined(24),
+                     pyEventLdapSyntaxSourceMACAddr(25),
+                     pyEventLdapSyntaxDestMACAddr(26),
+                     pyEventLdapServerDeleted(27),
+                     pyEventOptimizedPvpMonth(28),
+                     pyEventOptimizedPvpDoW(29),
+                     pyEventZeroPvpMonth(30),
+                     pyEventZeroPvpDoW(31),
+                     pyEventRuleScope(32),
+                     pyEventRuleActivated(33),
+                     pyEventRuleDeactivated(34),
+					 pyEventLdapReferenceIPFilter(35),
+					 pyEventLdapSyntaxTOSByte(36),
+					 pyEventTimeChangeDetected(37),
+					 pyEventPolicyWillNeverBeValid(38),
+					 pyEventLdapSetOption(39),
+					 pyEventLdapTLSChannelInit(40),
+					 pyEventLdapTLSParametersOK(41),
+					 pyEventMaxPolicyCountReached(42),
+					 pyEventMemoryError(43),
+					 pyEventMonitorSocketError(44),
+					 pyEventDispositionError(45),
+					 pyEventNameLengthError(46),
+                     pyEventTableResize(47),
+                     pyEvent48(48),
+                     pyEvent49(49),
+                     pyEvent50(50),
+                     pyEvent51(51),
+                     pyEvent52(52),
+                     pyEvent53(53),
+                     pyEvent54(54),
+                     pyEvent55(55),
+                     pyEvent56(56),
+                     pyEvent57(57),
+                     pyEventPolicyCacheLoaded(58)
+                   }
+
+
+--
+-- Global parameters
+--
+
+serverPolicyDecision OBJECT-TYPE 
+    SYNTAX INTEGER { 
+                     flushPolicies(0), 
+                     recachePolicies(1), 
+	             recacheQMMACGroup(2)
+                   } 
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION 
+      "This object allows an NMS application to influence the policy 
+      manager's treatment of existing policy decisions that were 
+      established by the policy manager.  By setting recachePolicies, 
+      an NMS can cause the policy manager to reload all its policies from the 
+      current primary LDAP server. By setting flushPolicies, all the policies 
+      are deleted by the policy manager." 
+ ::= { alcatelIND1PolicyMIBObjects 1 } 
+
+rsvpDefaultPolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+                     accept(1),
+                     deny(2)
+                   }
+    MAX-ACCESS not-accessible
+    STATUS deprecated
+    DESCRIPTION
+      "This object allows an NMS application to define the agent action
+      when there are no policy servers available to a switch.  When
+      this object is set to accept(1), the policy manager in the switch
+      will allow all RSVP control message requests.  When set to deny(2),
+      the policy manager will deny all RSVP control message requests."
+	::= { alcatelIND1PolicyMIBObjects 2 }
+
+policyManagerEventTableSize OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object defines the size of the policy manager event table.
+      When this object is set, the subagent adjusts the event table to 
+      meet the size defined."
+    DEFVAL { 50 }
+	::= { alcatelIND1PolicyMIBObjects 3 }
+
+-- 
+-- The directoryServerTable provides an NMS with the ability to define and 
+-- control what directory servers a switch can access. The object 
+-- directoryServerRowStatus provides a uniform way to create and remove 
+-- rows (entries) of the table. The NMS can define switch access to use via 
+-- authenticated or unauthenticated LDAP bind operations 
+-- (via directoryServerAuthenticationType) and their appropriate parameters 
+-- 
+
+directoryServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DirectoryServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "This table contains information related to the LDAP-based
+      directory server from the perspective of the policy manager."
+    ::= { alcatelIND1PolicyMIBObjects 4 }
+
+directoryServerEntry OBJECT-TYPE
+    SYNTAX DirectoryServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "An entry in the directory server table.  Each entry
+      represents a directory server instance to the policy manager."
+    INDEX {directoryServerAddress, directoryServerPort}
+    ::= {directoryServerTable 1}
+
+DirectoryServerEntry ::= SEQUENCE {
+    directoryServerAddress
+        IpAddress,
+    directoryServerPort
+        Integer32 (0..65535),
+    directoryServerPreference
+        Integer32 (0..255),
+    directoryServerAuthenticationType
+        INTEGER,
+    directoryServerUserId
+        DisplayString (SIZE(0..31)),
+    directoryServerPassword
+        DisplayString (SIZE(0..31)),
+    directoryServerPublicKey
+        Integer32,
+    directoryServerSearchbase
+        DisplayString (SIZE(0..31)),
+    directoryServerCacheChange
+        INTEGER,
+    directoryServerLastChange
+        TimeTicks,
+    directoryServerAdminStatus
+        INTEGER,
+    directoryServerOperStatus
+        INTEGER,
+    directoryServerRowStatus
+        RowStatus,
+	directoryServerEnableSSL
+		INTEGER
+}
+
+directoryServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "The IP Address of an LDAP server. The policy manager uses this
+	  object combined with the directory server port number to uniquely
+	  identify an LDAP server to use for directory queries and updates."
+    ::= {directoryServerEntry 1}
+
+directoryServerPort OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object contains the TCP port number, which, along with the
+      directory server IP address, identifies the LDAP server."
+    DEFVAL { 389 }
+    ::= {directoryServerEntry 2}
+
+directoryServerPreference OBJECT-TYPE
+    SYNTAX Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object represents the relative preference of the server
+      entry. The higher the value of this object, the greater the
+      preference the policy manager places on using this server for
+      LDAP queries. This object is used when the policy manager uses
+      server selection based on the configured preference."
+    DEFVAL { 0 }
+    ::= {directoryServerEntry 3}
+
+directoryServerAuthenticationType OBJECT-TYPE
+    SYNTAX INTEGER {
+                     none(0),
+                     simplePassword(1)--,
+--                   kerberos(2),	
+--                   publicKey(3)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "The value of this object specifies what authentication
+      mechanism the LDAP server expects. For simplePassword(1),
+      the policy manager uses the directoryServerPassword object
+	  for each LDAP query. kerberos and publicKey mechanisms are
+	  currently unsupported. The none(0) value directs the policy
+	  manager to use the 'anonymous' method for LDAP queries."
+    DEFVAL { none }
+    ::= {directoryServerEntry 4}
+
+directoryServerUserId OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object only has significance when the
+      directoryServerAuthenticationType has a value of
+      simplePassword(1). This simple display string is used by the
+      policy manager in LDAP queries and updates."
+    ::= {directoryServerEntry 5}
+
+directoryServerPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object only has significance when the
+      directoryServerAuthenticationType has a value of
+      simplePassword(1). This simple display string is used by the
+      policy manager in LDAP queries and updates."
+    ::= {directoryServerEntry 6}
+
+directoryServerPublicKey OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "This object only has significance when the
+      directoryServerAuthenticationType has a value of
+      publicKey(3), which is not a currently supported value"
+    ::= {directoryServerEntry 7}
+
+directoryServerSearchbase OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object specifies the base object required for
+      LDAP search operations. This object represents, in 
+      distinguished name format, the point where server 
+      searches start. Generally, this object represents
+      the base object of the organization."
+    DEFVAL { "o=Alcatel IND, c=US" }
+    ::= {directoryServerEntry 8}
+
+directoryServerCacheChange OBJECT-TYPE
+    SYNTAX INTEGER {
+                     none(0),
+                     recachePolicy(1)--,
+--                   recacheAll(2)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object allows an NMS application to influence the policy
+      manager's cache of policy-related data when this server becomes 
+      the primary LDAP server selected for the switch.  Setting this object
+      to recachePolicy(1) conveys to the policy manager that the
+      policy class object should be obtained from the LDAP server
+      represented by this table entry when this server becomes the 
+      primary LDAP server.  By setting this object to 'none', the 
+      policy manager will use the existing policy and policy rule
+      cache rather than reloading the policy data from this server.
+      In the case where there is no policy cache (for instance, when
+      the switch powers up) the policy manager will attempt to reload 
+      the policy class cache even if this object is set to 'none'. "
+    DEFVAL { none }
+    ::= {directoryServerEntry 9}
+
+directoryServerLastChange OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object contains the value of sysUpTime at the time of
+      the last creation, deletion or modification of an object in
+      this table entry."
+    ::= {directoryServerEntry 10}
+
+directoryServerAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                     up(1),
+                     down(2)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object specifies the desired administrative state of
+      the directory server.  The up and down states control the
+      policy manager's decision to user the server for LDAP queries
+      and updates."
+    DEFVAL { up }
+    ::= {directoryServerEntry 11}
+
+directoryServerOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                     up(1),
+                     down(2),
+                     unknown(3)--,
+--                   testing(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object identifies the current operational state of the
+      LDAP server. Semantics of this object closely resemble the
+      ifOperStatus definition, however, the LDAP application layer
+      is NOT modeled as an interface as defined by RFC2233."
+  DEFVAL { unknown }
+    ::= {directoryServerEntry 12}
+
+directoryServerRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object is used to create a new table entry or modify
+      or delete an existing table entry in this table."
+    DEFVAL { createAndGo }
+    ::= {directoryServerEntry 13}
+
+
+directoryServerEnableSSL OBJECT-TYPE
+	SYNTAX INTEGER {
+                     enableSSL(1),
+                     disableSSL(0)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object enables or disables SSL for the LDAP server."
+    DEFVAL { 0 }
+    ::= {directoryServerEntry 14}
+--
+-- policyEventTable
+--
+
+policyEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PolicyEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains significant events related to the
+        operation of the policy manager. "
+    ::= { alcatelIND1PolicyMIBObjects 5}
+
+policyEventEntry OBJECT-TYPE
+    SYNTAX PolicyEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "An entry in the policy manager event table."
+    INDEX { policyEventIndex }
+    ::= {policyEventTable 1}
+
+PolicyEventEntry ::= SEQUENCE {
+    policyEventIndex
+	        Integer32 (0..1000),
+    policyEventCode
+	        PolicyEventCodes,
+    policyEventDetailString
+	        DisplayString (SIZE(0..255)),
+    policyEventTime
+	        TimeTicks
+}
+
+policyEventIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..1000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object uniquely identifies the event record."
+    ::= {policyEventEntry 1}
+
+policyEventCode OBJECT-TYPE
+    SYNTAX PolicyEventCodes
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object identifies the event that occurred. The internal
+      protocol error and LDAP error events are rollup events that
+      represent a collection of events with similar characteristics.
+      The internal error event occurs due to software resource or
+      logic  problems; the LDAP error occurs because of LDAP init,
+      search, format, protocol or other similar errors."
+    ::= {policyEventEntry 2}
+
+policyEventDetailString OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object gives details about the event that took place. 
+      Included in the string are (potentially) fields that provide
+      more specific fault location and isolation, context resolution,
+      and event (error) instance information."
+    ::= {policyEventEntry 3}
+
+policyEventTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object contains the value of sysUpTime at the time
+      the event occurred."
+    ::= {policyEventEntry 4}
+
+-- 
+-- The rule names table provides confirmation to an element manager  
+-- that policy rules are loaded on a switch. 
+-- 
+
+policyRuleNamesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PolicyRuleNamesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "This table contains information that identifies the LDAP-based
+      policy rules defined on a directory server that are pushed by
+	  the policy manager to the QoS&F manager for making policy decisions."
+    ::= { alcatelIND1PolicyMIBObjects 6}
+
+policyRuleNamesEntry OBJECT-TYPE
+    SYNTAX PolicyRuleNamesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "An entry in the policy rules table.  Each entry represents the 
+      name of a policy rule on the directory server.  The policy manager
+      uses these names to build the correct policy rules."
+    INDEX {policyRuleNamesIndex}
+    ::= {policyRuleNamesTable 1}
+
+PolicyRuleNamesEntry ::= SEQUENCE {
+    policyRuleNamesIndex
+        Integer32 (0..65535),
+    policyRuleNamesName
+        DisplayString (SIZE(0..31)),
+    policyRuleNamesRowStatus
+        RowStatus,
+    policyRuleOperStatus
+        INTEGER
+    }
+
+policyRuleNamesIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object is a unique index identifying the policyRuleNames entry."
+    ::= { policyRuleNamesEntry 1 }
+
+policyRuleNamesName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object defines the name of the policyRule that the policy manager
+      will use to build a switch policy. The name coincides with the directory    
+      server class name equivalent."
+    ::= { policyRuleNamesEntry 2 }
+
+policyRuleNamesRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Deprecated (to avoid proliferation of control planes) - rules
+	to be changed should be updated in LDAP and flushed/pushed to
+	switches accordingly."
+    DEFVAL { active }
+    ::= { policyRuleNamesEntry 3 }
+
+policyRuleOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                   -- mip_def_values.h : MIP_ROW_STATUS_VALUES.ROWSTATUS_*
+                   -- and these should stay in agreement
+                   up(1),
+                   down(2), -- invalid, POLICY_INVALID, NotInService
+                   notReady(3) -- eg; pending PVP (POLICY ! _INVALID but ! _ACTIVE)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object is used to convey to an NMS the state of the policy.
+	A value of 'up' implies that the policy rule has been pushed to
+	the QoS / filtering manager (i.e. the PEP).  A value of 'down'
+	means the policy is invalid, so it was not pushed to the
+	QoS / filtering manager.  A value of 'notReady' means this
+	rule is valid, but not currently active (PVP not active, etc)."
+  DEFVAL { up }
+    ::= { policyRuleNamesEntry 4 }
+
+-- 
+-- policyStatsTable
+-- 
+
+policyStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PolicyStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+		"This table defines the objects maintained by the policy manager
+	  representing statistics available on a per policy server instance.
+		The objects in this table correspond directly to the similarly named
+	  objects in <draft-white-slapm-mib-00.txt>, except that the objects in 
+	  the draft are scalars. Note that the I-D is now RFC 2758, and experimental
+	  category RFC.
+		There are semantic differences from RFC 2758 for some objects - the 
+	  differences are detailed in the DESCRIPTION clauses. Some objects 
+	  behave differently from the RFC because of our combined PDP/PEP 
+	  implementation. Note that RFC 2758 applies to hosts more than switches."
+    ::= { alcatelIND1PolicyMIBObjects 7 }
+
+policyStatsEntry OBJECT-TYPE
+    SYNTAX PolicyStatsEntry 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "An entry in the policy manager stats table."
+    INDEX {policyStatsAddress, policyStatsServerPort }
+    ::= {policyStatsTable 1}
+
+PolicyStatsEntry ::= SEQUENCE {
+    policyStatsAddress
+        IpAddress,
+    policyStatsServerPort
+        Integer32 (0..65535),
+    policyStatsQueryCount
+        Counter32,
+    policyStatsAccessCount
+        Counter32,
+    policyStatsSuccessAccessCount
+        Counter32,
+    policyStatsNotFoundCount
+        Counter32
+}
+
+policyStatsAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "IP address of the policy server related to these statistics"
+    ::= { policyStatsEntry 1 }
+
+policyStatsServerPort OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TCP port number of the policy server related to these statistics"
+    ::= { policyStatsEntry 2 }
+
+policyStatsQueryCount OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+       "The query count gives the total number of times a policy repository   
+		was queried by the policy decision point. The policy repository is the LDAP
+		server where policies are stored."
+    ::= { policyStatsEntry 3 }
+
+policyStatsAccessCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of times that a policy repository was
+        accessed with respect to a policy agent.  The policy decision 
+        point (PDP)  in this implementation accesses the repository via
+        LDAP. The access count includes all operations required to 
+        access the policy rules (including role evaluations and discrete
+        policy entry accesses.)
+
+        The value of this object will increment on repository access."
+    ::= { policyStatsEntry 4 }
+
+policyStatsSuccessAccessCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of successful policy repository accesses.  This 
+        value increments if a 'known' attribute has been discovered in
+        a repository search, regardless of its PDP processing status.
+        This object will increment less than policyStatsAccessCount
+        on most repository accesses, based on repository structure
+        and what roles match the policy decision point."
+    ::= { policyStatsEntry 5 }
+
+policyStatsNotFoundCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of policy repository accesses that resulted
+        in an entry not being located. Not found counts increment on
+        protocol search failures and other attribute lookup problems. 
+        Generally, policyStatsNotFoundCount increments only in 
+        error cases."
+    ::= { policyStatsEntry 6 }
+
+-- 
+-- The policyNotificationTable allows an NMS to control notifications produced
+-- by switch software. This table allows an NMS to "zone in" on problems 
+-- by singling out specific events as part of a pro-active monitoring strategy 
+-- by the NMS application. 
+-- 
+
+policyNotificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PolicyNotificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains an association between an event ID and the
+        notification method that the policy manager uses to convey to an 
+        NMS that the event occurred. "
+    ::= { alcatelIND1PolicyMIBObjects 8 }
+
+policyNotificationEntry OBJECT-TYPE
+    SYNTAX PolicyNotificationEntry 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "An entry in the policy manager notification table."
+    INDEX { policyNotificationIndex }
+    ::= {policyNotificationTable 1}
+
+PolicyNotificationEntry ::= SEQUENCE {
+    policyNotificationIndex
+        PolicyEventCodes,
+    policyNotificationCode
+        INTEGER,
+    policyEventCount
+        Counter32
+}
+
+policyNotificationIndex OBJECT-TYPE
+    SYNTAX PolicyEventCodes
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object is a unique index identifying the policyNotification entry.
+      This index corresponds to the same value as the policyEvent."
+    ::= { policyNotificationEntry 1 }
+
+policyNotificationCode OBJECT-TYPE
+    SYNTAX INTEGER {
+                       noNotification(0),
+                       writeToLog(1),
+                       sendTrap(2),
+                       logAndTrap(3)
+                     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object defines the notification method used to convey information
+      about switch events to the NMS.  The notification code allows for    
+      multiple notification methods, updated by an NMS by setting the 
+      appropriate method corresponding to the event index."
+    ::= { policyNotificationEntry 2 }
+
+policyEventCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of times that this event was recognized. This value 
+       increments for each event occurance. No advertised management 
+       facility exists to clear these history counters. This object is 
+       intended to be a hint to management applications as to the past 
+       operating history of a switch even if entries are no longer 
+       present in the policyEventTable."
+    ::= { policyNotificationEntry 3 }
+
+policyManagerSwitchIdentifier OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of this object type identifies the switch
+		 with a identifier that is unique through out the network
+		 This identifier is stored on the switch and the Directory
+		 Server for policies that are specific to this switch.
+		 If this variable is changed on the switch then the Directory
+		 Server also must be changed correspondingly.
+		 Changing the variable on the switch and not making the
+		 corresponding change on the Directory Server will render the
+ 		 policies defined for this switch unusable.The syntax of this
+		 variable is macAddress:Date:Time. 
+		 Example: xx:xx:xx:xx:xx:xx:yyyymmdd:hhmmss "
+    ::= { alcatelIND1PolicyMIBObjects 9 }
+
+-- 
+-- Traps definitions
+--
+
+policyManagerTrapDesc OBJECT IDENTIFIER ::= { policyManagerTraps 1 }
+policyManagerTrapObjs OBJECT IDENTIFIER ::= { policyManagerTraps 2 }
+
+--
+-- Trap description
+--
+
+policyEventNotification NOTIFICATION-TYPE
+    OBJECTS {
+        policyTrapEventDetailString,
+		policyTrapEventCode
+    }
+    STATUS        current
+    DESCRIPTION
+       "The policyEventNotification allows the switch to notify an NMS when 
+        significant events happen. The NMS can then investigate and perform 
+        appropriate control functions.  Other tables allow the NMS app to 
+        zone in on the problem as part of a proactive monitoring system by the 
+        NMS application. "
+	::= { policyManagerTrapDesc 0 1 }
+
+--
+-- Trap objects
+--
+
+policyTrapEventDetailString OBJECT-TYPE
+	SYNTAX        DisplayString (SIZE(0..255))
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"Details about the event that took place"
+	::= { policyManagerTrapObjs 1 }
+
+policyTrapEventCode OBJECT-TYPE
+	SYNTAX        PolicyEventCodes
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"The code of the event"
+	::= { policyManagerTrapObjs 2 }
+
+--
+-- compliance statements
+--
+
+alcatelIND1PolicyMIBCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+		"The policy manager compliance statement"
+	MODULE  -- this module
+	MANDATORY-GROUPS {
+	    policyMIBGlobalGroup,
+		policyMIBDirectoryServerGroup,
+		policyMIBEventTableGroup,
+		policyMIBRuleNamesGroup,
+		policyMIBStatsGroup,
+		policyMIBNotificationGroup
+	}
+	::= { alcatelIND1PolicyMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+
+policyMIBGlobalGroup OBJECT-GROUP
+	OBJECTS {
+	serverPolicyDecision,
+	policyManagerEventTableSize
+	}
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing information on global
+		policy manager state"
+	::= { alcatelIND1PolicyMIBGroups 1 }
+
+policyMIBDirectoryServerGroup OBJECT-GROUP
+	OBJECTS {
+	    directoryServerAddress,
+		directoryServerPort,
+		directoryServerPreference,
+		directoryServerAuthenticationType,
+		directoryServerUserId,
+		directoryServerPassword,
+		directoryServerSearchbase,
+		directoryServerCacheChange,
+		directoryServerLastChange,
+		directoryServerAdminStatus,
+		directoryServerOperStatus,
+		directoryServerRowStatus,
+		directoryServerEnableSSL
+		}
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects for managing LDAP directory
+		servers"
+	::= { alcatelIND1PolicyMIBGroups 2 }
+
+policyMIBEventTableGroup OBJECT-GROUP
+	OBJECTS {
+	    policyEventIndex,
+		policyEventCode,
+		policyEventDetailString,
+		policyEventTime
+		}
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects detailling the events that
+		occurred during policy manager operation"
+	::= { alcatelIND1PolicyMIBGroups 3 }
+
+policyMIBRuleNamesGroup OBJECT-GROUP
+	OBJECTS {
+	    policyRuleNamesIndex,
+		policyRuleNamesName,
+		policyRuleNamesRowStatus,
+		policyRuleOperStatus
+        }
+	STATUS  current
+	DESCRIPTION
+		"A collection of object to know which policy rules have
+		been retrieved from a directory server"
+	::= { alcatelIND1PolicyMIBGroups 4 }
+
+policyMIBStatsGroup OBJECT-GROUP
+	OBJECTS {
+        policyStatsAddress,
+		policyStatsServerPort,
+		policyStatsAccessCount,
+		policyStatsSuccessAccessCount,
+		policyStatsNotFoundCount
+        }
+	STATUS  current
+	DESCRIPTION
+		"A collection of object to keep a trace of how directory
+		servers are accessed by the policy manager"
+	::= { alcatelIND1PolicyMIBGroups 5 }
+
+policyMIBNotificationGroup OBJECT-GROUP
+	OBJECTS {
+        policyNotificationIndex,
+		policyNotificationCode,
+		policyEventCount
+	}
+	STATUS  current
+	DESCRIPTION
+		"A collection of object to configure what the policy manager
+		must do when specific events happen"
+	::= { alcatelIND1PolicyMIBGroups 6 }
+
+policyMIBTrapsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS {
+      policyEventNotification
+   }
+   STATUS current
+   DESCRIPTION
+	   "Collection of traps for management of Policy Manager"
+   ::= { alcatelIND1PolicyMIBGroups 7 }
+
+END
+

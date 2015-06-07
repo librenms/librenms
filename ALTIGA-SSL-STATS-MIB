@@ -1,0 +1,154 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-SSL-STATS-MIB.my:  Altiga SSL Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-SSL-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32
+         FROM SNMPv2-SMI
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsSsl, alSslGroup
+         FROM ALTIGA-MIB
+      alSslMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaSslStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga SSL Statistics MIB models counters and objects that are
+          of management interest for SSL.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+            SSL:        Secure Sockets Layer
+
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alSslMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsSslGlobal  OBJECT IDENTIFIER ::= { alStatsSsl 1 }
+
+alSslStatsTotalSessions    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of total sessions."
+   ::= { alStatsSslGlobal 1 }
+
+alSslStatsActiveSessions   OBJECT-TYPE
+   SYNTAX         Gauge32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The current number of active sessions."
+   ::= { alStatsSslGlobal 2 }
+
+alSslStatsMaxSessions      OBJECT-TYPE
+   SYNTAX         Gauge32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The maximum number current of active sessions at 
+      any one time."
+   ::= { alStatsSslGlobal 3 }
+
+alSslStatsPreDecryptOctets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets sent to the decryption engine. Includes 
+      octets used as part of negotiation."
+   ::= { alStatsSslGlobal 4 }
+
+alSslStatsPostDecryptOctets   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets received from the decryption engine."
+   ::= { alStatsSslGlobal 5 }
+
+alSslStatsPreEncryptOctets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets send to the encryption engine."
+   ::= { alStatsSslGlobal 6 }
+
+alSslStatsPostEncryptOctets   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets received from the encryption engine.
+      Includes octets used as part of negitiation."
+   ::= { alStatsSslGlobal 7 }
+
+altigaSslStatsMibConformance OBJECT IDENTIFIER ::= { altigaSslStatsMibModule 1 }
+altigaSslStatsMibCompliances OBJECT IDENTIFIER ::= { altigaSslStatsMibConformance 1 }
+
+altigaSslStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga SSL Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaSslStatsGroup
+   }
+   ::= { altigaSslStatsMibCompliances 1 }
+
+altigaSslStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alSslStatsTotalSessions,
+      alSslStatsActiveSessions,
+      alSslStatsMaxSessions,
+      alSslStatsPreDecryptOctets,
+      alSslStatsPostDecryptOctets,
+      alSslStatsPreEncryptOctets,
+      alSslStatsPostEncryptOctets
+   }
+   STATUS   current
+   DESCRIPTION
+          "The objects for SSL statistics."
+   ::= { alSslGroup 2 }
+
+END
+

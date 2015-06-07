@@ -1,0 +1,125 @@
+
+BAY-STACK-ARP-INSPECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackArpInspectionMib MODULE-IDENTITY
+      LAST-UPDATED "200606230000Z"
+      ORGANIZATION "Nortel Ltd."
+      CONTACT-INFO "nortel.com"
+      DESCRIPTION
+              "This MIB module is used for ARP inspection configuration
+               settings in Nortel's software and products."
+
+      REVISION     "200606230000Z"  -- June 23, 2006
+      DESCRIPTION
+              "Ver 1:  Initial version."
+      ::= { bayStackMibs 18 }
+
+bsArpInspectionNotifications
+    OBJECT IDENTIFIER ::= { bayStackArpInspectionMib 0 }
+bsArpInspectionObjects
+    OBJECT IDENTIFIER ::= { bayStackArpInspectionMib 1 }
+
+--
+-- VLAN table
+--
+
+bsArpInspectionVlanTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsArpInspectionVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to control ARP inspection settings per-VLAN."
+    ::= { bsArpInspectionObjects 1 }
+
+bsArpInspectionVlanEntry OBJECT-TYPE
+    SYNTAX       BsArpInspectionVlanEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry containing objects for controlling ARP inspection settings
+         for a VLAN."
+    INDEX { bsArpInspectionVlanId }
+    ::= { bsArpInspectionVlanTable 1 }
+
+BsArpInspectionVlanEntry ::=
+    SEQUENCE {
+        bsArpInspectionVlanId        VlanIndex,
+        bsArpInspectionVlanEnabled   TruthValue
+    }
+
+bsArpInspectionVlanId OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID value of the VLAN."
+    ::= { bsArpInspectionVlanEntry 1 }
+
+bsArpInspectionVlanEnabled OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object is used to control whether ARP inspection is enabled
+         for this VLAN."
+    ::= { bsArpInspectionVlanEntry 2 }
+
+--
+-- Interface table
+--
+
+bsArpInspectionIfTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsArpInspectionIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to control ARP inspection settings per-interface."
+    ::= { bsArpInspectionObjects 2 }
+
+bsArpInspectionIfEntry OBJECT-TYPE
+    SYNTAX       BsArpInspectionIfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry containing objects for controlling ARP inspection settings
+         for an interface."
+    INDEX { bsArpInspectionIfIndex }
+    ::= { bsArpInspectionIfTable 1 }
+
+BsArpInspectionIfEntry ::=
+    SEQUENCE {
+        bsArpInspectionIfIndex     InterfaceIndex,
+        bsArpInspectionIfTrusted   TruthValue
+    }
+
+bsArpInspectionIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface."
+    ::= { bsArpInspectionIfEntry 1 }
+
+bsArpInspectionIfTrusted OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object is used to control whether this interface is trusted
+         for ARP inspection purposes."
+    ::= { bsArpInspectionIfEntry 2 }
+
+END
+

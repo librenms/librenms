@@ -1,0 +1,2977 @@
+-- *****************************************************************
+-- IEEE802dot11-MIB :
+-- IEEE 802.11 Management Information Base file
+--
+-- Nov 2002, Francis Pang 
+--
+-- Copyright (c) 2002 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+-- **********************************************************************
+-- * IEEE 802.11 Management Information Base
+-- **********************************************************************
+
+IEEE802dot11-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        NOTIFICATION-TYPE,Integer32, Counter32,
+        Unsigned32 				FROM SNMPv2-SMI
+
+        DisplayString , MacAddress, RowStatus,
+        TruthValue                              FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, 
+        NOTIFICATION-GROUP                      FROM SNMPv2-CONF 
+
+        ifIndex                                 FROM RFC1213-MIB;
+
+-- **********************************************************************
+-- *  Tree Definition
+-- **********************************************************************
+
+    member-body     OBJECT IDENTIFIER ::= { iso 2 }
+    us              OBJECT IDENTIFIER ::= { member-body 840 }
+
+-- **********************************************************************
+-- *  MODULE IDENTITY
+-- **********************************************************************
+
+ieee802dot11 MODULE-IDENTITY
+    LAST-UPDATED "0208300000Z"
+    ORGANIZATION "IEEE 802.11"
+    CONTACT-INFO 
+           "WG E-mail: stds-802-11@ieee.org
+
+                Chair: Stuart J. Kerry
+                Postal: Philips Semiconductors, Inc.
+                       1109 McKay Drive
+                       M/S 48 SJ
+                       San Jose, CA 95130-1706  USA
+                  Tel: +1 408 474 7356
+                  Fax: +1 408 474 7247
+               E-mail: stuart.kerry@philips.com
+
+               Editor: Bob O'Hara
+               Postal: Informed Technology, Inc.
+                       1750 Nantucket Circle, Suite 138
+                       Santa Clara, CA 95054 USA
+                  Tel: +1 408 986 9596
+                  Fax: +1 408 727 2654
+               E-mail: bob@informed-technology.com"
+    DESCRIPTION
+        "The MIB module for IEEE 802.11 entities.
+        iso(1).member-body(2).us(840).ieee802dot11(10036)"
+    ::= { us 10036 }
+
+-- **********************************************************************
+-- *  Major sections
+-- **********************************************************************
+
+--  Station ManagemenT (SMT) Attributes
+    --  DEFINED AS "The SMT object class provides the necessary support
+    --  at the station to manage the processes in the station such that
+    --  the station may work cooperatively as a part of an IEEE 802.11
+    --  network."
+
+    dot11smt OBJECT IDENTIFIER ::= { ieee802dot11 1 }
+
+        --  dot11smt GROUPS
+        --  dot11StationConfigTable            ::= { dot11smt 1 }
+        --  dot11AuthenticationAlgorithmsTable ::= { dot11smt 2 }
+        --  dot11WEPDefaultKeysTable           ::= { dot11smt 3 }
+        --  dot11WEPKeyMappingsTable           ::= { dot11smt 4 }
+        --  dot11PrivacyTable                  ::= { dot11smt 5 }
+        --  dot11SMTnotification               ::= { dot11smt 6 }
+        --  dot11MultiDomainCapabilityTable    ::= { dot11smt 7 }
+
+--  MAC Attributes
+    --  DEFINED AS "The MAC object class provides the necessary support
+    --  for the access control, generation, and verification of frame
+    --  check sequences (FCSs), and proper delivery of valid data to 
+    --  upper layers."
+
+    dot11mac OBJECT IDENTIFIER ::= { ieee802dot11 2 }
+
+      --  MAC GROUPS
+      --  reference IEEE Std 802.1f-1993
+         --  dot11OperationTable   	    ::= { dot11mac 1 }
+         --  dot11CountersTable    	    ::= { dot11mac 2 }
+         --  dot11GroupAddressesTable 	    ::= { dot11mac 3 }
+
+--  Resource Type ID
+    dot11res 		OBJECT IDENTIFIER 	::= { ieee802dot11 3 }
+    dot11resAttribute 	OBJECT IDENTIFIER 	::= { dot11res 1 }
+
+--  PHY Attributes
+    --  DEFINED AS "The PHY object class provides the necessary support
+    --  for required PHY operational information that may vary from PHY
+    --  to PHY and from STA to STA to be communicated to upper layers."
+
+    dot11phy OBJECT IDENTIFIER ::= { ieee802dot11 4 }
+
+    --  PHY GROUPS
+    	--  dot11PhyOperationTable    	    ::= { dot11phy 1 }
+    	--  dot11PhyAntennaTable   	    ::= { dot11phy 2 }
+    	--  dot11PhyTxPowerTable      	    ::= { dot11phy 3 }
+    	--  dot11PhyFHSSTable         	    ::= { dot11phy 4 }
+    	--  dot11PhyDSSSTable         	    ::= { dot11phy 5 }
+    	--  dot11PhyIRTable           	    ::= { dot11phy 6 }
+    	--  dot11RegDomainsSupportedTable   ::= { dot11phy 7 }
+    	--  dot11AntennasListTable          ::= { dot11phy 8 }
+    	--  dot11SupportedDataRatesTxTable  ::= { dot11phy 9 }
+    	--  dot11SupportedDataRatesRxTable  ::= { dot11phy 10 }
+    	--  dot11PhyOFDMTable               ::= { dot11phy 11 }
+    	--  dot11PhyHRDSSSTable 	    ::= { dot11phy 12 }
+	--  dot11EHCCHoppingPatternTable    ::= { dot11phy 13 }
+
+-- **********************************************************************
+-- *  Textual conventions from 802 definitions
+-- **********************************************************************
+
+    WEPKeytype ::= OCTET STRING (SIZE (5))
+
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+
+-- **********************************************************************
+-- *  SMT Station Config  Table
+-- **********************************************************************
+
+dot11StationConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11StationConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Station Configuration attributes.  In tablular form to
+            allow for multiple instances on an agent."
+    ::= { dot11smt 1 }
+
+dot11StationConfigEntry OBJECT-TYPE
+        SYNTAX Dot11StationConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11StationConfigTable.  It is
+            possible for there to be multiple IEEE 802.11 interfaces
+            on one agent, each with its unique MAC address. The
+            relationship between an IEEE 802.11 interface and an
+            interface in the context of the Internet-standard MIB is
+            one-to-one.  As such, the value of an ifIndex object
+            instance can be directly used to identify corresponding
+            instances of the objects defined herein.  
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11StationConfigTable 1 }
+
+Dot11StationConfigEntry ::=
+        SEQUENCE { 	
+	    dot11StationID                        MacAddress,
+            dot11MediumOccupancyLimit          	  INTEGER,
+            dot11CFPollable                    	  TruthValue,
+            dot11CFPPeriod                     	  INTEGER, 
+            dot11CFPMaxDuration                	  INTEGER,
+            dot11AuthenticationResponseTimeOut 	  Unsigned32,
+            dot11PrivacyOptionImplemented      	  TruthValue,
+	    dot11PowerManagementMode	  	  INTEGER,
+	    dot11DesiredSSID		  	  OCTET STRING,
+	    dot11DesiredBSSType		  	  INTEGER,
+	    dot11OperationalRateSet		  OCTET STRING,
+	    dot11BeaconPeriod		  	  INTEGER,
+	    dot11DTIMPeriod			  INTEGER,
+	    dot11AssociationResponseTimeOut	  Unsigned32,
+            dot11DisassociateReason               INTEGER,
+            dot11DisassociateStation              MacAddress,
+            dot11DeauthenticateReason             INTEGER,
+            dot11DeauthenticateStation            MacAddress,
+            dot11AuthenticateFailStatus           INTEGER,
+            dot11AuthenticateFailStation          MacAddress,
+            dot11MultiDomainCapabilityImplemented TruthValue, 
+	    dot11MultiDomainCapabilityEnabled TruthValue, 
+	    dot11CountryString		  OCTET STRING }
+
+dot11StationID OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "The purpose of dot11StationID is to allow a manager to 
+            identify a station for its own purposes.  This attribute
+            provides for that eventuality while keeping the true MAC
+            address independent.  Its syntax is MAC address, and the
+            default value is the station's assigned, unique 
+            MAC address."
+    ::= { dot11StationConfigEntry 1 }
+
+dot11MediumOccupancyLimit OBJECT-TYPE
+        SYNTAX INTEGER (0..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall indicate the maximum amount of time,
+            in TU, that a point coordinator (PC) may control the usage 
+            of the wireless medium (WM) without relinquishing control 
+            for long enough to allow at least one instance of DCF access 
+            to the medium.  The default value of this attribute shall 
+            be 100, and the maximum value shall be 1000."
+    ::= { dot11StationConfigEntry 2 }
+
+dot11CFPollable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "When this attribute is true, it shall indicate that 
+	        the STA is able to respond to a CF-Poll with a data frame 
+	        within a SIFS time. This attribute shall be false if 
+	        the STA is not able to respond to a CF-Poll with a data 
+	        frame within a SIFS time."
+    ::= { dot11StationConfigEntry 3 }
+
+dot11CFPPeriod OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The attribute shall describe the number of DTIM intervals
+            between the start of CFPs.  It is modified by
+            MLME-START.request primitive."
+    ::= { dot11StationConfigEntry 4 }
+
+dot11CFPMaxDuration OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "The attribute shall describe the maximum duration of 
+	        the CFP in TU that may be generated by the PCF. It is 
+	        modified by MLME-START.request primitive."
+    ::= { dot11StationConfigEntry 5 }
+
+dot11AuthenticationResponseTimeOut OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the number of time units (TUs)
+             that a responding STA should wait for the next frame in the
+            authentication sequence."
+    ::= { dot11StationConfigEntry 6 }
+
+dot11PrivacyOptionImplemented OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute, when true, shall indicate that the IEEE
+            802.11 WEP option is implemented.  The default value of
+            this attribute shall be false."
+    ::= { dot11StationConfigEntry 7 }
+
+dot11PowerManagementMode OBJECT-TYPE
+		SYNTAX INTEGER { active(1), powersave(2) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the power management
+			mode of the STA. When set to active, it shall 
+			indicate that the station is not in power-save 
+			(PS) mode. When set to powersave, it shall indicate
+			 that the station is in power-save mode. The power 
+			management mode is transmitted in all frames 
+			according to the rules in  7.1.3.1.7."
+	::= { dot11StationConfigEntry 8 }
+
+dot11DesiredSSID OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute reflects the Service Set ID (SSID)
+			used in the DesiredSSID parameter of the most recent
+			MLME_Scan.request.  This value may be modified
+			by an external management entity and used by the
+			local SME to make decisions about the Scanning 
+			process."
+	::= { dot11StationConfigEntry 9 }
+
+dot11DesiredBSSType OBJECT-TYPE
+		SYNTAX INTEGER { infrastructure(1), independent(2), any(3) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the type of BSS the
+			station shall use when scanning for a BSS with 
+			which to synchronize. This value is used to filter 
+			Probe Response frames and Beacons. When set to 
+			infrastructure, the station shall only synchronize 
+			with a BSS whose Capability Information field has 
+			the ESS subfield set to 1. When set to independent, 
+			the station shall only synchronize with a BSS whose 
+			Capability Information field has the IBSS subfield 
+			set to 1. When set to any, the station may 
+			synchronize to either type of BSS."
+	::= { dot11StationConfigEntry 10 }
+
+dot11OperationalRateSet OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(1..126))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the set of data 
+			rates at which the station may transmit data.  
+			Each octet contains a value representing a rate.  
+			Each rate shall be within the range from 2 to 127,
+			corresponding to data rates in increments of
+			500 kbit/s from 1 Mbit/s to 63.5 Mbit/s, and shall 
+			be supported (as indicated in the supported rates
+			table) for receiving data. This value is reported in
+			transmitted Beacon, Probe Request, Probe Response,
+			Association Request, Association Response,
+			Reassociation Request, and Reassociation Response
+			frames, and is used to determine whether a BSS
+			with which the station desires to synchronize is
+			suitable. It is also used when starting a BSS,
+			as specified in  10.3."
+	::= { dot11StationConfigEntry 11 }
+
+dot11BeaconPeriod OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the number of TUs that 
+			a station shall use for scheduling Beacon 
+			transmissions. This value is transmitted in Beacon 
+			and Probe Response frames."
+	::= { dot11StationConfigEntry 12 }
+
+dot11DTIMPeriod OBJECT-TYPE
+		SYNTAX INTEGER(1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the number of beacon
+			intervals that shall elapse between transmission of
+			Beacons frames containing a TIM element whose DTIM
+			Count field is 0. This value is transmitted in
+			the DTIM Period field of Beacon frames."
+	::= { dot11StationConfigEntry 13 }
+
+dot11AssociationResponseTimeOut OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall specify the number of TU that a
+			requesting STA should wait for a response to a
+			transmitted association-request MMPDU."
+	::= { dot11StationConfigEntry 14 }
+
+dot11DisassociateReason OBJECT-TYPE
+		SYNTAX INTEGER(0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the most recently
+			transmitted Reason Code in a Disassociation
+			frame.  If no Disassociation frame has been
+			transmitted, the value of this attribute shall
+			be 0."
+        REFERENCE "IEEE Std 802.11-2002, 7.3.1.7"
+	::= { dot11StationConfigEntry 15 }
+
+dot11DisassociateStation OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the MAC address from the
+			Address 1 field of the most recently transmitted
+			Disassociation frame.  If no Disassociation
+			frame has been transmitted, the value of this
+			attribute shall be 0."
+	::= { dot11StationConfigEntry 16 }
+
+dot11DeauthenticateReason OBJECT-TYPE
+		SYNTAX INTEGER(0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the most recently
+			transmitted Reason Code in a Deauthentication
+			frame.  If no Deauthentication frame has been
+			transmitted, the value of this attribute shall
+			be 0."
+        REFERENCE "IEEE Std 802.11-2002, 7.3.1.7"
+	::= { dot11StationConfigEntry 17 }
+
+dot11DeauthenticateStation OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the MAC address from the
+			Address 1 field of the most recently transmitted
+			Deauthentication frame.  If no Deauthentication
+			frame has been transmitted, the value of this
+			attribute shall be 0."
+	::= { dot11StationConfigEntry 18 }
+
+dot11AuthenticateFailStatus OBJECT-TYPE
+		SYNTAX INTEGER(0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the most recently
+			transmitted Status Code in a failed
+			Authentication frame.  If no failed
+			Authentication frame has been transmitted, the
+			value of this attribute shall be 0."
+        REFERENCE "IEEE Std 802.11-2002, 7.3.1.9"
+	::= { dot11StationConfigEntry 19 }
+
+dot11AuthenticateFailStation OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the MAC address from the
+			Address 1 field of the most recently transmitted
+			failed Authentication frame.  If no failed
+			Authentication frame has been transmitted, the
+			value of this attribute shall be 0."
+	::= { dot11StationConfigEntry 20 }
+
+dot11MultiDomainCapabilityImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, when TRUE, indicates that the 
+			station implementation is capable of supporting 
+			multiple regulatory domains.  The capability is 
+			disabled, otherwise.  The default value of this 
+			attribute is FALSE."
+	::= { dot11StationConfigEntry 21 }
+
+dot11MultiDomainCapabilityEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, when TRUE, indicates that the 
+			capability of the station to operate in multiple 
+			regulatory domains is enabled.  The capability is 
+			disabled, otherwise.  The default value of this 
+			attribute is FALSE."
+	::= { dot11StationConfigEntry 22 }
+
+dot11CountryString OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(3))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute identifies the country in which the 
+			station is operating. The first two octets of this 
+			string is the two character country code as described 
+			in document ISO/IEC 3166-1.  The third octet shall 
+			be one of the following:
+
+			1. an ASCII space character, if the regulations under 
+			which the station is operating encompass all 
+			environments in the country,
+
+			2. an ASCII 'O' character, if the regulations under 
+			which the station is operating are for an Outdoor 
+			environment only, or
+
+			3. an ASCII 'I' character, if the regulations under 
+			which the station is operating are for an Indoor 
+			environment only."
+	::= { dot11StationConfigEntry 23 }
+
+-- **********************************************************************
+-- *    End of dot11StationConfig  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    AuthenticationAlgorithms  TABLE
+-- **********************************************************************
+
+dot11AuthenticationAlgorithmsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11AuthenticationAlgorithmsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This (conceptual) table of attributes shall be a set of
+            all the authentication algorithms supported by the
+            stations.  The following are the default values and the
+            associated algorithm:
+                Value = 1: Open System
+                Value = 2: Shared Key"
+        REFERENCE "IEEE Std 802.11-2002, 7.3.1.1"
+    ::= { dot11smt 2 }
+
+dot11AuthenticationAlgorithmsEntry OBJECT-TYPE
+        SYNTAX Dot11AuthenticationAlgorithmsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the Authentication
+            Algorithms Table.  
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex,
+                dot11AuthenticationAlgorithmsIndex }
+    ::= { dot11AuthenticationAlgorithmsTable  1 }
+
+Dot11AuthenticationAlgorithmsEntry ::= 
+        SEQUENCE {	dot11AuthenticationAlgorithmsIndex	Integer32,
+        	       	dot11AuthenticationAlgorithm      	INTEGER,
+	    	     	dot11AuthenticationAlgorithmsEnable	TruthValue }
+
+dot11AuthenticationAlgorithmsIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the Authentication Algorithms Table."
+    ::= { dot11AuthenticationAlgorithmsEntry 1 }
+
+dot11AuthenticationAlgorithm OBJECT-TYPE
+        SYNTAX INTEGER { openSystem(1), sharedKey(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This attribute shall be a set of all the authentication
+	        algorithms supported by the STAs. The following are the
+	        default values and the associated algorithm.  
+		        Value = 1: Open System 
+		        Value = 2: Shared Key"
+    ::= { dot11AuthenticationAlgorithmsEntry 2 }
+
+dot11AuthenticationAlgorithmsEnable  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "This attribute, when true at a station, shall enable the acceptance 
+	        of the authentication algorithm described in the corresponding table 
+	        entry in authentication frames received by the station that have odd 
+	        authentication sequence numbers.  The default value of this attribute 
+	        shall be 1 for the Open System table entry and 2 for all other table 
+	        entries."
+    ::= { dot11AuthenticationAlgorithmsEntry 3 }
+
+-- **********************************************************************
+-- *    End of AuthenticationAlgorithms  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    WEPDefaultKeys  TABLE
+-- **********************************************************************
+
+dot11WEPDefaultKeysTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11WEPDefaultKeysEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for WEP default keys.  This table shall
+            contain the four WEP default secret key values
+            corresponding to the four possible KeyID values.  The WEP
+            default secret keys are logically WRITE-ONLY.  Attempts to
+            read the entries in this table shall return unsuccessful
+            status and values of null or zero.  The default value of
+            each WEP default key shall be null."
+        REFERENCE "IEEE Std 802.11-2002, 8.3.2"
+    ::= { dot11smt 3 }
+
+dot11WEPDefaultKeysEntry OBJECT-TYPE
+        SYNTAX Dot11WEPDefaultKeysEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the WEP Default Keys Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+       INDEX { ifIndex, 
+               dot11WEPDefaultKeyIndex}
+    ::= { dot11WEPDefaultKeysTable  1 }
+
+Dot11WEPDefaultKeysEntry ::= 
+        SEQUENCE {	dot11WEPDefaultKeyIndex     INTEGER,
+        	    	dot11WEPDefaultKeyValue     WEPKeytype }
+
+dot11WEPDefaultKeyIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..4)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the WEP Default Keys Table.
+           The value of this variable is equal to the WEPDefaultKeyID + 1"
+    ::= { dot11WEPDefaultKeysEntry 1 }
+
+dot11WEPDefaultKeyValue OBJECT-TYPE
+        SYNTAX WEPKeytype
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A WEP default secret key value."
+    ::= { dot11WEPDefaultKeysEntry 2 }
+
+-- **********************************************************************
+-- *    End of WEPDefaultKeys  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    WEPKeyMappings  TABLE
+-- **********************************************************************
+
+dot11WEPKeyMappingsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11WEPKeyMappingsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for WEP Key Mappings.  The MIB supports
+            the ability to share a separate WEP key for each RA/TA
+            pair.  The Key Mappings Table contains zero or one entry
+            for each MAC address and contains two fields for each
+            entry: WEPOn and the corresponding WEP key.  The WEP key
+            mappings are logically WRITE-ONLY.  Attempts to read the
+            entries in this table shall return unsuccessful status and
+            values of null or zero.  The default value for all WEPOn
+            fields is false."
+        REFERENCE "IEEE Std 802.11-2002, 8.3.2"
+    ::= { dot11smt 4 }
+
+dot11WEPKeyMappingsEntry OBJECT-TYPE
+        SYNTAX Dot11WEPKeyMappingsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the WEP Key Mappings Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11WEPKeyMappingIndex }
+    ::= { dot11WEPKeyMappingsTable  1 }
+
+Dot11WEPKeyMappingsEntry ::= 
+        SEQUENCE {	dot11WEPKeyMappingIndex	    Integer32,
+        	    	dot11WEPKeyMappingAddress   MacAddress,
+        	    	dot11WEPKeyMappingWEPOn 	TruthValue,
+        	    	dot11WEPKeyMappingValue     WEPKeytype,
+	    			dot11WEPKeyMappingStatus	RowStatus }
+
+dot11WEPKeyMappingIndex OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the WEP Key Mappings Table."
+    ::= { dot11WEPKeyMappingsEntry 1 }
+
+dot11WEPKeyMappingAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The MAC address of the STA for which the values from this
+            key mapping entry are to be used."
+    ::= { dot11WEPKeyMappingsEntry 2 }
+
+dot11WEPKeyMappingWEPOn OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Boolean as to whether WEP is to be used when communicating
+            with the dot11WEPKeyMappingAddress STA."
+    ::= { dot11WEPKeyMappingsEntry 3 }
+
+dot11WEPKeyMappingValue OBJECT-TYPE
+        SYNTAX WEPKeytype
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "A WEP secret key value."
+    ::= { dot11WEPKeyMappingsEntry 4 }
+
+dot11WEPKeyMappingStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status column used for creating, modifying, and
+            deleting instances of the columnar objects in the WEP key
+            mapping Table."
+        DEFVAL { active }
+    ::= { dot11WEPKeyMappingsEntry 5 }
+
+-- **********************************************************************
+-- *    End of WEPKeyMappings  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PrivacyTable  TABLE
+-- **********************************************************************
+
+dot11PrivacyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PrivacyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group containing attributes concerned with IEEE 802.11
+            Privacy.  Created as a table to allow multiple
+            instantiations on an agent."
+    ::= { dot11smt 5 }
+
+dot11PrivacyEntry OBJECT-TYPE
+        SYNTAX Dot11PrivacyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PrivacyTable Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PrivacyTable 1 }
+
+Dot11PrivacyEntry ::= 
+        SEQUENCE {	dot11PrivacyInvoked        	TruthValue,
+        	     	dot11WEPDefaultKeyID       	INTEGER,
+        	     	dot11WEPKeyMappingLength	Unsigned32,
+        	     	dot11ExcludeUnencrypted 	TruthValue,
+            	 	dot11WEPICVErrorCount      	Counter32,
+            	 	dot11WEPExcludedCount      	Counter32 }
+
+dot11PrivacyInvoked OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "When this attribute is true, it shall indicate that the IEEE
+	        802.11 WEP mechanism is used for transmitting frames of type
+	        Data. The default value of this attribute shall be false."
+    ::= { dot11PrivacyEntry 1 }
+
+dot11WEPDefaultKeyID  OBJECT-TYPE
+        SYNTAX INTEGER (0..3)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall indicate the use of the first,
+            second, third, or fourth element of the WEPDefaultKeys
+            array when set to values of zero, one, two, or three.  The
+            default value of this attribute shall be 0."
+        REFERENCE "IEEE Std 802.11-2002, 8.3.2"
+    ::= { dot11PrivacyEntry 2 }
+
+dot11WEPKeyMappingLength  OBJECT-TYPE
+        SYNTAX Unsigned32 (10..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of tuples that dot11WEPKeyMappings can hold."
+        REFERENCE "IEEE Std 802.11-2002, 8.3.2"
+    ::= { dot11PrivacyEntry 3 }
+
+dot11ExcludeUnencrypted  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "When this attribute is true, the STA shall not indicate at
+	        the MAC service interface received MSDUs that have the WEP
+	        subfield of the Frame Control field equal to zero. When this
+	        attribute is false, the STA may accept MSDUs that have the WEP
+	        subfield of the Frame Control field equal to zero. The default
+	        value of this attribute shall be false."
+    ::= { dot11PrivacyEntry 4 }
+
+dot11WEPICVErrorCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when a frame is received with the
+            WEP subfield of the Frame Control field set to one and the value
+            of the ICV as received in the frame does not match the ICV value
+            that is calculated for the contents of the received frame."
+    ::= { dot11PrivacyEntry 5 }
+
+dot11WEPExcludedCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when a frame is received with the
+            WEP subfield of the Frame Control field set to zero and the value
+            of dot11ExcludeUnencrypted causes that frame to be discarded."
+    ::= { dot11PrivacyEntry 6 }
+
+-- **********************************************************************
+-- *    End of dot11Privacy  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    SMT notification Objects
+-- **********************************************************************
+
+dot11SMTnotification OBJECT IDENTIFIER ::= { dot11smt 6 }
+
+dot11Disassociate NOTIFICATION-TYPE
+        OBJECTS { ifIndex, dot11DisassociateReason, dot11DisassociateStation }
+        STATUS current
+        DESCRIPTION
+	        "The disassociate notification shall be sent when the STA
+	        sends a Disassociation frame. The value of the notification
+	        shall include the MAC address of the MAC to which the Disassociation
+	        frame was sent and the reason for the disassociation.
+
+  	        ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+    ::= { dot11SMTnotification 0 1 }
+
+dot11Deauthenticate NOTIFICATION-TYPE
+        OBJECTS { ifIndex, dot11DeauthenticateReason, dot11DeauthenticateStation }
+        STATUS current
+        DESCRIPTION
+	        "The deauthenticate notification shall be sent when the STA
+	        sends a Deauthentication frame. The value of the notification
+	        shall include the MAC address of the MAC to which the Deauthentication
+	        frame was sent and the reason for the deauthentication.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+    ::= { dot11SMTnotification 0 2 }
+
+dot11AuthenticateFail NOTIFICATION-TYPE
+        OBJECTS { ifIndex, dot11AuthenticateFailStatus, dot11AuthenticateFailStation }
+        STATUS current
+        DESCRIPTION
+	        "The authenticate failure notification shall be sent when the STA
+	        sends an Authentication frame with a status code other than 
+	        'successful'. The value of the notification
+	        shall include the MAC address of the MAC to which the Authentication
+	        frame was sent and the reason for the authentication failure.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+    ::= { dot11SMTnotification 0 3 }
+
+
+-- **********************************************************************
+-- *    End of SMT notification Objects
+-- **********************************************************************
+
+-- ********************************************************************
+-- * dot11MultiDomainCapability TABLE
+-- ********************************************************************
+
+dot11MultiDomainCapabilityTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF Dot11MultiDomainCapabilityEntry
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+			"This (conceptual) table of attributes for 
+			cross-domain mobility."
+	::= { dot11smt 7 }
+
+dot11MultiDomainCapabilityEntry OBJECT-TYPE
+		SYNTAX Dot11MultiDomainCapabilityEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the Multiple Domain 
+                        Capability Table.
+
+			IfIndex - Each IEEE 802.11 interface is represented 
+			by an ifEntry. Interface tables in this MIB are 
+			indexed by ifIndex."
+		INDEX { ifIndex,
+		        dot11MultiDomainCapabilityIndex }
+	::= { dot11MultiDomainCapabilityTable 1 }
+	
+Dot11MultiDomainCapabilityEntry ::=
+	SEQUENCE {	dot11MultiDomainCapabilityIndex		Integer32,
+			dot11FirstChannelNumber			Integer32,
+			dot11NumberofChannels			Integer32,
+			dot11MaximumTransmitPowerLevel		Integer32 }
+
+dot11MultiDomainCapabilityIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The auxiliary variable used to identify instances of 
+			the columnar objects in the Multi Domain Capability Table."
+	::= { dot11MultiDomainCapabilityEntry 1 }
+
+dot11FirstChannelNumber OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall indicate the value of the lowest 
+			channel number in the subband for the associated domain 
+			country string. The default value of this attribute 
+			shall be zero."
+	::= { dot11MultiDomainCapabilityEntry 2 }
+
+dot11NumberofChannels OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall indicate the value of the total 
+			number of channels allowed in the subband for the 
+			associated domain country string. The default value of 
+			this attribute shall be zero."
+	::= { dot11MultiDomainCapabilityEntry 3 }
+
+dot11MaximumTransmitPowerLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall indicate the maximum transmit power, 
+			in dBm, allowed in the subband for the associated domain 
+			country string. The default value of this attribute shall 
+			be zero."
+	::= { dot11MultiDomainCapabilityEntry 4 }
+
+-- ********************************************************************
+-- * End of dot11MultiDomainCapability TABLE
+-- ********************************************************************
+
+
+-- **********************************************************************
+-- *    MAC Attribute Templates
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11OperationTable  TABLE
+-- **********************************************************************
+
+dot11OperationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11OperationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group contains MAC attributes pertaining to the operation
+            of the MAC.  This has been implemented as a table in order
+            to allow for multiple instantiations on an agent."
+    ::= { dot11mac 1 }
+
+dot11OperationEntry OBJECT-TYPE
+        SYNTAX Dot11OperationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11OperationEntry Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11OperationTable 1 }
+
+Dot11OperationEntry ::= 
+        SEQUENCE {	dot11MACAddress                 MacAddress,
+            		dot11RTSThreshold               INTEGER,
+            		dot11ShortRetryLimit            INTEGER,
+            		dot11LongRetryLimit             INTEGER,
+            		dot11FragmentationThreshold     INTEGER,
+            		dot11MaxTransmitMSDULifetime    Unsigned32,
+            		dot11MaxReceiveLifetime         Unsigned32,
+            		dot11ManufacturerID             DisplayString,
+            		dot11ProductID                  DisplayString }
+
+dot11MACAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"Unique MAC Address assigned to the STA."
+    ::= { dot11OperationEntry 1 }
+
+dot11RTSThreshold OBJECT-TYPE
+        SYNTAX INTEGER (0..2347)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "This attribute shall indicate the number of octets in an MPDU,
+	        below which an RTS/CTS handshake shall not be performed. An
+	        RTS/CTS handshake shall be performed at the beginning of any
+	        frame exchange sequence where the MPDU is of type Data or
+	        Management, the MPDU has an individual address in the Address1
+	        field, and the length of the MPDU is greater than
+	        this threshold. (For additional details, refer to Table 21 in
+	        9.7.) Setting this attribute to be larger than the maximum
+	        MSDU size shall have the effect of turning off the RTS/CTS
+	        handshake for frames of Data or Management type transmitted by
+	        this STA. Setting this attribute to zero shall have the effect
+	        of turning on the RTS/CTS handshake for all frames of Data or
+	        Management type transmitted by this STA. The default value of
+	        this attribute shall be 2347."
+    ::= { dot11OperationEntry 2 }
+
+dot11ShortRetryLimit OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "This attribute shall indicate the maximum number of
+	        transmission attempts of a frame, the length of which is less
+	        than or equal to dot11RTSThreshold, that shall be made before a
+	        failure condition is indicated. The default value of this
+	        attribute shall be 7."
+    ::= { dot11OperationEntry 3 }
+
+dot11LongRetryLimit OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "This attribute shall indicate the maximum number of
+	        transmission attempts of a frame, the length of which is
+	        greater than dot11RTSThreshold, that shall be made before a
+	        failure condition is indicated. The default value of this
+	        attribute shall be 4."
+    ::= { dot11OperationEntry 4 }
+
+dot11FragmentationThreshold OBJECT-TYPE
+        SYNTAX INTEGER (256..2346)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "This attribute shall specify the current maximum size, in
+	        octets, of the MPDU that may be delivered to the PHY. An MSDU
+	        shall be broken into fragments if its size exceeds the value
+	        of this attribute after adding MAC headers and trailers. An MSDU
+	        or MMPDU shall be fragmented when the resulting frame has an
+	        individual address in the Address1 field, and the length of the
+	        frame is larger than this threshold. The default value for this
+	        attribute shall be the lesser of 2346 or the aMPDUMaxLength of
+	        the attached PHY and shall never exceed the lesser of 2346 or
+	        the  aMPDUMaxLength of the attached PHY. The value of this
+	        attribute shall never be less than 256. "
+    ::= { dot11OperationEntry 5 }
+
+dot11MaxTransmitMSDULifetime OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	        "The MaxTransmitMSDULifetime shall be the elapsed time in TU,
+	        after the initial transmission of an MSDU, after which further
+	        attempts to transmit the MSDU shall be terminated. The default
+	        value of this attribute shall be 512."
+    ::= { dot11OperationEntry 6 }
+
+dot11MaxReceiveLifetime OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The MaxReceiveLifetime shall be the elapsed time in TU,
+            after the initial reception of a fragmented MMPDU or MSDU,
+            after which further attempts to reassemble the MMPDU or
+            MSDU shall be terminated. The default value shall be
+            512."
+    ::= { dot11OperationEntry 7 }
+
+dot11ManufacturerID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ManufacturerID shall include, at a minimum, the name
+            of the manufacturer.  It may include additional
+            information at the manufacturer's discretion.  The default
+            value of this attribute shall be null."
+    ::= { dot11OperationEntry 8 }
+
+dot11ProductID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ProductID shall include, at a minimum, an identifier
+            that is unique to the manufacturer.  It may include
+            additional information at the manufacturer's discretion.
+            The default value of this attribute shall be null."
+    ::= { dot11OperationEntry 9 }
+
+-- **********************************************************************
+-- *    End of dot11OperationEntry  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11Counters TABLE
+-- **********************************************************************
+
+dot11CountersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11CountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group containing attributes that are MAC counters.
+            Implemented as a table to allow for multiple
+            instantiations on an agent."
+    ::= { dot11mac 2 }
+
+dot11CountersEntry OBJECT-TYPE
+        SYNTAX Dot11CountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11CountersEntry Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11CountersTable 1 }
+
+Dot11CountersEntry ::= 
+        SEQUENCE {	dot11TransmittedFragmentCount       Counter32,
+            		dot11MulticastTransmittedFrameCount Counter32,
+            		dot11FailedCount                    Counter32,
+            		dot11RetryCount                     Counter32,
+            		dot11MultipleRetryCount             Counter32,
+            		dot11FrameDuplicateCount            Counter32,
+            		dot11RTSSuccessCount                Counter32,
+            		dot11RTSFailureCount                Counter32,
+            		dot11ACKFailureCount                Counter32,
+            		dot11ReceivedFragmentCount          Counter32,
+            		dot11MulticastReceivedFrameCount    Counter32,
+            		dot11FCSErrorCount                  Counter32,
+		    		dot11TransmittedFrameCount          Counter32,
+		    		dot11WEPUndecryptableCount          Counter32 }
+
+dot11TransmittedFragmentCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall be incremented for an acknowledged MPDU
+            with an individual address in the address 1 field or an MPDU
+            with a multicast address in the address 1 field of type Data
+            or Management."
+    ::= { dot11CountersEntry 1 }
+
+dot11MulticastTransmittedFrameCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment only when the multicast bit
+            is set in the destination MAC address of a successfully
+            transmitted MSDU.  When operating as a STA in an ESS, where
+            these frames are directed to the AP, this implies having
+            received an acknowledgment to all associated MPDUs."
+    ::= { dot11CountersEntry 2 }
+
+dot11FailedCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This counter shall increment when an MSDU is not transmitted
+	        successfully due to the number of transmit attempts exceeding
+	        either the  dot11ShortRetryLimit or dot11LongRetryLimit."
+    ::= { dot11CountersEntry 3 }
+
+dot11RetryCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when an MSDU is successfully
+            transmitted after one or more retransmissions."
+    ::= { dot11CountersEntry 4 }
+
+dot11MultipleRetryCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when an MSDU is successfully
+            transmitted after more than one retransmission."
+    ::= { dot11CountersEntry 5 }
+
+dot11FrameDuplicateCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when a frame is received
+            that the Sequence Control field indicates is a
+            duplicate."
+    ::= { dot11CountersEntry 6 }
+
+dot11RTSSuccessCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when a CTS is received in
+            response to an RTS."
+    ::= {  dot11CountersEntry 7 }
+
+dot11RTSFailureCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This counter shall increment when a CTS is not received in
+	        response to an RTS."
+    ::= { dot11CountersEntry 8 }
+
+dot11ACKFailureCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when an ACK is not received
+            when expected."
+    ::= {  dot11CountersEntry 9 }
+
+dot11ReceivedFragmentCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall be incremented for each successfully
+            received MPDU of type Data or Management."
+    ::= { dot11CountersEntry 10 }
+
+dot11MulticastReceivedFrameCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when a MSDU is received
+            with the multicast bit set in the destination
+            MAC address."
+    ::= { dot11CountersEntry 11 }
+
+dot11FCSErrorCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter shall increment when an FCS error is
+            detected in a received MPDU."
+    ::= { dot11CountersEntry 12 }
+
+dot11TransmittedFrameCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+			"This counter shall increment for each successfully transmitted MSDU."
+    ::= { dot11CountersEntry 13 }
+
+dot11WEPUndecryptableCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This counter shall increment when a frame is received with
+	        the WEP subfield of the Frame Control field set to one and the
+	        WEPOn value for the key mapped to the TA's MAC address
+	        indicates that the frame should not have been encrypted or
+	        that frame is discarded due to the receiving STA not
+	        implementing the privacy option."
+    ::= { dot11CountersEntry 14 }
+
+-- **********************************************************************
+-- *    End of dot11CountersEntry  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    GroupAddresses  TABLE
+-- **********************************************************************
+
+dot11GroupAddressesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11GroupAddressesEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A conceptual table containing a set of MAC addresses
+            identifying the multicast addresses for which this STA
+            will receive frames.  The default value of this attribute
+            shall be null."
+    ::= { dot11mac 3 }
+
+dot11GroupAddressesEntry OBJECT-TYPE
+        SYNTAX Dot11GroupAddressesEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the Group Addresses Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11GroupAddressesIndex}
+    ::= { dot11GroupAddressesTable  1 }
+
+Dot11GroupAddressesEntry ::= 
+        SEQUENCE {	dot11GroupAddressesIndex    Integer32,
+            		dot11Address                MacAddress,
+            		dot11GroupAddressesStatus   RowStatus }
+
+dot11GroupAddressesIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the Group Addresses Table."
+    ::= { dot11GroupAddressesEntry 1 }
+
+dot11Address OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "MAC address identifying a multicast addresses
+            from which this STA will receive frames."
+    ::= { dot11GroupAddressesEntry 2 }
+
+dot11GroupAddressesStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status column used for creating, modifying, and
+            deleting instances of the columnar objects in the Group
+            Addresses Table."
+        DEFVAL { active }
+    ::= { dot11GroupAddressesEntry 3 }
+
+-- **********************************************************************
+-- *    End of GroupAddress  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    Resource Type Attribute Templates
+-- **********************************************************************
+
+dot11ResourceTypeIDName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Contains the name of the Resource Type ID managed object.
+            The attribute is read-only and always contains the value
+            RTID.  This attribute value shall not be used as a naming
+            attribute for any other managed object class."
+        REFERENCE "IEEE Std 802.1F-1993,  A.7"
+        DEFVAL { "RTID" }
+    ::= { dot11resAttribute 1 }
+
+-- **********************************************************************
+-- *    dot11ResourceInfo  TABLE
+-- **********************************************************************
+
+dot11ResourceInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11ResourceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Provides a means of indicating, in data readable from a
+            managed object, information that identifies the source of
+            the implementation."
+        REFERENCE "IEEE Std 802.1F-1993,  A.7"
+    ::= { dot11resAttribute 2 }
+
+dot11ResourceInfoEntry OBJECT-TYPE
+        SYNTAX Dot11ResourceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11ResourceInfo Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11ResourceInfoTable 1 }
+
+Dot11ResourceInfoEntry ::= 
+        SEQUENCE {	dot11manufacturerOUI             OCTET STRING,
+            		dot11manufacturerName            DisplayString,
+            		dot11manufacturerProductName     DisplayString,
+            		dot11manufacturerProductVersion  DisplayString }
+
+dot11manufacturerOUI OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(3))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Takes the value of an organizationally unique identifier."
+    ::= { dot11ResourceInfoEntry 1 }
+
+dot11manufacturerName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A printable string used to identify the manufacturer of the
+            resource.  Maximum string length is 128 octets."
+    ::= { dot11ResourceInfoEntry 2 }
+
+dot11manufacturerProductName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A printable string used to identify the manufacturer's product
+            name of the resource.  Maximum string length is 128 octets."
+    ::= { dot11ResourceInfoEntry 3 }
+
+dot11manufacturerProductVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Printable string used to identify the manufacturer's product
+            version of the resource.  Maximum string length is 128 octets."
+    ::= { dot11ResourceInfoEntry 4 }
+
+-- **********************************************************************
+-- *    End of dot11ResourceInfo  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *   PHY Attribute Templates
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyOperation  TABLE
+-- **********************************************************************
+
+dot11PhyOperationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyOperationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+	        "PHY level attributes concerned with
+	        operation.  Implemented as a table indexed on
+
+	        ifIndex to allow for multiple instantiations on an
+	        Agent."
+    ::= { dot11phy 1 }
+
+dot11PhyOperationEntry OBJECT-TYPE
+        SYNTAX Dot11PhyOperationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyOperation Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyOperationTable 1 }
+
+Dot11PhyOperationEntry ::= 
+        SEQUENCE {	dot11PHYType            INTEGER,
+            		dot11CurrentRegDomain   Integer32,
+            		dot11TempType           INTEGER }
+
+dot11PHYType OBJECT-TYPE
+        SYNTAX INTEGER { fhss(1), dsss(2), irbaseband(3), ofdm(4),
+			             hrdsss(5) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This is an 8-bit integer value that identifies the PHY type
+	        supported by the attached PLCP and PMD. Currently defined
+	        values and their corresponding PHY types are:
+	
+	        FHSS 2.4 GHz = 01 , DSSS 2.4 GHz = 02, IR Baseband = 03,
+			OFDM 5GHz = 04, HRDSSS = 05"
+    ::= { dot11PhyOperationEntry 1 }
+
+dot11CurrentRegDomain OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current regulatory domain this instance of the PMD is
+            supporting.  This object corresponds to one of the
+            RegDomains listed in dot11RegDomainsSupported."
+    ::= { dot11PhyOperationEntry 2 }
+
+dot11TempType OBJECT-TYPE
+        SYNTAX INTEGER { tempType1(1), tempType2(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "There are different operating temperature requirements
+	        dependent on the anticipated environmental conditions. This
+	        attribute describes the current PHY's operating temperature
+	        range capability. Currently defined values and their
+	        corresponding temperature ranges are:
+
+	        Type 1 = X'01'-Commercial range of 0 to 40 degrees C,
+
+	        Type 2 = X'02'-Industrial range of -30 to 70 degrees C."
+    ::= { dot11PhyOperationEntry 3 }
+
+-- **********************************************************************
+-- *    End of dot11PhyOperation  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyAntenna  TABLE
+-- **********************************************************************
+
+dot11PhyAntennaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyAntennaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group of attributes for PhyAntenna.  Implemented as a
+            table indexed on ifIndex to allow for multiple instances on
+            an agent."
+    ::= { dot11phy 2}
+
+dot11PhyAntennaEntry OBJECT-TYPE
+        SYNTAX Dot11PhyAntennaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyAntenna Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyAntennaTable 1 }
+
+Dot11PhyAntennaEntry ::= 
+        SEQUENCE {	dot11CurrentTxAntenna  Integer32,
+             		dot11DiversitySupport  INTEGER,
+	     			dot11CurrentRxAntenna  Integer32 }
+
+dot11CurrentTxAntenna OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current antenna being used to transmit.  This value
+	        is one of the values appearing in dot11SupportedTxAntenna. This 
+	        may be used by a management agent to control which antenna is 
+	        used for transmission. "
+    ::= { dot11PhyAntennaEntry 1 }
+
+dot11DiversitySupport OBJECT-TYPE
+        SYNTAX INTEGER { fixedlist(1), notsupported(2), dynamic(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	        "This implementation's support for diversity, encoded as:
+
+	        X'01'-diversity is available and is performed over the fixed
+	            list of antennas defined in dot11DiversitySelectionRx.
+
+	        X'02'-diversity is not supported.
+
+	        X'03'-diversity is supported and control of diversity is also
+	            available, in which case the attribute 
+	            dot11DiversitySelectionRx can be dynamically modified by the
+	            LME."
+    ::= { dot11PhyAntennaEntry 2 }
+
+dot11CurrentRxAntenna OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+			"The current antenna being used to receive, if the dot11 
+			DiversitySupport indicates that diversity is not supported.  
+			The selected antenna shall be one of the antennae marked 
+			for receive in the dot11AntennasListTable."
+    ::= { dot11PhyAntennaEntry 3 }
+
+-- **********************************************************************
+-- *    End of dot11PhyAntenna  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyTxPower  TABLE
+-- **********************************************************************
+
+dot11PhyTxPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyTxPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group of attributes for dot11PhyTxPowerTable.  Implemented
+            as a table indexed on STA ID to allow for multiple
+            instances on an Agent."
+    ::= { dot11phy 3}
+
+dot11PhyTxPowerEntry OBJECT-TYPE
+        SYNTAX Dot11PhyTxPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyTxPower Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyTxPowerTable 1 }
+
+Dot11PhyTxPowerEntry ::= 
+        SEQUENCE {	dot11NumberSupportedPowerLevels  INTEGER,
+            		dot11TxPowerLevel1               INTEGER,
+            		dot11TxPowerLevel2               INTEGER,
+            		dot11TxPowerLevel3               INTEGER,
+            		dot11TxPowerLevel4               INTEGER,
+            		dot11TxPowerLevel5               INTEGER,
+            		dot11TxPowerLevel6               INTEGER,
+            		dot11TxPowerLevel7               INTEGER,
+            		dot11TxPowerLevel8               INTEGER,
+            		dot11CurrentTxPowerLevel         INTEGER }
+
+dot11NumberSupportedPowerLevels OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of power levels supported by the PMD.
+            This attribute can have a value of 1 to 8."
+    ::= { dot11PhyTxPowerEntry 1 }
+
+dot11TxPowerLevel1 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL1 in mW.
+            This is also the default power level."
+    ::= { dot11PhyTxPowerEntry 2 }
+
+dot11TxPowerLevel2 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL2 in mW."
+    ::= { dot11PhyTxPowerEntry 3 }
+
+dot11TxPowerLevel3 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL3 in mW."
+    ::= { dot11PhyTxPowerEntry 4 }
+
+dot11TxPowerLevel4 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL4 in mW."
+    ::= { dot11PhyTxPowerEntry 5 }
+
+dot11TxPowerLevel5 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL5 in mW."
+    ::= { dot11PhyTxPowerEntry 6 }
+
+dot11TxPowerLevel6 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL6 in mW."
+    ::= { dot11PhyTxPowerEntry 7 }
+
+dot11TxPowerLevel7 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL7 in mW."
+    ::= { dot11PhyTxPowerEntry 8 }
+
+dot11TxPowerLevel8 OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transmit output power for LEVEL8 in mW."
+    ::= { dot11PhyTxPowerEntry 9 }
+
+dot11CurrentTxPowerLevel OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The TxPowerLevel N currently being used to transmit data.
+            Some PHYs also use this value to determine the receiver
+            sensitivity requirements for CCA."
+    ::= { dot11PhyTxPowerEntry 10 }
+
+-- **********************************************************************
+-- *    End of dot11PhyTxPower  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyFHSS  TABLE
+-- **********************************************************************
+
+dot11PhyFHSSTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyFHSSEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group of attributes for dot11PhyFHSSTable.  Implemented as a
+            table indexed on STA ID to allow for multiple instances on
+            an Agent."
+    ::= { dot11phy 4 }
+
+dot11PhyFHSSEntry OBJECT-TYPE
+        SYNTAX Dot11PhyFHSSEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyFHSS Table.
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyFHSSTable 1 }
+
+Dot11PhyFHSSEntry ::= 
+        SEQUENCE {	dot11HopTime   				INTEGER,
+             		dot11CurrentChannelNumber  		INTEGER,
+             		dot11MaxDwellTime  			INTEGER,
+             		dot11CurrentDwellTime  			INTEGER,
+             		dot11CurrentSet    			INTEGER,
+             		dot11CurrentPattern    			INTEGER,
+             		dot11CurrentIndex  			INTEGER,
+ 			dot11EHCCPrimeRadix			Integer32, 
+			dot11EHCCNumberofChannelsFamilyIndex	Integer32,
+			dot11EHCCCapabilityImplemented		TruthValue, 
+			dot11EHCCCapabilityEnabled		TruthValue,
+			dot11HopAlgorithmAdopted		INTEGER,
+			dot11RandomTableFlag			TruthValue,
+			dot11NumberofHoppingSets		Integer32,
+			dot11HopModulus				Integer32,
+			dot11HopOffset				Integer32 }
+
+dot11HopTime OBJECT-TYPE
+        SYNTAX INTEGER (224)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The time in microseconds for the PMD to change from
+            channel 2 to channel 80."
+    ::= { dot11PhyFHSSEntry 1 }
+
+dot11CurrentChannelNumber OBJECT-TYPE
+        SYNTAX INTEGER (0..200)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        	"The current channel number of the frequency output by the RF
+        	synthesizer."
+    ::= { dot11PhyFHSSEntry 2 }
+
+dot11MaxDwellTime OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum time in TU that the transmitter
+            is permitted to operate on a single channel."
+    ::= { dot11PhyFHSSEntry 3 }
+
+dot11CurrentDwellTime OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current time in TU that the transmitter shall operate
+            on a single channel, as set by the MAC.  Default is 19 TU."
+    ::= { dot11PhyFHSSEntry 4 }
+
+dot11CurrentSet OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current set of patterns the PLME 
+	    is using to determine the hopping sequence. "
+    ::= { dot11PhyFHSSEntry 5 }
+
+dot11CurrentPattern OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current pattern the PLME is
+            using to determine the hop sequence."
+    ::= { dot11PhyFHSSEntry 6 }
+
+dot11CurrentIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current index value the PLME is using to determine
+            the CurrentChannelNumber."
+    ::= { dot11PhyFHSSEntry 7 }
+
+dot11EHCCPrimeRadix OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute indicates the value to be 
+			used as the prime radix (N) in the HCC and 
+			EHCC algorithms."
+    ::= { dot11PhyFHSSEntry 8 }
+
+dot11EHCCNumberofChannelsFamilyIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute indicates the value to be 
+			used as the maximum for the family index (a) 
+			in the HCC and EHCC algorithms. The value of 
+			this field shall not be less than the prime 
+			radix minus 3 (N - 3). The valid range of 
+			allowed values is (N - 1), (N - 2), and (N - 3)."
+    ::= { dot11PhyFHSSEntry 9 }
+
+dot11EHCCCapabilityImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, when TRUE, indicates that the 
+			station implementation is capable of generating 
+			the HCC or EHCC algorithms for determining Hopping 
+			patterns.  The capability is disabled, otherwise.  
+			The default value of this attribute is FALSE."
+    ::= { dot11PhyFHSSEntry 10 }
+
+dot11EHCCCapabilityEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, when TRUE, indicates that the 
+			capability of the station to operate using the HCC 
+			or EHCC algorithms for determining Hopping Patterns 
+			is enabled.  The capability is disabled, otherwise.  
+			The default value of this attribute is FALSE."
+    ::= { dot11PhyFHSSEntry 11 }
+
+dot11HopAlgorithmAdopted OBJECT-TYPE
+		SYNTAX INTEGER { crnt(1), hopindex(2), hcc(3) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, indicates which of the algorithms 
+			will be used to generate the Hopping Patterns. 
+			Valid values are: 
+	
+			1 - hopping patterns as defined in clause 14 
+			2 - hop index method (with or without table)
+			3 - HCC/EHCC method"
+    ::= { dot11PhyFHSSEntry 12 }
+
+dot11RandomTableFlag OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute, indicates that a Random Table is 
+			present when the value is True. When the value is 
+			False it indicates that a Random Table is not 
+			present and that the hop index method is to be 
+			used to determine the hopping sequence. The default 
+			value of this attribute is True."
+    ::= { dot11PhyFHSSEntry 13 }
+
+dot11NumberofHoppingSets OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Number of Sets field indicates the total 
+			number of sets within the hopping patterns."
+    ::= { dot11PhyFHSSEntry 14 }
+
+dot11HopModulus OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of allowed channels for the hopping 
+			set. This is defined by the governing regulatory 
+			agency for the country code of the country 
+			in which this device is operating."
+    ::= { dot11PhyFHSSEntry 15 }
+
+dot11HopOffset OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The next position in the hopping set."
+    ::= { dot11PhyFHSSEntry 16 }
+
+-- **********************************************************************
+-- *    End of dot11PhyFHSS  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyDSSSEntry  TABLE
+-- **********************************************************************
+
+dot11PhyDSSSTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyDSSSEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of attributes for dot11PhyDSSSEntry.  Implemented as a
+            table indexed on ifIndex allow for multiple instances on
+            an Agent."
+    ::= { dot11phy 5 }
+
+dot11PhyDSSSEntry OBJECT-TYPE
+        SYNTAX Dot11PhyDSSSEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyDSSSEntry Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyDSSSTable 1 }
+
+Dot11PhyDSSSEntry ::= 
+        SEQUENCE {	dot11CurrentChannel    INTEGER,
+             		dot11CCAModeSupported  INTEGER,
+             		dot11CurrentCCAMode    INTEGER,
+             		dot11EDThreshold       Integer32 }
+
+dot11CurrentChannel OBJECT-TYPE
+        SYNTAX INTEGER (1..14)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current operating frequency channel of the DSSS
+            PHY. Valid channel numbers are as defined in 15.4.6.2"
+    ::= { dot11PhyDSSSEntry 1 }
+
+dot11CCAModeSupported OBJECT-TYPE
+        SYNTAX INTEGER (1..7)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            	"dot11CCAModeSupported is a bit-significant value,
+	  	representing all of the CCA modes supported by the PHY.
+		Valid values are:
+
+            	   energy detect only (ED_ONLY) = 01,
+		   carrier sense only (CS_ONLY) = 02,
+		   carrier sense and energy detect (ED_and_CS)= 04
+		   or the logical sum of any of these values.  This
+		   attribute shall not be used to indicate the CCA modes
+		   supported by a higher rate extension PHY.  Rather, the
+		   dot11HRCCAModeSupported attribute shall be used to
+		   indicate the CCA modes of the higher rate extension PHY."
+    ::= { dot11PhyDSSSEntry 2 }
+
+dot11CurrentCCAMode OBJECT-TYPE
+        SYNTAX INTEGER { edonly(1), csonly(2), edandcs(4), cswithtimer(8),
+			             hrcsanded(16) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current CCA method in operation.   Valid values are:
+                energy detect only (edonly) = 01,
+                carrier sense only (csonly) = 02,
+                carrier sense and energy detect (edandcs)= 04
+                carrier sense with timer (cswithtimer)= 08
+                high rate carrier sense and energy detect (hrcsanded)=16."
+    ::= { dot11PhyDSSSEntry 3 }
+
+dot11EDThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The current Energy Detect Threshold being used by the DSSS PHY."
+    ::= { dot11PhyDSSSEntry 4 }
+
+-- **********************************************************************
+-- *    End of dot11PhyDSSSEntry  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11PhyIR  TABLE
+-- **********************************************************************
+
+dot11PhyIRTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyIREntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group of attributes for dot11PhyIRTable.  Implemented as a
+            table indexed on ifIndex to allow for multiple instances on
+            an Agent."
+    ::= { dot11phy 6 }
+
+dot11PhyIREntry OBJECT-TYPE
+        SYNTAX Dot11PhyIREntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyIR Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyIRTable 1 }
+
+Dot11PhyIREntry ::= 
+        SEQUENCE {	dot11CCAWatchdogTimerMax       Integer32,
+             		dot11CCAWatchdogCountMax       Integer32,
+             		dot11CCAWatchdogTimerMin       Integer32,
+             		dot11CCAWatchdogCountMin       Integer32 }
+
+dot11CCAWatchdogTimerMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This parameter, together with CCAWatchdogCountMax,
+            determines when energy detected in the channel can be
+            ignored."
+    ::= { dot11PhyIREntry 1 }
+
+dot11CCAWatchdogCountMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This parameter, together with CCAWatchdogTimerMax,
+            determines when energy detected in the channel can be
+            ignored."
+    ::= { dot11PhyIREntry 2 }
+
+dot11CCAWatchdogTimerMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The minimum value to which CCAWatchdogTimerMax can be
+            set."
+    ::= { dot11PhyIREntry 3 }
+
+dot11CCAWatchdogCountMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The minimum value to which CCAWatchdogCount can be set."
+    ::= { dot11PhyIREntry 4 }
+
+-- **********************************************************************
+-- *    End of dot11PhyIR  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11RegDomainsSupported  TABLE
+-- **********************************************************************
+
+dot11RegDomainsSupportedTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11RegDomainsSupportedEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "There are different operational requirements dependent on
+            the regulatory domain.  This attribute list describes the
+            regulatory domains the PLCP and PMD support in this
+            implementation.  Currently defined values and their
+            corresponding Regulatory Domains are:
+
+            FCC (USA) = X'10', DOC (Canada) = X'20', ETSI (most of
+            Europe) = X'30', Spain = X'31', France = X'32', MKK
+            (Japan) = X'40', Others = X'00' "
+    ::= { dot11phy 7}
+
+dot11RegDomainsSupportedEntry OBJECT-TYPE
+        SYNTAX Dot11RegDomainsSupportedEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11RegDomainsSupportedTable.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11RegDomainsSupportedIndex }
+    ::= { dot11RegDomainsSupportedTable 1 }
+
+Dot11RegDomainsSupportedEntry ::= 
+        SEQUENCE {	dot11RegDomainsSupportedIndex    Integer32,
+             		dot11RegDomainsSupportedValue    INTEGER }
+
+dot11RegDomainsSupportedIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the RegDomainsSupport Table."
+    ::= { dot11RegDomainsSupportedEntry 1 }
+
+dot11RegDomainsSupportedValue OBJECT-TYPE
+        SYNTAX INTEGER { fcc(16), doc(32), etsi(48), spain (49), france(50), 
+                         mkk (64) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "There are different operational requirements dependent on
+            the regulatory domain.  This attribute list describes the
+            regulatory domains the PLCP and PMD support in this
+            implementation.  Currently defined values and their
+            corresponding Regulatory Domains are:
+
+            FCC (USA) = X'10', DOC (Canada) = X'20', ETSI (most of
+            Europe) = X'30', Spain = X'31', France = X'32', MKK
+            (Japan) = X'40' "
+    ::= { dot11RegDomainsSupportedEntry 2 }
+
+-- **********************************************************************
+-- *    End of dot11RegDomainsSupported  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    dot11AntennasList  TABLE
+-- **********************************************************************
+
+dot11AntennasListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11AntennasListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+		"This table represents the list of antennae.  An antenna can be 
+		marked to be capable of transmitting, receiving, and/or for 
+		participation in receive diversity.  Each entry in this table 
+		represents a single antenna with its properties.  The maximum 
+		number of antennae that can be contained in this table is 255."
+    ::= { dot11phy 8 }
+
+dot11AntennasListEntry OBJECT-TYPE
+        SYNTAX Dot11AntennasListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11AntennasListTable, representing the properties 
+            of a single antenna.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11AntennaListIndex }
+    ::= { dot11AntennasListTable 1 }
+
+Dot11AntennasListEntry ::= 
+        SEQUENCE {	dot11AntennaListIndex     Integer32,
+             		dot11SupportedTxAntenna   TruthValue,
+             		dot11SupportedRxAntenna   TruthValue,
+             		dot11DiversitySelectionRx TruthValue }
+
+dot11AntennaListIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The unique index of an antenna which is used to identify the columnar 
+            objects in the dot11AntennasList Table."
+    ::= { dot11AntennasListEntry 1 }
+
+dot11SupportedTxAntenna OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When true, this object indicates that the antenna represented by 
+            dot11AntennaIndex can be used as a transmit antenna."
+    ::= { dot11AntennasListEntry 2 }
+
+dot11SupportedRxAntenna OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When true, this object indicates that the antenna represented by the 
+            dot11AntennaIndex xan be used as a receive antenna."
+    ::= { dot11AntennasListEntry 3 }
+
+dot11DiversitySelectionRx OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When true, this object indicates that the antenna represented by 
+            dot11AntennaIndex can be used for receive diversity.  This object 
+            may only be true if the antenna can be used as a receive antenna, 
+            as indicated by dot11SupportedRxAntenna."
+    ::= { dot11AntennasListEntry 4 }
+
+-- **********************************************************************
+-- *    End of dot11AntennasList  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    SupportedDataRatesTx  TABLE
+-- **********************************************************************
+
+dot11SupportedDataRatesTxTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11SupportedDataRatesTxEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Transmit bit rates supported by the PLCP and PMD,
+            represented by a count from X'02-X'7f, corresponding to data
+            rates in increments of 500kbit/s from 1 Mbit/s to 63.5 Mbit/s subject
+            to limitations of each individual PHY."
+    ::= { dot11phy 9 }
+
+dot11SupportedDataRatesTxEntry OBJECT-TYPE
+        SYNTAX Dot11SupportedDataRatesTxEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the dot11SupportedDataRatesTx
+            Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11SupportedDataRatesTxIndex }
+    ::= { dot11SupportedDataRatesTxTable  1 }
+
+Dot11SupportedDataRatesTxEntry ::= 
+        SEQUENCE {	dot11SupportedDataRatesTxIndex  Integer32,
+            		dot11SupportedDataRatesTxValue  Integer32 }
+
+dot11SupportedDataRatesTxIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index object which identifies which data rate to access.
+            Range is 1..8."
+    ::= { dot11SupportedDataRatesTxEntry 1 }
+
+dot11SupportedDataRatesTxValue OBJECT-TYPE
+        SYNTAX Integer32 (2..127)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Transmit bit rates supported by the PLCP and PMD,
+            represented by a count from X'02-X'7f, corresponding to data
+            rates in increments of 500kbit/s from 1 Mbit/s to 63.5 Mbit/s subject
+            to limitations of each individual PHY."
+    ::= { dot11SupportedDataRatesTxEntry 2 }
+
+-- **********************************************************************
+-- *    End of dot11SupportedDataRatesTx  TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *    SupportedDataRatesRx  TABLE
+-- **********************************************************************
+
+dot11SupportedDataRatesRxTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11SupportedDataRatesRxEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The receive bit rates supported by the PLCP and PMD,
+            represented by a count from X'002-X'7f, corresponding to data
+            rates in increments of 500kbit/s from 1 Mbit/s to 63.5 Mbit/s."
+    ::= { dot11phy 10 }
+
+dot11SupportedDataRatesRxEntry OBJECT-TYPE
+        SYNTAX Dot11SupportedDataRatesRxEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the dot11SupportedDataRatesRx Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry.  Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex, 
+                dot11SupportedDataRatesRxIndex }
+    ::= { dot11SupportedDataRatesRxTable  1 }
+
+Dot11SupportedDataRatesRxEntry ::= 
+        SEQUENCE {	dot11SupportedDataRatesRxIndex  Integer32,
+            		dot11SupportedDataRatesRxValue  Integer32 }
+
+dot11SupportedDataRatesRxIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index object which identifies which data rate to access.
+            Range is 1..8."
+    ::= { dot11SupportedDataRatesRxEntry 1 }
+
+dot11SupportedDataRatesRxValue OBJECT-TYPE
+        SYNTAX Integer32 (2..127)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The receive bit rates supported by the PLCP and PMD,
+            represented by a count from X'02-X'7f, corresponding to data
+            rates in increments of 500kbit/s from 1 Mbit/s to 63.5 Mbit/s."
+    ::= { dot11SupportedDataRatesRxEntry 2 }
+
+-- **********************************************************************
+-- *    End of dot11SupportedDataRatesRx  TABLE
+-- **********************************************************************
+
+--**********************************************************************
+-- * dot11PhyOFDM TABLE
+--**********************************************************************
+
+dot11PhyOFDMTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot11PhyOFDMEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group of attributes for dot11PhyOFDMTable. Implemented as a
+            table indexed on ifindex to allow for multiple instances on
+            an Agent."
+    ::= { dot11phy 11 }
+
+dot11PhyOFDMEntry OBJECT-TYPE
+        SYNTAX Dot11PhyOFDMEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the dot11PhyOFDM Table.
+
+            ifIndex - Each IEEE 802.11 interface is represented by an
+            ifEntry. Interface tables in this MIB module are indexed
+            by ifIndex."
+        INDEX { ifIndex }
+    ::= { dot11PhyOFDMTable 1 }
+
+Dot11PhyOFDMEntry ::= 
+        SEQUENCE {	dot11CurrentFrequency        INTEGER,
+            		dot11TIThreshold             Integer32,
+            		dot11FrequencyBandsSupported INTEGER }
+
+dot11CurrentFrequency OBJECT-TYPE
+        SYNTAX INTEGER (0..99)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of the current operating frequency channel of the OFDM PHY."
+    ::= { dot11PhyOFDMEntry 1 }
+
+dot11TIThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Threshold being used to detect a busy medium (frequency).
+            CCA shall report a busy medium upon detecting the RSSI above 
+	    this threshold."
+    ::= { dot11PhyOFDMEntry 2 }
+
+dot11FrequencyBandsSupported OBJECT-TYPE
+        SYNTAX INTEGER (1..7)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The capability of the OFDM PHY implementation to operate in 
+	    the three U-NII bands. Coded as an integer value of a three 
+	    bit field as follows:
+                bit 0 .. capable of operating in the lower (5.15-5.25 GHz)
+		U-NII band
+                bit 1 .. capable of operating in the middle (5.25-5.35 GHz) 
+		U-NII band
+                bit 2 .. capable of operating in the upper (5.725-5.825 GHz) 
+		U-NII band
+            For example, for an implementation capable of operating in the 
+	    lower and mid bands this attribute would take the value 3."
+    ::= { dot11PhyOFDMEntry 3 }
+
+-- **********************************************************************
+-- * End of dot11PhyOFDM TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- *	dot11PhyHRDSSSEntry TABLE
+-- **********************************************************************
+
+dot11PhyHRDSSSTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Dot11PhyHRDSSSEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Entry of attributes for dot11PhyHRDSSSEntry.
+			Implemented as a table indexed on ifIndex to allow for
+			multiple instances on an Agent."
+    ::= { dot11phy 12 }
+
+dot11PhyHRDSSSEntry OBJECT-TYPE
+		SYNTAX Dot11PhyHRDSSSEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the dot11PhyHRDSSSEntry Table.
+
+			ifIndex - Each IEEE 802.11 interface is represented by an
+			ifEntry. Interface tables in this MIB module are indexed
+			by ifIndex."
+	INDEX { ifIndex }
+    ::= { dot11PhyHRDSSSTable 1 }
+
+Dot11PhyHRDSSSEntry ::= 
+        SEQUENCE {	dot11ShortPreambleOptionImplemented	TruthValue,
+			dot11PBCCOptionImplemented		TruthValue,
+			dot11ChannelAgilityPresent 		TruthValue,
+			dot11ChannelAgilityEnabled 		TruthValue,
+			dot11HRCCAModeSupported			INTEGER }
+
+dot11ShortPreambleOptionImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute, when true, shall indicate that the
+			short preamble option as defined in subclause 18.2.2.2
+			is implemented.  The default value of this attribute
+			shall be false."
+    ::= {dot11PhyHRDSSSEntry 1 }
+
+dot11PBCCOptionImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute, when true, shall indicate that the PBCC
+			modulation option as defined in subclause 18.4.6.6 is
+			implemented.  The default value of this attribute shall
+			be false."
+    ::= {dot11PhyHRDSSSEntry 2 }
+
+dot11ChannelAgilityPresent OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute indicates that the PHY is capable of
+			channel agility."
+    ::= { dot11PhyHRDSSSEntry 3 }
+
+dot11ChannelAgilityEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute indicates that the PHY channel agility
+			functionality is enabled."
+    ::= { dot11PhyHRDSSSEntry 4 }
+
+dot11HRCCAModeSupported OBJECT-TYPE
+		SYNTAX INTEGER (1..31)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"dot11HRCCAModeSupported is a bit-significant value,
+			representing all of the CCA modes supported by the PHY.
+			Valid values are:
+			    energy detect only (ED_ONLY) = 01,
+			    carrier sense only (CS_ONLY) = 02,
+			    carrier sense and energy detect (ED_and_CS)= 04,
+			    carrier sense with timer (CS_and_Timer)= 08,
+			    high rate carrier sense and energy detect 
+			    (HRCS_and_ED)= 16
+			    or the logical sum of any of these values.  In 
+			    the high rate extension PHY, this attribute shall 
+			    be used in preference to the dot11CCAModeSupported 
+			    attribute."
+    ::= { dot11PhyHRDSSSEntry 5 }
+
+-- **********************************************************************
+-- * End of dot11PhyHRDSSSEntry TABLE
+-- **********************************************************************
+
+-- ********************************************************************
+-- * dot11 Hopping Pattern TABLE
+-- ********************************************************************
+
+dot11HoppingPatternTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Dot11HoppingPatternEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table of attributes necessary for 
+			a frequency hopping implementation to be able to 
+			create the hopping sequences necessary to operate 
+			in the subband for the associated domain country string."
+		::= { dot11phy 13 }
+
+dot11HoppingPatternEntry OBJECT-TYPE
+		SYNTAX Dot11HoppingPatternEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the Hopping Pattern Table 
+			that indicates the random hopping sequence to be followed. 
+
+			IfIndex - Each IEEE 802.11 interface is represented 
+			by an ifEntry. Interface tables in this MIB are indexed 
+			by ifIndex."
+		INDEX { ifIndex,
+				dot11HoppingPatternIndex }
+    ::= { dot11HoppingPatternTable 1 }
+
+Dot11HoppingPatternEntry ::=
+		SEQUENCE {	
+			dot11HoppingPatternIndex		Integer32,
+			dot11RandomTableFieldNumber		Integer32 }
+
+dot11HoppingPatternIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The auxiliary variable used to identify instances of 
+			the columnar objects in the Hopping Pattern Table."
+    ::= { dot11HoppingPatternEntry 1}
+
+dot11RandomTableFieldNumber OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This attribute shall indicate the value of the 
+			starting channel number in the hopping sequence of 
+			the subband for the associated domain country string. 
+			The default value of this attribute shall be zero."
+    ::= { dot11HoppingPatternEntry 2}
+
+-- **********************************************************************
+-- * End of dot11 Hopping Pattern TABLE 
+--**********************************************************************
+
+-- **********************************************************************
+-- * Conformance Information
+-- **********************************************************************
+
+dot11Conformance  	OBJECT IDENTIFIER ::= { ieee802dot11 5 }
+dot11Groups  		OBJECT IDENTIFIER ::= { dot11Conformance 1 }
+dot11Compliances  	OBJECT IDENTIFIER ::= { dot11Conformance 2 }
+
+-- **********************************************************************
+-- * Compliance Statements
+-- **********************************************************************
+
+dot11Compliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for SNMPv2 entities
+            that implement the IEEE 802.11 MIB."
+    	MODULE  -- this module
+    	MANDATORY-GROUPS {
+		dot11SMTbase2,
+        	dot11MACbase, dot11CountersGroup,
+        	dot11SmtAuthenticationAlgorithms, 
+        	dot11ResourceTypeID, dot11PhyOperationComplianceGroup }
+
+   GROUP dot11PhyDSSSComplianceGroup
+        DESCRIPTION
+        	"Implementation of this group is required when object
+            dot11PHYType has the value of dsss.  This group is
+            mutually exclusive with the groups dot11PhyIRComplianceGroup,
+            dot11PhyFHSSComplianceGroup, dot11PhyOFDMComplianceGroup
+	        and dot11PhyHRDSSSComplianceGroup."
+
+    GROUP dot11PhyIRComplianceGroup
+        DESCRIPTION
+            "Implementation of this group is required when object
+            dot11PHYType has the value of irbaseband.  This group is
+            mutually exclusive with the groups dot11PhyDSSSComplianceGroup,
+            dot11PhyFHSSComplianceGroup, dot11PhyOFDMComplianceGroup
+	        and dot11PhyHRDSSSComplianceGroup."
+
+    GROUP dot11PhyFHSSComplianceGroup
+        DESCRIPTION
+            "Implementation of this group is required when object
+            dot11PHYType has the value of fhss.  This group is
+            mutually exclusive with the groups dot11PhyDSSSComplianceGroup,
+            dot11PhyIRComplianceGroup, dot11PhyOFDMComplianceGroup
+	        and dot11PhyHRDSSSComplianceGroup."
+
+    GROUP dot11PhyOFDMComplianceGroup
+        DESCRIPTION
+            "Implementation of this group is required when object
+            dot11PHYType has the value of ofdm. This group is
+            mutually exclusive with the groups dot11PhyDSSSComplianceGroup,
+            dot11PhyIRComplianceGroup, dot11PhyFHSSComplianceGroup
+	        and dot11PhyHRDSSSComplianceGroup."
+
+    GROUP dot11PhyHRDSSSComplianceGroup
+	    DESCRIPTION
+	    "Implementation of this group is required when object
+	    dot11PHYType has the value of hrdsss. This group is
+	    mutually exclusive with the groups
+	    dot11PhyDSSSComplianceGroup, dot11PhyIRComplianceGroup,
+	    dot11PhyFHSSComplianceGroup and dot11PhyOFDMComplianceGroup."
+
+    -- OPTIONAL-GROUPS { dot11SMTprivacy, dot11MACStatistics,
+    --    dot11PhyAntennaComplianceGroup, dot11PhyTxPowerComplianceGroup, 
+    --    dot11PhyRegDomainsSupportGroup,
+    --    dot11PhyAntennasListGroup, dot11PhyRateGroup }
+
+    ::= { dot11Compliances 1 }
+
+-- **********************************************************************
+-- *   Groups - units of conformance
+-- **********************************************************************
+
+dot11SMTbase OBJECT-GROUP
+        OBJECTS {	dot11StationID, dot11MediumOccupancyLimit, 
+             		dot11CFPollable,
+             		dot11CFPPeriod,
+             		dot11CFPMaxDuration,
+             		dot11AuthenticationResponseTimeOut,
+				 	dot11PrivacyOptionImplemented,
+			     	dot11PowerManagementMode,
+		    	 	dot11DesiredSSID, dot11DesiredBSSType,
+		     		dot11OperationalRateSet,
+		     		dot11BeaconPeriod, dot11DTIMPeriod,
+		     		dot11AssociationResponseTimeOut }
+        STATUS deprecated
+        DESCRIPTION
+        	"The SMT object class provides the necessary support at the
+         	STA to manage the processes in the STA such that the STA may
+         	work cooperatively as a part of an IEEE 802.11 network."
+    ::= { dot11Groups 1 }
+
+dot11SMTprivacy OBJECT-GROUP
+        OBJECTS { 	dot11PrivacyInvoked, 
+			dot11WEPKeyMappingLength, dot11ExcludeUnencrypted,
+			dot11WEPICVErrorCount , dot11WEPExcludedCount ,
+			dot11WEPDefaultKeyID,
+                	dot11WEPDefaultKeyValue,
+	    	        dot11WEPKeyMappingWEPOn,
+                	dot11WEPKeyMappingValue , dot11WEPKeyMappingAddress,
+ 			dot11WEPKeyMappingStatus }
+        STATUS current
+        DESCRIPTION
+            "The SMTPrivacy package is a set of attributes that shall be
+            present if WEP is implemented in the STA."
+    ::= { dot11Groups 2 }
+
+dot11MACbase OBJECT-GROUP
+        OBJECTS {	dot11MACAddress, dot11Address,
+			dot11GroupAddressesStatus,
+			dot11RTSThreshold, dot11ShortRetryLimit,
+			dot11LongRetryLimit, dot11FragmentationThreshold,
+			dot11MaxTransmitMSDULifetime,
+			dot11MaxReceiveLifetime, dot11ManufacturerID,
+			dot11ProductID }
+        STATUS current
+        DESCRIPTION
+        	"The MAC object class provides the necessary support for the
+         	access control, generation, and verification of frame check
+         	sequences (FCSs), and proper delivery of valid data to upper
+         	layers."
+    ::= { dot11Groups 3 }
+
+dot11MACStatistics OBJECT-GROUP
+        OBJECTS { 	dot11RetryCount, dot11MultipleRetryCount,
+            		dot11RTSSuccessCount, dot11RTSFailureCount,
+            		dot11ACKFailureCount, dot11FrameDuplicateCount }
+        STATUS current
+        DESCRIPTION
+            "The MACStatistics package provides extended statistical
+            information on the operation of the MAC.  This 
+            package is completely optional."
+    ::= { dot11Groups 4 }
+
+dot11ResourceTypeID OBJECT-GROUP
+        OBJECTS {	dot11ResourceTypeIDName, dot11manufacturerOUI,
+            		dot11manufacturerName, dot11manufacturerProductName,
+            		dot11manufacturerProductVersion }
+        STATUS current
+        DESCRIPTION
+        	"Attributes used to identify a STA, its manufacturer,
+            and various product names and versions."
+    ::= { dot11Groups 5 }
+
+dot11SmtAuthenticationAlgorithms OBJECT-GROUP
+        OBJECTS {	dot11AuthenticationAlgorithm,
+                 	dot11AuthenticationAlgorithmsEnable }
+        STATUS current
+        DESCRIPTION
+        	"Authentication Algorithm Table."
+    ::= { dot11Groups 6 }
+
+dot11PhyOperationComplianceGroup OBJECT-GROUP
+        OBJECTS { 	dot11PHYType, dot11CurrentRegDomain, dot11TempType }
+        STATUS current
+        DESCRIPTION
+            "PHY layer operations attributes."
+    ::= { dot11Groups 7 }
+
+dot11PhyAntennaComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11CurrentTxAntenna, dot11DiversitySupport,
+               		dot11CurrentRxAntenna }
+        STATUS current
+        DESCRIPTION
+            "Attributes for Data Rates for IEEE 802.11."
+    ::= { dot11Groups 8 }
+
+dot11PhyTxPowerComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11NumberSupportedPowerLevels, dot11TxPowerLevel1,
+            		dot11TxPowerLevel2, dot11TxPowerLevel3, dot11TxPowerLevel4,
+            		dot11TxPowerLevel5, dot11TxPowerLevel6, dot11TxPowerLevel7,
+            		dot11TxPowerLevel8, dot11CurrentTxPowerLevel }
+        STATUS current
+        DESCRIPTION
+            "Attributes for Control and Management of transmit power."
+    ::= { dot11Groups 9 }
+
+dot11PhyFHSSComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11HopTime, dot11CurrentChannelNumber, dot11MaxDwellTime,
+            		dot11CurrentDwellTime, dot11CurrentSet, dot11CurrentPattern,
+            		dot11CurrentIndex}
+        STATUS current
+        DESCRIPTION
+            "Attributes that configure the Frequency Hopping for IEEE
+            802.11."
+    ::= { dot11Groups 10 }
+
+dot11PhyDSSSComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11CurrentChannel, dot11CCAModeSupported,
+            		dot11CurrentCCAMode, dot11EDThreshold}
+        STATUS current
+        DESCRIPTION
+            "Attributes that configure the DSSS for IEEE 802.11."
+    ::= { dot11Groups 11 }
+
+dot11PhyIRComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11CCAWatchdogTimerMax, dot11CCAWatchdogCountMax,
+       			dot11CCAWatchdogTimerMin, dot11CCAWatchdogCountMin}
+        STATUS current
+        DESCRIPTION
+            "Attributes that configure the baseband IR for IEEE 802.11."
+    ::= { dot11Groups 12 }
+
+dot11PhyRegDomainsSupportGroup OBJECT-GROUP
+        OBJECTS { dot11RegDomainsSupportedValue}
+        STATUS current
+        DESCRIPTION
+            "Attributes that specify the supported Regulation Domains."
+    ::= { dot11Groups 13}
+
+dot11PhyAntennasListGroup OBJECT-GROUP
+        OBJECTS { 	dot11SupportedTxAntenna,
+             		dot11SupportedRxAntenna, dot11DiversitySelectionRx }
+        STATUS current
+        DESCRIPTION
+            "Attributes that specify the supported Regulation Domains."
+    ::= { dot11Groups 14 }
+
+dot11PhyRateGroup OBJECT-GROUP
+        OBJECTS {	dot11SupportedDataRatesTxValue,
+            		dot11SupportedDataRatesRxValue }
+        STATUS current
+        DESCRIPTION
+            "Attributes for Data Rates for IEEE 802.11."
+    ::= { dot11Groups 15 }
+
+dot11CountersGroup OBJECT-GROUP
+        OBJECTS { 	dot11TransmittedFragmentCount,
+			dot11MulticastTransmittedFrameCount,
+			dot11FailedCount, dot11ReceivedFragmentCount,
+			dot11MulticastReceivedFrameCount,
+			dot11FCSErrorCount,
+		    	dot11WEPUndecryptableCount,
+	    		dot11TransmittedFrameCount }
+        STATUS current
+        DESCRIPTION
+            "Attributes from the dot11CountersGroup that are not described
+            in the dot11MACStatistics group.  These objects are
+            mandatory."
+    ::= { dot11Groups 16 }
+
+dot11NotificationGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {	dot11Disassociate, 
+				dot11Deauthenticate,
+				dot11AuthenticateFail }
+		STATUS current
+		DESCRIPTION
+			"IEEE 802.11 notifications"
+	::= { dot11Groups 17 }
+
+dot11SMTbase2 OBJECT-GROUP
+        OBJECTS { 	dot11MediumOccupancyLimit, 
+             		dot11CFPollable,
+             		dot11CFPPeriod,
+             		dot11CFPMaxDuration,
+           		dot11AuthenticationResponseTimeOut,
+			dot11PrivacyOptionImplemented,
+		     	dot11PowerManagementMode,
+		     	dot11DesiredSSID, dot11DesiredBSSType,
+		 	dot11OperationalRateSet,
+			dot11BeaconPeriod, dot11DTIMPeriod,
+		 	dot11AssociationResponseTimeOut,
+			dot11DisassociateReason,
+             		dot11DisassociateStation,
+             		dot11DeauthenticateReason,
+             		dot11DeauthenticateStation,
+             		dot11AuthenticateFailStatus,
+             		dot11AuthenticateFailStation }
+        STATUS current
+        DESCRIPTION
+         	"The SMTbase2 object class provides the necessary support at the
+         	STA to manage the processes in the STA such that the STA may
+         	work cooperatively as a part of an IEEE 802.11 network."
+    ::= { dot11Groups 18 }
+
+dot11PhyOFDMComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11CurrentFrequency,
+                  	dot11TIThreshold,
+                  	dot11FrequencyBandsSupported }
+        STATUS current
+        DESCRIPTION
+            "Attributes that configure the OFDM for IEEE 802.11."
+    ::= { dot11Groups 19 }
+
+dot11SMTbase3 OBJECT-GROUP
+        OBJECTS { 	dot11MediumOccupancyLimit, 
+             		dot11CFPollable,
+             		dot11CFPPeriod,
+             		dot11CFPMaxDuration,
+             		dot11AuthenticationResponseTimeOut,
+		     	dot11PrivacyOptionImplemented,
+		     	dot11PowerManagementMode,
+		     	dot11DesiredSSID, dot11DesiredBSSType,
+		 	dot11OperationalRateSet,
+			dot11BeaconPeriod, dot11DTIMPeriod,
+			dot11AssociationResponseTimeOut,
+			dot11DisassociateReason,
+             		dot11DisassociateStation,
+             		dot11DeauthenticateReason,
+             		dot11DeauthenticateStation,
+             		dot11AuthenticateFailStatus,
+             		dot11AuthenticateFailStation, 
+       	     		dot11MultiDomainCapabilityImplemented,
+			dot11MultiDomainCapabilityEnabled, 
+			dot11CountryString }
+        STATUS current
+        DESCRIPTION
+		"The SMTbase3 object class provides the necessary support at the
+		STA to manage the processes in the STA such that the STA may
+		work cooperatively as a part of an IEEE 802.11 network, when the STA
+		is capable of multi-domain operation. This object group should be
+		implemented when the multi-domain capability option is implemented."    
+	::= { dot11Groups 20 }
+
+dot11MultiDomainCapabilityGroup OBJECT-GROUP
+	OBJECTS {	dot11FirstChannelNumber,
+			dot11NumberofChannels,
+			dot11MaximumTransmitPowerLevel }
+		STATUS current
+		DESCRIPTION
+			"The dot11MultiDomainCapabilityGroup object class provides 
+			the objects necessary to manage the channels usable by a STA, 
+			when the multi-domain capability option is implemented."    
+		::= { dot11Groups 21 }
+    
+dot11PhyFHSSComplianceGroup2 OBJECT-GROUP
+        OBJECTS {	dot11HopTime, dot11CurrentChannelNumber, dot11MaxDwellTime,
+            		dot11CurrentDwellTime, dot11CurrentSet, dot11CurrentPattern,
+            		dot11CurrentIndex, dot11EHCCPrimeRadix, 
+            		dot11EHCCNumberofChannelsFamilyIndex,
+            		dot11EHCCCapabilityImplemented, dot11EHCCCapabilityEnabled, 
+            		dot11HopAlgorithmAdopted, dot11RandomTableFlag, 
+            		dot11NumberofHoppingSets, dot11HopModulus, 
+            		dot11HopOffset, dot11RandomTableFieldNumber }
+        STATUS current
+        DESCRIPTION
+            "Attributes that configure the Frequency Hopping for IEEE
+            802.11 when multi-domain capability option is implemented."
+    ::= { dot11Groups 22 }
+
+dot11PhyHRDSSSComplianceGroup OBJECT-GROUP
+        OBJECTS {	dot11CurrentChannel, dot11CCAModeSupported,
+                	dot11CurrentCCAMode, dot11EDThreshold,
+                	dot11ShortPreambleOptionImplemented,
+                	dot11PBCCOptionImplemented, dot11ChannelAgilityPresent,
+                	dot11ChannelAgilityEnabled, dot11HRCCAModeSupported }
+        STATUS current
+        DESCRIPTION
+        	"Attributes that configure the HRDSSS for IEEE 802.11."
+    ::= { dot11Groups 23 }
+
+-- **********************************************************************
+-- *   End of 802.11 MIB
+-- **********************************************************************
+
+END

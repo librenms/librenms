@@ -1,0 +1,335 @@
+CISCOSB-RMON DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Rmon Private Extension
+-- Version:    7.37.00.00
+-- Date:       17 May 2004
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OwnerString, EntryStatus                                FROM RMON-MIB
+    Unsigned32, Integer32, Counter32, TimeTicks,
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC;
+
+
+rlRmonControl  MODULE-IDENTITY
+                 LAST-UPDATED "200406010000Z"
+                 ORGANIZATION "Cisco Systems, Inc."
+
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
+
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                 DESCRIPTION
+                      "The private MIB module definition for switch001 RMON MIB."
+                 REVISION "200406010000Z"
+                 DESCRIPTION
+                      "Initial version of this MIB."
+                 ::= { switch001 49 }
+
+
+rlRmonControlMibVersion OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "The MIB's version. The current version is 1"
+   ::= {rlRmonControl 1}
+
+rlRmonControlHistoryControlQuotaBucket OBJECT-TYPE
+   SYNTAX INTEGER (1..65535)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Maximum number of buckets to be used by each
+        History Control group entry.
+        changed to read only, value is derived from
+        rsMaxRmonEtherHistoryEntrie"
+   DEFVAL  { 8 }
+   ::= {rlRmonControl 2}
+
+rlRmonControlHistoryControlMaxGlobalBuckets OBJECT-TYPE
+   SYNTAX INTEGER (1..65535)
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "Maximum number of buckets to be used by all
+        History Control group entries together."
+   DEFVAL  { 300 }
+   ::= {rlRmonControl 3}
+
+rlHistoryControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlHistoryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of rlHistory control entries. This table is exactly like the
+        corresponding RMON I History control group table, but is used to sample
+        statistics of counters not specified by the RMON I statistics group."
+    ::= {rlRmonControl 4}
+
+rlHistoryControlEntry OBJECT-TYPE
+    SYNTAX RlHistoryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of parameters that set up a periodic sampling
+        of statistics.  As an example, an instance of the
+        rlHistoryControlInterval object might be named
+        rlHistoryControlInterval.2"
+    INDEX { rlHistoryControlIndex }
+    ::= { rlHistoryControlTable 1 }
+
+RlHistoryControlEntry ::= SEQUENCE {
+    rlHistoryControlIndex             INTEGER (1..65535),
+    rlHistoryControlDataSource        OBJECT IDENTIFIER,
+    rlHistoryControlBucketsRequested  INTEGER (1..65535),
+    rlHistoryControlBucketsGranted    INTEGER (1..65535),
+    rlHistoryControlInterval          INTEGER (1..3600),
+    rlHistoryControlOwner             OwnerString,
+    rlHistoryControlStatus            EntryStatus
+}
+
+rlHistoryControlIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        rlHistoryControl table.  Each such entry defines a
+        set of samples at a particular interval for a sampled counter."
+    ::= { rlHistoryControlEntry 1 }
+
+rlHistoryControlDataSource OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the source of the data for
+        which historical data was collected and
+        placed in the rlHistory table.
+
+        This object may not be modified if the associated
+        rlHistoryControlStatus object is equal to valid(1)."
+    ::= { rlHistoryControlEntry 2 }
+
+rlHistoryControlBucketsRequested OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The requested number of discrete time intervals
+        over which data is to be saved in the part of the
+        rlHistory table associated with this rlHistoryControlEntry.
+
+        When this object is created or modified, the probe
+        should set rlHistoryControlBucketsGranted as closely to
+        this object as is possible for the particular probe
+        implementation and available resources."
+    DEFVAL { 50 }
+    ::= { rlHistoryControlEntry 3 }
+
+rlHistoryControlBucketsGranted OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discrete sampling intervals
+        over which data shall be saved in the part of
+        the rlHistory table associated with this
+        rlHistoryControlEntry.
+
+        When the associated rlHistoryControlBucketsRequested
+        object is created or modified, the probe
+        should set this object as closely to the requested
+        value as is possible for the particular
+        probe implementation and available resources.  The
+        probe must not lower this value except as a result
+        of a modification to the associated
+        rlHistoryControlBucketsRequested object.
+
+        There will be times when the actual number of
+        buckets associated with this entry is less than
+        the value of this object.  In this case, at the
+        end of each sampling interval, a new bucket will
+        be added to the rlHistory  table.
+
+        When the number of buckets reaches the value of
+        this object and a new bucket is to be added to the
+        media-specific table, the oldest bucket associated
+        with this rlHistoryControlEntry shall be deleted by
+        the agent so that the new bucket can be added.
+
+        When the value of this object changes to a value less
+        than the current value, entries are deleted
+        from the rlHistory table. Enough of the oldest of these
+        entries shall be deleted by the agent so that their
+        number remains less than or equal to the new value of
+        this object.
+
+        When the value of this object changes to a value
+        greater than the current value, the number of
+        associated rlHistory table entries may be allowed to
+        grow."
+    ::= { rlHistoryControlEntry 4 }
+
+rlHistoryControlInterval OBJECT-TYPE
+    SYNTAX INTEGER (1..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is
+        sampled for each bucket in the part of the
+        rlHistory table associated with this
+        rlHistoryControlEntry.  This interval can
+        be set to any number of seconds between 1 and
+        3600 (1 hour).
+
+        Because the counters in a bucket may overflow at their
+        maximum value with no indication, a prudent manager
+        will take into account the possibility of overflow
+        in any of the associated counters.  It is important
+        to consider the minimum time in which any counter
+        could overflow and set the rlHistoryControlInterval object to a value
+        This object may not be modified if the associated
+        rlHistoryControlStatus object is equal to valid(1)."
+    DEFVAL { 1800 }
+    ::= { rlHistoryControlEntry 5 }
+
+rlHistoryControlOwner OBJECT-TYPE
+    SYNTAX OwnerString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The entity that configured this entry and is
+        therefore using the resources assigned to it."
+    ::= { rlHistoryControlEntry 6 }
+
+rlHistoryControlStatus OBJECT-TYPE
+    SYNTAX EntryStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this rlHistoryControl entry.
+
+        Each instance of the rlHistory table associated
+        with this rlHistoryControlEntry will be deleted by the
+        agent if this rlHistoryControlEntry is not equal to
+        valid(1)."
+    ::= { rlHistoryControlEntry 7 }
+
+rlHistoryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of history entries."
+    ::= { rlRmonControl 5 }
+
+rlHistoryEntry OBJECT-TYPE
+    SYNTAX RlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An historical statistics sample of a counter specified
+        by the corresponding history control entry.
+        This sample is associated with the rlHistoryControlEntry which set up
+        the parameters for a regular collection of these
+        samples.  As an example, an instance of the
+        rlHistoryPkts object might be named
+        rlHistoryPkts.2.89"
+    INDEX { rlHistoryIndex , rlHistorySampleIndex }
+    ::= { rlHistoryTable 1 }
+
+RlHistoryEntry ::= SEQUENCE {
+    rlHistoryIndex                 INTEGER (1..65535),
+    rlHistorySampleIndex           INTEGER (1..2147483647),
+    rlHistoryIntervalStart         TimeTicks,
+    rlHistoryValue                 Counter32
+}
+
+rlHistoryIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The history of which this entry is a part.  The
+        history identified by a particular value of this
+        index is the same history as identified
+        by the same value of rlHistoryControlIndex."
+    ::= { rlHistoryEntry 1 }
+
+rlHistorySampleIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular
+        sample this entry represents among all samples
+        associated with the same rlHistoryControlEntry.
+        This index starts at 1 and increases by one
+        as each new sample is taken."
+    ::= { rlHistoryEntry 2 }
+
+rlHistoryIntervalStart OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at the start of the interval
+        over which this sample was measured.  If the probe
+        keeps track of the time of day, it should start
+        the first sample of the history at a time such that
+        when the next hour of the day begins, a sample is
+        started at that instant.  Note that following this
+        rule may require the probe to delay collecting the
+        first sample of the history, as each sample must be
+        of the same interval.  Also note that the sample which
+        is currently being collected is not accessible in this
+        table until the end of its interval."
+    ::= { rlHistoryEntry 3 }
+
+rlHistoryValue OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sampled counter at the time of this sampling."
+    ::= { rlHistoryEntry 4 }
+
+rlControlHistoryControlQuotaBucket OBJECT-TYPE
+   SYNTAX INTEGER (1..65535)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Maximum number of buckets to be used by each rlHistoryControlTable
+        entry."
+   DEFVAL  { 8 }
+   ::= {rlRmonControl 6}
+
+rlControlHistoryControlMaxGlobalBuckets OBJECT-TYPE
+   SYNTAX INTEGER (1..65535)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Maximum number of buckets to be used by all
+        rlHistoryControlTable entries together."
+   DEFVAL  { 300 }
+   ::= {rlRmonControl 7}
+
+rlControlHistoryMaxEntries OBJECT-TYPE
+   SYNTAX INTEGER (1..65535)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Maximum number of rlHistoryTable entries."
+   DEFVAL  { 300 }
+   ::= {rlRmonControl 8}
+
+END
+

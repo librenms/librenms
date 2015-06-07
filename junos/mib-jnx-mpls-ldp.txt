@@ -1,0 +1,2195 @@
+JUNIPER-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    RowPointer, RowStatus, TimeInterval, TruthValue,
+    TimeStamp, StorageType
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    InetAddressType,
+    InetAddress,
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    
+    jnxMibs 
+        FROM JUNIPER-SMI
+
+    MplsLabel,
+    MplsLabelDistributionMethod,
+    MplsLdpIdentifier,
+    MplsLdpLabelType,
+    MplsLspType,
+    MplsLsrIdentifier,
+    MplsRetentionMode
+
+        FROM MPLS-TC-STD-MIB
+    ;
+
+
+jnxMplsLdpMIB MODULE-IDENTITY
+    LAST-UPDATED "200605161200Z"  -- 16 May 2006 
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "    Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+        "This MIB contains managed object definitions for the
+        'Multiprotocol Label Switching, Label Distribution
+        Protocol, LDP' document."
+
+    REVISION "200605161200Z"  -- 16 May 2006
+    DESCRIPTION
+       "This mib was earlier supported on JUNOS as
+        ldpmib.mib (MPLS-LDP-MIB)."
+
+    ::= { jnxMibs 36 }
+
+
+--****************************************************************
+
+jnxMplsLdpObjects       OBJECT IDENTIFIER ::= { jnxMplsLdpMIB 1 }
+jnxMplsLdpNotifications OBJECT IDENTIFIER ::= { jnxMplsLdpMIB 2 }
+jnxMplsLdpConformance   OBJECT IDENTIFIER ::= { jnxMplsLdpMIB 3 }
+
+--****************************************************************
+-- MPLS LDP Objects
+--****************************************************************
+
+jnxMplsLdpLsrObjects    OBJECT IDENTIFIER ::= { jnxMplsLdpObjects 1 }
+
+jnxMplsLdpEntityObjects OBJECT IDENTIFIER ::= { jnxMplsLdpObjects 2 }
+
+--
+-- The MPLS Label Distribution Protocol's
+-- Label Switching Router Objects
+--
+
+jnxMplsLdpLsrId OBJECT-TYPE
+    SYNTAX      MplsLsrIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LSR's Identifier."
+    ::= { jnxMplsLdpLsrObjects 1 }
+
+jnxMplsLdpLsrLoopDetectionCapable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           none(1),
+                           other(2),
+                           hopCount(3),
+                           pathVector(4),
+
+                           hopCountAndPathVector(5)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A indication of whether this
+        Label Switching Router supports
+        loop detection.
+
+        none(1) -- Loop Detection is not supported
+                   on this LSR.
+
+        other(2) -- Loop Detection is supported but
+                    by a method other than those
+                    listed below.
+
+        hopCount(3) -- Loop Detection is supported by
+                       Hop Count only.
+
+        pathVector(4) -- Loop Detection is supported by
+                        Path Vector only.
+
+        hopCountAndPathVector(5) -- Loop Detection is
+                             supported by both Hop Count
+                             And Path Vector.
+
+        Since Loop Detection is determined during
+        Session Initialization, an individual session
+        may not be running with loop detection.  This
+        object simply gives an indication of whether or not the
+        LSR has the ability to support Loop Detection and
+        which types."
+    ::= { jnxMplsLdpLsrObjects 2 }
+
+
+--
+-- The MPLS Label Distribution Protocol Entity Objects
+--
+
+
+jnxMplsLdpEntityLastChange OBJECT-TYPE
+    SYNTAX  TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of sysUpTime at the time of the most
+        recent addition or deletion of an entry
+        to the jnxMplsLdpEntityTable/jnxMplsLdpEntityStatsTable.
+
+        If no such changes have occurred since the last
+
+        re-initialization of the local management subsystem,
+        then this object contains a zero value."
+    ::= { jnxMplsLdpEntityObjects 1 }
+
+jnxMplsLdpEntityIndexNext  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object contains an appropriate value to
+        be used for jnxMplsLdpEntityIndex when creating
+        entries in the jnxMplsLdpEntityTable. The value
+        0 indicates that no unassigned entries are
+        available. To obtain the jnxMplsLdpEntityIndex
+        value for a new entry, the manager issues a
+        management protocol retrieval operation to obtain
+        the current value of this object.  After each
+        retrieval, the agent should modify the value to
+        the next unassigned index."
+   ::= { jnxMplsLdpEntityObjects 2 }
+
+
+jnxMplsLdpEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the
+        MPLS Label Distribution Protocol Entities which
+        exist on this Label Switching Router (LSR)."
+    ::= { jnxMplsLdpEntityObjects 3 }
+
+jnxMplsLdpEntityEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents an LDP entity.
+        An entry can be created by a network administrator
+        or by an SNMP agent as instructed by LDP."
+    INDEX       {  jnxMplsLdpEntityLdpId, jnxMplsLdpEntityIndex  }
+    ::= { jnxMplsLdpEntityTable 1 }
+
+JnxMplsLdpEntityEntry ::= SEQUENCE {
+    jnxMplsLdpEntityLdpId              MplsLdpIdentifier,
+    jnxMplsLdpEntityIndex              Unsigned32,
+    jnxMplsLdpEntityProtocolVersion    Integer32,
+    jnxMplsLdpEntityAdminStatus        INTEGER,
+    jnxMplsLdpEntityOperStatus         INTEGER,
+    jnxMplsLdpEntityTcpDscPort         InetPortNumber,
+
+    jnxMplsLdpEntityUdpDscPort         InetPortNumber,
+    jnxMplsLdpEntityMaxPduLength       Unsigned32,
+    jnxMplsLdpEntityKeepAliveHoldTimer Integer32,
+    jnxMplsLdpEntityHelloHoldTimer     Integer32,
+    jnxMplsLdpEntityInitSesThreshold   Integer32,
+    jnxMplsLdpEntityLabelDistMethod    MplsLabelDistributionMethod,
+    jnxMplsLdpEntityLabelRetentionMode MplsRetentionMode,
+    jnxMplsLdpEntityPathVectorLimit    Integer32,
+    jnxMplsLdpEntityHopCountLimit      Integer32,
+    jnxMplsLdpEntityTargetPeer         TruthValue,
+    jnxMplsLdpEntityTargetPeerAddrType InetAddressType,
+    jnxMplsLdpEntityTargetPeerAddr     InetAddress,
+    jnxMplsLdpEntityLabelType          MplsLdpLabelType,
+    jnxMplsLdpEntityDiscontinuityTime  TimeStamp,
+    jnxMplsLdpEntityStorageType        StorageType,
+    jnxMplsLdpEntityRowStatus          RowStatus
+}
+
+
+jnxMplsLdpEntityLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier."
+    REFERENCE
+        "[RFC3036] LDP Specification, Section on LDP Identifiers."
+    ::= { jnxMplsLdpEntityEntry 1 }
+
+jnxMplsLdpEntityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is used as a secondary index to uniquely
+        identify this row.  Before creating a row in this table,
+        the 'jnxMplsLdpEntityIndexNext' object should be retrieved.
+        That value should be used for the value of this index
+        when creating a row in this table.  (NOTE:  if a value
+        of zero (0) is retrieved, that indicates that no rows
+        can be created in this table at this time.
+
+        A secondary index (this object) is meaningful to some
+        but not all, LDP implementations.  For example
+        in an LDP implementation which uses PPP would
+        use this index to differentiate PPP sub-links.
+
+        Another way to use this index is to give this the
+        value of ifIndex.  However, this is dependant
+        on the implementation."
+
+    ::= { jnxMplsLdpEntityEntry 2 }
+
+jnxMplsLdpEntityProtocolVersion OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The version number of the LDP protocol which will be
+       used in the session initialization message.
+
+       Section 3.5.3 in the LDP Specification specifies
+       that the version of the LDP protocol is negotiated during
+       session establishment. The value of this object
+       represents the value that is sent in the initialization
+       message."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.3 Initialization
+       Message."
+    DEFVAL { 1 }
+    ::= { jnxMplsLdpEntityEntry 3 }
+
+jnxMplsLdpEntityAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                }
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative status of this LDP Entity.
+        If this object is changed from 'enable' to 'disable'
+        and this entity has already attempted to establish
+        contact with a Peer, then all contact with that
+        Peer is lost and all information from that Peer
+        needs to be removed from the MIB. (This implies
+        that the network management subsystem should clean
+        up any related entry in the jnxMplsLdpPeerTable).
+
+        At this point the user is able to change values
+        which are related to this entity.
+
+        When the admin status is set back to 'up', then
+        this Entity will attempt to establish a new session
+        with the Peer."
+    DEFVAL  { enable }
+    ::= { jnxMplsLdpEntityEntry 4 }
+
+
+jnxMplsLdpEntityOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+
+                  unknown(1),
+                  enabled(2),
+                  disabled(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of this LDP Entity."
+    ::= { jnxMplsLdpEntityEntry 5 }
+
+jnxMplsLdpEntityTcpDscPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TCP Discovery Port for
+        LDP.  The default value is the well-known
+        value of this port."
+    REFERENCE
+        "[RFC3036], LDP Specification, Section 2.4.1,
+        Basic Discovery Mechanism, Section 2.4.2,
+        Extended Discovery Mechanism, Section
+        3.10, Well-known Numbers, and Section 3.10.1.
+        UDP and TCP Ports."
+    DEFVAL { 646 }
+    ::= { jnxMplsLdpEntityEntry 6 }
+
+jnxMplsLdpEntityUdpDscPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UDP Discovery Port for
+        LDP.  The default value is the
+        well-known value for this port."
+    REFERENCE
+        "[RFC3036], LDP Specification, Section 2.4.1,
+        Basic Discovery Mechanism, Section 2.4.2,
+        Extended Discovery Mechanism, Section
+        3.10, Well-known Numbers, and Section 3.10.1.
+        UDP and TCP Ports."
+    DEFVAL { 646 }
+    ::= { jnxMplsLdpEntityEntry 7 }
+
+jnxMplsLdpEntityMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (256..65535)
+    UNITS       "octets"
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+
+       "The maximum PDU Length that is sent in
+       the Common Session Parameters of an Initialization
+       Message. According to the LDP Specification [RFC3036]
+       a value of 255 or less specifies the
+       default maximum length of 4096 octets, this is why
+       the value of this object starts at 256.  The operator
+       should explicitely choose the default value (i.e. 4096),
+       or some other value.
+
+       The receiving LSR MUST calculate the maximum PDU
+       length for the session by using the smaller of its and
+       its peer's proposals for Max PDU Length."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.3.
+       Initialization Message."
+    DEFVAL { 4096 }
+    ::= { jnxMplsLdpEntityEntry 8 }
+
+jnxMplsLdpEntityKeepAliveHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 16-bit integer value which is the proposed keep
+        alive hold timer for this LDP Entity."
+    DEFVAL { 40 }
+    ::= { jnxMplsLdpEntityEntry 9 }
+
+jnxMplsLdpEntityHelloHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    UNITS       "seconds"
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 16-bit integer value which is the proposed Hello
+        hold timer for this LDP Entity. The Hello Hold time
+        in seconds.
+
+        An LSR maintains a record of Hellos received
+        from potential peers.  This object represents
+        the Hold Time in the Common Hello Parameters TLV of
+        the Hello Message.
+
+        A value of 0 is a default value and should be
+        interpretted in conjunction with the
+        jnxMplsLdpEntityTargetPeer object.
+
+        If the value of this object is 0: if the value of the
+        jnxMplsLdpEntityTargetPeer object is false(2), then this
+
+        specifies that the Hold Time's actual default value is
+        15 seconds (i.e. the default Hold time for Link Hellos
+        is 15 seconds).  Otherwise if the value of the
+        jnxMplsLdpEntityTargetPeer object is true(1), then this
+        specifies that the Hold Time's actual default value is
+        45 seconds (i.e. the default Hold time for Targeted
+        Hellos is 45 seconds).
+
+        A value of 65535 means infinite (i.e. wait forever).
+
+        All other values represent the amount of time in
+        seconds to wait for a Hello Message.  Setting the
+        hold time to a value smaller than 15 is not
+        recommended, although not forbidden according
+        to [RFC3036]."
+    REFERENCE
+        "[RFC3036], LDP Specification, Section 3.5.2.,
+        Hello Message."
+    DEFVAL { 0 }
+    ::= { jnxMplsLdpEntityEntry 10 }
+
+jnxMplsLdpEntityInitSesThreshold OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When attempting to establish a session with a
+        given Peer, the given LDP Entity should
+        send out the SNMP notification,
+        'jnxMplsLdpInitSesThresholdExceeded', when
+        the number of Session Initialization messages sent
+        exceeds this threshold.  The notification is
+        used to notify an operator when this Entity and
+        its Peer are possibily engaged in an endless
+        sequence of messages as each NAKs the other's
+        Initialization messages with Error Notification
+        messages.  Setting this threshold which triggers
+        the notification is one way to
+        notify the operator.
+
+        A value of 0 (zero) for this object
+        indicates that the threshold is infinity, thus
+        the SNMP notification will never be generated."
+    REFERENCE
+        "[RFC3036], LDP Specification,
+        Section 2.5.3 Session Initialization."
+    DEFVAL { 8 }
+    ::= { jnxMplsLdpEntityEntry 11 }
+
+
+jnxMplsLdpEntityLabelDistMethod OBJECT-TYPE
+    SYNTAX      MplsLabelDistributionMethod
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For any given LDP session, the method of
+        label distribution must be specified."
+    ::= { jnxMplsLdpEntityEntry 12 }
+
+jnxMplsLdpEntityLabelRetentionMode OBJECT-TYPE
+    SYNTAX      MplsRetentionMode
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LDP Entity can be configured to use either
+        conservative or liberal label retention mode.
+
+        If the value of this object is conservative(1)
+        then advertized label mappings are retained
+        only if they will be used to forward packets,
+        i.e. if label came from a valid next hop.
+
+        If the value of this object is liberal(2)
+        then all advertized label mappings are retained
+        whether they are from a valid next hop or not."
+    ::= { jnxMplsLdpEntityEntry 13 }
+
+jnxMplsLdpEntityPathVectorLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the value of this object is 0 (zero) then
+        Loop Dection for Path Vectors is disabled.
+
+        Otherwise, if this object has a value greater than
+        zero, then Loop Dection for Path Vectors is enabled,
+        and the Path Vector Limit is this value.
+        Also, the value of the object,
+        'jnxMplsLdpLsrLoopDetectionCapable', must be set to
+        either 'pathVector(4)' or 'hopCountAndPathVector(5)',
+        if this object has a value greater than 0 (zero),
+        otherwise it is ignored."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 2.8 Loop Dection,
+       Section 3.4.5 Path Vector TLV."
+    ::= { jnxMplsLdpEntityEntry 14 }
+
+jnxMplsLdpEntityHopCountLimit OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS       current
+    DESCRIPTION
+        "If the value of this object is 0 (zero),
+        then Loop Detection using Hop Counters is
+        disabled.
+
+        If the value of this object is greater than
+        0 (zero) then Loop Detection using Hop
+        Counters is enabled, and this object
+        specifies this Entity's maximum allowable
+        value for the Hop Count.
+        Also, the value of the object
+        jnxMplsLdpLsrLoopDetectionCapable must be set
+        to either 'hopCount(3)' or
+        'hopCountAndPathVector(5)' if this object
+        has a value greater than 0 (zero), otherwise
+        it is ignored."
+    DEFVAL { 0 }
+    ::= { jnxMplsLdpEntityEntry 15 }
+
+jnxMplsLdpEntityTargetPeer OBJECT-TYPE
+    SYNTAX      TruthValue
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this LDP entity uses targeted peer then set
+        this to true."
+    DEFVAL { false }
+    ::= { jnxMplsLdpEntityEntry 16 }
+
+jnxMplsLdpEntityTargetPeerAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the internetwork layer address used for
+        the Extended Discovery. This object indicates how
+        the value of jnxMplsLdpEntityTargetPeerAddr is to
+        be interpreted."
+    ::= { jnxMplsLdpEntityEntry 17 }
+
+jnxMplsLdpEntityTargetPeerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the internetwork layer address used for
+        the Extended Discovery."
+   ::= { jnxMplsLdpEntityEntry 18 }
+
+jnxMplsLdpEntityLabelType OBJECT-TYPE
+    SYNTAX      MplsLdpLabelType
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the optional parameters for the LDP
+        Initialization Message.  If the value is generic(1)
+        then no optional parameters will be sent in
+        the LDP Initialization message associated with
+        this Entity.
+
+        If the value is atmParameters(2) then
+        a row must be created in the jnxMplsLdpEntityAtmParms
+        Table, which corresponds to this entry.
+
+        If the value is frameRelayParameters(3) then
+        a row must be created in the jnxMplsLdpEntityFrameRelayParms
+        Table, which corresponds to this entry."
+    REFERENCE
+        "[RFC3036], LDP Specification, Section 3.5.3.,
+        Initialization Message."
+    ::= { jnxMplsLdpEntityEntry 19 }
+
+
+jnxMplsLdpEntityDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion
+        at which any one or more of this entity's counters
+        suffered a discontinuity.  The relevant counters are the
+        specific instances associated with this entity of
+        any Counter32, or Counter64 object contained
+        in the 'jnxMplsLdpEntityStatsTable'.  If no such
+        discontinuities have occurred since the last
+        re-initialization of the local management
+        subsystem, then this object contains a zero
+        value."
+    ::= { jnxMplsLdpEntityEntry 20 }
+
+jnxMplsLdpEntityStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { jnxMplsLdpEntityEntry 21 }
+
+jnxMplsLdpEntityRowStatus OBJECT-TYPE
+
+    SYNTAX      RowStatus
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+         be created and deleted using the
+         RowStatus convention."
+    ::= { jnxMplsLdpEntityEntry 22 }
+
+
+--
+-- The MPLS LDP Entity Statistics Table
+--
+
+jnxMplsLdpEntityStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpEntityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is a read-only table which augments
+        the jnxMplsLdpEntityTable.  The purpose of this
+        table is to keep statistical information about
+        the LDP Entities on the LSR."
+    ::= { jnxMplsLdpEntityObjects 4 }
+
+jnxMplsLdpEntityStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpEntityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table contains statistical information
+        about an LDP Entity.  Some counters contained in a
+        row are for fatal errors received during a former
+        LDP Session associated with this entry.  For example,
+        an Ldp Pdu received on a TCP connection during an
+        LDP Session contains a fatal error.  That
+        error is counted here, because the
+        session is terminated.
+
+        If the error is NOT fatal (i.e. and the Session
+        remains), then the error is counted in the
+        jnxMplsLdpSesStatsEntry."
+    AUGMENTS       {   jnxMplsLdpEntityEntry  }
+    ::= { jnxMplsLdpEntityStatsTable 1 }
+
+JnxMplsLdpEntityStatsEntry ::= SEQUENCE {
+    jnxMplsLdpAttemptedSessions            Counter32,
+    jnxMplsLdpSesRejectedNoHelloErrors     Counter32,
+    jnxMplsLdpSesRejectedAdErrors          Counter32,
+    jnxMplsLdpSesRejectedMaxPduErrors      Counter32,
+
+    jnxMplsLdpSesRejectedLRErrors          Counter32,
+    jnxMplsLdpBadLdpIdentifierErrors       Counter32,
+    jnxMplsLdpBadPduLengthErrors           Counter32,
+    jnxMplsLdpBadMessageLengthErrors       Counter32,
+    jnxMplsLdpBadTlvLengthErrors           Counter32,
+    jnxMplsLdpMalformedTlvValueErrors      Counter32,
+    jnxMplsLdpKeepAliveTimerExpErrors      Counter32,
+    jnxMplsLdpShutdownNotifReceived        Counter32,
+    jnxMplsLdpShutdownNotifSent            Counter32
+}
+
+jnxMplsLdpAttemptedSessions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the total attempted sessions for
+        this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 1 }
+
+
+jnxMplsLdpSesRejectedNoHelloErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/No Hello Error
+        Notification Messages sent or received by
+        this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 2 }
+
+jnxMplsLdpSesRejectedAdErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Advertisement Mode Error Notification Messages sent
+        or received by this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 3 }
+
+jnxMplsLdpSesRejectedMaxPduErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Max Pdu Length Error Notification Messages sent
+        or received by this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 4 }
+
+jnxMplsLdpSesRejectedLRErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Label Range Notification Messages sent
+        or received by this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 5 }
+
+
+jnxMplsLdpBadLdpIdentifierErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad LDP Identifier
+        Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 6 }
+
+jnxMplsLdpBadPduLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad Pdu Length
+        Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 7 }
+
+jnxMplsLdpBadMessageLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad Message
+        Length Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 8 }
+
+jnxMplsLdpBadTlvLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad TLV
+        Length Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+
+        jnxMplsLdpEntityDiscontinuityTime."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 9 }
+
+jnxMplsLdpMalformedTlvValueErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Malformed TLV
+        Value Fatal Errors detected by the session(s)
+        (past and present) associated with this
+        LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 10 }
+
+jnxMplsLdpKeepAliveTimerExpErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Session Keep Alive
+        Timer Expired Errors detected by the session(s)
+        (past and present) associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.1.2."
+    ::= { jnxMplsLdpEntityStatsEntry 11 }
+
+jnxMplsLdpShutdownNotifReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Shutdown Notfications
+        received related to session(s) (past and present)
+        associated with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 12 }
+
+jnxMplsLdpShutdownNotifSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Shutdown Notfications
+        sent related to session(s) (past and present) associated
+        with this LDP Entity.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpEntityDiscontinuityTime."
+    ::= { jnxMplsLdpEntityStatsEntry 13 }
+
+
+--
+-- The MPLS LDP Peer Table
+--
+
+jnxMplsLdpSessionObjects OBJECT IDENTIFIER ::=
+                                         { jnxMplsLdpObjects 3 }
+
+
+jnxMplsLdpPeerLastChange OBJECT-TYPE
+    SYNTAX  TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of sysUpTime at the time of the most
+        recent addition or deletion to the
+        jnxMplsLdpPeerTable/jnxMplsLdpSessionTable."
+    ::= { jnxMplsLdpSessionObjects 1 }
+
+jnxMplsLdpPeerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about LDP peers known by Entities in
+        the jnxMplsLdpEntityTable.  The information in this table
+        is based on information from the Entity-Peer interaction
+        during session initialization but is not appropriate
+        for the jnxMplsLdpSessionTable, because objects in this
+        table may or may not be used in session establishment."
+
+    ::= { jnxMplsLdpSessionObjects 2 }
+
+jnxMplsLdpPeerEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single Peer which is related
+        to a Session.  NOTE:  this table is augmented by
+        the jnxMplsLdpSessionTable."
+    INDEX       { jnxMplsLdpEntityLdpId,
+                  jnxMplsLdpEntityIndex,
+                  jnxMplsLdpPeerLdpId }
+    ::= { jnxMplsLdpPeerTable 1 }
+
+JnxMplsLdpPeerEntry ::= SEQUENCE {
+    jnxMplsLdpPeerLdpId                MplsLdpIdentifier,
+    jnxMplsLdpPeerLabelDistMethod      MplsLabelDistributionMethod,
+    jnxMplsLdpPeerPathVectorLimit      Integer32
+}
+
+jnxMplsLdpPeerLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier of this LDP Peer."
+    ::= { jnxMplsLdpPeerEntry 1 }
+
+jnxMplsLdpPeerLabelDistMethod OBJECT-TYPE
+    SYNTAX      MplsLabelDistributionMethod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For any given LDP session, the method of
+        label distribution must be specified."
+    ::= { jnxMplsLdpPeerEntry 2 }
+
+jnxMplsLdpPeerPathVectorLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the value of this object is 0 (zero) then
+        Loop Dection for Path Vectors for this Peer
+        is disabled.
+
+        Otherwise, if this object has a value greater than
+        zero, then Loop Dection for Path  Vectors for this
+        Peer is enabled and the Path Vector Limit is this value."
+
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 2.8 Loop Dection,
+       Section 3.4.5 Path Vector TLV."
+    ::= { jnxMplsLdpPeerEntry 3 }
+
+
+--
+-- The MPLS LDP Sessions Table
+--
+
+jnxMplsLdpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Sessions between the LDP Entities and
+        LDP Peers.  Each row represents a single session."
+    ::= { jnxMplsLdpSessionObjects 3 }
+
+jnxMplsLdpSessionEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only.
+
+        Please note:  the Path Vector Limit for the
+        Session is the value which is configured in
+        the corresponding jnxMplsLdpEntityEntry. The
+        Peer's Path Vector Limit is in noted in the
+        jnxMplsLdpPeerTable.
+
+        Values which may differ from those configured are
+        noted in the objects of this table, the
+        jnxMplsLdpAtmSesTable and the
+        jnxMplsLdpFrameRelaySesTable. A value will
+        differ if it was negotiated between the
+        Entity and the Peer. Values may or may not
+        be negotiated. For example, if the values
+        are the same then no negotiation takes place.
+        If they are negotiated, then they may differ."
+    AUGMENTS { jnxMplsLdpPeerEntry }
+    ::= { jnxMplsLdpSessionTable 1 }
+
+JnxMplsLdpSessionEntry ::= SEQUENCE {
+    jnxMplsLdpSesStateLastChange       TimeStamp,
+    jnxMplsLdpSesState                 INTEGER,
+    jnxMplsLdpSesProtocolVersion       Integer32,
+
+    jnxMplsLdpSesKeepAliveHoldTimeRem  TimeInterval,
+    jnxMplsLdpSesMaxPduLength          Unsigned32,
+    jnxMplsLdpSesDiscontinuityTime     TimeStamp
+}
+
+jnxMplsLdpSesStateLastChange OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object is sysUpTime when the
+        most recent change in the jnxMplsLdpSesState
+        object occurred.  When the entry is created, then
+        this object has the value of sysUpTime when the
+        entry was created."
+    ::= { jnxMplsLdpSessionEntry 1 }
+
+jnxMplsLdpSesState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   nonexistent(1),
+                   initialized(2),
+                   openrec(3),
+                   opensent(4),
+                   operational(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the session, all of the
+        states 1 to 5 are based on the state machine for
+        session negotiation behavior."
+    REFERENCE
+        "[RFC3036], LDP Specification, Section 2.5.4,
+        Initialization State Machine."
+    ::= { jnxMplsLdpSessionEntry 2 }
+
+jnxMplsLdpSesProtocolVersion OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the LDP Protocol which
+        this session is using.  This is the version of
+        the LDP protocol which has been negotiated during
+        session initialization."
+    REFERENCE
+       "[RFC3036], LDP Specification, Section 3.5.3,
+       Initialization Message."
+    ::= { jnxMplsLdpSessionEntry 3 }
+
+jnxMplsLdpSesKeepAliveHoldTimeRem OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The keep alive hold time remaining for this session."
+    ::= { jnxMplsLdpSessionEntry 4 }
+
+jnxMplsLdpSesMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of maximum allowable length for LDP PDUs for
+        this session.  This value may have been negotiated during
+        the Session Initialization.  This object is related to
+        the jnxMplsLdpEntityMaxPduLength object.  The
+        jnxMplsLdpEntityMaxPduLength object specifies the requested
+        LDP PDU length, and this object reflects the negotiated
+        LDP PDU length between the Entity and
+        the Peer."
+    ::= { jnxMplsLdpSessionEntry 5 }
+
+jnxMplsLdpSesDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at
+        which any one or more of this session's counters
+        suffered a discontinuity.  The relevant counters are
+        the specific instances associated with this session
+        of any Counter32 or Counter64 object contained in the
+        jnxMplsLdpSessionStatsTable.
+
+        The initial value of this object is the value of
+        sysUpTime when the entry was created in this table.
+
+        Also, a command generator can distinguish when a session
+        between a given Entity and Peer goes away and then is
+        're-established'.  This value would change and
+        thus indicate to the command generator that this is a
+        different session."
+    ::= { jnxMplsLdpSessionEntry 6 }
+
+
+--
+-- The MPLS LDP Session Statistics Table
+--
+
+jnxMplsLdpSesStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpSesStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of statistics for Sessions between
+        LDP Entities and LDP Peers."
+    ::= { jnxMplsLdpSessionObjects 4 }
+
+jnxMplsLdpSesStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpSesStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents statistical
+        information on a single session between an LDP
+        Entity and LDP Peer."
+    AUGMENTS       { jnxMplsLdpPeerEntry }
+    ::= { jnxMplsLdpSesStatsTable 1 }
+
+JnxMplsLdpSesStatsEntry ::= SEQUENCE {
+    jnxMplsLdpSesStatsUnkMesTypeErrors Counter32,
+    jnxMplsLdpSesStatsUnkTlvErrors         Counter32
+}
+
+jnxMplsLdpSesStatsUnkMesTypeErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Unknown Message Type
+        Errors detected during this session.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        jnxMplsLdpSesDiscontinuityTime."
+    ::= { jnxMplsLdpSesStatsEntry 1 }
+
+jnxMplsLdpSesStatsUnkTlvErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Unknown TLV Errors
+        detected during this session.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+
+        jnxMplsLdpSessionDiscontinuityTime."
+    ::= { jnxMplsLdpSesStatsEntry 2 }
+
+
+--
+-- The MPLS LDP Hello Adjacency Table
+--
+
+jnxMplsLdpHelloAdjacencyObjects OBJECT IDENTIFIER ::=
+                              { jnxMplsLdpSessionObjects 5 }
+
+jnxMplsLdpHelloAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Hello Adjacencies for Sessions."
+    ::= { jnxMplsLdpHelloAdjacencyObjects 1 }
+
+jnxMplsLdpHelloAdjacencyEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single LDP Hello Adjacency.
+        An LDP Session can have one or more Hello adjacencies."
+         INDEX       { jnxMplsLdpEntityLdpId,
+                       jnxMplsLdpEntityIndex,
+                       jnxMplsLdpPeerLdpId,
+                       jnxMplsLdpHelloAdjIndex }
+    ::= { jnxMplsLdpHelloAdjacencyTable 1 }
+
+JnxMplsLdpHelloAdjacencyEntry ::= SEQUENCE {
+    jnxMplsLdpHelloAdjIndex         Unsigned32,
+    jnxMplsLdpHelloAdjHoldTimeRem   TimeInterval,
+    jnxMplsLdpHelloAdjType          INTEGER
+}
+
+jnxMplsLdpHelloAdjIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifier for this specific adjacency."
+    ::= { jnxMplsLdpHelloAdjacencyEntry 1 }
+
+jnxMplsLdpHelloAdjHoldTimeRem OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+
+    DESCRIPTION
+        "The time remaining for this Hello Adjacency.
+        This interval will change when the 'next'
+        Hello message which corresponds to this
+        Hello Adjacency is received."
+    ::= { jnxMplsLdpHelloAdjacencyEntry 2 }
+
+jnxMplsLdpHelloAdjType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   link(1),
+                   targeted(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This adjacency is the result of a 'link'
+        hello if the value of this object is link(1).
+        Otherwise, it is a result of a 'targeted'
+        hello, targeted(2)."
+    ::= { jnxMplsLdpHelloAdjacencyEntry 3 }
+
+
+--
+--  Session Label (LSP) Mapping to LSR MIB's LIB Information.
+--
+
+jnxMplsLdpLspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsLdpLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of LDP LSP's which
+        map to a Segment Table in the
+        the LSR MIB's (either the mplsInSegmentTable
+        or mplsOutSegmentTable) AND to the
+        LSR MIB's mplsXCTable."
+    ::= { jnxMplsLdpSessionObjects 6 }
+
+jnxMplsLdpLspEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single LDP LSP which is represented by
+        a session's index triple (jnxMplsLdpEntityLdpId,
+        jnxMplsLdpEntityIndex, jnxMplsLdpPeerLdpId) AND the
+        index tuple (jnxMplsLdpLspIfIndex, jnxMplsLdpLspLabel).
+
+        The information contained in a row is read-only."
+
+    INDEX       { jnxMplsLdpEntityLdpId,
+                  jnxMplsLdpEntityIndex,
+                  jnxMplsLdpPeerLdpId,
+                  jnxMplsLdpLspIfIndex,
+                  jnxMplsLdpLspLabel
+                }
+    ::= { jnxMplsLdpLspTable 1 }
+
+JnxMplsLdpLspEntry ::= SEQUENCE {
+    jnxMplsLdpLspIfIndex               InterfaceIndex,
+    jnxMplsLdpLspLabel                 MplsLabel,
+    jnxMplsLdpLspLabelType             MplsLdpLabelType,
+    jnxMplsLdpLspType                  MplsLspType,
+    jnxMplsLdpLspLsrInSegmentPointer   RowPointer,
+    jnxMplsLdpLspLsrOutSegmentPointer  RowPointer,
+    jnxMplsLdpLspLsrXCPointer          RowPointer
+}
+
+jnxMplsLdpLspIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ifIndex value associated with this LSP."
+    ::= { jnxMplsLdpLspEntry 1 }
+
+jnxMplsLdpLspLabel OBJECT-TYPE
+    SYNTAX        MplsLabel
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The LDP label for this LSP."
+    ::= { jnxMplsLdpLspEntry 2 }
+
+jnxMplsLdpLspLabelType  OBJECT-TYPE
+    SYNTAX        MplsLdpLabelType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The Layer 2 Label Type."
+    ::= { jnxMplsLdpLspEntry 3 }
+
+jnxMplsLdpLspType OBJECT-TYPE
+    SYNTAX        MplsLspType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of LSP connection.
+        The possible values are:
+
+           unknown(1)         --  if the LSP is not known
+                                  to be one of the following.
+
+          terminatingLsp(2)   -- if the LSP terminates
+                                 on the LSR, then this
+                                 is an ingressing LSP
+                                 which ends on the LSR,
+
+          originatingLsp(3)   -- if the LSP originates
+                                 from the LSR, then this
+                                 is an egressing LSP which is
+                                 the head-end of the LSP,
+
+        crossConnectingLsp(4) -- if the LSP ingresses
+                                 and egresses on the LSR,
+                                 then it is cross-connecting
+                                 on that LSR."
+    ::= { jnxMplsLdpLspEntry 4 }
+
+jnxMplsLdpLspLsrInSegmentPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this LSP terminates or is cross-connecting
+        on this LSR, then this RowPointer should point
+        to an instance of an object in the
+        mplsLsrInSegmentTable. In other words if
+        the value of jnxMplsLdpLspType is
+        terminatingLsp(2) or crossConnectingLsp(4),
+        then this should point to an instance of an object
+        in the LSR-MIB's mplsInSegmentTable.
+
+        Otherwise, a value of zeroDotzero indicates that
+        this LSP has no corresponding mplsInSegmentEntry."
+    ::= { jnxMplsLdpLspEntry 5 }
+
+jnxMplsLdpLspLsrOutSegmentPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this LSP originates or is cross-connecting
+        on this LSR, then this RowPointer should point
+        to an instance of an object in the LSR-MIB's
+        mplsOutSegmentTable. In other words if
+        the value of jnxMplsLdpLspType is
+        originatingLsp(3) or crossConnectingLsp(4),
+        then this should point to an instance of an object
+        in the LSR-MIB's mplsOutSegmentTable.
+
+        Otherwise, a value of zeroDotzero indicates that
+        this LSP has no corresponding mplsOutSegmentEntry."
+    ::= { jnxMplsLdpLspEntry 6 }
+
+jnxMplsLdpLspLsrXCPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this LSP is cross-connecting on this LSR,
+        then this RowPointer should point
+        to an instance of an object in the
+        LSR-MIB's mplsXCTable. In other words if
+        the value of jnxMplsLdpLspType is crossConnectingLsp(4),
+        then this should point to an instance of an object
+        in the LSR-MIB's mplsXCTable.
+
+        Otherwise, a value of zeroDotzero indicates that
+        this LSP has no corresponding mplsXCEntry."
+    ::= { jnxMplsLdpLspEntry 7 }
+
+
+--
+-- Mpls FEC Table
+--
+
+jnxMplsFecObjects OBJECT IDENTIFIER ::=
+                                      { jnxMplsLdpSessionObjects 7 }
+
+jnxMplsFecIndexNext  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object contains an appropriate value to
+        be used for jnxMplsFecIndex when creating
+        entries in the jnxMplsFecTable. The value
+        0 indicates that no unassigned entries are
+        available. To obtain the jnxMplsFecIndex
+        value for a new entry, the manager issues a
+        management protocol retrieval operation to obtain
+        the current value of this object.  After each
+        retrieval, the agent should modify the value to
+        the next unassigned index."
+   ::= { jnxMplsFecObjects 1 }
+
+
+jnxMplsFecTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMplsFecEntry
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+    DESCRIPTION
+        "This table represents the FEC
+        (Forwarding Equivalence Class)
+        Information associated with an LSP."
+    ::= { jnxMplsFecObjects 2 }
+
+jnxMplsFecEntry OBJECT-TYPE
+    SYNTAX      JnxMplsFecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single FEC Element."
+    INDEX       { jnxMplsFecIndex }
+    ::= { jnxMplsFecTable 1 }
+
+JnxMplsFecEntry ::= SEQUENCE {
+    jnxMplsFecIndex         Unsigned32,
+    jnxMplsFecType          INTEGER,
+    jnxMplsFecAddrLength    Integer32,
+    jnxMplsFecAddrFamily    InetAddressType,
+    jnxMplsFecAddr          InetAddress,
+    jnxMplsFecStorageType   StorageType,
+    jnxMplsFecRowStatus     RowStatus
+}
+
+jnxMplsFecIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index which uniquely identifies this entry."
+    ::= { jnxMplsFecEntry 1 }
+
+jnxMplsFecType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   prefix(1),
+                   hostAddress(2)
+                }
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only    
+    STATUS      current
+    DESCRIPTION
+        "The type of the FEC.  If the value of this object
+        is 'prefix(1)' then the FEC type described by this
+        row is for address prefixes.
+
+        If the value of this object is 'hostAddress(2)' then
+        the FEC type described by this row is a host address."
+    ::= { jnxMplsFecEntry 2 }
+
+jnxMplsFecAddrLength  OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the value of 'jnxMplsFecType' is 'prefix(1)'
+        then the value of this object is the length in
+        bits of the address prefix represented by
+        'jnxMplsFecAddr', or if the length is zero then
+        this is a special value which indicates that the
+        prefix matches all addresses.  In this case the
+        prefix is also zero (i.e. 'jnxMplsFecAddr' will
+        have the value of zero.)"
+    DEFVAL { 0 }
+    ::= { jnxMplsFecEntry 3 }
+
+jnxMplsFecAddrFamily  OBJECT-TYPE
+    SYNTAX      InetAddressType
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object is from the Address Family
+        Numbers."
+    ::= { jnxMplsFecEntry 4 }
+
+
+jnxMplsFecAddr     OBJECT-TYPE
+    SYNTAX      InetAddress
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the value of 'jnxMplsFecType' is 'prefix(1)'
+        then the value of this object is the address prefix.
+        If the value of the 'jnxMplsFecAddrLength'
+        is object is zero, then this object should also be
+        zero.
+
+        If the value of the 'jnxMplsFecType' is 'hostAddress(2)'
+        then this is the host address."
+    ::= { jnxMplsFecEntry 5 }
+
+jnxMplsFecStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { jnxMplsFecEntry 6 }
+
+jnxMplsFecRowStatus OBJECT-TYPE
+
+    SYNTAX      RowStatus
+--  MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+         be created and deleted using the
+         RowStatus convention."
+    ::= { jnxMplsFecEntry 7 }
+
+
+--
+--  LDP LSP FEC Table
+--
+
+jnxMplsLdpLspFecTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF JnxMplsLdpLspFecEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table which shows the relationship between
+      LDP LSP's and FECs.  Each row represents
+      a single LSP to FEC association.
+      This table is read-only."
+  ::= { jnxMplsLdpSessionObjects 8 }
+
+jnxMplsLdpLspFecEntry OBJECT-TYPE
+   SYNTAX     JnxMplsLdpLspFecEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry represents a LDP LSP
+      to FEC association."
+   INDEX       { jnxMplsLdpEntityLdpId,
+                 jnxMplsLdpEntityIndex,
+                 jnxMplsLdpPeerLdpId,
+                 jnxMplsLdpLspIfIndex,
+                 jnxMplsLdpLspLabel,
+                 jnxMplsFecIndex
+                }
+   ::= { jnxMplsLdpLspFecTable 1 }
+
+JnxMplsLdpLspFecEntry ::= SEQUENCE {
+   jnxMplsLdpLspFecOperStatus   INTEGER,
+   jnxMplsLdpLspFecLastChange   TimeStamp,
+   jnxMplsLdpLspFecRowStatus    RowStatus
+}
+
+jnxMplsLdpLspFecOperStatus  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                         unknown(1),
+
+                         inUse(2),
+                         notInUse(3)
+                       }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "An indication of the operational status of
+      the FEC associated with LDP LSP.
+
+      unknown(1) - this is a temporary state which
+                   may indicate the LSP-FEC association
+                   is in a state of transition.
+
+      inUse(2) - the FEC associated with the LSP is
+                 currently being applied.
+
+      notInUse(3) - the FEC associated with the LSP is
+                    not being applied.  Eventually, this
+                    entry may be aged out."
+   ::= { jnxMplsLdpLspFecEntry 1 }
+
+jnxMplsLdpLspFecLastChange  OBJECT-TYPE
+   SYNTAX     TimeStamp
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "This value of sysUpTime when the
+      jnxMplsLdpLspFecOperStatus last changed state."
+   ::= { jnxMplsLdpLspFecEntry 2 }
+
+jnxMplsLdpLspFecRowStatus  OBJECT-TYPE
+   SYNTAX     RowStatus
+-- MAX-ACCESS  read-create
+   MAX-ACCESS  read-only
+   STATUS     current
+   DESCRIPTION
+       "An object that allows entries in this table to
+       be created and deleted using the
+       RowStatus convention."
+   ::= { jnxMplsLdpLspFecEntry 3 }
+
+
+--
+-- Address Message/Address Withdraw Message Information
+--
+-- This information is associated with a specific Session
+-- because Label Address Messages are sent after session
+-- initialization has taken place.
+--
+
+jnxMplsLdpSesPeerAddrTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF JnxMplsLdpSesPeerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table 'extends' the jnxMplsLdpSessionTable.
+        This table is used to store Label Address Information
+        from Label Address Messages received by this LSR from
+        Peers.  This table is read-only and should be updated
+        when Label Withdraw Address Messages are received, i.e.
+        Rows should be deleted as apropriate.
+
+        NOTE:  since more than one address may be contained
+        in a Label Address Message, this table 'extends',
+        rather than 'AUGMENTS' the jnxMplsLdpSessionTable's
+        information."
+    ::= { jnxMplsLdpSessionObjects 9 }
+
+jnxMplsLdpSesPeerAddrEntry OBJECT-TYPE
+    SYNTAX      JnxMplsLdpSesPeerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on
+        session's for a single next hop address which was
+        advertised in an Address Message from the LDP peer.
+        The information contained in a row is read-only."
+    INDEX       { jnxMplsLdpEntityLdpId,
+                  jnxMplsLdpEntityIndex,
+                  jnxMplsLdpPeerLdpId,
+                  jnxMplsLdpSesPeerAddrIndex
+                }
+    ::= { jnxMplsLdpSesPeerAddrTable 1 }
+
+JnxMplsLdpSesPeerAddrEntry ::= SEQUENCE {
+    jnxMplsLdpSesPeerAddrIndex       Unsigned32,
+    jnxMplsLdpSesPeerNextHopAddrType InetAddressType,
+    jnxMplsLdpSesPeerNextHopAddr     InetAddress
+}
+
+jnxMplsLdpSesPeerAddrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index which uniquely identifies this entry within
+        a given session."
+    ::= { jnxMplsLdpSesPeerAddrEntry 1 }
+
+jnxMplsLdpSesPeerNextHopAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The internetwork layer address type of this Next Hop
+        Address as specified in the Label Address Message
+        associated with this Session. The value of this
+        object indicates how to interpret the value of
+        jnxMplsLdpSessionPeerNextHopAddress."
+    ::= { jnxMplsLdpSesPeerAddrEntry 2 }
+
+jnxMplsLdpSesPeerNextHopAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the next hop address."
+    REFERENCE
+        "[RFC3036], LDP Specification defines only IPv4 for
+        LDP Protocol Version 1, see section 3.4.3."
+    ::= { jnxMplsLdpSesPeerAddrEntry 3 }
+
+
+---
+--- Notifications
+---
+
+jnxMplsLdpNotificationPrefix   OBJECT IDENTIFIER ::=
+                                 { jnxMplsLdpNotifications 0 }
+
+jnxMplsLdpInitSesThresholdExceeded NOTIFICATION-TYPE
+     OBJECTS     {
+                   jnxMplsLdpEntityInitSesThreshold
+                 }
+     STATUS      current
+     DESCRIPTION
+        "This notification is generated when the value of
+        the 'jnxMplsLdpEntityInitSesThreshold' object
+        is not zero, and the number of Session
+        Initialization messages exceeds the value
+        of the 'jnxMplsLdpEntityInitSesThreshold' object."
+     ::= { jnxMplsLdpNotificationPrefix 1 }
+
+jnxMplsLdpPathVectorLimitMismatch NOTIFICATION-TYPE
+     OBJECTS     {
+                   jnxMplsLdpEntityPathVectorLimit,
+                   jnxMplsLdpPeerPathVectorLimit
+                 }
+     STATUS      current
+     DESCRIPTION
+        "If this notification is enabled to generated,
+
+        then this notification is sent when the
+        'jnxMplsLdpEntityPathVectorLimit' does NOT match
+        the value of the 'jnxMplsLdpPeerPathVectorLimit' for
+        a specific Entity."
+     REFERENCE
+        "[RFC3036], LDP Specification, Section 3.5.3."
+     ::= { jnxMplsLdpNotificationPrefix 2 }
+
+jnxMplsLdpSessionUp NOTIFICATION-TYPE
+     OBJECTS     {
+                    jnxMplsLdpSesState,
+                    jnxMplsLdpSesDiscontinuityTime,
+                    jnxMplsLdpSesStatsUnkMesTypeErrors,
+                    jnxMplsLdpSesStatsUnkTlvErrors
+                 }
+     STATUS      current
+     DESCRIPTION
+        "If this notification is enabled to generated,
+        then this notification is sent when the
+        value of 'jnxMplsLdpSesState' enters
+        the 'operational(5)' state."
+     ::= { jnxMplsLdpNotificationPrefix 3 }
+
+jnxMplsLdpSessionDown NOTIFICATION-TYPE
+     OBJECTS     {
+                    jnxMplsLdpSesState,
+                    jnxMplsLdpSesDiscontinuityTime,
+                    jnxMplsLdpSesStatsUnkMesTypeErrors,
+                    jnxMplsLdpSesStatsUnkTlvErrors
+
+                 }
+     STATUS      current
+     DESCRIPTION
+        "If this notification is enabled to generated,
+        then this notification is sent when the
+        the value of 'jnxMplsLdpSesState' leaves
+        the 'operational(5)' state."
+     ::= { jnxMplsLdpNotificationPrefix 4 }
+
+
+--****************************************************************
+-- Module Conformance Statement
+--****************************************************************
+
+
+jnxMplsLdpGroups
+    OBJECT IDENTIFIER ::= { jnxMplsLdpConformance 1 }
+
+jnxMplsLdpCompliances
+    OBJECT IDENTIFIER ::= { jnxMplsLdpConformance 2 }
+
+--
+-- Full Compliance
+--
+
+jnxMplsLdpModuleFullCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The Module is implemented with support
+        for read-create and read-write.  In other
+        words, both monitoring and configuration
+        are available when using this MODULE-COMPLIANCE."
+
+    MODULE -- this module
+        MANDATORY-GROUPS    { jnxMplsLdpGeneralGroup,
+                              jnxMplsLdpLspGroup,
+                              jnxMplsLdpNotificationsGroup
+                            }
+
+
+    GROUP jnxMplsLdpLsrGroup
+    DESCRIPTION
+        "This group must be supported if the LSR MIB is
+        implemented, specifically the mplsInSegmentTable,
+        the mplsOutSegmentTable or the mplsXCTable."
+
+    OBJECT jnxMplsLdpEntityTargetPeerAddrType
+    SYNTAX InetAddressType 
+    DESCRIPTION
+       "An implementation is only required to support
+       'unknown(0)', and IPv4 addresses. Supporting
+       IPv6 addresses is optional."
+
+
+    OBJECT jnxMplsLdpEntityTargetPeerAddr
+    SYNTAX InetAddress (SIZE(0|4|16))
+    DESCRIPTION
+        "An implementation is only required to support IPv4 and
+        may optionally support IPv6 addresses."
+
+    OBJECT jnxMplsLdpEntityRowStatus
+    SYNTAX INTEGER { active(1) } 
+    WRITE-SYNTAX INTEGER { createAndGo(4), destroy(6) }
+    DESCRIPTION
+        "Support for createAndWait and notInService is not
+        required."
+
+    OBJECT jnxMplsFecAddrFamily
+    SYNTAX InetAddressType 
+    DESCRIPTION
+       "An implementation is only required to support
+
+       'unknown(0)', and IPv4 addresses. Supporting
+       IPv6 addresses is optional."
+
+    OBJECT jnxMplsFecAddr
+    SYNTAX InetAddress (SIZE(0|4|16))
+    DESCRIPTION
+        "An implementation is only required to support IPv4 and
+        may optionally support IPv6 addresses."
+
+    OBJECT jnxMplsFecRowStatus
+    SYNTAX INTEGER { active(1) }
+    WRITE-SYNTAX INTEGER { createAndGo(4), destroy(6) }
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Support for createAndWait and notInService is not
+        required. Also, the entries in this table may be
+        created by the agent, so strictly speaking
+        read-create functionality is not necessary, but
+        may be nice to have."
+
+    OBJECT jnxMplsLdpLspFecRowStatus
+    SYNTAX INTEGER { active(1) }
+    WRITE-SYNTAX INTEGER { createAndGo(4), destroy(6) }
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Support for createAndWait and notInService is not
+        required. Also, the entries in this table may be
+        created by the agent, so strictly speaking
+        read-create functionality is not necessary, but
+        may be nice to have."
+
+    OBJECT jnxMplsLdpSesPeerNextHopAddrType
+    SYNTAX InetAddressType
+    DESCRIPTION
+        "An implementation is only required to support
+        'unknown(0)', and IPv4 addresses. Supporting
+        IPv6 addresses is optional."
+
+    OBJECT jnxMplsLdpSesPeerNextHopAddr
+    SYNTAX InetAddress (SIZE(0|4|16))
+    DESCRIPTION
+        "An implementation is only required to support IPv4
+        and may optionally support IPv6 addresses."
+
+
+    ::= { jnxMplsLdpCompliances 1 }
+
+--
+-- Read-Only Compliance
+--
+
+jnxMplsLdpModuleReadOnlyCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The Module is implemented with support
+        for read-only.  In other words, only monitoring
+        is available by implementing this MODULE-COMPLIANCE."
+
+    MODULE -- this module
+        MANDATORY-GROUPS    { jnxMplsLdpGeneralGroup,
+                              jnxMplsLdpLspGroup,
+                              jnxMplsLdpNotificationsGroup
+                            }
+
+
+    GROUP jnxMplsLdpLsrGroup
+    DESCRIPTION
+        "This group must be supported if the LSR MIB is
+        implemented, specifically the mplsInSegmentTable,
+        the mplsOutSegmentTable or the mplsXCTable."
+
+    OBJECT       jnxMplsLdpEntityProtocolVersion
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityAdminStatus
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityTcpDscPort
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityUdpDscPort
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityMaxPduLength
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityKeepAliveHoldTimer
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityHelloHoldTimer
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityInitSesThreshold
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityLabelDistMethod
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityLabelRetentionMode
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityPathVectorLimit
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityHopCountLimit
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityTargetPeer
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityTargetPeerAddrType
+    SYNTAX       InetAddressType 
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required.
+       An implementation is only required to support
+       'unknown(0)', and IPv4 addresses. Supporting
+       IPv6 addresses is optional."
+
+    OBJECT       jnxMplsLdpEntityTargetPeerAddr
+    SYNTAX       InetAddress (SIZE(0|4|16))
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Write access is not required.
+        An implementation is only required to support IPv4 and
+
+        may optionally support IPv6 addresses."
+
+    OBJECT       jnxMplsLdpEntityLabelType
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsLdpEntityStorageType
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT jnxMplsLdpEntityRowStatus
+    SYNTAX INTEGER { active(1) }
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Write access is not required, and active is the
+        only status that needs to be supported."
+
+    OBJECT       jnxMplsFecType
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsFecAddrLength
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT       jnxMplsFecAddrFamily
+    SYNTAX       InetAddressType 
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required.
+       An implementation is only required to support
+       'unknown(0)', and IPv4 addresses. Supporting
+       IPv6 addresses is optional."
+
+    OBJECT        jnxMplsFecAddr
+    SYNTAX        InetAddress (SIZE(0|4|16))
+    MIN-ACCESS    read-only
+    DESCRIPTION
+        "Write access is not required.
+        An implementation is only required to support IPv4 and
+        may optionally support IPv6 addresses."
+
+    OBJECT       jnxMplsFecStorageType
+    MIN-ACCESS   read-only
+    DESCRIPTION
+       "Write access is not required."
+
+    OBJECT jnxMplsFecRowStatus
+    SYNTAX INTEGER { active(1) }
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Write access is not required, and active is the
+        only status that needs to be supported."
+
+    OBJECT jnxMplsLdpLspFecRowStatus
+    SYNTAX INTEGER { active(1) }
+    MIN-ACCESS   read-only
+    DESCRIPTION
+        "Write access is not required, and active is the
+        only status that needs to be supported."
+
+    OBJECT jnxMplsLdpSesPeerNextHopAddrType
+    SYNTAX InetAddressType 
+    DESCRIPTION
+       "An implementation is only required to support
+       'unknown(0)', and IPv4 addresses. Supporting
+       IPv6 addresses is optional."
+
+
+    OBJECT jnxMplsLdpSesPeerNextHopAddr
+    SYNTAX InetAddress (SIZE(0|4|16))
+    DESCRIPTION
+        "An implementation is only required to support IPv4
+        and may optionally support IPv6 addresses."
+
+    ::= { jnxMplsLdpCompliances 2 }
+
+
+-- units of conformance
+
+jnxMplsLdpGeneralGroup OBJECT-GROUP
+    OBJECTS {
+    jnxMplsLdpLsrId,
+    jnxMplsLdpLsrLoopDetectionCapable,
+    jnxMplsLdpEntityLastChange,
+    jnxMplsLdpEntityIndexNext,
+    jnxMplsLdpEntityProtocolVersion,
+    jnxMplsLdpEntityAdminStatus,
+    jnxMplsLdpEntityOperStatus,
+    jnxMplsLdpEntityTcpDscPort,
+    jnxMplsLdpEntityUdpDscPort,
+    jnxMplsLdpEntityMaxPduLength,
+    jnxMplsLdpEntityKeepAliveHoldTimer,
+    jnxMplsLdpEntityHelloHoldTimer,
+    jnxMplsLdpEntityInitSesThreshold,
+    jnxMplsLdpEntityLabelDistMethod,
+    jnxMplsLdpEntityLabelRetentionMode,
+
+    jnxMplsLdpEntityPathVectorLimit,
+    jnxMplsLdpEntityHopCountLimit,
+    jnxMplsLdpEntityTargetPeer,
+    jnxMplsLdpEntityTargetPeerAddrType,
+    jnxMplsLdpEntityTargetPeerAddr,
+    jnxMplsLdpEntityLabelType,
+    jnxMplsLdpEntityDiscontinuityTime,
+    jnxMplsLdpEntityStorageType,
+    jnxMplsLdpEntityRowStatus,
+    jnxMplsLdpAttemptedSessions,
+    jnxMplsLdpSesRejectedNoHelloErrors,
+    jnxMplsLdpSesRejectedAdErrors,
+    jnxMplsLdpSesRejectedMaxPduErrors,
+    jnxMplsLdpSesRejectedLRErrors,
+    jnxMplsLdpBadLdpIdentifierErrors,
+    jnxMplsLdpBadPduLengthErrors,
+    jnxMplsLdpBadMessageLengthErrors,
+    jnxMplsLdpBadTlvLengthErrors,
+    jnxMplsLdpMalformedTlvValueErrors,
+    jnxMplsLdpKeepAliveTimerExpErrors,
+    jnxMplsLdpShutdownNotifReceived,
+    jnxMplsLdpShutdownNotifSent,
+    jnxMplsLdpPeerLastChange,
+    jnxMplsLdpPeerLabelDistMethod,
+    jnxMplsLdpPeerPathVectorLimit,
+    jnxMplsLdpHelloAdjHoldTimeRem,
+    jnxMplsLdpHelloAdjType,
+    jnxMplsLdpSesStateLastChange,
+    jnxMplsLdpSesState,
+    jnxMplsLdpSesProtocolVersion,
+    jnxMplsLdpSesKeepAliveHoldTimeRem,
+    jnxMplsLdpSesMaxPduLength,
+    jnxMplsLdpSesDiscontinuityTime,
+    jnxMplsLdpSesStatsUnkMesTypeErrors,
+    jnxMplsLdpSesStatsUnkTlvErrors,
+    jnxMplsLdpSesPeerNextHopAddrType,
+    jnxMplsLdpSesPeerNextHopAddr,
+    jnxMplsFecIndexNext,
+    jnxMplsFecType,
+    jnxMplsFecAddrFamily,
+    jnxMplsFecAddrLength,
+    jnxMplsFecAddr,
+    jnxMplsFecStorageType,
+    jnxMplsFecRowStatus,
+    jnxMplsLdpLspFecOperStatus,
+    jnxMplsLdpLspFecLastChange,
+    jnxMplsLdpLspFecRowStatus
+    }
+    STATUS    current
+    DESCRIPTION
+
+        "Objects that apply to all MPLS LDP implementations."
+    ::= { jnxMplsLdpGroups 1 }
+
+
+jnxMplsLdpLspGroup OBJECT-GROUP
+    OBJECTS {
+    jnxMplsLdpLspLabelType,
+    jnxMplsLdpLspType
+    }
+    STATUS    current
+    DESCRIPTION
+        "These objects are specific to LDP LSPs."
+    ::= { jnxMplsLdpGroups 2 }
+
+jnxMplsLdpLsrGroup OBJECT-GROUP
+    OBJECTS {
+    jnxMplsLdpLspLsrInSegmentPointer,
+    jnxMplsLdpLspLsrOutSegmentPointer,
+    jnxMplsLdpLspLsrXCPointer
+    }
+    STATUS    current
+    DESCRIPTION
+        "These objects are optional and only need to be supported
+        for LDP implementations which support the following
+        tables in the LSR MIB: mplsInSegmentTable,
+        mplsOutSegmentTable and mplsXCTable."
+    ::= { jnxMplsLdpGroups 3 }
+
+
+jnxMplsLdpNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { jnxMplsLdpInitSesThresholdExceeded,
+                    jnxMplsLdpPathVectorLimitMismatch,
+                    jnxMplsLdpSessionUp,
+                    jnxMplsLdpSessionDown
+                       }
+    STATUS   current
+    DESCRIPTION
+        "The notification(s) which an MPLS LDP implemention
+         is required to implement."
+    ::= { jnxMplsLdpGroups 4 }
+
+
+END

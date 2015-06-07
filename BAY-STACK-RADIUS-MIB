@@ -1,0 +1,144 @@
+
+BAY-STACK-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackRadiusMib MODULE-IDENTITY
+      LAST-UPDATED "200704030000Z"
+      ORGANIZATION "Nortel Ltd."
+      CONTACT-INFO "nortel.com"
+      DESCRIPTION
+              "This MIB module is used for RADIUS configuration
+               settings in Nortel's software and products."
+
+      REVISION     "200704030000Z"  -- April 3, 2007
+      DESCRIPTION
+              "Ver 1:  Initial version."
+      ::= { bayStackMibs 21 }
+
+bsRadiusNotifications OBJECT IDENTIFIER ::= { bayStackRadiusMib 0 }
+bsRadiusObjects       OBJECT IDENTIFIER ::= { bayStackRadiusMib 1 }
+
+--
+-- configuration table
+--
+
+bsRadiusServerTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsRadiusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to control RADIUS server settings."
+    ::= { bsRadiusObjects 2 }
+
+bsRadiusServerEntry OBJECT-TYPE
+    SYNTAX       BsRadiusServerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry containing objects defining how to connect to a
+        single RADIUS server."
+    INDEX { bsRadiusServerIndex }
+    ::= { bsRadiusServerTable 1 }
+
+BsRadiusServerEntry ::=
+    SEQUENCE {
+        bsRadiusServerIndex        Integer32,
+        bsRadiusServerPriority     Integer32,
+        bsRadiusServerAddressType  InetAddressType,
+        bsRadiusServerAddress      InetAddress,
+        bsRadiusServerUdpPort      InetPortNumber,
+        bsRadiusServerTimeout      Integer32,
+        bsRadiusServerSecret       OCTET STRING,
+        bsRadiusServerRowStatus    RowStatus
+    }
+
+bsRadiusServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique integer value used to identify entries in this table."
+    ::= { bsRadiusServerEntry 1 }
+
+bsRadiusServerPriority OBJECT-TYPE
+    SYNTAX       Integer32 (1..65535)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value indicates the order in which entries in this table
+        are used when attempting to contact a RADIUS server.  Entries
+        with a lower priority number are tried first.  If two entries
+        have the same priority value, the entry with a lower index
+        value is tried first.
+
+        Also note that entries which contain an invalid internet
+        address will not be used."
+    ::= { bsRadiusServerEntry 2 }
+
+bsRadiusServerAddressType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The type of address contained in the corresponding instance
+        of bsRadiusServerAddress."
+    ::= { bsRadiusServerEntry 3 }
+
+bsRadiusServerAddress OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The internet address to use when attempting to contact a
+        RADIUS server."
+    ::= { bsRadiusServerEntry 4 }
+
+bsRadiusServerUdpPort OBJECT-TYPE
+    SYNTAX       InetPortNumber
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The UDP port number to use when trying to contact the RADIUS
+        server at the address contained in the corresponding instance
+        of bsRadiusServerAddress."
+    ::= { bsRadiusServerEntry 5 }
+
+bsRadiusServerTimeout OBJECT-TYPE
+    SYNTAX       Integer32
+    UNITS        "seconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The time interval to wait before re-sending a message to this
+        RADIUS server."
+    ::= { bsRadiusServerEntry 6 }
+
+bsRadiusServerSecret OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..16))
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The shared RADIUS secret to use when communicating with the
+        RADIUS server.  Note that when this object is retrieved, its
+        value will always by a zero-length octet string."
+    ::= { bsRadiusServerEntry 7 }
+
+bsRadiusServerRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Controls row creation/deletion in this table."
+    ::= { bsRadiusServerEntry 8 }
+
+END
+

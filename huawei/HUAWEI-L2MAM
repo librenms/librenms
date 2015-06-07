@@ -1,0 +1,1574 @@
+-- ==================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:  HUAWEI Layer Two mac management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--
+-- ==================================================================
+
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HUAWEI-L2MAM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hwDatacomm
+            FROM HUAWEI-MIB
+    MacAddress, RowStatus
+        FROM SNMPv2-TC
+    OBJECT-TYPE, Integer32, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    InterfaceIndex,InterfaceIndexOrZero,ifDescr
+        FROM IF-MIB
+    PhysicalIndex, entPhysicalIndex, entPhysicalName
+      FROM ENTITY-MIB
+    hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType
+        FROM HUAWEI-BASE-TRAP-MIB
+    hwL2IfPortName
+        FROM HUAWEI-L2IF-MIB
+    VlanIdOrNone, VlanId
+        FROM Q-BRIDGE-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    EnableValue
+        FROM NQA-MIB;
+
+    hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
+
+    hwL2MAM MODULE-IDENTITY
+            LAST-UPDATED "200504280000Z"
+            ORGANIZATION "Huawei Technologies co.,Ltd."
+            CONTACT-INFO
+            "VRP Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd.,
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+            Zip:100085"
+            DESCRIPTION
+            "This is the layer 2 mac-address management. It contains the layer 2
+            mac-address forwarding information currently operating on this device.
+            And also contains the information of mac-limit rule. "
+            ::= { hwL2Mgmt 2}
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hwL2MAMObjects OBJECT IDENTIFIER ::= { hwL2MAM 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+VlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX      Unsigned32
+
+
+    hwL2MaxMacLimit  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+        "The maximum of Mac-address limit rule."
+        ::= { hwL2MAMObjects  1 }
+
+
+    -- Configured mac-address forwarding table
+        hwdbCfgFdbTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwdbCfgFdbEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The layer 2 Configured mac-address forwarding table .The table that
+                        contains the layer 2 mac-address forwarding information
+                        currently operating on this device."
+                ::= { hwL2MAMObjects 2 }
+
+        hwdbCfgFdbEntry OBJECT-TYPE
+                SYNTAX HwdbCfgFdbEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of The layer 2 mac-address forwarding table."
+                INDEX { hwCfgFdbMac, hwCfgFdbVlanId, hwCfgFdbVsiName }
+                ::= { hwdbCfgFdbTable 1 }
+
+        HwdbCfgFdbEntry ::=
+                SEQUENCE {
+                        hwCfgFdbMac
+                                MacAddress,
+                        hwCfgFdbVlanId
+                                VlanIndex,
+                        hwCfgFdbVsiName
+                                OCTET STRING,
+                        hwCfgFdbPort
+                                InterfaceIndex,
+                        hwCfgFdbType
+                                INTEGER,
+                        hwCfgFdbRowstatus
+                                RowStatus,
+                        hwCfgFdbAtmPort
+                                InterfaceIndexOrZero,
+                        hwCfgFdbVpi
+                                Integer32,
+                        hwCfgFdbVci
+                                Integer32,
+            hwCfgFdbChgVlanId
+              VlanIdOrNone
+                 }
+
+        hwCfgFdbMac OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A unicast MAC address for which the device contains
+             it's information in the mac-address table. The mac-address
+             can't be a special address or multicast address."
+                ::= { hwdbCfgFdbEntry 1 }
+
+        hwCfgFdbVlanId OBJECT-TYPE
+                SYNTAX VlanIndex (0..4094)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VLAN name or other identifier referring to the VLAN
+                        which is correlative to the hwFdbMac."
+                ::= { hwdbCfgFdbEntry 2 }
+
+        hwCfgFdbVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VSI-ID or other identifier referring to the VSI
+                        which is correlative to the hwFdbMac."
+                ::= { hwdbCfgFdbEntry 3 }
+
+        hwCfgFdbPort OBJECT-TYPE
+                SYNTAX InterfaceIndex
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The forwarding port. The port must be an ethernet port.
+                        And the port must be contained by the hwFdbVlanId or allow
+                        the hwFdbVlanId get across through itself."
+                ::= { hwdbCfgFdbEntry 4 }
+
+        hwCfgFdbType OBJECT-TYPE
+                SYNTAX INTEGER
+                        {
+                        static(2),
+                        blackhole(3),
+                        sticky(4)
+        -- permanent(4),
+                        }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The mac-address table item type of this entry. The meanings of
+                         the values are:
+                        static(2)- the mac-address is configured by user, doesn't aging out, and this
+                        entry doesn't lost after the device/FSU is reset or FSU is pulled out.
+
+                        blackhole(3)- the mac-address is configured by user for discarding frame which
+                                        contains specific destination mac-address, doesn't aging out, and this
+                        entry doesn't lost after the device/FSU is reset or FSU is pulled out.
+                        When the type is dynamic ,the item can't be created.
+                         -- permanent(4)"
+                ::= { hwdbCfgFdbEntry 5 }
+
+        hwCfgFdbRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwdbCfgFdbEntry 6 }
+
+        hwCfgFdbAtmPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The forwarding port. The port must be an atm port. "
+                ::= { hwdbCfgFdbEntry 7 }
+
+        hwCfgFdbVpi OBJECT-TYPE
+                SYNTAX Integer32 (0..255 | 65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The Virtual Path Identifier."
+                ::= { hwdbCfgFdbEntry 8 }
+
+        hwCfgFdbVci OBJECT-TYPE
+                SYNTAX Integer32 (0..2047 | 65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The Virtual Connection Identifier."
+                ::= { hwdbCfgFdbEntry 9 }
+
+        hwCfgFdbChgVlanId OBJECT-TYPE
+                SYNTAX VlanIdOrNone
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+      "The vlan-ID that needs to be changed when packet's sended out from
+      the interface board.The Mac item including this vlan ID indicates
+      that the out interface has the application of the vlan stacking or
+      mapping which needs to chang the hwCfgFdbVlanId into this vlan ID."
+                ::= { hwdbCfgFdbEntry 10 }
+
+    -- Dynamic (Leaned) mac-address forwarding table
+        hwdbDynFdbTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwdbDynFdbEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The layer 2 Dynamic (Leaned)mac-address forwarding table .The table that
+                        contains the layer 2 mac-address forwarding information
+                        currently operating on this device."
+                ::= { hwL2MAMObjects 3 }
+
+        hwdbDynFdbEntry OBJECT-TYPE
+                SYNTAX HwdbDynFdbEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of The layer 2 mac-address forwarding table."
+                INDEX { hwDynFdbMac, hwDynFdbVlanId, hwDynFdbVsiName }
+                ::= { hwdbDynFdbTable 1 }
+
+        HwdbDynFdbEntry ::=
+                SEQUENCE {
+                        hwDynFdbMac
+                                MacAddress,
+                        hwDynFdbVlanId
+                                VlanIndex,
+                        hwDynFdbVsiName
+                                OCTET STRING,
+                        hwDynFdbPort
+                                InterfaceIndex,
+                        hwDynFdbAtmPort
+                                InterfaceIndexOrZero,
+                        hwDynFdbVpi
+                                Integer32,
+                        hwDynFdbVci
+                                Integer32,
+                        hwDynFdbRowstatus
+                                RowStatus,
+                        hwDynSecurityFdbToStaticEnable 
+                                EnableValue
+                 }
+
+        hwDynFdbMac OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A unicast MAC address for which the device contains
+             it's information in the mac-address table. The mac-address
+             can't be a special address or multicast address."
+                ::= { hwdbDynFdbEntry 1 }
+
+        hwDynFdbVlanId OBJECT-TYPE
+                SYNTAX VlanIndex (0..4094)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VLAN name or other identifier referring to the VLAN
+                        which is correlative to the hwFdbMac."
+                ::= { hwdbDynFdbEntry 2 }
+
+        hwDynFdbVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VSI-ID or other identifier referring to the VSI
+                        which is correlative to the hwFdbMac."
+                ::= { hwdbDynFdbEntry 3 }
+
+        hwDynFdbPort OBJECT-TYPE
+                SYNTAX InterfaceIndex
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The forwarding port. The port must be an ethernet port.
+                        And the port must be contained by the hwFdbVlanId or allow
+                        the hwFdbVlanId get across through itself."
+                ::= { hwdbDynFdbEntry 4 }
+
+        hwDynFdbAtmPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The forwarding port. The port must be an atm port. "
+                ::= { hwdbDynFdbEntry 5 }
+
+        hwDynFdbVpi OBJECT-TYPE
+                SYNTAX Integer32 (0..255 | 65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The Virtual Path Identifier."
+                ::= { hwdbDynFdbEntry 6 }
+
+        hwDynFdbVci OBJECT-TYPE
+                SYNTAX Integer32 (0..2047 | 65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The Virtual Connection Identifier."
+                ::= { hwdbDynFdbEntry 7 }
+
+        hwDynFdbRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwdbDynFdbEntry 8 }
+                
+        hwDynSecurityFdbToStaticEnable  OBJECT-TYPE
+                SYNTAX          EnableValue
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                    "When this object is set to 'Enable(1)',if port security is enabled ,
+                the dynamic mac will convert to static."
+                ::= { hwdbDynFdbEntry 9 }   
+                                                                  
+                                                   
+ 
+  -- MacLimit
+        hwMacLimitTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacLimitEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table containing the mac-address learning-limit rule information for device.
+                        It can limit on ethernet interface,vlan,ethernet interface + vlan."
+                ::= { hwL2MAMObjects 4 }
+
+        hwMacLimitEntry OBJECT-TYPE
+                SYNTAX HwMacLimitEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the mac-address learning-limit table."
+                INDEX { hwMacLimitPort,hwMacLimitVlanId,hwMacLimitVsiName}
+                ::= { hwMacLimitTable 1 }
+
+        HwMacLimitEntry ::=
+                SEQUENCE {
+                        hwMacLimitPort
+                                InterfaceIndexOrZero,
+                        hwMacLimitVlanId
+                                Integer32,
+                        hwMacLimitVsiName
+                                OCTET STRING,
+                        hwMacLimitMaxMac
+                                Integer32,
+                        hwMacLimitMaxRate
+                                Integer32,
+                        hwMacLimitAction
+                                INTEGER,
+                        hwMacLimitAlarm
+                                INTEGER,
+                        hwMacLimitRowstatus
+                                RowStatus,
+                        hwMacAddressLearn
+                                INTEGER,
+                        hwMacDynAddressLearnNum
+                                Integer32
+                       }
+
+        hwMacLimitPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The port number which will be configured mac-limit."
+                ::= { hwMacLimitEntry 1 }
+
+        hwMacLimitVlanId OBJECT-TYPE
+                SYNTAX Integer32(0..4094)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The vlan id which will be configured mac-limit."
+                ::= { hwMacLimitEntry 2 }
+
+        hwMacLimitVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The vsi name which will be configured mac-limit."
+                ::= { hwMacLimitEntry 3 }
+
+        hwMacLimitMaxMac OBJECT-TYPE
+                SYNTAX Integer32(0..131072)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwMacLimitEntry 4 }
+
+        hwMacLimitMaxRate OBJECT-TYPE
+                SYNTAX Integer32(0..1000)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The max mac-address learning rate. When the valu
+                        e is '0', the meaning is that there isn't limiting
+                         rule to the learning rate."
+                ::= { hwMacLimitEntry 5 }
+
+        hwMacLimitAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                discard(1),
+                forward(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The mac-address limit action of this entry. The
+                        meanings of the values are:
+                         discard(1)- Discard packets
+                         forward(2)- Forward packets."
+                ::= { hwMacLimitEntry 6 }
+
+        hwMacLimitAlarm OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                disable(1),
+                enable(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The mac-limit alarm switch of this entry. The meanings of
+                         the values are:
+                         disable(1), enable(2)"
+                ::= { hwMacLimitEntry 7 }
+
+        hwMacLimitRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwMacLimitEntry 8 }
+
+        hwMacAddressLearn  OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    disable(1),
+                    enable(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                "The flag of enable Mac address learn."
+                ::= { hwMacLimitEntry 9 }
+
+        hwMacDynAddressLearnNum   OBJECT-TYPE
+                SYNTAX Integer32(0..131072)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The number of learned dynamic mac-address ."
+                ::= { hwMacLimitEntry 10 }
+
+        hwMacUsageTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacUsageEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION 
+                "MAC usage table"
+                ::= { hwL2MAMObjects 5 }
+
+        hwMacUsageEntry OBJECT-TYPE
+               SYNTAX HwMacUsageEntry
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION
+               "MAC usage entry"
+               INDEX { entPhysicalIndex }
+               ::= { hwMacUsageTable 1 }
+
+       HwMacUsageEntry ::=
+               SEQUENCE {
+                           hwMacEntityUsage
+                                Integer32,
+                           hwMacEntityUsageThreshold
+                                Integer32
+                        }
+
+       hwMacEntityUsage OBJECT-TYPE
+               SYNTAX Integer32 (0..100)
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION
+               "MAC usage in every IO board"
+               ::= { hwMacUsageEntry 1 }
+
+       hwMacEntityUsageThreshold OBJECT-TYPE
+               SYNTAX Integer32 (0..100)
+               MAX-ACCESS read-write
+               STATUS current
+               DESCRIPTION
+               "MAC usage range"
+        ::= { hwMacUsageEntry 2 }
+
+--3tuple static mac   
+	    hwdbCfg3tupleFdbTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwdbCfg3tupleFdbEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION "The layer 2 configured mac-address forwarding table .The table that 
+ 						contains the layer 2 mac-address forwarding information 
+ 						currently operating on this device."  
+			::= { hwL2MAMObjects 6 }   
+	    
+	    hwdbCfg3tupleFdbEntry OBJECT-TYPE
+                SYNTAX HwdbCfg3tupleFdbEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of The layer 2 mac-address forwarding table."
+                INDEX { hwdbCfg3tupleFdbMac, hwdbCfg3tupleFdbVlanId, hwdbCfg3tupleFdbInPort }
+                ::= { hwdbCfg3tupleFdbTable 1 }
+            
+		HwdbCfg3tupleFdbEntry ::= 
+			SEQUENCE {
+				hwdbCfg3tupleFdbMac
+					MacAddress, 
+				hwdbCfg3tupleFdbVlanId
+					Integer32,
+				hwdbCfg3tupleFdbInPort
+					InterfaceIndex,
+				hwdbCfg3tupleFdbOutPort
+					InterfaceIndex, 
+				hwdbCfg3tupleFdbRowStatus
+					RowStatus
+				}
+                        
+        hwdbCfg3tupleFdbMac OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A unicast MAC address for which the device contains
+					 	it's information in the mac-address table. The mac-address 
+					 	can't be a special address or multicast address."
+                ::= { hwdbCfg3tupleFdbEntry 1 }
+        
+        hwdbCfg3tupleFdbVlanId OBJECT-TYPE
+                SYNTAX Integer32 (1..4094)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VLAN name or other identifier referring to the VLAN 
+ 						which is correlative to the hwFdbMac."
+                ::= { hwdbCfg3tupleFdbEntry 2 }  
+        hwdbCfg3tupleFdbInPort OBJECT-TYPE
+                SYNTAX InterfaceIndex 
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The input port. The port must be an ethernet port. 
+					 	And the port must be contained by the hwFdbVlanId or allow 
+					 	the hwFdbVlanId get across through itself."
+                ::= { hwdbCfg3tupleFdbEntry 3 }   
+                
+		hwdbCfg3tupleFdbOutPort OBJECT-TYPE
+                SYNTAX InterfaceIndex 
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The forwarding port. The port must be an ethernet port. 
+					 	And the port must be contained by the hwFdbVlanId or allow 
+					 	the hwFdbVlanId get across through itself."
+                ::= { hwdbCfg3tupleFdbEntry 4 }    
+                
+         hwdbCfg3tupleFdbRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwdbCfg3tupleFdbEntry 5 }
+    hwL2MacTraps OBJECT IDENTIFIER ::= { hwL2MAMObjects 7 }
+
+    hwMacUsageRaisingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacEntityUsage, hwMacEntityUsageThreshold}
+            STATUS current
+            DESCRIPTION
+                "Beyond the configurated Mac usage"
+            ::= { hwL2MacTraps 1 }
+
+    hwMacUsageFallingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacEntityUsage, hwMacEntityUsageThreshold}
+            STATUS current
+            DESCRIPTION
+                "Resume the alarm of Mac usage"
+            ::= { hwL2MacTraps 2 }
+
+    hwMacLimitNumRaisingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac,hwL2IfPortName}
+            STATUS current
+            DESCRIPTION
+                "Beyond the mac limited learning number "
+            ::= { hwL2MacTraps 3 }
+
+    hwMacLimitNumFallingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac,hwL2IfPortName}
+            STATUS current
+            DESCRIPTION
+                "Resume the alarm of Mac usage"
+            ::= { hwL2MacTraps 4 }
+            
+    hwUntargetMacNumAlarm NOTIFICATION-TYPE      
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwUntargetMacNum}
+            STATUS current
+            DESCRIPTION "Warning of untarget mac-address numbers."
+            ::= { hwL2MacTraps 5 }
+
+
+    hwPortSecRcvInsecurePktAlarm NOTIFICATION-TYPE
+            OBJECTS {ifDescr, hwPortSecurityProtectAction}
+            STATUS current
+            DESCRIPTION 
+                "Alarm of port perform the protect action shutdown or restrict
+                        when receiving insecure mac packets in the interface."
+            ::= { hwL2MacTraps 6 }
+
+    hwPwMacLimitNumRaisingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwPwMacDynAddressLearnNum, hwPwMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "The number of MAC addresses that are learnt based on the PW reaches 
+                 the upper limit."
+            ::= { hwL2MacTraps 7 }
+
+    hwPwMacLimitNumFallingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwPwMacDynAddressLearnNum, hwPwMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "The number of MAC addresses that are learnt based on the PW falls below 
+                 the upper limit."
+            ::= { hwL2MacTraps 8 }
+
+    hwPortStickyReachMaxAlarm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "An alarm is generated when the number of sticky MAC address entries reaches the maximum value."
+            ::= { hwL2MacTraps 9 }
+            
+    hwRecIllegalMacPktAlarm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "The MAC addresses that received are illegal."
+            ::= { hwL2MacTraps 10 }
+            
+            
+-- untarget mac number            
+    hwUntargetMacNum  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The number of untarget mac-address."
+        ::= { hwL2MAMObjects  8 }
+        
+-- mac-address aging-time         
+    hwMacAgingTime OBJECT-TYPE
+        SYNTAX Integer32 (60..1000000 | 0)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "The interval that the hardware deletes any entry 
+        whose hit bit is cleared and clears the hit bit  
+        of the remaining entries.The default value is 300 seconds.'0'means the MAC entries will be 
+        never aged."
+        ::= { hwL2MAMObjects 9 }   
+                        
+-- mac-address restrict         
+    hwMacRestrict OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "This object indicates whether MAC address learning 
+        restrict has been enabled for the system."
+        ::= { hwL2MAMObjects 10 }
+                
+   -- port-security
+        hwPortSecurityTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwPortSecurityEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table containing the port security information for device.
+                It can protect the port from inaccessible mac."
+                ::= { hwL2MAMObjects  11 }
+
+        hwPortSecurityEntry OBJECT-TYPE
+                SYNTAX HwPortSecurityEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the port security table."
+                INDEX { hwPortSecurityPort }
+                ::= { hwPortSecurityTable 1 }
+
+        HwPortSecurityEntry ::=
+                SEQUENCE {
+                        hwPortSecurityPort
+                                InterfaceIndexOrZero,
+                        hwPortSecurityEnabled
+                                EnabledStatus,
+                        hwPortSecurityProtectAction
+                                INTEGER,
+                        hwPortSecurityAllDynToStaticEnable
+                                EnableValue,    
+                        hwPortSecurityAllDynToStickyEnable
+                                EnableValue    
+                              
+                       }
+
+        hwPortSecurityPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The port number which will be configured port security."
+                ::= { hwPortSecurityEntry 1 }
+
+        hwPortSecurityEnabled  OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION 
+                       "When this object is set to 'enabled(1)' Port security
+                    is enabled on this port else disabled."
+                ::= { hwPortSecurityEntry 2 }      
+        
+
+        hwPortSecurityProtectAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                restrict(1),
+                protect(2),
+                shutdown(3),
+                noaction(4)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "The port security protect action of this entry. The
+                        meanings of the values are:
+                         restrict(1)- shutdown the port
+                         protect(2)- discard the unknow source mac packets and not learn
+                         shutdown(3)- send trap
+                         noaction(4)- broadcast the packet ."
+                ::= { hwPortSecurityEntry 3 }
+              
+                
+        hwPortSecurityAllDynToStaticEnable  OBJECT-TYPE
+                SYNTAX          EnableValue
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "When this object is set to 'enable(1)' all dynamic mac-address on the Port 
+                will convert to static."
+                ::= { hwPortSecurityEntry 4 } 
+                 
+        hwPortSecurityAllDynToStickyEnable  OBJECT-TYPE
+                SYNTAX          EnableValue
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "When this object is set to enable and port security is enabled, 
+                    the dynamic MAC address entry will be changed to a sticky MAC address entry."
+                ::= { hwPortSecurityEntry 5 } 
+
+ -- MacLimitGlobalRule
+        hwMacLimitGlobalRuleTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacLimitGlobalRuleEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table containing the global mac-address learning-limit rules information for device."
+                ::= { hwL2MAMObjects 12 }
+
+        hwMacLimitGlobalRuleEntry OBJECT-TYPE
+                SYNTAX HwMacLimitGlobalRuleEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the global mac-address learning-limit rule table."
+                INDEX { hwMacLimitGlobalRuleName }
+                ::= { hwMacLimitGlobalRuleTable 1 }
+
+        HwMacLimitGlobalRuleEntry ::=
+                SEQUENCE {                       
+                        hwMacLimitGlobalRuleName
+                                OCTET STRING,
+                        hwMacLimitRuleMaxMac
+                                Integer32,
+                        hwMacLimitRuleMaxRate
+                                Integer32,
+                        hwMacLimitRuleAction 
+                                INTEGER,
+                        hwMacLimitRuleAlarm
+                                INTEGER,
+                        hwMacLimitRuleRowstatus
+                                RowStatus
+                       }
+
+        hwMacLimitGlobalRuleName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The global mac-address learning-limit rule name."
+                ::= { hwMacLimitGlobalRuleEntry 1 }
+
+        hwMacLimitRuleMaxMac OBJECT-TYPE
+                SYNTAX Integer32(0..131072)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwMacLimitGlobalRuleEntry 11 }
+
+        hwMacLimitRuleMaxRate OBJECT-TYPE
+                SYNTAX Integer32(0..1000)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The max mac-address learning rate. When the valu
+                        e is '0', the meaning is that there isn't limiting
+                         rule to the learning rate."
+                ::= { hwMacLimitGlobalRuleEntry 12 }
+
+        hwMacLimitRuleAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                discard(1),
+                forward(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The mac-address limit action of this entry. The
+                        meanings of the values are:
+                         discard(1)- Discard packets
+                         forward(2)- Forward packets."
+                ::= { hwMacLimitGlobalRuleEntry 13 }
+
+        hwMacLimitRuleAlarm OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                disable(1),
+                enable(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The mac-limit alarm switch of this entry. The meanings of
+                         the values are:
+                         disable(1), enable(2)"
+                ::= { hwMacLimitGlobalRuleEntry 14 }
+
+        hwMacLimitRuleRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwMacLimitGlobalRuleEntry 51 }
+
+ -- MacLimitApplyTable               
+        hwMacLimitApplyRuleTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacLimitApplyRuleEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table containing the global mac-address learning-limit rules and apply ports."
+                ::= { hwL2MAMObjects 13 }
+
+        hwMacLimitApplyRuleEntry OBJECT-TYPE
+                SYNTAX HwMacLimitApplyRuleEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the global mac-address learning-limit rules and apply ports table."
+                INDEX { hwMacLimitApplyPort, hwMacLimitApplyVlanId }
+                ::= { hwMacLimitApplyRuleTable 1 }     
+                
+        HwMacLimitApplyRuleEntry ::=
+                SEQUENCE {
+                        hwMacLimitApplyPort
+                                InterfaceIndexOrZero,   
+                        hwMacLimitApplyVlanId
+                                Integer32,
+                        hwMacLimitApplyRuleName
+                        	    OCTET STRING,        
+                        hwMacLimitApplyRowstatus
+                                RowStatus
+                       }      
+                       
+        hwMacLimitApplyPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The port number which apply the global mac-address learning-limit rule."
+                ::= { hwMacLimitApplyRuleEntry 1 }      
+                
+        hwMacLimitApplyVlanId OBJECT-TYPE
+                SYNTAX Integer32(0..4094)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The vlan id which apply the global mac-address learning-limit rule."
+                ::= { hwMacLimitApplyRuleEntry 2 }
+                
+        hwMacLimitApplyRuleName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The global mac-address learning-limit rule name."
+                ::= { hwMacLimitApplyRuleEntry 11 } 
+                
+        hwMacLimitApplyRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwMacLimitApplyRuleEntry 51 }
+
+        hwMacGlobalStatistics OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the global mac-address items."
+                ::= { hwL2MAMObjects 14 }
+                
+        hwMacIfStatisticsTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacIfStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table showing the number of mac-address items by interface index."
+                ::= { hwL2MAMObjects 15 }
+
+        hwMacIfStatisticsEntry OBJECT-TYPE
+                SYNTAX HwMacIfStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the statistics of mac-address table."
+                INDEX { hwMacIfStatisticsIfIndex }
+                ::= { hwMacIfStatisticsTable 1 }
+                
+        HwMacIfStatisticsEntry ::=
+                SEQUENCE {
+                        hwMacIfStatisticsIfIndex
+                                InterfaceIndex,
+                        hwMacIfStatistics
+                                Integer32
+                         }      
+                       
+        hwMacIfStatisticsIfIndex OBJECT-TYPE
+                SYNTAX InterfaceIndex
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The interface index which is correlative to the hwIfMacStatistics table."
+                ::= { hwMacIfStatisticsEntry 1 }                
+                
+        hwMacIfStatistics OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the mac-address items."
+                ::= { hwMacIfStatisticsEntry 2 }                 
+                 
+        hwMacSlotStatisticsTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacSlotStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table showing the number of mac-address items by slot ID."
+                ::= { hwL2MAMObjects 16 }
+
+        hwMacSlotStatisticsEntry OBJECT-TYPE
+                SYNTAX HwMacSlotStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the statistics of mac-address table."
+                INDEX { hwMacSlotStatisticsSlotId }
+                ::= { hwMacSlotStatisticsTable 1 }
+                
+        HwMacSlotStatisticsEntry ::=
+                SEQUENCE {
+                        hwMacSlotStatisticsSlotId
+                                Integer32,
+                        hwMacSlotStatistics
+                                Integer32
+                         }      
+                       
+        hwMacSlotStatisticsSlotId OBJECT-TYPE
+                SYNTAX Integer32 (1..128)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The slot ID which is correlative to the hwMacSlotStatistics table."
+                ::= { hwMacSlotStatisticsEntry 1 }               
+                
+        hwMacSlotStatistics OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the mac-address items by slot ID."
+                ::= { hwMacSlotStatisticsEntry 2 }
+                
+        hwMacVlanStatisticsTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacVlanStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table showing the number of mac-address items by VLAN ID."
+                ::= { hwL2MAMObjects 17 }
+
+        hwMacVlanStatisticsEntry OBJECT-TYPE
+                SYNTAX HwMacVlanStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the statistics of mac-address table."
+                INDEX { hwMacVlanStatisticsVlanId }
+                ::= { hwMacVlanStatisticsTable 1 }
+                
+        HwMacVlanStatisticsEntry ::=
+                SEQUENCE {
+                        hwMacVlanStatisticsVlanId
+                                VlanId,
+                        hwMacVlanStatistics
+                                Integer32
+                         }      
+                
+        hwMacVlanStatisticsVlanId OBJECT-TYPE
+                SYNTAX VlanId
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VLAN ID which is correlative to the hwMacVlanStatistics table."
+                ::= { hwMacVlanStatisticsEntry 1 }                
+                
+        hwMacVlanStatistics OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the mac-address items."
+                ::= { hwMacVlanStatisticsEntry 2 }
+                
+
+        hwMacVsiStatisticsTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacVsiStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table showing the number of mac-address items by VSI name."
+                ::= { hwL2MAMObjects 18 }
+
+        hwMacVsiStatisticsEntry OBJECT-TYPE
+                SYNTAX HwMacVsiStatisticsEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the statistics of mac-address table."
+                INDEX { hwMacVsiStatisticsVsiName }
+                ::= { hwMacVsiStatisticsTable 1 }
+                
+        HwMacVsiStatisticsEntry ::=
+                SEQUENCE {
+                        hwMacVsiStatisticsVsiName
+                                OCTET STRING,
+                        hwMacVsiStatistics
+                                Integer32
+                         }                             
+                
+        hwMacVsiStatisticsVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VSI name which is correlative to the hwMacVsiStatistics table."
+                ::= { hwMacVsiStatisticsEntry 1 }
+                
+        hwMacVsiStatistics OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the mac-address items."
+                ::= { hwMacVsiStatisticsEntry 2 }  
+
+-- PwMacLimit
+        hwPwMacLimitTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwPwMacLimitEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This is a rule table for PW-based MAC learning limit."
+                ::= { hwL2MAMObjects 19 }
+
+        hwPwMacLimitEntry OBJECT-TYPE
+                SYNTAX HwPwMacLimitEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of a rule table for PW-based MAC learning limit."
+                INDEX { hwPwMacLimitVsiName,hwPwMacLimitPwName }
+                ::= { hwPwMacLimitTable 1 }
+
+        HwPwMacLimitEntry ::=
+                SEQUENCE {
+                        hwPwMacLimitVsiName
+                                OCTET STRING,
+                        hwPwMacLimitPwName
+                                OCTET STRING,
+                        hwPwMacLimitMaxMac
+                                Integer32,
+                        hwPwMacLimitMaxRate
+                                Integer32,
+                        hwPwMacLimitAction
+                                INTEGER,
+                        hwPwMacLimitAlarm
+                                INTEGER,
+                        hwPwMacLimitRowstatus
+                                RowStatus,
+                        hwPwMacAddressLearn
+                                INTEGER,
+                        hwPwMacDynAddressLearnNum
+                                Integer32
+                       }
+
+        hwPwMacLimitVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This object indicates the name of the VSI that is configured with 
+                         PW-based MAC learning limit."
+                ::= { hwPwMacLimitEntry 1 }
+
+        hwPwMacLimitPwName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..16))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This object indicates the name of the PW that is configured with 
+                         PW-based MAC learning limit."
+                ::= { hwPwMacLimitEntry 2 }
+
+        hwPwMacLimitMaxMac OBJECT-TYPE
+                SYNTAX Integer32(0..131072)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The value of this object specifies the maximum number of MAC 
+                         addresses that can be learnt. 0 indicates no limit."
+                ::= { hwPwMacLimitEntry 3 }
+
+        hwPwMacLimitMaxRate OBJECT-TYPE
+                SYNTAX Integer32(0..1000)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The value of this object specifies the maximum rate for MAC 
+                         address learning. 0 indicates no limit."
+                ::= { hwPwMacLimitEntry 4 }
+
+        hwPwMacLimitAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                discard(1),
+                forward(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The value of this object specifies whether packets are forwarded 
+                         or discarded after the number of MAC addresses that are learnt 
+                         reaches the upper limit:
+                         1: packets are discarded
+                         2: packets are forwarded"
+                ::= { hwPwMacLimitEntry 5 }
+
+        hwPwMacLimitAlarm OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The value of this object specifies whether the alarm is enabled 
+                         or disabled after the number of MAC addresses that are learnt reaches 
+                         the upper limit:
+                         1: alarm is enabled
+                         2: alarm is disabled"
+                ::= { hwPwMacLimitEntry 6 }
+
+        hwPwMacLimitRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "This object indicates the RowStatus of hwPwMacLimitTable."
+                ::= { hwPwMacLimitEntry 7 }
+
+        hwPwMacAddressLearn  OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The object indicates whether MAC learning is enabled."
+                ::= { hwPwMacLimitEntry 8 }
+
+        hwPwMacDynAddressLearnNum   OBJECT-TYPE
+                SYNTAX Integer32(0..131072)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The value of this object specifies the number of dynamic MAC 
+                         addresses that are learnt."
+                ::= { hwPwMacLimitEntry 9 }
+
+        hwMacSpoofingDefendTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMacSpoofingDefendEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table enable the MAC spoofing defend."
+                ::= { hwL2MAMObjects 20 }
+
+        hwMacSpoofingDefendEntry OBJECT-TYPE
+                SYNTAX HwMacSpoofingDefendEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the MAC spoofing defend table."
+                INDEX { hwMacSpoofingDefendPort }
+                ::= { hwMacSpoofingDefendTable 1 }
+
+        HwMacSpoofingDefendEntry ::=
+                SEQUENCE {
+                        hwMacSpoofingDefendPort
+                                InterfaceIndexOrZero,
+                        hwMacSpoofingDefendEnabled
+                                EnabledStatus
+                       }
+
+        hwMacSpoofingDefendPort OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The port number which will be configured 1.1.1 MAC spoofing defend."
+                ::= { hwMacSpoofingDefendEntry 1 }
+
+        hwMacSpoofingDefendEnabled  OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION 
+                       "When this object is set to 'enabled(1)' MAC spoofing defend
+                    is enabled on this port else disabled."
+                ::= { hwMacSpoofingDefendEntry 2 }   
+
+        hwDiscardIllegalMacEnable OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                       "When this object is set to 'enabled(1)' illegal MAC will be discarded."
+                ::= { hwL2MAMObjects 21 }        
+
+        hwDiscardIllegalMacAlarm OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                       "When this object is set to 'enabled(1)' discard illegal MAC alarm
+                       is enabled else disabled."
+                ::= { hwL2MAMObjects 22 }   
+                 
+        hwMacSpoofingDefend OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                       "When this object is set to 'enabled(1)' MAC spoofing defend 
+                       is enabled on global else disabled."
+                ::= { hwL2MAMObjects 23 }  
+             
+-- -------------------------------------------------------------
+-- IEEE 802.1Q MIB - Conformance Information
+-- -------------------------------------------------------------
+
+hwL2MAMConformance OBJECT IDENTIFIER ::= { hwL2MAM 2 }
+
+hwL2MAMGroups OBJECT IDENTIFIER ::= { hwL2MAMConformance 1 }
+
+hwL2MAMCompliances OBJECT IDENTIFIER
+    ::= { hwL2MAMConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+hwL2MAMCfgFdbGroup OBJECT-GROUP
+    OBJECTS {
+        hwCfgFdbPort,
+        hwCfgFdbType,
+        hwCfgFdbAtmPort,
+        hwCfgFdbVpi,
+        hwCfgFdbVci,
+        hwCfgFdbRowstatus,
+        hwCfgFdbChgVlanId,
+        hwUntargetMacNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        level 2 configured mac-address table."
+    ::= { hwL2MAMGroups 1 }
+
+hwL2MAMDynFdbGroup OBJECT-GROUP
+    OBJECTS {
+        hwDynFdbPort,
+        hwDynFdbAtmPort,
+        hwDynFdbVpi,
+        hwDynFdbVci,
+        hwDynFdbRowstatus,
+        hwDynSecurityFdbToStaticEnable
+       }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about
+        level 2 Dynamic mac-address table."
+    ::= { hwL2MAMGroups 2 }
+
+
+hwL2MAMMacLimitGroup OBJECT-GROUP
+    OBJECTS {
+        hwMacLimitMaxMac,
+        hwMacLimitMaxRate,
+        hwMacLimitAction,
+        hwMacLimitAlarm,
+        hwMacLimitRowstatus,
+        hwL2MaxMacLimit,
+        hwMacAddressLearn,
+        hwMacDynAddressLearnNum,
+        hwMacLimitRuleMaxMac,   
+        hwMacLimitRuleMaxRate,
+        hwMacLimitRuleAction,
+        hwMacLimitRuleAlarm,
+        hwMacLimitRuleRowstatus, 
+        hwMacLimitApplyRuleName,
+        hwMacLimitApplyRowstatus,
+        hwPwMacLimitMaxMac,
+        hwPwMacLimitMaxRate,
+        hwPwMacLimitAction,
+        hwPwMacLimitAlarm,
+        hwPwMacLimitRowstatus,
+        hwPwMacAddressLearn,
+        hwPwMacDynAddressLearnNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address
+        limit rules."
+    ::= { hwL2MAMGroups 3 }
+
+hwL2MAMMacUsageGroup OBJECT-GROUP
+    OBJECTS {
+        hwMacEntityUsage,
+        hwMacEntityUsageThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address
+        usage."
+    ::= { hwL2MAMGroups 4 }   
+    
+hwdbCfg3tupleFdbGroup OBJECT-GROUP
+    OBJECTS {
+		hwdbCfg3tupleFdbOutPort, 
+		hwdbCfg3tupleFdbRowStatus
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+        level 2 configured 3-tuple mac-address table."
+    ::= { hwL2MAMGroups 5 }      
+    
+hwL2MAMObjectsGroup OBJECT-GROUP
+    OBJECTS {
+		hwMacAgingTime,
+		hwMacRestrict,
+		hwMacGlobalStatistics,
+		hwDiscardIllegalMacEnable,
+		hwDiscardIllegalMacAlarm,
+		hwMacSpoofingDefend
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+        mac-address configuration."
+    ::= { hwL2MAMGroups 6 }     
+  
+hwPortSecurityGroup OBJECT-GROUP
+        OBJECTS {
+                hwPortSecurityEnabled,
+                hwPortSecurityProtectAction,
+                hwPortSecurityAllDynToStaticEnable,
+                hwPortSecurityAllDynToStickyEnable
+           } 
+      STATUS      current
+      DESCRIPTION
+            "A table containing the port security information for device.
+    It can protect the port from unaccessible mac."
+     ::= { hwL2MAMGroups 7 }  
+
+hwMacIfStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+		hwMacIfStatisticsIfIndex, 
+		hwMacIfStatistics
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address statistics by interface index."
+    ::= { hwL2MAMGroups 8 } 
+    
+hwMacSlotStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+		hwMacSlotStatisticsSlotId, 
+		hwMacSlotStatistics
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address statistics by slot ID."
+    ::= { hwL2MAMGroups 9 } 
+    
+hwMacVlanStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+		hwMacVlanStatisticsVlanId, 
+		hwMacVlanStatistics
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address statistics by VLAN ID."
+    ::= { hwL2MAMGroups 10 } 
+                 
+hwMacVsiStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+		hwMacVsiStatisticsVsiName, 
+		hwMacVsiStatistics
+	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about mac-address statistics by VSI name."
+    ::= { hwL2MAMGroups 11 } 
+    
+hwMacSpoofingDefendGroup OBJECT-GROUP
+        OBJECTS {
+                hwMacSpoofingDefendEnabled
+           } 
+      STATUS      current
+      DESCRIPTION
+            "A collection of objects providing information about MAC spoofing defend."
+     ::= { hwL2MAMGroups 12 } 
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+hwL2MAMCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of Level 2
+        Mac-address management."
+
+    MODULE
+        MANDATORY-GROUPS {
+            hwL2MAMCfgFdbGroup,
+            hwL2MAMDynFdbGroup,
+            hwL2MAMMacLimitGroup,
+            hwL2MAMMacUsageGroup,
+            hwdbCfg3tupleFdbGroup,
+            hwMacIfStatisticsGroup,
+            hwMacSlotStatisticsGroup,
+            hwMacVlanStatisticsGroup,
+            hwMacVsiStatisticsGroup
+        }
+
+
+       ::= { hwL2MAMCompliances 1 }
+
+    hwL2MACTrapGroups OBJECT IDENTIFIER ::= { hwL2MAMConformance 3 }
+
+        hwBaseTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS {hwMacUsageRaisingThreshold, 
+            hwMacUsageFallingThreshold,
+            hwMacLimitNumRaisingThreshold,
+            hwMacLimitNumFallingThreshold,hwUntargetMacNumAlarm,
+            hwPwMacLimitNumRaisingThreshold,
+            hwPwMacLimitNumFallingThreshold,  
+            hwPortStickyReachMaxAlarm,
+            hwRecIllegalMacPktAlarm 
+            }
+            STATUS current
+            DESCRIPTION
+                "L2 MAC tap group."
+            ::= { hwL2MACTrapGroups 2 }
+
+END
+

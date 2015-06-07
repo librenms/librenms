@@ -1,0 +1,229 @@
+
+Wellfleet-COMMON-MIB
+
+-- Copyright 1997 Bay Networks, Inc.  All Rights
+-- Reserved.  Reproduction of this document is authorized on
+-- condition that the foregoing copyright notice is included.
+-- This Wellfleet SNMP Management Information Base Specification
+-- (Specification) embodies Bay Networks' confidential and
+-- proprietary intellectual property.  Bay Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+--
+-- It is Bay Networks' intent to encourage the widespread use of
+-- this Specification in connection with the management of
+-- Bay Networks products. Bay Networks grants vendors, end-users,
+-- and other interested parties a non-exclusive license to
+-- use this Specification in connection with the management
+-- of Bay Networks products.
+--
+-- This Specification is supplied "AS IS", and Bay Networks makes
+-- no warranty, either expressed or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+  enterprises
+    FROM RFC1155-SMI;
+
+--
+-- Top level sub-trees.
+--
+wellfleet                       OBJECT IDENTIFIER ::= { enterprises 18 }
+wfSwSeries7		        OBJECT IDENTIFIER ::= { wellfleet 3 }
+
+wfHardwareConfig	        OBJECT IDENTIFIER ::= { wfSwSeries7 1 }
+  wfHwModuleGroup		OBJECT IDENTIFIER ::= { wfHardwareConfig 4 }
+  wfHwIdentities		OBJECT IDENTIFIER ::= { wfHardwareConfig 5 }
+    wfHwFn			OBJECT IDENTIFIER ::= { wfHwIdentities 1 }
+    wfHwLn			OBJECT IDENTIFIER ::= { wfHwIdentities 2 }
+    wfHwCn			OBJECT IDENTIFIER ::= { wfHwIdentities 3 }
+    wfHwAfn			OBJECT IDENTIFIER ::= { wfHwIdentities 4 }
+    wfHwIn			OBJECT IDENTIFIER ::= { wfHwIdentities 5 }
+    wfHwAn			OBJECT IDENTIFIER ::= { wfHwIdentities 16 }
+      wfHwAnMpr		        OBJECT IDENTIFIER ::= { wfHwAn 1 }
+      wfHwAnHub		        OBJECT IDENTIFIER ::= { wfHwAn 2 }
+    wfHwBln			OBJECT IDENTIFIER ::= { wfHwIdentities 16640 }
+    wfHwBcn			OBJECT IDENTIFIER ::= { wfHwIdentities 16896 }
+    wfHwRbln		        OBJECT IDENTIFIER ::= { wfHwIdentities 17152 }
+    wfHwAsn			OBJECT IDENTIFIER ::= { wfHwIdentities 20480 }
+    wfHwAsnZ		        OBJECT IDENTIFIER ::= { wfHwIdentities 20736 }
+    wfHwAsnB		        OBJECT IDENTIFIER ::= { wfHwIdentities 20992 }
+    wfSwitchNode	        OBJECT IDENTIFIER ::= { wfHwIdentities 24576 }
+wfSoftwareConfig	        OBJECT IDENTIFIER ::= { wfSwSeries7 2 }
+-- wfProtocols                  OBJECT IDENTIFIER ::= { wfSwConfig  1 }
+-- wfLinkModules                OBJECT IDENTIFIER ::= { wfSwConfig  2 }
+-- wfDrivers                    OBJECT IDENTIFIER ::= { wfSwConfig  3 }
+wfSystem		        OBJECT IDENTIFIER ::= { wfSwSeries7 3 }
+  wfServices		        OBJECT IDENTIFIER ::= { wfSystem 2 }
+--  wfConsole                   OBJECT IDENTIFIER ::= { wfServices 1 }
+--  wfTiRui                     OBJECT IDENTIFIER ::= { wfServices 2 }
+--  wfCircuitNameTable          OBJECT IDENTIFIER ::= { wfServices 3 }
+  wfPacketGenGroup	        OBJECT IDENTIFIER ::= { wfServices 4 }
+    wfBacPktGenGroup            OBJECT IDENTIFIER ::= { wfPacketGenGroup 1 }
+  wfGameGroup		        OBJECT IDENTIFIER ::= { wfServices 5 }
+  wfStaGroup		        OBJECT IDENTIFIER ::= { wfServices 6 }
+  wfMibHeapGroup		OBJECT IDENTIFIER ::= { wfServices 7 }
+  wfCircuitNameExtension	OBJECT IDENTIFIER ::= { wfServices 9 }
+-- in file "cct_name.mib",       wfLineMappingTable = { wfCircuitNameExtension 1 }
+-- in file "cct_name.mib",       wfNode             = { wfCircuitNameExtension 2 }
+    wfTdmGroup                  OBJECT IDENTIFIER ::= { wfCircuitNameExtension 3 }
+  wfNetBootGroup		OBJECT IDENTIFIER ::= { wfServices 10 }
+  wfSerialPortGroup	        OBJECT IDENTIFIER ::= { wfServices 11 }
+  wfFileSystemGroup	        OBJECT IDENTIFIER ::= { wfServices 12 }
+  wfPingGroup		        OBJECT IDENTIFIER ::= { wfServices 13 }
+  wfRuiBootGroup		OBJECT IDENTIFIER ::= { wfServices 14 }
+  wfSyslogGroup		        OBJECT IDENTIFIER ::= { wfServices 15 }
+  wfDCMmwGroup		        OBJECT IDENTIFIER ::= { wfServices 16 }
+  wfStatsDcGroup		OBJECT IDENTIFIER ::= { wfServices 17 }
+  wfName                        OBJECT IDENTIFIER ::= { wfServices 18 }
+  wfEntityGroup                 OBJECT IDENTIFIER ::= { wfServices 20 }
+  wfUserServicesGroup           OBJECT IDENTIFIER ::= { wfServices 22 }
+  wfDiffServGroup               OBJECT IDENTIFIER ::= { wfServices 23 }
+      wfServicePkgGroup         OBJECT IDENTIFIER ::= { wfDiffServGroup 1 }
+      wfAcctGroup               OBJECT IDENTIFIER ::= { wfDiffServGroup 2 }
+wfLine			        OBJECT IDENTIFIER ::= { wfSwSeries7 4 }
+--wfCSMACDTable                 OBJECT IDENTIFIER ::= { wfLine 1 }
+--wfTokenRingTable              OBJECT IDENTIFIER ::= { wfLine 2 }
+--wfFddiTable                   OBJECT IDENTIFIER ::= { wfLine 4 }
+--wfSyncTable                   OBJECT IDENTIFIER ::= { wfLine 5 }
+  wfHwFGroup		        OBJECT IDENTIFIER ::= { wfLine 6 }
+--wfHssiTable                   OBJECT IDENTIFIER ::= { wfLine 7 }
+  wfMcT1Group		        OBJECT IDENTIFIER ::= { wfLine 8 }
+  wfDs1E1Group		        OBJECT IDENTIFIER ::= { wfLine 9 }
+--wfT1Table                     OBJECT IDENTIFIER ::= { wfLine 10 }
+--wfE1Table                     OBJECT IDENTIFIER ::= { wfLine 11 }
+  wfDs1Group		        OBJECT IDENTIFIER ::= { wfLine 12 }
+  wfDs3Group		        OBJECT IDENTIFIER ::= { wfLine 13 }
+  wfSipGroup		        OBJECT IDENTIFIER ::= { wfLine 14 }
+  wfFddiGroup		        OBJECT IDENTIFIER ::= { wfLine 15 }
+  wfCSMACDAutoNegGroup	        OBJECT IDENTIFIER ::= { wfLine 16 }
+  wfDiagsGroup                  OBJECT IDENTIFIER ::= { wfLine 20 }
+  wfPktCaptureGroup	        OBJECT IDENTIFIER ::= { wfLine 21 }
+  wfCompressionGroup	        OBJECT IDENTIFIER ::= { wfLine 22 }
+  wfAtmInterfaceGroup	        OBJECT IDENTIFIER ::= { wfLine 23 }
+  wfSonetGroup		        OBJECT IDENTIFIER ::= { wfLine 24 }
+  wfTaxiGroup                   OBJECT IDENTIFIER ::= { wfLine 25 }
+  wfDsx3Group		        OBJECT IDENTIFIER ::= { wfLine 26 }
+  wfBisyncGroup		        OBJECT IDENTIFIER ::= { wfLine 27 }
+  wfLinkEncryptionGroup         OBJECT IDENTIFIER ::= { wfLine 28 }
+  wfModemGroup                  OBJECT IDENTIFIER ::= { wfLine 29 }
+  wfDsuCsuGroup                 OBJECT IDENTIFIER ::= { wfLine 30 }
+  wfSwitchMediaGroup            OBJECT IDENTIFIER ::= { wfLine 31 }
+    wfXCtlGroup                 OBJECT IDENTIFIER ::= { wfSwitchMediaGroup 1 }
+    wfCSMACDIfGroup             OBJECT IDENTIFIER ::= { wfSwitchMediaGroup 2 }
+    wfMAUGroup                  OBJECT IDENTIFIER ::= { wfSwitchMediaGroup 3 }
+  wfFntsAtmGroup                OBJECT IDENTIFIER ::= { wfLine 32 }
+  wfIsdbGroup                   OBJECT IDENTIFIER ::= { wfLine 33 }
+  wfDeviceCtlGroup              OBJECT IDENTIFIER ::= { wfLine 34 }
+    wfModCtlGroup               OBJECT IDENTIFIER ::= { wfDeviceCtlGroup 1 }
+    wfIfpGroup                  OBJECT IDENTIFIER ::= { wfDeviceCtlGroup 2 }
+  wfVoiceT1Group		OBJECT IDENTIFIER ::= { wfLine 35 }
+  wfVoiceE1Group                OBJECT IDENTIFIER ::= { wfLine 36 }
+wfApplication			OBJECT IDENTIFIER ::= { wfSwSeries7 5 }
+  wfDataLink			OBJECT IDENTIFIER ::= { wfApplication 1 }
+    wfBridgeGroup		OBJECT IDENTIFIER ::= { wfDataLink 1 }
+    wfSpanningTree		OBJECT IDENTIFIER ::= { wfDataLink 2 }
+    wfIfGroup			OBJECT IDENTIFIER ::= { wfDataLink 3 }
+    wfCircuitOptsGroup		OBJECT IDENTIFIER ::= { wfDataLink 4 }
+    wfDlsGroup			OBJECT IDENTIFIER ::= { wfDataLink 5 }
+    wfLlcGroup			OBJECT IDENTIFIER ::= { wfDataLink 6 }
+    wfSdlcGroup			OBJECT IDENTIFIER ::= { wfDataLink 7 }
+--  wfLapBGroup                 OBJECT IDENTIFIER ::= { wfDataLink 8 }
+    wfProtocolPriorityGroup	OBJECT IDENTIFIER ::= { wfDataLink 9 }
+    wfIRedundGroup		OBJECT IDENTIFIER ::= { wfDataLink 10 }
+    wfFwallGroup    		OBJECT IDENTIFIER ::= { wfDataLink 11 }
+    wfVlanGroup                 OBJECT IDENTIFIER ::= { wfDataLink 12 }
+      wfPortMatrixGroup         OBJECT IDENTIFIER ::= { wfVlanGroup 1 }
+      wfCommonVlanGroup         OBJECT IDENTIFIER ::= { wfVlanGroup 2 }
+      wfMacAddrAssgGroup        OBJECT IDENTIFIER ::= { wfVlanGroup 3 }
+      wfHelloGroup              OBJECT IDENTIFIER ::= { wfVlanGroup 4 }
+      wfDot1dConfigGroup        OBJECT IDENTIFIER ::= { wfVlanGroup 5 }
+      wfDot1qTagConfigGroup     OBJECT IDENTIFIER ::= { wfVlanGroup 6 }
+    wfConvSteeringGroup         OBJECT IDENTIFIER ::= { wfDataLink 13 }
+    wfTrunkGroup                OBJECT IDENTIFIER ::= { wfDataLink 15 }
+    wfDsqmsGroup                OBJECT IDENTIFIER ::= { wfDataLink 16 }
+  wfDecGroup			OBJECT IDENTIFIER ::= { wfApplication 2 }
+  wfInternet			OBJECT IDENTIFIER ::= { wfApplication 3 }
+    wfArpGroup			OBJECT IDENTIFIER ::= { wfInternet 1 }
+    wfIpRouting			OBJECT IDENTIFIER ::= { wfInternet 2 }
+      wfIpGroup			OBJECT IDENTIFIER ::= { wfIpRouting 1 }
+      wfRipGroup		OBJECT IDENTIFIER ::= { wfIpRouting 2 }
+      wfOspfGroup		OBJECT IDENTIFIER ::= { wfIpRouting 3 }
+      wfEgpGroup		OBJECT IDENTIFIER ::= { wfIpRouting 4 }
+      wfBgpGroup		OBJECT IDENTIFIER ::= { wfIpRouting 5 }
+      wfIpPolicyGroup		OBJECT IDENTIFIER ::= { wfIpRouting 6 }
+      wfNatGroup                OBJECT IDENTIFIER ::= { wfIpRouting 7 }
+      wfIisisGroup              OBJECT IDENTIFIER ::= { wfIpRouting 8 }
+
+    wfTcpGroup			OBJECT IDENTIFIER ::= { wfInternet 3 }
+    wfUdpGroup			OBJECT IDENTIFIER ::= { wfInternet 4 }
+    wfSnmpGroup			OBJECT IDENTIFIER ::= { wfInternet 5 }
+--  wfTftpGroup                 OBJECT IDENTIFIER ::= { wfInternet 6 }
+    wfTelnetGroup		OBJECT IDENTIFIER ::= { wfInternet 7 }
+    wfBootpGroup		OBJECT IDENTIFIER ::= { wfInternet 8 }
+    wfRarpGroup			OBJECT IDENTIFIER ::= { wfInternet 9 }
+    wfFtpGroup			OBJECT IDENTIFIER ::= { wfInternet 10 }
+    wfNetBIOSIpGroup		OBJECT IDENTIFIER ::= { wfInternet 11 }
+    wfDvmrpGroup		OBJECT IDENTIFIER ::= { wfInternet 12 }
+    wfIgmpGroup			OBJECT IDENTIFIER ::= { wfInternet 13 }
+    wfPimGroup              	OBJECT IDENTIFIER ::= { wfInternet 14 }
+    wfIpv6Group			OBJECT IDENTIFIER ::= { wfInternet 16 }
+    wfNtpGroup              	OBJECT IDENTIFIER ::= { wfInternet 17 }
+    wfRcmdsGroup            	OBJECT IDENTIFIER ::= { wfInternet 18 }
+    wfDnsGroup              	OBJECT IDENTIFIER ::= { wfInternet 19 }
+    wfGreGroup              	OBJECT IDENTIFIER ::= { wfInternet 20 }
+    wfMobileIpGroup         	OBJECT IDENTIFIER ::= { wfInternet 21 }
+    wfHttpGroup                 OBJECT IDENTIFIER ::= { wfInternet 22 }
+    wfNhrpGroup                 OBJECT IDENTIFIER ::= { wfInternet 23 }
+    wfDhcpServerGroup           OBJECT IDENTIFIER ::= { wfInternet 24 }
+    wfVrrpGroup                 OBJECT IDENTIFIER ::= { wfInternet 25 }
+    wfIpsecGroup                OBJECT IDENTIFIER ::= { wfInternet 26 }
+    wfVoIPGroup                 OBJECT IDENTIFIER ::= { wfInternet 27 }
+  wfAppletalkGroup		OBJECT IDENTIFIER ::= { wfApplication 4 }
+  wfIpxGroup			OBJECT IDENTIFIER ::= { wfApplication 5 }
+    wfNlspGroup			OBJECT IDENTIFIER ::= { wfIpxGroup 128 }
+  wfOsiGroup			OBJECT IDENTIFIER ::= { wfApplication 6 }
+  wfVinesGroup			OBJECT IDENTIFIER ::= { wfApplication 8 }
+  wfWanGroup			OBJECT IDENTIFIER ::= { wfApplication 9 }
+    wfFrameRelayGroup		OBJECT IDENTIFIER ::= { wfWanGroup 1 }
+    wfPppGroup			OBJECT IDENTIFIER ::= { wfWanGroup 2 }
+--  wfSmdsGroup                 OBJECT IDENTIFIER ::= { wfWanGroup 3 }
+    wfX25Group			OBJECT IDENTIFIER ::= { wfWanGroup 4 }
+    wfAtmGroup			OBJECT IDENTIFIER ::= { wfWanGroup 5 }
+      wfAtmLeGroup		OBJECT IDENTIFIER ::= { wfAtmGroup 20 }
+    wfFrswGroup			OBJECT IDENTIFIER ::= { wfWanGroup 6 }
+    wfSmdsSwGroup		OBJECT IDENTIFIER ::= { wfWanGroup 7 }
+    wfIsdnGroup			OBJECT IDENTIFIER ::= { wfWanGroup 8 }
+    wfFrameRelay2Group		OBJECT IDENTIFIER ::= { wfWanGroup 9 }
+    wfmpsObjects                OBJECT IDENTIFIER ::= { wfWanGroup 10 }
+    wfAsrGroup                  OBJECT IDENTIFIER ::= { wfWanGroup 11 }
+    wfX25PadGroup               OBJECT IDENTIFIER ::= { wfWanGroup 12 }
+    wfAtmHalfBridgeGroup        OBJECT IDENTIFIER ::= { wfWanGroup 13 }
+    wfmpcObjects                OBJECT IDENTIFIER ::= { wfWanGroup 14 }
+    wfMplsLdpGroup              OBJECT IDENTIFIER ::= { wfWanGroup 15 }
+    wfMplsAtmGroup              OBJECT IDENTIFIER ::= { wfWanGroup 16 }
+  wfXnsGroup			OBJECT IDENTIFIER ::= { wfApplication 10 }
+  wfTestGroup			OBJECT IDENTIFIER ::= { wfApplication 11 }
+  wfLanManagerGroup		OBJECT IDENTIFIER ::= { wfApplication 12 }
+  wfOsiConsGroup                OBJECT IDENTIFIER ::= { wfApplication 13 }
+  wfAppnGroup			OBJECT IDENTIFIER ::= { wfApplication 14 }
+  wfIpexGroup             	OBJECT IDENTIFIER ::= { wfApplication 15 }
+  wfIntegratedServicesGroup 	OBJECT IDENTIFIER ::= { wfApplication 16 }
+    wfReservationProtocolGroup  OBJECT IDENTIFIER ::= { wfIntegratedServicesGroup 1 }
+  wfRRedGroup			OBJECT IDENTIFIER ::= { wfApplication 17 }
+  wfBotGroup			OBJECT IDENTIFIER ::= { wfApplication 18 }
+  wfAccountingGroup       	OBJECT IDENTIFIER ::= { wfApplication 20 }
+  wfAsyncOverTcpGroup           OBJECT IDENTIFIER ::= { wfApplication 21 }
+  wfRadiusGroup           	OBJECT IDENTIFIER ::= { wfApplication 22 }
+  wfL2TPGroup                   OBJECT IDENTIFIER ::= { wfApplication 23 }
+  wfVcctGroup                   OBJECT IDENTIFIER ::= { wfApplication 24 }
+  wfQoSPolicyGroup              OBJECT IDENTIFIER ::= { wfApplication 25 }
+    wfCopsCGroup                OBJECT IDENTIFIER ::= { wfQoSPolicyGroup 1 }
+  wfDiffServAppGroup            OBJECT IDENTIFIER ::= { wfApplication 26 }
+  wfIKEGroup                   OBJECT IDENTIFIER ::= { wfApplication 27 }
+
+END  -- Wellfleet-COMMON-MIB
+

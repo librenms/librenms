@@ -1,0 +1,1413 @@
+SAMSUNG-GENERAL-TC DEFINITIONS ::= BEGIN
+
+-- Module:  General TC
+-- File: SamsungGeneraltc.mib
+-- Editors: wono.song@samsung.com
+-- Date:    July 17, 2004
+-- Version: 1.00
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        Counter32, Gauge32, Integer32
+                FROM SNMPv2-SMI       -- RFC 1442/1902/2578
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC        -- RFC 1443/1903/2579
+        samsungCommonMIB
+                FROM SAMSUNG-COMMON-MIB;
+
+scmGeneralTC MODULE-IDENTITY
+    LAST-UPDATED "0407170000Z" -- 17 Jul 2004
+    ORGANIZATION "Samsung Corporation - SCMI Working Group"
+    CONTACT-INFO "
+                SCMI Editors
+            E-Mail:     wono.song@samsung.com
+
+    --
+    --
+            "
+    DESCRIPTION "
+        Version:    1.00
+
+        Samsung General Textual Conventions
+
+        See section 9 'Supplement' of SCMI General TC for
+        implementation and conformance guidance for this TC module.
+
+        Copyright (C) 1995-2002 Samsung Corporation. All Rights Reserved."
+    ::= { samsungCommonMIB 50 }
+
+--
+--  Samsung General Textual Conventions (in alphabetical order)
+
+
+--
+
+Cardinal16 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The representation for non-negative integers.
+        Used for indices in small tables where 0 means not specified.
+        It avoids use of the sign bit."
+    SYNTAX      INTEGER (0..32767)       -- biggest int = 2**15-1
+
+Cardinal32 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The representation for non-negative integers.
+        Used for indices in large tables where 0 means not specified.
+        Same size as ISO 10175 (avoids use of sign bit)."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Cardinal64High ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The high-order 31 bits of a 62-bit non-negative integer
+        (0..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Cardinal64Low ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The low-order 31 bits of a 62-bit non-negative integer
+        (0..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+CodedCountry ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        A two character country or territory abbreviation from
+        ISO/IEC 3166:1993 - Codes for the Representation of
+        Names of Countries.
+        Examples: US, FR, DE
+        A null string SHALL indicate that the country or territory
+        is not defined."
+    SYNTAX      OCTET STRING (SIZE(0..2))
+
+CodedLanguage ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        A two character language abbreviation as defined in
+        ISO/IEC 639:1988 - Codes For the Representation of
+        Names of Languages.
+        Examples EN, GB, CA, FR, DE.
+        An empty string SHALL indicate that the language
+        is not defined."
+
+
+    SYNTAX      OCTET STRING (SIZE(0..2))
+
+CodeIndexedStringIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The representation of string data which the agent can provide
+        in one or more character sets (but not further localized).
+        Typically this representation is used because the string data
+        is relatively dynamic, changing too rapidly for full
+        localization; or because the data exists inherently in only one
+        or a limited number of character sets and cannot meaningfully
+        be further localized.
+
+        The value is an index into a single global string table, 
+        scmGenCodeIndexedStringTable.  A subsidiary index into the
+        scmGenCodeIndexedStringTable is the IANA registered enum
+        (see the CodedCharSet textual-convention in RFC 1759) for the 
+        coded character set desired by the management station (from 
+        among the coded character sets supported by the SNMP agent).
+
+        A 0 index value SHALL indicate that there is no associated entry
+        in the string table.
+
+        32 bits are needed because Jobs can use up 10-12 code-indexed
+        strings per job."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Counter64High ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The high-order 32 bits of a 63-bit counter (0..2**63-1).
+        A manager must get or set the high and low parts in the
+        same operation."
+    SYNTAX      Counter32  -- (0..2**32-1)
+
+Counter64Low ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The low-order 31 bits of a 63-bit counter (0..2**63-1).
+        A manager must get or set the high and low parts in the
+        same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Gauge64High ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The high-order 32 bits of a 63-bit gauge (0..2**63-1).
+        A manager must get or set the high and low parts in the
+        same operation."
+    SYNTAX      Gauge32  -- (0..2**32-1)
+
+
+Gauge64Low ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The low-order 31 bits of a 63-bit gauge (0..2**63-1).
+        A manager must get or set the high and low parts in the
+        same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Integer64High ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The high-order 32 bits of a 63-bit signed integer
+        (-2**62..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      Integer32
+
+Integer64Low ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The low-order 31 bits of a 63-bit signed integer
+        (-2**62..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Ordinal16 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The representation for positive integers.
+        Used for indices in small tables where 0 is illegal.
+        It avoids use of the sign bit.."
+    SYNTAX      INTEGER (1..32767)  -- biggest int = 2**15-1
+
+Ordinal32 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The representation for positive integers.
+        Same size as ISO 10175 (avoids use of sign bit)."
+    SYNTAX      INTEGER (1..2147483647)  -- biggest int = 2**31-1
+
+Ordinal64High ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The high-order 31 bits of a 62-bit positive integer
+        (1..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+Ordinal64Low ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The low-order 31 bits of a 62-bit positive integer
+        (1..2**62-1).  A manager must get or set the high
+        and low parts in the same operation."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+
+--  Note:   Some SMIv1 compilers do NOT understand the 'ccitt' root
+--          causing compile errors in SCMI modules converted to SMIv1.
+--          'zeroDotZero' makes 'scmGenZeroDotZero' a simple definition.
+zeroDotZero OBJECT IDENTIFIER ::= { 0 0 }
+
+scmGenZeroDotZero OBJECT-IDENTITY
+    STATUS      current -- Actually deprecated
+    DESCRIPTION "
+        A value used for null object identifiers prior to SCMI v5.1.
+        Do not use.  Instead use the standard definition in
+        RFC 1902/2578 - 'zeroDotZero' - left here for compatibility."
+    ::= { zeroDotZero 0 }
+
+ScmFixedLocaleDisplayString ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This data type is used to model textual information in some
+        localization (language, country, and character set), which is
+        fixed (ie, NOT capable of being altered by management station
+        request).  This textual information SHALL be represented in the
+        localization which is indicated by the current value of
+        'scmGenFixedLocalizationIndex'."
+    REFERENCE "
+        See:    'ScmFixedLocaleUtf8String' in this module.
+        See:    'ScmNamedLocaleUtf8String' in this module.
+        See:    'InternationalDisplayString' in IETF Host Resources MIB
+        (RFC 2790), 'DisplayString' in IETF SNMPv2 TC (RFC 1903/2579),
+        'CodeIndexedStringIndex' in this module, and 'OCTET STRING' in
+        OSI ASN.1 (CCITT X.208/X.209 | ISO 8824/8825)."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+ScmFixedLocaleUtf8String ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This data type is used to model textual information in the UTF-8
+        character set and some locale (language/country), which is
+        fixed (ie, NOT capable of being altered by management station
+        request).  This textual information SHALL be represented in
+        UTF-8 and the locale which is indicated by the current value of
+        'scmGenFixedLocalizationIndex'."
+    REFERENCE "
+        See:    'UTF-8, a transformation of ISO 10646' (RFC 2279) and
+        'IETF Policy on Character Sets and Languages' (RFC 2277).
+        See:    'ScmFixedLocaleDisplayString' in this module.
+        See:    'ScmNamedLocaleUtf8String' in this module.
+        See:    'InternationalDisplayString' in IETF Host Resources MIB
+        (RFC 2790), 'DisplayString' in IETF SNMPv2 TC (RFC 1903/2579),
+        'CodeIndexedStringIndex' in this module, and 'OCTET STRING' in
+        OSI ASN.1 (CCITT X.208/X.209 | ISO 8824/8825)."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+
+ScmNamedLocaleUtf8String ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This data type is used to model textual information in the UTF-8
+        character set and some locale (language/country), which is
+        named (ie, explicitly named by a parallel column or attribute or
+        by the operation context)."
+    REFERENCE "
+        See:    'UTF-8, a transformation of ISO 10646' (RFC 2279) and
+        'IETF Policy on Character Sets and Languages' (RFC 2277).
+        See:    'ScmFixedLocaleDisplayString' in this module.
+        See:    'ScmFixedLocaleUtf8String' in this module.
+        See:    'InternationalDisplayString' in IETF Host Resources MIB
+        (RFC 2790), 'DisplayString' in IETF SNMPv2 TC (RFC 1903/2579),
+        'CodeIndexedStringIndex' in this module, and 'OCTET STRING' in
+        OSI ASN.1 (CCITT X.208/X.209 | ISO 8824/8825)."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+ScmGenGroupSupport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The terse conformance statement of ALL mandatory, conditionally
+        mandatory, and optional SCMI General MIB object groups which are
+        supported by this management agent implementation (ie, version)
+        on this host system, specified in a bit-mask.
+
+        The current set of values (which MAY be extended in the future)
+        is given below:
+
+              1 : scmGenCurrentLocalizationGroup    -- 2**0
+              2 : scmGenLocalizationGroup           -- 2**1
+              4 : scmGenCodeIndexedStringGroup      -- 2**2
+              8 : scmGenCodedCharSetGroup           -- 2**3
+             16 : scmGenFixedLocalizationGroup      -- 2**4
+             32 : scmGenLockGroup                   -- 2**5
+             64 : scmGenReconfGroup                 -- 2**6
+            128 : scmGenOptionGroup                 -- 2**7
+            256 : scmGenClientDataGroup             -- 2**8
+            512 : scmGenTrapClientGroup             -- 2**9
+           1024 : scmGenTrapViewGroup               -- 2**10
+           2048 : scmGenBaseGroup                   -- 2**11
+           4096 : scmGenMessageMapGroup             -- 2**12
+           8192 : scmGenMessageTextGroup            -- 2**13
+          16384 : scmGenNotifyRuleGroup             -- 2**14
+          32768 : scmGenNotifyDetailGroup           -- 2**15
+
+        Usage:  Conforming management agents SHALL accurately
+        report their support for SCMI General MIB object groups."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+
+ScmGenLogFullPolicy ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The current policy for handling job/request/event log 'full'
+        (in MIBs, in shared RAM, on disk, etc), on this host system."
+    SYNTAX      INTEGER {
+        other(1),                       -- other
+        unknown(2),                     -- unknown
+        disableService(3),              -- disable service
+        disableAndPauseService(4),      -- disable and pause service
+        enableServiceAndFlushLog(5),    -- enable svc/flush entire log
+        enableServiceAndFlushOldest(6)  -- enable svc/flush oldest entry
+    }
+
+ScmGenMessageMapStringLabel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This syntax is used to specify a Samsung standard or experiemental
+        message string label associated with the current value of the
+        message string pointed to by 'scmGenMessageMapStringIndexOID'.
+
+        Usage:  Experimental message string labels SHOULD NOT be used in
+        shipping versions of Samsung-branded products or services.  They
+        exist solely to facilitate rapid product development cycles.
+
+        Usage:  All Samsung message string label values SHALL
+        be specified using display (NOT space) characters from the IANA
+        registered charset 'utf-8' (ie, the UTF-8 octet-stream encoding
+        of ISO-10646 UCS-4, described in RFC 2279).
+
+        Usage:  All Samsung message string label values SHALL
+        contain no more than 64 UTF-8 display characters AND no more
+        than 128 total octets (in some scripts, less than 64 characters
+        in UTF-8 octet-stream encoding).
+
+        Usage:  All Samsung message string label values SHALL
+        conform to the syntax specified below.  A 'format', 'namespace',
+        'module', or 'field' component SHALL NOT contain hyphens.  A
+        'format', 'namespace', or 'module' component SHALL use
+        lowercase.  A 'field' or 'qualifier' component MAY use mixed
+        case (see examples below).  A 'field' component MAY be use an
+        abbreviated MIB object tag or other standardized identifier.
+        ONLY a terminal 'qualifier' component MAY contain hyphens.  Each
+        component SHALL be separated by a hyphen '-' character.
+
+            --  Samsung message string label general ABNF syntax
+            msg_label   =
+                format '-' namespace '-' module '-' field '-' qualifier
+
+            --  Samsung message string label alternatives ABNF syntax
+            msg_label   =
+                std_label / exp_label
+
+        Usage:  All Samsung standard message string label values
+
+
+        SHALL conform to the refined syntax specified below.
+
+            --  Samsung standard message label refined ABNF syntax
+            std_label   =
+                std_fmt '-' std_ns '-' module '-' field '-' qualifier
+
+            --  Samsung standard format
+            std_fmt     =
+                'xs'        -- Samsung standard format
+              / 'x?'        -- Samsung reserved formats (2 characters)
+
+            --  Samsung standard namespace
+            std_ns      =
+                'ansi'      -- American National Standards Institute
+              / 'dmtf'      -- Desktop Management Task Force
+              / 'ecma'      -- European Computer Manufacturers Assn
+              / 'ieee'      -- Institute Electrical/Electronic Engineers
+              / 'ietf'      -- Internet Engineering Task Force
+              / 'iso'       -- Int'l Organization for Standardization
+              / 'itu'       -- Int'l Telecommunication Union (aka CCITT)
+              / 'omg'       -- Object Management Group
+              / 'pwg'       -- Printer Working Group
+              / 'scmi'      -- Samsung Common Management Interface
+              / 'xopen'     -- X/Open (aka Open Group)
+              / 'w3c'       -- World Wide Web Consortium
+
+            --  Samsung message label common components
+            module      =   -- module identifier w/out hyphens
+
+            field       =   -- field identifier w/out hyphens
+
+            qualifier   =   -- qualifer (MAY contain hyphens)
+
+        Examples of well-formed standard message string labels:
+
+            --  Examples of ISO standard media sizes
+            xs-iso-10175-mediaSize-iso-a4   -- 210 mm by 297 mm
+            xs-iso-10175-mediaSize-iso-b4   -- 250 mm by 353 mm
+
+            --  Examples of ISO standard media types
+            xs-iso-10175-mediaType-envelope
+            xs-iso-10175-mediaType-transparency
+
+            --  Examples of ISO standard media colors
+            xs-iso-10175-mediaColor-white
+            xs-iso-10175-mediaColor-yellow
+
+            --  Examples of standard MIB objects
+            xs-ietf-rfc1759-alertDescription-coverOpen
+            xs-pwg-jobmon-processingMessage-completed
+            xs-scmi-11hostx-deviceDescription-dc230ST
+
+        Usage:  All Samsung experimental message string label values
+        SHALL conform to the refined syntax specified below.
+
+
+            --  Samsung experimental message label refined ABNF syntax
+            exp_label   =
+                exp_fmt '-' exp_ns '-' module '-' field '-' qualifier
+
+            --  Samsung experimental format
+            exp_fmt     =
+                'xx'        -- Samsung experimental format
+
+            --  Samsung experimental namespace
+            exp_ns      =
+                std_ns '.' prod_ns
+            std_ns      =   -- as defined above for standard labels
+            prod_ns     =   -- 'official' / 'working' product identifier
+
+            --  Samsung message label common components
+            module      =   -- as defined above for standard labels
+
+            field       =   -- as defined above for standard labels
+
+            qualifier   =   -- as defined above for standard labels
+
+        Examples of well-formed experimental message string labels:
+
+            xx-ietf.dcs265-rfc1759-alertDescription-skyIsFalling
+            xx-scmi.dc230-11hostx-deviceDescription-dc230ST
+            xx-scmi.belize-11hostx-systemFaultString-missingWidgets
+
+        Note:   New or refined message label syntaxes MAY be defined in
+        future versions of this SCMI General TC."
+    REFERENCE "
+        See:    'scmGenMessageMapStringLabel' in SCMI General MIB.
+        See:    'deviceLifetimeUsage', 'deviceAccountingUsage',
+                'deviceLifetimeErrorCount', and
+                'deviceLifetimeWarningCount' in 'ScmHrDevDetailType'
+                textual convention in SCMI Host Resources Ext TC."
+    SYNTAX      OCTET STRING (SIZE (0..128))
+
+ScmGenNotifyDetailType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The type of notify detail stored in this conceptual row
+        in 'scmGenNotifyDetailTable'.
+
+        Usage:  Conforming SCMI management stations and agents SHALL
+        encode notify details as UTF-8 strings (like SLPv2, RFC 2608).
+        - Integers SHALL be encoded as (signed) decimal strings.
+        - Booleans SHALL be encoded as 'true' or 'false' strings.
+        - Strings SHALL be encoded as UTF-8 character strings.
+        - Binary data (e.g., 'userCertificate') SHALL be stored
+        in SLPv2 opaque encoding (leading '\FF' and escaped octets).
+
+        Usage:  Conformant implementations MUST encrypt passwords, keys,
+        and other security information in 'scmGenNotifyDetailString'."
+
+
+    REFERENCE "
+        See:    Section 5 'Subscription Object' and
+                Section 5.3 'Subscription Template Attributes' and
+                section 5.4 'Subscription Description Attributes' in
+                IPP Notify (draft-ietf-ipp-not-spec-06.txt).
+        See:    Section 5 'Service Attributes' (encoding rules) in
+                Service Location Protocol v2 (RFC 2608)."
+    SYNTAX      INTEGER {
+--    * 'other'
+--    * 'unknown'
+--
+--      -   Extensions of objects in 'scmGenNotifyRuleTable'
+--    * 'notifyRecipientURI'
+--      - notify recipient URI (Uniform Resource Identifier)
+--      - (MAY include parameters for SNMP and other URL schemes)
+--      - (eg, 'snmp://machine.sample.com;version=2c;community=public'
+--      - for SNMPv2c delivery with community-name of 'public')
+--      - ('ftp:' and 'http:' URLs specify paths for event logs)
+--      - see - Section 5.3.1 'notify-recipient-uri' in IPP Notify
+--      - see - Generic URI Syntax (RFC 2396)
+--      - see - The 'mailto:' URL Scheme (RFC 2368)
+--      - (eg, 'mailto:joe@sample.com')
+--      - see - Minimal PSTN address in Internet Mail (RFC 2303)
+--      - (eg, 'mailto:VOICE=+3940226338@samplevoice.com')
+--      - see - Minimal FAX address in Internet Mail (RFC 2304)
+--      - (eg, 'mailto:FAX=+1.800.5553000/T33S=6377@sampleserv.com')
+--
+--    * 'notifyEventNames'
+--      - notify event names - comma-delimited list of keywords
+--      - (keywords of IPP 'notify-events' and SNMP traps and enums)
+--      - (eg, 'lowPaper,jammed' from IETF HR MIB, RFC 2790)
+--      - (MAY be scoped, eg, 'hrPrinterDetectedErrorState.jammed')
+--      - (event enable/disable w/ 'active' and 'notInService')
+--      - note - 'notifyEvent...' are parallel notify details
+--      - see - Section 5.3.2 'notify-events' in IPP Notify
+--      - see - TRAP-TYPE and NOTIFICATION-TYPE names in IETF/SCMI MIBs
+--      - see - 'hrDeviceStatus' in IETF HR MIB (RFC 2790)
+--      - see - 'scmHrDevInfoXStatus' in SCMI HRX MIB
+--      - see - 'hrPrinterDetectedErrorState' in IETF HR MIB (RFC 2790)
+--      - see - 'prtAlertCode' in IETF Printer MIB (RFC 1759)
+--
+--    * 'notifyEventDelay'
+--      - notify event delay - delay in seconds before event delivery
+--      - (eg, '60' is 1 minute)
+--      - note - 'notifyEvent...' are parallel notify details
+--
+--    * 'notifySeverityFilter'
+--      - notify event severity filter
+--      - (eg, '15' is report/warning/error)
+--      - note - 'notifyEvent...' are parallel notify details
+--      - see - 'ScmGenNotifySeverityFilter' in SCMI General TC
+--
+--    * 'notifyTrainingFilter'
+--      - notify event training filter
+
+
+--      - (eg, '60' is none/trained/fieldService/management
+--      - note - 'notifyEvent...' are parallel notify details
+--      - see - 'ScmGenNotifyTrainingFilter' in SCMI General TC
+--
+--      -   No corresponding objects in 'scmGenNotifyRuleTable'
+--    * 'notifyMessageHeaderKeys'
+--      - notify message header keys - comma-delimited list of headers
+--      - (keywords of SMTP, HTTP, or other protocol headers)
+--      - (eg, 'Reply-To')
+--      - see - 'systemJobShowSenderContent[Key|OID]' in SCMI Svc Mon TC
+--
+--    * 'notifyMessageHeaderText'
+--      - notify message header text - free-text header line(s)
+--      - (eg, 'Content-Language: no-nyn, no-bok')
+--      - see - 'systemJobShowSenderContentText' in SCMI Svc Mon TC
+--
+--    * 'notifyMessageContentKeys'
+--      - notify message content keys - comma-delimited list of contents
+--      - (keywords of SNMP objects or non-MIB message contents)
+--      - (eg, 'sysName,sysLocation')
+--      - see - Section 5.3.3 'notify-attributes' in IPP Notify
+--      - see - 'systemJobShowSenderContent[Key|OID]' in SCMI Svc Mon TC
+--
+--    * 'notifyMessageContentText'
+--      - notify message content text - free-text content line(s)
+--      - (eg, 'Please call help desk')
+--      - see - Section 5.3.4 'notify-user-data' in IPP Notify
+--      - see - 'systemJobShowSenderContentText' in SCMI Svc Mon TC
+
+        other(1),
+        unknown(2),
+        --  Extensions of objects in 'scmGenNotifyRuleTable'
+        notifyRecipientURI(10),
+        notifyEventNames(20),
+        notifyEventDelay(21),
+        notifySeverityFilter(22),
+        notifyTrainingFilter(23),
+        --  No corresponding objects in 'scmGenNotifyRuleTable'
+        notifyMessageHeaderKeys(30),
+        notifyMessageHeaderText(31),
+        notifyMessageContentKeys(32),
+        notifyMessageContentText(33)
+    }
+
+ScmGenNotifySchemeSupport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The terse conformance statement of ALL notification URI schemes
+        which are supported by this management agent implementation
+        (ie, version) on this host system, specified in a bit-mask.
+
+        The current set of values (which MAY be extended in the future)
+        is given below:
+
+
+              1 : uriNotifySNMP   -- RFC 1215/1906  -  2**0 (SNMP)
+              2 : uriNotifyMailto -- RFC 1738/2368  -  2**1 (SMTP)
+              4 : uriNotifyHTTP   -- RFC 1738/2616  -  2**2 (HTTP)
+              8 : uriNotifyHTTPS  -- RFC 1738/2396  -  2**3 (HTTPS)
+             16 : uriNotifyFTP    -- RFC 1738/959   -  2**4 (FTP)
+
+        Usage:  Conforming management agents SHALL accurately
+        report their support for notification URI schemes."
+    REFERENCE "
+        See:    'scmGenBaseNotifySchemeSupport' and
+                'scmGenBaseSNMPDomainSupport' in SCMI General MIB.
+        See:    Cited IETF URI/URL specifications."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+ScmGenNotifySeverityFilter ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This type is used to specify a notification severity filter
+        supported by this management agent for notification traffic
+        in ALL domains specified by 'scmGenBaseSNMPDomainSupport' and
+        'scmGenBaseNotifySchemeSupport' (for URI-based notification),
+        specified in a bit-mask.
+
+        The current set of values (which MAY be extended in the future)
+        is given below:
+
+              1 : severityReport            -- 2**0 (informational)
+              2 : severityWarning           -- 2**1 (eg, low toner)
+              4 : severitySoftError         -- 2**2 (non-critical)
+              8 : severityHardError         -- 2**3 (critical)
+             16 : severityTestReport        -- 2**4 (product-specific)
+             32 : severityTestWarning       -- 2**5 (product-specific)
+             64 : severityTestSoftError     -- 2**6 (product-specific)
+            128 : severityTestHardError     -- 2**7 (product-specific)
+            256 : severityInternalError     -- 2**8 (product-specific)
+
+        Usage:  The terminology 'report', 'warning', and 'error' is
+        coherent with the IETF IPP event notification work-in-progress
+        and with the IETF Printer MIB (RFC 1759).
+
+        Usage:  Individual trap definitions MAY further constrain which
+        notifications are 'in scope'.
+
+        Usage:  Conforming management agents SHALL accurately
+        report their support for notification severity filters."
+    REFERENCE "
+        See:    'prtAlertSeverityLevel' in IETF Printer MIB (RFC 1759).
+        See:    'scmGenBaseNotifySeveritySupport' and
+                'scmGenTrapViewNotifySeverity' in SCMI General MIB."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+
+ScmGenNotifyTrainingFilter ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This type is used to specify a notification training filter
+        supported by this management agent for notification traffic
+        in ALL domains specified by 'scmGenBaseSNMPDomainSupport' and
+        'scmGenBaseNotifySchemeSupport' (for URI-based notification),
+        specified in a bit-mask.
+
+        The current set of values (which MAY be extended in the future)
+        is given below:
+
+              1 : trainingOther             -- 2**0 (extension)
+              2 : trainingUnknown           -- 2**1 (unknown)
+              4 : trainingNone              -- 2**2 (untrained)
+              8 : trainingTrained           -- 2**3 (trained)
+             16 : trainingFieldService      -- 2**4 (field service)
+             32 : trainingManagement        -- 2**5 (management)
+             64 : trainingNoIntervention    -- 2**6 (management)
+
+        Usage:  The terminology used here is coherent with the IETF
+        Printer MIB (RFC 1759).
+
+        Usage:  Individual trap definitions MAY further constrain which
+        notifications are 'in scope'.
+
+        Usage:  Conforming management agents SHALL accurately
+        report their support for notification training filters."
+    REFERENCE "
+        See:    'prtAlertTrainingLevel' in IETF Printer MIB (RFC 1759).
+        See:    'scmGenBaseNotifyTrainingSupport' and
+                'scmGenTrapViewNotifyTraining' in SCMI General MIB."
+    SYNTAX      INTEGER (0..2147483647)  -- biggest int = 2**31-1
+
+ScmGenOptionValueSyntax ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        A reconfiguration option, device detail, storage detail,
+        service detail, or security profile detail value syntax,
+        used by system administrators and end users to specify
+        the correct value syntax for this option or detail.
+
+        Usage:  This option or detail value syntax is used to
+        select which of the three value objects SHALL be used to
+        contain the value of this option or detail.
+
+      * An option or detail value syntax of 'oidObject'
+        indicates that 'scm...ValueOID' SHALL be used to specify
+        an actual object type, defined with 'OBJECT-TYPE'.
+
+      * An option or detail value syntax of 'oidAutonomous'
+        indicates that 'scm...ValueOID' SHALL be used to specify
+        an autonomous object type, defined with 'OBJECT-IDENTITY' or
+        simply 'OBJECT IDENTIFIER'.
+
+
+      * An option or detail value syntax of 'stringBinary'
+        indicates that 'scm...ValueString' SHALL be used to
+        specify a (possibly) 'binary' (or 'non-printing') value string.
+
+      * An option or detail value syntax of 'stringDisplay'
+        indicates that 'scm...ValueString' SHALL be used to
+        specify a 'displayable' (or 'printing') value string.
+
+      * An option or detail value syntax of 'stringLocalization'
+        indicates that 'scm...ValueLocalization' (for options) or
+        'scmGenFixedLocalizationIndex' (for details) SHALL be used
+        to control the localization of the value string
+        (with an underlying type of 'ScmGenFixedLocaleDisplayString').
+
+      * An option or detail value syntax of 'stringCodedCharSet'
+        indicates that 'scm...ValueCodedCharSet' (for options) or
+        'scmGenFixedLocalizationIndex' (for details) SHALL be used
+        to control the character set ONLY of the value string
+        (with an underlying type of 'CodeIndexedStringIndex').
+
+      * An option or detail value syntax of 'stringDynamicLocalization'
+        indicates that 'scmGenCurrentLocalization' SHALL be used
+        to control the localization of the value string
+        (with an underlying type of 'InternationalDisplayString').
+
+      * An option or detail value syntax of 'stringUtf8Localization'
+        indicates that 'scm...ValueLocalization' (for options) or
+        'scmGenFixedLocalizationIndex' (for details) SHALL be used
+        to control the localization of the value string
+        (with an underlying type of 'ScmGenFixedLocaleUtf8String')."
+    REFERENCE "
+        See:    'scmGenOptionTable' in SCMI General MIB
+        See:    'scmCommsOptionTable' in SCMI Comms Config MIB
+        See:    'scmHrDevDetailTable' in SCMI Host Resources Ext MIB
+        See:    'scmHrStorageDetailTable' in SCMI Host Resources Ext MIB
+        See:    'scmSvcMonServiceDetailTable' in SCMI Service Mon MIB
+        See:    'scmSecProfileDetailTable' in SCMI Security MIB"
+    SYNTAX      INTEGER {
+        --  'scm...Value...' object holds value
+        other(1),                       
+        unknown(2),
+        --  'scm...ValueInteger' object holds value
+        integerNumber(3),               -- (Integer32)
+        integerCounter(4),              -- (Counter32)
+        integerEnum(5),                 -- (INTEGER {..})
+        integerGauge(6),                -- (Gauge32)
+        integerIndex(7),                -- (Ordinal32|Cardinal32)
+        integerTruthValue(8),           -- (TruthValue)
+        --  'scm...ValueOID' object holds value
+        oidObject(9),                   -- (OBJECT-TYPE)
+        oidAutonomous(10),              -- (OBJECT IDENTIFIER)
+        --  'scm...ValueString' object holds value
+        stringBinary(11),               -- (OCTET STRING)
+
+
+        stringDisplay(12),              -- (DisplayString)
+        stringLocalization(13),         -- (ScmFixedLocaleDisplayString)
+        stringCodedCharSet(14),         -- (CodeIndexedStringIndex)
+        stringDynamicLocalization(15),  -- (InternationalDisplayString)
+        stringUtf8Localization(16)      -- (ScmFixedLocaleUtf8String)
+    }
+
+ScmGenReconfOptionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        The processing state of ALL pending reconfiguration options of
+        this host system.
+
+        A write to this object by an (authorized) management station
+        invokes a request for validation (or activation) of ALL pending
+        reconfiguration options of this host system.
+        A read of this object returns 'idle', 'validateInProgress', or
+        'activateInProgress' to report the processing state of the last
+        'validate...' or 'activate...' request.
+        It is mandatory that a conforming management agent ensure that,
+        at system initialization, this object SHALL be set to a
+        value of 'idle'.
+
+      * 'idle' - NO processing is 'in progress' for either 'validate...'
+        or 'activate...' of any pending reconfiguration options.
+      * 'validateForImmediateChange' - this management agent (and host
+        system) SHALL perform ALL possible and appropriate validation of
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation), so that reconfiguration could
+        be performed successfully via 'activateForImmediateChange'.
+      * 'validateForRebootChange' - this management agent (and host
+        system) SHALL perform ALL possible and appropriate validation of
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation), so that reconfiguration could
+        be performed successfully via 'activateForRebootChange'.
+      * 'validateForImmediateReboot' - this management agent (and host
+        system) SHALL perform ALL possible and appropriate validation of
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation), so that reconfiguration could
+        be performed successfully via 'activateForImmediateReboot'.
+      * 'validateInProgress' - indicates that this management agent (and
+        host system) are currently performing validation of ALL pending
+        reconfiguration options.
+        Note:   Conforming implementations NEED NOT support more than
+        ONE of the above three 'validation...' operations.
+      * 'activateForImmediateChange' - this management agent (and host
+        system) SHALL perform immediate reconfiguration, NOT reboot, for
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation).
+        For all conforming implementations, this reconfiguration SHALL
+        ALWAYS take effect immediately, WITHOUT host system reboot!
+        Note:   Conforming implementations are STRONGLY encouraged to
+        consider supporting 'benign' reconfiguration in this manner.
+      * 'activateForRebootChange' - this management agent (and host
+
+
+        system) SHALL perform delayed reconfiguration, NOT reboot, for
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation).
+        For all conforming implementations, this reconfiguration SHALL
+        ALWAYS take effect delayed, AFTER subsequent host system reboot!
+        Note:   Conforming implementations NEED NOT support 'caching' of
+        multiple outstanding 'sets of reconfiguration' in this manner.
+      * 'activateForImmediateReboot' - this management agent (and host
+        system) SHALL perform immediate reconfiguration, AND reboot, for
+        ALL pending reconfiguration options (reporting the FIRST error
+        encountered during validation).
+        For all conforming implementations, this reconfiguration SHALL
+        ALWAYS take effect immediately, WITH host system reboot!
+        Note:   Conforming implementations are STRONGLY encouraged to
+        consider secure alternatives (eg, Device Mgmt) for system reset.
+      * 'activateInProgress' - indicates that this management agent (and
+        host system) are currently performing activation of ALL pending
+        reconfiguration options.
+        Note:   Conforming implementations NEED NOT support more than
+        ONE of the above three 'activation...' operations."
+    REFERENCE "
+        See:    'scmGenReconfError[Index|Status]'"
+    SYNTAX      INTEGER {
+        idle(1),                        -- idle
+        validateForImmediateChange(2),  -- validate for immediate change
+        validateForRebootChange(3),     -- validate for reboot change
+        validateForImmediateReboot(4),  -- validate for immediate reboot
+        validateInProgress(5),          -- validate in progress
+        activateForImmediateChange(6),  -- activate for immediate change
+        activateForRebootChange(7),     -- activate for reboot change
+        activateForImmediateReboot(8),  -- activate for immediate reboot
+        activateInProgress(9)           -- activate in progress
+    }
+
+ScmGenRowPersistence ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This type is used to specify the persistence of this
+        conceptual row in a table.
+
+        Usage:  Conforming management agents SHALL interpret
+        persistence as follows:
+
+        1)  'volatile' rows NEED NOT be saved across power cycles,
+            MAY contain one or more 'read-[create|write|only]' objects,
+            and their underlying storage MAY be removable,
+            and conforming management agents NEED NOT delete such rows
+            (eg, a block in RAM, PCMCIA card, etc);
+        2)  'nonvolatile' rows SHALL be saved across power cycles,
+            MAY contain one or more 'read-[write|only]' objects,
+            and their underlying storage MAY be removable,
+            and conforming management agents MAY delete such rows
+            (eg, a sector on CD-ROM, font cartridge, hard disk, etc);
+        3)  'permanent' rows SHALL be saved across power cycles,
+
+
+            MAY contain one or more 'read-[write|only]' objects,
+            and their underlying storage SHALL NOT be removable,
+            and conforming management agents SHALL NOT delete such rows
+            (eg, a sector on EEPROM, battery-backed RAM, bubble, etc);
+        4)  'readonly' rows SHALL be saved across power cycles,
+            SHALL contain exclusively 'read-only' objects,
+            and their underlying storage SHALL NOT be removable,
+            and conforming management agents SHALL NOT delete such rows
+            (eg, a sector on ROM, ASIC, etc).
+
+        Usage:  Dynamically created rows MAY ONLY be given 'volatile'
+        or 'nonvolatile' persistence.
+
+        Note:   Equivalent to SNMPv2 'StorageType' textual convention,
+        which has an unfortunately ambiguous name."
+    REFERENCE "
+        See:    'hrStorageType' in the Storage group of the
+                IETF Host Resources MIB (RFC 2790).
+        See:    'StorageType' textual convention in the
+                Historic SNMPv2 Party MIB (RFC 1447).
+        See:    'StorageType' textual convention in the
+                IETF SNMPv2 Textual Conventions (RFC 2579)."
+    SYNTAX      INTEGER {
+        other(1),
+        unknown(2),
+        volatile(3),                    -- lost across power cycles
+        nonvolatile(4),                 -- saved across power cycles
+        permanent(5),                   -- read-write, and no deletion
+        readonly(6)                     -- read-only, and no deletion
+    }
+
+ScmGenSNMPDomain ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This type is used to specify a transport domain (address
+        and name space) which is supported by this management agent
+        for SNMP protocol traffic (SNMP responses, SNMP traps, etc),
+        in ALL versions specified by 'scmGenBaseSNMPVersionSupport'.
+
+        This type is also used to allow the 'scmGenTrapClientTable' to
+        be used with any URI scheme (e.g., 'mailto:') for notifications,
+        by specifying 'uriNotifyDomain'."
+    REFERENCE "
+        See:    'scmGenBaseSNMPDomainSupport' and
+                'scmGenTrapClientSNMPDomain' in SCMI General MIB.
+        See:    Cited IETF SNMP specifications."
+    SYNTAX      INTEGER {
+        snmpUDPDomain(1),               -- SNMP over UDP (Internet)
+            --  'snmpUDPDomain' - SNMP Transport Mappings RFC 1449/1906
+        snmpCLNSDomain(2),              -- SNMP over CLNS/TP4 (OSI)
+            --  'snmpCLNSDomain' - SNMP Transport Mappings RFC 1449/1906
+        snmpCONSDomain(3),              -- SNMP over CONS/TP0 (OSI)
+            --  'snmpCONSDomain' - SNMP Transport Mappings RFC 1449/1906
+        snmpDDPDomain(4),               -- SNMP over DDP (AppleTalk)
+
+
+            --  'snmpDDPDomain' - SNMP Transport Mappings RFC 1449/1906
+        snmpIPXDomain(5),               -- SNMP over IPX (NetWare)
+            --  'snmpDDPDomain' - SNMP Transport Mappings RFC 1449/1906
+        snmpNetBIOSDomain(10),          -- SNMP over NetBIOS (session)
+            --  'scmSnmpNetbiosDomain' - SCMI Comms Config TC
+        snmpNetBEUIDomain(11),          -- SNMP over NetBEUI (IBM DLC)
+            --  'scmSnmpNetbeuiDomain' - SCMI Comms Config TC
+        snmpTCPDomain(20),              -- SNMP over TCP (Internet)
+            --  'draft-irtf-nmrg-snmp-tcp-06.txt' (March 2001)
+        uriNotifyDomain(30)             -- Any URI for notifications
+    }
+
+ScmGenSNMPVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        This type is used to specify an SNMP version (RFC 1157, RFC
+        1905, etc) which is supported by this management agent
+        for SNMP protocol traffic (SNMP responses, SNMP traps, etc),
+        in ALL domains specified by 'scmGenBaseSNMPDomainSupport'."
+    REFERENCE "
+        See:    'scmGenBaseSNMPVersionSupport' and
+                'scmGenTrapClientSNMPVersion' in SCMI General MIB.
+        See:    Cited IETF SNMP specifications."
+    SYNTAX      INTEGER {
+        unknown(1),                     -- indeterminate
+        other(2),                       -- some other version
+        snmpV1Community(3),             -- SNMPv1 Community - RFC 1157
+            --  SNMPv1 Standard w/ Communities (RFC 1157, May 1990)
+        snmpV1Party(4),                 -- SNMPv1 Party - RFC 1352
+            --  SNMPv1 Secure w/ Party MIB (RFC 1352, July 1992)
+        snmpV2Party(5),                 -- SNMPv2 Party - RFC 1448
+            --  SNMPv2 Historic w/ Party MIB (RFC 1448, April 1993)
+        snmpV2Community(6),             -- SNMPv2 Community - RFC 1905
+            --  SNMPv2 Std w/ Communities (RFC 1905, January 1996)
+        snmpV2Usec(7),                  -- SNMPv2 Usec - RFC 1910
+            --  SNMPv2 User-Based Security (RFC 1910, January 1996)
+        snmpV2Star(8),                  -- SNMPv2 Star - no RFCs
+            --  SNMPv2 User-Based Security (by Jeff Case, SNMP Research)
+        snmpV2Secure(9),                -- SNMPv2 Secure - not published
+            --  SNMPv2 Secure - never completed by SNMPv2 Working Group
+        snmpV3Secure(10)                -- SNMPv3 Secure - RFC 2571-2575
+            --  SNMPv3 Secure (RFC 2571-2575, April 1999)
+    }
+
+ScmGenSNMPv2ErrorStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        Usage:  This type specifies the SMIv2 equivalent of the SMIv1
+        'ErrorStatus' textual convention as an enumerated type.
+
+        Note:   The enum of '0' (zero) in this textual convention is
+        illegal in strict SMIv1 (see section 3.2.1.1 of RFC 1155), so
+        this TC must be converted to an integer range for pure SMIv1."
+    REFERENCE "
+
+
+        See:    'error-status' in SNMPv2 Protocol (RFC 1448/1905)"
+    SYNTAX      INTEGER {
+        noError(0),
+        tooBig(1),
+        noSuchName(2),                  -- for proxy compatibility
+        badValue(3),                    -- for proxy compatibility
+        readOnly(4),                    -- for proxy compatibility
+        genErr(5),
+        noAccess(6),
+        wrongType(7),
+        wrongLength(8),
+        wrongEncoding(9),
+        wrongValue(10),
+        noCreation(11),
+        inconsistentValue(12),
+        resourceUnavailable(13),
+        commitFailed(14),
+        undoFailed(15),
+        authorizationError(16),
+        notWritable(17),
+        inconsistentName(18)
+    }
+
+ScmGlobalUniqueID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "
+        A management station or management agent specifies an object of
+        type 'GlobalUniqueID' to uniquely label a client job request, a
+        system administration request, or ANY other managed object (or
+        set of managed objects) which are required to be unambiguously
+        identified in a distributed network environment.
+
+        An object of type 'GlobalUniqueID' SHALL be a textual string
+        representation in standard 'dotted decimal' form of an OID.
+        An object of type 'GlobalUniqueID' SHALL be composed of three
+        mandatory sections (plus zero or more optional sections),
+        as follows:
+
+                nodeID.userID.seqID[[.subID1]...[.subIDn]]
+
+        Each of the sections SHALL be separated by a dot ('.').  The
+        three mandatory sections and any specified optional sections
+        (in left to right order) SHALL be:
+
+        1)  A globally unambiguous (within at least the network domain
+            of the Requestor and Responder host systems) dotted decimal
+            'nodeID' of the Requestor host system which explicitly or
+            implicitly labelled this managed object, either:
+            a)  A domain specific network layer address
+                (eg, IETF IP address for 'nodeIDTypeIP'); OR
+            b)  A domain specific datalink MAC sublayer address
+                (eg, ISO 8802-5 MAC address for 'nodeIDType88025').
+
+        2)  A locally unambiguous (within at least the Requestor and/or
+
+
+            Responder host systems) dotted decimal 'userID' (ie, user
+            identifier) of the user who explicitly or implicitly
+            labelled this managed object.
+
+        3)  A locally unambiguous (within at least the Requestor and/or
+            Responder host systems) dotted decimal 'seqID' (ie, sequence
+            identifier) assigned by the host system or user who
+            explicitly or implicitly labelled this managed object.
+
+        4)  A locally unambiguous (within at least the Requestor and/or
+            Responder host systems) dotted decimal 'subID' (ie, sequence
+            sub-identifier) assigned by the host system or user who
+            explicitly or implicitly labelled this managed object.
+
+        Usage:  Conforming implementations MAY use one or more optional
+        sections in an 'ScmGlobalUniqueID', for example to assign a
+        sub-job identifier for job distribution services (e.g., fax to
+        multiple destinations specified in the PDL of an input 'print'
+        job - using an original 'scmJobClientId' which is augmented by
+        the server that splits up the destinations into separate jobs).
+
+        Usage:  Conforming implementations SHALL NOT specify BOTH the
+        first ('nodeID') and second ('userID') sections as 'empty', but
+        one OR the other section MAY take on an 'empty' value (see
+        below).  The third ('seqID') section SHALL NOT be 'empty'.
+
+        Each of the three mandatory sections and any optional sections
+        SHALL be composed of one mandatory and two optional subsections,
+        as follows:
+
+                sectionLength.sectionType.sectionValue
+
+        Each of the subsections SHALL be separated by a dot ('.').  The
+        three subsections (in left to right order) SHALL be:
+
+        1)  A mandatory 'sectionLength', which specifies the decimal
+            count of dotted decimal 'components' in the associated
+            'sectionValue' - this 'sectionLength' SHALL NOT be
+            self-inclusive and SHALL NOT include the single 'component'
+            of the 'sectionType' - a 'sectionLength' of decimal zero
+            ('0') SHALL indicate an 'empty' section, and the associated
+            two subsections ('sectionType' and 'sectionValue') SHALL be
+            omitted.
+
+        2)  An optional 'sectionType', selected from the standard
+            'sectionType' choices applicable to this section (below).
+
+        3)  An optional 'sectionValue', specified as a dotted decimal
+            string of 'components', each 'component' separated by a dot
+            ('.').
+
+        The standard 'sectionType' choices (one set for each section)
+        SHALL be as follows:
+
+
+        1)  'nodeIDType' -- for mandatory 'nodeID' section
+              1 : nodeIDTypeOther       -- Other
+              2 : nodeIDTypeUnknown     -- Unknown
+             11 : nodeIDTypeIP          -- Internet IP
+             12 : nodeIDTypeCLNS        -- OSI CLNS
+             13 : nodeIDTypeCONS        -- OSI CONS
+             14 : nodeIDTypeDDP         -- AppleTalk DDP
+             15 : nodeIDTypeIPX         -- NetWare IPX
+             16 : nodeIDTypeNetBIOS     -- IBM NetBIOS
+             31 : nodeIDType88023       -- ISO 8802-3 (Ethernet LAN)
+             32 : nodeIDType88024       -- ISO 8802-4 (TokenBus LAN)
+             33 : nodeIDType88025       -- ISO 8802-5 (TokenRing LAN)
+             34 : nodeIDType88026       -- ISO 8802-6 (SlottedRing MAN)
+
+        2)  'userIDType' -- for mandatory 'userID' section
+              1 : userIDTypeOther       -- Other
+              2 : userIDTypeUnknown     -- Unknown
+             11 : userIDTypeSystem      -- System scope
+             12 : userIDTypeSubnet      -- Subnet scope
+             13 : userIDTypeNetwork     -- Network scope
+             14 : userIDTypeGlobal      -- Global scope
+
+        3)  'seqIDType' -- for mandatory 'seqID' section
+              1 : seqIDTypeOther        -- Other
+              2 : seqIDTypeUnknown      -- Unknown
+             11 : seqIDTypeSystem       -- System generated
+             12 : seqIDTypeProcess      -- Process generated
+             13 : seqIDTypeThread       -- Thread generated
+
+        4)  'subIDType' -- for optional 'subID' sections
+              1 : subIDTypeOther        -- Other
+              2 : subIDTypeUnknown      -- Unknown
+             11 : subIDTypeSystem       -- System generated
+             12 : subIDTypeProcess      -- Process generated
+             13 : subIDTypeThread       -- Thread generated
+
+        Usage:  A 'seqID' of any type SHALL be system-unique.
+
+        Usage:  A 'seqID' of type 'seqIDTypeProcess' SHALL be prefixed
+        (if necessary) by a system-unique dotted decimal 'processID'.
+
+        Usage:  A 'seqID' of type 'seqIDTypeThread' SHALL be prefixed
+        (if necessary) by a system-unique dotted decimal 'threadID'
+        (possibly itself prefixed by a system-unique 'processID').
+
+        Example:  A request submitted from a client end system running
+        the IETF Internet Protocol Suite (IPS), with an IP address of
+        '13.240.128.21', without a specified dotted decimal 'userID',
+        might include an 'scmJobClientId' of the following form:
+
+            '4.11.13.240.128.21.0.1.11.3045.1.11.23' [GlobalUniqueID]
+            |---------1--------|2|----3----|---4---| [Sections]
+
+
+        1)  The mandatory first section ('nodeID') consists of:
+            a)  'sectionLength' of '4';
+            b)  'sectionType' of '11' ('nodeIDTypeIP'); and
+            c)  'sectionValue' of '13.240.128.21' (4 components).
+        2)  The mandatory second section ('userID') consists of:
+            a)  'sectionLength' of '0' (ie, 'empty' section).
+        3)  The mandatory third section ('seqID') consists of:
+            a)  'sectionLength' of '1';
+            b)  'sectionType' of '11' ('seqIDTypeSystem'); and
+            c)  'sectionValue' of '3045' (one component).
+        4)  The optional fourth section ('subID') consists of:
+            a)  'sectionLength' of '1';
+            b)  'sectionType' of '11' ('subIDTypeSystem'); and
+            c)  'sectionValue' of '23' (one component)."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+--
+--          The General TC Dummy Group (DO NOT USE)
+--
+--          DO NOT USE - Present to suppress compiler warnings ONLY!
+--
+--          Note:  The following objects have 'odd' use of case in their
+--          names (ie, 'sCm...'), in order to make obvious their related
+--          textual conventions
+
+sCmGeneralDummy     OBJECT IDENTIFIER ::= { scmGeneralTC 999 }
+
+sCmGenCardinal16 OBJECT-TYPE
+    SYNTAX      Cardinal16
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 1 }
+
+sCmGenCardinal32 OBJECT-TYPE
+    SYNTAX      Cardinal32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 2 }
+
+sCmGenCardinal64High OBJECT-TYPE
+    SYNTAX      Cardinal64High
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 3 }
+
+sCmGenCardinal64Low OBJECT-TYPE
+    SYNTAX      Cardinal64Low
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+
+
+    ::= { sCmGeneralDummy 4 }
+
+sCmGenCodedCountry OBJECT-TYPE
+    SYNTAX      CodedCountry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 5 }
+
+sCmGenCodedLanguage OBJECT-TYPE
+    SYNTAX      CodedLanguage
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 6 }
+
+sCmGenCodeIndexedStringIndex OBJECT-TYPE
+    SYNTAX      CodeIndexedStringIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 7 }
+
+sCmGenCounter64High OBJECT-TYPE
+    SYNTAX      Counter64High
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 8 }
+
+sCmGenCounter64Low OBJECT-TYPE
+    SYNTAX      Counter64Low
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 9 }
+
+sCmGenGauge64High OBJECT-TYPE
+    SYNTAX      Gauge64High
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 10 }
+
+sCmGenGauge64Low OBJECT-TYPE
+    SYNTAX      Gauge64Low
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 11 }
+
+sCmGenInteger64High OBJECT-TYPE
+    SYNTAX      Integer64High
+    MAX-ACCESS  not-accessible
+
+
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 12 }
+
+sCmGenInteger64Low OBJECT-TYPE
+    SYNTAX      Integer64Low
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 13 }
+
+sCmGenOrdinal16 OBJECT-TYPE
+    SYNTAX      Ordinal16
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 14 }
+
+sCmGenOrdinal32 OBJECT-TYPE
+    SYNTAX      Ordinal32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 15 }
+
+sCmGenOrdinal64High OBJECT-TYPE
+    SYNTAX      Ordinal64High
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 16 }
+
+sCmGenOrdinal64Low OBJECT-TYPE
+    SYNTAX      Ordinal64Low
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 17 }
+
+sCmGenFixedLocaleDisplayString OBJECT-TYPE
+    SYNTAX      ScmFixedLocaleDisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 18 }
+
+sCmGenGroupSupport OBJECT-TYPE
+    SYNTAX      ScmGenGroupSupport
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 19 }
+
+sCmGenLogFullPolicy OBJECT-TYPE
+
+
+    SYNTAX      ScmGenLogFullPolicy
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 20 }
+
+sCmGenOptionValueSyntax OBJECT-TYPE
+    SYNTAX      ScmGenOptionValueSyntax
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 21 }
+
+sCmGenReconfOptionState OBJECT-TYPE
+    SYNTAX      ScmGenReconfOptionState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 22 }
+
+sCmGenRowPersistence OBJECT-TYPE
+    SYNTAX      ScmGenRowPersistence
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 23 }
+
+sCmGenSNMPDomain OBJECT-TYPE
+    SYNTAX      ScmGenSNMPDomain
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 24 }
+
+sCmGenSNMPVersion OBJECT-TYPE
+    SYNTAX      ScmGenSNMPVersion
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 25 }
+
+sCmGenSNMPv2ErrorStatus OBJECT-TYPE
+    SYNTAX      ScmGenSNMPv2ErrorStatus
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 26 }
+
+sCmGenGlobalUniqueID OBJECT-TYPE
+    SYNTAX      ScmGlobalUniqueID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 27 }
+
+
+sCmGenFixedLocaleUtf8String OBJECT-TYPE
+    SYNTAX      ScmFixedLocaleUtf8String
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 28 }
+
+sCmGenMessageMapStringLabel OBJECT-TYPE
+    SYNTAX      ScmGenMessageMapStringLabel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 29 }
+
+sCmGenNamedLocaleUtf8String OBJECT-TYPE
+    SYNTAX      ScmNamedLocaleUtf8String
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 30 }
+
+sCmGenNotifySchemeSupport OBJECT-TYPE
+    SYNTAX      ScmGenNotifySchemeSupport
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 31 }
+
+sCmGenNotifySeverityFilter OBJECT-TYPE
+    SYNTAX      ScmGenNotifySeverityFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 32 }
+
+sCmGenNotifyTrainingFilter OBJECT-TYPE
+    SYNTAX      ScmGenNotifyTrainingFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 33 }
+
+sCmGenNotifyDetailType OBJECT-TYPE
+    SYNTAX      ScmGenNotifyDetailType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dummy - DO NOT USE"
+    ::= { sCmGeneralDummy 34 }
+
+END

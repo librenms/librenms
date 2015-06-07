@@ -1,0 +1,170 @@
+          CISCOSB-CPU-COUNTERS-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+                switch001                                   FROM CISCOSB-MIB
+                Counter32, OBJECT-TYPE, MODULE-IDENTITY     FROM SNMPv2-SMI
+                DisplayString,
+                TruthValue                                  FROM SNMPv2-TC;
+
+
+-- module
+
+        rlCpuCounters MODULE-IDENTITY
+            LAST-UPDATED "2007010600Z"
+            ORGANIZATION "Cisco Systems, Inc."
+
+            CONTACT-INFO
+            "Postal: 170 West Tasman Drive
+            San Jose , CA 95134-1706
+            USA
+
+            
+            Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+            DESCRIPTION
+                "CPU Counter MIBs"
+            REVISION "200705150000Z"
+            DESCRIPTION
+                    "Initial revision."
+
+            ::={ switch001 124 }
+
+-- table
+          rlCpuCountersTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF RlCpuCountersEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Table of rx&tx counter, the key is cpuCounters"
+              ::= { rlCpuCounters 1 }
+--entry:
+          rlCpuCountersEntry OBJECT-TYPE
+              SYNTAX  RlCpuCountersEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Table of rx&tx counters, the key is cpuCounters"
+              INDEX   { rlCpuCountersTarget  }
+              ::= { rlCpuCountersTable 1 }
+
+--entry content
+          RlCpuCountersEntry ::= SEQUENCE {
+                  rlCpuCountersTarget INTEGER,
+                  rlCpuCountersTxBC  Counter32,
+                  rlCpuCountersTxMC  Counter32,
+                  rlCpuCountersTxUC  Counter32,
+                  rlCpuCountersTxOctets  Counter32,
+                  rlCpuCountersRxBC  Counter32,
+                  rlCpuCountersRxMC  Counter32,
+                  rlCpuCountersRxUC  Counter32,
+                  rlCpuCountersRxOctets  Counter32
+              }
+--field definition:
+
+        rlCpuCountersTarget OBJECT-TYPE
+              SYNTAX  INTEGER  {
+                cpuCounters (0)
+              }
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Packet type can be Multicast (MC), Broadcast (BC) or Unicast(UC)"
+              ::= { rlCpuCountersEntry 1 }
+
+        rlCpuCountersTxBC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of received broadcast packets."
+              ::= { rlCpuCountersEntry 2 }
+
+        rlCpuCountersTxMC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of transmitted multicast packets."
+              ::= { rlCpuCountersEntry 3 }
+
+        rlCpuCountersTxUC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of transmitted unicast packets."
+              ::= { rlCpuCountersEntry 4 }
+
+        rlCpuCountersTxOctets  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of transmitted octets."
+              ::= { rlCpuCountersEntry 5 }
+
+        rlCpuCountersRxBC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of received broadcast packets."
+              ::= { rlCpuCountersEntry 6 }
+
+          rlCpuCountersRxMC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of received mutlicast packets."
+              ::= { rlCpuCountersEntry 7 }
+
+        rlCpuCountersRxUC  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of received unicast packets."
+              ::= { rlCpuCountersEntry 8 }
+
+        rlCpuCountersRxOctets  OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Number of received octets"
+              ::= { rlCpuCountersEntry 9 }
+
+
+
+
+
+-- rlCpuCountersReset:
+
+
+        rlCpuCountersReset OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Setting true to this MIB object will reset the CPU counters."
+            DEFVAL { false}
+            ::= { rlCpuCounters 2 }
+
+-- rlCpuCountersEnabled:
+
+        rlCpuCountersEnabled OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "True - feature is enabled, false - feature is disabled "
+            DEFVAL { false}
+            ::= { rlCpuCounters 3 }
+
+
+
+
+
+          END
+

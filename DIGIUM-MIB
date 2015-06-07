@@ -1,0 +1,17 @@
+DIGIUM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM SNMPv2-SMI;
+
+digium MODULE-IDENTITY
+	LAST-UPDATED	"200602041900Z"
+	ORGANIZATION	"Digium, Inc."
+	CONTACT-INFO
+		"Mark Spencer
+		Email: markster@digium.com"
+	DESCRIPTION
+		""
+	::= { enterprises 22736 }
+
+END

@@ -1,0 +1,210 @@
+-- ArubaOS 3.2.0.0_16376
+ARUBA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE,
+       OBJECT-IDENTITY,
+	   enterprises,
+       snmpModules                           FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION                    FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF;
+
+
+-- The top node
+
+aruba  OBJECT IDENTIFIER ::= { enterprises 14823 }
+
+-- Node Product will contain all the products from Aruba Networks.
+
+products OBJECT IDENTIFIER ::= { aruba 1}
+
+-- Node arubaEnterpriseMibModules contains all the Enterprise
+-- specific MIBS supported by Aruba Networks products.
+
+arubaEnterpriseMibModules OBJECT IDENTIFIER ::= { aruba 2}
+
+-- Node arubaMgmtGroup defines the objects related to the Aruba Management 
+-- Extensions.
+
+arubaMgmt OBJECT IDENTIFIER ::= { aruba 3}
+
+-- List of all the products.
+
+-- Switch Products
+switchProducts OBJECT IDENTIFIER ::= { products 1}
+
+-- a5000 product , this object is the SYSOID
+
+a5000 OBJECT IDENTIFIER ::= { switchProducts 1}
+
+-- a2400 product , this object is the SYSOID
+
+a2400 OBJECT IDENTIFIER ::= { switchProducts 2}
+
+-- a800 product , this object is the SYSOID
+
+a800 OBJECT IDENTIFIER ::= { switchProducts 3}
+
+-- a6000 product , this object is the SYSOID
+
+a6000 OBJECT IDENTIFIER ::= { switchProducts 4}
+
+-- a2400E product , this object is the SYSOID
+
+a2400E OBJECT IDENTIFIER ::= { switchProducts 7}
+
+-- a800-E product , this object is the SYSOID
+
+a800E OBJECT IDENTIFIER ::= { switchProducts 8}
+
+-- a800-4 product , this object is the SYSOID
+
+a804 OBJECT IDENTIFIER ::= { switchProducts 9}
+
+-- a200 product , this object is the SYSOID
+
+a200 OBJECT IDENTIFIER ::= { switchProducts 10}
+
+-- a2400-24 product , this object is the SYSOID
+
+a2424 OBJECT IDENTIFIER ::= { switchProducts 11}
+
+-- a6000-SC3 (nebbiolo) product , this object is the SYSOID
+
+a6000-SC3 OBJECT IDENTIFIER ::= { switchProducts 12}
+
+a3200 OBJECT IDENTIFIER ::= { switchProducts 13}
+a3200-8 OBJECT IDENTIFIER ::= { switchProducts 14}
+
+a3400 OBJECT IDENTIFIER ::= { switchProducts 15}
+a3400-32 OBJECT IDENTIFIER ::= { switchProducts 16}
+
+a3600 OBJECT IDENTIFIER ::= { switchProducts 17}
+a3600-64 OBJECT IDENTIFIER ::= { switchProducts 18}
+
+--Undefined switch.
+aUndefined OBJECT IDENTIFIER ::= { switchProducts 9999}
+
+-- Access Point Products
+apProducts OBJECT IDENTIFIER ::= { products 2}
+
+-- a50 , this object is the SYSOID
+
+a50 OBJECT IDENTIFIER ::= {apProducts 1}
+
+-- a52 , this object is the SYSOID
+
+a52 OBJECT IDENTIFIER ::= {apProducts 2}
+
+-- a60 , this object is the SYSOID
+
+ap60 OBJECT IDENTIFIER ::= {apProducts 3}
+
+-- a61 , this object is the SYSOID
+
+ap61 OBJECT IDENTIFIER ::= {apProducts 4}
+
+-- a70 , this object is the SYSOID
+
+ap70 OBJECT IDENTIFIER ::= {apProducts 5}
+
+-- walljackAp61, this object is the SYSOID
+
+walljackAp61 OBJECT IDENTIFIER ::= {apProducts 6}
+
+-- a2E, this object is the SYSOID
+
+a2E OBJECT IDENTIFIER ::= {apProducts 7}
+
+-- ap1200, this object is the SYSOID
+
+ap1200 OBJECT IDENTIFIER ::= {apProducts 8}
+
+-- ap80s, this object is the SYSOID
+
+ap80s OBJECT IDENTIFIER ::= {apProducts 9}
+
+-- ap80m, this object is the SYSOID
+
+ap80m OBJECT IDENTIFIER ::= {apProducts 10}
+
+-- wg102, this object is the SYSOID
+
+wg102 OBJECT IDENTIFIER ::= {apProducts 11}
+
+-- ap40, this object is the SYSOID
+
+ap40 OBJECT IDENTIFIER ::= {apProducts 12}
+
+-- ap41, this object is the SYSOID
+
+ap41 OBJECT IDENTIFIER ::= {apProducts 13}
+
+-- ap65, this object is the SYSOID
+
+ap65 OBJECT IDENTIFIER ::= {apProducts 14}
+
+-- NesotMW1700
+apMw1700 OBJECT IDENTIFIER ::= {apProducts 15}
+
+-- ortronics Wi Jack Duo
+apDuowj OBJECT IDENTIFIER ::= {apProducts 16}
+
+-- ortronics Duo
+apDuo OBJECT IDENTIFIER ::= {apProducts 17}
+
+--ap80MB, this object is the SYSOID 
+
+ap80MB OBJECT IDENTIFIER ::= {apProducts 18}
+
+--ap80SB, this object is the SYSOID
+
+ap80SB OBJECT IDENTIFIER ::= {apProducts 19}
+
+--ap85, this object is the SYSOID
+
+ap85 OBJECT IDENTIFIER ::= {apProducts 20}
+
+--Undefined ap.
+apUndefined OBJECT IDENTIFIER ::= { apProducts 9999}
+
+-- EMS Products
+emsProducts OBJECT IDENTIFIER ::= { products 3}
+
+
+--Partner Products
+partnerProducts OBJECT IDENTIFIER	::= {products 4}
+
+ecsE50    OBJECT IDENTIFIER ::= {partnerProducts 1}
+ecsE100C  OBJECT IDENTIFIER ::= {partnerProducts 2}
+ecsE100A  OBJECT IDENTIFIER ::= {partnerProducts 3}
+ecsENSM   OBJECT IDENTIFIER ::= {partnerProducts 4}
+
+-- List of all the Enterprise MIB Modules.
+
+-- common node will contain all the objects which can be shared between
+-- Aruba products.
+
+common	OBJECT IDENTIFIER ::= { arubaEnterpriseMibModules 1 }
+
+-- switch node will contain all the objects for the switch products
+
+switch OBJECT IDENTIFIER ::= { arubaEnterpriseMibModules 2 }
+
+-- Aruba AP will contain all the objects for the Aruba AP.
+arubaAp OBJECT IDENTIFIER ::= { arubaEnterpriseMibModules 3 }
+
+arubaEcs	OBJECT IDENTIFIER ::= {arubaEnterpriseMibModules 4}
+
+-- Switch Mib Modules.
+wlsxEnterpriseMibModules OBJECT IDENTIFIER ::= { switch 1 }
+
+-- Access Point Mib Modules.
+wlsrEnterpriseMibModules OBJECT IDENTIFIER ::= { arubaAp 1 }
+
+-- Outdoor AP Mib definition.
+
+wlsrOutDoorApMibModules OBJECT IDENTIFIER ::= { arubaAp 2 }
+
+
+END

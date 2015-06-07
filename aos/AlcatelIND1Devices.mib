@@ -1,0 +1,2296 @@
+ALCATEL-IND1-DEVICES DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+FROM
+    SNMPv2-SMI
+
+    hardwareIND1Devices
+FROM
+    ALCATEL-IND1-BASE;
+
+
+alcatelIND1DevicesMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This module provides Object Indentifier definitions for
+             Chassis and Modules of the Alcatel Internetworking
+             OmniSwitch 9000/8000/7000/4000 Series Product Lines.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "Initial version of this MIB Module."
+
+    ::= { hardwareIND1Devices 1 }
+
+
+
+familyOmniSwitch7000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 1 }
+
+
+
+
+chassisOmniSwitch7000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Chassis."
+    ::= { familyOmniSwitch7000 1 }
+
+
+deviceOmniSwitch7700 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7700 10-Slot Chassis.
+        Model Name: OS7700
+        Assembly:   901749-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.1.1"
+    ::= { chassisOmniSwitch7000 1 }
+
+
+deviceOmniSwitch7800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7800 18-Slot Chassis.
+        Model Name: OS7800
+        Assembly:   901748-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.1.2"
+    ::= { chassisOmniSwitch7000 2 }
+
+
+
+
+fansOmniSwitch7000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Fan Trays."
+    ::= { familyOmniSwitch7000 2 }
+
+
+fansOmniSwitch7000FT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Fan Tray.
+        Model Name: OS7000-FT
+        Assembly:   901752-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.2.1"
+    ::= { fansOmniSwitch7000 1 }
+
+
+
+
+powersOmniSwitch7000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Power Supplies."
+    ::= { familyOmniSwitch7000 3 }
+
+
+powersOmniSwitch7000PS600AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 600 Watt A/C Power Supply.
+        Model Name: OS7-PS-0600AC
+        Assembly:   901750-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.3.1"
+    ::= { powersOmniSwitch7000 1 }
+
+
+powersOmniSwitch7000PS600DC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 600 Watt D/C Power Supply.
+        Model Name: OS7-PS-0600DC
+        Assembly:   902076-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.3.2"
+    ::= { powersOmniSwitch7000 2 }
+
+
+powersOmniSwitch7000PDShelf OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Inline Power Shelf.
+        Model Name: OS7-PD-Shelf
+        Assembly:   902067-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.3.3"
+    ::= { powersOmniSwitch7000 3 }
+
+
+powersOmniSwitch7000PDPS600AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 600 Watt A/C Inline Power Supply.
+        Model Name: OS7-PDPS-0900AC
+        Assembly:   902068-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.3.4"
+    ::= { powersOmniSwitch7000 4 }
+
+
+powersOmniSwitch7000PDPS900DC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 900 Watt D/C Inline Power Supply.
+        Model Name: OS7-PDPS-0900DC
+        Assembly:   902069-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.3.5"
+    ::= { powersOmniSwitch7000 5 }
+
+
+
+
+modulesOmniSwitch7000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Modules."
+    ::= { familyOmniSwitch7000 4 }
+
+
+
+
+modulesOmniSwitch7000CM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 7000 Series Chassis Management (CM) Modules."
+    ::= { modulesOmniSwitch7000 1 }
+
+
+
+cmmOmniSwitch7700 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7700 Series Chassis Management Module.
+        Model Name: OS7700-CMM
+        Assembly:   901750-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.1"
+    ::= { modulesOmniSwitch7000CM 1 }
+
+
+cmmOmniSwitch7700PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7700 Series Chassis Management Module Processor.
+        Model Name: OS7700-CMM Processor
+        Assembly:   050358-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.1.1"
+    ::= { cmmOmniSwitch7700 1 }
+
+
+cmmOmniSwitch7700BBUS OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7700 Series Chassis Management Module BBUS Bridge.
+        Model Name: OS7700-CMM BBUS Bridge
+        Assembly:   050373-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.1.2"
+    ::= { cmmOmniSwitch7700 2 }
+
+
+
+cmmOmniSwitch7800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7800 Series Chassis Management Module.
+        Model Name: OS7800-CMM
+        Assembly:   901953-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.2"
+    ::= { modulesOmniSwitch7000CM 2 }
+
+
+cmmOmniSwitch7800PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7800 Series Chassis Management Module Processor.
+        Model Name: OS7800-CMM Processor
+        Assembly:   050358-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.2.1"
+    ::= { cmmOmniSwitch7800 1 }
+
+
+cmmOmniSwitch7800BBUS OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7800 Series Chassis Management Module BBUS Bridge.
+        Model Name: OS7800-CMM BBUS Bridge
+        Assembly:   050352-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.1.2.2"
+    ::= { cmmOmniSwitch7800 2 }
+
+
+
+
+modulesOmniSwitch7000NI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Network Interface (NI) Modules."
+    ::= { modulesOmniSwitch7000 2 }
+
+
+
+
+niOmniSwitch7000ENI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 10/100BaseX Ethernet Network Interface (ENI) Modules."
+    ::= { modulesOmniSwitch7000NI 1 }
+
+
+eniOmniSwitch7000C24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Copper 24-Port 10/100BaseTX Ethernet Network Interface Module.
+        Model Name: OS7-ENI-C24
+        Assembly:   901765-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.1.1"
+    ::= { niOmniSwitch7000ENI 1 }
+
+
+eniOmniSwitch7000FM12 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Fiber 12-Port 10/100BaseFX Ethernet Network Interface Module.
+        Model Name: OS7-ENI-FM12
+        Assembly:   901766-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.1.2"
+    ::= { niOmniSwitch7000ENI 2 }
+
+eniOmniSwitch7000PDPS24ENI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 24 Port ENI Inline Power Supply.
+        Model Name: OS7-PDPS-0900DC
+        Assembly:   902066-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.1.3"
+    ::= { niOmniSwitch7000ENI 3 }
+
+
+niOmniSwitch7000GNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 1000BaseX Ethernet Network Interface (GNI) Modules."
+    ::= { modulesOmniSwitch7000NI 2 }
+
+
+
+gniOmniSwitch7000U2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Universal 2-Port 1000BaseX Ethernet Network Interface Module.
+        Model Name: OS7-GNI-U2
+        Assembly:   901759-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.2.1"
+    ::= { niOmniSwitch7000GNI 1 }
+
+
+gni2OmniSwitch7000C12 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Copper 12-Port 10/100BaseTX/1000BaseCX Ethernet Network Interface Module.
+        Model Name: OS7-GNI2-C12
+        Assembly:   902063-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.2.2"
+    ::= { niOmniSwitch7000GNI 2 }
+
+
+gni2OmniSwitch7000U12 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Universal 12-Port 1000BaseX Ethernet Network Interface Module.
+        Model Name: OS7-GNI2-U12
+        Assembly:   902064-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.2.3"
+    ::= { niOmniSwitch7000GNI 3 }
+
+
+
+niOmniSwitch7000IC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Network Interface Module Interface Cards (IC)."
+    ::= { modulesOmniSwitch7000NI 3 }
+
+
+
+icOmniSwitch7000GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series 1000BaseX Interface Cards (IC)."
+    ::= { niOmniSwitch7000IC 1 }
+
+
+gicOmniSwitch7000LH70 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Long Haul 70km Fiber 1000BaseX Interface Card.
+        Model Name: GBIC-LH-70
+        Assembly:   901953-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.3.1.1"
+    ::= { icOmniSwitch7000GIC 1 }
+
+
+gicOmniSwitch7000LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: GBIC-LX
+        Assembly:   901952-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.3.1.2"
+    ::= { icOmniSwitch7000GIC 2 }
+
+
+gicOmniSwitch7000SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Multi Mode Fiber 1000BaseSX Interface Card.
+        Model Name: GBIC-SX
+        Assembly:   901951-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.3.1.3"
+    ::= { icOmniSwitch7000GIC 3 }
+
+
+gicOmniSwitch7000C OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Copper 1000BaseCX Interface Card.
+        Model Name: GBIC-C
+        Assembly:   902088-11
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.3.1.4"
+    ::= { icOmniSwitch7000GIC 4 }
+
+
+niOmniSwitch7000DM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Network Daughter Module (DM)."
+    ::= { modulesOmniSwitch7000NI 4 }
+
+dmOmniSwitch7000Power OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series daughter modules (DM) for in line power."
+    ::= { niOmniSwitch7000DM 1 }
+
+
+dmOmniSwitch7000PowerDsine OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series  Card.
+        Model Name:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.4.1.1"
+    ::= { dmOmniSwitch7000Power 1 }
+
+
+niOmniSwitch7000ANI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series ATM Network Interface (ANI) Modules."
+    ::= { modulesOmniSwitch7000NI 5 }
+
+aniOmniSwitch7000U4 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Universal 4-Port OC3 ATM uplink module.
+        Model Name: OS7-ANI3-U4
+        Assembly:   902310-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.5.1"
+    ::= { niOmniSwitch7000ANI 1 }
+
+aniOmniSwitch7000U1 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 7000 Series Universal 1-Port OC12 ATM uplink module.
+        Model Name: OS7-ANI12-U1
+        Assembly:   902311-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.1.4.2.5.2"
+    ::= { niOmniSwitch7000ANI 2 }
+
+
+familyOmniSwitch8000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 2 }
+
+chassisOmniSwitch8000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Chassis."
+    ::= { familyOmniSwitch8000 1 }
+
+
+deviceOmniSwitch8800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 18-Slot Chassis.
+        Model Name: OS8800
+        Assembly:   901977-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.1.1"
+    ::= { chassisOmniSwitch8000 1 }
+
+
+
+
+fansOmniSwitch8000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Fan Trays."
+    ::= { familyOmniSwitch8000 2 }
+
+
+fansOmniSwitch8800CFT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Chassis Fan Tray.
+        Model Name: OS8800-CFT
+        Assembly:   902074-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.2.1"
+    ::= { fansOmniSwitch8000 1 }
+
+
+fansOmniSwitch8800FFT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Fabric Fan Tray.
+        Model Name: OS8800-FFT
+        Assembly:   902075-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.2.2"
+    ::= { fansOmniSwitch8000 2 }
+
+
+
+powersOmniSwitch8000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Power Supplies."
+    ::= { familyOmniSwitch8000 3 }
+
+
+powersOmniSwitch8000PS1375AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 1375 Watt A/C Power Supply.
+        Model Name: OS8-PS-1375AC
+        Assembly:   901978-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.3.1"
+    ::= { powersOmniSwitch8000 1 }
+
+
+powersOmniSwitch8000PS1375DC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 1375 Watt D/C Power Supply.
+        Model Name: OS8-PS-1375DC
+        Assembly:   902054-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.3.2"
+    ::= { powersOmniSwitch8000 2 }
+
+
+
+
+modulesOmniSwitch8000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Modules."
+    ::= { familyOmniSwitch8000 4 }
+
+
+
+
+modulesOmniSwitch8000CM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Chassis Management (CM) Modules."
+    ::= { modulesOmniSwitch8000 1 }
+
+
+
+cmmOmniSwitch8800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Chassis Management Module.
+        Model Name: OS8800-CMM
+        Assembly:   901980-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.1.1"
+    ::= { modulesOmniSwitch8000CM 1 }
+
+
+cmmOmniSwitch8800PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Chassis Management Module Processor.
+        Model Name: OS8800-CMM Processor
+        Assembly:   050358-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.1.1.1"
+    ::= { cmmOmniSwitch8800 1 }
+
+
+cmmOmniSwitch8800BBUS OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Chassis Management Module BBUS Bridge.
+        Model Name: OS8800-CMM BBUS Bridge
+        Assembly:   050386-06
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.1.1.2"
+    ::= { cmmOmniSwitch8800 2 }
+
+
+
+
+modulesOmniSwitch8000NI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Network Interface (NI) Modules."
+    ::= { modulesOmniSwitch8000 2 }
+
+
+
+
+niOmniSwitch8000ENI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 10/100BaseX Ethernet Network Interface (ENI) Modules."
+    ::= { modulesOmniSwitch8000NI 1 }
+
+
+eniOmniSwitch8000C24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Copper 24-Port 10/100BaseTX Ethernet Network Interface Module.
+        Model Name: OS8-ENI-C24
+        Assembly:   902055-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.1.1"
+    ::= { niOmniSwitch8000ENI 1 }
+
+
+
+
+niOmniSwitch8000GNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 1000BaseX Ethernet Network Interface (GNI) Modules."
+    ::= { modulesOmniSwitch8000NI 2 }
+
+
+
+gniOmniSwitch8000U8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Universal 8-Port 1000BaseX Ethernet Network Interface Module.
+        Model Name: OS8-GNI-U8
+        Assembly:   901981-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.2.1"
+    ::= { niOmniSwitch8000GNI 1 }
+
+
+gniOmniSwitch8000C8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Copper 8-Port 1000BaseCX Ethernet Network Interface Module.
+        Model Name: OS8-GNI-C8
+        Assembly:   902057-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.2.2"
+    ::= { niOmniSwitch8000GNI 2 }
+
+
+gni2OmniSwitch8000U8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Universal 8-Port 1000BaseX Ethernet Network Interface Module.
+        Model Name: OS8-GNI2-U8
+        Assembly:   902070-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.2.3"
+    ::= { niOmniSwitch8000GNI 3 }
+
+
+gni2OmniSwitch8000C24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Copper 24-Port 10/100BaseTX/1000BaseCX Ethernet Network Interface Module.
+        Model Name: OS8-GNI2-C24
+        Assembly:   902072-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.2.4"
+    ::= { niOmniSwitch8000GNI 4 }
+
+
+gni2OmniSwitch8000U24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Universal 24-Port 1000BaseX Ethernet Network Interface Module.
+        Model Name: OS8-GNI2-U24
+        Assembly:   902073-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.2.5"
+    ::= { niOmniSwitch8000GNI 5 }
+
+
+
+
+niOmniSwitch8000G10NI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 10-Gigabit Ethernet Network Interface (G10NI) Modules."
+    ::= { modulesOmniSwitch8000NI 3 }
+
+
+
+g10niOmniSwitch8000U1 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Universal 1-Port 10-Gigabit Ethernet Network Interface Module.
+        Model Name: OS8-10GNI-U1
+        Assembly:   902056-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.3.1"
+    ::= { niOmniSwitch8000G10NI 1 }
+
+
+
+
+niOmniSwitch8000IC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Network Interface Module Interface Cards (IC)."
+    ::= { modulesOmniSwitch8000NI 4 }
+
+
+
+icOmniSwitch8000GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series 1000BaseX Interface Cards (IC)."
+    ::= { niOmniSwitch8000IC 1 }
+
+
+mgicOmniSwitch8000SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Multi Mode Fiber 1000BaseSX Interface Card.
+        Model Name: MiniGBIC-SX
+        Assembly:   902053-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.4.1.1"
+    ::= { icOmniSwitch8000GIC 1 }
+
+
+mgicOmniSwitch8000LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: MiniGBIC-LX
+        Assembly:   902052-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.4.1.2"
+    ::= { icOmniSwitch8000GIC 2 }
+
+
+mgicOmniSwitch8000LH70 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Long Haul 70km Fiber 1000BaseX Interface Card.
+        Model Name: MiniGBIC-LH-70
+        Assembly:   902051-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.4.1.3"
+    ::= { icOmniSwitch8000GIC 3 }
+
+
+
+
+modulesOmniSwitch8000SF OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 8000 Series Switch Fabric (SF) Modules."
+    ::= { modulesOmniSwitch8000 3 }
+
+
+sfOmniSwitch8800SFM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8800 Series Switch Fabric Module.
+        Model Name: OS8800-SFM
+        Assembly:   901979-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.3.1"
+    ::= { modulesOmniSwitch8000SF 1 }
+
+
+familyOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 3 }
+
+
+
+chassisOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6600 Series Switch."
+    ::= { familyOmniSwitch6600 1 }
+
+deviceOmniSwitch6624 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6624 Stackable Switch.
+        Model Number:   OSW-6624
+        Assembly:       902083-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.1"
+    ::= { chassisOmniSwitch6600 1 }
+
+deviceOmniSwitch6648 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6648 Stackable Switch.
+        Model Number:   OSW-6648
+        Assembly:       902098-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.2"
+    ::= { chassisOmniSwitch6600 2 }
+
+deviceOmniSwitch6624Fiber OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6624 Stackable Switch - Fiber.
+        Model Number:
+        Assembly:
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.3"
+    ::= { chassisOmniSwitch6600 3 }
+
+deviceOmniSwitch660224 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6624 Stackable Switch - Reduced cost (24Rj45 + 2Stk +2 1G Upl)
+        Model Number:
+        Assembly: 902285-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.4"
+    ::= { chassisOmniSwitch6600 4 }
+
+deviceOmniSwitch660248 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6648 Stackable Switch - Reduced cost(48Rj45 + 2Stk +2 1G Upl)
+        Model Number:
+        Assembly:   902286-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.5"
+    ::= { chassisOmniSwitch6600 5 }
+
+deviceOmniSwitch6624PoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6624 Stackable Power over Ethernet Switch.
+        Model Number:   OS66-P24
+        Assembly:       902296-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.6"
+    ::= { chassisOmniSwitch6600 6 }
+
+deviceOmniSwitch6648PoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6648 Stackable Power over Ethernet Switch.
+        Model Number:   OS66-P48
+        Assembly:
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.1.7"
+    ::= { chassisOmniSwitch6600 7 }
+
+fansOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6600 Series Fan Trays."
+    ::= { familyOmniSwitch6600 2 }
+
+powersOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6600 Series Power Supplies."
+    ::= { familyOmniSwitch6600 3 }
+
+powersOmniSwitch6600BSP OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Hawk Back Up Power Supply
+        Model Number:   OSW-6600-BPS
+        Assembly:       902087-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.3.1"
+    ::= { powersOmniSwitch6600 1 }
+
+modulesOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6600 Series Modules."
+    ::= { familyOmniSwitch6600 4 }
+
+expOmniSwitch6600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6600 Expantion Modules."
+    ::= { modulesOmniSwitch6600 1 }
+
+mgicOmniSwitch66002 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 - MiniGBIC - Fiber Module
+        Model Number:   OSW-66MiniGBIC2
+        Assembly:       902084-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.4.1.1"
+    ::= { expOmniSwitch6600 1 }
+
+gsmOmniSwitch6600T2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 -T-2 - Copper Module.
+        Model Number:   OSW-66-GSM-T-2
+        Assembly:       902085-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.4.1.2"
+    ::= { expOmniSwitch6600 2 }
+
+stkOmniSwitch6600Kit OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+       "OmniSwitch 6600 STK Kit.
+        Model Number:   OSW-66-STK-Kit
+        Assembly:       902086-10
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.3.4.1.3"
+    ::= { expOmniSwitch6600 3 }
+
+icOmniSwitch6600GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Series 1000BaseX Interface Cards (IC)."
+    ::= { modulesOmniSwitch6600 2 }
+
+
+mgicOmniSwitch6600SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Series Multi Mode Fiber 1000BaseSX Interface Card.
+        Model Name: MiniGBIC-SX
+        Assembly:   902053-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.3.4.2.1 "
+    ::= { icOmniSwitch6600GIC 1 }
+
+
+mgicOmniSwitch6600LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: MiniGBIC-LX
+        Assembly:   902052-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.3.4.2.2"
+    ::= { icOmniSwitch6600GIC 2 }
+
+
+mgicOmniSwitch6600LH70 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6600 Series Long Haul 70km Fiber 1000BaseX Interface Card.
+        Model Name: MiniGBIC-LH-70
+        Assembly:   902051-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.3.4.2.3"
+    ::= { icOmniSwitch6600GIC 3 }
+
+
+familyOmniAccess200 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 8000 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 4 }
+
+chassisOmniAccess200 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniAccess 200 Series Chassis."
+    ::= { familyOmniAccess200 1 }
+
+deviceOmniAccess210 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess 210 VPN product Chassis.
+        Model Number:
+        Assembly:
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.4.1.1"
+    ::= { chassisOmniAccess200 1 }
+
+deviceOmniAccess250 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess 250 VPN product Chassis.
+        Model Number:
+        Assembly:
+        sysObjectID:    1.3.6.1.4.1.6486.800.1.1.2.1.4.1.2"
+    ::= { chassisOmniAccess200 2 }
+
+
+fansOmniSwitch200 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniAccess 200 Series Fan Trays."
+    ::= { familyOmniAccess200 2 }
+
+powersOmniAccess200 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniAccess 200 Series Power Supplies."
+    ::= { familyOmniAccess200 3 }
+
+modulesOmniAccess200 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniAccess 200 Series Modules."
+    ::= { familyOmniAccess200 4 }
+
+
+
+familyOmniStack6300 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Omni Stack 6300 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 5 }
+
+chassisOmniStack6300 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniStack 6300 Series Chassis."
+    ::= { familyOmniStack6300 1 }
+
+deviceOmniStack6324  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniStack 24 port product Chassis.
+        Model Number:
+        Assembly:
+        sysObjectID:      1.3.6.1.4.1.6486.800.1.1.2.1.5.1.1"
+    ::= { chassisOmniStack6300 1 }
+
+fansOmniStack6300 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniStack 6300 Series Fan Trays."
+    ::= { familyOmniStack6300 2 }
+
+powersOmniStack6300 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniStack 6300 Series Power Supplies."
+    ::= { familyOmniStack6300 3 }
+
+modulesOmniStack6300 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For family OmniStack 6300 Series Modules."
+    ::= { familyOmniStack6300 4 }
+
+
+
+familyOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 6 }
+
+chassisOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Switch."
+    ::= { familyOmniSwitch6800 1 }
+
+deviceOmniSwitch6824 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Switch consisting
+        of 20 RJ-45 connectors individually configurable to 10/100/1000 Base-T
+        and 4 combo ports individually configurable to be 10/100/1000 Base-T or
+        1000 Base-X; with 2 stacking ports.
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.1.1"
+    ::= { chassisOmniSwitch6800 1 }
+
+deviceOmniSwitch6848 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Switch consisting of 44 RJ-45 connectors
+        individually configurable to 10/100/1000 Base-T and 4 combo ports
+        individually configurable to be 10/100/1000 Base-T or 1000 Base-X; with 2
+        stacking ports.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.2"
+    ::= { chassisOmniSwitch6800 2 }
+
+deviceOmniSwitch6824Fiber OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 (Non-Stackable) Switch - Fiber consisting of 20 1000 Base-X ports
+        and 4 combo ports ports individually configurable to be 10/100/1000 Base-T
+        or 1000 Base-X. The 20 fiber ports will be equipped with 20 pluggable SFP
+        transceivers that can support short, long, very long distances.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.3"
+    ::= { chassisOmniSwitch6800 3 }
+
+deviceOmniSwitch6824PoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Power over Ethernet Switch.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.4"
+    ::= { chassisOmniSwitch6800 4 }
+
+deviceOmniSwitch6848PoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Power over Ethernet Switch.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.5"
+    ::= { chassisOmniSwitch6800 5 }
+
+deviceOmniSwitch6824L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Lite.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.6"
+    ::= { chassisOmniSwitch6800 6 }
+
+deviceOmniSwitch6848L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Lite.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.7"
+    ::= { chassisOmniSwitch6800 7 }
+
+deviceOmniSwitch6824LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Lite Upgraded.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.8"
+    ::= { chassisOmniSwitch6800 8 }
+
+deviceOmniSwitch6848LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Lite upgraded.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.9"
+    ::= { chassisOmniSwitch6800 9 }
+
+deviceOmniSwitch6824LPoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Lite Power over Ethernet.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.10"
+    ::= { chassisOmniSwitch6800 10 }
+
+deviceOmniSwitch6848LPoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Lite Power over Ethernet.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.11"
+    ::= { chassisOmniSwitch6800 11 }
+
+deviceOmniSwitch6824LUPoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6824 Stackable Lite Upgraded power over Ethernet.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.12"
+    ::= { chassisOmniSwitch6800 12 }
+
+deviceOmniSwitch6848LUPoE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6848 Stackable Lite upgraded Power over Ethernet.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.1.13"
+    ::= { chassisOmniSwitch6800 13 }
+
+fansOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Fan Trays."
+    ::= { familyOmniSwitch6800 2 }
+
+powersOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Power Supplies."
+    ::= { familyOmniSwitch6800 3 }
+
+
+powersOmniSwitch6800BPS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Omni Switch 6800 Series Backup Power supply.
+        Model Name: OS6800-BPS-PS
+        Assembly: 902279-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.3.1 "
+    ::= { powersOmniSwitch6800 1 }
+
+powersOmniSwitch6800MOD OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Power interface module, that plugs into the primary unit.
+        Model Name: OS6800-BP-MOD
+        Assembly: 902292-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.3.2 "
+    ::= { powersOmniSwitch6800 2 }
+
+powersOmniSwitch6800SHLF OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Chassis, that accepts the power supply modules.
+        Model Name: OS6800-BPS-SHLF
+        Assembly: 902278-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.3.3 "
+    ::= { powersOmniSwitch6800 3 }
+
+modulesOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Modules."
+    ::= { familyOmniSwitch6800 4 }
+
+icOmniSwitch8000TenGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series 10 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6800 1 }
+
+mgicOmniSwitch6800SR OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "OmniSwitch 6800 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: 10G-XFP-SR
+        Assembly:   902343-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.4.1.1"
+    ::= { icOmniSwitch8000TenGIC 1 }
+
+mgicOmniSwitch6800LR OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "OmniSwitch 6800 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: 10G-XFP-LR
+        Assembly:   902344-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.2.4.2.4.1.2"
+    ::= { icOmniSwitch8000TenGIC 2 }
+
+icOmniSwitch6800GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series 1000BaseX Interface Cards (IC)."
+    ::= { modulesOmniSwitch6800 2 }
+
+
+mgicOmniSwitch6800SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series Multi Mode Fiber 1000BaseSX Interface Card.
+        Model Name: MiniGBIC-SX
+        Assembly:   902053-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.4.2.1"
+    ::= { icOmniSwitch6800GIC 1 }
+
+
+mgicOmniSwitch6800LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series Single Mode Fiber 1000BaseLX Interface Card.
+        Model Name: MiniGBIC-LX
+        Assembly:   902052-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.4.2.2 "
+    ::= { icOmniSwitch6800GIC 2 }
+
+
+mgicOmniSwitch6800LH70 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series Long Haul 70km Fiber 1000BaseX Interface Card.
+        Model Name: MiniGBIC-LH-70
+        Assembly:   902051-10
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.6.4.2.3"
+    ::= { icOmniSwitch6800GIC 3 }
+
+expOmniSwitch6800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Expantion Modules."
+    ::= { modulesOmniSwitch6800 3 }
+
+expOmniSwitch6800U2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6800 Series Universal 2-Port 10 gig Network Interface Module.
+        Model Name: OS6800-XNI-U2
+        Assembly:   902277-10
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.6.4.3.1 "
+    ::= { expOmniSwitch6800 1 }
+
+familyOmniSwitch6850 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 7 }
+
+chassisOmniSwitch6850 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6850 Series Switch."
+    ::= { familyOmniSwitch6850 1 }
+
+deviceOmniSwitch685024 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24 Stackable switch consisting of
+        24 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6850-24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.1"
+    ::= { chassisOmniSwitch6850 1 }
+
+deviceOmniSwitch685048 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48 Stackable switch consisting of
+        48 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6850-48
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.7.1.2"
+    ::= { chassisOmniSwitch6850 2 }
+
+deviceOmniSwitch685024X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24X Stackable switch consisting of
+        24 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports
+        2 10Gig ports and 2 stacking ports.
+        Model Number: OS6850-24X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.3 "
+    ::= { chassisOmniSwitch6850 3 }
+
+deviceOmniSwitch685048X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48X Stackable switch consisting of
+        48 copper GigE Ports, 2 10Gig ports and 2 stacking ports.
+        Model Number: OS6850-48X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.4 "
+    ::= { chassisOmniSwitch6850 4 }
+
+deviceOmniSwitch6850P24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24 Stackable switch consisting of
+        24 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6850-P24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.5 "
+    ::= { chassisOmniSwitch6850 5 }
+
+deviceOmniSwitch6850P48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48 Stackable switch consisting of
+        48 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6850-P48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.6 "
+    ::= { chassisOmniSwitch6850 6 }
+
+deviceOmniSwitch6850P24X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24X Stackable switch consisting of
+        24 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports,
+        2 10 Gig ports, and 2 stacking ports.
+        Model Number: OS6850-P24X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.7 "
+    ::= { chassisOmniSwitch6850 7 }
+
+deviceOmniSwitch6850P48X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48X Stackable switch consisting of
+        48 copper PoE Ports, 2 10 Gig ports, and 2 stacking ports.
+        Model Number: OS6850-P48X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.8 "
+    ::= { chassisOmniSwitch6850 8 }
+
+deviceOmniSwitch6850U24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-U24 Stackable switch consisting of 24
+        fiber GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports ,
+        and 2 stacking ports.
+        Model Number: OS6850-U24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.9 "
+    ::= { chassisOmniSwitch6850 9 }
+
+deviceOmniSwitch6850U24X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-U24X Stackable switch consisting of
+        24 fiber GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports,
+        2 10 Gig ports, and 2 stacking ports.
+        Model Number: OS6850-U24X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.10 "
+    ::= { chassisOmniSwitch6850 10 }
+
+
+deviceOmniSwitch685024L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24 Stackable switch consisting of
+        24 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6850-24L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.11 "
+    ::= { chassisOmniSwitch6850 11 }
+
+deviceOmniSwitch685048L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48 Stackable switch consisting of
+        48 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6850-48L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.12 "
+    ::= { chassisOmniSwitch6850 12 }
+
+deviceOmniSwitch685024XL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24X Stackable switch consisting of
+        24 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports
+        2 10Gig ports and 2 stacking ports.
+        Model Number: OS6850-24XL
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.13 "
+    ::= { chassisOmniSwitch6850 13 }
+
+deviceOmniSwitch685048XL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48X Stackable switch consisting of
+        48 copper GigE Ports, 2 10Gig ports and 2 stacking ports.
+        Model Number: OS6850-48XL
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.14 "
+    ::= { chassisOmniSwitch6850 14 }
+
+deviceOmniSwitch6850P24L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24 Stackable switch consisting of
+        24 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6850-P24L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.15 "
+    ::= { chassisOmniSwitch6850 15 }
+
+deviceOmniSwitch6850P48L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48 Stackable switch consisting of
+        48 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6850-P48L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.16 "
+    ::= { chassisOmniSwitch6850 16 }
+
+deviceOmniSwitch6850P24XL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24X Stackable switch consisting of
+        24 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports,
+        2 10 Gig ports, and 2 stacking ports.
+        Model Number: OS6850-P24XL
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.17 "
+    ::= { chassisOmniSwitch6850 17 }
+
+deviceOmniSwitch6850P48XL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48X Stackable switch consisting of
+        48 copper PoE Ports, 2 10 Gig ports, and 2 stacking ports.
+        Model Number: OS6850-P48XL
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.18 "
+    ::= { chassisOmniSwitch6850 18 }
+
+deviceOmniSwitch685024LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24 Lite upgraded version.
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.19 "
+    ::= { chassisOmniSwitch6850 19 }
+
+deviceOmniSwitch685048LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48 Lite upgraded version.
+        Model Number:
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.7.1.20 "
+    ::= { chassisOmniSwitch6850 20 }
+
+deviceOmniSwitch685024XLU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-24X Lite upgraded
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.21 "
+    ::= { chassisOmniSwitch6850 21 }
+
+deviceOmniSwitch685048XLU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-48X Lite upgraded version
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.22 "
+    ::= { chassisOmniSwitch6850 22 }
+
+deviceOmniSwitch6850P24LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24 Lite upgraded version
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.23 "
+    ::= { chassisOmniSwitch6850 23 }
+
+deviceOmniSwitch6850P48LU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48 Lite upgraded version
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.24 "
+    ::= { chassisOmniSwitch6850 24 }
+
+deviceOmniSwitch6850P24XLU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P24X Lite Upgraded version
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.25 "
+    ::= { chassisOmniSwitch6850 25 }
+
+deviceOmniSwitch6850P48XLU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6850-P48X Lite upgraded version
+        Model Number:
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.1.26 "
+    ::= { chassisOmniSwitch6850 26 }
+
+fansOmniSwitch6850 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Fan Trays."
+    ::= { familyOmniSwitch6850 2 }
+
+powersOmniSwitch6850 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6800 Series Power Supplies."
+    ::= { familyOmniSwitch6850 3 }
+
+powersOmniSwitch6850BPS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Omni Switch 6850 Series Backup Power supply.
+        Model Name: OS6850-BPS-PS
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.7.3.1 "
+    ::= { powersOmniSwitch6850 1 }
+
+modulesOmniSwitch6850 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6850 Series Modules."
+    ::= { familyOmniSwitch6850 4 }
+
+--------------------------------------------------------------------------------
+
+familyOmniSwitch9000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 8 }
+
+
+chassisOmniSwitch9000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Chassis."
+    ::= { familyOmniSwitch9000 1 }
+
+
+deviceOmniSwitch9700 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9700 10-Slot Chassis.
+        Model Name: OS9700
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.1 "
+    ::= { chassisOmniSwitch9000 1 }
+
+
+deviceOmniSwitch9800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9800 18-Slot Chassis.
+        Model Name: OS9800
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.2 "
+    ::= { chassisOmniSwitch9000 2 }
+
+
+deviceOmniSwitch9600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9600 5-Slot Chassis.
+        Model Name: OS9600
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.3 "
+    ::= { chassisOmniSwitch9000 3 }
+
+deviceOmniSwitch9700E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9700E 8-Slot Chassis.
+        Model Name: OS9700E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.4 "
+    ::= { chassisOmniSwitch9000 4 }
+
+deviceOmniSwitch9800E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9800E 16-Slot Chassis.
+        Model Name: OS9800E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.5 "
+    ::= { chassisOmniSwitch9000 5 }
+
+deviceOmniSwitch9600E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9600E 5-Slot Chassis.
+        Model Name: OS9600E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.1.6 "
+    ::= { chassisOmniSwitch9000 6 }
+
+
+fansOmniSwitch9000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Fan Trays."
+    ::= { familyOmniSwitch9000 2 }
+
+
+powersOmniSwitch9000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Power Supplies."
+    ::= { familyOmniSwitch9000 3 }
+
+
+modulesOmniSwitch9000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Modules."
+    ::= { familyOmniSwitch9000 4 }
+
+
+
+modulesOmniSwitch9000CM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9000 Series Chassis Management (CM) Modules."
+    ::= { modulesOmniSwitch9000 1 }
+
+
+
+cmmOmniSwitch9700 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9700 Series Chassis Management Module.
+        Model Name: OS9700-CMM
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.1"
+    ::= { modulesOmniSwitch9000CM 1 }
+
+
+cmmOmniSwitch9700PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9700 Series Chassis Management Module Processor.
+        Model Name: OS9700-CMM Processor
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.1.1"
+    ::= { cmmOmniSwitch9700 1 }
+
+
+cmmOmniSwitch9800 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9800 Series Chassis Management Module.
+        Model Name: OS9800-CMM
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.2"
+    ::= { modulesOmniSwitch9000CM 2 }
+
+
+cmmOmniSwitch9800PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9800 Series Chassis Management Module Processor.
+        Model Name: OS9800-CMM Processor
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.2.1 "
+    ::= { cmmOmniSwitch9800 1 }
+
+
+cmmOmniSwitch9600 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9600 Series Chassis Management Module.
+        Model Name: OS9600-CMM
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.3"
+    ::= { modulesOmniSwitch9000CM 3 }
+
+
+cmmOmniSwitch9600PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9600 Series Chassis Management Module Processor.
+        Model Name: OS9600-CMM Processor
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.1.3.1 "
+    ::= { cmmOmniSwitch9600 1 }
+
+
+modulesOmniSwitch9000NI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Network Interface (NI) Modules."
+    ::= { modulesOmniSwitch9000 2 }
+
+
+niOmniSwitch9000ENI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series 10/100BaseX Ethernet Network Interface (ENI) Modules."
+    ::= { modulesOmniSwitch9000NI 1 }
+
+
+niOmniSwitch9000GNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series 1000BaseX Ethernet Network Interface (GNI) Modules."
+    ::= { modulesOmniSwitch9000NI 2 }
+
+
+gniOmniSwitch9000C24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series .
+        Model Name: OS9-GNI-C24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.1 "
+    ::= { niOmniSwitch9000GNI 1 }
+
+
+gniOmniSwitch9000U24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9-GNI-U24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.2 "
+    ::= { niOmniSwitch9000GNI 2 }
+
+
+gniOmniSwitch9000U2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9-XNI-U2
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.3 "
+    ::= { niOmniSwitch9000GNI 3 }
+
+
+gniOmniSwitch9000U6 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9-XNI-U6
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.4 "
+    ::= { niOmniSwitch9000GNI 4 }
+
+gniOmniSwitch9000P24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9-GNI-P24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.5"
+    ::= { niOmniSwitch9000GNI 5 }
+
+
+gniOmniSwitch900048T OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9_GNI_C48T
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.6"
+    ::= { niOmniSwitch9000GNI 6 }
+
+
+gniOmniSwitch9000GC20L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9_GNI_C20L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.7"
+    ::= { niOmniSwitch9000GNI 7 }
+
+
+gniOmniSwitch9000EC20L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module.
+        Model Name: OS9_GNI_C20L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.8"
+    ::= { niOmniSwitch9000GNI 8 }
+
+
+gniOmniSwitchLockedC20L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Locked Ethernet Network Interface Module.
+        Model Name: OS9_ENI_LOCKED
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.9"
+    ::= { niOmniSwitch9000GNI 9 }
+
+
+
+gniOmniSwitch900048TE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9_GNI_C48T_E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.10"
+    ::= { niOmniSwitch9000GNI 10 }
+
+
+gniOmniSwitch9000EC20LE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9_GNI_C20L_E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.11"
+    ::= { niOmniSwitch9000GNI 11 }
+
+
+gniOmniSwitchLockedC20LE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Locked Ethernet Network Interface Module, FB1r2.
+        Model Name: OS9_ENI_LOCKED_E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.12"
+    ::= { niOmniSwitch9000GNI 12 }
+
+
+gniOmniSwitch9000C24E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series .
+        Model Name: OS9-GNI-C24-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.13"
+    ::= { niOmniSwitch9000GNI 13 }
+
+
+gniOmniSwitch9000P24E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9-GNI-P24-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.14"
+    ::= { niOmniSwitch9000GNI 14 }
+
+
+gniOmniSwitch9000U24E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9-GNI-U24-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.15"
+    ::= { niOmniSwitch9000GNI 15 }
+
+
+gniOmniSwitch9000GC20LE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9_GNI_C20L_E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.16"
+    ::= { niOmniSwitch9000GNI 16 }
+
+
+gniOmniSwitch9000U2E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module with FB1r2.
+        Model Name: OS9-XNI-U2-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.17"
+    ::= { niOmniSwitch9000GNI 17 }
+
+
+gniOmniSwitch9000U6E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module FB1r2.
+        Model Name: OS9-XNI-U6-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.18"
+    ::= { niOmniSwitch9000GNI 18 }
+
+gniOmniSwitch9000C24FJ2E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module TRIUMPH.
+        Model Name: OS9-GNI-C24-FJ2-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.19"
+    ::= { niOmniSwitch9000GNI 19 }
+
+gniOmniSwitch9000U24FJ2E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module TRIUMPH.
+        Model Name: OS9-GNI-U24-FJ2-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.20"
+    ::= { niOmniSwitch9000GNI 20 }
+
+
+gniOmniSwitch9000U2FJ2E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module TRIUMPH.
+        Model Name: OS9-XNI-U2-FJ2-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.21"
+    ::= { niOmniSwitch9000GNI 21 }
+
+
+gniOmniSwitch9000U12PlusFJ2E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Ethernet Network Interface Module SCORPION.
+        Model Name: OS9-XNI-U12Plus-FJ2-E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.8.4.2.2.23"
+    ::= { niOmniSwitch9000GNI 22 }
+
+
+niOmniSwitch9000IC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Network Interface Module Interface Cards (IC)."
+    ::= { modulesOmniSwitch9000NI 3 }
+
+niOmniSwitch9000DM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9000 Series Network Daughter Module (DM)."
+    ::= { modulesOmniSwitch9000NI 4 }
+
+
+---------------------------------------------------------------
+
+
+familyOmniSwitch6855 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 9 }
+
+chassisOmniSwitch6855 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6855 Series Switch."
+    ::= { familyOmniSwitch6855 1 }
+
+deviceOmniSwitch685514 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855-14 Industrial Grade Temperature Switch 
+        consisting of 12 copper GigE Ports and 2 Fiber ports.
+        Model Number: OS6855-14
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.9.1.1"
+    ::= { chassisOmniSwitch6855 1 }
+
+deviceOmniSwitch6855U10 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855-U10 Industrial Grade Temperature Switch
+        consisting of 2 copper GigE Ports and 8 Fiber ports.
+        Model Number: OS6855-U10-ITEMP
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.9.1.2"
+    ::= { chassisOmniSwitch6855 2 }
+
+deviceOmniSwitch685524 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855-24 Industrial Grade Temperature Switch 
+        consisting of 24 copper GigE Ports and 
+        4 Fiber_GigE/Copper_GigE combo ports.
+        Model Number: OS6855-24-ITEMP
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.9.1.3"
+    ::= { chassisOmniSwitch6855 3 }
+
+deviceOmniSwitch6855U24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855-U24 Industrial Grade Temperature Switch
+        consisting of 24 fiber ports and 
+        2 Fiber_GigE/Copper_GigE combo ports.
+        Model Number: OS6855-U24-ITEMP
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.9.1.4"
+    ::= { chassisOmniSwitch6855 4 }
+
+deviceOmniSwitch6855U24X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6855-U24X Industrial Grade LAN switch that has 24 fiber ports,
+        2 Fiber_GigE/Copper_GigE combo ports and 2 10gig ports that can be used 
+	either as stacking or uplink ports.
+        Model Number: OS6855-U24X-ITEMP
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.9.1.5"
+    ::= { chassisOmniSwitch6855 5 }
+
+
+fansOmniSwitch6855 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6855 Series Fan Trays."
+    ::= { familyOmniSwitch6855 2 }
+
+powersOmniSwitch6855 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6855 Series Power Supplies."
+    ::= { familyOmniSwitch6855 3 }
+
+modulesOmniSwitch6855 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6855 Series Modules."
+    ::= { familyOmniSwitch6855 4 }
+
+--------------------------------------------------------------------------------
+
+familyOmniSwitch6400 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 10 }
+
+chassisOmniSwitch6400 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6400 Series Chassis."
+    ::= { familyOmniSwitch6400 1 }
+
+deviceOmniSwitch640024 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-24 Stackable Switch consisting of
+        24 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6400-24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.1.1"
+    ::= { chassisOmniSwitch6400 1 }
+
+
+deviceOmniSwitch6400P24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-P24 Stackable Switch consisting of
+        24 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6400-P24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.1.2 "
+    ::= { chassisOmniSwitch6400 2 }
+
+deviceOmniSwitch6400U24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-U24 Stackable Switch consisting of 24
+        fiber GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports ,
+        and 2 stacking ports.
+        Model Number: OS6400-U24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.1.3 "
+    ::= { chassisOmniSwitch6400 3 }
+
+deviceOmniSwitch6400DU24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-DU24 Stackable Switch consisting of 24
+        fiber GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports ,
+        and 2 stacking ports, internal DC power suplly.
+        Model Number: OS6400-DU24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.1.4 "
+    ::= { chassisOmniSwitch6400 4 }
+
+deviceOmniSwitch640048 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-48 Stackable Switch consisting of
+        48 copper GigE Ports, 4 Fiber_GigE/Copper_GigE combo ports and
+        2 stacking ports.
+        Model Number: OS6400-48
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.800.1.1.2.1.10.1.5"
+    ::= { chassisOmniSwitch6400 5 }
+
+
+deviceOmniSwitch6400P48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6400-P48 Stackable Switch consisting of
+        48 copper PoE Ports, 4 Fiber_GigE/Copper_GigE combo ports, and 2 stacking ports.
+        Model Number: OS6400-P48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.1.6 "
+    ::= { chassisOmniSwitch6400 6 }
+
+fansOmniSwitch6400 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6400 Series Fan Trays."
+    ::= { familyOmniSwitch6400 2 }
+
+powersOmniSwitch6400 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6400 Series Power Supplies."
+    ::= { familyOmniSwitch6400 3 }
+
+powersOmniSwitch6400BPS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Omni Switch 6400 Series Backup Power supply.
+        Model Name: OS6400-BPS-PS
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.10.3.1 "
+    ::= { powersOmniSwitch6400 1 }
+
+modulesOmniSwitch6400 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6400 Series Modules."
+    ::= { familyOmniSwitch6400 4 }
+
+--------------------------------------------------------------------------------
+
+familyOmniSwitch6250 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 11 }
+
+chassisOmniSwitch6250M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6250 Series Metro Stackable Switch."
+    ::= { familyOmniSwitch6250 1 }
+
+chassisOmniSwitch6250ENT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6250 Series Enterprise Stackable Switch."
+    ::= { familyOmniSwitch6250 2 }
+
+-- Metro Models
+
+deviceOmniSwitch62508M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250-8M Metro Stackable Switch consisting of
+        8 copper FastE Ports, 2 Fiber_GigE/Copper_GigE combo ports
+                and 2 Fiber_GigE user/stacking ports.
+        Model Number: OS6250-8M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.1.1"
+    ::= { chassisOmniSwitch6250M 1 }
+
+deviceOmniSwitch625024M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250-24M Metro Stackable Switch consisting of
+        24 copper FastE Ports, 2 Fiber_GigE/Copper_GigE combo ports
+                and 2 Fiber_GigE user/stacking ports.
+        Model Number: OS6250-24M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.1.2"
+    ::= { chassisOmniSwitch6250M 2 }
+
+deviceOmniSwitch625024MD OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250-24M Metro Stackable Switch consisting of
+        24 copper FastE Ports, 2 Fiber_GigE/Copper_GigE combo ports,
+                2 Fiber_GigE user/stacking ports and DC power.
+        Model Number: OS6250-24MD
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.1.3"
+    ::= { chassisOmniSwitch6250M 3 }
+
+-- Enterprise Models
+
+deviceOmniSwitch625024ENT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250-24 Stackable Switch consisting of
+        24 copper FastE Ports, 2 Fiber_GigE/Copper_GigE combo ports and
+        2 HDMI stacking ports.
+        Model Number: OS6250-24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.2.1"
+    ::= { chassisOmniSwitch6250ENT 1 }
+
+deviceOmniSwitch6250P24ENT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6250-P24 Stackable Switch consisting of
+        24 copper PoE Ports, 2 Fiber_GigE/Copper_GigE combo ports and
+        2 HDMI stacking ports.
+        Model Number: OS6250-P24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.2.2"
+    ::= { chassisOmniSwitch6250ENT 2 }
+
+fansOmniSwitch6250 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6250 Series Fan Trays."
+    ::= { familyOmniSwitch6250 3 }
+
+powersOmniSwitch6250 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6250 Series Power Supplies."
+    ::= { familyOmniSwitch6250 4 }
+
+powersOmniSwitch6250BPS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Omni Switch 6250 Series Backup Power supply.
+        Model Name: OS6250-BPS-PS
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.800.1.1.2.1.11.4.1"
+    ::= { powersOmniSwitch6250 1 }
+
+modulesOmniSwitch6250 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6250 Series Modules."
+    ::= { familyOmniSwitch6250 5 }
+
+END

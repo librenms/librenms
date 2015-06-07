@@ -1,0 +1,469 @@
+ENTERASYS-RESOURCE-UTILIZATION-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Resource usage monitoring.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright Aug, 2004 Enterasys Networks, Inc.
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+   
+etsysResourceUtilizationMIB MODULE-IDENTITY
+    LAST-UPDATED "200411301633Z"  -- Tue Nov 30 16:33 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This module provides authoritative definitions for
+         Enterasys Networks' Resource Utilization MIB."
+    
+    REVISION    "200411301633Z"  -- Tue Nov 30 16:33 GMT 2004
+    DESCRIPTION "The initial version of this MIB module"
+    ::= { etsysModules 49 } 
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+ResourceStorageType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This data type is used as the syntax of the 
+         etsysResourceStorageType object in the definition
+         of the etsysResourceStorageTable.
+  
+         other(1)  storage type not defined by textual convention
+         ram(2)    volatile storage 
+         flash(3)  nonvolatile storage"
+
+    SYNTAX INTEGER {
+                     other(1),
+                     ram(2),
+                     flash(3)
+                   }
+
+ResourceUtilization ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This data type is used as the syntax for objects which
+         report the utilization of a resource as a percentage of
+         a defined period of time. Each value embeds the first
+         digit to the right of the decimal, 1/10ths of a percent, 
+         by multiplying the utilization by 10.  For example, a 
+         utilization of 95.7 encodes to a ResourceUtilization value 
+         of 957."
+    SYNTAX Integer32 (0..1000) 
+
+
+-- ---------------------------------------------------------- --
+-- branches in the ENTERASYS-RESOURCE-UTILIZATION-MIB
+-- ---------------------------------------------------------- --
+
+etsysResourceUtilizationObjects
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationMIB 1 }
+
+etsysResourceUtilizationNotifications
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationObjects 0 }
+
+etsysResourceCpu
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationObjects 1 }
+
+etsysResourceProcess
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationObjects 2 }
+
+etsysResourceStorage
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationObjects 3 }
+
+etsysResourceScalars
+    OBJECT IDENTIFIER ::= { etsysResourceUtilizationObjects 4 }
+
+  
+-- -------------------------------------------------------------
+-- Objects in the etsysResourceCpuGroup 
+-- -------------------------------------------------------------
+
+etsysResourceCpuTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysResourceCpuEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of processors contained in the chassis."
+    ::= { etsysResourceCpu 1 }
+
+etsysResourceCpuEntry OBJECT-TYPE
+    SYNTAX     EtsysResourceCpuEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a processor contained in the system.
+         The entPhysicalIndex represents the chassis module 
+         the processor is contained in." 
+    INDEX { entPhysicalIndex,
+            etsysResourceCpuId }
+    ::= { etsysResourceCpuTable 1 }
+
+EtsysResourceCpuEntry ::=
+    SEQUENCE {   
+        etsysResourceCpuId             Unsigned32,
+        etsysResourceCpuLoad5sec       ResourceUtilization, 
+        etsysResourceCpuLoad1min       ResourceUtilization, 
+        etsysResourceCpuLoad5min       ResourceUtilization   
+    }
+
+etsysResourceCpuId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A value assigned to the processor. Each value needs only to
+         be unique for the module identified by the entPhysicalIndex
+         of this entry."
+    ::= { etsysResourceCpuEntry 1 }
+
+etsysResourceCpuLoad5sec OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 5 seconds, of the percentage
+         of time that this processor was not idle."
+    ::= { etsysResourceCpuEntry 2 }
+
+etsysResourceCpuLoad1min OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 1 minute, of the percentage
+         of time that this processor was not idle."
+    ::= { etsysResourceCpuEntry 3 }
+
+etsysResourceCpuLoad5min OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 5 minutes, of the percentage
+         of time that this processor was not idle."
+    ::= { etsysResourceCpuEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Objects in the etsysResourceProcessGroup 
+-- -------------------------------------------------------------
+
+etsysResourceProcessTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysResourceProcessEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of processes running in the chassis." 
+    ::= { etsysResourceProcess 1 }
+
+etsysResourceProcessEntry OBJECT-TYPE
+    SYNTAX     EtsysResourceProcessEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a  process running in the chassis.
+         The etsysResourceCpuId identifies the processor 
+         the process is running in. " 
+    INDEX { entPhysicalIndex,
+            etsysResourceCpuId,
+            etsysResourceProcessID }
+    ::= { etsysResourceProcessTable 1 }
+
+EtsysResourceProcessEntry ::= SEQUENCE {
+    etsysResourceProcessID        Unsigned32,
+    etsysResourceProcessName      SnmpAdminString,
+    etsysResourceProcessLoad5sec  ResourceUtilization, 
+    etsysResourceProcessLoad1min  ResourceUtilization, 
+    etsysResourceProcessLoad5min  ResourceUtilization }
+
+etsysResourceProcessID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION     
+        "A value assigned to the process. This value is only unique 
+         per processor, not per chassis." 
+    ::= { etsysResourceProcessEntry 1 }
+      
+etsysResourceProcessName OBJECT-TYPE
+    SYNTAX     SnmpAdminString 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual description of this running process."
+    ::= { etsysResourceProcessEntry 2 }
+
+etsysResourceProcessLoad5sec OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 5 seconds, of the percentage
+         of time that this process was not idle."
+    ::= { etsysResourceProcessEntry 3 }
+
+etsysResourceProcessLoad1min OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 1 minute, of the percentage
+         of time that this process was not idle."
+    ::= { etsysResourceProcessEntry 4 }
+
+etsysResourceProcessLoad5min OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The average, over the last 5 minutes, of the percentage
+         of time that this process was not idle."
+    ::= { etsysResourceProcessEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- Objects in the etsysResourceStorage
+-- -------------------------------------------------------------
+
+etsysResourceStorageTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysResourceStorageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The Table of storage utilization in the chassis."
+    ::= { etsysResourceStorage 1 }
+
+etsysResourceStorageEntry OBJECT-TYPE
+    SYNTAX     EtsysResourceStorageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry for one storage area in the chassis."
+    INDEX { entPhysicalIndex,
+            etsysResourceStorageType,
+            etsysResourceStorageTypeID }
+    ::= { etsysResourceStorageTable 1 } 
+
+EtsysResourceStorageEntry ::=
+    SEQUENCE {      
+        etsysResourceStorageType      ResourceStorageType,
+        etsysResourceStorageTypeID    Unsigned32,
+        etsysResourceStorageDescr     SnmpAdminString,
+        etsysResourceStorageSize      Unsigned32,
+        etsysResourceStorageAvailable Unsigned32
+    }
+
+etsysResourceStorageType OBJECT-TYPE
+    SYNTAX     ResourceStorageType
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "The type of storage represented by this entry."
+    ::= { etsysResourceStorageEntry 1 }
+
+etsysResourceStorageTypeID OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "A unique arbitrary value per storage type assigned to the
+         entry."
+    ::= { etsysResourceStorageEntry 2 }
+
+etsysResourceStorageDescr OBJECT-TYPE
+    SYNTAX     SnmpAdminString 
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+        "A textual description of this storage area." 
+    ::= { etsysResourceStorageEntry 3 }
+  
+etsysResourceStorageSize OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The size, in Kilobytes, of the storage area."
+    ::= { etsysResourceStorageEntry 4 }
+
+etsysResourceStorageAvailable OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The available space, in Kilobytes, left on the storage area."
+    ::= { etsysResourceStorageEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- Objects in the etsysResourceScalarsGroup 
+-- -------------------------------------------------------------
+
+etsysResource1minThreshold OBJECT-TYPE
+    SYNTAX     ResourceUtilization 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The threshold for generating
+         etsysResourceLoad1minThresholdExceeded  Notifications. 
+
+         Setting this object to 0 will prevent the agent from
+         generating etsysResourceCpuLoad1minThresholdExceeded 
+         notifications. 
+
+         When this object is set to a nonzero value, the agent will 
+         generate etsysResourceLoad1minThresholdExceeded notifications 
+         when it is detected that an etsysResourceCpuLoad1min object 
+         value has exceeded this threshold value. After the threshold 
+         has been exceeded additional notifications will be sent once 
+         a minute until the corresponding etsysResourceCpuLoad1min 
+         drops back below the threshold."
+    DEFVAL { 800 }
+    ::= { etsysResourceScalars 1 }
+
+
+-- -------------------------------------------------------------
+-- Notifications  
+-- -------------------------------------------------------------
+
+etsysResourceCpuLoad1minThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS    { etsysResourceCpuLoad1min }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the average, over the last 
+         1 minute, of the percentage of time that a processor was not 
+         idle, has exceeded the etsysResourceCpuLoad1minThreshold 
+         value."
+    ::= { etsysResourceUtilizationNotifications 1 }
+        
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysResourceUtilizationConformance  OBJECT IDENTIFIER
+    ::= { etsysResourceUtilizationMIB 2 }
+
+etsysResourceUtilizationGroups       OBJECT IDENTIFIER
+    ::= { etsysResourceUtilizationConformance 1 }
+
+etsysResourceUtilizationCompliances  OBJECT IDENTIFIER
+    ::= { etsysResourceUtilizationConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysResourceUtilizationCpuGroup OBJECT-GROUP
+    OBJECTS { etsysResourceCpuLoad5sec,
+              etsysResourceCpuLoad1min, 
+              etsysResourceCpuLoad5min }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic instrumentation of
+         CPU Resource Utilization."
+    ::= { etsysResourceUtilizationGroups 1 }
+
+etsysResourceUtilizationProcessGroup OBJECT-GROUP 
+    OBJECTS { etsysResourceProcessName,
+              etsysResourceProcessLoad5sec,
+              etsysResourceProcessLoad1min,
+              etsysResourceProcessLoad5min }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic instrumentation of 
+         Process Resource Utilization."
+    ::= { etsysResourceUtilizationGroups 2 }
+
+etsysResourceUtilizationStorageGroup OBJECT-GROUP
+    OBJECTS { etsysResourceStorageDescr,
+              etsysResourceStorageSize, 
+              etsysResourceStorageAvailable }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic instrumentation of  
+         Storage Resource Utilization."
+    ::= { etsysResourceUtilizationGroups 3 }
+
+etsysResourceUtilizationNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { etsysResourceCpuLoad1minThresholdExceeded }
+    STATUS current
+    DESCRIPTION
+        "The utilization threshold exceeded Notification."
+    ::= { etsysResourceUtilizationGroups 4 }
+
+etsysResourceUtilizationScalarsGroup OBJECT-GROUP
+    OBJECTS { etsysResource1minThreshold }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic instrumentation for  
+         Threshold configuration."
+    ::= { etsysResourceUtilizationGroups 5 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysResourceUtilizationCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+       "The compliance statement for devices that
+        support the Enterasys Resource Utilization MIB."
+    MODULE
+    MANDATORY-GROUPS { 
+        etsysResourceUtilizationCpuGroup,
+        etsysResourceUtilizationProcessGroup,
+        etsysResourceUtilizationStorageGroup, 
+        etsysResourceUtilizationNotificationGroup,
+        etsysResourceUtilizationScalarsGroup } 
+    ::= { etsysResourceUtilizationCompliances 1 }
+
+END

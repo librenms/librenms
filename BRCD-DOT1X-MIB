@@ -1,0 +1,590 @@
+BRCD-DOT1X-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Unsigned32
+	   	FROM SNMPv2-SMI				-- [RFC2578]
+	ifIndex
+	   	FROM IF-MIB					-- [RFC2863]
+	MacAddress
+	   	FROM SNMPv2-TC				-- [RFC2579]
+       InetAddressType, InetAddress
+       	FROM INET-ADDRESS-MIB		-- [RFC4001]
+	EnabledStatus
+		FROM P-BRIDGE-MIB
+       SnmpAdminString
+        	FROM SNMP-FRAMEWORK-MIB; 	-- [RFC3411]
+
+brcdDot1xAuth MODULE-IDENTITY
+	LAST-UPDATED "201009300000Z" -- September 30, 2010
+	ORGANIZATION "Brocade Communications Systems, Inc."
+	CONTACT-INFO
+		"Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+	DESCRIPTION
+		"Management Information for configuration /querying of 802.1x authentication
+			It is grouped into five MIBs -
+			1. Global level configurable admin /status 802.1x information
+			2. Port level EAPOL statistics information
+			3. Port level configuration information
+			4. Different Port state information and
+			5. 802.1x mac session information
+		Copyright 1996-2010 Brocade Communications Systems, Inc.
+  		All rights reserved.
+  		This Brocade Communications Systems SNMP Management Information Base Specification
+ 		embodies Brocade Communications Systems' confidential and proprietary
+ 		intellectual property. Brocade Communications Systems retains all
+  		title and ownership in the Specification, including any revisions.
+
+ 		This Specification is supplied AS IS, and Brocade Communications Systems makes
+ 		no warranty, either express or implied, as to the use,
+ 		operation, condition, or performance of the specification, and any unintended
+ 		consequence it may on the user environment."
+	REVISION     "201009300000Z" -- September 30, 2010
+	DESCRIPTION
+		""
+ ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) products(1) switch(1) snSwitch(3) 38 }
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+
+-- ---------------------------------------------------------- --
+-- groups in the Dot1x MIB
+-- ---------------------------------------------------------- --
+brcdDot1xAuthGlobalConfigGroup	OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 1 }
+brcdDot1xAuthPortStatistics	OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 2 }
+brcdDot1xAuthPortConfig		OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 3 }
+brcdDot1xAuthPortState		OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 4 }
+brcdDot1xAuthMacSession		OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 5 }
+brcdDot1xAuthGlobalAdminGroup	OBJECT IDENTIFIER  ::=  { brcdDot1xAuth 6 }
+
+brcdDot1xAuthGlobalConfigQuietperiod	OBJECT-TYPE
+	SYNTAX			Unsigned32 (1..4294967294)
+	UNITS       		"seconds"
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"When the Brocade device is unable to authenticate a Client,
+					the	amount of time the Brocade device waits before trying
+					again.. The allowed range is from 1 to 4294967294"
+	DEFVAL			{ 60 }
+	::= { brcdDot1xAuthGlobalConfigGroup 1 }
+
+brcdDot1xAuthGlobalConfigTxPeriod	OBJECT-TYPE
+	SYNTAX			Unsigned32 (1..4294967294)
+	UNITS       		"seconds"
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"When a Client does not send back an EAP(Extensible
+					Authentication Protocol)-response/identity
+					frame, the amount of time the Brocade device waits before
+					retransmitting the EAP-request/identity frame to a Client
+					The allowed range is from 1 to 4294967294"
+	DEFVAL			{ 30 }
+	::= { brcdDot1xAuthGlobalConfigGroup 2 }
+
+brcdDot1xAuthGlobalConfigSuppTimeOut	OBJECT-TYPE
+	SYNTAX			Unsigned32 (1..4294967294)
+	UNITS       		"seconds"
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"When a supplicant (Client) does not respond to an
+					EAP-request frame, the amount of time before the Brocade
+					device retransmits the frame
+					The allowed range is from 1 to 4294967294"
+	DEFVAL			{ 30 }
+	::= { brcdDot1xAuthGlobalConfigGroup 3 }
+
+brcdDot1xAuthGlobalConfigAuthServerTimeOut	OBJECT-TYPE
+	SYNTAX			Unsigned32 (1..4294967294)
+	UNITS       		"seconds"
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"When the Authentication Server (RADIUS) does not respond
+					to a message sent from the Client, the amount of time before
+					the Brocade device retransmits the message.
+					The allowed range is from 1 to 4294967294"
+	DEFVAL			{ 2 }
+	::= { brcdDot1xAuthGlobalConfigGroup 4 }
+
+brcdDot1xAuthGlobalConfigMaxReq		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"The number of times the Brocade device retransmits an
+					EAP-request/identity request frame if it does not receive
+					an EAP-response/identity response frame from a Client"
+	DEFVAL			{ 2 }
+	::= { brcdDot1xAuthGlobalConfigGroup 5 }
+
+brcdDot1xAuthGlobalConfigReAuthMax		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"The number of re-authentication attempts that are
+					permitted before the port becomes Unauthorized"
+	DEFVAL			{ 2 }
+	::= { brcdDot1xAuthGlobalConfigGroup 6 }
+
+brcdDot1xAuthGlobalConfigReAuthPeriod	OBJECT-TYPE
+	SYNTAX			Unsigned32 (1..4294967294)
+	UNITS       		"seconds"
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"How often the device automatically re-authenticates
+					clients when periodic re-authentication is enabled
+				 The allowed range is from 1 to 4294967294"
+	DEFVAL			{ 3600 }
+	::= { brcdDot1xAuthGlobalConfigGroup 7 }
+
+brcdDot1xAuthGlobalConfigProtocolVersion	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The EAP protocol version"
+	 ::= { brcdDot1xAuthGlobalConfigGroup 8 }
+
+brcdDot1xAuthGlobalConfigTotalPortsEnabled	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The total number of ports that have 802.1x enabled"
+	::= { brcdDot1xAuthGlobalConfigGroup 9 }
+
+brcdDot1xAuthGlobalConfigReauthStatus	OBJECT-TYPE
+	SYNTAX			EnabledStatus
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"Used to enable / disable Reauthentication globally"
+	DEFVAL			{ disabled }
+	::= {brcdDot1xAuthGlobalConfigGroup 10 }
+
+brcdDot1xAuthGlobalConfigMacSessionMaxAge		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"The Max-Age of the 802.1x mac session-
+					A value between 0 and 65535"
+	::= {brcdDot1xAuthGlobalConfigGroup 11 }
+
+brcdDot1xAuthGlobalConfigNoAgingDeniedSessions	OBJECT-TYPE
+	SYNTAX				EnabledStatus
+	MAX-ACCESS			read-write
+	STATUS				current
+	DESCRIPTION			"Enable / Disable Mac-Session-No Aging
+						for Denied  sessions"
+	DEFVAL			{ disabled }
+	::= {brcdDot1xAuthGlobalConfigGroup 12 }
+
+brcdDot1xAuthGlobalConfigNoAgingPermittedSessions	OBJECT-TYPE
+	SYNTAX				EnabledStatus
+	MAX-ACCESS			read-write
+	STATUS				current
+	DESCRIPTION			"Enable / Disable Mac-Session-No Aging
+						for Permitted sessions"
+	DEFVAL			{ disabled }
+	::= {brcdDot1xAuthGlobalConfigGroup 13 }
+
+brcdDot1xAuthGlobalConfigAuthFailAction	OBJECT-TYPE
+	SYNTAX							INTEGER { blockTraffic(1),
+                  									restrictedVlan(2) }
+	MAX-ACCESS						read-write
+	STATUS							current
+	DESCRIPTION						"To Configure the action to take when the authentication fails"
+
+::= {brcdDot1xAuthGlobalConfigGroup 14 }
+
+---802.1x Per Port Statistics Table
+
+brcdDot1xAuthPortStatTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BrcdDot1xAuthPortStatEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"A table that contains port EAP(Extensible Authentication
+					Protocol) frames statistics for 802.1x authentication"
+	::= { brcdDot1xAuthPortStatistics 1 }
+
+brcdDot1xAuthPortStatEntry		OBJECT-TYPE
+	 SYNTAX			BrcdDot1xAuthPortStatEntry
+	 MAX-ACCESS		not-accessible
+	 STATUS			current
+	 DESCRIPTION	"An entry of EAP frames statistics indexed by ifIndex"
+	 INDEX			{ifIndex  }
+	 ::= { brcdDot1xAuthPortStatTable 1 }
+
+
+BrcdDot1xAuthPortStatEntry  ::= SEQUENCE {
+	brcdDot1xAuthPortStatRxEAPFrames				Counter32,
+	brcdDot1xAuthPortStatTxEAPFrames				Counter32,
+	brcdDot1xAuthPortStatRxEAPStartFrames			Counter32,
+	brcdDot1xAuthPortStatRxEAPLogOffFrames			Counter32,
+	brcdDot1xAuthPortStatRxEAPRespIdFrames			Counter32,
+	brcdDot1xAuthPortStatTxEAPReqIdFrames			Counter32,
+	brcdDot1xAuthPortStatRxEAPInvalidFrames			Counter32,
+	brcdDot1xAuthPortStatEAPLastFrameVersionRx	 	Unsigned32,
+	brcdDot1xAuthPortStatRxEAPRespOrIdFrames		Counter32,
+	brcdDot1xAuthPortStatRxLengthErrorFrame			Integer32,
+	brcdDot1xAuthPortStatTxRequestFrames			Counter32,
+	brcdDot1xAuthPortStatLastEAPFrameSource		MacAddress
+ }
+
+brcdDot1xAuthPortStatRxEAPFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The total number of EAPOL frames received on the port
+				  	It includes EAP frames - "
+	::= { brcdDot1xAuthPortStatEntry 1 }
+
+brcdDot1xAuthPortStatTxEAPFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The no of EAPOL frames transmitted on the port"
+	::= { brcdDot1xAuthPortStatEntry 2 }
+
+brcdDot1xAuthPortStatRxEAPStartFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of EAPOL-Start frames received on the port"
+	::= { brcdDot1xAuthPortStatEntry 3 }
+
+brcdDot1xAuthPortStatRxEAPLogOffFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of EAPOL-Logoff frames received on the port"
+	::= { brcdDot1xAuthPortStatEntry 4 }
+
+brcdDot1xAuthPortStatRxEAPRespIdFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of  EAP frames other than Response/Identity
+					frames received on the port"
+	::= { brcdDot1xAuthPortStatEntry 5 }
+
+brcdDot1xAuthPortStatTxEAPReqIdFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of EAP-Request/Identity frames transmitted on
+					the port"
+	::= { brcdDot1xAuthPortStatEntry 6 }
+
+brcdDot1xAuthPortStatRxEAPInvalidFrames	OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of invalid EAPOL frames received on the port"
+	::= { brcdDot1xAuthPortStatEntry 7 }
+
+brcdDot1xAuthPortStatEAPLastFrameVersionRx		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The version of last EAP frame received"
+	::= { brcdDot1xAuthPortStatEntry 8 }
+
+brcdDot1xAuthPortStatRxEAPRespOrIdFrames		OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of  received EAP response or Id frames on the
+					port"
+	::= { brcdDot1xAuthPortStatEntry 9 }
+
+brcdDot1xAuthPortStatRxLengthErrorFrame		OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The received EAP Length Error frame"
+	::= { brcdDot1xAuthPortStatEntry 10 }
+
+brcdDot1xAuthPortStatTxRequestFrames		OBJECT-TYPE
+	SYNTAX			Counter32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of  transmitted EAP request frames on the port"
+	::= { brcdDot1xAuthPortStatEntry 11 }
+
+brcdDot1xAuthPortStatLastEAPFrameSource OBJECT-TYPE
+	SYNTAX			MacAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The MAC address of the source from which the last EAP frame came"
+        ::= {brcdDot1xAuthPortStatEntry 12}
+
+---A table of 802.1x dynamic states that the port is currently in..
+
+brcdDot1xAuthPortStateTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BrcdDot1xAuthPortStateEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"A table that contains entries of port dot1x values"
+	::= { brcdDot1xAuthPortState 1 }
+
+brcdDot1xAuthPortStateEntry 			OBJECT-TYPE
+	SYNTAX			BrcdDot1xAuthPortStateEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"An entry of 802.1x config values indexed by ifIndex to
+					be able to have port values"
+		INDEX		{ ifIndex }
+	::= { brcdDot1xAuthPortStateTable 1 }
+
+BrcdDot1xAuthPortStateEntry ::= SEQUENCE {
+	brcdDot1xAuthPortStateMacSessions			Unsigned32,
+	brcdDot1xAuthPortStateAuthMacSessions		Unsigned32,
+	brcdDot1xAuthPortStateOriginalPVID			Unsigned32,
+	brcdDot1xAuthPortStatePVIDMacTotal			Unsigned32,
+	brcdDot1xAuthPortStatePVIDMacAuthorized		Unsigned32,
+	brcdDot1xAuthPortStatePortVlanState			INTEGER,
+	brcdDot1xAuthPortStatePVID					Unsigned32,
+	brcdDot1xAuthPortStateRestrictPVID			Unsigned32,
+	brcdDot1xAuthPortStateRadiusAssignPVID		Unsigned32
+	}
+
+brcdDot1xAuthPortStateMacSessions	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"Number of 802.1x MAC sessions per port"
+	::= { brcdDot1xAuthPortStateEntry 1 }
+
+brcdDot1xAuthPortStateAuthMacSessions	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"Number of Authorized MAC sessions per port"
+	::= { brcdDot1xAuthPortStateEntry 2 }
+
+brcdDot1xAuthPortStateOriginalPVID	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"Originally configured(not dynamically assigned)
+					PVID(port's default VLAN ID) for the port"
+	::= { brcdDot1xAuthPortStateEntry 3}
+
+brcdDot1xAuthPortStatePVIDMacTotal	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of devices transmitting untagged traffic
+					 on the port's PVID"
+	::= { brcdDot1xAuthPortStateEntry 4 }
+
+brcdDot1xAuthPortStatePVIDMacAuthorized 	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The number of devices transmitting untagged traffic
+					on the port's PVID as a result of dynamic VLAN assignment"
+	::= { brcdDot1xAuthPortStateEntry 5 }
+
+brcdDot1xAuthPortStatePortVlanState	 OBJECT-TYPE
+	SYNTAX			INTEGER { radius(1), restricted(2), normal(3) }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The Current Vlan state the port is in, which can be
+					RADIUS -The port's PVID was dynamically assigned by a RADIUS server
+					Restricted - The port's PVID is the restricted VLAN Normal - The port's PVID is not set by a RADIUS server,
+					nor is it the restricted VLAN"
+	::= { brcdDot1xAuthPortStateEntry 6 }
+
+brcdDot1xAuthPortStatePVID		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The Dot1x Authentication default Port VLAN Id"
+	::= { brcdDot1xAuthPortStateEntry 7 }
+
+brcdDot1xAuthPortStateRestrictPVID	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"Restrict  PVID"
+	::= { brcdDot1xAuthPortStateEntry 8 }
+
+brcdDot1xAuthPortStateRadiusAssignPVID		OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"RADIUS assign PVID"
+	::= { brcdDot1xAuthPortStateEntry 9 }
+
+--- A table of port configuration parameters for 802.1x authentication
+
+brcdDot1xAuthPortConfigTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BrcdDot1xAuthPortConfigEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"A table that allows configuration of dot1x values for a given port"
+	::= { brcdDot1xAuthPortConfig  1 }
+
+brcdDot1xAuthPortConfigEntry 			OBJECT-TYPE
+	SYNTAX			BrcdDot1xAuthPortConfigEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"An entry of 802.1x config values"
+	INDEX		{ ifIndex }
+	::= { brcdDot1xAuthPortConfigTable 1 }
+
+BrcdDot1xAuthPortConfigEntry ::= SEQUENCE {
+	brcdDot1xAuthPortConfigPortControl			INTEGER,
+	brcdDot1xAuthPortConfigFilterStrictSec		EnabledStatus,
+	brcdDot1xAuthPortConfigDot1xOnPort			EnabledStatus
+	}
+
+brcdDot1xAuthPortConfigPortControl		OBJECT-TYPE
+	SYNTAX			INTEGER	{ forceUnauthorized(1), controlauto(2), forceAuthorized(3)}
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"The configured port control type
+					for the interface which can be
+					1. force-unauthorized - port's controlled port is placed
+					unconditionally in the unauthorized state
+					2. control-auto - the controlled port is unauthorized
+					until authentication takes place between client and RADIUS
+					3. force-authorized - the port's controlled port is placed
+					unconditionally in the authorized state"
+
+			::= { brcdDot1xAuthPortConfigEntry 1 }
+
+brcdDot1xAuthPortConfigFilterStrictSec	OBJECT-TYPE
+	SYNTAX			EnabledStatus
+	MAX-ACCESS 	read-write
+	STATUS			current
+	DESCRIPTION		"To configure  filter strict security
+					on the interface - enable(1) or disable(0)"
+	::= { brcdDot1xAuthPortConfigEntry 2 }
+
+brcdDot1xAuthPortConfigDot1xOnPort			OBJECT-TYPE
+	SYNTAX			EnabledStatus
+	MAX-ACCESS 	read-write
+	STATUS			current
+	DESCRIPTION		"To Configure (enable / disable) 802.1x  on an interface level"
+	::= { brcdDot1xAuthPortConfigEntry 3 }
+
+---A table that contains 802.1x mac-sessions
+
+brcdDot1xAuthMacSessionTable	OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BrcdDot1xAuthMacSessionEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"A table that contains 802.1x MAC sessions"
+	::= { brcdDot1xAuthMacSession 1}
+
+brcdDot1xAuthMacSessionEntry  	OBJECT-TYPE
+	SYNTAX			BrcdDot1xAuthMacSessionEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"An entry containing information applicable to
+					a particular interface and client MAC ie., dot1x-mac-session "
+	INDEX			 { ifIndex, brcdDot1xAuthMacSessionAuthMac }
+	::= { brcdDot1xAuthMacSessionTable 1 }
+
+BrcdDot1xAuthMacSessionEntry ::=
+	SEQUENCE {
+	brcdDot1xAuthMacSessionAuthMac		MacAddress,
+	brcdDot1xAuthMacSessionUserName		SnmpAdminString,
+	brcdDot1xAuthMacSessionIncomingVlanId	VlanId,
+	brcdDot1xAuthMacSessionCurrentVlanId	VlanId,
+	brcdDot1xAuthMacSessionAccessStatus	INTEGER,
+	brcdDot1xAuthMacSessionMaxAge		Unsigned32,
+	brcdDot1xAuthMacSessionAddrType		InetAddressType,
+	brcdDot1xAuthMacSessionIpAddr			InetAddress,
+	brcdDot1xAuthMacSessionAging			INTEGER
+	}
+
+brcdDot1xAuthMacSessionAuthMac	OBJECT-TYPE
+	SYNTAX			MacAddress
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"Mac address of the client - which
+					basically represents the username used for RADIUS authentication"
+	::= { brcdDot1xAuthMacSessionEntry 1 }
+
+brcdDot1xAuthMacSessionUserName		OBJECT-TYPE
+	SYNTAX			SnmpAdminString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"User name of the 802.1x mac session"
+	::= { brcdDot1xAuthMacSessionEntry 2 }
+
+brcdDot1xAuthMacSessionIncomingVlanId                  OBJECT-TYPE
+	SYNTAX				VlanId
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION			"Incoming VLAN ID"
+	::= { brcdDot1xAuthMacSessionEntry 3 }
+
+brcdDot1xAuthMacSessionCurrentVlanId 	OBJECT-TYPE
+	SYNTAX			VlanId
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The VLAN to which the port is currently assigned"
+	::= { brcdDot1xAuthMacSessionEntry 4 }
+
+brcdDot1xAuthMacSessionAccessStatus 	OBJECT-TYPE
+	SYNTAX			INTEGER { permit(1), blocked(2), restrict(3), init(4) }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The authentication state of the dot1x-mac-session - which
+					can be permitted, denied, restricted or in the Init state"
+	::= { brcdDot1xAuthMacSessionEntry 5 }
+
+brcdDot1xAuthMacSessionMaxAge	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"MAX Age of the mac session in which
+					  the MAC address is authenticated."
+	::= { brcdDot1xAuthMacSessionEntry 6 }
+
+brcdDot1xAuthMacSessionAddrType	 OBJECT-TYPE
+	SYNTAX			InetAddressType
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"Client(supplicant) IP address Type. Supported address types
+					are ipv4(1) and ipv6(2)"
+	DEFVAL	{ ipv4 }
+	::= { brcdDot1xAuthMacSessionEntry 7 }
+
+brcdDot1xAuthMacSessionIpAddr			OBJECT-TYPE
+	SYNTAX			InetAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The IP Address of the client"
+	::= { brcdDot1xAuthMacSessionEntry 8 }
+
+brcdDot1xAuthMacSessionAging		OBJECT-TYPE
+	SYNTAX			INTEGER { software(1), hardware(2), ena(3), notapplicable(4) }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The age's type - Hardware
+					 or Software aging, Ena in which case
+					 the aging hasn't started, or notapplicable when
+					 there is a fake 802.1x mac session"
+	::= { brcdDot1xAuthMacSessionEntry 9 }
+
+---A scalar belonging to brcdDot1xAuthGlobalAdminGroup
+
+brcdDot1xAuthGlobalAdminConfigStatus OBJECT-TYPE
+	SYNTAX			EnabledStatus
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION		"Used to enable /disable 802.1x authentication globally"
+	DEFVAL			{ disabled }
+	::= { brcdDot1xAuthGlobalAdminGroup 1}
+
+END

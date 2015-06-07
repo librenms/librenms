@@ -1,0 +1,37 @@
+HP-BASE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	MODULE-IDENTITY				FROM SNMPv2-SMI
+	enterprises				FROM RFC1155-SMI;
+
+    hpicfAccess MODULE-IDENTITY
+	LAST-UPDATED "200501311355Z"
+	ORGANIZATION "Hewlett Packard Company,
+                     ProCurve Networking Business"
+	CONTACT-INFO "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+    DESCRIPTION  "This MIB module describes devices in the HP Procurve
+                     700 series product line."
+    REVISION     "200501311355Z"  -- January 31, 2005
+    DESCRIPTION  "Modified to reflect new OID hierarchy for 
+                  HP J8162A XL Access Controller Module."                     
+	::= { hpicfObjects 6 }
+
+	hp                OBJECT IDENTIFIER ::= { enterprises 11 }
+    nm                OBJECT IDENTIFIER ::= { hp 2 }
+    icf			      OBJECT IDENTIFIER	::= { nm 14 }
+    hpicfObjects      OBJECT IDENTIFIER	::= { icf 11 }
+    hpSystem          OBJECT IDENTIFIER ::= { nm 3 }
+    netElement        OBJECT IDENTIFIER ::= { hpSystem 7 }
+    hpEtherSwitch     OBJECT IDENTIFIER ::= { netElement 11 }
+    hpSwitchJ4819A    OBJECT IDENTIFIER ::= { hpEtherSwitch 17 }
+    
+    
+--
+-- HP J8162A XL Access Controller module
+--    
+    hpSwitchModuleJ8162A     OBJECT IDENTIFIER ::= { hpSwitchJ4819A 7 }
+    hpProcurveCommon	     OBJECT IDENTIFIER 	::= { hpSwitchModuleJ8162A 1 }
+
+END

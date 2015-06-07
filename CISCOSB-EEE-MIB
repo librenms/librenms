@@ -1,0 +1,318 @@
+CISCOSB-EEE-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB EEE MIB
+-- Version:    7.50
+-- Date:       05 May 2010
+--
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32    FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue              FROM SNMPv2-TC
+    ifIndex, ifOperStatus                       FROM IF-MIB;
+
+rlEee MODULE-IDENTITY  --  5-May-2010
+
+        LAST-UPDATED  "201003150000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION   "The private MIB module definition for Energy Efficient Ethernet feature."
+        REVISION      "201005150000Z"
+        DESCRIPTION   "Add Energy Efficient Ethernet support per port and per system"
+::= { switch001  149}
+
+----------------------
+-- rlEeeEnable
+----------------------
+rlEeeEnable OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "Enable the EEE mode globally"
+    DEFVAL { false }
+    ::= { rlEee 1 }
+
+----------------------
+-- rlEeePortTable
+----------------------
+rlEeePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlEeePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of EEE state of ports"
+    ::= { rlEee 2 }
+
+rlEeePortEntry OBJECT-TYPE
+    SYNTAX      RlEeePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of EEE state of bridge port"
+    INDEX   { ifIndex }
+    ::= { rlEeePortTable 1 }
+
+RlEeePortEntry ::= SEQUENCE {
+    rlEeePortAdminStatus        TruthValue,
+    rlEeePortSupported          BITS,
+    rlEeePortRemoteStatus       TruthValue,
+    rlEeePortOperStatus         TruthValue
+}
+
+rlEeePortAdminStatus OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "Enable/Disable EEE on ifindex"
+    DEFVAL { false }
+    ::= { rlEeePortEntry 1 }
+
+rlEeePortSupported OBJECT-TYPE
+    SYNTAX      BITS {
+                    rlEeePortSupported10M(0),
+                    rlEeePortSupported100M(1),
+                    rlEeePortSupported1G(2),
+                    rlEeePortSupported10G(3)
+                }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Bit map that indicates whether EEE supported on the phy of the ifindex per speed
+         0 - speed 10m; 1 - 100m; 2 - 1g; 3 - 10g"
+    ::= { rlEeePortEntry 2 }
+
+rlEeePortRemoteStatus OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates whether EEE active on remote link on current port's speed"
+    ::= { rlEeePortEntry 3 }
+
+rlEeePortOperStatus OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates whether EEE active on ifindex - ifoper is up,
+                                                   rlEeePortSupported BIT is on in current port speed
+                                                   rlEeePortLldpRemoteStatus is true,
+                                                   rlEeeEnable is true,
+                                                   rlEeePortAdminStatus is true"
+    ::= { rlEeePortEntry 4 }
+
+----------------------
+-- rlEeePortLldpTable
+----------------------
+
+rlEeePortLldpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlEeePortLldpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of EEE LLDP"
+    ::= { rlEee 3 }
+
+rlEeePortLldpEntry OBJECT-TYPE
+    SYNTAX      RlEeePortLldpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of EEE LLDP"
+    INDEX   { ifIndex }
+    ::= { rlEeePortLldpTable 1 }
+
+RlEeePortLldpEntry ::= SEQUENCE {
+
+    rlEeePortLldpAdminStatus    TruthValue,
+    rlEeePortLldpOperStatus     TruthValue
+}
+
+rlEeePortLldpAdminStatus OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "Enable/Disable EEE LLDP on ifindex"
+    DEFVAL { false }
+    ::= { rlEeePortLldpEntry 1 }
+
+rlEeePortLldpOperStatus OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates whether EEE LLDP active on ifindex - rlEeePortLldpAdminStatus is true
+                                                        lldpPortConfigAdminStatus is txAndRx,
+                                                        rlLldpEnabled is true,
+                                                        recieve a synch lldp packet"
+    ::= { rlEeePortLldpEntry 2 }
+
+----------------------
+-- rlEeePortLldpLocalTable
+----------------------
+
+rlEeePortLldpLocalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlEeePortLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of EEE Local ports"
+    ::= { rlEee 4 }
+
+rlEeePortLldpLocalEntry OBJECT-TYPE
+    SYNTAX      RlEeePortLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of EEE Local port"
+    INDEX   { ifIndex }
+    ::= { rlEeePortLldpLocalTable 1 }
+
+RlEeePortLocalEntry ::= SEQUENCE {
+
+    rlEeePortLldpLocalResolvedTx    Unsigned32,
+    rlEeePortLldpLocalTx            Unsigned32,
+    rlEeePortLldpLocalTxEcho        Unsigned32,
+    rlEeePortLldpLocalResolvedRx    Unsigned32,
+    rlEeePortLldpLocalRx            Unsigned32,
+    rlEeePortLldpLocalRxEcho        Unsigned32
+}
+
+rlEeePortLldpLocalResolvedTx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the current Tw_sys_tx configured in the local system, in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 1 }
+
+rlEeePortLldpLocalTx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value of Tw_sys_tx that the local system can support, in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 2 }
+
+rlEeePortLldpLocalTxEcho OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the remote system's Transmit Tw_sys_tx that was used by the local system
+         to compute the Tw_sys_tx that it wants to request from the remote system, in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 3 }
+
+rlEeePortLldpLocalResolvedRx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the current Tw_sys_tx configured by the remote system, in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 4 }
+
+rlEeePortLldpLocalRx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value of Tw_sys_tx that the local system requests from the remote system,
+         in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 5 }
+
+rlEeePortLldpLocalRxEcho OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the remote system Receive Tw_sys_tx that was used by the local system
+         to compute the Tw_sys_tx that it can support, in micro-seconds"
+    ::= { rlEeePortLldpLocalEntry 6 }
+
+----------------------
+-- rlEeePortLldpRemoteTable
+----------------------
+
+rlEeePortLldpRemoteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlEeePortRemoteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of EEE remote ports"
+    ::= { rlEee 5 }
+
+rlEeePortLldpRemoteEntry OBJECT-TYPE
+    SYNTAX      RlEeePortRemoteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of EEE remote port"
+    INDEX   { ifIndex }
+    ::= { rlEeePortLldpRemoteTable 1 }
+
+RlEeePortRemoteEntry ::= SEQUENCE {
+
+    rlEeePortLldpRemoteTx       Unsigned32,
+    rlEeePortLldpRemoteRx       Unsigned32,
+    rlEeePortLldpRemoteTxEcho   Unsigned32,
+    rlEeePortLldpRemoteRxEcho   Unsigned32
+}
+
+rlEeePortLldpRemoteTx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value of Tw_sys_tx that the remote system can support, in micro-seconds"
+    ::= { rlEeePortLldpRemoteEntry 1 }
+
+rlEeePortLldpRemoteRx OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value of Tw_sys_tx that the remote system requests from the local system,
+         in micro-seconds"
+    ::= { rlEeePortLldpRemoteEntry 2 }
+
+rlEeePortLldpRemoteTxEcho OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value of transmit Tw_sys_tx echoed back by the remote system, in micro-seconds"
+    ::= { rlEeePortLldpRemoteEntry 3 }
+
+rlEeePortLldpRemoteRxEcho OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "uSec"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates the value Receive Tw_sys_tx echoed back by the remote system, in micro-seconds"
+    ::= { rlEeePortLldpRemoteEntry 4 }
+
+
+
+END
+
+

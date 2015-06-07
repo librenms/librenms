@@ -1,0 +1,656 @@
+ENTERASYS-POWER-ETHERNET-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-power-ethernet-mib-ext-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Power Ethernet Extensions MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright 2004-2005 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    Integer32, Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    pethMainPseEntry, pethPsePortEntry
+        FROM POWER-ETHERNET-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysPowerEthernetMibExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200501101630Z"  -- Mon Jan 10 16:30 GMT 2005
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+   
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Enterasys Networks enterprise OID pertaining to the
+         allocation of power in a Pse chassis."
+
+    REVISION    "200501101630Z"  -- Mon Jan 10 16:30 GMT 2005
+    DESCRIPTION 
+        "Added the power management functionality."
+
+    REVISION    "200408172227Z"  -- Tue Aug 17 22:27 GMT 2004
+    DESCRIPTION 
+        "The initial version of this MIB module"
+
+    ::= { etsysModules 50 } 
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysPowerEthernetObjects       OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetMibExtMIB 1 }
+
+etsysPseChassisPowerAllocation  OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 1 }
+
+etsysPseSlotPowerAllocation     OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 2 }
+
+etsysPseChassisPowerStatus      OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 3 }
+
+etsysPseSlotPowerManagement     OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 4 }
+
+etsysPsePortPowerManagement     OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 5 }
+                        
+etsysPsePowerNotification       OBJECT IDENTIFIER 
+                                   ::= { etsysPowerEthernetObjects 0 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Chassis Power Allocation Group
+-- -------------------------------------------------------------
+
+etsysPseChassisPowerAllocationMode OBJECT-TYPE
+    SYNTAX       INTEGER { 
+                   auto     (1), 
+                   manual   (2) 
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "In auto mode, a Pse Power Management Algorithm handles the
+         allocation of power to all the modules.
+
+         In manual mode, power is manually allocated to the modules
+         via the etsysPseSlotPowerAllocationTable.
+
+         The value of etsysPseChassisPowerAllocationAvailable is used
+         to determine the power available for allocation in this
+         chassis in both auto and manual mode.
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { auto }
+    ::= { etsysPseChassisPowerAllocation 1 }
+
+etsysPseChassisPowerSnmpNotification OBJECT-TYPE
+    SYNTAX       EnabledStatus 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current state of the SNMP Notification functionality for
+         Pse.
+
+         enabled  (1) - The Pse will generate SNMP Notifications for
+                        potentially adverse Pse power conditions.
+                        The generation of these notifications are NOT
+                        dependant upon the state of
+                        etsysPseChassisPowerAllocationMode.
+
+         disabled (2) - The SNMP Notifications defined in this MIB will
+                        NOT be generated under any conditions.
+
+         Agents are not required to generate SNMP Notifications for
+         conditions that exist when this object is set to enabled.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    ::= { etsysPseChassisPowerAllocation 2 }
+
+etsysPseChassisPowerAvailableMaximum OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    UNITS        "percent"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The maximum percentage of power from the Pse Power Supply
+         that this chassis can use.
+
+         The default value should be 100 percent, meaning the
+         chassis can use all the power detected from Pse Power
+         Supply.
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { 100 }
+    ::= { etsysPseChassisPowerAllocation 3 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Slot Power Allocation Group
+-- -------------------------------------------------------------
+
+etsysPseSlotPowerAllocationTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EtsysPseModulePowerAllocationEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Power allocation management information for all slots."
+    ::= { etsysPseSlotPowerAllocation 1 }
+
+etsysPseSlotPowerAllocationEntry OBJECT-TYPE
+    SYNTAX       EtsysPseModulePowerAllocationEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Power allocation management information for an entPhysicalEntry
+         that has an entPhysicalClass of container(5) and represents a
+         slot in the chassis that could be occupied by a Pse module."
+    INDEX { entPhysicalIndex }
+    ::= { etsysPseSlotPowerAllocationTable 1 }
+
+EtsysPseModulePowerAllocationEntry ::= 
+    SEQUENCE {
+        etsysPseSlotPowerMaximum       Unsigned32,
+        etsysPseSlotPowerAssigned      Unsigned32
+    }
+
+etsysPseSlotPowerMaximum OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The maximum power that can be consumed by the module in
+         this slot, based on the module's characteristics.  For
+         slots without Pse modules this object MUST return zero."
+    ::= { etsysPseSlotPowerAllocationEntry 1 }
+
+etsysPseSlotPowerAssigned OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    UNITS        "Watts"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The power that will be allocated to this slot in manual mode.
+         In auto mode, this object has no effect.
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { 0 }
+    ::= { etsysPseSlotPowerAllocationEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Chassis Power Status Group
+-- -------------------------------------------------------------
+
+etsysPseChassisPowerDetected OBJECT-TYPE
+    SYNTAX       Gauge32
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power detected by the chassis from Pse Power Supply."
+    ::= { etsysPseChassisPowerStatus 1 }
+ 
+etsysPseChassisPowerAvailable OBJECT-TYPE
+    SYNTAX       Gauge32
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power available for this chassis.  This is
+         ( etsysPseChassisPowerDetected *
+         ( etsysPseChassisPowerAvailableMaximum / 100 ) )."
+    ::= { etsysPseChassisPowerStatus 2 }
+ 
+etsysPseChassisPowerConsumable OBJECT-TYPE
+    SYNTAX       Gauge32
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power that could be consumed by all of the Pse
+         modules in the chassis.  This is the summation of the values
+         of all of the etsysPseSlotPowerMaximum objects."
+    ::= { etsysPseChassisPowerStatus 3 }
+
+etsysPseChassisPowerAssigned OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power assigned to the slots in the chassis.
+         This is the summation of the values of all of the
+         etsysPseSlotPowerAssigned objects."
+    ::= { etsysPseChassisPowerStatus 4 }
+
+etsysPseChassisPowerRedundancy OBJECT-TYPE
+    SYNTAX       INTEGER { 
+                   redundant     (1), 
+                   notRedundant  (2),
+                   notSupported  (3)   -- Object is not supported
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Denotes whether or not the Pse power system has redundant
+         capacity."
+    ::= { etsysPseChassisPowerStatus 5 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Module Power Management Group
+-- -------------------------------------------------------------
+
+etsysPseModulePowerManagementTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EtsysPseModulePowerManagementEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table augments the pethMainPseTable of the
+         PowerEthernetMIB (rfc3621).  It provides objects
+         that are used to budget power."
+    ::= { etsysPseSlotPowerManagement 1 }
+
+etsysPseModulePowerManagementEntry OBJECT-TYPE
+    SYNTAX       EtsysPseModulePowerManagementEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A set of objects that display, control, and calculate
+         the power consumption of a PSE."
+    AUGMENTS { pethMainPseEntry }
+    ::= { etsysPseModulePowerManagementTable 1 }
+
+EtsysPseModulePowerManagementEntry ::= 
+    SEQUENCE {
+        etsysPseModulePowerMode          INTEGER,
+        etsysPseModulePowerClassBudget   Gauge32,
+        etsysPseModulePowerUsage         Integer32
+    }
+
+etsysPseModulePowerMode OBJECT-TYPE
+    SYNTAX       INTEGER { 
+                   realtime     (1), 
+                   class        (2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object controls the power management of the PSE.
+         It also controls how etsysPseModulePowerClassBudget, 
+         etsysPseModulePowerUsage and etsysPsePortPowerLimit are 
+         utilized.
+
+         In realtime mode, the power is managed based on the 
+         actual power consumption of the ports.  
+         etsysPseModulePowerClassBudget is sum of power
+         consumed by all ports, measured in real-time. The 
+         etsysPseModulePowerUsage is ratio of pethMainPseConsumptionPower 
+         over pethMainPsePower, expressed in percents.
+
+         In class mode, the power is managed based on the IEEE 802.3af 
+         definition of the class upper limit, except classes 0 & 4
+         for which the actual power consumption is used. 
+         etsysPseModulePowerClassBudget is sum of all ports
+         power according to their class upper bound, except classes 0 & 4
+         for which the actual power consumption is accounted.
+         The etsysPseModulePowerUsage is ratio of
+         etsysPseModulePowerClassBudget over pethMainPsePower, expressed
+         in percents.
+
+         The effect of etsysPseModulePowerMode to etsysPsePortPowerLimit is
+         described in etsysPsePortPowerLimit definition. 
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { realtime }
+    ::= { etsysPseModulePowerManagementEntry 1 }
+
+etsysPseModulePowerClassBudget OBJECT-TYPE
+    SYNTAX       Gauge32 
+    UNITS        "Watts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "In class mode, this is sum of all ports power according to
+         their class upper bound, except classes 0 & 4 for which the
+         actual power consumption is accounted.  In realtime mode,
+         this is sum of power consumed by all ports, measured in
+         real-time." 
+    ::= { etsysPseModulePowerManagementEntry 2 }
+
+etsysPseModulePowerUsage OBJECT-TYPE
+    SYNTAX       Integer32 (0..100) 
+    UNITS        "%"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "In class mode, this is ratio of etsysPseModulePowerClassBudget
+         over pethMainPsePower, expressed in percents.
+         In realtime mode, this is ratio of pethMainPseConsumptionPower 
+         over pethMainPsePower, expressed in percents."
+    ::= { etsysPseModulePowerManagementEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Port Power Management Group
+-- -------------------------------------------------------------
+
+etsysPsePortPowerManagementTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EtsysPsePortPowerManagementEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table augments the pethPsePortTable of the
+        PowerEthernetMIB (rfc3621).  It provides objects
+        that are used to budget power."
+    ::= { etsysPsePortPowerManagement 1 }
+
+etsysPsePortPowerManagementEntry OBJECT-TYPE
+    SYNTAX       EtsysPsePortPowerManagementEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A set of objects that display and control the power 
+         consumption of a PSE, at the port level."
+    AUGMENTS { pethPsePortEntry }
+    ::= { etsysPsePortPowerManagementTable 1 }
+
+EtsysPsePortPowerManagementEntry ::= 
+    SEQUENCE {
+        etsysPsePortPowerLimit   Integer32,
+        etsysPsePortPowerUsage   Gauge32,
+        etsysPsePortPDType       INTEGER 
+    }
+
+etsysPsePortPowerLimit OBJECT-TYPE
+    SYNTAX       Integer32 (0..15400)
+    UNITS        "milliwatts"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object sets the maximum power allowed on this port.
+         If the port exceeds its power limit, it will be shut down.
+         This object has effect only when its module is in realtime
+         mode (specified by etsysPseModulePowerMode).  In class mode,
+         the power limit of a port is defined by port's class upper
+         bound, according to IEEE 802.3af."
+    DEFVAL { 15400 }
+    ::= { etsysPsePortPowerManagementEntry 1 }
+
+etsysPsePortPowerUsage OBJECT-TYPE
+    SYNTAX       Gauge32 
+    UNITS        "milliwatts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Actual power consumption measured in real-time." 
+    ::= { etsysPsePortPowerManagementEntry 2 }
+
+etsysPsePortPDType OBJECT-TYPE
+    SYNTAX       INTEGER { 
+                   legacy       (1), 
+                   ieee8023af   (2),
+                   other        (3)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object indicates detected PD type on this port."    
+    ::= { etsysPsePortPowerManagementEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Power Supply Status Table
+-- -------------------------------------------------------------
+
+etsysPsePowerSupplyStatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EtsysPsePowerSupplyStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Status information for all of the Pse power supply modules."
+    ::= { etsysPseChassisPowerStatus 6 }
+
+etsysPsePowerSupplyStatusEntry OBJECT-TYPE
+    SYNTAX       EtsysPsePowerSupplyStatusEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Status information for an individual Pse power supply module."
+    INDEX { etsysPsePowerSupplyModuleNumber }
+    ::= { etsysPsePowerSupplyStatusTable 1 }
+
+EtsysPsePowerSupplyStatusEntry ::= 
+    SEQUENCE {
+        etsysPsePowerSupplyModuleNumber      Unsigned32,
+        etsysPsePowerSupplyModuleStatus      INTEGER
+    }
+
+etsysPsePowerSupplyModuleNumber OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A unique number that identifies the Pse power supply
+         and is relative to the module's physical location."
+    ::= { etsysPsePowerSupplyStatusEntry 1 }
+
+etsysPsePowerSupplyModuleStatus OBJECT-TYPE
+    SYNTAX       INTEGER  {
+                     infoNotAvailable           (1),
+                     notInstalled               (2),
+                     installedAndOperating      (3),
+                     installedAndNotOperating   (4)
+                 }    
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Denotes the power supply's status."
+    ::= { etsysPsePowerSupplyStatusEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- The Pse Power Notifications Group
+-- -------------------------------------------------------------
+
+etsysPseChassisPowerRedundant NOTIFICATION-TYPE
+    OBJECTS      { etsysPseChassisPowerDetected }
+    STATUS       current
+    DESCRIPTION
+        "Pse chassis power is in redundant state.  At least 500 msec
+         must elapse between notifications being emitted by the same
+         object instance."
+    ::= { etsysPsePowerNotification 1 }
+
+etsysPseChassisPowerNonRedundant NOTIFICATION-TYPE
+    OBJECTS      { etsysPseChassisPowerDetected }
+    STATUS       current
+    DESCRIPTION
+        "Pse chassis power is in non-redundant state.  At least 500
+         msec must elapse between notifications being emitted by the
+         same object instance."
+    ::= { etsysPsePowerNotification 2 }
+
+etsysPsePowerSupplyModuleStatusChange NOTIFICATION-TYPE
+    OBJECTS      { etsysPsePowerSupplyModuleStatus }
+    STATUS       current
+    DESCRIPTION
+        "A Pse Power Supply module has changed state.  At least 500
+         msec must elapse between notifications being emitted by the
+         same object instance."
+    ::= { etsysPsePowerNotification 3 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysPsePowerAllocationConformance OBJECT IDENTIFIER
+                      ::= { etsysPowerEthernetMibExtMIB 2 }
+
+etsysPsePowerAllocationGroups      OBJECT IDENTIFIER
+                      ::= { etsysPsePowerAllocationConformance 1 }
+
+etsysPsePowerAllocationCompliances OBJECT IDENTIFIER
+                      ::= { etsysPsePowerAllocationConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysPsePowerAllocationControlGroup OBJECT-GROUP
+    OBJECTS {
+        etsysPseChassisPowerAllocationMode,
+        etsysPseChassisPowerSnmpNotification,
+        etsysPseChassisPowerAvailableMaximum,
+        etsysPseSlotPowerMaximum,
+        etsysPseSlotPowerAssigned
+    }
+    STATUS      current
+    DESCRIPTION
+        "Power over Ethernet Power Allocation Control group."
+    ::= { etsysPsePowerAllocationGroups 1 }
+
+etsysPseChassisPowerStatusGroup OBJECT-GROUP
+    OBJECTS {
+        etsysPseChassisPowerDetected,
+        etsysPseChassisPowerAvailable,
+        etsysPseChassisPowerConsumable,
+        etsysPseChassisPowerAssigned,
+        etsysPseChassisPowerRedundancy,
+        etsysPsePowerSupplyModuleStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Power over Ethernet Power Supply group."
+    ::= { etsysPsePowerAllocationGroups 2 }
+
+etsysPsePowerNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysPseChassisPowerRedundant,
+        etsysPseChassisPowerNonRedundant,
+        etsysPsePowerSupplyModuleStatusChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "Power over Ethernet Power Redundancy Notifications group."
+    ::= { etsysPsePowerAllocationGroups 3 }
+
+etsysPseModulePowerManagementGroup OBJECT-GROUP
+    OBJECTS {
+        etsysPseModulePowerMode,
+        etsysPseModulePowerClassBudget,
+        etsysPseModulePowerUsage
+    }
+    STATUS      current
+    DESCRIPTION
+        "Power over Ethernet Module Power Budget Management group."
+    ::= { etsysPsePowerAllocationGroups 4 }
+
+etsysPsePortPowerManagementGroup OBJECT-GROUP
+    OBJECTS {
+        etsysPsePortPowerLimit,
+        etsysPsePortPowerUsage,
+        etsysPsePortPDType    
+    }
+    STATUS      current
+    DESCRIPTION
+        "Power over Ethernet Port Power Budget Management group."
+    ::= { etsysPsePowerAllocationGroups 5 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysPsePowerAllocationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support manual
+         power allocation."
+
+    MODULE
+        MANDATORY-GROUPS { 
+            etsysPsePowerAllocationControlGroup,
+            etsysPseChassisPowerStatusGroup,
+            etsysPsePowerNotificationGroup
+        }
+
+    ::= { etsysPsePowerAllocationCompliances 1 }
+
+etsysPsePowerAllocationCompliance2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support 
+         power budgets."
+
+    MODULE
+        MANDATORY-GROUPS { 
+            etsysPsePowerAllocationControlGroup,
+            etsysPseChassisPowerStatusGroup,
+            etsysPsePowerNotificationGroup
+        }
+
+    GROUP etsysPseModulePowerManagementGroup
+    DESCRIPTION
+        "This group is conditionally mandatory for entities that
+         support power management on a per module basis."
+
+    GROUP etsysPsePortPowerManagementGroup
+    DESCRIPTION
+        "This group is conditionally mandatory for entities that
+         support power management on a per port basis."
+
+    ::= { etsysPsePowerAllocationCompliances 2 }
+
+END

@@ -1,0 +1,276 @@
+
+-- *****************************************************************************
+-- Juniper-SUBSCRIBER-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Subscriber MIB
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-SUBSCRIBER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable
+        FROM Juniper-TC;
+
+juniSubscriberMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Subscriber MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200205101953Z"  -- 10-May-02 03:53 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added local authentication support."
+    REVISION    "200011160000Z"  -- 16-Nov-00               - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 49 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniSubscrEncaps ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Encapsulated protocol type."
+    SYNTAX      INTEGER {
+                    ip(0),
+                    bridgedEthernet(19) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSubscrObjects        OBJECT IDENTIFIER ::= {juniSubscriberMIB 1}
+
+-- Functional groups
+juniSubscrLocal          OBJECT IDENTIFIER ::= {juniSubscrObjects 1}
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSubscrLocalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSubscrLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Permits local configuration associating a remote subscriber's identity
+        with a local interface, for use in circumstances where the remote
+        subscriber's identity cannot be queried directly (e.g. dynamic IPoA
+        operation)."
+    ::= { juniSubscrLocal 1 }
+
+juniSubscrLocalEntry OBJECT-TYPE
+    SYNTAX      JuniSubscrLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Local configuration associating a remote subscriber's identity with a
+        local interface."
+    INDEX     { juniSubscrLocalIfIndex,
+                juniSubscrLocalEncaps }
+    ::= { juniSubscrLocalTable 1 }
+
+JuniSubscrLocalEntry ::= SEQUENCE {
+    juniSubscrLocalIfIndex           InterfaceIndex,
+    juniSubscrLocalEncaps            JuniSubscrEncaps,
+    juniSubscrLocalControl           INTEGER,
+    juniSubscrLocalNamePrefix        JuniEnable,
+    juniSubscrLocalName              DisplayString,
+    juniSubscrLocalPasswordPrefix    JuniEnable,
+    juniSubscrLocalPassword          DisplayString,
+    juniSubscrLocalDomain            DisplayString,
+    juniSubscrLocalAuthentication    JuniEnable }
+
+juniSubscrLocalIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which this subscriber information
+        applies."
+    ::= { juniSubscrLocalEntry 1 }
+
+juniSubscrLocalEncaps OBJECT-TYPE
+    SYNTAX      JuniSubscrEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The incoming data encapsulation to which this subscriber information
+        applies.  An interface may have a unique subscriber identity configured
+        for each incoming data encapsulation it supports."
+    ::= { juniSubscrLocalEntry 2 }
+
+juniSubscrLocalControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ok(0),
+                    clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to clear(1), causes the subscriber information in this entry
+        to be cleared.  When set to ok(0), there is no effect and subscriber
+        information is unchanged.
+
+        When read, always returns a value of ok(0).
+
+        No other object in this entry can be set simultaneously, otherwise an
+        InconsistentValue error is reported."
+    ::= { juniSubscrLocalEntry 3 }
+
+juniSubscrLocalNamePrefix OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, indicates whether the value of juniSubscrLocalName is a
+        prefix rather than a full name."
+    ::= { juniSubscrLocalEntry 4 }
+
+juniSubscrLocalName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The subscriber's name.
+
+        If juniSubscrLocalNamePrefix has the value 'enabled', the value of this
+        object serves as the prefix of a full subscriber name.  The full name is
+        constructed by appending local geographic information (slot, port, etc.)
+        that uniquely distinguishes the subscriber."
+    ::= { juniSubscrLocalEntry 5 }
+
+juniSubscrLocalPasswordPrefix OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, indicates whether the value of juniSubscrLocalPassword
+        prefix rather than a full password."
+    ::= { juniSubscrLocalEntry 6 }
+
+juniSubscrLocalPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The subscriber's password.
+
+        If juniSubscrLocalPasswordPrefix has the value 'enabled', the value of
+        this object serves as the prefix of a full subscriber password.  The
+        full password is constructed by appending local geographic information
+        (slot, port, etc.) that uniquely distinguishes the subscriber."
+    ::= { juniSubscrLocalEntry 7 }
+
+juniSubscrLocalDomain OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The subscriber's domain."
+    ::= { juniSubscrLocalEntry 8 }
+
+juniSubscrLocalAuthentication OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, the interface performs authentication with RADIUS server
+        using the configured subscriber information and associated with the
+        incoming data encapsulation (juniSubscriberLocalEncaps)."
+    DEFVAL    { enable }
+    ::= { juniSubscrLocalEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSubscriberMIBConformance
+             OBJECT IDENTIFIER ::= { juniSubscriberMIB 4 }
+juniSubscriberMIBCompliances
+             OBJECT IDENTIFIER ::= { juniSubscriberMIBConformance 1 }
+juniSubscriberMIBGroups
+             OBJECT IDENTIFIER ::= { juniSubscriberMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniSubscriberCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting subscriber
+        operation.  This statement became obsolete when local authentication
+        support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSubscriberLocalGroup }
+    ::= { juniSubscriberMIBCompliances 1 }
+
+juniSubscriberCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting subscriber operation."
+    MODULE  -- this module
+        MANDATORY-GROUPS { juniSubscriberLocalGroup2 }
+    ::= { juniSubscriberMIBCompliances 2 }
+
+--
+-- units of conformance
+--
+juniSubscriberLocalGroup OBJECT-GROUP
+    OBJECTS {
+        juniSubscrLocalControl,
+        juniSubscrLocalNamePrefix,
+        juniSubscrLocalName,
+        juniSubscrLocalPasswordPrefix,
+        juniSubscrLocalPassword,
+        juniSubscrLocalDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of
+        locally-configured subscriber identities in a Juniper product.  This
+        group became obsolete when local authentication support was added."
+    ::= { juniSubscriberMIBGroups 1 }
+
+juniSubscriberLocalGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniSubscrLocalControl,
+        juniSubscrLocalNamePrefix,
+        juniSubscrLocalName,
+        juniSubscrLocalPasswordPrefix,
+        juniSubscrLocalPassword,
+        juniSubscrLocalDomain,
+        juniSubscrLocalAuthentication }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of
+        locally-configured subscriber identities in a Juniper product."
+    ::= { juniSubscriberMIBGroups 2 }
+
+END

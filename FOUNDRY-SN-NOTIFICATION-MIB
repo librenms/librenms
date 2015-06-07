@@ -1,0 +1,3064 @@
+FOUNDRY-SN-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, NOTIFICATION-TYPE	FROM SNMPv2-SMI
+   foundry				FROM FOUNDRY-SN-ROOT-MIB
+   ifIndex                          FROM IF-MIB
+   dot3OamLoopbackStatus	FROM DOT3-OAM-MIB
+   snVLanByPortCfgVLanId 		  FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+   snChasPwrSupplyStatus,
+   snAgGblTrapMessage,
+   snAgentBrdIndex,
+   snAgentBrdModuleStatus,
+   snChasPwrSupplyIndex,
+   snChasPwrSupplyDescription,
+   snChasUnitIndex,
+   snChasFanIndex,
+   snChasFanDescription,
+   fdryLicenseType			FROM FOUNDRY-SN-AGENT-MIB
+   snSwViolatorPortNumber,
+   snSwViolatorMacAddress FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+   snL4TrapLinkName,
+   snL4LinkVirtualInterface,
+   snL4MaxSessionLimit,
+   snL4TcpSynLimit,
+   snL4TrapRealServerIP,
+   snL4TrapRealServerName,
+   snL4TrapRealServerPort,
+   snL4TrapRealServerCurConnections FROM FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
+   wgPnPStatus FROM FOUNDRY-SN-WIRELESS-GROUP-MIB
+   snOspfRouterId,
+   snOspfIfStatusIpAddress,
+   snOspfIfStatusState,
+   snOspfVirtIfStatusAreaID,
+   snOspfVirtIfStatusNeighbor,
+   snOspfVirtIfStatusState,
+   snOspfNbrIpAddr,
+   snOspfNbrRtrId,
+   snOspfNbrState,
+   snOspfVirtNbrArea,
+   snOspfVirtNbrRtrId,
+   snOspfVirtNbrState,
+   snOspfPacketSrc,
+   snOspfConfigErrorType,
+   snOspfPacketType,
+   snOspfLsdbAreaId,
+   snOspfLsdbType,
+   snOspfLsdbLsId,
+   snOspfLsdbRouterId,
+   snOspfExtLsdbLimit	  FROM FOUNDRY-SN-OSPF-GROUP-MIB
+   dot1agCfmMdName,
+   dot1agCfmMaNetName,
+   dot1agCfmMepDbRMepState FROM IEEE8021-CFM-MIB
+   ;
+
+snTraps MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+	      "This MIB module describes proprietery SNMP Trap information
+		of Brocade Communications' router/switch product.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+	::= { foundry 0 }
+
+-- Trap Information
+-- Brocade Communications Systems, Inc. Specific Traps
+
+snTrapChasPwrSupply NOTIFICATION-TYPE
+   OBJECTS { snChasPwrSupplyStatus }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a power supply fails
+		to operate normally. The value is a packed bit string;
+		the 2 power supplies status are encoded into 4 bits
+		(a nibble).
+		The following shows the meaning of each bit:
+		(bit 0 is the least significant bit).
+
+		bit position   meaning
+		------------   -------
+		4-31	 reserved
+		3		 Power  Supply 2 DC (0=bad, 1=good).
+		2		 Power  Supply 1 DC (0=bad, 1=good).
+		1		 Power  Supply 2 present status (0=present, 1=not-present).
+		0		 Power  Supply 1 present status (0=present, 1=not-present)."
+		--#TYPE "Brocade Trap: Power Supply Failure"
+		--#SUMMARY "Power supply fails, error status %d."
+		--#ARGUMENTS { 0 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 1 }
+
+snTrapLockedAddressViolation NOTIFICATION-TYPE
+   OBJECTS { snSwViolatorPortNumber, snSwViolatorMacAddress }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when more source MAC addresses
+		are received from a port than the maximum number of addresses
+		configured to that port."
+		--#TYPE "Brocade Trap: MAC Addresses Violation"
+		--#SUMMARY "Lock address violation on Port %d with MAC Address %s."
+		--#ARGUMENTS { 0, 1 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 2 }
+
+snTrapOspfIfStateChange NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfIfStatusState   -- The new state
+              }
+   STATUS current
+   DESCRIPTION
+      "An ospfIfStateChange trap signifies that there
+      has been a change in the state of a non-virtual
+      OSPF interface. This trap should  be  generated
+      when  the interface state regresses (e.g., goes
+      from Dr to Down) or progresses  to  a  terminal
+      state  (i.e.,  Point-to-Point, DR Other, Dr, or
+      Backup)."
+      --#TYPE "Brocade Trap: OSPF Interface State Change"
+      --#SUMMARY "OSPF router id %s, interface %s state changed to %d."
+      --#ARGUMENTS { 0, 1, 2 }
+      --#SEVERITY INFORMATIONAL
+      --#STATE OPERATIONAL
+   ::= { snTraps 3 }
+
+snTrapOspfVirtIfStateChange NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfVirtIfStatusState  -- The new state
+              }
+   STATUS current
+   DESCRIPTION
+      "An ospfIfStateChange trap signifies that there
+      has  been a change in the state of an OSPF vir-
+      tual interface.
+      This trap should be generated when  the  inter-
+      face  state  regresses  (e.g., goes from Point-
+      to-Point to Down) or progresses to  a  terminal
+      state (i.e., Point-to-Point)."
+      --#TYPE "Brocade Trap: OSPF Virtual Interface State Change"
+      --#SUMMARY "OSPF router id %s, virtual interface area id %s  neighbor %s state changed to %d."
+      --#ARGUMENTS { 0, 1, 2, 3 }
+      --#SEVERITY INFORMATIONAL
+      --#STATE OPERATIONAL
+   ::= { snTraps 4 }
+
+
+snOspfNbrStateChange NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfNbrIpAddr,
+                snOspfNbrRtrId,
+                snOspfNbrState  -- The new state
+              }
+    STATUS current
+    DESCRIPTION
+       "An  ospfNbrStateChange  trap  signifies   that
+       there  has been a change in the state of a non-
+       virtual OSPF neighbor.   This  trap  should  be
+       generated  when  the  neighbor  state regresses
+       (e.g., goes from Attempt or Full  to  1-Way  or
+       Down)  or progresses to a terminal state (e.g.,
+       2-Way or Full).  When an  neighbor  transitions
+       from  or  to Full on non-broadcast multi-access
+       and broadcast networks, the trap should be gen-
+       erated  by the designated router.  A designated
+       router transitioning to Down will be  noted  by
+       ospfIfStateChange."
+       --#TYPE "Brocade Trap: OSPF Neighbour State Change"
+       --#SUMMARY "OSPF  router id %s neighbor area %s, neighbor router id  %s state changed to %d."
+       --#ARGUMENTS { 0, 1, 2, 3 }
+       --#SEVERITY INFORMATIONAL
+       --#STATE OPERATIONAL
+   ::= { snTraps 5 }
+
+
+snOspfVirtNbrStateChange NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtNbrArea,
+                snOspfVirtNbrRtrId,
+                snOspfVirtNbrState  -- The new state
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfIfStateChange trap signifies that there
+       has  been a change in the state of an OSPF vir-
+       tual neighbor.  This trap should  be  generated
+       when  the  neighbor state regresses (e.g., goes
+       from Attempt or  Full  to  1-Way  or  Down)  or
+       progresses to a terminal state (e.g., Full)."
+       --#TYPE "Brocade Trap: OSPF Virtual Neighbour State Change"
+       --#SUMMARY "OSPF router id %s virtual neighbor area %s, virtual neighbor router id  %s state changed to %d."
+       --#ARGUMENTS { 0, 1, 2, 3 }
+       --#SEVERITY INFORMATIONAL
+       --#STATE OPERATIONAL
+   ::= { snTraps 6 }
+
+
+
+snOspfIfConfigError NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfConfigErrorType, -- Type of error
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfIfConfigError  trap  signifies  that  a
+       packet  has  been received on a non-virtual in-
+       terface  from  a  router  whose   configuration
+       parameters  conflict  with this router's confi-
+       guration parameters.  Note that the  event  op-
+       tionMismatch  should  cause  a  trap only if it
+       prevents an adjacency from forming."
+       --#TYPE "Brocade Trap: OSPF Interface Configuration Error"
+       --#SUMMARY "configuration error type %d with  packet type %d has been received on interface %s, router id %s from  %s."
+       --#ARGUMENTS { 3, 4, 1, 0, 2 }
+       --#SEVERITY MAJOR
+       --#STATE OPERATIONAL
+   ::= { snTraps 7 }
+
+
+snOspfVirtIfConfigError NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfConfigErrorType, -- Type of error
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfConfigError trap signifies that a pack-
+       et  has  been  received  on a virtual interface
+       from a router  whose  configuration  parameters
+       conflict   with   this  router's  configuration
+       parameters.  Note that the event optionMismatch
+       should  cause a trap only if it prevents an ad-
+       jacency from forming."
+       --#TYPE "Brocade Trap: OSPF Virtual Interface Configuration Error"
+       --#SUMMARY "configuration error type %d with  packet type %d has been received on virtual interface area id %s, router id %s from neighbor %s."
+       --#ARGUMENTS { 3, 4, 1, 0, 2 }
+       --#SEVERITY MAJOR
+       --#STATE OPERATIONAL
+   ::= { snTraps 8 }
+
+
+snOspfIfAuthFailure NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfConfigErrorType, -- authTypeMismatch or
+                                     -- authFailure
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfIfAuthFailure  trap  signifies  that  a
+       packet  has  been received on a non-virtual in-
+       terface from a router whose authentication  key
+       or  authentication  type  conflicts  with  this
+       router's authentication key  or  authentication
+       type."
+       --#TYPE "Brocade Trap: OSPF Interface Authentication Failure"
+       --#SUMMARY "OSPF authentication failed. Router ID %s,Interface %s, packet src %s, error type %d and packet type %d."
+       --#ARGUMENTS { 0, 1, 2, 3, 4 }
+       --#SEVERITY MINOR
+       --#STATE OPERATIONAL
+   ::= { snTraps 9 }
+
+
+snOspfVirtIfAuthFailure NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfConfigErrorType, -- authTypeMismatch or
+                                     -- authFailure
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfVirtIfAuthFailure trap signifies that a
+       packet has been received on a virtual interface
+       from a router whose authentication key  or  au-
+       thentication  type conflicts with this router's
+       authentication key or authentication type."
+       --#TYPE "Brocade Trap: OSPF Virtual Interface Authentication Failure"
+       --#SUMMARY "OSPF authentication failed. Router ID %s,virtual interface %s, Neigbor %s, Error type %d and packet type %d."
+       --#ARGUMENTS { 0, 1, 2, 3, 4 }
+       --#SEVERITY MINOR
+       --#STATE OPERATIONAL
+   ::= { snTraps 10 }
+
+
+snOspfIfRxBadPacket NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfIfRxBadPacket trap  signifies  that  an
+       OSPF  packet has been received on a non-virtual
+       interface that cannot be parsed."
+       --#TYPE "Brocade Trap: OSPF Interface Receive Bad Packet"
+       --#SUMMARY "OSPF Router Id %s, interface %s  receive bad packet (type %d) from %s."
+       --#ARGUMENTS { 0, 1, 3, 2 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 11 }
+
+
+snOspfVirtIfRxBadPacket NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfPacketType
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfRxBadPacket trap signifies that an OSPF
+       packet has been received on a virtual interface
+       that cannot be parsed."
+       --#TYPE "Brocade Trap: OSPF Virt Interface Receive Bad Packet"
+       --#SUMMARY "OSPF router id %s, virtual interface %s received bad packet (type %d) from neighbor %s."
+       --#ARGUMENTS { 0, 1, 3, 2 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 12 }
+
+
+snOspfTxRetransmit NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfNbrRtrId, -- Destination
+                snOspfPacketType,
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfTxRetransmit  trap  signifies  than  an
+       OSPF  packet  has  been retransmitted on a non-
+       virtual interface.  All packets that may be re-
+       transmitted  are associated with an LSDB entry.
+       The LS type, LS ID, and Router ID are  used  to
+       identify the LSDB entry."
+       --#TYPE "Brocade Trap: OSPF Retransmit"
+       --#SUMMARY "OSPF router id %s, interface %s retransmited packet type %d,LSDB type %d, LSDB LS ID %s and LSDB router id %s to neightbor router id %s."
+       --#ARGUMENTS { 0, 1, 3, 4, 5, 6, 2 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 13 }
+
+
+ospfVirtIfTxRetransmit NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfPacketType,
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+
+    STATUS current
+    DESCRIPTION
+       "An ospfTxRetransmit  trap  signifies  than  an
+       OSPF packet has been retransmitted on a virtual
+       interface.  All packets that may be retransmit-
+       ted  are  associated with an LSDB entry. The LS
+       type, LS ID, and Router ID are used to identify
+       the LSDB entry."
+       --#TYPE "Brocade Trap: OSPF Virt Interface Retransmit"
+       --#SUMMARY "OSPF router id %s, virtual interface area id %s retransmited packet type %d,LSDB type %d, LSDB LS ID %s and LSDB router id %s to neightbor %s."
+       --#ARGUMENTS { 0, 1, 3, 4, 5, 6, 2 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 14 }
+
+
+snOspfOriginateLsa NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfOriginateLsa trap signifies that a  new
+       LSA  has  been originated by this router.  This
+       trap should not be invoked for simple refreshes
+       of  LSAs  (which happesn every 30 minutes), but
+       instead will only be invoked  when  an  LSA  is
+       (re)originated due to a topology change.  Addi-
+       tionally, this trap does not include LSAs  that
+       are  being  flushed  because  they have reached
+       MaxAge."
+       --#TYPE "Brocade Trap: OSPF Originate LSA"
+       --#SUMMARY "New LSA (area id %s, type %d, LS Id %s and router id %s) has been originated by router id %s."
+       --#ARGUMENTS { 1, 2, 3, 4, 0 }
+       --#SEVERITY INFORMATIONAL
+       --#STATE OPERATIONAL
+   ::= { snTraps 15 }
+
+
+snOspfMaxAgeLsa NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfMaxAgeLsa trap signifies  that  one  of
+       the LSA in the router's link-state database has
+       aged to MaxAge."
+       --#TYPE "Brocade Trap: OSPF MaxAge LSA"
+       --#SUMMARY "The LSA (area id %s, type %d, LS Id %s and router id %s) in router id %s link-state database has aged to maximum age."
+       --#ARGUMENTS { 1, 2, 3, 4, 0 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 16 }
+
+
+
+snOspfLsdbOverflow NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfExtLsdbLimit
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfLsdbOverflow trap  signifies  that  the
+       number of LSAs in the router's link-state data-
+       base has exceeded ospfExtLsdbLimit."
+       --#TYPE "Brocade Trap: OSPF LS DB Overflow"
+       --#SUMMARY "The number of LSAs in the OSPF router id %s link-state database has exceeded %d."
+       --#ARGUMENTS { 0, 1 }
+       --#SEVERITY WARNING
+       --#STATE OPERATIONAL
+   ::= { snTraps 17 }
+
+
+snOspfLsdbApproachingOverflow NOTIFICATION-TYPE
+   OBJECTS {
+                snOspfRouterId, -- The originator of the trap
+                snOspfExtLsdbLimit
+              }
+    STATUS current
+    DESCRIPTION
+       "An ospfLsdbApproachingOverflow trap  signifies
+       that  the  number of LSAs in the router's link-
+       state database has exceeded ninety  percent  of
+       ospfExtLsdbLimit."
+       --#TYPE "Brocade Trap: OSPF LS DB Near Full"
+       --#SUMMARY "The number of LSAs in the OSPF router id %s link-state database has exceeded ninety percent of  %d."
+       --#ARGUMENTS { 0, 1 }
+       --#SEVERITY INFORMATIONAL
+       --#STATE OPERATIONAL
+   ::= { snTraps 18 }
+
+
+snTrapL4MaxSessionLimitReached NOTIFICATION-TYPE
+   OBJECTS { snL4MaxSessionLimit }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the maximum number
+	   of connections reached."
+	   --#TYPE "Brocade Trap: L4 Session Limit"
+	   --#SUMMARY "SLB maximum number of connections  %d has been reached."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 19 }
+
+
+snTrapL4TcpSynLimitReached NOTIFICATION-TYPE
+   OBJECTS { snL4TcpSynLimit }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the number of TCP
+	   SYN limits reached."
+	   --#TYPE "Brocade Trap: L4 TCP Syn Limit"
+	   --#SUMMARY "SLB TCP Syn limits %d has been reached."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 20 }
+
+
+snTrapL4RealServerUp NOTIFICATION-TYPE
+   OBJECTS { snL4TrapRealServerIP, snL4TrapRealServerName }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the load balancing
+	   real server is up."
+	   --#TYPE "Brocade Trap: L4 Real Server Up"
+	   --#SUMMARY "SLB real server %s %s is up."
+	   --#ARGUMENTS { 0, 1 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 21 }
+
+
+snTrapL4RealServerDown NOTIFICATION-TYPE
+   OBJECTS { snL4TrapRealServerIP, snL4TrapRealServerName }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the load balancing
+	   real server is down."
+	   --#TYPE "Brocade Trap: L4 Real Server Down"
+	   --#SUMMARY "SLB real server %s %s is down."
+	   --#ARGUMENTS { 0, 1 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 22 }
+
+
+snTrapL4RealServerPortUp NOTIFICATION-TYPE
+   OBJECTS { snL4TrapRealServerIP, snL4TrapRealServerName, snL4TrapRealServerPort }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the load balancing
+	   real server TCP port is up."
+	   --#TYPE "Brocade Trap: L4 Real Server Port Up"
+	   --#SUMMARY "SLB real server port %s %s %d is up."
+	   --#ARGUMENTS { 0, 1, 2 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 23 }
+
+
+snTrapL4RealServerPortDown NOTIFICATION-TYPE
+   OBJECTS { snL4TrapRealServerIP, snL4TrapRealServerName, snL4TrapRealServerPort }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the load balancing
+	   real server TCP port is down."
+	   --#TYPE "Brocade Trap: L4 Real Server Port Down"
+	   --#SUMMARY "SLB real server port %s %s %d is down."
+	   --#ARGUMENTS { 0, 1, 2 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 24 }
+
+
+snTrapL4RealServerMaxConnectionLimitReached NOTIFICATION-TYPE
+   OBJECTS { snL4TrapRealServerIP, snL4TrapRealServerName, snL4TrapRealServerCurConnections }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the real server reaches
+	   maximum number of connections."
+	   --#TYPE "Brocade Trap: L4 Real Server Max Connection Limit"
+	   --#SUMMARY "SLB real server %s %s maximum connection %d has been reached."
+	   --#ARGUMENTS { 0, 1, 2 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 25 }
+
+
+snTrapL4BecomeStandby NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch changes state from active to standby."
+	   --#TYPE "Brocade Trap: L4 Server On Standby"
+	   --#SUMMARY "SLB changes state from active to standby."
+	   --#ARGUMENTS { }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 26 }
+
+
+snTrapL4BecomeActive NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch changes state from standby to active."
+	   --#TYPE "Brocade Trap: L4 Server Active"
+	   --#SUMMARY "SLB changes state from standby to active."
+	   --#ARGUMENTS { }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 27 }
+
+
+snTrapModuleInserted NOTIFICATION-TYPE
+   OBJECTS { snAgentBrdIndex }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a module was inserted
+	   to the chassis during system running."
+	   --#TYPE "Brocade Trap: Module Inserted"
+	   --#SUMMARY "Module %d was inserted to the chassis during system running."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 28 }
+
+
+snTrapModuleRemoved NOTIFICATION-TYPE
+   OBJECTS { snAgentBrdIndex }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a module was removed
+	   from the chassis during system running."
+	   --#TYPE "Brocade Trap: Module Removed"
+	   --#SUMMARY "Module %d was removed from the chassis during system running."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 29 }
+
+
+snTrapChasPwrSupplyFailed NOTIFICATION-TYPE
+   OBJECTS { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a power supply operational
+		status changed from normal to failure."
+		--#TYPE "Brocade Trap: Power Supply Failure"
+		--#SUMMARY "Power supply %d (%s)  failed."
+		--#ARGUMENTS { 0, 1 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 30 }
+
+
+snTrapChasFanFailed NOTIFICATION-TYPE
+   OBJECTS { snChasFanIndex, snChasFanDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a fan fails
+		to operate normally."
+		--#TYPE "Brocade Trap: Fan Failure"
+		--#SUMMARY "Fan  %d (%s)  failed."
+		--#ARGUMENTS { 0, 1 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 31 }
+
+
+snTrapLockedAddressViolation2 NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when more source MAC addresses
+		are received from a port than the maximum number of addresses
+		configured to that port."
+		--#TYPE "Brocade Trap: Lock Address Violation"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 0 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 32 }
+
+
+snTrapFsrpIfStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a FSRP routing device
+	   changed state from active to standby or vice-versa."
+	   --#TYPE "Brocade Trap: FSRP Interface Change"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY INFORMATIONAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 33 }
+
+snTrapVrrpIfStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a VRRP routing device
+	   switched between states master, backup, intialized or uknown."
+	   --#TYPE "Brocade Trap: VRRP Interface Change"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 34 }
+
+
+snTrapMgmtModuleRedunStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the management module
+	   changes redundancy state."
+	   --#TYPE "Brocade Trap: Management Module Change State"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 35 }
+
+
+snTrapTemperatureWarning NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the actual temperature
+	   reading is above the warning temperature threshold."
+	   --#TYPE "Brocade Trap: Temperature Warning"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY CRITICAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 36 }
+
+snTrapAccessListDeny NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a packet was denied
+	   by an access list."
+	   --#TYPE "Brocade Trap: Deny from ACL"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 37 }
+
+snTrapMacFilterDeny NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a packet was denied
+	   by a MAC address filter."
+	   --#TYPE "Brocade Trap: Deny from MAC Filter"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 38 }
+
+snTrapL4GslbRemoteUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the connection to the remote SI is established."
+		--#TYPE "Brocade Trap: Remote SI Up"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 0 }
+		--#SEVERITY WARNING
+		--#STATE OPERATIONAL
+   ::= { snTraps 39 }
+
+snTrapL4GslbRemoteDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the connection to the remote SI is down."
+		--#TYPE "Brocade Trap: Remote SI Down"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 0 }
+		--#SEVERITY WARNING
+		--#STATE OPERATIONAL
+   ::= { snTraps 40 }
+
+snTrapL4GslbRemoteControllerUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the connection to the GSLB SI is established."
+	   --#TYPE "Brocade Trap: Remote GSLB SI Up"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 41 }
+
+snTrapL4GslbRemoteControllerDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the connection to the GSLB SI is down."
+	   --#TYPE "Brocade Trap: Remote GSLB SI Down"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 0 }
+	   --#SEVERITY WARNING
+	   --#STATE OPERATIONAL
+   ::= { snTraps 42 }
+
+snTrapL4GslbHealthCheckIpUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when GSLB health check for an address transitions
+		from down to active state."
+	 --#TYPE "Brocade Trap: GSLB HealtCheck Up"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 0 }
+	 --#SEVERITY WARNING
+	 --#STATE OPERATIONAL
+   ::= { snTraps 43 }
+
+snTrapL4GslbHealthCheckIpDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when GSLB health check for an address transitions
+		from active to down state."
+	 --#TYPE "Brocade Trap: GSLB HealthCheck Down"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 0 }
+	 --#SEVERITY WARNING
+	 --#STATE OPERATIONAL
+   ::= { snTraps 44 }
+
+snTrapL4GslbHealthCheckIpPortUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a given port for a health check address is up."
+	--#TYPE "Brocade Trap: GSLB HealthCheck Port Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 45 }
+
+snTrapL4GslbHealthCheckIpPortDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a given port for a health check address is down."
+	 --#TYPE "Brocade Trap: GSLB HealthCheck Port Down"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 0 }
+	 --#SEVERITY WARNING
+	 --#STATE OPERATIONAL
+   ::= { snTraps 46 }
+
+snTrapL4FirewallBecomeStandby NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch Firewall changes state from active to standby."
+	--#TYPE "Brocade Trap: Firewall Standby"
+	--#SUMMARY "Firewall changes state from active to standby."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 47 }
+
+snTrapL4FirewallBecomeActive NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch Firewall changes state from standby to active."
+	--#TYPE "Brocade Trap: Firewall Active"
+	--#SUMMARY "Firewall changes state from standby to active."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 48 }
+
+snTrapL4FirewallPathUp NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch Firewall path is up."
+	--#TYPE "Brocade Trap: Firewall Path Up"
+	--#SUMMARY "Firewall path is up."
+	--#ARGUMENTS { }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 49 }
+
+
+snTrapL4FirewallPathDown NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the server load
+	   balancing switch Firewall path is down."
+	--#TYPE "Brocade Trap: Firewall Path Down"
+	--#SUMMARY "Firewall path is down."
+	--#ARGUMENTS { }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 50 }
+
+snTrapIcmpLocalExceedBurst NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when incoming ICMP exceeds burst-MAX."
+	--#TYPE "Brocade Trap: ICMP Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 51 }
+
+snTrapIcmpTransitExceedBurst NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when transit ICMP exceeds burst-MAX."
+	--#TYPE "Brocade Trap: Transit ICMP Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 52 }
+
+snTrapTcpLocalExceedBurst NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when incoming TCP SYN exceeds burst-MAX."
+	--#TYPE "Brocade Trap: TCP SYN Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 53 }
+
+snTrapTcpTransitExceedBurst NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when transit TCP exceeds burst-MAX."
+	--#TYPE "Brocade Trap: Transit TCP SYN Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 54 }
+
+snTrapL4ContentVerification NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the HTTP match-list pattern
+	   is found."
+   --#TYPE "Brocade Trap: HTTP Match"
+   --#SUMMARY "HTTP match-list pattern is found."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 55 }
+
+snTrapDuplicateIp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "Duplicate IP address detected."
+	--#TYPE "Brocade Trap: Duplicate IP"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 56 }
+
+snTrapMplsProblem NOTIFICATION-TYPE
+   STATUS obsolete
+   DESCRIPTION
+	   "NOT IMPLEMENTED: MPLS Problem Detected."
+	--#TYPE "Brocade Trap: MPLS Problem"
+	--#SUMMARY "MPLS Problem detect."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 57 }
+
+snTrapMplsException NOTIFICATION-TYPE
+   STATUS obsolete
+   DESCRIPTION
+	   "NOT IMPLEMENTED: MPLS Exception Detected."
+	--#TYPE "Brocade Trap: MPLS Exception"
+	--#SUMMARY "MPLS Exception detect."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 58 }
+
+snTrapMplsAudit NOTIFICATION-TYPE
+   STATUS obsolete
+   DESCRIPTION
+	   "NOT IMPLEMENTED: MPLS Audit Trap."
+	--#TYPE "Brocade Trap: MPLS Audit"
+	--#SUMMARY "MPLS Audit Trap."
+	--#ARGUMENTS { }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 59 }
+
+snTrapMplsDeveloper NOTIFICATION-TYPE
+   STATUS obsolete
+   DESCRIPTION
+	   "NOT IMPLEMENTED: MPLS Developer Trap."
+	--#TYPE "Brocade Trap: MPLS Developer"
+	--#SUMMARY "MPLS Developer Trap."
+	--#ARGUMENTS { }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 60 }
+
+snTrapNoBmFreeQueue NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when no free queue is available in buffer manager."
+	--#TYPE "Brocade Trap: No BM Free Queue"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 61 }
+
+snTrapSmcDmaDrop NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when SMC DMA packet is dropped."
+	--#TYPE "Brocade Trap: SMC DMA Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 62 }
+
+snTrapSmcBpDrop NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when SMC BackPlane packet is dropped."
+	--#TYPE "Brocade Trap: SMC BP Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 63 }
+
+snTrapBmWriteSeqDrop NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when BM write sequence packet is dropped."
+	--#TYPE "Brocade Trap: BM Write Sequence Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 64 }
+
+snTrapBgpPeerUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the bgp peer is up."
+   --#TYPE "Brocade Trap: BGP Peer Up"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 65 }
+
+snTrapBgpPeerDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the bgp peer is down."
+	--#TYPE "Brocade Trap: BGP Peer Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 66 }
+
+snTrapL4RealServerResponseTimeLowerLimit NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the real server average response time exceeds lower threshold."
+   --#TYPE "Brocade Trap: L4 Real Server Response Exceeds Lower Threshold"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 67 }
+
+snTrapL4RealServerResponseTimeUpperLimit NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the real server average response time exceeds upper threshold."
+   --#TYPE "Brocade Trap: L4 Real Server Response Exceeds Upper Threshold"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 68 }
+
+snTrapL4TcpAttackRateExceedMax NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the TCP attack rate exceeds configured maximum."
+	--#TYPE "Brocade Trap: L4 TCP Attack Rate Exceed Max"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 69 }
+
+snTrapL4TcpAttackRateExceedThreshold NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the TCP attack rate exceeds 80% of configured maximum."
+   --#TYPE "Brocade Trap: L4 TCP Attack Rate Exceed Threshold"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 70 }
+
+snTrapL4ConnectionRateExceedMax NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the L4 connection rate exceeds configured maximum."
+   --#TYPE "Brocade Trap: L4 Connection Rate Exceed Max"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY CRITICAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 71 }
+
+snTrapL4ConnectionRateExceedThreshold NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the L4 connection rate exceeds 80% of configured maximum"
+	--#TYPE "Brocade Trap: L4 Connection Rate Exceed Threshold"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 72 }
+
+snTrapRunningConfigChanged NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the running configuration
+		was changed."
+   --#TYPE "Brocade Trap: Running Configuration Changed"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 73 }
+
+snTrapStartupConfigChanged NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the startup configuration
+		was changed."
+   --#TYPE "Brocade Trap: Startup Configuration Changed"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 74 }
+
+snTrapUserLogin NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when user login."
+   --#TYPE "Brocade Trap: User Login"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 75 }
+
+snTrapUserLogout NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when user logout."
+   --#TYPE "Brocade Trap: User Logout"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 76 }
+
+snTrapPortSecurityViolation NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when insecure MAC addresses
+		are received from a port with MAC security feature enabled."
+  --#TYPE "Brocade Trap: Port Security Violation"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 0 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 77 }
+
+snTrapPortSecurityShutdown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when insecure MAC addresses
+		are received from a port caused the port to shutdown."
+   --#TYPE "Brocade Trap: Port Security Violation Cause Shutdown"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY MINOR
+   --#STATE OPERATIONAL
+   ::= { snTraps 78 }
+
+snTrapMrpStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a MRP switching and routing device
+	   changed state to  disabled, blocking, preforwarding, forwarding, uknown."
+   --#TYPE "Brocade Trap: MRP Interface Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 79 }
+
+snTrapMrpCamError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a MRP Cam Error occurs."
+   --#TYPE "Brocade Trap: MRP Cam Error"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 80 }
+
+snTrapChasPwrSupplyOK NOTIFICATION-TYPE
+   OBJECTS { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a power supply operational
+		status changed from failure to normal."
+  --#TYPE "Brocade Trap: Power Supply OK"
+  --#SUMMARY "Power supply %d (%s)  OK."
+  --#ARGUMENTS { 0, 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 81 }
+
+
+snTrapVrrpeIfStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a VRRPE routing device
+	   switched between states master, backup, intialized or uknown."
+  --#TYPE "Brocade Trap: VRRPE Interface Change"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 0 }
+  --#SEVERITY WARNING
+  --#STATE OPERATIONAL
+   ::= { snTraps 82 }
+
+snTrapVsrpIfStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a VSRP switching and routing device
+	   switched between states master, backup, intialized or uknown."
+   --#TYPE "Brocade Trap: VSRP Interface Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 83 }
+
+snTrapSrcIpAddressViolation NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a rogue device spoofs source
+	   IP address for denial of service attack."
+   --#TYPE "Brocade Trap: Intruder Source IP Address"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 84 }
+
+snTrapMacAuthEnable NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC-Authentication is enabled
+	   on an interface."
+   --#TYPE "Brocade Trap: MAC-Authentication enabled"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 85 }
+
+snTrapMacAuthDisable NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC-Authentication is disabled
+	   on an interface."
+   --#TYPE "Brocade Trap: MAC-Authentication disabled"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 86 }
+
+snTrapMacAuthMACAccepted NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC-Authentication is successful
+	   on an interface."
+   --#TYPE "Brocade Trap: MAC-Authentication success"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 87 }
+
+snTrapMacAuthMACRejected NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC-Authentication is failed
+	   on an interface."
+   --#TYPE "Brocade Trap: MAC-Authentication failure"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 88 }
+
+snTrapMacAuthPortDisabled NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when an interface is disabled due to
+	   MAC-Authentication detecting a DOS attack on that interface."
+   --#TYPE "Brocade Trap: MAC-Authentication port disabled"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY CRITICAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 89 }
+
+-- 90 through 103 are OSPFv3 traps
+
+snTrapClientLoginReject NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a login attempt by a
+	   telnet or SSH client fails."
+   --#TYPE "Brocade Trap: Client Login Reject"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 110 }
+
+snTrapLocalUserConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a local user configuration is changed."
+   --#TYPE "Brocade Trap: Local User Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 111 }
+
+snTrapVlanConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a vlan configuration is changed."
+   --#TYPE "Brocade Trap: Vlan Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 112 }
+
+snTrapAclConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a ACL configuration is changed."
+   --#TYPE "Brocade Trap: ACL Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 113 }
+
+snTrapMacFilterConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a MAC Filter configuration is changed."
+   --#TYPE "Brocade Trap: MAC Filter Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 114 }
+
+snTrapSNMPConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a SNMP configuration is changed."
+   --#TYPE "Brocade Trap: SNMP Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 115 }
+
+snTrapSyslogConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a Syslog configuration is changed."
+   --#TYPE "Brocade Trap: Syslog Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 116 }
+
+snTrapPasswordConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when enable or line password is changed."
+   --#TYPE "Brocade Trap: Password Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 117 }
+
+snTrapServerStatusChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a server is disabled or enabled."
+   --#TYPE "Brocade Trap: Server Status Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 118 }
+
+snTrapL4RealServerPortMaxConnectionLimitReached NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the real server's port reaches
+	   maximum number of connections."
+   --#TYPE "Brocade Trap: L4 Real Server Port Max Connection Limit"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 119 }
+
+snTrapL4LinkDown NOTIFICATION-TYPE
+   OBJECTS { snL4TrapLinkName, snL4LinkVirtualInterface }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the ISP link goes down."
+   --#TYPE "Brocade Trap: L4 "
+   --#SUMMARY "ISP Link %s bound to ve %d is down."
+   --#ARGUMENTS { 0, 1 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 120 }
+
+snTrapL4LinkUp NOTIFICATION-TYPE
+   OBJECTS { snL4TrapLinkName, snL4LinkVirtualInterface }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the ISP link goes up."
+   --#TYPE "Brocade Trap: L4 "
+   --#SUMMARY "ISP Link %s bound to ve %d is up."
+   --#ARGUMENTS { 0, 1 }
+   --#SEVERITY WARNING
+   --#STATE OPERATIONAL
+   ::= { snTraps 121 }
+
+snTrapPortPriorityChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the priority of a port is changed."
+   --#TYPE "Brocade Trap: Port Priority Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 122 }
+
+snTrapAutoPortDisableTrigger NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when automatic port disable was triggered."
+   --#TYPE "Brocade Trap: Automatic Port Disable Triggered "
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY ALERTS
+   --#STATE OPERATIONAL
+   ::= { snTraps 123 }
+
+snTrapAutoPortDisableRelease NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when automatic port disable was released."
+   --#TYPE "Brocade Trap: Automatic Port Disable Released "
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY ALERTS
+   --#STATE OPERATIONAL
+   ::= { snTraps 124 }
+
+snTrapPnPStatusChange NOTIFICATION-TYPE
+   OBJECTS { wgPnPStatus, wgPnPStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when plug-and-play status change."
+   --#TYPE "Brocade Trap: Plug-and-play Status Change "
+   --#SUMMARY "Plug and Play status changed from  %d to %d due to %s."
+   --#ARGUMENTS { 0, 1, 2 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 125 }
+
+snTrapWirelessIsrpPeerStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when ISRP Peer changes state."
+   --#TYPE "Brocade Trap: ISRP Peer's state has changed  "
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 126 }
+
+snTrapWirelessStationStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a wireless station's state changes."
+   --#TYPE "Brocade Trap: Wireless Station's state has changed."
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 127 }
+
+snTrapWirelessStationRoamingEventTriggered NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when we received a MOVE request from
+   the AP"
+   --#TYPE "Brocade Trap: Station has roamed "
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 128 }
+
+snTrapWirelessSappStateChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when SAPP between an AP and a FIPS
+   changes state."
+   --#TYPE "Brocade Trap: SAPP between AP and FIPS changes state. "
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 129 }
+
+snTrapExternalPowerConnectionStatus NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the external power supply
+	   connecting or disconnecting to a power over ethernet module."
+   --#TYPE "Brocade Trap: External Power Supply Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY ALERTS
+   --#STATE OPERATIONAL
+   ::= { snTraps 130 }
+
+snTrapDot1xSecurityViolation NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a malicious mac
+	   address was detected."
+   --#TYPE "Brocade Trap: 802.1x Security Violation"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY ALERTS
+   --#STATE OPERATIONAL
+   ::= { snTraps 131 }
+
+snTrapDot1xPortLinkChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when software port link status
+	   has changed to up or down."
+   --#TYPE "Brocade Trap: 802.1x Port Link Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 132 }
+
+snTrapDot1xPortControlChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when software port control status
+	   has changed to authorize or unauthorize."
+   --#TYPE "Brocade Trap: 802.1x Port Control Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 133 }
+
+snTrapDot1xVlanIdChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when VLAN ID of a port
+	   has changed."
+   --#TYPE "Brocade Trap: 802.1x VLAN ID Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 134 }
+
+snTrapDot1xFilterSetupFailure NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when software failed
+	   to setup a filter to a mac address of a port."
+   --#TYPE "Brocade Trap: 802.1x Filter Setup Failure"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 135 }
+
+snTrapDot1xError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when software detected
+	   system error."
+   --#TYPE "Brocade Trap: 802.1x Error"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY DEBUGGING
+   --#STATE OPERATIONAL
+   ::= { snTraps 136 }
+
+snTrapPortConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a port configuration is changed."
+   --#TYPE "Brocade Trap: Port Config Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 137 }
+
+snTrapMacAuthVlanIdChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when VLAN ID of a port
+	   has changed."
+   --#TYPE "Brocade Trap: MAC-Authentication VLAN ID Change"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 138 }
+
+snTrapWebAuthEnabled NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when web authentication is enabled."
+	--#TYPE "Brocade Trap: Web Authentication Enabled"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 139 }
+
+snTrapWebAuthDisabled NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when web authentication is disabled."
+	--#TYPE "Brocade Trap: Web Authentication Disabled"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 140 }
+
+snTrapIpConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when IP system address changes."
+	--#TYPE "Brocade Trap: IP Configuration Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 141 }
+
+snTrapIpv6ConfigChange NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when IPv6 system address changes."
+	--#TYPE "Brocade Trap: IPv6 Configuration Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 142 }
+
+snTrapMacAuthRadiusTimeout NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a request from Mac-Auth
+	   to RADIUS has not been answered within the retry and time limit."
+	--#TYPE "Brocade Trap: MAC-Authentication RADIUS timeout"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 143 }
+
+snTrapDot1xRadiusTimeout NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a request from 802.1x
+	   to RADIUS has not been answered within the retry and time limit."
+	--#TYPE "Brocade Trap: MAC-Authentication RADIUS timeout"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 144 }
+
+snTrapUDLDLinkDown NOTIFICATION-TYPE
+   OBJECTS { ifIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when UDLD port link status
+	   has changed to down."
+	--#TYPE "Brocade Trap: UDLD Port Link Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 1 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 145 }
+
+snTrapUDLDLinkUp NOTIFICATION-TYPE
+   OBJECTS { ifIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when UDLD port link status
+	   has changed to up."
+	--#TYPE "Brocade Trap: UDLD Port Link Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 1 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 146 }
+
+snTrapMacBasedVlanEnabled NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC based VLAN is enabled."
+	--#TYPE "Brocade Trap: MAC based VLAN enabled"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 147 }
+
+snTrapMacBasedVlanDisabled NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when MAC based VLAN is disabled."
+	--#TYPE "Brocade Trap: MAC based VLAN disabled"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 148 }
+
+snTrapChasFanNormal NOTIFICATION-TYPE
+   OBJECTS { snChasFanIndex, snChasFanDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a fan operational status
+		changed from failure to normal."
+	--#TYPE "Brocade Trap: Fan OK"
+	--#SUMMARY "Fan  %d (%s)  OK."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 149 }
+
+snTrapStpRootGuardDetect NOTIFICATION-TYPE
+	OBJECTS {ifIndex, snVLanByPortCfgVLanId, snAgGblTrapMessage}
+	STATUS current
+	DESCRIPTION
+	   "The SNMP trap that is generated when VLAN's Root-Guarded port received superior BPDU."
+	--#TYPE "Brocade Trap:  Stp root guard detect"
+	--#SUMMARY "%s."
+	--#ARGUMENTS {  2  }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 150 }
+
+snTrapStpRootGuardExpire NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snVLanByPortCfgVLanId, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+		   "The SNMP trap that is generated when VLAN's ports's Root-Guard expire."
+	 --#TYPE "Brocade Trap:  Stp root guard expire"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 2 }
+	 --#SEVERITY NOTIFICATIONS
+	 --#STATE OPERATIONAL
+   ::= { snTraps 151 }
+
+snTrapStpBPDUGuardDetect NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snVLanByPortCfgVLanId, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when VLAN's BPDU-guarded port received BPDU . "
+	 --#TYPE "Brocade Trap: STP BPDU guard "
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 2 }
+	 --#SEVERITY NOTIFICATIONS
+	 --#STATE OPERATIONAL
+   ::= { snTraps 152 }
+
+snTrapMstpBPDUGuardDetect NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when BPDU-guarded port received BPDU . "
+	 --#TYPE "Brocade Trap: MSTP BPDU guard "
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS { 1 }
+	 --#SEVERITY NOTIFICATIONS
+	 --#STATE OPERATIONAL
+   ::= { snTraps 153 }
+
+snTrapErrorDisableAction NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when  Interface error-disable is hit or recovery times out . "
+	 --#TYPE "Brocade Trap:  Error-disable hit or recovery times out"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS {  1  }
+	 --#SEVERITY NOTIFICATIONS
+	 --#STATE OPERATIONAL
+   ::= { snTraps 154 }
+
+snTrapLACPLinkStateChange NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when LACP port changes its state. "
+	 --#TYPE "Brocade Trap:  LACP port state change"
+	 --#SUMMARY "%s."
+	 --#ARGUMENTS {  1  }
+	 --#SEVERITY NOTIFICATIONS
+	 --#STATE OPERATIONAL
+   ::= { snTraps 155 }
+
+snTrapOpticalMonitoringNotFoundryOptics NOTIFICATION-TYPE
+   OBJECTS {snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if optical monitoring is enabled but optics vendor is not Foundry Networks."
+	--#TYPE "Brocade Trap: Optical Monitoring Not Brocade Optics"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY ALERTS
+	--#STATE OPERATIONAL
+   ::= { snTraps 156 }
+
+snTrapOpticalMonitoringFoundryOpticsNotCapable NOTIFICATION-TYPE
+   OBJECTS {snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if optical monitoring is enabled but the Foundry optic is not capable."
+	--#TYPE "Brocade Trap: Optical Monitoring Optics Not Capable"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY ALERTS
+	--#STATE OPERATIONAL
+   ::= { snTraps 157 }
+
+snTrapStaticMulticastMacConfigAdd NOTIFICATION-TYPE
+   OBJECTS {snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if a new entry is added to static multicast mac configuration table.
+		Format 1: Static Mac entry with Mac Address <xxxx:xxxx:xxxx> is added to portnumber <port> on VLAN <id>
+		Format 2: Static Mac entry with Mac Address <xxxx:xxxx:xxxx> is added to portmask <0xXXXXXXXX-XXXXXXXX> on VLAN <id>"
+	--#TYPE "Brocade Trap: New Entry is Added To Static Multicast Mac Configuration Table."
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 158 }
+
+snTrapStaticMulticastMacConfigRemove NOTIFICATION-TYPE
+   OBJECTS {snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if an entry is removed from static multicast mac configuration table .
+		Format 1: Static Mac entry with Mac Address <xxxx:xxxx:xxxx> is deleted from portnumber <port> on VLAN <id>
+		Format 2: Static Mac entry with Mac Address <xxxx:xxxx:xxxx> is deleted from portmask <0xXXXXXXXX-XXXXXXXX> on VLAN <id>"
+	--#TYPE "Brocade Trap:  Entry is Removed From Static Multicast Mac Configuration Table."
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 159 }
+
+snTrapSTPBPDUGuardExpire NOTIFICATION-TYPE
+   OBJECTS { ifIndex, snVLanByPortCfgVLanId, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP notification that is generated when a port is re-enabled after being disabled due to BPDU Guard Violation.
+		Format: STP: BPDU Guard re-enabled on VLAN <id> port <slot>/<port>"
+		--#TYPE "Brocade Trap: STP BPDU Guard Expire"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 2 }
+		--#SEVERITY NOTIFICATIONS
+		--#STATE OPERATIONAL
+::= { snTraps 160 }
+
+snTrapPortLoopDetection NOTIFICATION-TYPE
+   OBJECTS { ifIndex, snVLanByPortCfgVLanId, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP notification is generated when a port loop is detected.
+	   Format: LOOP DETECTION: VLAN <id>,  port <slot>/<port> detect, putting into err-disable state"
+			--#TYPE "Brocade Trap: Port Loop Detection"
+			--#SUMMARY "%s."
+			--#ARGUMENTS { 2 }
+			--#SEVERITY NOTIFICATIONS
+			--#STATE OPERATIONAL
+   ::= { snTraps 161 }
+
+snTrapNoFreeTcamEntry NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when system is running out of TCAM spaces allocated for routing entries. "
+		--#TYPE "Brocade Trap: No TCAM free entry"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 0 }
+		--#SEVERITY ALERTS
+		--#STATE OPERATIONAL
+   ::= { snTraps 162 }
+
+-- Stacking traps
+
+snTrapStackingMasterElected NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex,  snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a unit is elected as Master unit for the stacking system."
+  --#TYPE "Brocade Trap: Unit is elected as Master"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 163 }
+
+ snTrapStackingUnitAdded NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex,  snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a unit has been added to the stacking system."
+  --#TYPE "Brocade Trap: Unit is added"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 164 }
+
+ snTrapStackingUnitDeleted NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex,  snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a unit has been deleted from the stacking system."
+  --#TYPE "Brocade Trap: Unit is deleted"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 165 }
+
+snTrapStackingChasPwrSupplyOK NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snChasPwrSupplyIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a power supply operational
+		status changed from failure to normal for a stacking system."
+  --#TYPE "Brocade Trap: Stacking Power Supply OK"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 2 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 166 }
+
+snTrapStackingChasPwrSupplyFailed NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snChasPwrSupplyIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a power supply operational
+		status changed from normal to failure for a stacking system."
+		--#TYPE "Brocade Trap: Stacking Power Supply Failure"
+		--#SUMMARY "%s."
+		--#ARGUMENTS { 2 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 167 }
+
+snTrapStackingChasFanNormal NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snChasFanIndex, snChasFanDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a fan operational status
+		changed from failure to normal for a stacking system"
+		--#TYPE "Brocade Trap: Stacking Fan OK"
+		--#SUMMARY "Stack-unit %d Fan  %d (%s)  OK."
+		--#ARGUMENTS { 0, 1, 2}
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 168 }
+
+snTrapStackingChasFanFailed NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snChasFanIndex, snChasFanDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a fan fails
+		to operate normally for a stacking system."
+		--#TYPE "Brocade Trap: Stacking Fan Failure"
+		--#SUMMARY "Stack-unit %d Fan  %d (%s)  failed."
+		--#ARGUMENTS { 0, 1, 2 }
+		--#SEVERITY MINOR
+		--#STATE OPERATIONAL
+   ::= { snTraps 169 }
+
+ snTrapStackingManagementMACChanged NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the managemnet MAC
+		address of a stacking system has been changed."
+	--#TYPE "Brocade Trap: The management MAC address changed "
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { snTraps 170 }
+
+  snTrapStackingTemperatureWarning NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the actual temperature
+	   reading is above the warning temperature threshold for a stack
+	   sytem."
+	   --#TYPE "Brocade Trap: Stacking Temperature Warning"
+	   --#SUMMARY "%s."
+	   --#ARGUMENTS { 1 }
+	   --#SEVERITY CRITICAL
+	   --#STATE OPERATIONAL
+   ::= { snTraps 171 }
+
+snTrapIfIndexAssignmentChanged NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the Interface Index (IfIndex)
+		assignment for the physical interfaces was changed."
+	--#TYPE "Brocade Trap: IfIndex Assignment Changed"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 172 }
+
+snTrapPBRConfigChanged NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	  "The SNMP trap that is generated when a Policy Based Routing (PBR) routemap
+	   is bound or unbound either globally or to an interface."
+	  --#TYPE "Brocade Trap: Policy Based Routing (PBR) Config Changed "
+	  --#SUMMARY "%s."
+	  --#ARGUMENTS { 0 }
+	  --#SEVERITY ALERTS
+	  --#STATE OPERATIONAL
+   ::= { snTraps  173 }
+
+snTrapChasPwrSupplyRPSAdd NOTIFICATION-TYPE
+   OBJECTS { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when an External Redundant
+	   Power Supply (RPS2-EIF) is added to the system."
+  --#TYPE "Brocade Trap: Power Supply RPS Added"
+  --#SUMMARY "External redundant power supply %d (%s) added."
+  --#ARGUMENTS { 0, 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 174}
+
+snTrapChasPwrSupplyRPSRemove NOTIFICATION-TYPE
+   OBJECTS { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when an External Redundant
+	   Power Supply (RPS2-EIF) is removed from the system."
+  --#TYPE "Brocade Trap: Power Supply RPS Removed"
+  --#SUMMARY "External redundant power supply %d (%s) removed."
+  --#ARGUMENTS { 0, 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 175}
+
+snTrapModuleStatusChange NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex, snAgentBrdIndex, snAgentBrdModuleStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP notification that is generated when a module's operational state changes.
+	   The management entity receiving the notification can identify the
+	   module and the event by referencing snChasUnitIndex, snAgentBrdIndex, snAgentBrdModuleStatus.
+	   In case of a module-down event, the varbind snAgGblTrapMessage is a text string
+	   that describes the cause. In case of module-up event, snAgGblTrapMessage is a null
+	   string. "
+	--#TYPE "Brocade Trap: Module status changed"
+	--#SUMMARY " Module %d (of unit %d) changed state to %d due to reason: %s."
+	--#ARGUMENTS { 1,0,2,3 }
+	--#SEVERITY NOTIFICATION
+	--#STATE OPERATIONAL
+   ::= { snTraps 176 }
+
+snTrapChasHighSpeedFansNeeded NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when chassis doesn't have high speed fans for specific modules"
+	--#TYPE "Brocade Trap: High Speed fans needed"
+	--#SUMMARY "%s"
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 177 }
+
+snTrapSysmaxReverted NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the revertible
+		sysmax elements are reverted during the card bringup
+		if they can not be accomodated in the available memory."
+	--#TYPE "Brocade Trap: Sysmax Reverted"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 178 }
+
+
+snTrapSysmaxLeftLowMem NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when its found during bootup that
+		the configured sysmax set shall leave less than 10% available memory free."
+	--#TYPE "Brocade Trap: Sysmax Left Low Memory"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 179 }
+
+
+snTrapSysMemoryLowThreshold NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the available dynamic memory
+		in a card is below 5% of the installed physical memory."
+	--#TYPE "Brocade Trap: Low Available Memory"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 180 }
+
+
+snTrapSysMemoryOutThreshold NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the dynamic memory
+		fails to be allocated in a system."
+	--#TYPE "Brocade Trap: Failed Memory Allocation"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 181 }
+
+snTrapLinkOAMLinkDown NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when Link-OAM port link status
+	   has changed to down."
+	  --#TYPE "Brocade Trap: Link-OAM Port Link Change"
+	  --#SUMMARY "%s"
+	  --#ARGUMENTS { 1 }
+	  --#SEVERITY NOTIFICATIONS
+	  --#STATE OPERATIONAL
+   ::= { snTraps 182 }
+
+snTrapLinkOAMLinkUp NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when Link-OAM port link status
+	   has changed to up."
+	  --#TYPE "Brocade Trap: Link-OAM Port Link Change"
+	  --#SUMMARY "%s"
+	  --#ARGUMENTS { 1 }
+	  --#SEVERITY NOTIFICATIONS
+	  --#STATE OPERATIONAL
+   ::= { snTraps 183 }
+
+snTrapI2CAccessLog NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated to provide information about state of the management module's  I2C accesses."
+	--#TYPE "Brocade Trap: MP I2C access data"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 184 }
+
+snTrapLinkOAMLoopbackEntered NOTIFICATION-TYPE
+   OBJECTS {ifIndex, dot3OamLoopbackStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when Link-OAM port has entered
+	   loopback mode. The link is not useful for data transfer any more."
+	  --#TYPE "Brocade Trap: Link-OAM Port Loopback Mode"
+	  --#SUMMARY "%s"
+	  --#ARGUMENTS { 2 }
+	  --#SEVERITY NOTIFICATIONS
+	  --#STATE OPERATIONAL
+   ::= { snTraps 185 }
+
+snTrapLinkOAMLoopbackCleared NOTIFICATION-TYPE
+   OBJECTS {ifIndex, dot3OamLoopbackStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when Link-OAM port has entered
+	   loopback mode. The link is not useful for data transfer any more."
+	  --#TYPE "Brocade Trap: Link-OAM Port Loopback Mode"
+	  --#SUMMARY "%s"
+	  --#ARGUMENTS { 2 }
+	  --#SEVERITY NOTIFICATIONS
+	  --#STATE OPERATIONAL
+   ::= { snTraps 186 }
+
+snTrapLicenseAdded NOTIFICATION-TYPE
+   OBJECTS { fdryLicenseType, snAgGblTrapMessage  }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a new license is added to the system."
+		--#TYPE "Brocade Trap: New license added"
+		--#SUMMARY "%s"
+		--#ARGUMENTS { 1 }
+		--#SEVERITY NOTIFICATIONS
+		--#STATE OPERATIONAL
+   ::= { snTraps 187 }
+
+snTrapLicenseRemoved NOTIFICATION-TYPE
+   OBJECTS { fdryLicenseType, snAgGblTrapMessage  }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when an existing license is removed from the system."
+		--#TYPE "Brocade Trap: License removed"
+		--#SUMMARY "%s"
+		--#ARGUMENTS { 1 }
+		--#SEVERITY NOTIFICATIONS
+		--#STATE OPERATIONAL
+   ::= { snTraps 188 }
+
+snTrapLicenseExpires NOTIFICATION-TYPE
+   OBJECTS { fdryLicenseType, snAgGblTrapMessage  }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a trial license is about to expire. This trap is generated
+		daily for last 3 days and every 2 hours on the last day of expire."
+		--#TYPE "Brocade Trap: License is about to expire"
+		--#SUMMARY "%s"
+		--#ARGUMENTS { 1 }
+		--#SEVERITY WARNING
+		--#STATE OPERATIONAL
+   ::= { snTraps 189 }
+
+snTrapLicenseExpired NOTIFICATION-TYPE
+   OBJECTS { fdryLicenseType, snAgGblTrapMessage  }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a trial license has expired."
+		--#TYPE "Brocade Trap: License expired"
+		--#SUMMARY "%s"
+		--#ARGUMENTS { 1 }
+		--#SEVERITY WARNING
+		--#STATE OPERATIONAL
+   ::= { snTraps 190 }
+
+snTrapUDLDCrcFailureDetected    NOTIFICATION-TYPE
+   OBJECTS {ifIndex, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when UDLD detects CRC failures on  PDUs received on a port"
+                 --#TYPE "Brocade Trap:  UDLD detected CRC failures "
+                 --#SUMMARY "%s."
+                 --#ARGUMENTS { 1 }
+                 --#SEVERITY WARNING
+                 --#STATE OPERATIONAL
+   ::= { snTraps 191 }
+
+-- 802.1ag traps to match the generated syslog
+
+snTrapDot1agCfmRemoteMEPAgeOut    NOTIFICATION-TYPE
+   OBJECTS {dot1agCfmMdName, dot1agCfmMaNetName, dot1agCfmMepDbRMepState, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when 802.1ag Remote MEP ages out."
+                 --#TYPE "Brocade Trap:  DOT1AG Remote MEP Age Out "
+                 --#SUMMARY "%s."
+                 --#ARGUMENTS { 3 }
+                 --#SEVERITY WARNING
+                 --#STATE OPERATIONAL
+   ::= { snTraps 192 }
+
+snTrapDot1agCfmRemoteMEPUp    NOTIFICATION-TYPE
+   OBJECTS {dot1agCfmMdName, dot1agCfmMaNetName, dot1agCfmMepDbRMepState, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when 802.1ag Remote MEP is up."
+                 --#TYPE "Brocade Trap:  DOT1AG Remote MEP is up "
+                 --#SUMMARY "%s."
+                 --#ARGUMENTS { 3 }
+                 --#SEVERITY INFORMATIONAL
+                 --#STATE OPERATIONAL
+   ::= { snTraps 193 }
+
+snTrapDot1agCfmDomainCrossConnection    NOTIFICATION-TYPE
+   OBJECTS {dot1agCfmMdName, dot1agCfmMaNetName, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when 802.1ag domain gets cross-connected."
+                 --#TYPE "Brocade Trap:  DOT1AG Domain Cross Connect "
+                 --#SUMMARY "%s."
+                 --#ARGUMENTS { 2 }
+                 --#SEVERITY WARNING
+                 --#STATE OPERATIONAL
+   ::= { snTraps 194 }
+
+snTrapDot1agCfmDuplicateMEPId    NOTIFICATION-TYPE
+   OBJECTS {dot1agCfmMdName, dot1agCfmMaNetName, dot1agCfmMepDbRMepState, snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when 802.1ag Remote MEP reports a duplicate MEP Id
+                   that conflicts with local MEP Id."
+                 --#TYPE "Brocade Trap:  DOT1AG Duplicate MEP Id "
+                 --#SUMMARY "%s."
+                 --#ARGUMENTS { 3 }
+                 --#SEVERITY WARNING
+                 --#STATE OPERATIONAL
+   ::= { snTraps 195 }
+
+snTrapStackingStandbyElected NOTIFICATION-TYPE
+   OBJECTS { snChasUnitIndex,  snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when a unit is elected as Standby unit for the stacking system."
+  --#TYPE "Brocade Trap: Unit is elected as Standby"
+  --#SUMMARY "%s."
+  --#ARGUMENTS { 1 }
+  --#SEVERITY MINOR
+  --#STATE OPERATIONAL
+   ::= { snTraps 196 }
+
+snTrapMacMoveThresholdRate NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP notification is generated when MAC movement exceeding the certain threshold for a sampling interval is detected.
+	   Format: Mac-Move threshold-rate: MAC address <mac> moved from interface <port-id> to interface <port-id> for vlan <vlan-id>, 
+	   <move-count> times exceeding the threshold rate <threshold-rate> for a sampling interval <interval> seconds"
+			--#TYPE "Brocade Trap: MAC movement threshold-rate Detection"
+			--#SUMMARY "%s."
+			--#ARGUMENTS { 0 }
+			--#SEVERITY NOTIFICATIONS
+			--#STATE OPERATIONAL
+   ::= { snTraps 197 }
+
+snTrapMacMoveIntervalHistory NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP notification is generated every user configured interval, summarizing the moves in the interval .
+	   Format: Mac-Move Interval-History: <#macs> macs moved in last <interval> seconds. Total number of mac moves in the interval is <#moves>"
+			--#TYPE "Brocade Trap: MAC movement interval-history Detection"
+			--#SUMMARY "%s."
+			--#ARGUMENTS { 0 }
+			--#SEVERITY NOTIFICATIONS
+			--#STATE OPERATIONAL
+   ::= { snTraps 198 }
+
+
+-- Trapids from 1000 are reserved for XMR/IMR/MLX devices
+
+snTrapChasFanOK NOTIFICATION-TYPE
+   OBJECTS { snChasFanIndex, snChasFanDescription }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a fan operational status
+		changed from failure to normal or change in the fan speed due to
+		temperature variations downwards."
+	--#TYPE "Brocade Trap: Fan OK"
+	--#SUMMARY "Fan  %d (%s)  OK."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= { snTraps 1000 }
+
+snTrapTemperatureOK NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when the actual temperature
+	   reading is below the warning temperature threshold."
+	--#TYPE "Brocade Trap: Temperature Warning"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 1001 }
+
+snTrapCAMOverflow NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when any CAM partition
+	   becomes full."
+	--#TYPE "Brocade Trap: CAM partition full"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY ALERTS
+	--#STATE OPERATIONAL
+   ::= { snTraps 1002 }
+
+snTrapOpticalMonitoringWarning NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is a warning during optical
+        monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: Optical Monitoring Warning"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY WARNING
+        --#STATE OPERATIONAL
+   ::= { snTraps 1003 }
+
+snTrapOpticalMonitoringAlarm NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is an alarm during optical
+        monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: Optical Monitoring Alarm"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY ALERTS
+        --#STATE OPERATIONAL
+   ::= { snTraps 1004 }
+
+snTrapOpticalMonitoringError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is an error during optical
+        monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: Optical Monitoring Error"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY INFORMATIONAL
+        --#STATE OPERATIONAL
+   ::= { snTraps 1005 }
+
+snTrapPosMonitoringWarning NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is a warning during POS
+       alarm monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: POS Monitoring Warning"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY INFORMATIONAL
+        --#STATE OPERATIONAL
+   ::= { snTraps 1006 }
+
+   snTrapPosMonitoringAlarm NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is an alarm up/down
+       during POS alarm monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: POS Monitoring Alarm"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY ALERTS
+        --#STATE OPERATIONAL
+   ::= { snTraps 1007 }
+
+   snTrapPosMonitoringError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated if there is an error during POS
+        alarm monitoring.
+        The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second optional varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: POS Monitoring Error"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY INFORMATIONAL
+        --#STATE OPERATIONAL
+   ::= { snTraps 1008 }
+
+snTrapXfpSfpIncompatibleOptics NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if optics is incompatible with port configuration."
+	--#TYPE "Brocade Trap: Optical Incompatibility Error"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY ALERTS
+	--#STATE OPERATIONAL
+   ::= { snTraps 1009 }
+
+-- TRAP snMplsLspUp (1010), snMplsLspDown (1011), snMplsLspChange (1012)
+-- are defined in snmpls.mib. These IDs are reserverd.
+
+snTrapTMLoggingStart NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if TM logging is started by an event trigger."
+	--#TYPE "Brocade Trap: TM Logging Start"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 1015 }
+
+snTrapTMLoggingStop NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if TM logging stopped due to storage full."
+	--#TYPE "Brocade Trap: TM Logging Stop"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 1016 }
+
+snTrapTMLoggingRestart NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if TM logging restarted after user clearing the log."
+	--#TYPE "Brocade Trap: TM Logging Restart"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 1017    }
+
+snTrapXfpSfpNotFoundryOptics NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated if optics vendor is not Foundry Networks."
+	--#TYPE "Brocade Trap: Not Brocade Optics"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= { snTraps 1018    }
+
+snTrapTMRecoverySlotReset NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when TM recovery slot reset is triggered."
+	--#TYPE "Brocade Trap: TM recovery level II"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= { snTraps 1019    }
+
+--TM Egress Error TRAP
+snTrapTMEgressDataError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when system detects egress data errors on Traffic Manager.
+	   For e.g.  Fabric Monitoring : TM Egress data errors detected on LP <num>/TM <num>"
+	--#TYPE "Brocade Trap: TM Egress Data Error"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+::= { snTraps 1020 }
+
+
+snTrapSFMLinkDown NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a link from LP Traffic Manager to
+	   SFM Fabric Element is down.
+	   For eg.  Fabric Monitoring Link Down : SFM <num>/FE <num>/Link <num>, LP <num>/TM <num>"
+	--#TYPE "Brocade Trap: SFM Link Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+::= { snTraps 1100 }
+
+snTrapSFMLinkUp NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when a link from LP Traffic Manager to
+	   SFM Fabric Element is up.
+	   For eg.  Fabric Monitoring Link Up : SFM <num>/FE <num>/Link <num>, LP <num>/TM <num>"
+	--#TYPE "Brocade Trap: SFM Link Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+::= { snTraps 1101 }
+
+--FE Read/write TRAP
+snTrapSFMAccessError NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when system fails to access a  SFM Fabric Element.
+	   For e.g.  Fabric Monitoring : Device access failure in SFM <num>/FE <num>"
+	--#TYPE "Brocade Trap: FE Access Error"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+::= { snTraps 1102 }
+
+snTrapSFMStatusChange NOTIFICATION-TYPE
+   OBJECTS { snAgentBrdIndex, snAgentBrdModuleStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP notification that is generated when there is a change in the operational state
+                   of the Switch Fabric Module (SFM). For example,
+                       System: Health Monitoring: SFM <num> powered off due to failure detection"
+                --#TYPE "Brocade Trap: SFM status changed"
+                --#SUMMARY "%s."
+                --#ARGUMENTS { 2 }
+                --#SEVERITY MAJOR
+                --#STATE OPERATIONAL
+::= { snTraps 1103 }
+
+snTrapLPFabricStatusChange NOTIFICATION-TYPE
+   OBJECTS { snAgentBrdIndex, snAgentBrdModuleStatus, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "Health Monitoring:  LP Fabric status change."
+                --#TYPE "Brocade Trap: TM status changed"
+                --#SUMMARY "%s."
+                --#ARGUMENTS { 2 }
+                --#SEVERITY MAJOR
+                --#STATE OPERATIONAL
+::= { snTraps 1104 }
+
+snTrapChassisFanSpeedLow NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when all chassis fans change to low speed."
+	--#TYPE "Brocade Trap: Chassis Fans Speed Low"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+::= { snTraps 1200 }
+
+snTrapChassisFanSpeedMedium NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when all chassis fans change to medium speed."
+	--#TYPE "Brocade Trap: Chassis Fans Speed Medium"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+::= { snTraps 1201 }
+
+snTrapChassisFanSpeedMedHigh NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when all chassis fans change to medium high speed."
+	--#TYPE "Brocade Trap: Chassis Fans Speed Medium High"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+::= { snTraps 1202 }
+
+snTrapChassisFanSpeedHigh NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when all chassis fans change to high speed."
+	--#TYPE "Brocade Trap: Chassis Fans Speed High"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+::= { snTraps 1203 }
+
+-- TRAP IDs 1204 and 1205 are reserved for fdryTrapLagDeployed (1024)
+-- and  fdryTrapLagUndeployed(1025) traps.
+snTrapFIPSModeEnable NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when FIPS mode is enabled."
+   --#TYPE "Brocade Trap: FIPS mode enabled by <username> from console"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1207 }
+
+snTrapFIPSModeDisable NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when FIPS mode is disabled."
+   --#TYPE "Brocade Trap: FIPS mode disabled by <username> from console"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1208  }
+
+
+snTrapFIPSHostZeroized NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when host keys are zeroized in FIPS mode"
+   --#TYPE "Brocade Trap: Host keys have been zeroized by <username> from console."
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1209  }
+
+snTrapFIPSSharedSecretZeroized NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when shared secret are zeroized in FIPS mode"
+   --#TYPE "Brocade Trap: Shared Secrets have been zeroized by <username> from console."
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1210  }
+
+snTrapFIPSPOSTStatus NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated after POST."
+   --#TYPE "Brocade Trap: FIPS POST status =< SUCCESS | FAIL>"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1211  }
+
+snTrapFIPSCryptoModuleFailure NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated on cryptographic  module failure."
+   --#TYPE "Brocade Trap: FIPS Cryptographic Module Failure"
+   --#SUMMARY "%s."
+   --#ARGUMENTS { 0 }
+   --#SEVERITY CRITICAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1212  }
+
+snTrapLicense2PortNotSupported NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage  }
+   STATUS current
+   DESCRIPTION
+                   "The SNMP trap that is generated when a 2 port license cannot be applied due to hardware limitation."
+   --#TYPE "Brocade Trap: License not supported"
+   --#SUMMARY "%s"
+   --#ARGUMENTS { 0 }
+   --#SEVERITY NOTIFICATIONS
+   --#STATE OPERATIONAL
+   ::= { snTraps 1213 }
+
+snTrapOpticalMonitoringOK NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage, ifIndex }
+   STATUS current
+   DESCRIPTION
+       "The SNMP trap that is generated when an interface transitions from an error to normal state because
+        the alarms/warnings are below the threshold. snTrapOpticalMonitoringError would have been earlier generated
+        when the interface transitioned to the error state. The first varbind, snAgGblTrapMessage, will have a detailed message on
+        the cause of event. The second varbind, ifIndex, points to the affected interface
+        originating this event. If an event does not have associated port, or has multiple
+        associated ports, then ifIndex will have maximum value 0x7ffffff."
+        --#TYPE "Brocade Trap: Optical Monitoring OK"
+        --#SUMMARY "%s."
+        --#ARGUMENTS { 0 }
+        --#SEVERITY INFORMATIONAL
+        --#STATE OPERATIONAL
+   ::= { snTraps 1214 }
+
+snTrapSFMAccessOK NOTIFICATION-TYPE
+   OBJECTS { snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+    "The SNMP trap that is generated when system can successfully access an SFM Fabric Element.
+     snTrapSFMAccessError would have been generated when the system failed to access the FE.
+     For e.g.  Fabric Monitoring : Device SFM <num>/FE <num> is OK to access."
+ --#TYPE "Brocade Trap: FE Access OK"
+ --#SUMMARY "%s."
+ --#ARGUMENTS { 0 }
+ --#SEVERITY INFORMATIONAL
+ --#STATE OPERATIONAL
+::= { snTraps 1215 }
+
+snTrapUpgradeSingleCmdStart NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION
+        "The SNMP trap that is generated when the single-command package
+	   upgrade has started. This happens after a successful download
+          and validation of manifest file and before the first image download
+          takes place."
+   --#TYPE "Brocade Trap: Single-command package upgrade started."
+   --#SUMMARY "Single command package upgrade started."
+   --#ARGUMENTS {}
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1216  }
+
+snTrapUpgradeSingleCmdDone NOTIFICATION-TYPE
+   OBJECTS {snAgGblTrapMessage}
+   STATUS current
+   DESCRIPTION
+        "The SNMP trap that is generated when the single-command package
+         upgrade completed, or partially completed. The table
+         brcdSwPackageLoadResultTable lists the result of the upgrade."
+   --#TYPE "Brocade Trap: Single-command package upgrade completed."
+   --#SUMMARY "Single command package upgrade completed %s."
+   --#ARGUMENTS {0}
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1217  }
+
+snTrapAutoUpgradeStart NOTIFICATION-TYPE
+   OBJECTS {snAgentBrdIndex }
+   STATUS current
+   DESCRIPTION
+        "The SNMP trap that is generated when an auto-upgrade on a line card
+          has started."
+   --#TYPE "Brocade Trap: Auto-upgrade of interface module started."
+   --#SUMMARY "Auto-upgrade of interface module %d started."
+   --#ARGUMENTS {0}
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1218  }
+
+snTrapAutoUpgradeDone NOTIFICATION-TYPE
+   OBJECTS {snAgentBrdIndex, snAgGblTrapMessage }
+   STATUS current
+   DESCRIPTION
+        "The SNMP trap that is generated when the auto-upgrade of interface
+         module completed."
+   --#TYPE "Brocade Trap: Auto-upgrade of interface card competed."
+   --#SUMMARY "Auto-upgrade of module %d completed %s."
+   --#ARGUMENTS {0, 1}
+   --#SEVERITY INFORMATIONAL
+   --#STATE OPERATIONAL
+   ::= { snTraps 1219  }
+
+
+END

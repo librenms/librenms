@@ -1,0 +1,207 @@
+--  ====================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei Module information MIB Definition
+-- Reference:   
+-- Version:     V1.0
+-- History:
+--              huruoheng create first version v1.0
+-- =====================================================================
+
+HUAWEI-MODULE-INFO-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB            
+        OBJECT-TYPE,  MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        DateAndTime, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC            
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB;
+
+    hwModuleInfo MODULE-IDENTITY 
+        LAST-UPDATED "200506301600Z"        
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "
+            The HUAWEI-MODULE-INFO-MIB contains objects to describe
+            the module information.Such as module BOM description string.
+            "
+        ::= { hwDatacomm 43 }
+
+    hwModuleInfoObjects OBJECT IDENTIFIER ::= { hwModuleInfo 1 }
+
+    hwModuleInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwModuleInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the Module Information about slot and subslot."
+        ::= { hwModuleInfoObjects 1 }
+    
+    hwModuleInfoEntry OBJECT-TYPE
+        SYNTAX HwModuleInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwModuleIndex, hwSubModuleIndex }
+        ::= { hwModuleInfoTable 1 }
+    
+    HwModuleInfoEntry ::=
+        SEQUENCE { 
+            hwModuleIndex
+                INTEGER,
+            hwSubModuleIndex
+                INTEGER,                
+            hwModuleBomId
+                SnmpAdminString,
+            hwModuleBomEnDesc
+                SnmpAdminString,
+            hwModuleBomLocalDesc
+                SnmpAdminString,
+            hwModuleManufacturedDate
+                DateAndTime,
+            hwModuleManufactureCode
+                INTEGER,
+            hwModuleCLEICode
+                SnmpAdminString,
+            hwModuleUpdateLog
+                SnmpAdminString,
+            hwModuleArchivesInfoVersion
+                SnmpAdminString,
+            hwModuleSerialNum
+                SnmpAdminString
+         }
+         
+         
+    hwModuleIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Object to index the table.It can be integer up from 1.
+            For example: 3 means the entry is a module from No.3 slot
+            and it can be slot or subslot.
+            "
+        ::= { hwModuleInfoEntry 1 }
+        
+    hwSubModuleIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Sub Object to index the table.It can be integer up from 1.
+            
+            For example: 
+            
+            hwModuleIndex=1    hwSubModuleIndex=5
+            That means this entry is the fifth subslot on slot No.1
+            
+            hwModuleIndex=2    hwSubModuleIndex=0
+            That means this entry is the second slot,and not a subslot.
+            "
+        ::= { hwModuleInfoEntry 2 }
+         
+    hwModuleBomId OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The identity of the Bill of Material about this replaceable 
+            unit which coded by vendor. This node is mapping to 'ITEM' 
+            in the information file.
+            "
+        ::= { hwModuleInfoEntry 3 }
+        
+    hwModuleBomEnDesc OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The English description of the Bill of Material about this 
+            replaceable unit.
+            "
+        ::= { hwModuleInfoEntry 4 }
+        
+    hwModuleBomLocalDesc OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The local description of the Bill of Material about this 
+            replaceable unit.
+            "
+        ::= { hwModuleInfoEntry 5 }        
+        
+    hwModuleManufacturedDate OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The date when this physical entity is Manufactured.
+            "
+        ::= { hwModuleInfoEntry 6 }        
+        
+    hwModuleManufactureCode OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The code of the place where this physical entity is Manufactured.
+            "
+        ::= { hwModuleInfoEntry 7 }        
+        
+    hwModuleCLEICode OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The string code of CLEI which was granted by America.
+            "
+        ::= { hwModuleInfoEntry 8 }        
+        
+    hwModuleUpdateLog OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maintenance log of this replaceable unit.
+            "
+        ::= { hwModuleInfoEntry 9 }         
+        
+    hwModuleArchivesInfoVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Version of Archives Information.
+            "
+        ::= { hwModuleInfoEntry 10 }        
+        
+    hwModuleSerialNum OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Serial number of this replaceable unit.
+            "
+        ::= { hwModuleInfoEntry 11 }                
+            
+         
+         
+END
+
+         

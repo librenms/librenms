@@ -1,0 +1,2235 @@
+
+	ATM-FORUM-ILMI40-MIB DEFINITIONS ::= BEGIN
+
+	-- RCSID information
+
+	--  $RCSfile: atmf-ILMI40.mib,v $
+	--  $Revision: 1.2 $		$State: Exp $
+	--  $Date: 1997/06/24 22:13:48 $
+	--  $Author: eric $
+
+
+	--  This module provides authoritative definitions for Alcatel Internetworking,
+	--  Inc. implimentation of the ATM Forum ILMI 4.0 mib. It use and distribution
+	--  is regulated by both Alcatel Internetworking, Inc. and the ATM Forum.
+
+	--  The Address registration (net/user sides) is implimented
+	--  in a hard state machine, thus these groups have been
+	--  commented out.
+
+	--  This module will be extended, as needed.
+
+
+	--  Alcatel Internetworking, Inc. reserves the right to make changes in
+	--  specification and oher information contained in this document without
+	--  prior notice.  The reader should consult Alcatel Internetworking, Inc.
+	--  to determine whether any such changes have been made.
+	--  Current MIBs are availible from the following URLs:
+	--              ftp://ftp.ind.alcatel.com/pub/products/mibs
+	--              http://www.ind.alcatel.com
+
+	--  In no event shall Alcatel Internetworking, Inc. be liable for any incidental,
+	--  indirect, special, or consequential damages whatsoever (including
+	--  but not limited to lost profits) arising out of or related to this
+	--  document or the information contained in it, even if Alcatel Internetworking,
+	--  Inc. has been advised of, known, or should have known, the
+	--  possibility of such damages.
+
+	--  atmf-ILMI40
+	--  Revision: 1.00
+	--  Date: Feb 21, 1997
+
+
+
+	IMPORTS
+		enterprises
+			FROM RFC1155-SMI
+		Counter, IpAddress
+			FROM RFC1155-SMI
+		DisplayString
+			FROM RFC1213-MIB
+		TRAP-TYPE
+			FROM RFC-1215
+		OBJECT-TYPE
+			FROM RFC-1212
+			;
+
+
+--              Textual Conventions
+
+-- All representations of ATM addresses in this MIB Module use
+-- the data type:
+AtmAddress ::= OCTET STRING (SIZE (0 .. 32))
+-- Note this data type is used only by the deprecated object
+-- atmfPortAddress. Another definition (a refined one) is
+-- specified in the Textual Conventions MIB.
+
+-- Boolean values use this data type from RFC-1903, "Textual Conventions
+-- for Version 2 of the Simple Network Management Protocol (SNMPv2)"
+TruthValue ::= INTEGER { true(1), false(2) }
+
+-- CLNP address values use this data type from RFC-1238, "CLNS MIB for
+-- use with Connectionless Network Protocol (ISO 8473) and End System
+-- to Intermediate System (ISO 9542)"
+ClnpAddress ::= OCTET STRING (SIZE (1..21))
+
+-- ATM Service Categories use this data type (See [TM4.0]):
+AtmServiceCategory ::=
+        INTEGER {
+                other(1),
+                cbr(2),
+                rtVbr(3),
+                nrtVbr(4),
+                abr(5),
+                ubr(6)
+        }
+
+-- ATM End-System Addresses use this data type:
+--AtmAddress ::= OCTET STRING (SIZE (8 | 20))
+
+-- Network-Prefixes for an ATM Address use this data type:
+--NetPrefix ::= OCTET STRING (SIZE (8 | 13))
+
+-- In both the AtmAddress and NetPrefix conventions, Native E.164 addresses
+-- are represented as 8 octets using the format specified in section
+-- 3.1.1.3 of the ATM Forum UNI Signalling 4.0 specification.
+-- In contrast, an NSAP-encoded address is 20 octets, and an NSAP-encoded
+-- network prefix is 13 octets long.
+
+
+--              MIB Groups
+
+-- a subtree for defining ATM Forum MIB object types
+-- enterprises		OBJECT IDENTIFIER ::= { 0 }
+atmForum                OBJECT IDENTIFIER ::= { enterprises 353 }
+
+-- a subtree for defining administrative object types
+atmForumAdmin           OBJECT IDENTIFIER ::= { atmForum 1 }
+atmfTransmissionTypes   OBJECT IDENTIFIER ::= { atmForumAdmin 2 }
+atmfMediaTypes          OBJECT IDENTIFIER ::= { atmForumAdmin 3 }
+atmfTrafficDescrTypes   OBJECT IDENTIFIER ::= { atmForumAdmin 4 }
+atmfSrvcRegTypes        OBJECT IDENTIFIER ::= { atmForumAdmin 5 }
+
+-- a subtree for defining ATM Interface MIB object types
+atmForumUni             OBJECT IDENTIFIER ::= { atmForum 2 }
+atmfPhysicalGroup       OBJECT IDENTIFIER ::= { atmForumUni 1 }
+atmfAtmLayerGroup       OBJECT IDENTIFIER ::= { atmForumUni 2 }
+atmfAtmStatsGroup       OBJECT IDENTIFIER ::= { atmForumUni 3 }
+atmfVpcGroup            OBJECT IDENTIFIER ::= { atmForumUni 4 }
+atmfVccGroup            OBJECT IDENTIFIER ::= { atmForumUni 5 }
+atmfAddressGroup        OBJECT IDENTIFIER ::= { atmForumUni 6 }
+atmfNetPrefixGroup      OBJECT IDENTIFIER ::= { atmForumUni 7 }
+atmfSrvcRegistryGroup   OBJECT IDENTIFIER ::= { atmForumUni 8 }
+atmfVpcAbrGroup         OBJECT IDENTIFIER ::= { atmForumUni 9 }
+atmfVccAbrGroup         OBJECT IDENTIFIER ::= { atmForumUni 10 }
+atmfAddressRegistrationAdminGroup OBJECT IDENTIFIER ::= { atmForumUni 11 }
+
+
+--              Object Identifier definitions
+
+-- Transmission Types: These values are no longer used
+atmfUnknownType         OBJECT IDENTIFIER ::= { atmfTransmissionTypes 1}
+atmfSonetSTS3c          OBJECT IDENTIFIER ::= { atmfTransmissionTypes 2 }
+atmfDs3                 OBJECT IDENTIFIER ::= { atmfTransmissionTypes 3 }
+atmf4B5B                OBJECT IDENTIFIER ::= { atmfTransmissionTypes 4 }
+atmf8B10B               OBJECT IDENTIFIER ::= { atmfTransmissionTypes 5 }
+atmfSonetSTS12c         OBJECT IDENTIFIER ::= { atmfTransmissionTypes 6 }
+atmfE3                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 7 }
+atmfT1                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 8 }
+atmfE1                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 9 }
+
+-- Media Types: These values are no longer used
+atmfMediaUnknownType    OBJECT IDENTIFIER ::= { atmfMediaTypes 1 }
+atmfMediaCoaxCable      OBJECT IDENTIFIER ::= { atmfMediaTypes 2 }
+atmfMediaSingleMode     OBJECT IDENTIFIER ::= { atmfMediaTypes 3 }
+atmfMediaMultiMode      OBJECT IDENTIFIER ::= { atmfMediaTypes 4 }
+atmfMediaStp            OBJECT IDENTIFIER ::= { atmfMediaTypes 5 }
+atmfMediaUtp            OBJECT IDENTIFIER ::= { atmfMediaTypes 6 }
+
+-- Traffic Descriptor Types: These types are combined with a five element
+-- parameter vector to describe a Traffic Descriptor.
+-- Traffic Descriptors along with a Best Effort Indicator are used to
+-- indicate a Conformance Definition as defined in [TM4.0].
+
+-- These types are no longer used
+atmfNoDescriptor        OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 1 }
+atmfPeakRate            OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 2 }
+
+-- The No CLP/No SCR Type
+-- Indicates the CBR.1 Conformance Definition if Best Effort is No
+-- Indicates the UBR.1 and UBR.2 Conformance Definitions if Best Effort is Yes
+atmfNoClpNoScr          OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 3 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - CDVT in tenths of microseconds
+        -- Parameters #3, #4 and #5 are unused
+
+-- These types are no longer used
+atmfClpNoTaggingNoScr   OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 4 }
+atmfClpTaggingNoScr     OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 5 }
+
+-- The SCR/No CLP Type
+-- Indicates the VBR.1 Conformance Definition
+atmfNoClpScr            OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 6 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The CLP without Tagging/SCR Type
+-- Indicates the VBR.2 Conformance Definition
+atmfClpNoTaggingScr     OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 7 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0 traffic
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The CLP with Tagging/SCR Type
+-- Indicates the VBR.3 Conformance Definition
+atmfClpTaggingScr       OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 8 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0
+        --      traffic, excess tagged as CLP=1
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The ABR Type
+-- Indicates the ABR Conformance Definition
+atmfClpNoTaggingMcr      OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 9 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second
+        -- parameter #2 - CDVT in tenths of microseconds
+        -- Parameter #3 - minimum cell rate in cells/second
+        -- Parameter #4 - unused
+        -- Parameter #5 - unused
+
+
+
+--              The Physical Port Group
+--
+-- This group is mandatory for all ATM Interface devices.
+--
+-- The Physical Port Table
+
+atmfPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of physical layer status and parameter
+                information for the ATM Interface's physical interface."
+        ::= { atmfPhysicalGroup 1 }
+
+atmfPortEntry OBJECT-TYPE
+        SYNTAX  AtmfPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about
+                the physical layer of an ATM Interface."
+        INDEX   { atmfPortIndex }
+        ::= { atmfPortTable 1 }
+
+AtmfPortEntry ::=
+        SEQUENCE {
+                atmfPortIndex
+                        INTEGER,
+                atmfPortAddress
+                        AtmAddress,
+                atmfPortTransmissionType
+                        OBJECT IDENTIFIER,
+                atmfPortMediaType
+                        OBJECT IDENTIFIER,
+                atmfPortOperStatus
+                        INTEGER,
+                atmfPortSpecific
+                        OBJECT IDENTIFIER,
+                atmfPortMyIfName
+                        DisplayString,
+                atmfPortMyIfIdentifier
+                        INTEGER
+
+        }
+
+atmfPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+        ::= { atmfPortEntry 1 }
+
+atmfPortAddress OBJECT-TYPE
+        SYNTAX  AtmAddress
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 2.0
+                of the UNI specification. The Address Group, defined
+                in theAddress Registration MIB should be used instead."
+        ::= { atmfPortEntry 2 }
+
+atmfPortTransmissionType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification. Appropriate Network Management
+                MIBs should be used instead."
+        ::= { atmfPortEntry 3 }
+
+atmfPortMediaType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification. Appropriate Network Management
+                MIBs should be used instead."
+        ::= { atmfPortEntry 4 }
+
+atmfPortOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        inService(2),
+                        outOfService(3),
+                        loopBack(4)
+                }
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification. Appropriate Network Management
+                MIBs should be used instead."
+        ::= { atmfPortEntry 5 }
+
+atmfPortSpecific OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification. Appropriate Network Management
+                MIBs should be used instead."
+        ::= { atmfPortEntry 6 }
+
+atmfPortMyIfName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual name of this interface. If this system is
+                manageable through SNMP, and supports the object
+                ifName, the value of this object must be identical
+                with that of ifName for the ifEntry of the lowest
+                level physical interface for this port. This interface
+                must be uniquely named on this system to distinguish
+                parallel links with a neighboring system.  If this
+                interface does not have a textual name, the value of
+                this object is a zero length string."
+        ::= { atmfPortEntry 7 }
+
+atmfPortMyIfIdentifier OBJECT-TYPE
+        SYNTAX INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ATM interface. The scheme used to
+                number the ATM interfaces on an ATM device is
+                implementation specific. One way to generate this value is
+                to use the ifIndex that an SNMP manager would use to
+                identify the port. This interface must be uniquely numbered
+                on this system to distinguish parallel links with a
+                neighboring system."
+        ::= { atmfPortEntry 8 }
+
+--  Note: The typical IME will support only one of the following two objects
+atmfMyIpNmAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An IP Address to which a Network Management Station
+                can send Network Management protocol messages, e.g. SNMP
+                messages to UDP port 161, in order to access network
+                management information concerning the operation of the
+                ATM device local to this IME. If this object is supported,
+                but the Network Management Agent has not been configured with
+                an IP Address, the IME should return 0.0.0.0."
+        ::= { atmfPhysicalGroup 2 }
+
+atmfMyOsiNmNsapAddress OBJECT-TYPE
+        SYNTAX  ClnpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An NSAP Address to which a Network Management Station
+                can send Network Management protocol messages in order
+                to access network management information concerning
+                the operation of the ATM device local to this IME.
+                If this object is supported,
+                but the Network Management Agent has not been configured with
+                an NSAP Address, the IME should return 0.0.0.0"
+        ::= { atmfPhysicalGroup 3 }
+
+atmfMySystemIdentifier OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A 48 bit identifier, taken from the IEEE universally
+                administered MAC address space, which uniquely
+                identifies the ATM device local to this IME."
+        ::= { atmfPhysicalGroup 4 }
+
+
+--              The ATM Layer Group
+-- This group is mandatory for all ATM Interfaces.
+--
+-- ATM-layer specific information for the ATM Interface.
+
+atmfAtmLayerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfAtmLayerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of ATM layer status and parameter information
+                for the ATM Interface."
+        ::= { atmfAtmLayerGroup 1 }
+
+atmfAtmLayerEntry OBJECT-TYPE
+        SYNTAX  AtmfAtmLayerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about
+                the ATM layer of an ATM Interface."
+        INDEX   { atmfAtmLayerIndex }
+        ::= { atmfAtmLayerTable 1 }
+
+AtmfAtmLayerEntry ::=
+        SEQUENCE {
+                atmfAtmLayerIndex
+                        INTEGER,
+                atmfAtmLayerMaxVPCs
+                        INTEGER,
+                atmfAtmLayerMaxVCCs
+                        INTEGER,
+                atmfAtmLayerConfiguredVPCs
+                        INTEGER,
+                atmfAtmLayerConfiguredVCCs
+                        INTEGER,
+                atmfAtmLayerMaxVpiBits
+                        INTEGER,
+                atmfAtmLayerMaxVciBits
+                        INTEGER,
+                atmfAtmLayerUniType
+                        INTEGER,
+                atmfAtmLayerUniVersion
+                        INTEGER,
+                atmfAtmLayerDeviceType
+                        INTEGER,
+                atmfAtmLayerIlmiVersion
+                        INTEGER,
+                atmfAtmLayerNniSigVersion
+                        INTEGER,
+                atmfAtmLayerMaxSvpcVpi
+                        INTEGER,
+                atmfAtmLayerMaxSvccVpi
+                        INTEGER,
+                atmfAtmLayerMinSvccVci
+                        INTEGER
+        }
+
+atmfAtmLayerIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+        ::= { atmfAtmLayerEntry 1 }
+
+atmfAtmLayerMaxVPCs OBJECT-TYPE
+        SYNTAX  INTEGER (0..4096)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of switched and permanent VPCs
+                supported on this ATM Interface. For virtual interfaces
+                (i.e. Virtual Path Connections), the maximum number of VPCs
+                PNNI may communicate over is set to zero."
+        ::= { atmfAtmLayerEntry 2 }
+
+atmfAtmLayerMaxVCCs OBJECT-TYPE
+        SYNTAX  INTEGER (0..268435456)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of switched and permanent VCCs
+                supported on this ATM Interface."
+        ::= { atmfAtmLayerEntry 3 }
+
+atmfAtmLayerConfiguredVPCs OBJECT-TYPE
+        SYNTAX  INTEGER (0..4096)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of permanent VPCs configured for use on
+                this ATM Interface. For virtual interfaces (i.e. Virtual Path
+                Connections used by PNNI), the maximum number of VPCs
+                is set to zero."
+        ::= { atmfAtmLayerEntry 4 }
+
+atmfAtmLayerConfiguredVCCs OBJECT-TYPE
+        SYNTAX  INTEGER (0..268435456)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of permanent VCCs configured for use on
+                this ATM Interface."
+        ::= { atmfAtmLayerEntry 5 }
+
+atmfAtmLayerMaxVpiBits OBJECT-TYPE
+        SYNTAX  INTEGER (0..12)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of active VPI bits on this ATM Interface.
+                For virtual interfaces (i.e. Virtual Path Connections used by PNNI),
+                this value has no meaning and is set to zero."
+        ::= { atmfAtmLayerEntry 6 }
+
+atmfAtmLayerMaxVciBits OBJECT-TYPE
+        SYNTAX  INTEGER (0..16)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of active VCI bits on this ATM Interface."
+        ::= { atmfAtmLayerEntry 7 }
+
+atmfAtmLayerUniType OBJECT-TYPE
+        SYNTAX  INTEGER { public(1), private(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of the ATM device, either public or private."
+        ::= { atmfAtmLayerEntry 8 }
+
+atmfAtmLayerUniVersion OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        version2point0(1),
+                        version3point0(2),
+                        version3point1(3),
+                        version4point0(4),
+                        unsupported(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An indication of the latest version of the ATM Forum UNI
+                Signalling Specification that is supported on this ATM
+                Interface.  If this value is not present, a version of the UNI
+                earlier than 3.1 is supported.
+
+                If the peer IME's value of this object is the same as,
+                or later than the local IME's value, then the version
+                corresponding to the local IME's value should be
+                attempted.  Otherwise, if the peer IME's value of this
+                object is earlier, and supported locally, then the
+                local IME should attempt the version corresponding to
+                the peer IME's value.  Otherwise, compatibility of the
+                two IMEs cannot be assumed."
+        ::= { atmfAtmLayerEntry 9 }
+
+atmfAtmLayerDeviceType OBJECT-TYPE
+        SYNTAX  INTEGER { user(1), node(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object determines the type of the ATM device. This
+                object is used in automatic ATM Interface-Type determination
+                procedure such that a correct operational ATM
+                Interface-type can be determined. An ATM End System
+                shall take the value of user(1), and an ATM network
+                node shall take the value of node(2)."
+        ::= { atmfAtmLayerEntry 10 }
+
+atmfAtmLayerIlmiVersion OBJECT-TYPE
+        SYNTAX  INTEGER { unsupported(1), version4point0(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An indication of the latest version of the ATM Forum
+                ILMI Specification that is supported on this ATM Interface.
+
+                If the peer IME's value of this object is the same as,
+                or later than the local IME's value, then the version
+                corresponding to the local IME's value should be
+                attempted.  Otherwise, if the peer IME's value of this
+                object is earlier, and supported locally, then the
+                local IME should attempt the version corresponding to
+                the peer IME's value.  Otherwise, compatibility of the
+                two IMEs cannot be assumed.
+
+                If this object is not present, a version of the ILMI earlier
+                than 4.0 is supported."
+        ::= { atmfAtmLayerEntry 11 }
+
+atmfAtmLayerNniSigVersion OBJECT-TYPE
+        SYNTAX  INTEGER { unsupported(1), iisp(2),
+                          pnniVersion1point0(3) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An indication of the latest version of the ATM Forum
+                PNNI Signalling Specification that is supported on this
+                ATM Interface. Note that the PNNI routing version is not
+                determined through ILMI.
+
+                If the peer IME's value of this object is the same as,
+                or later than the local IME's value, then the version
+                corresponding to the local IME's value should be
+                attempted.  Otherwise, if the peer IME's value of this
+                object is earlier, and supported locally, then the
+                local IME should attempt the version corresponding to
+                the peer IME's value.  Otherwise, compatibility of the
+                two IMEs cannot be assumed."
+        ::= { atmfAtmLayerEntry 12 }
+
+atmfAtmLayerMaxSvpcVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4096)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "The maximum VPI that the signalling stack on the ATM
+                interface is configured to support for allocation to
+                switched virtual path connections."
+        ::= { atmfAtmLayerEntry 13 }
+
+atmfAtmLayerMaxSvccVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4096)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum VPI that the signalling stack on the ATM
+                interface is configured to support for allocation to
+                switched virtual channel connections."
+        ::= { atmfAtmLayerEntry 14 }
+
+atmfAtmLayerMinSvccVci OBJECT-TYPE
+        SYNTAX  INTEGER (0..65536)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the minimum VCI value that the
+                signalling stack is configured to support for
+                allocation to switched virtual channel connections.  The same
+                value applies to all SVCC VPI values for which the
+                signalling stack is configured."
+        ::= { atmfAtmLayerEntry 15 }
+
+
+--              The ATM Statistics Group
+-- This group is deprecated and should not be implemented except as
+-- required for backward compatibility with version 3.1 of the UNI
+-- specification.
+
+atmfAtmStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfAtmStatsEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+                "This group is deprecated and should not be implemented
+                 except as required for backward compatibility with version
+                 3.1 of the UNI specification."
+        ::= { atmfAtmStatsGroup 1 }
+
+atmfAtmStatsEntry OBJECT-TYPE
+        SYNTAX  AtmfAtmStatsEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        INDEX   { atmfAtmStatsIndex }
+        ::= { atmfAtmStatsTable 1 }
+
+AtmfAtmStatsEntry ::=
+        SEQUENCE {
+                atmfAtmStatsIndex
+                        INTEGER,
+                atmfAtmStatsReceivedCells
+                        Counter,
+                atmfAtmStatsDroppedReceivedCells
+                        Counter,
+                atmfAtmStatsTransmittedCells
+                        Counter
+        }
+
+atmfAtmStatsIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfAtmStatsEntry 1 }
+
+atmfAtmStatsReceivedCells OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfAtmStatsEntry 2 }
+
+atmfAtmStatsDroppedReceivedCells OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfAtmStatsEntry 3 }
+
+atmfAtmStatsTransmittedCells OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfAtmStatsEntry 4 }
+
+
+--              The Virtual Path Group
+-- This group is mandatory for all ATM Interfaces.
+--
+-- Information concerning Virtual Path Connections
+
+atmfVpcTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfVpcEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of status and parameter information on the
+                virtual path connections which cross this ATM
+                Interface. There is one entry in this table for each
+                permanent virtual path connection."
+        ::= { atmfVpcGroup 1 }
+
+atmfVpcEntry OBJECT-TYPE
+        SYNTAX  AtmfVpcEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about a
+                particular virtual path connection."
+        INDEX   { atmfVpcPortIndex, atmfVpcVpi }
+        ::= { atmfVpcTable 1 }
+
+AtmfVpcEntry ::=
+        SEQUENCE {
+                atmfVpcPortIndex
+                        INTEGER,
+                atmfVpcVpi
+                        INTEGER,
+                atmfVpcOperStatus
+                        INTEGER,
+                atmfVpcTransmitTrafficDescriptorType
+                        OBJECT IDENTIFIER,
+                atmfVpcTransmitTrafficDescriptorParam1
+                        INTEGER,
+                atmfVpcTransmitTrafficDescriptorParam2
+                        INTEGER,
+                atmfVpcTransmitTrafficDescriptorParam3
+                        INTEGER,
+                atmfVpcTransmitTrafficDescriptorParam4
+                        INTEGER,
+                atmfVpcTransmitTrafficDescriptorParam5
+                        INTEGER,
+                atmfVpcReceiveTrafficDescriptorType
+                        OBJECT IDENTIFIER,
+                atmfVpcReceiveTrafficDescriptorParam1
+                        INTEGER,
+                atmfVpcReceiveTrafficDescriptorParam2
+                        INTEGER,
+                atmfVpcReceiveTrafficDescriptorParam3
+                        INTEGER,
+                atmfVpcReceiveTrafficDescriptorParam4
+                        INTEGER,
+                atmfVpcReceiveTrafficDescriptorParam5
+                        INTEGER,
+                atmfVpcQoSCategory
+                        INTEGER,
+                atmfVpcTransmitQoSClass
+                        INTEGER,
+                atmfVpcReceiveQoSClass
+                        INTEGER,
+                atmfVpcBestEffortIndicator
+                        TruthValue,
+                atmfVpcServiceCategory
+                        AtmServiceCategory
+        }
+
+atmfVpcPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+        ::= { atmfVpcEntry 1 }
+
+atmfVpcVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4095)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VPI value of this Virtual Path Connection at the
+                local ATM Interface."
+        ::= { atmfVpcEntry 2 }
+
+atmfVpcOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unknown(1),
+                        end2endUp(2),
+                        end2endDown(3),
+                        localUpEnd2endUnknown(4),
+                        localDown(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The present actual operational status of the VPC.
+
+                A value of end2endUp(2) or end2endDown(3) would be
+                used if the end-to-end status is known. If only local
+                status information is available, a value of
+                localUpEnd2endUnknown(4) or localDown(5) would be
+                used."
+        ::= { atmfVpcEntry 3 }
+
+atmfVpcTransmitTrafficDescriptorType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of traffic management, applicable to the
+                transmit direction of this VPC. The type may indicate
+                none, or a type with one or more parameters. These
+                parameters are specified as a parameter vector, in the
+                corresponding instances of the objects:
+                        atmfVpcTransmitTrafficDescriptorParam1,
+                        atmfVpcTransmitTrafficDescriptorParam2,
+                        atmfVpcTransmitTrafficDescriptorParam3,
+                        atmfVpcTransmitTrafficDescriptorParam4, and
+                        atmfVpcTransmitTrafficDescriptorParam5."
+        ::= { atmfVpcEntry 4 }
+
+atmfVpcTransmitTrafficDescriptorParam1 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The first parameter of the transmit parameter vector
+                for this VPC, used according to the value of
+                atmfVpcTransmitTrafficDescriptorType."
+        ::= { atmfVpcEntry 5 }
+
+atmfVpcTransmitTrafficDescriptorParam2 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The second parameter of the transmit parameter vector
+                for this VPC, used according to the value of
+                atmfVpcTransmitTrafficDescriptorType."
+        ::= { atmfVpcEntry 6 }
+
+atmfVpcTransmitTrafficDescriptorParam3 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The third parameter of the transmit parameter vector
+                for this VPC, used according to the value of
+                atmfVpcTransmitTrafficDescriptorType."
+        ::= { atmfVpcEntry 7 }
+
+atmfVpcTransmitTrafficDescriptorParam4 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fourth parameter of the transmit parameter vector
+                for this VPC, used according to the value of
+                atmfVpcTransmitTrafficDescriptorType."
+        ::= { atmfVpcEntry 8 }
+
+atmfVpcTransmitTrafficDescriptorParam5 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fifth parameter of the transmit parameter vector
+                for this VPC, used according to the value of
+                atmfVpcTransmitTrafficDescriptorType."
+        ::= { atmfVpcEntry 9 }
+
+atmfVpcReceiveTrafficDescriptorType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of traffic management, applicable to the
+                traffic in the receive direction of this VPC. The type
+                may indicate none, or a type with one or more
+                parameters. These parameters are specified as a
+                parameter vector, in the corresponding instances of
+                the objects:
+                        atmfVpcReceiveTrafficDescriptorParam1,
+                        atmfVpcReceiveTrafficDescriptorParam2,
+                        atmfVpcReceiveTrafficDescriptorParam3,
+                        atmfVpcReceiveTrafficDescriptorParam4, and
+                        atmfVpcReceiveTrafficDescriptorParam5."
+        ::= { atmfVpcEntry 10 }
+
+atmfVpcReceiveTrafficDescriptorParam1 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The first parameter of the receive parameter vector
+                for this VPC, used according to the value of
+                atmfVpcReceiveTrafficDescriptorType."
+        ::= { atmfVpcEntry 11 }
+
+atmfVpcReceiveTrafficDescriptorParam2 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The second parameter of the receive parameter vector
+                for this VPC, used according to the value of
+                atmfVpcReceiveTrafficDescriptorType."
+        ::= { atmfVpcEntry 12 }
+
+atmfVpcReceiveTrafficDescriptorParam3 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The third parameter of the receive parameter vector
+                for this VPC, used according to the value of
+                atmfVpcReceiveTrafficDescriptorType."
+        ::= { atmfVpcEntry 13 }
+
+atmfVpcReceiveTrafficDescriptorParam4 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fourth parameter of the receive parameter vector
+                for this VPC, used according to the value of
+                atmfVpcReceiveTrafficDescriptorType."
+        ::= { atmfVpcEntry 14 }
+
+atmfVpcReceiveTrafficDescriptorParam5 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fifth parameter of the receive parameter vector
+                for this VPC, used according to the value of
+                atmfVpcReceiveTrafficDescriptorType."
+        ::= { atmfVpcEntry 15 }
+
+atmfVpcQoSCategory OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        deterministic (2),
+                        statistical (3),
+                        unspecified (4)
+                }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 2.0
+                of the UNI specification."
+        ::= { atmfVpcEntry 16 }
+
+atmfVpcTransmitQoSClass OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfVpcEntry 17 }
+
+atmfVpcReceiveQoSClass OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfVpcEntry 18 }
+
+atmfVpcBestEffortIndicator OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The object is examined when
+                atmfVpcTransmitTrafficDescriptorType or
+                atmfVpcReceiveTrafficDescriptorType for the associated
+                connection is equal to atmfNoClpNoScr.
+                If this object is set to false(2), the network is requested
+                to apply the CBR.1 conformance definition. If this object
+                is set to true(1), the network is requested to apply the
+                UBR.1 conformance definition."
+        ::= { atmfVpcEntry 19 }
+
+atmfVpcServiceCategory OBJECT-TYPE
+        SYNTAX  AtmServiceCategory
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The service category of this virtual path connection."
+        ::= { atmfVpcEntry 20 }
+
+
+--              The Virtual Path ABR Group
+-- This group contains per-VPC information, support for which is optional.
+--
+-- Attributes of ABR Virtual Path connections
+
+atmfVpcAbrTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfVpcAbrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of operational parameters related to the ABR
+                virtual path connections which cross this ATM
+                Interface. There is one entry in this table for each
+                ABR virtual path connection.
+
+                Each virtual path connection represented
+                in this table must also be represented by
+                an entry in the atmfVpcTable."
+        ::= { atmfVpcAbrGroup 1 }
+
+atmfVpcAbrEntry OBJECT-TYPE
+        SYNTAX  AtmfVpcAbrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about a 
+                particular ABR virtual path connection."
+        INDEX   { atmfVpcAbrPortIndex, atmfVpcAbrVpi }
+        ::= { atmfVpcAbrTable 1 }
+
+AtmfVpcAbrEntry ::=
+        SEQUENCE {
+                atmfVpcAbrPortIndex
+                        INTEGER,
+                atmfVpcAbrVpi
+                        INTEGER,
+                atmfVpcAbrTransmitIcr
+                        INTEGER,
+                atmfVpcAbrTransmitNrm
+                        INTEGER,
+                atmfVpcAbrTransmitTrm
+                        INTEGER,
+                atmfVpcAbrTransmitCdf
+                        INTEGER,
+                atmfVpcAbrTransmitRif
+                        INTEGER,
+                atmfVpcAbrTransmitRdf
+                        INTEGER,
+                atmfVpcAbrTransmitAdtf
+                        INTEGER,
+                atmfVpcAbrTransmitCrm
+                        INTEGER
+        }
+
+atmfVpcAbrPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of identifying 
+                the ATM Interface over which this message was received."
+        ::= { atmfVpcAbrEntry 1 }
+
+atmfVpcAbrVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4095)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VPI value of this ABR Virtual Path Connection at the 
+                local ATM Interface."
+        ::= { atmfVpcAbrEntry 2 }
+
+atmfVpcAbrTransmitIcr OBJECT-TYPE
+        SYNTAX  INTEGER (0..16777215)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Initial Cell Rate: This is the rate at which the
+                source starts, both initially and after an idle period.
+                The unit is cells per second.  The value must not be
+                larger than PCR, and is usually lower."
+        ::= { atmfVpcAbrEntry 3 }
+
+atmfVpcAbrTransmitNrm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        nrm2(1),
+                        nrm4(2),
+                        nrm8(3),
+                        nrm16(4),
+                        nrm32(5),
+                        nrm64(6),
+                        nrm128(7),
+                        nrm256(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of data cells a source may send
+                for each forward RM-cell.  The default value is nrm32(5)."
+        ::= { atmfVpcAbrEntry 4 }
+
+atmfVpcAbrTransmitTrm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        trm0point78125(1),
+                        trm1point5625(2),
+                        trm3point125(3),
+                        trm6point25(4),
+                        trm12point5(5),
+                        trm25(6),
+                        trm50(7),
+                        trm100(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Upper bound on the time between forward RM-cells for
+                an active source (in milliseconds). The default value
+                is trm100(8)."
+        ::= { atmfVpcAbrEntry 5 }
+
+atmfVpcAbrTransmitCdf OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        cdf0(1),
+                        cdfOneOver64(2),
+                        cdfOneOver32(3),
+                        cdfOneOver16(4),
+                        cdfOneOver8(5),
+                        cdfOneOver4(6),
+                        cdfOneOver2(7),
+                        cdfOne(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Cutoff Decrease Factor: This field controls the rate
+                decrease associated with lost or delayed backward RM
+                cells.  Larger values result in faster rate decrease.
+                The default value is cdfOneOver16(4)."
+        ::= { atmfVpcAbrEntry 6 }
+
+atmfVpcAbrTransmitRif OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        rifOneOver32768(1),
+                        rifOneOver16384(2),
+                        rifOneOver8192(3),
+                        rifOneOver4096(4),
+                        rifOneOver2048(5),
+                        rifOneOver1024(6),
+                        rifOneOver512(7),
+                        rifOneOver256(8),
+                        rifOneOver128(9),
+                        rifOneOver64(10),
+                        rifOneOver32(11),
+                        rifOneOver16(12),
+                        rifOneOver8(13),
+                        rifOneOver4(14),
+                        rifOneOver2(15),
+                        rifOne(16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Rate Increment Factor: Controls the rate at which the rate
+                increases, when a backward RM-cell is received with CI=0 and
+                NI=0.  Larger values lead to faster rate increase.  The default
+                value is rifOneOver16(12)."
+        ::= { atmfVpcAbrEntry 7 }
+
+atmfVpcAbrTransmitRdf OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        rdfOneOver32768(1),
+                        rdfOneOver16384(2),
+                        rdfOneOver8192(3),
+                        rdfOneOver4096(4),
+                        rdfOneOver2048(5),
+                        rdfOneOver1024(6),
+                        rdfOneOver512(7),
+                        rdfOneOver256(8),
+                        rdfOneOver128(9),
+                        rdfOneOver64(10),
+                        rdfOneOver32(11),
+                        rdfOneOver16(12),
+                        rdfOneOver8(13),
+                        rdfOneOver4(14),
+                        rdfOneOver2(15),
+                        rdfOne(16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Rate Decrease Factor: Controls the rate decrease
+                which occurs when backward RM-cells with CI=1, are
+                received.  Larger values lead to faster rate
+                decrease.  The default value is rdfOneOver16(12)."
+        ::= { atmfVpcAbrEntry 8 }
+
+atmfVpcAbrTransmitAdtf OBJECT-TYPE
+        SYNTAX  INTEGER (1..1023)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ACR Decrease Time Factor: Time permitted between
+                sending RM-cells, before the allowed rate (ACR) is
+                decreased to ICR.  Range is 10 ms to 10.23 seconds.
+                The unit is 10 milliseconds.  For example, the default
+                value of 50 corresponds to a time factor of 500 ms.
+                Larger values allow a source to retain its current
+                rate longer, during periods of relative inactivity.
+                The default is 50 (0.5 seconds)."
+        ::= { atmfVpcAbrEntry 9 }
+
+atmfVpcAbrTransmitCrm OBJECT-TYPE
+        SYNTAX  INTEGER (0..8388608)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RM Cells Before Cutoff: Limits the number of forward
+                RM-cells which may be sent in the absence of received
+                backward RM-cells."
+        ::= { atmfVpcAbrEntry 10 }
+
+
+--              The Virtual Channel Group
+-- This group is mandatory for all ATM Interfaces.
+--
+-- Information concerning Virtual Channel Connections
+
+atmfVccTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfVccEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of status and parameter information on the
+                virtual channel connections which are visible at this
+                ATM Interface. There is one entry in this table for
+                each permanent virtual channel connection, including
+                reserved VCCs that are supported; e.g., signalling,
+                OAM flows, and ILMI, but not unassigned cells."
+        ::= { atmfVccGroup 1 }
+
+atmfVccEntry OBJECT-TYPE
+        SYNTAX  AtmfVccEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about a
+                particular virtual channel connection."
+        INDEX   { atmfVccPortIndex, atmfVccVpi, atmfVccVci }
+        ::= { atmfVccTable 1 }
+
+AtmfVccEntry ::=
+        SEQUENCE {
+                atmfVccPortIndex
+                        INTEGER,
+                atmfVccVpi
+                        INTEGER,
+                atmfVccVci
+                        INTEGER,
+                atmfVccOperStatus
+                        INTEGER,
+                atmfVccTransmitTrafficDescriptorType
+                        OBJECT IDENTIFIER,
+                atmfVccTransmitTrafficDescriptorParam1
+                        INTEGER,
+                atmfVccTransmitTrafficDescriptorParam2
+                        INTEGER,
+                atmfVccTransmitTrafficDescriptorParam3
+                        INTEGER,
+                atmfVccTransmitTrafficDescriptorParam4
+                        INTEGER,
+                atmfVccTransmitTrafficDescriptorParam5
+                        INTEGER,
+                atmfVccReceiveTrafficDescriptorType
+                        OBJECT IDENTIFIER,
+                atmfVccReceiveTrafficDescriptorParam1
+                        INTEGER,
+                atmfVccReceiveTrafficDescriptorParam2
+                        INTEGER,
+                atmfVccReceiveTrafficDescriptorParam3
+                        INTEGER,
+                atmfVccReceiveTrafficDescriptorParam4
+                        INTEGER,
+                atmfVccReceiveTrafficDescriptorParam5
+                        INTEGER,
+                atmfVccQoSCategory
+                        INTEGER,
+                atmfVccTransmitQoSClass
+                        INTEGER,
+                atmfVccReceiveQoSClass
+                        INTEGER,
+                atmfVccBestEffortIndicator
+                        TruthValue,
+                atmfVccTransmitFrameDiscard
+                        TruthValue,
+                atmfVccReceiveFrameDiscard
+                        TruthValue,
+                atmfVccServiceCategory
+                        AtmServiceCategory
+        }
+
+atmfVccPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+        ::= { atmfVccEntry 1 }
+
+atmfVccVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4095)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VPI value of this Virtual Channel Connection at
+                the local ATM Interface. For virtual interfaces (i.e.
+                Virtual Path Connections), this value has no meaning
+                and is set to zero "
+        ::= { atmfVccEntry 2 }
+
+atmfVccVci OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VCI value of this Virtual Channel Connection at
+                the local ATM Interface."
+        ::= { atmfVccEntry 3 }
+
+atmfVccOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unknown(1),
+                        end2endUp(2),
+                        end2endDown(3),
+                        localUpEnd2endUnknown(4),
+                        localDown(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The present actual operational status of the VCC. A
+                value of end2endUp(2) or end2endUp(3) is used if the
+                end to end status is known.
+
+                If only local status is known a value of
+                localUpEnd2endUnknown(4) or localDown(5) is used."
+        ::= { atmfVccEntry 4 }
+
+atmfVccTransmitTrafficDescriptorType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of traffic management, applicable to the
+                transmit direction of this VCC. The type may indicate
+                none, or a type with one or more parameters. These
+                parameters are specified as a parameter vector, in the
+                corresponding instances of the objects:
+                        atmfVccTransmitTrafficDescriptorParam1,
+                        atmfVccTransmitTrafficDescriptorParam2,
+                        atmfVccTransmitTrafficDescriptorParam3,
+                        atmfVccTransmitTrafficDescriptorParam4, and
+                        atmfVccTransmitTrafficDescriptorParam5."
+        ::= { atmfVccEntry 5 }
+
+atmfVccTransmitTrafficDescriptorParam1 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The first parameter of the transmit parameter vector
+                for this VCC, used according to the value of
+                atmfVccTransmitTrafficDescriptorType."
+        ::= { atmfVccEntry 6 }
+
+atmfVccTransmitTrafficDescriptorParam2 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The second parameter of the transmit parameter vector
+                for this VCC, used according to the value of
+                atmfVccTransmitTrafficDescriptorType."
+        ::= { atmfVccEntry 7 }
+
+atmfVccTransmitTrafficDescriptorParam3 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The third parameter of the transmit parameter vector
+                for this VCC, used according to the value of
+                atmfVccTransmitTrafficDescriptorType."
+        ::= { atmfVccEntry 8 }
+
+atmfVccTransmitTrafficDescriptorParam4 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fourth parameter of the transmit parameter vector
+                for this VCC, used according to the value of
+                atmfVccTransmitTrafficDescriptorType."
+        ::= { atmfVccEntry 9 }
+
+atmfVccTransmitTrafficDescriptorParam5 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fifth parameter of the transmit parameter vector
+                for this VCC, used according to the value of
+                atmfVccTransmitTrafficDescriptorType."
+        ::= { atmfVccEntry 10 }
+
+atmfVccReceiveTrafficDescriptorType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of traffic management, applicable to the
+                traffic in the receive direction of this VCC. The type
+                may indicate none, or a type with one or more
+                parameters. These parameters are specified as a
+                parameter vector, in the corresponding instances of
+                the objects:
+                        atmfVccReceiveTrafficDescriptorParam1,
+                        atmfVccReceiveTrafficDescriptorParam2,
+                        atmfVccReceiveTrafficDescriptorParam3,
+                        atmfVccReceiveTrafficDescriptorParam4, and
+                        atmfVccReceiveTrafficDescriptorParam5."
+        ::= { atmfVccEntry 11 }
+
+atmfVccReceiveTrafficDescriptorParam1 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The first parameter of the receive parameter vector
+                for this VCC, used according to the value of
+                atmfVccReceiveTrafficDescriptorType."
+        ::= { atmfVccEntry 12 }
+
+atmfVccReceiveTrafficDescriptorParam2 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The second parameter of the receive parameter vector
+                for this VCC, used according to the value of
+                atmfVccReceiveTrafficDescriptorType."
+        ::= { atmfVccEntry 13 }
+
+atmfVccReceiveTrafficDescriptorParam3 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The third parameter of the receive parameter vector
+                for this VCC, used according to the value of
+                atmfVccReceiveTrafficDescriptorType."
+        ::= { atmfVccEntry 14 }
+
+atmfVccReceiveTrafficDescriptorParam4 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fourth parameter of the receive parameter vector
+                for this VCC, used according to the value of
+                atmfVccReceiveTrafficDescriptorType."
+        ::= { atmfVccEntry 15 }
+
+atmfVccReceiveTrafficDescriptorParam5 OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The fifth parameter of the receive parameter vector
+                for this VCC, used according to the value of
+                atmfVccReceiveTrafficDescriptorType."
+        ::= { atmfVccEntry 16 }
+
+atmfVccQoSCategory OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        deterministic(2),
+                        statistical(3),
+                        unspecified(4)
+                }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 2.0
+                of the UNI specification."
+        ::= { atmfVccEntry 17 }
+
+ atmfVccTransmitQoSClass OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfVccEntry 18 }
+
+atmfVccReceiveQoSClass OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object should not be implemented except as
+                required for backward compatibility with version 3.1
+                of the UNI specification."
+        ::= { atmfVccEntry 19 }
+
+atmfVccBestEffortIndicator OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The object is examined when
+                atmfVccTransmitTrafficDescriptorType or
+                atmfVccReceiveTrafficDescriptorType for the associated
+                connection is equal to atmfNoClpNoScr.
+                If this object is set to false(2), the network is requested
+                to apply the CBR.1 conformance definition. If this object
+                is set to true(1), the network is requested to apply the
+                UBR.1 conformance definition."
+        ::= { atmfVccEntry 20 }
+
+atmfVccTransmitFrameDiscard OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If set to true(1), this object indicates that the network
+                is requested to treat data for this connection (in the
+                transmit direction) as frames (e.g. AAL5 CPCS_PDU's) rather
+                than as individual cells.  While the precise
+                implementation is network-specific, this treatment may
+                for example involve discarding entire frames during
+                congestion, rather than a few cells from many frames.
+                The default value is false(2)."
+        ::= { atmfVccEntry 21 }
+
+atmfVccReceiveFrameDiscard OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If set to true(1), this object indicates that the network
+                is requested to treat data for this connection (in the
+                receive direction) as frames (e.g. AAL5 CPCS_PDU's) rather
+                than as individual cells.  While the precise
+                implementation is network-specific, this treatment may
+                for example involve discarding entire frames during
+                congestion, rather than a few cells from many frames.
+                The default value is false(2)."
+        ::= { atmfVccEntry 22 }
+
+atmfVccServiceCategory OBJECT-TYPE
+        SYNTAX  AtmServiceCategory
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The service category of this virtual channel connection."
+        ::= { atmfVccEntry 23 }
+
+
+--              The Virtual Channel ABR Group
+-- This group contains per-VCC information, support for which is optional.
+--
+-- Attributes of ABR Virtual Channel connections
+
+atmfVccAbrTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfVccAbrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of operational parameters related to the ABR
+                virtual channel connections which cross this ATM
+                Interface. There is one entry in this table for each
+                ABR virtual channel connection.
+
+                Each virtual channel connection represented
+                in this table must also be represented by
+                an entry in the atmfVccTable."
+        ::= { atmfVccAbrGroup 1 }
+
+atmfVccAbrEntry OBJECT-TYPE
+        SYNTAX  AtmfVccAbrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing information about a 
+                particular ABR virtual channel connection."
+        INDEX   { atmfVccAbrPortIndex, atmfVccAbrVpi, atmfVccAbrVci }
+        ::= { atmfVccAbrTable 1 }
+
+AtmfVccAbrEntry ::=
+        SEQUENCE {
+                atmfVccAbrPortIndex
+                        INTEGER,
+                atmfVccAbrVpi
+                        INTEGER,
+                atmfVccAbrVci
+                        INTEGER,
+                atmfVccAbrTransmitIcr
+                        INTEGER,
+                atmfVccAbrTransmitNrm
+                        INTEGER,
+                atmfVccAbrTransmitTrm
+                        INTEGER,
+                atmfVccAbrTransmitCdf
+                        INTEGER,
+                atmfVccAbrTransmitRif
+                        INTEGER,
+                atmfVccAbrTransmitRdf
+                        INTEGER,
+                atmfVccAbrTransmitAdtf
+                        INTEGER,
+                atmfVccAbrTransmitCrm
+                       INTEGER
+        }
+
+atmfVccAbrPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of identifying 
+                the ATM Interface over which this message was received."
+        ::= { atmfVccAbrEntry 1 }
+
+atmfVccAbrVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..4095)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VPI value of this ABR Virtual Channel Connection at the 
+                local ATM Interface. For virtual interfaces (i.e. Virtual Path
+                Connections), this value has no meaning and is set to zero "
+        ::= { atmfVccAbrEntry 2 }
+
+atmfVccAbrVci OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The VCI value of this ABR Virtual Channel Connection at the 
+                local ATM Interface."
+        ::= { atmfVccAbrEntry 3 }
+
+atmfVccAbrTransmitIcr OBJECT-TYPE
+        SYNTAX  INTEGER (0..16777215)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Initial Cell Rate: This is the rate at which the
+                source starts, both initially and after an idle period.
+                The unit is cells per second.  The value must not be
+                larger than PCR, and is usually lower."
+        ::= { atmfVccAbrEntry 4 }
+
+atmfVccAbrTransmitNrm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        nrm2(1),
+                        nrm4(2),
+                        nrm8(3),
+                        nrm16(4),
+                        nrm32(5),
+                        nrm64(6),
+                        nrm128(7),
+                        nrm256(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of data cells a source may send
+                for each forward RM-cell.  The default value is nrm32(5)."
+        ::= { atmfVccAbrEntry 5 }
+
+atmfVccAbrTransmitTrm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        trm0point78125(1),
+                        trm1point5625(2),
+                        trm3point125(3),
+                        trm6point25(4),
+                        trm12point5(5),
+                        trm25(6),
+                        trm50(7),
+                        trm100(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Upper bound on the time between forward RM-cells for
+                an active source (in milliseconds). The default value
+                is trm100(8)."
+        ::= { atmfVccAbrEntry 6 }
+
+atmfVccAbrTransmitCdf OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        cdf0(1),
+                        cdfOneOver64(2),
+                        cdfOneOver32(3),
+                        cdfOneOver16(4),
+                        cdfOneOver8(5),
+                        cdfOneOver4(6),
+                        cdfOneOver2(7),
+                        cdfOne(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Cutoff Decrease Factor: This field controls the rate
+                decrease associated with lost or delayed backward RM
+                cells.  Larger values result in faster rate decrease.
+                The default value is cdfOneOver16(4)."
+        ::= { atmfVccAbrEntry 7 }
+
+atmfVccAbrTransmitRif OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        rifOneOver32768(1),
+                        rifOneOver16384(2),
+                        rifOneOver8192(3),
+                        rifOneOver4096(4),
+                        rifOneOver2048(5),
+                        rifOneOver1024(6),
+                        rifOneOver512(7),
+                        rifOneOver256(8),
+                        rifOneOver128(9),
+                        rifOneOver64(10),
+                        rifOneOver32(11),
+                        rifOneOver16(12),
+                        rifOneOver8(13),
+                        rifOneOver4(14),
+                        rifOneOver2(15),
+                        rifOne(16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Rate Increment Factor: Controls the rate at which the rate
+                increases, when a backward RM-cell is received with CI=0 and
+                NI=0.  Larger values lead to faster rate increase.  The default
+                value is rifOneOver16(12)."
+        ::= { atmfVccAbrEntry 8 }
+
+atmfVccAbrTransmitRdf OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        rdfOneOver32768(1),
+                        rdfOneOver16384(2),
+                        rdfOneOver8192(3),
+                        rdfOneOver4096(4),
+                        rdfOneOver2048(5),
+                        rdfOneOver1024(6),
+                        rdfOneOver512(7),
+                        rdfOneOver256(8),
+                        rdfOneOver128(9),
+                        rdfOneOver64(10),
+                        rdfOneOver32(11),
+                        rdfOneOver16(12),
+                        rdfOneOver8(13),
+                        rdfOneOver4(14),
+                        rdfOneOver2(15),
+                        rdfOne(16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Rate Decrease Factor: Controls the rate decrease
+                which occurs when backward RM-cells with CI=1, are
+                received.  Larger values lead to faster rate
+                decrease.  The default value is rdfOneOver16(12)."
+        ::= { atmfVccAbrEntry 9 }
+
+atmfVccAbrTransmitAdtf OBJECT-TYPE
+        SYNTAX  INTEGER (1..1023)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ACR Decrease Time Factor: Time permitted between
+                sending RM-cells, before the allowed rate (ACR) is
+                decreased to ICR.  Range is 10 ms to 10.23 seconds.
+                The unit is 10 milliseconds.  For example, the default
+                value of 50 corresponds to a time factor of 500 ms.
+                Larger values allow a source to retain its current
+                rate longer, during periods of relative inactivity.
+                The default is 50 (0.5 seconds)."
+        ::= { atmfVccAbrEntry 10 }
+
+atmfVccAbrTransmitCrm OBJECT-TYPE
+        SYNTAX  INTEGER (0..8388608)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RM Cells Before Cutoff: Limits the number of forward
+                RM-cells which may be sent in the absence of received
+                backward RM-cells."
+        ::= { atmfVccAbrEntry 11 }
+
+
+-- Traps
+atmfVpcChange TRAP-TYPE
+        ENTERPRISE      atmForum
+        VARIABLES       { atmfVpcPortIndex, atmfVpcVpi, atmfVpcOperStatus }
+        DESCRIPTION
+                "An atmfVpcChange trap indicates that a permanent VPC has been
+                added or deleted at this ATM Interface or that the attributes
+                of an existing VPC have been modified. The variables
+                included in the trap identify the VPI value of the
+                reconfigured VPC at this ATM Interface."
+        ::= 1
+
+atmfVccChange TRAP-TYPE
+        ENTERPRISE      atmForum
+        VARIABLES       { atmfVccPortIndex, atmfVccVci, atmfVccVpi,
+                          atmfVccOperStatus }
+        DESCRIPTION
+                "An atmfVccChange trap indicates that a permanent VCC has been 
+                added or deleted at this ATM Interface or that the attributes
+                of an existing VCC have been modified.. The variables
+                included in the trap identify the VCI and VPI values
+                of the reconfigured VCC at this ATM
+                Interface."
+        ::= 2
+
+
+--                  The NetPrefix Group
+--
+-- The Network Prefix Table is implemented by the user-side IME.
+
+-- This is hardcoded into UME... mgo, Xylan
+
+--atmfNetPrefixTable OBJECT-TYPE
+        --SYNTAX  SEQUENCE OF AtmfNetPrefixEntry
+        --ACCESS  not-accessible
+        --STATUS  mandatory
+        --DESCRIPTION
+                --"A table implemented by the user-side IME, containing the
+                --network-prefix(es) for ATM-layer addresses in effect on
+                --the user side of the UNI."
+        --::= { atmfNetPrefixGroup 1 }
+
+--atmfNetPrefixEntry OBJECT-TYPE
+        --SYNTAX  AtmfNetPrefixEntry
+        --ACCESS  not-accessible
+        --STATUS  mandatory
+        --DESCRIPTION
+                --"Information about a single network-prefix for
+                --ATM-layer addresses in effect on the user-side IME.
+                --Note that the index variable atmNetPrefixPrefix is a
+                --variable-length string, and as such the rule for
+                --variable-length strings in section 4.1.6 of RFC 1212
+                --applies."
+
+        --INDEX   { atmfNetPrefixPort, atmfNetPrefixPrefix }
+        --::= { atmfNetPrefixTable 1 }
+
+--AtmfNetPrefixEntry ::=
+        --SEQUENCE {
+                --atmfNetPrefixPort
+                        --INTEGER,
+                --atmfNetPrefixPrefix
+                        --NetPrefix,
+                --atmfNetPrefixStatus
+                        --INTEGER
+        --}
+
+--atmfNetPrefixPort OBJECT-TYPE
+        --SYNTAX  INTEGER (0..2147483647)
+        --ACCESS  not-accessible
+        --STATUS  mandatory
+        --DESCRIPTION
+                --"A unique value which identifies the UNI port for
+                --which the network prefix for ATM addresses is in
+                --effect.  The value of 0 has the special meaning of
+                --identifying the local UNI."
+        --::= { atmfNetPrefixEntry 1 }
+--
+--atmfNetPrefixPrefix  OBJECT-TYPE
+        --SYNTAX  NetPrefix
+        --ACCESS  not-accessible
+        --STATUS  mandatory
+        --DESCRIPTION
+                --"The network prefix for ATM addresses which is in
+                --effect on the user side of the ATM UNI port."
+        --::= { atmfNetPrefixEntry 2 }
+--
+--atmfNetPrefixStatus  OBJECT-TYPE
+        --SYNTAX  INTEGER { valid(1), invalid(2) }
+        --ACCESS  read-write
+        --STATUS  mandatory
+        --DESCRIPTION
+                --"An indication of the validity of the network prefix
+                --for ATM addresses on the user side of the UNI port.
+                --To configure a new network prefix in this table, the
+                --network-side IME must set the appropriate instance of this
+                --object to the value valid(1).  To delete an existing
+                --network prefix in this table, the network-side IME must
+                --set the appropriate instance of this object to the
+                --value invalid(2).
+--
+                --If circumstances occur on the user-side IME which cause a
+                --prefix to become invalid, the user-side IME modifies the
+                --value of the appropriate instance of this object to invalid(2).
+--
+                --Whenever the value of this object for a particular
+                --prefix becomes invalid(2), the conceptual row for that
+                --prefix may be removed from the table at any time,
+                --either immediately or subsequently."
+        --::= { atmfNetPrefixEntry 3 }
+--
+--
+--                     The Address Group
+--
+-- The Address Table is implemented by the network-side IME.
+--
+atmfAddressTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfAddressEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table implemented by the network-side IME, containing the
+                ATM-layer addresses in effect on the user side of the UNI."
+        ::= { atmfAddressGroup 1 }
+
+atmfAddressEntry OBJECT-TYPE
+        SYNTAX  AtmfAddressEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Information about a single ATM-layer address in effect
+                on the user-side IME.  Note that the index variable
+                atmAddressAtmAddress is a variable-length string, and as
+                such the rule for variable-length strings in section
+                 4.1.6 of RFC 1212 applies."
+        INDEX   { atmfAddressPort, atmfAddressAtmAddress }
+        ::= { atmfAddressTable 1 }
+
+AtmfAddressEntry ::=
+        SEQUENCE {
+                atmfAddressPort
+                        INTEGER,
+                atmfAddressAtmAddress
+                        AtmAddress,
+                atmfAddressStatus
+                        INTEGER,
+                atmfAddressOrgScope
+                        INTEGER
+        }
+
+atmfAddressPort OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value which identifies the UNI port for
+                which the ATM address is in effect.  The value of 0
+                has the special meaning of identifying the local UNI."
+        ::= { atmfAddressEntry 1 }
+
+atmfAddressAtmAddress  OBJECT-TYPE
+        SYNTAX  AtmAddress
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The ATM address which is in effect on the user side
+                of the ATM UNI port."
+        ::= { atmfAddressEntry 2 }
+
+atmfAddressStatus  OBJECT-TYPE
+        SYNTAX  INTEGER { valid(1), invalid(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "An indication of the validity of the ATM address at
+                the user side of the UNI port.  To configure a new
+                address in this table, the user-side IME must set the
+                appropriate instance of this object to the value
+                valid(1).  To delete an existing address in this table,
+                the user-side IME must set the appropriate instance of
+                this object to the value invalid(2).
+
+                If circumstances occur on the network-side IME which cause
+                an address to become invalid, the network-side IME
+                modifies the value of the appropriate instance of this
+                object to invalid(2).
+
+                Whenever the value of this object for a particular
+                address becomes invalid(2), the conceptual row for
+                that address may be removed from the table at any
+                time, either immediately or subsequently."
+        ::= { atmfAddressEntry 3 }
+
+atmfAddressOrgScope OBJECT-TYPE
+        SYNTAX  INTEGER {
+                localNetwork(1),
+                localNetworkPlusOne(2),
+                localNetworkPlusTwo(3),
+                siteMinusOne(4),
+                intraSite(5), 
+                sitePlusOne(6),
+                organizationMinusOne(7),
+                intraOrganization(8),
+                organizationPlusOne(9),
+                communityMinusOne(10),
+                intraCommunity(11),
+                communityPlusOne(12),
+                regional(13),
+                interRegional(14),
+                global(15)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION 
+                "This object indicates the organizational
+                scope for the referenced address. The information of
+                the referenced address shall not be distributed
+                outside the indicated scope. If the user-side IME does
+                not specify a value for the atmfAddressOrgScope object,
+                the network shall set the value of this object to
+                localNetwork(1), if the registered address is an ATM group
+                address, or to global(15), if the registered address is 
+                an individual address.  Refer to Annex 6.0
+                of ATM Forum UNI Signalling 4.0 for guidelines regarding
+                the use of organizational scopes.
+
+                This organization hierarchy may be mapped to ATM network's
+                routing hierarchy such as PNNI's routing level and
+                the mapping shall be configurable in
+                nodes. Use of this object in a public network is for
+                further study.
+                The default values for organizational scope are
+                localNetwork(1) for ATM group addresses, and global(15)
+                for individual addresses."
+        ::= { atmfAddressEntry 4 }
+
+
+--                     The Address Registration Admin Group
+--
+-- The Address Registration Admin Table is mandatory for all IMEs.
+
+atmfAddressRegistrationAdminTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfAddressRegistrationAdminEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of Address Registration administrative
+                information for the ATM Interface."
+    ::= { atmfAddressRegistrationAdminGroup 1 }
+
+atmfAddressRegistrationAdminEntry OBJECT-TYPE
+        SYNTAX  AtmfAddressRegistrationAdminEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table, containing Address
+                Registration administrative information for the ATM
+                Interface."
+        INDEX   { atmfAddressRegistrationAdminIndex }
+        ::= { atmfAddressRegistrationAdminTable 1 }
+
+
+AtmfAddressRegistrationAdminEntry ::=
+        SEQUENCE {
+                atmfAddressRegistrationAdminIndex
+                        INTEGER,
+                atmfAddressRegistrationAdminStatus
+                        INTEGER
+        }
+
+atmfAddressRegistrationAdminIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+        ::= { atmfAddressRegistrationAdminEntry 1 }
+
+atmfAddressRegistrationAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER { supported(1), unsupported(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An indication of whether or not Address Registration
+                is supported on this ATM Interface. Supported(1)
+                indicates that this ATM Interface supports address
+                registration. Unsupported(2) indicates that this ATM
+                Interface does not support address registration."
+        ::= { atmfAddressRegistrationAdminEntry 2 }
+
+
+--              Object Identifier definitions
+
+-- The following values are defined for use as possible values
+-- of the atmfSrvcRegServiceID object.
+
+-- LAN Emulation Configuration Server (LECS)
+atmfSrvcRegLecs         OBJECT IDENTIFIER ::= { atmfSrvcRegTypes 1 }
+-- When atmfSrvcRegServiceID has a value of atmfSrvcRegLecs,
+-- the value of atmfSrvcRegParm1 is ignored.
+
+-- ATM Name Server (ANS)
+atmfSrvcRegAns         OBJECT IDENTIFIER ::= { atmfSrvcRegTypes 2 }
+-- When atmfSrvcRegServiceID has a value of atmfSrvcRegAns,
+-- the value of atmfSrvcRegParm1 is ignored.
+
+
+--          The Service Registry Table
+--
+-- The Service Registry Table is implemented by the network-side IME
+
+atmfSrvcRegTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfSrvcRegEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The table implemented by the IME on the network side of
+                the ATM UNI port contains all of the services that are
+                available to the user-side IME indexed by service
+                identifier."
+        ::= { atmfSrvcRegistryGroup 1 }
+
+atmfSrvcRegEntry OBJECT-TYPE
+        SYNTAX  AtmfSrvcRegEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Information about a single service provider that is 
+                available to the user-side IME."
+        INDEX   { atmfSrvcRegPort, atmfSrvcRegServiceID, 
+                  atmfSrvcRegAddressIndex }
+        ::= { atmfSrvcRegTable 1 }
+
+AtmfSrvcRegEntry ::=
+        SEQUENCE {
+                atmfSrvcRegPort
+                        INTEGER,
+                atmfSrvcRegServiceID
+                        OBJECT IDENTIFIER,
+                atmfSrvcRegATMAddress
+                        AtmAddress,
+                atmfSrvcRegAddressIndex
+                        INTEGER,
+                atmfSrvcRegParm1
+                        OCTET STRING
+        }
+
+atmfSrvcRegPort OBJECT-TYPE
+        SYNTAX  INTEGER (0..2147483647)
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of 0 which has the special meaning of
+                identifying the ATM Interface over which this message
+                was received."
+       ::= { atmfSrvcRegEntry 1 }
+
+atmfSrvcRegServiceID OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the service identifier which uniquely identifies
+                the type of service at the address provided in the table."
+        ::= { atmfSrvcRegEntry 2 }
+
+atmfSrvcRegATMAddress OBJECT-TYPE
+        SYNTAX  AtmAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the full address of the service.  The user-side
+                IME may use this address to establish a connection
+                with the service."
+        ::= { atmfSrvcRegEntry 3 }
+
+atmfSrvcRegAddressIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..2147483647)
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An arbitrary integer to differentiate multiple rows
+                containing different ATM addresses for the same service
+                on the same port."
+        ::= { atmfSrvcRegEntry 4 }
+
+atmfSrvcRegParm1 OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An octet string whose size and meaning is determined
+                by the value of atmfSrvcRegServiceID."
+        ::= { atmfSrvcRegEntry 5 }
+END
+
+

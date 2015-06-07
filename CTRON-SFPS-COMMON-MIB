@@ -1,0 +1,603 @@
+CTRON-SFPS-COMMON-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-common-mib.txt
+--  Revision: 0.0.13
+--              
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+--      TimeTicks
+--              FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+         sfpsSystemGenerics, sfpsDiagEventLog, sfpsAOProperties,
+         sfpsAOPropertiesAPI
+        
+        
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+--  SFPS Switch Generics Group
+
+sfpsGenericVersionTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsGenericVersionEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table describing the SFS generics and their versions
+                that are contained within this image." 
+        ::= { sfpsSystemGenerics 1 }
+
+sfpsGenericVersionEntry    OBJECT-TYPE
+        SYNTAX  SfpsGenericVersionEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table instanced by the Generic name."
+        INDEX   { sfpsGenericVersionHash }
+        ::= { sfpsGenericVersionTable 1 }
+
+SfpsGenericVersionEntry ::=
+
+SEQUENCE {
+                sfpsGenericVersionHash     INTEGER,
+                sfpsGenericVersionName     DisplayString,
+                sfpsGenericVersionVersion  DisplayString,
+                sfpsGenericVersionMIBRev   DisplayString
+         }
+
+sfpsGenericVersionHash    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Hash of the name to make it a unique entry." 
+        ::= { sfpsGenericVersionEntry 1 }
+
+sfpsGenericVersionName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Name of the Generic." 
+        ::= { sfpsGenericVersionEntry 2 }
+
+sfpsGenericVersionVersion      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Version stamp of the generic component."
+        ::= { sfpsGenericVersionEntry 3 }
+
+sfpsGenericVersionMIBRev      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "MIB version of the generic component."
+        ::= { sfpsGenericVersionEntry 4 }
+
+ 
+--  SFPS Diagnostics Group                              (Experiment)
+--  This group contains the objects that pertain to the SFPS Diagnostics group.
+
+--  SFPS Diagnostic Event Logger Groups                 (Experiment)
+--  This group contains the objects that pertain to the Event Logger
+--  of the Diagnostics group.
+
+ 
+sfpsDiagLogConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDiagLogConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the informtion to configure an
+                 Event Logger object."
+        ::= { sfpsDiagEventLog 1 }
+
+sfpsDiagLogConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsDiagLogConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains configuration data."
+        INDEX   { sfpsDiagLogConfigInstance } 
+        ::= { sfpsDiagLogConfigTable 1 }
+
+SfpsDiagLogConfigEntry ::=
+        SEQUENCE {
+                sfpsDiagLogConfigInstance               INTEGER,  
+                sfpsDiagLogConfigStatus                 INTEGER,  
+                sfpsDiagLogConfigIndex                  INTEGER,  
+                sfpsDiagLogConfigStart                  INTEGER,  
+                sfpsDiagLogConfigStop                   INTEGER,  
+                sfpsDiagLogConfigLogIndex               INTEGER,  
+                sfpsDiagLogConfigFilterMatch            INTEGER,  
+                sfpsDiagLogConfigFilterStart            INTEGER,  
+                sfpsDiagLogConfigFilterStop             INTEGER,  
+                sfpsDiagLogAccessPortControl            HexInteger,  
+                sfpsDiagLogCallIdleTime         INTEGER,  
+                sfpsDiagLogFilterAddTimer               INTEGER,  
+                sfpsDiagLogRedirectorWakeup             INTEGER,  
+                sfpsDiagLogRedirectorNumPackets         INTEGER,
+                sfpsDiagLogEndSystemTimeout             INTEGER,
+                sfpsDiagLogSwitchIdleInterval           INTEGER,
+                sfpsDiagLogInlnFltrAgeTime                      INTEGER,  
+                sfpsDiagLogConfigDebug9                 INTEGER, 
+                sfpsDiagLogSignalThrottle               INTEGER, 
+                sfpsDiagLogConfigOther                  INTEGER, 
+                sfpsDiagLogConfigSoftReset              INTEGER, 
+                sfpsDiagLogConfigSFPSVlan               INTEGER 
+        }  
+
+
+sfpsDiagLogConfigInstance   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The instance of this Event Logger."
+        ::= { sfpsDiagLogConfigEntry 1 }
+
+sfpsDiagLogConfigStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),              
+                        disabled(2),          
+                        enabled(3)               
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The status of this Event Logger object."
+        ::= { sfpsDiagLogConfigEntry 2 }
+
+sfpsDiagLogConfigIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The current index in the circular buffer where events are 
+                 being logged."
+        ::= { sfpsDiagLogConfigEntry 3 }
+
+sfpsDiagLogConfigStart   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The starting index in the circular buffer to display."
+        ::= { sfpsDiagLogConfigEntry 4 }
+
+sfpsDiagLogConfigStop   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The last index in the circular buffer to display."
+        ::= { sfpsDiagLogConfigEntry 5 }
+
+sfpsDiagLogConfigLogIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The current index in the log buffer where we are looking."
+        ::= { sfpsDiagLogConfigEntry 6 }
+
+sfpsDiagLogConfigFilterMatch   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The specified Event Id to log. A value of 0 will 
+                 cause every event to be logged."
+        ::= { sfpsDiagLogConfigEntry 7 }
+
+sfpsDiagLogConfigFilterStart   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The beginning range of Event Ids to log."
+        ::= { sfpsDiagLogConfigEntry 8 }
+
+sfpsDiagLogConfigFilterStop   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ending range of Event Ids to log."
+        ::= { sfpsDiagLogConfigEntry 9 }
+
+sfpsDiagLogAccessPortControl   OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set a port bit mask. This bit mask
+                 represents which ports shall be statically set to be
+                 an ACCESS port. Bit 0 corresponds to Port 1."
+        DEFVAL { 0 }
+        ::= { sfpsDiagLogConfigEntry 10 }
+
+sfpsDiagLogCallIdleTime   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set a debug variable. (in seconds)"
+        DEFVAL { 60 }
+        ::= { sfpsDiagLogConfigEntry 11 }
+
+sfpsDiagLogFilterAddTimer   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set how long a filter connection
+                 should be (Default : 900 seconds)"
+        DEFVAL { 900 }
+        ::= { sfpsDiagLogConfigEntry 12 }
+
+sfpsDiagLogRedirectorWakeup   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set how often the Redirector
+                 wakes up to service the queue (in seconds)"
+        ::= { sfpsDiagLogConfigEntry 13 }
+
+sfpsDiagLogRedirectorNumPackets   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set how many packets the
+                 Redirector reads off at a time."
+        DEFVAL { 64 }
+        ::= { sfpsDiagLogConfigEntry 14 }
+
+sfpsDiagLogEndSystemTimeout   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set a debug variable. (Default : 
+                 10 minutes) (in seconds)"
+        DEFVAL { 600 }
+        ::= { sfpsDiagLogConfigEntry 15 }
+
+sfpsDiagLogSwitchIdleInterval   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set a debug variable. (in seconds)"
+        DEFVAL { 30 }
+        ::= { sfpsDiagLogConfigEntry 16 }
+
+sfpsDiagLogInlnFltrAgeTime   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set the BAF age time (seconds)."
+        ::= { sfpsDiagLogConfigEntry 17 }
+
+sfpsDiagLogConfigDebug9   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set a debug variable."
+        ::= { sfpsDiagLogConfigEntry 18 }
+
+sfpsDiagLogSignalThrottle   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf to be used to set the Signal Thottle knob.
+                 Throttling defaults to off. By setting it to
+                 1,2,5, or 10 one can dictate the rate (signal/second)
+                 at which SFPS sends signals to the ACMS Signal Stack.."
+        ::= { sfpsDiagLogConfigEntry 19 }
+
+sfpsDiagLogConfigOther   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        string(1),              
+                        integer(2)          
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Dictates the format of the Event to be displayed (either 
+                 Text or Integer values)."
+        ::= { sfpsDiagLogConfigEntry 20 }
+
+sfpsDiagLogConfigSoftReset   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDiagLogConfigEntry 21 }
+
+sfpsDiagLogConfigSFPSVlan   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDiagLogConfigEntry 22 }
+
+-- AO Properties Table
+
+sfpsAOPropertiesTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsAOPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOProperties 1 }
+
+sfpsAOPropertiesEntry    OBJECT-TYPE
+        SYNTAX  SfpsAOPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the table instanced by the tag."
+        INDEX   { sfpsAOPropertiesTag }
+        ::= { sfpsAOPropertiesTable 1 }
+
+SfpsAOPropertiesEntry ::=
+
+        SEQUENCE {
+                sfpsAOPropertiesTag         INTEGER,
+                sfpsAOPropertiesTagDescriptor   OCTET STRING,
+                sfpsAOPropertiesPrettyType  OCTET STRING,
+                sfpsAOPropertiesNumBytes    INTEGER,
+                sfpsAOPropertiesIsLimit     INTEGER,
+                sfpsAOPropertiesIsMobile    INTEGER,
+                sfpsAOPropertiesIsSingle    INTEGER,
+                sfpsAOPropertiesNoBlock     INTEGER,
+                sfpsAOPropertiesNoDelta     INTEGER
+         }
+
+sfpsAOPropertiesTag    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 1 }
+
+sfpsAOPropertiesTagDescriptor    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 2 }
+
+sfpsAOPropertiesPrettyType    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 3 }
+
+sfpsAOPropertiesNumBytes    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 4 }
+
+sfpsAOPropertiesIsLimit    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 5 }
+
+sfpsAOPropertiesIsMobile    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 6 }
+
+sfpsAOPropertiesIsSingle    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 7 }
+
+sfpsAOPropertiesNoBlock    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 8 }
+
+sfpsAOPropertiesNoDelta    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesEntry 9 }
+
+-- AO Properties API
+
+sfpsAOPropertiesAPITag    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 1 }
+
+sfpsAOPropertiesAPITagString    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 2 }
+
+sfpsAOPropertiesAPIPrettyType    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 3 }
+
+sfpsAOPropertiesAPINumBytes    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 4 }
+
+sfpsAOPropertiesAPIIsLimit    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notSet(1),
+                false(2),
+                true(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 5 }
+
+sfpsAOPropertiesAPIIsMobile    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notSet(1),
+                false(2),
+                true(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 6 }
+
+sfpsAOPropertiesAPIIsSingle    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notSet(1),
+                false(2),
+                true(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 7 }
+
+sfpsAOPropertiesAPINoBlock    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notSet(1),
+                false(2),
+                true(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 8 }
+
+sfpsAOPropertiesAPINoDelta    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notSet(1),
+                false(2),
+                true(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 9 }
+
+sfpsAOPropertiesAPIAction    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                readProperties(1),
+                setProperties(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAOPropertiesAPI 10 }
+
+END

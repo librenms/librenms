@@ -1,0 +1,428 @@
+ALCATEL-IND1-ETHERNET-OAM-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	 	OBJECT-TYPE, MODULE-IDENTITY,
+		OBJECT-IDENTITY, Integer32,
+		Unsigned32
+						FROM SNMPv2-SMI
+		MacAddress
+		
+						FROM SNMPv2-TC 
+		OBJECT-GROUP,MODULE-COMPLIANCE
+						FROM SNMPv2-CONF
+		softentIND1EthernetOam		FROM ALCATEL-IND1-BASE
+		Dot1agCfmMepId, 
+                dot1agCfmMaIndex,
+                Dot1agCfmMepIdOrZero,
+		dot1agCfmMdIndex,
+		dot1agCfmMepIdentifier,
+		dot1agCfmMepEntry		FROM IEEE8021-CFM-MIB;
+
+	
+
+
+	alcatelIND1EoamMIB MODULE-IDENTITY
+		LAST-UPDATED "200909080000Z"     -- 09/08/2009 00:00GMT
+		ORGANIZATION "Alcatel - Architects Of An Internet World"
+		CONTACT-INFO
+            "Please consult with Customer Service to insure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel Internetworking, Incorporated
+                       (Division 1, Formerly XYLAN Corporation)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://www.ind.alcatel.com
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-
+		specific Simple Network Management Protocol (SNMP) Management 
+		Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Ethernet OAM for the Connectivity Fault Management.
+				 
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, 
+	     special, or consequential damages whatsoever arising from or 
+	     related to this document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+               Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200909080000Z"
+        DESCRIPTION
+            	"Conectivity Fault Management module for managing IEEE 802.1ag. 
+            	This CFM MIB extends standard draft 802.1ag 8.1.
+		
+
+		The set of objects defined in this MIB, do not duplicate, 
+		nor conflict with any MIB object definitions defined in 
+		the 802.1ag 7.0 draft MIB."
+		::= { softentIND1EthernetOam 1}
+
+-- --------------------------------------------------------------
+--
+-- Ethernet OAM MIB
+--
+
+alcatelIND1CfmMIBObjects OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+   "Branch For Connectivity Fault Management (Ethernet OAM) Objects."
+   ::= { alcatelIND1EoamMIB 1 }
+
+-- -------------------------------------------------------------
+-- groups in the Ethernet OAM MIB
+-- -------------------------------------------------------------
+
+alaCfmBase         OBJECT IDENTIFIER ::= { alcatelIND1CfmMIBObjects 1 }
+alaCfmMep          OBJECT IDENTIFIER ::= { alcatelIND1CfmMIBObjects 2 }
+alaCfmDelayResult  OBJECT IDENTIFIER ::= { alcatelIND1CfmMIBObjects 3 }
+-- -------------------------------------------------------------
+
+
+alaCfmGlobalClearStats	OBJECT-TYPE
+  	SYNTAX		INTEGER {
+			default(0),
+			reset(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Defines the global clear statistics control for Ethernet OAM.  
+		The value reset (1) indicates that Ethernet OAM should clear all 		
+		statistic counters related to all MEPs in the system. 
+		By default, this object contains a zero value."
+	DEFVAL  { default }
+	::= { alaCfmBase 1 }	
+
+alaCfmGlobalOWDClear	OBJECT-TYPE
+  	SYNTAX		INTEGER {
+			default(0),
+			reset(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Defines the global clear of one-way-delay entries control for 
+		Ethernet OAM.  The value reset (1) indicates that Ethernet OAM
+		should remove all the one-way-delay entries in the delay result
+		table. By default, this object contains a zero value."
+	DEFVAL  { default }
+	::= { alaCfmBase 2 }
+
+alaCfmGlobalTWDClear	OBJECT-TYPE
+  	SYNTAX		INTEGER {
+			default(0),
+			reset(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Defines the global clear of two-way-delay entries control for 
+		Ethernet OAM.  The value reset (1) indicates that Ethernet OAM
+		should remove all the two-way-delay entries in the delay result
+		table. By default, this object contains a zero value."
+	DEFVAL  { default }
+	::= { alaCfmBase 3 }
+
+--
+--  Augmentation of the dot1agCfmMepTable
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship
+--  between the base table, dot1agCfmMepTable, and the augmenting table,
+--  alaCfmMepTable. This in effect extends the dot1agCfmMepTable with an
+--  additional column to clear statistics. Creation (or deletion) of a row in 
+--  the dot1agCfmMepTable results in the same fate for the row in the 
+--  alaCfmMepTable.
+
+alaCfmMepTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AlaCfmMepEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+        "This table augments the MEP table for clearing statistics based 
+	on MdIndex/MaIndex/MEPId. This table also contains the objects for
+	initiating 1DM and DMM."
+    ::= { alaCfmMep 1 }
+
+alaCfmMepEntry OBJECT-TYPE
+   SYNTAX      AlaCfmMepEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+        "Each row entry in the alaCfmMepTable represents additional
+         column for proprietary extension to the existing MEP table. 
+         It provides the facility to clear the statistics based on 
+	 uniquely identified MEP. It also provides the facility to
+	 intiate 1DM and DMM"
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { alaCfmMepTable 1 }
+
+AlaCfmMepEntry ::=
+    SEQUENCE {
+               	alaCfmMepClearStats         INTEGER,
+                alaCfmMepOWDTMacAddress     MacAddress,
+                alaCfmMepOWDTRMepIdentifier Dot1agCfmMepId,
+                alaCfmMepOWDTPriority       Unsigned32,
+                alaCfmMepTWDTMacAddress     MacAddress,
+                alaCfmMepTWDTRMepIdentifier Dot1agCfmMepId,
+                alaCfmMepTWDTPriority       Unsigned32
+     }
+
+alaCfmMepClearStats	OBJECT-TYPE
+   SYNTAX		INTEGER {
+				default(0),
+				reset(1)
+	}
+	MAX-ACCESS	read-write
+   STATUS      current
+   DESCRIPTION
+		"Reset all statistics parameters corresponding to this MEP.
+		 By default, this objects contains a zero value."
+	DEFVAL  { default }
+   ::= { alaCfmMepEntry 1 }
+
+alaCfmMepOWDTMacAddress   OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the MAC address used as a target for the 
+         One-Way-Delay Test (OWDT).
+
+         Setting this object will trigger a One-Way-Delay test to the specified
+         MAC address. The number of messages transmitted per initiation will 
+         be 2.
+         
+         Upon completion of the test, the MacAddress will revert to it's
+         default value, indicating that another test is possible."
+    DEFVAL { '000000000000'H }
+    ::= { alaCfmMepEntry 2 }
+
+alaCfmMepOWDTRMepIdentifier       OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepId
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+       "Specifies the Mep-Id assigned to the Remote MEP."
+    ::= { alaCfmMepEntry 3 }
+
+alaCfmMepOWDTPriority     OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the priority used in the generated test frame 
+         for the One-Way-Delay test."
+    DEFVAL { 7 }
+    ::= { alaCfmMepEntry 4 }
+
+alaCfmMepTWDTMacAddress   OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the MAC address used as a target for the 
+          Two-Way-Delay Test (TWDT).
+
+         Setting this object will trigger a Two-Way-Delay test to the specified
+         MAC address. The number of messages transmitted per initiation will  
+         be 2.
+         
+         Upon completion of the test, the MacAddress will revert to it's
+         default value, indicating that another test is possible."
+    DEFVAL { '000000000000'H }
+    ::= { alaCfmMepEntry 5 }
+
+alaCfmMepTWDTRMepIdentifier       OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepId
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+       "Specifies the Mep-Id assigned to the Remote MEP."
+    ::= { alaCfmMepEntry 6 }
+
+alaCfmMepTWDTPriority     OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the priority used in the generated test 
+             frame for the Two-Way-Delay test."
+    DEFVAL { 7 }
+    ::= { alaCfmMepEntry 7 }
+
+--
+-- MEP Delay Result Table
+--
+alaCfmDelayResultTable   OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaCfmDelayResultEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "Indicates the results of all the One-Way/Two-Way Delay Tests 
+        from the originating MAC addresses.
+        
+        This table is not persistent over reboots of the chassis."
+    ::= { alaCfmDelayResult 1 }
+
+alaCfmDelayResultEntry   OBJECT-TYPE
+    SYNTAX     AlaCfmDelayResultEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The MEP delay result table."
+    INDEX { 
+              dot1agCfmMdIndex,
+              dot1agCfmMaIndex,
+              dot1agCfmMepIdentifier,
+              alaCfmDelayResultType,
+              alaCfmDelayResultRMepMacAddress
+          }
+    ::= { alaCfmDelayResultTable 1 }
+
+AlaCfmDelayResultEntry   ::= SEQUENCE {
+    alaCfmDelayResultType           INTEGER,
+    alaCfmDelayResultRMepMacAddress MacAddress,
+    alaCfmDelayResultRMepIdentifier Dot1agCfmMepIdOrZero,
+    alaCfmDelayResultTestDelay      Integer32,
+    alaCfmDelayResultVariation      Unsigned32
+}
+
+alaCfmDelayResultType    OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   oneWayTest (1),
+                   twoWayTest (2)
+               }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Indicates the type of test this row details."
+    ::= { alaCfmDelayResultEntry 1 }
+
+alaCfmDelayResultRMepMacAddress  OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Indicates the MAC address of the Remote MEP."
+    ::= { alaCfmDelayResultEntry 2 }
+
+alaCfmDelayResultRMepIdentifier  OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepIdOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the Mep-Id of the Remote MEP. Valid only in the case of 
+         two-way delay. When initiated for a target Mep-Id contains the
+         Mep-Id of the target, else if two-way delay initiated for a 
+         target mac-address contains '0'."
+    ::= { alaCfmDelayResultEntry 3 }
+
+alaCfmDelayResultTestDelay   OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the amount of time, measured in microseconds, 
+         from when the test-frame was transmitted to the time 
+         it was received minus the local processing time
+         taken by the remote system."
+    ::= { alaCfmDelayResultEntry 4 }
+
+alaCfmDelayResultVariation   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the amount of time delay variation, measured 
+         in microseconds, from the two most recent time delay measurements"
+    ::= { alaCfmDelayResultEntry 5 }
+
+ 
+-- --------------------------------------------------------------
+-- IEEE 802.1ag MIB - Conformance Information
+-- --------------------------------------------------------------
+alaCfmConformance OBJECT IDENTIFIER ::= { alcatelIND1EoamMIB 2 }
+alaCfmGroups 	  OBJECT IDENTIFIER ::= { alaCfmConformance 1 }
+alaCfmCompliances OBJECT IDENTIFIER ::= { alaCfmConformance 2 }
+-- --------------------------------------------------------------
+
+-- --------------------------------------------------------------
+-- Units of conformance
+-- --------------------------------------------------------------
+alaCfmBaseGroup OBJECT-GROUP
+   OBJECTS {
+      alaCfmGlobalClearStats,
+      alaCfmGlobalOWDClear,
+      alaCfmGlobalTWDClear
+   }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for the Base group"
+   ::= { alaCfmGroups 1 }
+
+alaCfmMepGroup OBJECT-GROUP
+   OBJECTS {
+   	alaCfmMepClearStats,
+        alaCfmMepOWDTMacAddress,
+        alaCfmMepOWDTRMepIdentifier,
+        alaCfmMepOWDTPriority,
+        alaCfmMepTWDTMacAddress,
+        alaCfmMepTWDTRMepIdentifier,
+        alaCfmMepTWDTPriority
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for the MEP group. Proprietary extension to 
+       support statistics clearing and one-way and two-way delay tests."
+   ::= { alaCfmGroups 2 }    
+
+alaCfmDelayResultGroup OBJECT-GROUP
+   OBJECTS {
+       alaCfmDelayResultRMepIdentifier,
+       alaCfmDelayResultTestDelay,     
+       alaCfmDelayResultVariation 
+  }
+   STATUS	current
+   DESCRIPTION
+      "Mandatory objects for the Delay Result Group."
+   ::= { alaCfmGroups 3 }      
+
+-- --------------------------------------------------------------
+-- Compliance statements
+-- --------------------------------------------------------------
+alaCfmCompliance MODULE-COMPLIANCE
+   STATUS      current
+   DESCRIPTION
+      "The compliance statement for support of CFM."
+   MODULE
+      MANDATORY-GROUPS {
+         alaCfmBaseGroup,
+         alaCfmMepGroup,
+	alaCfmDelayResultGroup
+      }
+   ::= { alaCfmCompliances 1 }
+-- --------------------------------------------------------------
+
+END

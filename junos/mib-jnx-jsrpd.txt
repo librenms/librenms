@@ -1,0 +1,180 @@
+-- *******************************************************************
+-- Juniper enterprise specific Chassis Cluster objects MIB.
+--
+-- Copyright (c) 2008-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-CHASSIS-CLUSTER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter32, Counter64, IpAddress, Integer32,
+        NOTIFICATION-TYPE, MODULE-IDENTITY, 
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC 
+
+        jnxJsChassisCluster
+            FROM JUNIPER-JS-SMI;
+
+
+    jnxJsChassisClusterMIB  MODULE-IDENTITY
+        LAST-UPDATED  "201106280000Z"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "Chassis Clustering is concerned with ensuring minimal disruption to 
+             data and control planes in case of a failover. If one of the chassis in 
+             a cluster fails, the other chassis in the cluster takes over the function 
+             of the failed chassis with minimal service interruption.
+             This module defines the objects pertaining to Chassis Cluster."
+
+        REVISION      "201106280000Z"
+        DESCRIPTION   "Added trap jnxJsChClusterIntfTrap"
+
+        REVISION      "200905270000Z"
+        DESCRIPTION   "Added trap class for jnxJsChassisClusterSwitchover"
+
+        REVISION      "200902030000Z"
+        DESCRIPTION   "Creation Date"
+    ::= { jnxJsChassisCluster 1 }   
+
+
+    jnxJsChassisClusterNotifications OBJECT IDENTIFIER ::= 
+                                     { jnxJsChassisClusterMIB 0 }
+    jnxJsChassisClusterTrapObjects   OBJECT IDENTIFIER ::= 
+                                     { jnxJsChassisClusterMIB 1 }
+
+    -- ***************************************************************
+    -- definition of ChassisCluster related traps and objects.
+    -- ***************************************************************
+
+    jnxJsChassisClusterSwitchover NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterSwitchoverInfoRedundancyGroup,
+                  jnxJsChClusterSwitchoverInfoClusterId,
+                  jnxJsChClusterSwitchoverInfoNodeId,
+                  jnxJsChClusterSwitchoverInfoPreviousState,
+                  jnxJsChClusterSwitchoverInfoCurrentState,
+                  jnxJsChClusterSwitchoverInfoReason }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal switchover/failover."
+        ::= { jnxJsChassisClusterNotifications 1 }
+
+    -- ***************************************************************
+    -- definition of a trap that notifies changes in fabric
+    -- and control link status.
+    -- ***************************************************************
+
+    jnxJsChClusterIntfTrap  NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterSwitchoverInfoClusterId, 
+                  jnxJsChClusterIntfName,
+                  jnxJsChClusterIntfState,
+                  jnxJsChClusterIntfSeverity,
+                  jnxJsChClusterIntfStateReason }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal change in HA interface state."
+        ::= { jnxJsChassisClusterNotifications 2 }
+
+	jnxJsChClusterSwitchoverInfoRedundancyGroup OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of redundancy group
+             that switched over."
+        ::= { jnxJsChassisClusterTrapObjects 1 }
+
+    jnxJsChClusterSwitchoverInfoClusterId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains cluster identification information
+             where the switchover occured."
+        ::= { jnxJsChassisClusterTrapObjects 2 }
+
+    jnxJsChClusterSwitchoverInfoNodeId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains node identification information
+             where the switchover occured."
+        ::= { jnxJsChassisClusterTrapObjects 3 }
+
+    jnxJsChClusterSwitchoverInfoPreviousState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the redundancy state of the cluster 
+             before the occurance of switchover."
+        ::= { jnxJsChassisClusterTrapObjects 4 }
+
+    jnxJsChClusterSwitchoverInfoCurrentState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the redundancy state of the cluster 
+             after the occurance of switchover."
+        ::= { jnxJsChassisClusterTrapObjects 5 }
+
+    jnxJsChClusterSwitchoverInfoReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the cause for switchover."
+        ::= { jnxJsChassisClusterTrapObjects 6 }
+
+    jnxJsChClusterIntfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the name of the link 
+             that changed its state."
+        ::= { jnxJsChassisClusterTrapObjects 7 }
+
+    jnxJsChClusterIntfState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the state of the link; 
+             whether it is UP or DOWN."
+        ::= { jnxJsChassisClusterTrapObjects 8 }
+
+    jnxJsChClusterIntfSeverity OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object reflects the severity; 
+             whether it is minor or major."
+        ::= { jnxJsChassisClusterTrapObjects 9 }
+
+    jnxJsChClusterIntfStateReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains the reason why the link state 
+             changed."
+        ::= { jnxJsChassisClusterTrapObjects 10 }
+
+END

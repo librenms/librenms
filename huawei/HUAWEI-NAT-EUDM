@@ -1,0 +1,318 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:
+-- Reference:
+-- Version:     V1.20
+-- History:
+-- 
+--  2005-05-25, V1.20  Wei Rixi(22510), added mplsVpnVrfName as table index,
+--      changed the region of ApplyZoneID(hwNatEudmZoneApplyZoneID1 and 
+--      hwNatEudmZoneApplyZoneID2) from 1~16 to 0~128
+--  2004-06-30, V1.10  Xin Jianfeng(37631), changed the region of NatID 
+--      (hwNatEudmOutboundNatID and hwNatEudmZoneApplyNatID) to 1~128
+--      changed the region of hwNatEudmOutboundPoolIndex to 0~128
+--  2003-04-16, V1.00  chenruining, initial version. 
+-- =================================================================
+
+HUAWEI-NAT-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+
+    hwNATEudm MODULE-IDENTITY 
+        LAST-UPDATED "200303180900Z"        -- March 18, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd.
+            "
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The NAT-EUDM mib is for Eudemon product.
+            "
+        ::= { hwNAT 2 }
+
+    --
+    -- Textual conventions
+    --
+    NatType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "
+            nat type.
+            "
+        SYNTAX INTEGER
+            {
+            pat(1),
+            nat(2),
+            easyIP(3)
+            }
+        
+
+--
+-- Node definitions
+--
+    -- 1.3.6.1.4.1.2011.5.25.7
+    hwNAT OBJECT IDENTIFIER ::= { hwDatacomm 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1
+    hwNatEudmMibObjects OBJECT IDENTIFIER ::= { hwNATEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1
+    hwNatEudmOutboundTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatEudmOutboundEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT Inside Table.
+            "
+        ::= { hwNatEudmMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1
+    hwNatEudmOutboundEntry OBJECT-TYPE
+        SYNTAX HwNatEudmOutboundEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT Inside Table Entry.
+            "
+        INDEX { hwNatEudmOutboundNatID }
+        ::= { hwNatEudmOutboundTable 1 }
+    
+    HwNatEudmOutboundEntry ::=
+        SEQUENCE { 
+            hwNatEudmOutboundNatID
+                Integer32,
+            hwNatEudmOutboundType
+                NatType,
+            hwNatEudmOutboundAclNumber
+                Integer32,
+            hwNatEudmOutboundPoolIndex
+                Integer32,
+            hwNatEudmOutboundEasyIpIfIndex
+                Gauge32,
+            hwNatEudmOutboundRefCount
+                Integer32,
+            hwNatEudmOutboundRowstatus
+                RowStatus
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.1
+    hwNatEudmOutboundNatID OBJECT-TYPE
+        SYNTAX Integer32 (1..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The nat outbound table index.
+            
+            This is index.
+            "
+        ::= { hwNatEudmOutboundEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.2
+    hwNatEudmOutboundType OBJECT-TYPE
+        SYNTAX NatType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The type of NAT
+            "
+        ::= { hwNatEudmOutboundEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.3
+    hwNatEudmOutboundAclNumber OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..3999)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The access-list number.
+            0 means no use this item.
+            "
+        ::= { hwNatEudmOutboundEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.4
+    hwNatEudmOutboundPoolIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The index of nat address pool.
+            0 means no use this item.
+            "
+        ::= { hwNatEudmOutboundEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.5
+    hwNatEudmOutboundEasyIpIfIndex OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The interface index used by easy-ip.
+            "
+        ::= { hwNatEudmOutboundEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.6
+    hwNatEudmOutboundRefCount OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This outbound table reference count.
+            "
+        ::= { hwNatEudmOutboundEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.1.1.7
+    hwNatEudmOutboundRowstatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Row status
+            
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwNatEudmOutboundEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2
+    hwNatEudmZoneApplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatEudmZoneApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table saves which nat is applyed between Zones .
+            "
+        ::= { hwNatEudmMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2.1
+    hwNatEudmZoneApplyEntry OBJECT-TYPE
+        SYNTAX HwNatEudmZoneApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Apply Table Entry.
+            "
+        INDEX { mplsVpnVrfName, hwNatEudmZoneApplyZoneID1, hwNatEudmZoneApplyZoneID2, hwNatEudmZoneApplyNatID }
+        ::= { hwNatEudmZoneApplyTable 1 }
+    
+    HwNatEudmZoneApplyEntry ::=
+        SEQUENCE { 
+            hwNatEudmZoneApplyZoneID1
+                Integer32,
+            hwNatEudmZoneApplyZoneID2
+                Integer32,
+            hwNatEudmZoneApplyNatID
+                Integer32,
+            hwNatEudmZoneApplyRowstatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2.1.1
+    hwNatEudmZoneApplyZoneID1 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The internal ID of first security zone
+            
+            This is index.
+            0: Any zone.
+            "
+        ::= { hwNatEudmZoneApplyEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2.1.2
+    hwNatEudmZoneApplyZoneID2 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The internal ID of second security zone.
+            
+            This is index.
+            0: Any zone.
+            "
+        ::= { hwNatEudmZoneApplyEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2.1.3
+    hwNatEudmZoneApplyNatID OBJECT-TYPE
+        SYNTAX Integer32 (1..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The nat outbound table index.
+            
+            This is index.
+            "
+        ::= { hwNatEudmZoneApplyEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.1.2.1.4
+    hwNatEudmZoneApplyRowstatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Row status
+            
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwNatEudmZoneApplyEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.2
+    hwNatEudmConformance OBJECT IDENTIFIER ::= { hwNATEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.2.1
+    hwNatEudmGroups OBJECT IDENTIFIER ::= { hwNatEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.2.2.1.1
+    hwNatEudmCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwNatEudmOutboundRefCount, 
+            hwNatEudmZoneApplyRowstatus, 
+            hwNatEudmOutboundType, 
+            hwNatEudmOutboundAclNumber, 
+            hwNatEudmOutboundPoolIndex, 
+            hwNatEudmOutboundEasyIpIfIndex, 
+            hwNatEudmOutboundRowstatus }
+        STATUS current
+        DESCRIPTION 
+            "
+            Nat Eudemon mib group.
+            "
+        ::= { hwNatEudmGroups 1 }
+
+END
+

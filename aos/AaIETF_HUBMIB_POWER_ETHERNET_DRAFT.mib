@@ -1,0 +1,706 @@
+POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+-- **********************************************************
+-- > > >  Use Alcatel Branch Until IANA Assigns Number  < < <
+-- **********************************************************
+    softentIND1InLinePower   		FROM ALCATEL-IND1-BASE
+-- **********************************************************
+-- > > >  Use Alcatel Branch Until IANA Assigns Number  < < <
+-- **********************************************************
+
+--           MODULE-IDENTITY, mib-2, OBJECT-TYPE, Integer32,
+           MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+           Gauge32, Counter32, NOTIFICATION-TYPE
+                   FROM SNMPv2-SMI
+           TruthValue
+                   FROM SNMPv2-TC
+           InterfaceIndex
+                   FROM IF-MIB
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                   FROM SNMPv2-CONF;
+
+      powerEthernetMIB MODULE-IDENTITY
+
+
+           LAST-UPDATED    "200212020000Z"  -- December 02, 2002
+           ORGANIZATION "IETF Ethernet Interfaces and Hub MIB
+                         Working Group"
+           CONTACT-INFO
+           "
+
+                       Chair: Dan Romascanu
+                                  Avaya Inc.
+                                  Tel:  +972-3-645-8414
+                                  Email: dromasca@avaya.com
+
+                       Editor: Avi Berger
+                                 PowerDsine Inc.
+                                   Tel:    972-9-7755100 Ext 307
+                                  Fax:    972-9-7755120
+                                   E-mail: avib@PowerDsine.com
+           "
+
+          DESCRIPTION
+                   "The MIB module for for managing Powered Devices (PD) or
+                   Power Source Equipment (PSE) working according to the IEEE
+                   802.af Powered Ethernet (DTE Power via MDI) standard.
+                  The following terms are used throughout this
+                  MIB module.  For complete formal definitions,
+                  the IEEE 802.3 standards should be consulted
+                  wherever possible:
+
+                  Group - A recommended, but optional, entity
+                  defined by the IEEE 802.3 management standard,
+                  in order to support a modular numbering scheme.
+                  The classical example allows an implementor to
+                  represent field-replaceable units as groups of
+                  ports, with the port numbering matching the
+                  modular hardware implementation.
+
+                   Port - This entity identifies the port within the group
+                   for which this entry contains information. The numbering
+                   scheme for ports is implementation specific."
+
+          REVISION    "200212020000Z"  -- December 02, 2002
+          DESCRIPTION "Initial version, published as RFC yyyy."
+    -- ::= { mib-2 xx }
+    -- NOTE TO RFC EDITOR: When this document is published as an
+    -- RFC, replace xx with IANA assignment, and delete this comment.
+
+-- **********************************************************
+-- > > >  Use Alcatel Branch Until IANA Assigns Number  < < <
+-- **********************************************************
+    ::= { softentIND1InLinePower   999 }
+-- **********************************************************
+-- > > >  Use Alcatel Branch Until IANA Assigns Number  < < <
+-- **********************************************************
+
+   pethNotifications OBJECT IDENTIFIER ::= { powerEthernetMIB 0 }
+   pethObjects       OBJECT IDENTIFIER ::= { powerEthernetMIB 1 }
+   pethConformance   OBJECT IDENTIFIER ::= { powerEthernetMIB 2 }
+
+   -- PSE Objects
+
+     pethPsePortTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF PethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that display and control the power
+               characteristics power Ethernet ports on a Power Source
+               Entity (PSE) device. This group will be implemented in
+               managed power Ethernet switches and mid-span devices."
+          ::= { pethObjects 1 }
+
+      pethPsePortEntry OBJECT-TYPE
+          SYNTAX      PethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                  "A set of objects that display and control the power
+                  characteristics of a power Ethernet PSE port."
+          INDEX    { pethPsePortGroupIndex , pethPsePortIndex  }
+          ::= { pethPsePortTable 1 }
+
+
+      PethPsePortEntry ::= SEQUENCE {
+          pethPsePortGroupIndex
+             Integer32,
+          pethPsePortIndex
+             Integer32,
+          pethPsePortAdminEnable
+              INTEGER,
+          pethPsePortPowerPairsControlAbility
+              TruthValue,
+          pethPsePortPowerPairs
+              INTEGER,
+          pethPsePortPowerDetectionControl
+              INTEGER,
+          pethPsePortDetectionStatus
+              INTEGER,
+          pethPsePortPowerPriority
+              INTEGER,
+          pethPsePortPowerMaintenanceStatus
+              INTEGER,
+          pethPsePortMPSAbsentCounter
+                Counter32,
+          pethPsePortOverCurrentCounter
+                Counter32,
+          pethPsePortType
+              INTEGER,
+          pethPsePortPowerClassifications
+                INTEGER
+      }
+
+        pethPsePortGroupIndex OBJECT-TYPE
+          SYNTAX      Integer32 (1..2147483647)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This variable uniquely identifies the group
+               containing the port to which a power Ethernet PSE is connected.
+               Group means box in the stack, module in a rack and the value 1
+               MUST be used for non-modular devices .
+               pethPseMidSpanGroupCapacity is the number of Mid-Span PSE
+               groups that can be contained within the Mid-Span PSE."
+          ::= { pethPsePortEntry 1 }
+
+        pethPsePortIndex OBJECT-TYPE
+          SYNTAX      Integer32 (1..2147483647)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This variable uniquely identifies the power Ethernet PSE
+               port within group pethPseGroupIndex to which the
+               power Ethernet PSE entry is connected."
+          ::= { pethPsePortEntry 2 }
+
+
+       pethPsePortAdminEnable OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  enable(1),
+                  disable(2)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables power supply on this port.
+            Setting this object at a value enable(1) enables power
+            and detection mechanism for this port.
+            Setting this object at a value disable(2) disables power
+            for this port."
+       ::= { pethPsePortEntry 3 }
+
+       pethPsePortPowerPairsControlAbility OBJECT-TYPE
+       SYNTAX TruthValue
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+            "Describes the capability of controlling the power pairs
+            functionality to switch pins for sourcing power.
+            The value true indicate that the device has the capability
+            to control the power pairs"
+       ::= { pethPsePortEntry 4 }
+
+       pethPsePortPowerPairs OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  signal(1),
+                  spare(2)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Describes or controls the pairs in use. If the value of
+            pethPsePortPowerPairsControl is true, this object is
+            writable.
+            A value of signal(1) means that the signal pairs
+            only are in use.
+            A value of spare(2) means that the spare pairs
+            only are in use."
+       ::= { pethPsePortEntry 5 }
+
+       pethPsePortPowerDetectionControl OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  auto(1),
+                  test(2)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls the power detection mechanism of the port.
+            Setting the value auto(1) enables the power detection
+            mechanism of the port.
+            Setting the value test(2) puts the port in a
+            testmode: force continuous discovery without applying
+            power regardless of whether PD detected."
+       ::= { pethPsePortEntry 6 }
+
+
+       pethPsePortDetectionStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+                disabled(1),
+                searching(2),
+                  deliveringPower(4),
+                  fault(5),
+                  test(7),
+                  denyLowPriority(8)
+        }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the operational status of the port PD detection.
+            A value of disabled(1)- indicates that the PSE State diagram is in
+            the state IDLE
+            A value of searching(2)- indicates that the PSE State diagram is in
+            the state DETECTION, CLASSIFICATION, SIGNATURE_INVALID or BACKOFF.
+            A value of deliveringPower(4) - indicates that the PSE State diagram
+            is in the state POWER_UP, POWER_ON or POWER_OFF.
+            A value of fault(5) - indicates that the PSE State diagram is in the
+            state TEST_ERROR or the state IDLE due to the variable error
+            condition.
+            Faults detected are vendor specific.
+            A value of test(7) - indicates that the PSE State diagram is in the
+            state TEST_MODE.
+            A value of denyLowPriority(8) indicates that the port was
+            disabled by the power management system, in order to keep
+            active higher priority ports.
+             "
+       ::= { pethPsePortEntry 7 }
+
+        pethPsePortPowerPriority OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  critical(1),
+                  high(2),
+                  low(3)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This object controls the priority of the port from the point
+            of view of a power management algorithm. The priority that
+            is set by this variable could be used by a control mechanism
+            that prevents over current situations by disconnecting first
+            ports with lower power priority. Ports that connect devices
+            critical to the operation of the network - like the E911
+            telephones ports - should be set to higher priority."
+       ::= { pethPsePortEntry 8 }
+
+        pethPsePortPowerMaintenanceStatus  OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  ok(1),
+                  underCurrent(2),
+                  mPSAbsent(3)
+        }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The value ok(1) indicates the Power Maintenance
+            Signature is present and the overcurrent condition has not been
+            detected.
+            The value overCurrent (2) indicates an overcurrent condition
+            has been detected.
+            The value mPSAbsent(3) indicates that the Power Maintenance
+            Signature is absent."
+
+
+       REFERENCE   "[IEEE Draft P802.3af/D4.0, November, 2002, 30.9.1.1.8
+                   aPSEPowerMaintenanceStatus]"
+       ::= { pethPsePortEntry 10 }
+
+        pethPsePortMPSAbsentCounter OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "Counts the number of times that the
+                pethPsePortPowerMaintenanceStatus attribute changes from any
+                value to the value mPSAbsent(3)."
+       REFERENCE   "[IEEE Draft P802.3af/D4.0, November, 2002, object 30.9.1.1.9
+                     aPSEUnderCurrentCounter]"
+       ::= { pethPsePortEntry 11 }
+
+        pethPsePortOverCurrentCounter OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+                "Counts the number of times that the aPSEPowerCurrentStatus
+                 attribute changes from any value to the value overCurrent(2)."
+       REFERENCE   "[IEEE Draft P802.3af/D4.0, November, 2002, object 30.9.1.1.1
+                     aPSEOverCurrentCounter]"
+       ::= { pethPsePortEntry 12 }
+
+
+        pethPsePortType OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  other(1),
+                  telephone(2),
+                  webcam(3),
+                  wireless(4)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "A manager will set the value of this variable to a value
+            that indicates the type of the device that is connected
+            to theport. This value can be the result of the mapping
+            the address of the station connected to the port and of
+            the value of the pethPdPortType of the respective PD port."
+       ::= { pethPsePortEntry 13 }
+
+       pethPsePortPowerClassifications OBJECT-TYPE
+        SYNTAX INTEGER   {
+                  class0(1),
+                  class1(2),
+                  class2(3),
+                  class3(4),
+                  class4(5)
+        }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Classification is a way to tag different terminals on the
+           Power over LAN network according to their power consumption.
+           Devices such as IP telephones, WLAN access points and others,
+           will be classified according to their power requirements.
+
+          The value is only valid while a valid PD is being detected as
+          indicated by the attribute pethPsePortDetectionStatus reporting
+          the value or deliveringPower(4)."
+       REFERENCE   "[IEEE Draft P802.3af/D4.0, November, 2002,
+                     object 30.9.1.1.7 aPSEPowerClassification]"
+      ::= { pethPsePortEntry 14 }
+
+
+   -- PD Port table
+
+   pethPdPortTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF PethPdPortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that display and control the power
+               characteristics power Ethernet ports on a Powered
+               Device(PD) device. This group will be implemented in
+               managed powered and mid-span devices."
+          ::= { pethObjects 2 }
+
+      pethPdPortEntry OBJECT-TYPE
+          SYNTAX      PethPdPortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "A set of objects that display and control the power
+               characteristics of a Powered Device port."
+          INDEX    { pethPdPortIndex }
+          ::= { pethPdPortTable 1 }
+
+      PethPdPortEntry ::= SEQUENCE {
+          pethPdPortIndex
+              InterfaceIndex,
+          pethPdPortAdminEnable
+              INTEGER
+     }
+
+        pethPdPortIndex OBJECT-TYPE
+          SYNTAX      InterfaceIndex
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "An index value that uniquely identifies an
+               interface to a PD device.  The
+               interface identified by a particular value of
+               this index is the same interface as identified
+               by the same value of ifIndex. The mapping
+               between the ifIndex values and the numbering of
+               the port on the device is an implementation
+               issue."
+          ::= { pethPdPortEntry 1 }
+
+       pethPdPortAdminEnable OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  enable(1),
+                  disable(2)
+        }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+             "This value  identifies the operational state of the PD functions.
+                 An interface which can provide the PD functions will be enabled
+                 to do so when this attribute has the value enable. When this
+                 attribute has the value disable the interface will act
+                 as it would if it had no PD function."
+        ::= { pethPdPortEntry 2 }
+
+
+   -- Main PSE Objects
+
+   pethMainPseObjects       OBJECT IDENTIFIER ::= { pethObjects 3 }
+
+   pethMainPseTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF PethMainPseEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that display and control the Main power
+             on a PSE  device. Example - an Ethernet switch midspan device can
+               control an Ethnternet port and the Main Power supply unit's."
+          ::= { pethMainPseObjects 1 }
+
+      pethMainPseEntry OBJECT-TYPE
+          SYNTAX      PethMainPseEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "A set of objects that display and control the Main power
+                of a PSE. "
+          INDEX    { pethMainPseGroupIndex }
+          ::= { pethMainPseTable 1 }
+
+      PethMainPseEntry ::= SEQUENCE {
+          pethMainPseGroupIndex
+              Integer32,
+          pethMainPsePower
+              Gauge32 ,
+          pethMainPseOperStatus
+              INTEGER,
+          pethMainPseConsumptionPower
+              Gauge32,
+          pethMainPseUsageThreshold
+              Integer32
+      }
+        pethMainPseGroupIndex OBJECT-TYPE
+          SYNTAX       Integer32 (1..2147483647)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This variable uniquely identifies the group to which
+              power Ethernet PSE is connected.Group means (box in the stack,
+              module in a rack) and  the value 1 MUST be  used for non-modular
+              devices "
+          ::= { pethMainPseEntry 1 }
+
+        pethMainPsePower OBJECT-TYPE
+          SYNTAX      Gauge32  (1..65535)
+          UNITS      "Watts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "The nominal power of the PSE expressed in Watts."
+          ::= { pethMainPseEntry 2 }
+
+
+        pethMainPseOperStatus OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  on(1),
+                  off(2),
+                  faulty(3)
+             }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "The operational status of the main PSE."
+          ::= { pethMainPseEntry 3 }
+
+        pethMainPseConsumptionPower OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS      "Watts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "Measured usage power expressed in Watts."
+          ::= { pethMainPseEntry 4 }
+
+        pethMainPseUsageThreshold OBJECT-TYPE
+          SYNTAX      Integer32  (1..99)
+          UNITS      "%"
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "The usage threshold expressed in percents for
+                   comparing the measured power and initiating
+                   an alarm if the threshold is exceeded."
+          ::= { pethMainPseEntry 7 }
+
+   -- Notification  Control  Objects
+
+   pethNotificationControl        OBJECT IDENTIFIER ::= { pethObjects 4 }
+
+   pethNotificationControlTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF PethNotificationControlEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that display and control the Notification
+             on a PSE  device."
+          ::= { pethNotificationControl 1 }
+
+      pethNotificationControlEntry OBJECT-TYPE
+          SYNTAX      PethNotificationControlEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "A set of objects that control the Notification events."
+          INDEX    { pethNotificationControlGroupIndex }
+          ::= { pethNotificationControlTable 1 }
+      PethNotificationControlEntry ::= SEQUENCE {
+          pethNotificationControlGroupIndex
+              Integer32,
+          pethNotificationControlEnable
+                INTEGER
+      }
+        pethNotificationControlGroupIndex OBJECT-TYPE
+          SYNTAX      Integer32 (1..2147483647)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This variable uniquely identifies the group. Group means
+              box in the stack, module in a rack and it is RECOMENDED
+              that the value 1 be used for non-modular devices "
+          ::= { pethNotificationControlEntry 1 }
+
+
+         pethNotificationControlEnable  OBJECT-TYPE
+             SYNTAX             INTEGER
+                  {
+                       enable(1),
+                       disable(2)
+                  }
+             MAX-ACCESS         read-write
+             STATUS             current
+             DESCRIPTION
+                  "Enable Notification from Agent"
+          ::= { pethNotificationControlEntry 2 }
+
+
+   --
+   -- Notifications Section
+   --
+   --
+
+        pethPsePortOnOffNotification NOTIFICATION-TYPE
+            OBJECTS     { pethPsePortDetectionStatus }
+            STATUS      current
+            DESCRIPTION
+                    " This Notification indicates if Pse Port is  delivering  or
+                       not power to the PD. This Notification SHOULD be sent on
+                       every status change except in the searching mode."
+             ::= { pethNotifications 1 }
+
+        pethPsePortPowerMaintenanceStatusNotification NOTIFICATION-TYPE
+            OBJECTS     { pethPsePortPowerMaintenanceStatus  }
+            STATUS      current
+            DESCRIPTION
+                  " This Notification indicates a Port Change Status and it
+                        SHOULD be sent on every status change."
+            ::= { pethNotifications 2 }
+
+        pethMainPowerUsageOnNotification NOTIFICATION-TYPE
+            OBJECTS     { pethMainPseConsumptionPower  }
+            STATUS      current
+            DESCRIPTION
+                  " This Notification indicate PSE Threshold usage indication is
+                       on, the usage power is above the threshold."
+            ::= { pethNotifications 4 }
+
+         pethMainPowerUsageOffNotification NOTIFICATION-TYPE
+            OBJECTS     { pethMainPseConsumptionPower }
+            STATUS      current
+            DESCRIPTION
+                  " This Notification indicate PSE Threshold usage indication
+                       off, the usage power is below the threshold."
+            ::= { pethNotifications 5 }
+
+   --
+   -- Conformance Section
+   --
+   pethCompliances OBJECT IDENTIFIER ::= { pethConformance 1 }
+   pethGroups      OBJECT IDENTIFIER ::= { pethConformance 2 }
+
+   pethCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the
+               Power Ethernet MIB."
+       MODULE  -- this module
+           GROUP   pethPsePortGroup
+           DESCRIPTION
+               "The pethPsePortGroup is mandatory for systems which
+               implement PSE ports."
+          GROUP   pethPdPortGroup
+           DESCRIPTION
+               "The pethPdPortGroup is mandatory for systems which
+               implement PD Ports."
+           GROUP   pethMainPseGroup
+           DESCRIPTION
+               "The pethMainPseGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   pethNotificationControlGroup
+           DESCRIPTION
+               "The pethNotificationControlGroup is mandatory for systems which
+               implement PSE ports."
+       ::= { pethCompliances 1 }
+
+   pethPseCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the PSE and MID-
+                Span."
+       MODULE  -- this module
+       MANDATORY-GROUPS {pethPsePortGroup, pethMainPseGroup,pethNotificationControlGroup}
+        ::= { pethCompliances 2 }
+
+   pethPdCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the PD."
+       MODULE  -- this module
+       MANDATORY-GROUPS {pethPdPortGroup}
+        ::= { pethCompliances 3}
+
+   pethPsePortGroup OBJECT-GROUP
+       OBJECTS {
+          pethPsePortAdminEnable,
+          pethPsePortPowerPairsControlAbility,
+           pethPsePortPowerDetectionControl,
+          pethPsePortPowerPairs,
+          pethPsePortDetectionStatus,
+          pethPsePortPowerPriority,
+          pethPsePortPowerMaintenanceStatus ,
+          pethPsePortMPSAbsentCounter,
+          pethPsePortOverCurrentCounter,
+          pethPsePortType,
+          pethPsePortPowerClassifications
+       }
+       STATUS  current
+       DESCRIPTION
+             "The pethPsePortGroup is mandatory for systems which
+             implement PSE ports."
+       ::= { pethGroups 1 }
+
+   pethPdPortGroup OBJECT-GROUP
+       OBJECTS {
+          pethPdPortAdminEnable
+       }
+       STATUS  current
+       DESCRIPTION
+        "The pethPdPortGroup is mandatory for systems which
+        implement PD Ports."
+      ::= { pethGroups 2 }
+
+   pethMainPseGroup OBJECT-GROUP
+       OBJECTS {
+          pethMainPsePower,
+          pethMainPseOperStatus,
+          pethMainPseConsumptionPower,
+          pethMainPseUsageThreshold
+       }
+       STATUS  current
+       DESCRIPTION
+               "Main PSE Objects. "
+       ::= { pethGroups 3 }
+
+   pethNotificationControlGroup OBJECT-GROUP
+       OBJECTS {
+          pethNotificationControlEnable
+       }
+       STATUS  current
+       DESCRIPTION
+               "Notification Control  Objects. "
+       ::= { pethGroups 4 }
+
+     pethPsePortNotificationGroup NOTIFICATION-GROUP
+             NOTIFICATIONS { pethPsePortOnOffNotification,
+                         pethPsePortPowerMaintenanceStatusNotification}
+             STATUS          current
+             DESCRIPTION  "Pse Notification indications"
+           ::= { pethCompliances 4 }
+
+       pethMainPowerNotificationGroup NOTIFICATION-GROUP
+             NOTIFICATIONS { pethMainPowerUsageOnNotification,
+                           pethMainPowerUsageOffNotification}
+             STATUS          current
+             DESCRIPTION  "Pse Notification indications"
+           ::= { pethCompliances 5 }
+   END

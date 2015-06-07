@@ -1,0 +1,1324 @@
+ALCATEL-IND1-SLB-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    IpAddress,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    Counter64 						FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP     FROM SNMPv2-CONF
+
+		SnmpAdminString FROM SNMP-FRAMEWORK-MIB
+
+    MacAddress,
+    TEXTUAL-CONVENTION,
+    RowStatus              FROM SNMPv2-TC
+
+    softentIND1Slb,
+    slbTraps              FROM ALCATEL-IND1-BASE;
+
+--
+-- Module Identity
+--
+
+alcatelIND1SLBMIB MODULE-IDENTITY
+   LAST-UPDATED    "200704030000Z"
+   ORGANIZATION    "Alcatel-Lucent"
+   CONTACT-INFO
+       "Please consult with Customer Service to ensure the most appropriate
+        version of this document is used with the products in question:
+    
+                   Alcatel-Lucent, Enterprise Solutions Division
+                  (Formerly Alcatel Internetworking, Incorporated)
+                          26801 West Agoura Road
+                       Agoura Hills, CA  91301-5122
+                         United States Of America
+   
+       Telephone:               North America  +1 800 995 2696
+                                Latin America  +1 877 919 9526
+                                Europe         +31 23 556 0100
+                                Asia           +65 394 7933
+                                All Other      +1 818 878 4507
+   
+       Electronic Mail:         support@ind.alcatel.com
+       World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+       File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+
+   DESCRIPTION
+       "This module describes an authoritative enterprise-specific Simple
+        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+            For the Birds Of Prey Product Line
+            Configuration and monitoring of the Server Load Balancing feature
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+
+                    Copyright (C) 1995-2007 Alcatel-Lucent
+                        ALL RIGHTS RESERVED WORLDWIDE"
+   ::= { softentIND1Slb 1 }
+
+--
+-- Object roots used in this MIB
+--
+
+alcatelIND1SLBMIBObjects OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION 
+      "Branch for server load balancing application objects"
+   ::= { alcatelIND1SLBMIB 1 }
+
+alcatelIND1SLBMIBConformance OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for server load balancing application conformance information"
+   ::= { alcatelIND1SLBMIB 2 }
+
+alcatelIND1SLBMIBGroups OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for server load balancing application units of conformance"
+   ::= { alcatelIND1SLBMIBConformance 1 }
+
+alcatelIND1SLBMIBCompliances OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for server load balancing application compliance statements"
+   ::= { alcatelIND1SLBMIBConformance 2 }
+
+ 
+--
+-- Textual Conventions
+--
+
+-- An Administrative State
+SlbAdminState ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "The administrative state of various SLB entities
+                'disable' : The entity has been disabled.
+                'enable'  : The entity is enabled so it can participate
+                            in the load balancing activity."
+        SYNTAX INTEGER {
+                disable(1),
+                enable(2)
+        }
+
+-- A Basic Operational State
+SlbOperState ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "The operational state of various SLB entities
+                'outOfService' : The entity is out of service.
+                'inService'    : The entity operates properly."
+        SYNTAX INTEGER {
+                outOfService(1),
+                inService(2)
+        }
+
+-- The SLB Redirection Algorithm
+SlbRedirectAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "The load-balancing algorithm being used on a 
+                cluster to distribute load evenly among real servers. 
+		'roundRobin' load-balancing delivers connections evenly 
+                amongst real servers while 'serverFailover' gives new 
+                connections to the real server only when the previous 
+                has failed."
+        SYNTAX INTEGER {
+                roundRobin(1),
+                serverFailover(2)
+        }
+
+SlbServerOperState ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "The server operational state represents the state of a
+                real server being load-balanced by SLB.
+                'inService'  : Server is in use as a destination
+                               for SLB client connections.
+                'linkDown'   : The link by which the server can be
+                               reached has failed, so the server
+                               is considered out of service.
+                'noAnswer'   : The server has not answered to a sequence
+                               of ping retries, so the server
+                               is considered out of service.
+                'disabled'   : Server has been disabled by the admin
+                               status, so the server is considered
+                               out of service.
+                'retrying'   : The server is currently being tested
+                               for a number of retries. It is still
+                               considered in service.
+                'discovery'  : The server is currently being tested to
+                               get its MAC address. The server is considered
+                               out of service."
+        SYNTAX INTEGER {
+                inService(1),
+                linkDown(2),
+                noAnswer(3),
+                disabled(4),
+                retrying(5),
+                discovery(6)
+        }
+
+--
+--  SLB Feature (global parameters)
+--
+
+slbFeature OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 1 }
+
+slbAdminStatus          OBJECT-TYPE
+        SYNTAX          SlbAdminState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The administrative status of the SLB feature.
+                It allows to turn on/off the feature"
+        DEFVAL          { disable }
+        ::= { slbFeature 1 }
+
+slbOperStatus           OBJECT-TYPE
+        SYNTAX          SlbOperState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The operational status of the SLB feature.
+                'inService'    means that at least one cluster of
+                               servers is inService.
+                'outOfService' means that all of defined clusters
+                               of servers are outOfService."
+        ::= { slbFeature 2 }
+
+slbClustersCount        OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of configured clusters."
+        ::= { slbFeature 3 }
+
+slbResetStatistics      OBJECT-TYPE
+				SYNTAX INTEGER {
+		 				notSignificant(0),
+				 		resetSlbStats(1)
+       }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Resets the SLB statistics."
+        ::= { slbFeature 4 }
+
+
+--
+-- SLB Cluster of servers Table
+--
+
+slbClusters OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 2 }
+
+slbClusterTable         OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbClusterTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This is a table of clusters, each of which is a
+                group of real servers to be used by SLB for load
+                balancing.  Columnar objects can be modified when the
+                row is 'active'.  Rows can be created and destroyed.
+                Entries are added to this table via
+                slbClusterRowStatus in accordance with the
+                RowStatus convention."
+        ::= { slbClusters 1 }
+
+slbClusterTableEntry    OBJECT-TYPE
+        SYNTAX          SlbClusterTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information about a particular Cluster." 
+        INDEX   {
+                slbClusterName
+        }
+        ::= { slbClusterTable 1 }
+
+SlbClusterTableEntry ::= SEQUENCE {
+        slbClusterName                    SnmpAdminString,
+        slbClusterAdminStatus             SlbAdminState,
+        slbClusterOperStatus              SlbOperState,
+        slbClusterVIP                     IpAddress,
+        slbClusterRoutedFlowsSuccessRatio Unsigned32,
+        slbClusterPingPeriod              Unsigned32,
+        slbClusterPingTimeout             Unsigned32,
+        slbClusterPingRetries             Unsigned32,
+        slbClusterRedirectAlgorithm       SlbRedirectAlgorithm,
+        slbClusterIdleTimer               Unsigned32,
+        slbClusterNumberOfServers         Unsigned32,
+        slbClusterNewFlows                Counter32,
+        slbClusterRowStatus               RowStatus,
+        slbClusterProbeName               SnmpAdminString,
+        slbClusterPackets                 Counter32,
+        slbClusterCondition               SnmpAdminString,
+        slbClusterType                    INTEGER
+}
+
+slbClusterName          OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (1..23))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The name of the cluster."
+        ::= { slbClusterTableEntry 1 }
+
+slbClusterAdminStatus   OBJECT-TYPE
+        SYNTAX          SlbAdminState
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The administrative state of the cluster."
+        DEFVAL          { disable }
+        ::= { slbClusterTableEntry 2 }
+
+slbClusterOperStatus    OBJECT-TYPE
+        SYNTAX          SlbOperState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The operational state of the cluster."
+        ::= { slbClusterTableEntry 3 }
+
+slbClusterVIP           OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The Virtual IP address for that cluster."
+        ::= { slbClusterTableEntry 4 }
+
+slbClusterRoutedFlowsSuccessRatio  OBJECT-TYPE
+        SYNTAX             Unsigned32
+        UNITS              "%"
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "The ratio (in %) of sucessfully routed flows per total
+                 number of flows in the cluster."
+        ::= { slbClusterTableEntry 5 }
+
+slbClusterPingPeriod    OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..3600) 
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The ping period to check health of servers."
+        DEFVAL          { 60 }
+        ::= { slbClusterTableEntry 6 }
+
+slbClusterPingTimeout   OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..3600000)
+        UNITS           "milliseconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The timeout used to wait for ping answers."
+        DEFVAL          { 3000 }
+        ::= { slbClusterTableEntry 7 }
+
+slbClusterPingRetries   OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The number of ping retries before deciding
+                 that a server is OutOfService."
+        DEFVAL          { 3 }
+        ::= { slbClusterTableEntry 8 }
+
+slbClusterRedirectAlgorithm   OBJECT-TYPE
+        SYNTAX                SlbRedirectAlgorithm
+        MAX-ACCESS            read-create
+        STATUS                current
+        DESCRIPTION           "The load balancing algorithm in use
+                               by the cluster."
+        DEFVAL                { roundRobin }
+        ::= { slbClusterTableEntry 9 }
+
+slbClusterIdleTimer     OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..86400)
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The maximum delay with no activity a client is
+                 kept attached to a real server."
+        DEFVAL          { 1200 }
+        ::= { slbClusterTableEntry 10 }
+
+slbClusterNumberOfServers  OBJECT-TYPE
+        SYNTAX             Unsigned32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "The number of real servers in this cluster."
+        DEFVAL             { 0 }
+        ::= { slbClusterTableEntry 11 }
+
+slbClusterNewFlows         OBJECT-TYPE
+        SYNTAX             Counter32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "The number of flows balanced for this cluster."
+        ::= { slbClusterTableEntry 12 }
+
+slbClusterRowStatus        OBJECT-TYPE
+        SYNTAX             RowStatus
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+                "The object is used by a management station to create
+                or delete the row entry in slbClusterTable following
+                the RowStatus textual convention."
+        ::= { slbClusterTableEntry 13 }
+
+slbClusterProbeName        OBJECT-TYPE
+        SYNTAX             SnmpAdminString (SIZE (0..23))
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+                "The name of the cluster's probe."
+        ::= { slbClusterTableEntry 14 }
+
+slbClusterPackets          OBJECT-TYPE
+        SYNTAX             Counter32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "The number of packets passed for this cluster."
+        ::= { slbClusterTableEntry 15 }
+
+slbClusterCondition        OBJECT-TYPE
+        SYNTAX             SnmpAdminString (SIZE (0..23))
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+                "The Condition name rule.
+								Mutually exclusive with VIP" 
+        ::= { slbClusterTableEntry 16 }
+
+slbClusterType             OBJECT-TYPE
+        SYNTAX             INTEGER {
+                                     l3(1),
+                                     l2(2)
+				}
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+                "The type of load balancing.  l3 - routed, l2flows - 
+								distribute bridged flows"
+        DEFVAL          { l3 }
+        ::= { slbClusterTableEntry 17 }
+--
+-- SLB Server Table
+--
+
+slbServers OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 3 }
+
+slbServerTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbServerTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A table of real servers.  Columnar objects can be
+                modified when the row is 'active'.  Rows can be created
+                and destroyed.  Entries are added to this table via
+                slbServerRowStatus in accordance with the RowStatus
+                convention."
+        ::= { slbServers 1 }
+
+slbServerTableEntry     OBJECT-TYPE
+        SYNTAX          SlbServerTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information about a particular real server in a
+                particular cluster."
+        INDEX   {
+                slbServerClusterName,
+                slbServerIpAddress
+        }
+        ::= { slbServerTable 1 }
+
+SlbServerTableEntry ::= SEQUENCE {
+        slbServerClusterName           SnmpAdminString,
+        slbServerIpAddress             IpAddress,
+        slbServerAdminStatus           SlbAdminState,
+        slbServerOperStatus            SlbServerOperState,
+        slbServerAdminWeight           Unsigned32,
+        slbServerMacAddress            MacAddress,
+        slbServerSlotNumber            Integer32,
+        slbServerPortNumber            Integer32,
+        slbServerUpTime                Integer32,
+        slbServerLastRTT               Integer32,
+        slbServerPingFails             Counter32,
+        slbServerPortDown              Counter32,
+        slbServerFlows                 Counter32,
+        slbServerRowStatus             RowStatus,
+        slbServerProbeName             SnmpAdminString,
+        slbServerProbeStatus           SnmpAdminString
+}
+
+slbServerClusterName    OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (1..23))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The server's cluster name."
+        ::= { slbServerTableEntry 1 }
+
+slbServerIpAddress      OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The IP address of real server."
+        ::= { slbServerTableEntry 2 }
+
+slbServerAdminStatus    OBJECT-TYPE
+        SYNTAX          SlbAdminState
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The administrative status of the server."
+        DEFVAL          { enable }
+        ::= { slbServerTableEntry 3 }
+
+slbServerOperStatus     OBJECT-TYPE
+        SYNTAX          SlbServerOperState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The operational status of the server."
+        ::= { slbServerTableEntry 4 }
+
+slbServerAdminWeight    OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..32)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The Administrative weight of the real server used
+                by the load-balancing algorithms.  A weight of zero
+                indicates that the server is a backup server and is
+                not assigned if all non-backup servers are inservice.
+                Higher weight values indicate to the load-balancing
+                algorithms a higher proportionality hash buckets
+                to accept more work."
+        DEFVAL          { 1 }
+        ::= { slbServerTableEntry 5 }
+
+slbServerMacAddress     OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The MAC address of the server."
+        ::= { slbServerTableEntry 6 }
+
+slbServerSlotNumber     OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The physical slot number to which is
+                 connected the server."
+        ::= { slbServerTableEntry 7 }
+
+slbServerPortNumber     OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The physical port number to which is
+                 connected the server."
+        ::= { slbServerTableEntry 8 }
+
+slbServerUpTime         OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The server availibility in %"
+        ::= { slbServerTableEntry 9 }
+
+slbServerLastRTT        OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The last valid round trip time measured
+                 by ping."
+        ::= { slbServerTableEntry 10}
+
+slbServerPingFails      OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of pings that have failed on
+                 this server."
+        ::= { slbServerTableEntry 11}
+
+slbServerPortDown       OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of down events received at server port."
+        ::= { slbServerTableEntry 12 }
+
+slbServerFlows          OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of flows directed to this server."
+        ::= { slbServerTableEntry 13 }
+
+slbServerRowStatus      OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The object used by a management station to create
+                or delete the row entry in slbServerTable following the
+                RowStatus textual convention."
+        ::= { slbServerTableEntry 14 }
+
+slbServerProbeName    OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..23))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The server's probe name."
+        ::= { slbServerTableEntry 15 }
+
+slbServerProbeStatus    OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The status from doing a probe."
+        ::= { slbServerTableEntry 16 }
+
+--
+-- SLB Probes Table
+--
+
+slbProbes OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 4 }
+
+slbProbeTable           OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbProbeTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This is a table of probes, each of which can be 
+                used in either the server or cluster tables to 
+                define the method that the will be used to determine
+                the status of servers.
+                Columnar objects can be modified when the
+                row is 'active'.  Rows can be created and destroyed.
+                Entries are added to this table via
+                slbProbeRowStatus in accordance with the
+                RowStatus convention."
+        ::= { slbProbes 1 }
+
+slbProbeTableEntry      OBJECT-TYPE
+        SYNTAX          SlbProbeTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information about a particular Probe." 
+        INDEX   {
+                slbProbeName
+        }
+        ::= { slbProbeTable 1 }
+
+SlbProbeTableEntry ::= SEQUENCE {
+        slbProbeName                      SnmpAdminString,
+        slbProbeMethod                    INTEGER,
+        slbProbePeriod                    Unsigned32,
+        slbProbeTimeout                   Unsigned32,
+        slbProbeRetries                   Unsigned32,
+        slbProbePort                      Integer32,
+        slbProbeExpect                    SnmpAdminString,
+        slbProbeSend                      SnmpAdminString,
+        slbProbeSSL                       INTEGER,
+        slbProbeHttpStatus                Integer32,
+        slbProbeHttpUrl                   SnmpAdminString,
+        slbProbeHttpUsername              SnmpAdminString,
+        slbProbeHttpPassword              SnmpAdminString,
+        slbProbeRowStatus                 RowStatus
+}
+
+slbProbeName            OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..23))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The name of the probe."
+        ::= { slbProbeTableEntry 1 }
+
+slbProbeMethod          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          ping(1),
+                          http(2),
+                          https(3),
+                          udp(4),
+                          tcp(5),
+                          ftp(6),
+                          smtp(7),
+                          pop(8),
+                          pops(9),
+                          imap(10),
+                          imaps(11),
+                          nntp(12)
+                    }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The probe method used to check the health of servers."
+        DEFVAL          { 1 }
+        ::= { slbProbeTableEntry 2 }
+
+
+slbProbePeriod          OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..3600) 
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The probe period to check health of servers."
+        DEFVAL          { 60 }
+        ::= { slbProbeTableEntry 3 }
+
+slbProbeTimeout         OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..3600000)
+        UNITS           "milliseconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The timeout used to wait for probe answers."
+        DEFVAL          { 3000 }
+        ::= { slbProbeTableEntry 4 }
+
+slbProbeRetries         OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "The number of probe retries before deciding
+                 that a server is OutOfService."
+        DEFVAL          { 3 }
+        ::= { slbProbeTableEntry 5 }
+
+slbProbePort             OBJECT-TYPE
+        SYNTAX           Integer32
+        MAX-ACCESS       read-create
+        STATUS           current
+        DESCRIPTION  
+                "The TCP/UDP port the probe should
+                be sent on."
+        DEFVAL                { 0 }
+        ::= { slbProbeTableEntry 6 }
+
+slbProbeExpect           OBJECT-TYPE
+        SYNTAX           SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS       read-create
+        STATUS           current
+        DESCRIPTION
+                "An ASCII string used to compare a response from 
+                a server to verify the health of the server."
+        ::= { slbProbeTableEntry 7 }
+
+slbProbeSSL               OBJECT-TYPE
+        SYNTAX            INTEGER {
+                            enable(1),
+                            disable(2)
+        }
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "Indicates if a TCP/UDP probe uses SSL."
+                DEFVAL { disable }
+        ::= { slbProbeTableEntry 8 }
+
+slbProbeSend              OBJECT-TYPE
+        SYNTAX            SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "An ASCII string sent to a server to invoke a 
+                response from a server to verify the health of 
+                the server."
+        ::= { slbProbeTableEntry 9 }
+
+slbProbeHttpStatus            OBJECT-TYPE
+        SYNTAX            Integer32      
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "The expected status returned from an HTTP GET to
+                verify the health of the server."
+        DEFVAL            { 200 }
+        ::= { slbProbeTableEntry 10 }
+
+slbProbeHttpUrl               OBJECT-TYPE
+        SYNTAX            SnmpAdminString (SIZE (0..128))
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "A URL sent to a server for an HTTP GET to verify 
+                the health of the server."
+        ::= { slbProbeTableEntry 11 }
+
+
+slbProbeHttpUsername          OBJECT-TYPE
+        SYNTAX            SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "An ASCII string sent to a server as credentials for
+                an HTTP GET to verify the health of the server."
+        ::= { slbProbeTableEntry 12 }
+
+slbProbeHttpPassword          OBJECT-TYPE
+        SYNTAX            SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "An ASCII string sent to a server as credentials for
+                an HTTP GET to verify the health of the server.  This
+                string will be encrypted so it will not display readable."
+        ::= { slbProbeTableEntry 13 }
+
+
+slbProbeRowStatus         OBJECT-TYPE
+        SYNTAX            RowStatus
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+                "The object is used by a management station to create
+                or delete the row entry in slbProbeTable following
+                the RowStatus textual convention."
+        ::= { slbProbeTableEntry 14 }
+
+
+
+--
+-- SLB Statistic Tables
+--
+
+slbStats OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 5 }
+
+slbStatsTable           OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbStatsTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Contains the counters statistics for SLB NI entries"
+        ::= { slbStats 1 }
+
+slbStatsTableEntry      OBJECT-TYPE
+        SYNTAX          SlbStatsTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Cluster statistics table." 
+        INDEX   {
+                slbStatsClusterName,
+                slbStatsIndex
+        }
+        ::= { slbStatsTable 1 }
+
+SlbStatsTableEntry ::= SEQUENCE {
+        slbStatsClusterName               SnmpAdminString,
+        slbStatsIndex                     INTEGER,
+        slbStatsCounter                   Counter64
+}
+
+slbStatsClusterName     OBJECT-TYPE
+        SYNTAX           SnmpAdminString (SIZE (1..23))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The name of the cluster."
+        ::= { slbStatsTableEntry 1 }
+				
+slbStatsIndex           OBJECT-TYPE
+        SYNTAX          INTEGER(1..2000)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The sequence number for cluster statistics counter."
+        ::= { slbStatsTableEntry 2 }
+
+slbStatsCounter        OBJECT-TYPE
+        SYNTAX         Counter64 
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The statistics counter."
+        ::= { slbStatsTableEntry 3 }
+
+
+slbStatsQual OBJECT IDENTIFIER ::= { alcatelIND1SLBMIBObjects 6 }
+
+slbStatsQualTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbStatsQualTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The description for the statistics counter.  Describes the 
+								qualification parameters on the counter."
+        ::= { slbStats 2 }
+
+slbStatsQualTableEntry   OBJECT-TYPE
+        SYNTAX          SlbStatsQualTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information about a particular counter." 
+        INDEX   {
+                slbStatsClusterName,
+                slbStatsIndex,
+								slbStatsQualType
+        }
+        ::= { slbStatsQualTable 1 }
+
+SlbStatsQualTableEntry ::= SEQUENCE {
+				slbStatsQualType INTEGER,
+				slbStatsQualDataIp IpAddress,
+				slbStatsQualDataIpMask IpAddress,
+				slbStatsQualDataSlot INTEGER,
+				slbStatsQualDataStartPort INTEGER,
+				slbStatsQualDataEndPort INTEGER,
+				slbStatsQualDataVlan INTEGER,
+				slbStatsQualDataL4Port INTEGER,
+				slbStatsQualDataIpProtocol INTEGER,
+				slbStatsQualDataMac MacAddress,
+				slbStatsQualDataMacMask MacAddress,
+				slbStatsQualDataEthertype INTEGER,
+				slbStatsQualDataIcmpData INTEGER,
+				slbStatsQualDataTcpFlags OCTET STRING,
+				slbStatsQualDataTos  OCTET STRING,
+				slbStatsQualData8021p  INTEGER
+}
+
+slbStatsQualType       OBJECT-TYPE
+        SYNTAX         INTEGER {
+                        dstIp(1),
+                        srcIp(2),
+                        srcPort(3),
+                        srcPortGroup(4),
+                        srcVlan(5),
+                        ipProtocol(6),
+                        dstIpPort(7),
+                        srcIpPort(8),
+                        dstIpTcpPort(9),
+                        srcIpTcpPort(10),
+                        dstIpUdpPort(11),
+                        srcIpUdpPort(12),
+												srcMac(13),
+												dstMac(14),
+												d8021p(15),
+												ethertype(16),
+												icmpType(17),
+												icmpCode(18),
+												tcpFlags(19),
+												tos(20),
+												dstPort(21),
+												dstPortGroup(22)
+
+				}
+        MAX-ACCESS     not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The qualification parameter."
+        ::= { slbStatsQualTableEntry 1 }
+
+slbStatsQualDataIp     OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The IP Address of the qualifier."
+        ::= { slbStatsQualTableEntry 2 }
+
+slbStatsQualDataIpMask     OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The IP Address Mask of the qualifier."
+        ::= { slbStatsQualTableEntry 3 }
+
+slbStatsQualDataSlot OBJECT-TYPE
+        SYNTAX         INTEGER(0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The Slot of the qualifier."
+        ::= { slbStatsQualTableEntry 4 }
+
+slbStatsQualDataStartPort OBJECT-TYPE
+        SYNTAX         INTEGER(0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The Start Port of the qualifier."
+        ::= { slbStatsQualTableEntry 5 }
+
+slbStatsQualDataEndPort OBJECT-TYPE
+        SYNTAX         INTEGER(0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The End Port of the qualifier."
+        ::= { slbStatsQualTableEntry 6 }
+
+slbStatsQualDataIpProtocol OBJECT-TYPE
+        SYNTAX         INTEGER(0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The IP Protocol of the qualifier."
+        ::= { slbStatsQualTableEntry 7 }
+
+slbStatsQualDataVlan OBJECT-TYPE
+        SYNTAX         INTEGER (0..4094)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The VLAN of the qualifier. 0 indicates no vlan"
+        ::= { slbStatsQualTableEntry 8 }
+
+slbStatsQualDataL4Port OBJECT-TYPE
+        SYNTAX         INTEGER (0..65535)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The L4 Port of the qualifier."
+        ::= { slbStatsQualTableEntry 9 }
+
+slbStatsQualDataMac OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The MAC Address of the qualifier."
+        ::= { slbStatsQualTableEntry 10 }
+
+slbStatsQualDataMacMask OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The MAC Address Mask of the qualifier."
+        ::= { slbStatsQualTableEntry 11 }
+
+slbStatsQualDataEthertype OBJECT-TYPE
+        SYNTAX         INTEGER (0..65535)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The Ethertype of the qualifier."
+        ::= { slbStatsQualTableEntry 12 }
+
+slbStatsQualDataIcmpData OBJECT-TYPE
+        SYNTAX         INTEGER (0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The ICMP code or type of the qualifier."
+        ::= { slbStatsQualTableEntry 13 }
+
+slbStatsQualDataTcpFlags OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE (3))
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The TCP flag/mask/<any|all> of the qualifier."
+        ::= { slbStatsQualTableEntry 14 }
+
+slbStatsQualDataTos OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE (2))
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The TOS/mask of the qualifier."
+        ::= { slbStatsQualTableEntry 15 }
+
+slbStatsQualData8021p OBJECT-TYPE
+        SYNTAX         INTEGER(0..255)
+        MAX-ACCESS     read-only
+        STATUS          current
+        DESCRIPTION
+                "The 802.1p of the qualifier."
+        ::= { slbStatsQualTableEntry 16 }
+
+
+--
+-- Server Load Balancing Traps
+--
+
+slbTrapsDesc OBJECT IDENTIFIER ::= { slbTraps 1 }
+slbTrapsObj  OBJECT IDENTIFIER ::= { slbTraps 2 }
+
+--
+-- Traps description
+--
+
+-- Software exception
+slbTrapException       NOTIFICATION-TYPE
+    OBJECTS {
+      slbTrapInfoException
+    }
+    STATUS  current
+    DESCRIPTION
+        "Software exception in SLB module."
+    ::= { slbTrapsDesc 0 1 }
+
+-- Configuration change
+slbTrapConfigChanged   NOTIFICATION-TYPE
+    OBJECTS {
+      slbTrapInfoEntityGroup,
+      slbTrapInfoClusterName,
+      slbTrapInfoServerIpAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "A change occured in SLB configuration."
+    ::= { slbTrapsDesc 0 2 }
+
+-- Operational status changed
+slbTrapOperStatus         NOTIFICATION-TYPE
+    OBJECTS {
+      slbTrapInfoEntityGroup,
+      slbTrapInfoOperStatus,
+      slbTrapInfoClusterName,
+      slbTrapInfoServerIpAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "A change occured in the operational status of a slb entity."
+    ::= { slbTrapsDesc 0 3 }
+
+--
+-- Trap objects
+--
+
+-- A Cluster Name
+slbTrapInfoClusterName        OBJECT-TYPE
+    SYNTAX                    SnmpAdminString (SIZE (1..23))
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The name of a cluster."
+    ::= { slbTrapsObj 1 }
+
+-- The Operational Status of a cluster
+slbTrapInfoOperStatus  OBJECT-TYPE
+    SYNTAX                    SlbOperState
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The operational status of slb, cluster or
+                               server."
+    ::= { slbTrapsObj 2 }
+
+-- The IP addr of a server
+slbTrapInfoServerIpAddr       OBJECT-TYPE
+    SYNTAX                    IpAddress
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The IP address of a server."
+    ::= { slbTrapsObj 3 }
+
+-- The Managed entity sub-group
+slbTrapInfoEntityGroup        OBJECT-TYPE
+    SYNTAX                    INTEGER {
+                                slb(1),
+                                cluster(2),
+                                server(3)
+	  }
+    MAX-ACCESS 	              read-only
+    STATUS                    current
+    DESCRIPTION               "The entity group inside slb management."
+    ::= { slbTrapsObj 4 }
+
+-- A sofware exception number
+slbTrapInfoException          OBJECT-TYPE
+    SYNTAX                    Integer32
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "A number identifying the sofware exception."
+    ::= { slbTrapsObj 5 }
+
+
+--
+-- COMPLIANCE
+--
+
+alcatelIND1SLBMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for Server Load Balancing."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            slbFeatureGroup,
+            slbClustersGroup,
+            slbServersGroup,
+            slbProbesGroup,
+	    slbTrapsGroup
+        }
+    ::= { alcatelIND1SLBMIBCompliances 1 }
+
+
+--
+-- UNITS OF CONFORMANCE
+--
+
+slbFeatureGroup OBJECT-GROUP
+   OBJECTS
+   {
+      slbAdminStatus,
+      slbOperStatus,
+      slbClustersCount
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Server Load Balancing"
+   ::= { alcatelIND1SLBMIBGroups 1 }
+
+slbClustersGroup OBJECT-GROUP
+   OBJECTS
+   {
+      slbClusterAdminStatus,
+      slbClusterOperStatus,
+      slbClusterVIP,
+      slbClusterRoutedFlowsSuccessRatio,
+      slbClusterPingPeriod,
+      slbClusterPingTimeout,
+      slbClusterPingRetries,
+      slbClusterRedirectAlgorithm,
+      slbClusterIdleTimer,
+      slbClusterNumberOfServers,
+      slbClusterNewFlows,
+      slbClusterRowStatus,
+      slbClusterProbeName,
+      slbClusterPackets,
+      slbClusterCondition,
+      slbClusterType
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Server Load Balancing clusters"
+   ::= { alcatelIND1SLBMIBGroups 2 }
+
+slbServersGroup OBJECT-GROUP
+   OBJECTS
+   {
+      slbServerAdminStatus,
+      slbServerOperStatus,
+      slbServerAdminWeight,
+      slbServerMacAddress,
+      slbServerSlotNumber, 
+      slbServerPortNumber,
+      slbServerUpTime,
+      slbServerLastRTT,
+      slbServerPingFails,
+      slbServerPortDown,
+      slbServerFlows,
+      slbServerRowStatus,
+      slbServerProbeName,
+      slbServerProbeStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Server Load Balancing servers"
+   ::= { alcatelIND1SLBMIBGroups 3 }
+
+slbTrapsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS 
+   {
+      slbTrapException,
+      slbTrapConfigChanged,
+      slbTrapOperStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of traps for management of Server Load Balancing"
+   ::= { alcatelIND1SLBMIBGroups 4 }
+
+slbProbesGroup OBJECT-GROUP
+   OBJECTS
+   { 
+      slbProbeMethod,
+      slbProbePeriod,
+      slbProbeTimeout,
+      slbProbeRetries,
+      slbProbePort,
+      slbProbeExpect,
+      slbProbeSend,
+      slbProbeSSL,
+      slbProbeHttpStatus,
+      slbProbeHttpUrl,
+      slbProbeHttpUsername,
+      slbProbeHttpPassword,
+      slbProbeRowStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Server Load Balancing probes"
+   ::= { alcatelIND1SLBMIBGroups 5 }
+
+
+slbStatsGroup OBJECT-GROUP
+   OBJECTS
+   { 
+      slbStatsCounter,  
+			slbStatsQualDataIp,
+			slbStatsQualDataIpMask,
+			slbStatsQualDataSlot,
+			slbStatsQualDataStartPort,
+			slbStatsQualDataEndPort,
+			slbStatsQualDataVlan,
+			slbStatsQualDataL4Port,
+			slbStatsQualDataMac,
+			slbStatsQualDataEthertype,
+			slbStatsQualDataIcmpData,
+			slbStatsQualDataTcpFlags,
+			slbStatsQualDataTos
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Server Load Balancing probes"
+   ::= { alcatelIND1SLBMIBGroups 6 }
+END
+

@@ -1,0 +1,752 @@
+ALCATEL-IND1-WCCP-MIB DEFINITIONS ::= BEGIN 
+
+	IMPORTS 
+		MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE,
+		IpAddress,
+		Counter32,
+		Integer32 FROM SNMPv2-SMI 
+
+	MODULE-COMPLIANCE,
+		OBJECT-GROUP,
+		NOTIFICATION-GROUP   FROM SNMPv2-CONF 
+
+	TEXTUAL-CONVENTION,
+		TruthValue,
+		RowStatus FROM SNMPv2-TC 
+
+	softentIND1Wccp,
+ 	wccpTraps	FROM ALCATEL-IND1-BASE
+
+  InetAddressType, InetAddress
+						FROM INET-ADDRESS-MIB;
+--
+-- Module Identity
+--
+
+alcatelIND1WCCPMIB MODULE-IDENTITY 
+	LAST-UPDATED "200704030000Z"
+	ORGANIZATION "Alcatel" 
+	CONTACT-INFO 
+	       "Please consult with Customer Service to ensure the most appropriate
+        version of this document is used with the products in question:
+
+                   Alcatel-Lucent, Enterprise Solutions Division
+                  (Formerly Alcatel Internetworking, Incorporated)
+                          26801 West Agoura Road
+                       Agoura Hills, CA  91301-5122
+                         United States Of America
+
+       Telephone:               North America  +1 800 995 2696
+                                Latin America  +1 877 919 9526
+                                Europe         +31 23 556 0100
+                                Asia           +65 394 7933
+                                All Other      +1 818 878 4507
+
+       Electronic Mail:         support@ind.alcatel.com
+       World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+       File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+	DESCRIPTION 
+		    "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+         The AlcatelIND1WCCPMIB is used to monitor the services for the WCCP
+		     (Web Cache Coordination Protocol).
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+	       or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+::= { softentIND1Wccp 1 } 
+
+--
+-- Object roots used in this MIB
+--
+
+alcatelIND1WCCPMIBObjects OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for WCCP application objects"
+   ::= { alcatelIND1WCCPMIB 1 }
+
+alcatelIND1WCCPMIBConformance OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for WCCP application conformance 
+			information"
+   ::= { alcatelIND1WCCPMIB 2 }
+
+alcatelIND1WCCPMIBGroups OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for WCCP application units of conformance"
+   ::= { alcatelIND1WCCPMIBConformance 1 }
+
+alcatelIND1WCCPMIBCompliances OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+      "Branch for WCCP application compliance statements"
+   ::= { alcatelIND1WCCPMIBConformance 2 }
+
+--
+-- Textual COnventions
+--
+
+WccpServiceType ::= TEXTUAL-CONVENTION 
+	STATUS current 
+	DESCRIPTION 
+	"Indicates the type of WCCP service being used. 
+	standard - well known service is being used. 
+	dynamic - dynamic service is being used. 
+	unknown - cannot determine the type of service being used." 
+
+	SYNTAX INTEGER { 
+		standard(1), 
+		dynamic(2), 
+		unknown(3) 
+} 
+
+WccpVersion ::= TEXTUAL-CONVENTION 
+	STATUS current 
+	DESCRIPTION 
+	"Indicates the version of WCCP being used for a service. 
+	version1 - WCCP version 1 being used for the service. 
+	version2 - WCCP version 2 being used for the service. 
+	unknown - unknown version." 
+	
+	SYNTAX INTEGER { 
+		version1(1), 
+		version2(2), 
+		unknown(3) 
+} 
+
+-- A Username/Password String
+WccpPasswordString ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "255a"
+	STATUS current
+	DESCRIPTION
+	"The configured configured string used for WCCP password.
+	Only accepts ASCII strings."
+	SYNTAX OCTET STRING (SIZE (1..8))
+
+
+-- A Basic Operational State
+WccpOperState ::= TEXTUAL-CONVENTION
+		STATUS          current
+    DESCRIPTION
+    "The operational state of various WCCP entities
+    'outOfService' : The entity is out of service.
+    'inService'    : The entity operates properly."
+    SYNTAX INTEGER {
+      outOfService(1),
+      inService(2)
+		}
+
+
+-- A Basic Operational State
+WccpRestrictDisposition ::= TEXTUAL-CONVENTION
+		STATUS          current
+    DESCRIPTION
+    "The disposition of the restriction"
+    SYNTAX INTEGER {
+      allow(1),
+      block(2)
+		}
+
+-- 
+-- WCCP Feature (global parameters)
+--
+
+wccpFeature OBJECT IDENTIFIER ::= { alcatelIND1WCCPMIBObjects 1 }
+
+wccpAdminEnabled OBJECT-TYPE 
+	SYNTAX TruthValue 
+	MAX-ACCESS read-write 
+	STATUS current 
+	DESCRIPTION 
+	"This variable enables/disables WCCP feature." 
+	::= { wccpFeature 1 } 
+
+wccpServiceCount        OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of configured WCCP services."
+	::= { wccpFeature 2 }
+
+-- 
+-- WCCP Service Table
+-- 
+
+wccpServices OBJECT IDENTIFIER ::= { alcatelIND1WCCPMIBObjects 2 }
+
+wccpServiceTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF WccpServiceTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"Table of WCCP services." 
+	::= { wccpServices 1 } 
+
+wccpServiceTableEntry OBJECT-TYPE 
+	SYNTAX WccpServiceTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"A wccpServiceTable entry describes the WCCP service." 
+	INDEX { wccpServiceId } 
+	::= { wccpServiceTable 1 } 
+
+WccpServiceTableEntry ::= SEQUENCE { 
+	wccpServiceId Integer32, 
+	wccpServiceAdminEnabled TruthValue,
+	wccpServicePassword WccpPasswordString, 
+	wccpServiceType WccpServiceType, 
+	wccpServiceVersion WccpVersion, 
+	wccpServiceWebCacheCount Counter32, 
+	wccpServicePacketsRedir Counter32, 
+	wccpServicePacketsLowRedir Counter32, 
+	wccpServiceReceiveId Counter32, 
+	wccpServiceChangeNumber Counter32, 
+	wccpServiceRowStatus RowStatus 
+} 
+
+wccpServiceId OBJECT-TYPE 
+	SYNTAX Integer32 
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the WCCP's service id." 
+	::= { wccpServiceTableEntry 1 } 
+
+wccpServiceAdminEnabled OBJECT-TYPE 
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates WCCP's service status." 
+	::= { wccpServiceTableEntry 2 } 
+
+wccpServicePassword OBJECT-TYPE 
+	SYNTAX WccpPasswordString 
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the password for the WCCP service." 
+	::= { wccpServiceTableEntry 3 } 
+
+wccpServiceType OBJECT-TYPE 
+	SYNTAX WccpServiceType 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the WCCP service type." 
+	::= { wccpServiceTableEntry 4 } 
+
+wccpServiceVersion OBJECT-TYPE 
+	SYNTAX WccpVersion 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the WCCP service version." 
+	::= { wccpServiceTableEntry 5 } 
+
+wccpServiceWebCacheCount OBJECT-TYPE 
+	SYNTAX Counter32
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable show the number web caches currently active
+	on the service."
+	::= { wccpServiceTableEntry 6 } 
+
+wccpServicePacketsRedir OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the how many packet WCCP 
+	has redirected." 
+	::= { wccpServiceTableEntry 7 } 
+
+wccpServicePacketsLowRedir OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates the how many packet WCCP 
+	has redirected - lower 32 bits." 
+	::= { wccpServiceTableEntry 8 } 
+
+wccpServiceReceiveId OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable contains the current Receive ID from the router.
+	This is incremented each time a WCCP message is sent."
+	::= { wccpServiceTableEntry 9 } 
+
+wccpServiceChangeNumber OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable contains the current Change Number.
+	This is incremented each time there is a WCCP topology 
+	change."
+	::= { wccpServiceTableEntry 10 } 
+
+wccpServiceRowStatus OBJECT-TYPE 
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"The object is used by a management station to create
+  or delete the row entry in wccpServiceTable following
+  the RowStatus textual convention."
+	::= { wccpServiceTableEntry 11 } 
+
+-- 
+-- WCCP Web Cache Table
+-- 
+
+wccpWebCaches OBJECT IDENTIFIER ::= { alcatelIND1WCCPMIBObjects 3 }
+
+wccpWebCacheTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF WccpWebCacheTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"Table of WCCP web caches." 
+	::= { wccpWebCaches 1 } 
+
+wccpWebCacheTableEntry OBJECT-TYPE 
+	SYNTAX WccpWebCacheTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"A wccpWebCacheTable entry describes the status of a Web Cache." 
+	INDEX { wccpWebCacheServiceId,
+ 					wccpWebCacheIpAddress	} 
+	::= { wccpWebCacheTable 1 } 
+
+WccpWebCacheTableEntry ::= SEQUENCE { 
+	wccpWebCacheServiceId Integer32, 
+	wccpWebCacheIpAddress InetAddress,
+	wccpWebCacheIpAddressType InetAddressType,
+	wccpWebCacheReceiveId Counter32,
+	wccpWebCacheChangeNum Counter32,
+	wccpWebCacheNumberOfRouters Counter32,
+	wccpWebCacheNumberOfWebCaches Counter32
+} 
+
+wccpWebCacheServiceId OBJECT-TYPE 
+	SYNTAX Integer32 
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates service id for this Web Cache." 
+	::= { wccpWebCacheTableEntry 1 } 
+
+wccpWebCacheIpAddress OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable IP address of the Web Cache." 
+	::= { wccpWebCacheTableEntry 2 } 
+
+wccpWebCacheIpAddressType OBJECT-TYPE
+  SYNTAX InetAddressType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+  "This variable IP address of the Web Cache."
+  ::= { wccpWebCacheTableEntry 3 }
+
+wccpWebCacheReceiveId OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable contains the current Receive ID from the Web
+	Cache."
+	::= { wccpWebCacheTableEntry 4 } 
+
+wccpWebCacheChangeNum OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable contains the current Change Number.
+	This is incremented each time there is a WCCP topology 
+	change."
+	::= { wccpWebCacheTableEntry 5 } 
+	
+wccpWebCacheNumberOfRouters OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates how many WCCP routers the Web
+	Cache is in contact with."
+	::= { wccpWebCacheTableEntry 6 } 
+
+wccpWebCacheNumberOfWebCaches OBJECT-TYPE 
+	SYNTAX Counter32 
+	MAX-ACCESS read-only 
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates how many Web Caches the Web
+	Cache is in contact with."
+	::= { wccpWebCacheTableEntry 7 } 
+
+-- 
+-- WCCP VLAN Restrictions
+-- 
+
+wccpRestrictVlan OBJECT IDENTIFIER ::= { alcatelIND1WCCPMIBObjects 4 }
+
+wccpRestrictVlanTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF WccpRestrictVlanTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"Table of WCCP VLAN filter. Indicates on which VLANs redirection 
+	should take place" 
+	::= { wccpRestrictVlan 1 } 
+
+wccpRestrictVlanTableEntry OBJECT-TYPE 
+	SYNTAX WccpRestrictVlanTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"A wccpRestrictVlanTable entry describes the 
+	status of a VLAN restriction." 
+	INDEX { wccpRestrictVlanServiceId,
+ 					wccpRestrictVlanVlanId	} 
+	::= { wccpRestrictVlanTable 1 } 
+
+WccpRestrictVlanTableEntry ::= SEQUENCE { 
+	wccpRestrictVlanServiceId Integer32, 
+	wccpRestrictVlanVlanId Integer32,
+	wccpRestrictVlanDisposition WccpRestrictDisposition,
+	wccpRestrictVlanRowStatus RowStatus 
+} 
+
+wccpRestrictVlanServiceId OBJECT-TYPE 
+	SYNTAX Integer32 
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates WCCP's service id." 
+	::= { wccpRestrictVlanTableEntry 1 } 
+
+wccpRestrictVlanVlanId OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates a VLAN for redirection restrictions." 
+	::= { wccpRestrictVlanTableEntry 2 }
+
+wccpRestrictVlanDisposition OBJECT-TYPE 
+	SYNTAX WccpRestrictDisposition
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates if the vlan is allowed(TRUE) or
+	blocked (FALSE)." 
+	::= { wccpRestrictVlanTableEntry 3 }
+
+wccpRestrictVlanRowStatus OBJECT-TYPE 
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"The object is used by a management station to create
+  or delete the row entry in wccpServiceTable following
+  the RowStatus textual convention."
+	::= { wccpRestrictVlanTableEntry 4 }
+
+-- 
+-- WCCP Web Cache Restrictions
+-- 
+
+wccpRestrictWebCache OBJECT IDENTIFIER ::= { alcatelIND1WCCPMIBObjects 5 }
+
+wccpRestrictWebCacheTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF WccpRestrictWebCacheTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"Table of WCCP VLAN filter." 
+	::= { wccpRestrictWebCache 1 } 
+
+wccpRestrictWebCacheTableEntry OBJECT-TYPE 
+	SYNTAX WccpRestrictWebCacheTableEntry 
+	MAX-ACCESS not-accessible 
+	STATUS current 
+	DESCRIPTION 
+	"A wccpRestrictWebCacheTable entry describes the 
+	status of a WCCP service." 
+	INDEX { wccpRestrictWebCacheServiceId,
+ 					wccpRestrictWebCacheIpAddress,
+ 					wccpRestrictWebCacheIpMask	} 
+	::= { wccpRestrictWebCacheTable 1 } 
+
+WccpRestrictWebCacheTableEntry ::= SEQUENCE { 
+	wccpRestrictWebCacheServiceId Integer32, 
+	wccpRestrictWebCacheIpAddress InetAddress,
+	wccpRestrictWebCacheIpAddressType InetAddressType,
+	wccpRestrictWebCacheIpMask InetAddress,
+	wccpRestrictWebCacheIpMaskAddressType InetAddressType,
+	wccpRestrictWebCacheDisposition WccpRestrictDisposition,
+	wccpRestrictWebCacheRowStatus RowStatus 
+} 
+
+wccpRestrictWebCacheServiceId OBJECT-TYPE 
+	SYNTAX Integer32 
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates WCCP's service id." 
+	::= { wccpRestrictWebCacheTableEntry 1 } 
+
+wccpRestrictWebCacheIpAddress OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable is the IP address of the Web Cache. Used 
+	with wccpRestrictWebCacheIpMask." 
+	::= { wccpRestrictWebCacheTableEntry 2 }
+
+wccpRestrictWebCacheIpAddressType OBJECT-TYPE
+  SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This variable is the IP address type of the Web Cache. Used
+	with wccpRestrictWebCacheIpMask."
+	::= { wccpRestrictWebCacheTableEntry 3 }
+
+wccpRestrictWebCacheIpMask OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS not-accessible
+	STATUS current 
+	DESCRIPTION 
+	"This variable is the IP mask of the IP Address." 
+	::= { wccpRestrictWebCacheTableEntry 4 }
+
+wccpRestrictWebCacheIpMaskAddressType OBJECT-TYPE
+  SYNTAX InetAddressType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+  "This variable is the IP mask type of the IP Address."
+  ::= { wccpRestrictWebCacheTableEntry 5 }
+
+wccpRestrictWebCacheDisposition OBJECT-TYPE 
+	SYNTAX WccpRestrictDisposition
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"This variable indicates if the IP address is allowed(TRUE) 
+	or blocked (FALSE)." 
+	::= { wccpRestrictWebCacheTableEntry 6 }
+
+wccpRestrictWebCacheRowStatus OBJECT-TYPE 
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current 
+	DESCRIPTION 
+	"The object is used by a management station to create
+  or delete the row entry in wccpServiceTable following
+  the RowStatus textual convention."
+	::= { wccpRestrictWebCacheTableEntry 7 }
+	
+--
+-- Web Cache Coordination Protocol Traps
+--
+
+wccpTrapsDesc OBJECT IDENTIFIER ::= { wccpTraps 1 }
+wccpTrapsObj  OBJECT IDENTIFIER ::= { wccpTraps 2 }
+
+--
+-- Traps description
+--
+
+-- Operational status changed
+
+wccpTrapOperStatus         NOTIFICATION-TYPE
+    OBJECTS {
+      wccpTrapInfoEntityGroup,
+      wccpTrapInfoOperStatus,
+      wccpTrapInfoServiceId,
+      wccpTrapInfoWebCacheIpAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "A change occured in the operational status of a wccp entity."
+    ::= { wccpTrapsDesc 0 3 }
+
+--
+-- Trap objects
+--
+
+-- A Service ID 
+wccpTrapInfoServiceId         OBJECT-TYPE
+    SYNTAX                    Integer32
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The WCCP Service Id."
+    ::= { wccpTrapsObj 1 }
+
+
+-- The Operational Status of a service
+wccpTrapInfoOperStatus  OBJECT-TYPE
+    SYNTAX                    WccpOperState
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The operational status of wccp, service or
+															 webcache."
+    ::= { wccpTrapsObj 2 }
+
+-- The IP addr of a web cache 
+wccpTrapInfoWebCacheIpAddr    OBJECT-TYPE
+    SYNTAX                    IpAddress
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The IP address of a Web Cache."
+    ::= { wccpTrapsObj 3 }
+
+-- The Managed entity sub-group
+wccpTrapInfoEntityGroup       OBJECT-TYPE
+    SYNTAX                    INTEGER {
+                                wccp(1),
+                                service(2),
+                                webcache(3)
+    }
+    MAX-ACCESS                read-only
+    STATUS                    current
+    DESCRIPTION               "The entity group inside wccp management."
+    ::= { wccpTrapsObj 4 }
+
+
+--
+-- COMPLIANCE
+--
+
+alcatelIND1WCCPMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for WCCP."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            wccpFeatureGroup,
+            wccpServiceGroup,
+            wccpWebCacheGroup,
+            wccpRestrictVlanGroup,
+            wccpRestrictWebCacheGroup,
+      			wccpTrapsGroup
+        }
+    ::= { alcatelIND1WCCPMIBCompliances 1 }
+
+--
+-- UNITS OF CONFORMANCE
+--
+
+wccpFeatureGroup OBJECT-GROUP
+   OBJECTS
+   {
+      wccpAdminEnabled,
+      wccpServiceCount
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of Web Cache Coordination"
+   ::= { alcatelIND1WCCPMIBGroups 1 }
+
+wccpServiceGroup OBJECT-GROUP
+   OBJECTS
+   {
+		 	wccpServiceAdminEnabled,
+			wccpServicePassword,
+			wccpServiceType,
+			wccpServiceVersion,
+			wccpServiceWebCacheCount,
+			wccpServicePacketsRedir,
+			wccpServicePacketsLowRedir,
+			wccpServiceReceiveId,
+			wccpServiceChangeNumber,
+			wccpServiceRowStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of WCCP services"
+   ::= { alcatelIND1WCCPMIBGroups 2 }
+
+wccpWebCacheGroup OBJECT-GROUP
+   OBJECTS
+   {
+		 	wccpWebCacheReceiveId,
+			wccpWebCacheChangeNum,
+			wccpWebCacheNumberOfRouters,
+			wccpWebCacheNumberOfWebCaches
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of WCCP Web Caches"
+   ::= { alcatelIND1WCCPMIBGroups 3 }
+
+wccpRestrictVlanGroup OBJECT-GROUP
+   OBJECTS
+   {
+	 	wccpRestrictVlanDisposition,
+		wccpRestrictVlanRowStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of WCCP Web Caches"
+   ::= { alcatelIND1WCCPMIBGroups 4 }
+
+wccpRestrictWebCacheGroup OBJECT-GROUP
+   OBJECTS
+   {
+	 	wccpRestrictWebCacheDisposition,
+		wccpRestrictWebCacheRowStatus 
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of objects for management of WCCP Web Caches"
+   ::= { alcatelIND1WCCPMIBGroups 5 }
+
+wccpTrapsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS
+   {
+      wccpTrapOperStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Collection of traps for management of WCCP"
+   ::= { alcatelIND1WCCPMIBGroups 6 }
+
+
+END

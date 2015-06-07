@@ -1,0 +1,2263 @@
+CTRON-SFPS-DIRECTORY-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-directory-mib.txt
+--  Revision: 0.0.11
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+--       IpAddress, Counter, Gauge
+       TimeTicks
+                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsTopologyNodes, sfpsTopologyAliases, sfpsTopologyDAPITest, sfpsTopologyDAPI,
+        sfpsTopologyDirStats, sfpsServiceCenter, sfpsTopologyRemoteNodes, sfpsDirFilterAPI
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+--  SFPS Switch Agent Topology Groups
+--  This group contains the objects that pertain to the discovery and 
+--  mapping of end systems (behind access ports) and adjacent switch systems 
+--  (behind network ports).  End systems are discovered passively through 
+--  the switch's listen capability.  Adjacent systems are discovered actively 
+--  through the switch's hello protocol.
+
+
+--  SFPS Switch Agent Topology Node Table Group
+--  This group contains the objects that pertain to the discovery and 
+--  mapping of network base addresses to nodes (end-systems) discovered 
+--  on access ports.  This allows the location of nodes based on their
+--  controlling switch and port.
+
+
+sfpsNodeTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsNodeTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of bottom layer protocol addresses and related 
+                information of recently or curently active nodes 
+                (end-stations).  This table replaces the sfpsEndSystemTable."
+        ::= { sfpsTopologyNodes 1 }
+
+sfpsNodeTableEntry  OBJECT-TYPE
+        SYNTAX  SfpsNodeTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to recently or
+                currently active nodes."
+        INDEX   { sfpsNodeTableBaseHash, sfpsNodeTableHashIndex }
+        ::= { sfpsNodeTable 1 }
+
+SfpsNodeTableEntry  ::=
+        SEQUENCE {
+                sfpsNodeTableBaseHash               INTEGER,
+                sfpsNodeTableHashIndex          INTEGER,
+                sfpsNodeTableSwitchType         DisplayString,
+                sfpsNodeTableSwitchAddress      DisplayString,
+                sfpsNodeTablePort               INTEGER,
+                sfpsNodeTableBaseType           DisplayString,
+                sfpsNodeTableBaseAddress        DisplayString,
+                sfpsNodeTableEntryType          DisplayString,
+                sfpsNodeTableCallTag            HexInteger,
+                sfpsNodeTableLastHeard          TimeTicks,
+                sfpsNodeTableAge                TimeTicks,
+                sfpsNodeTableAliasCount         INTEGER,
+                sfpsNodeTableVlanCount          INTEGER,
+                sfpsNodeTableNodeLocked         INTEGER,
+                sfpsNodeTableNodeLocal          INTEGER,
+                sfpsNodeTableSelf               INTEGER,
+                sfpsNodeTableNext               INTEGER,
+                sfpsNodeTablePrev               INTEGER
+
+        }
+
+sfpsNodeTableBaseHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of the sfpsNodeTableAddress used to identify the 
+                instance."
+        ::= { sfpsNodeTableEntry 1 }
+
+sfpsNodeTableHashIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A count of the non-unique sfpsNodeTableAddress hashes used to
+                identify the instance."
+        ::= { sfpsNodeTableEntry 2 }
+
+sfpsNodeTableSwitchType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The address type of the bottom layer address."
+        ::= { sfpsNodeTableEntry 3 }
+
+sfpsNodeTableSwitchAddress  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address value."
+        ::= { sfpsNodeTableEntry 4 }
+
+sfpsNodeTablePort  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The port on which the node was discovered."
+        ::= { sfpsNodeTableEntry 5 }
+
+sfpsNodeTableBaseType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The address type of the bottom layer address."
+        ::= { sfpsNodeTableEntry 6 }
+
+sfpsNodeTableBaseAddress  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address value."
+        ::= { sfpsNodeTableEntry 7 }
+
+sfpsNodeTableEntryType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of entry represented.  This is determined
+                by the way in which the node was learned."
+        ::= { sfpsNodeTableEntry 8 }
+
+sfpsNodeTableCallTag  OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The tag, reference number, associated with the 
+                packet responsible for the generation of this entry"
+        ::= { sfpsNodeTableEntry 9 }
+
+sfpsNodeTableLastHeard  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time since the node for this entry last
+                sourced a packet."
+        ::= { sfpsNodeTableEntry 10 }
+
+sfpsNodeTableAge  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time since this entry was created."
+        ::= { sfpsNodeTableEntry 11 }
+
+sfpsNodeTableAliasCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of higher layer protocol addresses learned 
+                about this node from the same packet it was discovered from."
+        ::= { sfpsNodeTableEntry 12 }
+
+sfpsNodeTableVlanCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of vlans to which this node is mapped."
+        ::= { sfpsNodeTableEntry 13 }
+
+sfpsNodeTableNodeLocked  OBJECT-TYPE
+        SYNTAX  INTEGER         {
+                 false(1),
+                 true(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsNodeTableEntry 14 }
+
+sfpsNodeTableNodeLocal  OBJECT-TYPE
+        SYNTAX  INTEGER         {
+                 false(1),
+                 true(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsNodeTableEntry 15 }
+
+sfpsNodeTableSelf  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsNodeTableEntry 16 }
+
+sfpsNodeTableNext  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsNodeTableEntry 17 }
+
+sfpsNodeTablePrev  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsNodeTableEntry 18 }
+
+
+--
+
+--  SFPS Switch Agent Topology Alias Table Group
+--  This group contains the objects that pertain to the discovery and 
+--  mapping of upper-layer network services and entities (IP, IPX addresses) 
+--  as well as abstract group types (eg. VLAN), in use by nodes connected to 
+--  the switching fabric.  This table allows the mapping of these aliases or 
+--  groups to the nodes they are associated with and to the location of their 
+--  controlling switch and port (via the node table).
+
+
+sfpsAliasTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsAliasTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of upper layer protocol addresses (aliases) and
+                abstract group names related to the bottom layer protocol 
+                addresses (nodes) found in the sfpsNodeTable.  This table 
+                replaces the sfpsEntitiesTable."
+        ::= { sfpsTopologyAliases 1 }
+
+sfpsAliasTableEntry  OBJECT-TYPE
+        SYNTAX  SfpsAliasTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to upper
+                layer protocol addresses."
+        INDEX   { sfpsAliasTableAliasHash, 
+                  sfpsAliasTableBaseHash, 
+                  sfpsAliasTableHashIndex }
+        ::= { sfpsAliasTable 1 }
+
+SfpsAliasTableEntry  ::=
+        SEQUENCE {
+                sfpsAliasTableAliasHash         INTEGER,
+                sfpsAliasTableBaseHash          INTEGER,
+                sfpsAliasTableHashIndex         INTEGER,
+                sfpsAliasTableSwitchType        DisplayString,
+                sfpsAliasTableSwitchAddress     DisplayString,
+                sfpsAliasTablePort              INTEGER,
+                sfpsAliasTableBaseType          DisplayString,
+                sfpsAliasTableBaseAddress       DisplayString,
+                sfpsAliasTableAliasType         DisplayString,
+                sfpsAliasTableAliasAddress      DisplayString,
+                sfpsAliasTableAliasAge          TimeTicks,
+                sfpsAliasTableSwitchOctets      OCTET STRING,
+                sfpsAliasTableBaseOctets        OCTET STRING,
+                sfpsAliasTableAliasOctets       OCTET STRING,
+                sfpsAliasTableOpaqueTag         OCTET STRING,
+                sfpsAliasTableVlanPolicy        INTEGER,
+                sfpsAliasTableBaseLock          INTEGER,
+                sfpsAliasTableAliasLock         INTEGER,
+                sfpsAliasTableAliasState        INTEGER,
+                sfpsAliasTableSelf              INTEGER,
+                sfpsAliasTableNext              INTEGER,
+                sfpsAliasTablePrev              INTEGER
+        }
+
+sfpsAliasTableAliasHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of the sfpsAliasTableAliasAddress used to 
+                identify the instance."
+        ::= { sfpsAliasTableEntry 1 }
+
+sfpsAliasTableBaseHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of the sfpsAliasTableNodeAddress used to
+                identify the instance."
+        ::= { sfpsAliasTableEntry 2 }
+
+sfpsAliasTableHashIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A count of the non-unique pairs of sfpsAliasTableAliasHash  
+                and sfpsAliasTableNodeHash used to identify the instance."
+        ::= { sfpsAliasTableEntry 3 }
+
+sfpsAliasTableSwitchType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The address type of the bottom layer address of the
+                switch on which this node was found."
+        ::= { sfpsAliasTableEntry 4 }
+
+sfpsAliasTableSwitchAddress  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address value (formatted in printable 
+                characters) of the switch on which this node was found."
+        ::= { sfpsAliasTableEntry 5 }
+
+sfpsAliasTablePort  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The port on which the node was discovered."
+        ::= { sfpsAliasTableEntry 6 }
+
+sfpsAliasTableBaseType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The address type of the bottom layer address of the node."
+        ::= { sfpsAliasTableEntry 7 }
+
+sfpsAliasTableBaseAddress  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address value (formatted in printable 
+                characters) of the node."
+        ::= { sfpsAliasTableEntry 8 }
+
+sfpsAliasTableAliasType  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The address type of the higher layer address."
+        ::= { sfpsAliasTableEntry 9 }
+
+sfpsAliasTableAliasAddress  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The higher layer address value formatted in
+                printable characters."
+        ::= { sfpsAliasTableEntry 10 }
+
+sfpsAliasTableAliasAge  OBJECT-TYPE
+        SYNTAX  TimeTicks     
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time since this alias was discovered and 
+                made visible in this table."
+        ::= { sfpsAliasTableEntry 11 }
+
+sfpsAliasTableSwitchOctets  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The base address of the switch on which the node 
+                associated with this alias entry was found."
+        ::= { sfpsAliasTableEntry 12 }
+
+sfpsAliasTableBaseOctets  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address of the node associated with
+                this alias entry."
+        ::= { sfpsAliasTableEntry 13 }
+
+sfpsAliasTableAliasOctets  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The higher layer address (alias), or the abstract 
+                group value."
+        ::= { sfpsAliasTableEntry 14 }
+
+sfpsAliasTableOpaqueTag  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An identifier for the type of alias this entry represents."
+        ::= { sfpsAliasTableEntry 15 }
+
+sfpsAliasTableVlanPolicy  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        inherited(2),         --  not vlan manager assigned
+                        autoRegistered(3),    --  vlan selected by criteria
+                        static(4)             --  vlan manager assigned
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The way in which this user was assigned to a vlan. 
+                Inherited(2) signifies that the user was assigned its vlan
+                based on the default for its port.  Auto-Registered(3)
+                indicates that the user was assigned to its vlan based on
+                packet analysis and vlan manager criteria. Static(4) signifies
+                the user was assigned its vlan by the vlan manager application."
+        ::= { sfpsAliasTableEntry 16 }
+
+ 
+sfpsAliasTableBaseLock OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        false(1),
+                        true(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 17 }
+
+sfpsAliasTableAliasLock OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        false(1),
+                        true(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 18 }
+
+sfpsAliasTableAliasState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        remote(2),
+                        local(3),
+                        hidden(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 19 }
+
+sfpsAliasTableSelf  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 20 }
+
+sfpsAliasTableNext  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 21 }
+
+sfpsAliasTablePrev  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasTableEntry 22 }
+
+ 
+--
+
+--  SFPS Switch Agent Topology Alias Delta Table Group
+--  This group is used to maintain a table of newly discovered/lost aliases.
+--  This Delta Table resembles the Alias Table with one additional field to 
+--  distinguish those entries which are newly found from those which are newly
+--  lost.
+
+
+sfpsAliasDeltaTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsAliasDeltaTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of of newly discovered/lost upper layer protocol 
+                addresses (aliases) related to the bottom layer protocol 
+                addresses (nodes) found in the sfpsNodeTable."  
+        ::= { sfpsTopologyAliases 2 }
+
+sfpsAliasDeltaTableEntry  OBJECT-TYPE
+        SYNTAX  SfpsAliasDeltaTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to a newly
+                discovered or lost upper layer protocol addresses."
+        INDEX   { sfpsAliasDeltaTableIndex }
+        ::= { sfpsAliasDeltaTable 1 }
+
+SfpsAliasDeltaTableEntry  ::=
+        SEQUENCE {
+                sfpsAliasDeltaTableIndex          INTEGER,
+                sfpsAliasDeltaTablePort           INTEGER,
+                sfpsAliasDeltaTableBase           SfpsAddress,
+                sfpsAliasDeltaTableAlias          OCTET STRING,
+                sfpsAliasDeltaTableAliasLength    INTEGER,
+                sfpsAliasDeltaTableOpaqueTag      OCTET STRING,
+                sfpsAliasDeltaTableAliasState     INTEGER,
+                sfpsAliasDeltaTableNodeLock       INTEGER,
+                sfpsAliasDeltaTableAliasLock      INTEGER,
+                sfpsAliasDeltaTableTimestamp      TimeTicks
+        }
+
+sfpsAliasDeltaTableIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index into the table. This allows the server to
+                read the information and process it sequentially."
+        ::= { sfpsAliasDeltaTableEntry 1 }
+
+sfpsAliasDeltaTablePort  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The port on which the node was discovered."
+        ::= { sfpsAliasDeltaTableEntry 2 }
+
+sfpsAliasDeltaTableBase  OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The bottom layer address value (MAC) of the node."
+        ::= { sfpsAliasDeltaTableEntry 3 }
+
+sfpsAliasDeltaTableAlias  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The higher layer address associated with the discovered node."
+        ::= { sfpsAliasDeltaTableEntry 4 }
+
+sfpsAliasDeltaTableAliasLength  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of alias octets in sfpsAliasDeltaTableAliasOctets."
+        ::= { sfpsAliasDeltaTableEntry 5 }
+
+sfpsAliasDeltaTableOpaqueTag  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual identifier for the type of alias this entry 
+                represents."
+        ::= { sfpsAliasDeltaTableEntry 6 }
+
+sfpsAliasDeltaTableAliasState  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        added(2),             --  newly discovered
+                        deleted(3)            --  newly lost
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This enumeration describes the state of the delta table entry.
+                A value of (2) indicates the entry has been added to the alias
+                table.  A value of (3) indicates the entry has been deleted 
+                from the alias table."
+        ::= { sfpsAliasDeltaTableEntry 7 }
+
+sfpsAliasDeltaTableNodeLock  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unlocked(1),
+                        locked(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasDeltaTableEntry 8 }
+
+sfpsAliasDeltaTableAliasLock  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unlocked(1),
+                        locked(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasDeltaTableEntry 9 }
+
+sfpsAliasDeltaTableTimestamp  OBJECT-TYPE
+        SYNTAX  TimeTicks 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAliasDeltaTableEntry 10 }
+
+--
+
+--  SFPS Switch Agent Topology Alias Delta Table Information
+--  These two oids are used to check the status of the Delta Table and 
+--  clear the Delta Table with a set.
+
+sfpsAliasDeltaCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A count of the number of entries in the alias delta table."
+        ::= { sfpsTopologyAliases 3 }
+
+
+sfpsAliasDeltaSetBack  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                        lock(1),             --  lock table to read
+                        unlock(2)            --  unlock and clear table
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Used to lock the table so that all the entries may be
+                read without additions or losses.  Then after the table
+                has been read the table is unlocked to clear those entries
+                which have been read and allow new entries to be added or
+                lost."
+        ::= { sfpsTopologyAliases 4 }
+
+sfpsAliasDeltaFullFlag  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                        full(1),
+                        unfull(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               ""
+        ::= { sfpsTopologyAliases 5 }
+
+--
+
+-- SFPS Directory Test API Group
+-- This group contains the objects that pertain to the SFPS Directory
+-- Test Application Program Interface (API).  The API provides a verb-based
+-- autonomous interface to the directory information.
+
+sfpsDAPITestVerb   OBJECT-TYPE
+     SYNTAX    INTEGER {
+                       other(1),              --  none of the following
+                       add(2),                --  add to the following
+                       delete(3),             --  delete from the following
+                       resolve(4),            --  resolve from the following
+                       multiResolve(5),       --  resolve multiple entries
+                       fillDirectory(6),      --  Flood directory with entries
+                       ageDirectory(7),       --  Wait
+                       mapVlanOnPort(8),      --  Map port on connection
+                       mapVlanOffPort(9)      --  Map port off connection
+                }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "Specifies the action to be initiated as a result of setting this leaf"
+    ::= { sfpsTopologyDAPITest 1 }
+
+sfpsDAPITestSwitchMac    OBJECT-TYPE
+    SYNTAX           SfpsAddress
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION 
+           "Specifies the actual user's MAC value for the action."
+    ::= { sfpsTopologyDAPITest 2 }
+
+sfpsDAPITestPort         OBJECT-TYPE
+    SYNTAX           SfpsSwitchPort
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "Specifies the Source Port os a user when mapping a user"
+    ::= { sfpsTopologyDAPITest 3 }
+
+sfpsDAPITestAddrOneTag   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        macDX(1),
+                        ipxSap(2),
+                        ipxRIP(3),
+                        inetYP(4),
+                        inetUDP(5),
+                        ipxIpx(6),
+                        inetIP(7),
+                        inetRPC(8),
+                        inetRIP(9),
+                        macDXMcast(10),
+                        atDDP(11),
+                        empty(12),
+                        vlan(13),
+                        hostName(14),
+                        netBiosName(15),
+                        inetIPMask(16),
+                        ipxSap8022(17),
+                        ipxSapSnap(18),
+                        ipxSapEnet(19),
+                        ipxRip8022(20),
+                        ipxRipSnap(21),
+                        ipxRipEnet(22)
+                }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+            "Indicates the Address tag of the user."
+    ::= { sfpsTopologyDAPITest 4 }
+
+sfpsDAPITestAddrOneValue OBJECT-TYPE
+    SYNTAX           DisplayString
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "Indicates the Address value of the user."
+    ::= { sfpsTopologyDAPITest 5 }
+
+sfpsDAPITestAddrTwoTag   OBJECT-TYPE
+    SYNTAX     INTEGER {
+                        macDX(1),
+                        ipxSap(2),
+                        ipxRIP(3),
+                        inetYP(4),
+                        inetUDP(5),
+                        ipxIpx(6),
+                        inetIP(7),
+                        inetRPC(8),
+                        inetRIP(9),
+                        macDXMcast(10),
+                        atDDP(11),
+                        empty(12),
+                        vlan(13),
+                        hostName(14),
+                        netBiosName(15),
+                        inetIPMask(16),
+                        ipxSap8022(17),
+                        ipxSapSnap(18),
+                        ipxSapEnet(19),
+                        ipxRip8022(20),
+                        ipxRipSnap(21),
+                        ipxRipEnet(22)
+               }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+            "Indicates the address tag of the user."
+    ::= { sfpsTopologyDAPITest 6 }
+
+sfpsDAPITestAddrTwoValue OBJECT-TYPE
+    SYNTAX           DisplayString
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "Indicates the Address value of the user"
+    ::= { sfpsTopologyDAPITest 7 }
+
+sfpsDAPITestCallTag      OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+          "Specify the Call Tag value of the user."
+    ::= { sfpsTopologyDAPITest 8 }         
+
+sfpsDAPITestOutputTable       OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SfpsDAPITestOutputEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  
+           "A Table of the DAPITest switch ports, both input and output."
+    ::= { sfpsTopologyDAPITest 9 }
+
+sfpsDAPITestOutputEntry  OBJECT-TYPE
+    SYNTAX       SfpsDAPITestOutputEntry 
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION
+           "Each entry contains information pertaining to a DAPITest
+            switch port."
+    INDEX {  sfpsDAPITestOutputIndex }
+    ::= { sfpsDAPITestOutputTable 1 }
+
+SfpsDAPITestOutputEntry ::=
+    SEQUENCE {
+              sfpsDAPITestOutputIndex           INTEGER,
+              sfpsDAPITestOutputSwitchMac       SfpsAddress,
+              sfpsDAPITestOutputPort            INTEGER,
+              sfpsDAPITestOutputAddrOneTag      INTEGER,
+              sfpsDAPITestOutputAddrOneValue    DisplayString,
+              sfpsDAPITestOutputAddrTwoTag      INTEGER,
+              sfpsDAPITestOutputAddrTwoValue    DisplayString,
+              sfpsDAPITestOutputCallTag         INTEGER
+        }
+
+sfpsDAPITestOutputIndex  OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION 
+           "Index of entries in the DAPITest Output Table."
+     ::= { sfpsDAPITestOutputEntry 1 }
+
+sfpsDAPITestOutputSwitchMac OBJECT-TYPE
+     SYNTAX     SfpsAddress
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+           "Specifies the actual user's MAC value for the action."
+     ::= { sfpsDAPITestOutputEntry 2 }
+
+sfpsDAPITestOutputPort   OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+           "Specifies the Source Port of a user when mapping a user."
+     ::= { sfpsDAPITestOutputEntry 3 }
+
+
+sfpsDAPITestOutputAddrOneTag   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        macDX(1),
+                        ipxSap(2),
+                        ipxRIP(3),
+                        inetYP(4),
+                        inetUDP(5),
+                        ipxIpx(6),
+                        inetIP(7),
+                        inetRPC(8),
+                        inetRIP(9),
+                        macDXMcast(10),
+                        atDDP(11),
+                        empty(12),
+                        vlan(13),
+                        hostName(14),
+                        netBiosName(15),
+                        inetIPMask(16),
+                        ipxSap8022(17),
+                        ipxSapSnap(18),
+                        ipxSapEnet(19),
+                        ipxRip8022(20),
+                        ipxRipSnap(21),
+                        ipxRipEnet(22)
+                }
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION
+            "Indicates the Address tag of the user."
+    ::= { sfpsDAPITestOutputEntry 4 }
+
+sfpsDAPITestOutputAddrOneValue   OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION
+            "Indicates the address value of the user."
+    ::= { sfpsDAPITestOutputEntry 5 }
+
+sfpsDAPITestOutputAddrTwoTag   OBJECT-TYPE
+    SYNTAX     INTEGER {
+                        macDX(1),
+                        ipxSap(2),
+                        ipxRIP(3),
+                        inetYP(4),
+                        inetUDP(5),
+                        ipxIpx(6),
+                        inetIP(7),
+                        inetRPC(8),
+                        inetRIP(9),
+                        macDXMcast(10),
+                        atDDP(11),
+                        empty(12),
+                        vlan(13),
+                        hostName(14),
+                        netBiosName(15),
+                        inetIPMask(16),
+                        ipxSap8022(17),
+                        ipxSapSnap(18),
+                        ipxSapEnet(19),
+                        ipxRip8022(20),
+                        ipxRipSnap(21),
+                        ipxRipEnet(22)
+               }
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      
+            "Indicates the address tag of the user."
+    ::= { sfpsDAPITestOutputEntry 6 }
+
+sfpsDAPITestOutputAddrTwoValue   OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION
+            "Indicates the address value of the user."
+    ::= { sfpsDAPITestOutputEntry 7 }
+
+sfpsDAPITestOutputCallTag      OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION
+          "Specify the Call Tag value of the user."
+    ::= { sfpsDAPITestOutputEntry 8 }
+
+
+-- SFPS Directory API Group
+-- This group contains the objects that pertain to the SFPS Directory
+-- Application Program Interface (API).  The API provides a verb-based
+-- autonomous interface to the directory information.
+
+sfpsDAPIVerb   OBJECT-TYPE
+     SYNTAX    INTEGER {
+                       other(1),
+                       add(2),
+                       delete(3),
+                       clearPort(4),
+                       clearPortLocals(5),
+                       clearSwitchRefs(6),
+                       lockNode(7),
+                       unlockNode(8),
+                       restrictPort(9),
+                       unrestrictPort(10),
+                       ageNodes(11),
+                       ageAliases(12)
+                }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "Describes the action to perform with the information provided
+           in the other leafs of this MIB group.  This leaf should be set
+           last (after all other desired information is provided)."
+    ::= { sfpsTopologyDAPI 1 }
+
+sfpsDAPIPort         OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "Describes the port of the entry."
+    ::= { sfpsTopologyDAPI 2 }
+
+sfpsDAPINodeType     OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "Describes the node type with a well-known string."
+    ::= { sfpsTopologyDAPI 3 }
+
+sfpsDAPINodeValue    OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "The value of the node address (i.e., base MAC) for this entry."
+    ::= { sfpsTopologyDAPI 4 }
+
+sfpsDAPIAliasType    OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "Describes the alias type associated with this node. This must be
+           a well-known string."
+    ::= { sfpsTopologyDAPI 5 }
+
+sfpsDAPIAliasValue   OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "The value of the alias (i.e., protocol address) for this entry."
+    ::= { sfpsTopologyDAPI 6 }
+
+sfpsDAPIAge         OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION      
+           "In minutes"
+    ::= { sfpsTopologyDAPI 7 }
+
+
+-- DIRECTORY
+
+sfpsServiceCenterDirectoryTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsServiceCenterDirectoryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table gives directory semantics to call processing."
+        ::= { sfpsServiceCenter 3 }
+
+sfpsServiceCenterDirectoryEntry    OBJECT-TYPE
+        SYNTAX  SfpsServiceCenterDirectoryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the configuration of the Directory Entry."
+        INDEX   { sfpsServiceCenterDirectoryHashLeaf } 
+        ::= { sfpsServiceCenterDirectoryTable 1 }
+
+SfpsServiceCenterDirectoryEntry ::=
+        SEQUENCE {
+                sfpsServiceCenterDirectoryHashLeaf      HexInteger,  
+                sfpsServiceCenterDirectoryMetric        INTEGER,  
+                sfpsServiceCenterDirectoryName          DisplayString,  
+                sfpsServiceCenterDirectoryOperStatus    INTEGER,  
+                sfpsServiceCenterDirectoryAdminStatus     INTEGER,
+                sfpsServiceCenterDirectoryStatusTime    TimeTicks,
+                sfpsServiceCenterDirectoryRequests      INTEGER,
+                sfpsServiceCenterDirectoryResponses     INTEGER
+                  
+         }  
+
+sfpsServiceCenterDirectoryHashLeaf   OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server hash, part of instance key."
+        ::= { sfpsServiceCenterDirectoryEntry 1 }
+
+sfpsServiceCenterDirectoryMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines order servers are called low to high."
+        ::= { sfpsServiceCenterDirectoryEntry 2 }
+
+sfpsServiceCenterDirectoryName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server name."
+        ::= { sfpsServiceCenterDirectoryEntry 3 }
+
+sfpsServiceCenterDirectoryOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsServiceCenterDirectoryEntry 4 }
+
+sfpsServiceCenterDirectoryAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER       {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative State of Entry."
+        ::= { sfpsServiceCenterDirectoryEntry 5 }
+
+sfpsServiceCenterDirectoryStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time Tick of last operStatus change."
+        ::= { sfpsServiceCenterDirectoryEntry 6 }
+
+sfpsServiceCenterDirectoryRequests   OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests made to server."
+        ::= { sfpsServiceCenterDirectoryEntry 7 }
+
+sfpsServiceCenterDirectoryResponses   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GOOD replies by server."
+        ::= { sfpsServiceCenterDirectoryEntry 8 }
+
+--
+ 
+sfpsTopologyDirStatsTotalUsage  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes used by the Directory."
+        ::= { sfpsTopologyDirStats 1 }
+
+sfpsTopologyDirStatsDynamicUsage        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes dynamically used by the Directory."
+        ::= { sfpsTopologyDirStats 2 }
+
+sfpsTopologyDirStatsNumOfNodes  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Current number of nodes in the Directory."
+        ::= { sfpsTopologyDirStats 3 }
+
+sfpsTopologyDirStatsNodeUsage   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes used by the nodes."
+        ::= { sfpsTopologyDirStats 4 }
+
+sfpsTopologyDirStatsNumLocalNodes       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of nodes local to the switch."
+        ::= { sfpsTopologyDirStats 5 }
+
+sfpsTopologyDirStatsLocalNodeUsage      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes used by the local nodes."
+        ::= { sfpsTopologyDirStats 6 }
+
+sfpsTopologyDirStatsMaxLocalNodes       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of local nodes that resided in Directory
+                since the switch initiated."
+        ::= { sfpsTopologyDirStats 7 }
+
+sfpsTopologyDirStatsNumRemoteNodes      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of remote nodes in the Directory."
+        ::= { sfpsTopologyDirStats 8 }
+
+sfpsTopologyDirStatsRemoteNodeUsage     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes used for the Remote nodes."
+        ::= { sfpsTopologyDirStats 9 }
+
+sfpsTopologyDirStatsMaxRemoteNodes      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of remote nodes that resided in Directory
+                since the switch initiated."
+        ::= { sfpsTopologyDirStats 10 }
+
+sfpsTopologyDirStatsNumOfAliases        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of aliases in the Directory. An alias is an entry
+                that maps to a node. It may be layer 3 information, Vlan 
+                information, etc. There can be several alias entries which
+                bind to on node entry."
+        ::= { sfpsTopologyDirStats 11 }
+
+sfpsTopologyDirStatsAliasUsage  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes used by the aliases in the Directory."
+        ::= { sfpsTopologyDirStats 12 }
+
+
+sfpsTopologyDirStatsStaticUsage OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of bytes statically used for Directory."
+        ::= { sfpsTopologyDirStats 14 }
+
+sfpsTopologyDirStatsObjectsUsage        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of objects used in Directory."
+        ::= { sfpsTopologyDirStats 15 }
+
+sfpsTopologyDirStatsNodeTableSize       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of node entries in Node Table."
+        ::= { sfpsTopologyDirStats 16 }
+
+sfpsTopologyDirStatsNodeTableUsage      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of bytes used for Node Table."
+        ::= { sfpsTopologyDirStats 17 }
+
+sfpsTopologyDirStatsAliasTableSize      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of alias entries in Alias Table."
+        ::= { sfpsTopologyDirStats 18 }
+
+sfpsTopologyDirStatsAliasTableUsage     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of bytes used for Alias Table."
+        ::= { sfpsTopologyDirStats 19 }
+
+sfpsTopologyDirStatsNodeCollisions      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of collisions - Node Table."
+        ::= { sfpsTopologyDirStats 20 }
+
+sfpsTopologyDirStatsNodeLongestChain    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 21 }
+
+sfpsTopologyDirStatsAliasCollisions     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Total number of collisions - Alias Table."
+        ::= { sfpsTopologyDirStats 22 }
+
+sfpsTopologyDirStatsAliasLongestChain   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 23 }
+
+sfpsTopologyDirStatsLocalAddsRefused    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of adds into the Directory of local nodes which
+                were refused."
+        ::= { sfpsTopologyDirStats 24 }
+
+sfpsTopologyDirStatsAliasRemotesReplaced        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of remote entries which had to be replaced in
+                the Directory."
+        ::= { sfpsTopologyDirStats 25 }
+
+sfpsTopologyDirStatsAliasMultiPortClears        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times the Directory entries were cleared for
+                multiple ports. Used for debugging."
+        ::= { sfpsTopologyDirStats 26 }
+
+sfpsTopologyDirStatsReservedForRemoteNodes      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of entries in the Directory reserved for Remote
+                nodes. Remote nodes may exceed this reserved area but if
+                the Directory becomes full from local nodes, then the remote
+                nodes will be cycled through this reserved area."
+        ::= { sfpsTopologyDirStats 27 }
+
+sfpsTopologyDirStatsNumSwitches OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 28 }
+
+sfpsTopologyDirStatsSwitchUsage OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 29 }
+
+sfpsTopologyDirStatsMaxSwitches OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 30 }
+
+sfpsTopologyDirStatsSwitchTableSize     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 31 }
+
+sfpsTopologyDirStatsSwitchTableUsage    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 32 }
+
+sfpsTopologyDirStatsSwitchLookups       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 33 }
+
+sfpsTopologyDirStatsSwitchCacheHits     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 34 }
+
+sfpsTopologyDirStatsNumVlans    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 35 }
+
+sfpsTopologyDirStatsVlanUsage   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 36 }
+
+sfpsTopologyDirStatsMaxVlans    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 37 }
+
+sfpsTopologyDirStatsVlanTableSize       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 38 }
+
+sfpsTopologyDirStatsVlanTableUsage      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 39 }
+
+sfpsTopologyDirStatsVlanLookups OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 40 }
+
+sfpsTopologyDirStatsVlanCacheHits       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 41 }
+
+sfpsTopologyDirStatsNodeAliasMax        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 42 }
+
+sfpsTopologyDirStatsLocalAliasRefused   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 43 }
+
+sfpsTopologyDirStatsRemoteAliasRemoved  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsTopologyDirStats 44 }
+
+
+---
+
+sfpsDirAliasStatsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDirAliasStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyDirStats 13 }
+
+sfpsDirAliasStatsEntry   OBJECT-TYPE
+        SYNTAX  SfpsDirAliasStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDirAliasStatsAliasType }
+        ::= { sfpsDirAliasStatsTable 1 }
+
+SfpsDirAliasStatsEntry ::=
+        SEQUENCE {
+                sfpsDirAliasStatsAliasType      INTEGER,
+                sfpsDirAliasStatsAliasName      DisplayString,
+                sfpsDirAliasStatsNumOfAliases   INTEGER,
+                sfpsDirAliasStatsAliasUsage     INTEGER,
+                sfpsDirAliasStatsMaxAliases     INTEGER
+                }
+
+sfpsDirAliasStatsAliasType      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "A number which correlates to an alias name."
+        ::= { sfpsDirAliasStatsEntry 1 }
+
+sfpsDirAliasStatsAliasName      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "A human readable name which represents the Alias type."
+        ::= { sfpsDirAliasStatsEntry 2 }
+
+sfpsDirAliasStatsNumOfAliases   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The current number of alias entries of this AliasType."
+        ::= { sfpsDirAliasStatsEntry 3 }
+
+sfpsDirAliasStatsAliasUsage     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The amount of memory (bytes) used by entries of this alias 
+                type."
+        ::= { sfpsDirAliasStatsEntry 4 }
+
+sfpsDirAliasStatsMaxAliases     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of entries of this Alias Type that have
+                been in the Directory."
+        ::= { sfpsDirAliasStatsEntry 5 }
+
+--
+
+
+
+sfpsDirFilterAliasTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDirFilterAliasEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyRemoteNodes 3 }
+
+sfpsDirFilterAliasEntry  OBJECT-TYPE
+        SYNTAX  SfpsDirFilterAliasEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDirFilterAliasLockCount, sfpsDirFilterAliasAliasHash, sfpsDirFilterAliasBaseHash, sfpsDirFilterAliasHashIndex }
+        ::= { sfpsDirFilterAliasTable 1 }
+
+SfpsDirFilterAliasEntry ::=
+        SEQUENCE {
+                sfpsDirFilterAliasLockCount     INTEGER,
+                sfpsDirFilterAliasAliasHash     INTEGER,
+                sfpsDirFilterAliasBaseHash      INTEGER,
+                sfpsDirFilterAliasHashIndex     INTEGER,
+                sfpsDirFilterAliasDomain        DisplayString,
+                sfpsDirFilterAliasChassisType   DisplayString,
+                sfpsDirFilterAliasChassisLoad   DisplayString,
+                sfpsDirFilterAliasSwitchType    DisplayString,
+                sfpsDirFilterAliasSwitchLoad    DisplayString,
+                sfpsDirFilterAliasInPort            INTEGER,
+                sfpsDirFilterAliasBaseType          DisplayString,
+                sfpsDirFilterAliasBaseLoad          DisplayString,
+                sfpsDirFilterAliasNodeState         INTEGER,
+                sfpsDirFilterAliasNodeAge       TimeTicks,
+                sfpsDirFilterAliasNodeLock          INTEGER,
+                sfpsDirFilterAliasLinkType          DisplayString,
+                sfpsDirFilterAliasLinkLoad          DisplayString,
+                sfpsDirFilterAliasLinkAge           TimeTicks,
+                sfpsDirFilterAliasLinkLock          INTEGER,
+                sfpsDirFilterAliasVlanLearned   INTEGER,
+                sfpsDirFilterAliasOpaqueTag         OCTET STRING,
+                sfpsDirFilterAliasChassisOctets OCTET STRING,
+                sfpsDirFilterAliasSwitchOctets  OCTET STRING,
+                sfpsDirFilterAliasNodeOctets    OCTET STRING,
+                sfpsDirFilterAliasLinkOctets    OCTET STRING,
+                sfpsDirFilterAliasNodeLocal     INTEGER,
+                sfpsDirFilterAliasLinkState     INTEGER
+
+                }
+
+sfpsDirFilterAliasLockCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 1 }
+
+sfpsDirFilterAliasAliasHash     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 2 }
+
+sfpsDirFilterAliasBaseHash      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 3 }
+
+sfpsDirFilterAliasHashIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 4 }
+
+sfpsDirFilterAliasDomain        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 5 }
+
+sfpsDirFilterAliasChassisType   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 6 }
+
+sfpsDirFilterAliasChassisLoad   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 7 }
+
+sfpsDirFilterAliasSwitchType    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 8 }
+
+sfpsDirFilterAliasSwitchLoad    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 9 }
+
+sfpsDirFilterAliasInPort        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 10 }
+
+sfpsDirFilterAliasBaseType      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 11 }
+
+sfpsDirFilterAliasBaseLoad      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 12 }
+
+sfpsDirFilterAliasNodeState     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 13 }
+
+sfpsDirFilterAliasNodeAge       OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 14 }
+
+sfpsDirFilterAliasNodeLock      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unlocked(1),
+                locked-to-port(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 15 }
+
+sfpsDirFilterAliasLinkType      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 16 }
+
+sfpsDirFilterAliasLinkLoad      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 17 }
+
+sfpsDirFilterAliasLinkAge       OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 18 }
+
+sfpsDirFilterAliasLinkLock      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unlocked(1),
+                locked-to-node(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 19 }
+
+sfpsDirFilterAliasVlanLearned   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                inherited(2),
+                amr(3),
+                static(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 20 }
+
+sfpsDirFilterAliasOpaqueTag     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 21 }
+
+sfpsDirFilterAliasChassisOctets OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 22 }
+
+sfpsDirFilterAliasSwitchOctets  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 23 }
+
+sfpsDirFilterAliasNodeOctets    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 24 }
+
+sfpsDirFilterAliasLinkOctets    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 25 }
+
+sfpsDirFilterAliasNodeLocal     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 26 }
+
+sfpsDirFilterAliasLinkState     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                remote(2),
+                local(3),
+                hidden(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAliasEntry 27 }
+
+--
+
+sfpsDirFilterNodeTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDirFilterNodeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyRemoteNodes 2 }
+
+sfpsDirFilterNodeEntry   OBJECT-TYPE
+        SYNTAX  SfpsDirFilterNodeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDirFilterNodeLockCount, sfpsDirFilterNodeNodeIndex, sfpsDirFilterNodeLinkIndex }
+        ::= { sfpsDirFilterNodeTable 1 }
+
+SfpsDirFilterNodeEntry ::=
+        SEQUENCE {
+                sfpsDirFilterNodeLockCount      INTEGER,
+                sfpsDirFilterNodeNodeIndex      INTEGER,
+                sfpsDirFilterNodeLinkIndex      INTEGER,
+                sfpsDirFilterNodeNodeCount      INTEGER,
+                sfpsDirFilterNodeLinkCount      INTEGER,
+                sfpsDirFilterNodeDomainName     DisplayString,
+                sfpsDirFilterNodeChassisType    DisplayString,
+                sfpsDirFilterNodeChassisLoad    DisplayString,
+                sfpsDirFilterNodeSwitchType     DisplayString,
+                sfpsDirFilterNodeSwitchLoad     DisplayString,
+                sfpsDirFilterNodeInPort     INTEGER,
+                sfpsDirFilterNodeBaseType           DisplayString,
+                sfpsDirFilterNodeBaseLoad           DisplayString,
+                sfpsDirFilterNodeNodeState          INTEGER,
+                sfpsDirFilterNodeNodeAge       TimeTicks,
+                sfpsDirFilterNodeNodeLock           INTEGER,
+                sfpsDirFilterNodeLinkType           DisplayString,
+                sfpsDirFilterNodeLinkLoad           DisplayString,
+                sfpsDirFilterNodeLinkAge            TimeTicks,
+                sfpsDirFilterNodeLinkLock           INTEGER,
+                sfpsDirFilterNodeVlanLearned    INTEGER,
+                sfpsDirFilterNodeOpaqueTag          OCTET STRING,
+                sfpsDirFilterNodeChassisOctets  OCTET STRING,
+                sfpsDirFilterNodeSwitchOctets   OCTET STRING,
+                sfpsDirFilterNodeNodeOctets     OCTET STRING,
+                sfpsDirFilterNodeLinkOctets     OCTET STRING,
+                sfpsDirFilterNodeNodeLocal      INTEGER,
+                sfpsDirFilterNodeLinkState      INTEGER
+
+                }
+
+sfpsDirFilterNodeLockCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 1 }
+
+sfpsDirFilterNodeNodeIndex      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 2 }
+
+sfpsDirFilterNodeLinkIndex      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 3 }
+
+sfpsDirFilterNodeNodeCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 4 }
+
+sfpsDirFilterNodeLinkCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 5 }
+
+sfpsDirFilterNodeDomainName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 6 }
+
+sfpsDirFilterNodeChassisType    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 7 }
+
+sfpsDirFilterNodeChassisLoad    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 8 }
+
+sfpsDirFilterNodeSwitchType     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 9 }
+
+sfpsDirFilterNodeSwitchLoad     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 10 }
+
+sfpsDirFilterNodeInPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 11 }
+
+sfpsDirFilterNodeBaseType       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 12 }
+
+sfpsDirFilterNodeBaseLoad       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 13 }
+
+sfpsDirFilterNodeNodeState      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 14 }
+
+sfpsDirFilterNodeNodeAge        OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 15 }
+
+sfpsDirFilterNodeNodeLock       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unlocked(1),
+                locked-to-port(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 16 }
+
+sfpsDirFilterNodeLinkType       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 17 }
+
+sfpsDirFilterNodeLinkLoad       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 18 }
+
+sfpsDirFilterNodeLinkAge        OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 19 }
+
+sfpsDirFilterNodeLinkLock       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unlocked(1),
+                locked-to-node(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 20 }
+
+sfpsDirFilterNodeVlanLearned    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                inherit(2),
+                autoReg(3),
+                static(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 21 }
+
+sfpsDirFilterNodeOpaqueTag      OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 22 }
+
+sfpsDirFilterNodeChassisOctets  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 23 }
+
+sfpsDirFilterNodeSwitchOctets   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 24 }
+
+sfpsDirFilterNodeNodeOctets     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 25 }
+
+sfpsDirFilterNodeLinkOctets     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 26 }
+
+sfpsDirFilterNodeNodeLocal      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                false(1),
+                true(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 27 }
+
+sfpsDirFilterNodeLinkState      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                remote(2),
+                local(3),
+                hidden(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterNodeEntry 28 }
+
+--
+
+sfpsDirFilterAPILockAdmin       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                lock(2),
+                unlock(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 1 }
+
+sfpsDirFilterAPILockStatus      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                locked(2),
+                unlocked(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 2 }
+
+sfpsDirFilterAPILockCount       OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 3 }
+
+sfpsDirFilterAPIValueType       OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 4 }
+
+sfpsDirFilterAPIValue   OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 5 }
+
+sfpsDirFilterAPILockTimeOut     OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 6 }
+
+sfpsDirFilterAPILockTimeElapsed OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDirFilterAPI 7 }
+
+END 

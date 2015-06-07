@@ -1,0 +1,1114 @@
+
+-- *****************************************************************************
+-- Juniper-ACCOUNTING-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Accounting MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ACCOUNTING-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    acctngSelectionEntry, acctngSelectionIndex, acctngFileEntry
+        FROM ACCOUNTING-CONTROL-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    juniIfType
+        FROM Juniper-UNI-IF-MIB
+    JuniAcctngOperType, JuniAcctngAdminType, JuniInterfaceDescrFormat,
+    JuniInterfaceLocation, JuniEnable
+        FROM Juniper-TC
+    JuniPolicyAttachmentType
+        FROM Juniper-POLICY-MIB;
+
+juniAcctngMIB  MODULE-IDENTITY
+    LAST-UPDATED "200907161500Z"  -- 16-Jul-09 10:0 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The accounting MIB for the Juniper Networks enterprise.  This MIB
+        augments with the Virtual Router Accounting MIB specified in RLI618."
+    -- Revision History
+    REVISION    "200907161500Z"  -- 16-Jul-09 10:0 AM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added Qos Schema IDs"
+    REVISION "200504261500Z"  -- 26-Apr-05 10:00 AM EST     - JUNOSe 7.1
+    DESCRIPTION
+        "Key revisions include:
+         o  Added Virtual Router Based Accounting Config (RLI618)"
+    REVISION    "200302281500Z"  -- 28-Feb-03 10:00 AM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added IGMP schema IDs."
+    REVISION    "200212171537Z"  -- 17-Dec-02 10:37 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Key revisions include:
+         o  Replaced Unisphere names with Juniper names.
+         o  Added juniAcctngInterfaceDescrFormat,
+            juniAcctngInterfaceNumberingMode and juniAcctngFileFormat.
+         o  Changed the indexing scheme to the juniAcctngInterfaceTable to allow
+            specification by interface type, fileIndex and interface location.
+            Gave the table a new OID." 
+    REVISION    "200112051416Z"  -- 05-Dec-01 09:16 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngSelectionPolicyName and
+            juniAcctngSelectionPolicyType objects to juniAcctngSelectionTable
+         o  Added juniAcctngSelectionSchemaPolicy and associated policy
+            statistic OIDs "
+    REVISION    "200111191900Z"  -- 19-Nov-01 02:00 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngifInMulticastPkts
+         o  Added juniAcctngifInBroadcastPkts
+         o  Added juniAcctngifOutMulticastPkts
+         o  Added juniAcctngifOutBroadcastPkts "
+    REVISION    "200103261322Z"  -- 26-Mar-01 08:22 AM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngSelectionSchemaSystem
+         o  Deprecated juniAcctngSelectionSubtreeType "
+    REVISION    "200011071900Z"  -- 07-Nov-00 03:00 PM EDT  - JUNOSe 2.6
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngIfTimeOffset "
+    REVISION    "200007210000Z"  -- 21-Jul-00               - JUNOSe 2.2
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngIfCorrelator
+         o  Added juniAcctngIfInPolicedOctets
+         o  Added juniAcctngIfInPolicedPkts
+         o  Added juniAcctngIfInSpoofedPkts
+         o  Added juniAcctngIfOutPolicedOctets
+         o  Added juniAcctngIfOutPolicedPkts
+         o  Added juniAcctngIfOutSchedulerDropOctets
+         o  Added juniAcctngIfOutSchedulerDropPkts
+         o  Added juniAcctngIfLowerInterface "
+    REVISION    "200003200000Z"  -- 20-Mar-00              - JUNOSe 2.0
+    DESCRIPTION
+        "Key revisions include:
+         o  Moved juniAcctngSelectionMaxIfStackLevels
+         o  Added juniAcctngSelectionSubtreeType
+         o  Added juniAcctngIfCorrelator
+         o  Removed juniAcctngSelectionSchemaPpp "
+    REVISION    "200001170000Z"  -- 17-Jan-00              - JUNOSe 1.3
+    DESCRIPTION
+        "Key revisions include:
+         o  Added juniAcctngSelectionMaxIfStackLevels
+         o  Added juniAcctngSelectionIfStackStartTable
+         o  Added juniAcctngSelectionSchemaIfStack "
+    REVISION      "9910180000Z"  -- 18-Oct-99              - JUNOSe 1.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 24 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAcctngMIBObjects       OBJECT IDENTIFIER ::= { juniAcctngMIB 1 }
+
+juniAcctngSelectionControl OBJECT IDENTIFIER ::= { juniAcctngMIBObjects 1 }
+juniAcctngFileControl      OBJECT IDENTIFIER ::= { juniAcctngMIBObjects 2 }
+juniAcctngInterfaceControl OBJECT IDENTIFIER ::= { juniAcctngMIBObjects 3 }
+juniAcctngScalarGroup      OBJECT IDENTIFIER ::= { juniAcctngMIBObjects 4 }
+juniAcctngVirtualRouterControl        OBJECT IDENTIFIER ::= { juniAcctngMIBObjects 5 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The Juniper Accounting Scalar Group
+--
+juniAcctngInterfaceDescrFormat OBJECT-TYPE
+    SYNTAX      JuniInterfaceDescrFormat
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The format of the interface descriptions reported by the accounting
+        application."
+    ::= { juniAcctngScalarGroup 1 }
+
+juniAcctngInterfaceNumberingMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+            proprietaryNumbering(0),
+            rfc1213Number(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The format of the interface descriptions reported by the accounting
+        application."
+    ::= { juniAcctngScalarGroup 2 }
+
+juniAcctngFileFormat OBJECT-TYPE
+    SYNTAX      INTEGER {
+            includeCR(0),
+            includeCRLF(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The file format of the accounting file." 
+    ::= { juniAcctngScalarGroup 3 }
+                
+
+--
+-- The Accounting Information Selection table
+--
+juniAcctngSelectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngSelectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of accounting information selection entries.
+
+        Note that additions, modifications and deletions of entries in this
+        table can occur at any time, but such changes only take effect on the
+        next occasion when collection begins into a new interval.  Thus, between
+        modification and the next 'swap', the content of this table does not
+        reflect the current selection."
+    ::= { juniAcctngSelectionControl 1 }
+
+juniAcctngSelectionEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngSelectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used to extend the the selection entry in
+        acctngSelectionEntry.  This conceptual row extension is used for
+        Juniper accounting extensions for connectionless data collection."
+    AUGMENTS  { acctngSelectionEntry }
+    ::= { juniAcctngSelectionTable 1 }
+
+JuniAcctngSelectionEntry ::= SEQUENCE {
+    juniAcctngSelectionType                       BITS,
+    juniAcctngSelectionMode                       INTEGER,
+    juniAcctngSelectionSubtreeType                INTEGER,
+    juniAcctngSelectionMaxIfStackLevels           Integer32,
+    juniAcctngSelectionPolicyName                 DisplayString,
+    juniAcctngSelectionPolicyType                 JuniPolicyAttachmentType,
+    juniAcctngSelectionIfCreateDeleteStats        JuniEnable,
+    juniAcctngSelectionIfCreateDeleteStatsIfTypes BITS }
+
+juniAcctngSelectionType OBJECT-TYPE
+    SYNTAX      BITS {
+                    ietfAccountControl(0),
+                    connectionLessLayer2(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the types of connections for which the information selected
+        by this entry are to be collected.  The ietfAccountControl(0) bit
+        position indicates that the ACCOUNTING-CONTROL-MIB.acctngSelectionType
+        in the base conceptual row determines the selection type.  All other bit
+        positions for this object over-ride the acctngSelectionType in the base
+        conceptual row.  When the value of this object over-rides the
+        acctngSelectionType object, the following objects have no meaning:
+
+            ACCOUNTING-CONTROL-MIB.acctngFileCollectFailedAttempts
+            ACCOUNTING-CONTROL-MIB.acctngFileMinAge
+
+        because they control or are related to connection oriented accounting."
+    ::= { juniAcctngSelectionEntry 1 }
+
+juniAcctngSelectionMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    absoluteCounterValues(1),
+                    deltaCounterValues(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the data collection mode."
+    DEFVAL    { deltaCounterValues }
+    ::= { juniAcctngSelectionEntry 2 }
+
+juniAcctngSelectionSubtreeType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    lineCard(1),
+                    systemController(2) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates the origin of the collection, given the row's subtree.  The
+        architecture implementation for statistics collection imposes that rows
+        with distinct juniAcctngSelectionSubtreeType may not be collected into
+        the same accounting file.  Conversely, different files (configured from
+        acctngSelectionFile) entries are necessary in order to collect from
+        subtrees (configured from acctngSelectionSubtree) that imply into
+        different subtree types (juniAcctngSelectionSubtreeType)."
+    ::= { juniAcctngSelectionEntry 3 }
+
+juniAcctngSelectionMaxIfStackLevels OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum number of levels in the ifStack table to be
+        returned when using the ifStack accounting schema.  This object is
+        ignored if acctngSelectionSubtree is not set to
+        juniAcctngSelectionSchemaIfStack.  When this object is zero, the entire
+        stack above the starting point(s) given will be returned.  When this
+        object is set to 1, only ifIndexes stacked above the starting point(s)
+        given will be returned."
+    DEFVAL    { 0 }
+    ::= { juniAcctngSelectionEntry 4 }
+
+juniAcctngSelectionPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..40))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the policy associated with the statistics
+        collected when using the policy accounting schema.  This object is
+        ignored if acctngSelectionSubtree is not set to
+        juniAcctngSelectionSchemaPolicy."
+    DEFVAL    { "" }
+    ::= { juniAcctngSelectionEntry 5 }
+
+juniAcctngSelectionPolicyType OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the attachment point for the policy associated with the
+        statistics collected when using the policy accounting schema.  This
+        object is ignored if acctngSelectionSubtree is not set to
+        juniAcctngSelectionSchemaPolicy."
+    DEFVAL    { noPolicy }
+    ::= { juniAcctngSelectionEntry 6 }
+
+juniAcctngSelectionIfCreateDeleteStats OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable interfaces create and delete statistics collection."       
+    DEFVAL { disable }
+    ::= { juniAcctngSelectionEntry 7 }
+
+juniAcctngSelectionIfCreateDeleteStatsIfTypes OBJECT-TYPE
+    SYNTAX      BITS {
+                    ip(0),
+                    ppp(1),
+                    atm1483(2),
+                    vlan(3),
+		    mplsMajor(4),
+	            mplsL2Shim(5),
+		    mplsMinor(6)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interface-types that are used in the configuration of the create/delete  
+    statistics collection. Allowed interface-types are IP, ATM1483, PPP and VLAN.
+        These interface-types are allowed to configure if the interfaces create/delete stats 
+    feature is enabled i.e juniAcctngSelectionIfCreateDeleteStats == enable."
+    ::= { juniAcctngSelectionEntry 8 }
+
+--
+-- The Accounting Information ifStack Selection
+--
+juniAcctngSelectionIfStackStartTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngSelectionIfStackStartEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of ifIndexes to be used as starting point when using the ifStack
+        selection schema.
+
+        Note that additions, modifications and deletions of entries in this
+        table can occur at any time, but such changes only take effect on the
+        next occasion when collection begins into a new interval.  Thus, between
+        modification and the next 'swap', the content of this table does not
+        reflect the current selection."
+    ::= { juniAcctngSelectionControl 3 }
+
+juniAcctngSelectionIfStackStartEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngSelectionIfStackStartEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used to determine the starting point entry when using the
+        ifStack schema."
+    INDEX     { acctngSelectionIndex,
+                juniAcctngSelectionIfStackIfIndex }
+    ::= { juniAcctngSelectionIfStackStartTable 1 }
+
+JuniAcctngSelectionIfStackStartEntry ::= SEQUENCE {
+    juniAcctngSelectionIfStackIfIndex     InterfaceIndex,
+    juniAcctngSelectionIfStackRowStatus   RowStatus }
+
+juniAcctngSelectionIfStackIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex to be used as a starting point in the interface stack
+        configuration.  The interfaces to be returned in the ifStack schema will
+        start from this value, going up."
+    ::= { juniAcctngSelectionIfStackStartEntry 1 }
+
+juniAcctngSelectionIfStackRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table."
+    ::= { juniAcctngSelectionIfStackStartEntry 2 }
+
+
+--
+-- The Accounting File Table
+--
+juniAcctngFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value identifying the file transfer behavior and the the file
+        to where accounting data is to be stored."
+    ::= { juniAcctngFileControl 1 }
+
+juniAcctngFileEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used to extend the file management of acctngFileEntry.  This
+        conceptual row extension is used for Juniper accounting extensions to
+        automate the transfer of accounting data to remote hosts."
+    AUGMENTS  { acctngFileEntry }
+    ::= { juniAcctngFileTable 1 }
+
+JuniAcctngFileEntry ::= SEQUENCE {
+    juniAcctngFileXferMode            INTEGER,
+    juniAcctngFileXferIndex           INTEGER,
+    juniAcctngFileXferSecondaryIndex  INTEGER }
+
+juniAcctngFileXferMode OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  juniAcctngManualTransfer(1),
+                  juniAcctngAutomatedTransfer(2),
+                  juniAcctngTransferOnFileFull(3),
+                  juniAcctngRedundantTransfer(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the mode to use for transfering accounting data to remote
+        client.
+
+        juniAcctngManualTransfer - Administrator is responsible for manually
+        transfering collected accounting data off of the system.
+
+        juniAcctngAutomatedTransfer - The agent will automatically transfer the
+        collected accounting data based at a acctngFileIntervals using an entry
+        in the juniFileXferTable pointed to by juniAcctngFileXferIndex.  If a
+        manager sets this object to this value, a corresponding row in the
+        juniFileXferTable must exist, otherwise the set command will fail.
+
+        juniActngTransferOnFileFull - The agent will automatically transfer the
+        collected accounting data when the file reaches the maximum size defined
+        by acctngFileMaximumSize.  If a manager sets this object to this value,
+        a corresponding row in the juniFileXferTable must exist, otherwise the
+        set command will fail.
+
+        juniAcctngRedundantTransfer - The agent will automatically transfer two
+        copies of the accounting data based on the acctngFileInterval.  One copy
+        will go to the juniFileXferTable entry identified by
+        juniAcctngFileXferIndex and one copy will go the the juniFileXferTable
+        entry identified by juniAcctngFileXferSecondaryIndex."
+    ::= { juniAcctngFileEntry 1 }
+
+juniAcctngFileXferIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies an entry in the juniFileXferTable, which defines the file
+        transfer parameters to use when the agent is configured to automatically
+        transfer collected accounting data files.  A set to this object will
+        fail if a corresponding entry in the juniFileXferTable does not exist or
+        it is not set to juniFileXferAcctngStatistics."
+    ::= { juniAcctngFileEntry 2 }
+
+juniAcctngFileXferSecondaryIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies a backup or secondary entry in the juniFileXferTable, which
+        defines the file transfer parameters to use when the agent is configured
+        to automatically transfer collected accounting data files.  A set to
+        this object will fail if a corresponding entry in the juniFileXferTable
+        does not exist or it is not set to juniFileXferAcctngStatistics."
+    ::= { juniAcctngFileEntry 3 }
+
+
+--
+--  Obsolete Per-interface Type Control Table
+--  This table was obsoleted when the indexing changed.
+--
+juniAcctngObsInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngObsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "This table was obsoleted when the indexing changed."
+    ::= { juniAcctngInterfaceControl 1 }
+
+juniAcctngObsInterfaceEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngObsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete table entry."
+    INDEX     { juniIfType }
+    ::= { juniAcctngObsInterfaceTable 1 }
+
+JuniAcctngObsInterfaceEntry ::= SEQUENCE {
+    juniAcctngObsInterfaceAdminStatus        JuniAcctngAdminType,
+    juniAcctngObsInterfaceOperStatus         JuniAcctngOperType,
+    juniAcctngObsInterfaceRowStatus          RowStatus,
+    juniAcctngObsInterfaceAccntgFileIndex    Integer32 }
+
+juniAcctngObsInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      JuniAcctngAdminType
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete object."
+    ::= { juniAcctngObsInterfaceEntry 1 }
+
+juniAcctngObsInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      JuniAcctngOperType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete object."
+    ::= { juniAcctngObsInterfaceEntry 2 }
+
+juniAcctngObsInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete object."
+    ::= { juniAcctngObsInterfaceEntry 3 }
+
+juniAcctngObsInterfaceAccntgFileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete object."
+    ::= { juniAcctngObsInterfaceEntry 4 }
+
+
+--
+--  Per-interface Type Control Table
+--
+juniAcctngInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table controlling the collection of accounting data on specific
+        interfaces types.  This table provides an efficient mechanism to enable
+        and/or disable data collection on all interfaces of a specified type.
+        This table replaces the obsolete version with the same name."
+    ::= { juniAcctngInterfaceControl 2 }
+
+juniAcctngInterfaceEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry which controls whether accounting data is to be collected on
+        interfaces of a specific type, to a specific accounting file and by the
+        systems interface location."
+    INDEX     { juniIfType,
+                juniAcctngInterfaceFileIndex,
+                juniAcctngInterfaceLocation }
+    ::= { juniAcctngInterfaceTable 1 }
+
+JuniAcctngInterfaceEntry ::= SEQUENCE {
+    juniAcctngInterfaceFileIndex          Integer32,
+    juniAcctngInterfaceLocation           JuniInterfaceLocation,
+    juniAcctngInterfaceAdminStatus        JuniAcctngAdminType,
+    juniAcctngInterfaceOperStatus         JuniAcctngOperType,
+    juniAcctngInterfaceRowStatus          RowStatus }
+
+juniAcctngInterfaceFileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object selects the acctngFileTable entry for the collection
+        statistics for this interface type.  The value of this object is the
+        same as the acctngFileIndex and is used to cross reference accounting
+        data files in the AcctngFileTable.
+
+        If the value of this object is zero (special value), then the combined
+        interface type/location defined by this entry is collected into all
+        entries in the acctngFileTable, i.e., all accounting files."
+    ::= { juniAcctngInterfaceEntry 1 }
+
+juniAcctngInterfaceLocation OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocation
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface location specification for this entry.  If the value of
+        this entry is a zero length string, then all system locations are
+        included for the interface type defined by juniIfType."
+    ::= { juniAcctngInterfaceEntry 2 }
+
+juniAcctngInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      JuniAcctngAdminType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for accounting data collection for
+        interfaces defined by the type of this entry.  The administrative scope
+        is for all interfaces of the type defined by the corresponding
+        juniIfType for this entry."
+    ::= { juniAcctngInterfaceEntry 3 }
+
+juniAcctngInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      JuniAcctngOperType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for accounting data collection on for all
+        interfaces corresponding to this entries type."
+    ::= { juniAcctngInterfaceEntry 4 }
+
+juniAcctngInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table."
+    ::= { juniAcctngInterfaceEntry 5 }
+
+--
+--  Per-slot interface final stats transfer statistics Table
+--   
+
+juniAcctngIfFinalStatsXferStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngIfFinalStatsXferStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table to display line cards interfaces final statistics transfer 
+        statistics."
+    ::= { juniAcctngInterfaceControl 3 }
+
+juniAcctngIfFinalStatsXferStatsEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngIfFinalStatsXferStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry is a display of one line card's interfaces final statistics         
+        transfer statistics."
+    INDEX     { juniAcctngIfFinalStatsXferStatsSlotNumber }
+    ::= { juniAcctngIfFinalStatsXferStatsTable 1 }
+
+JuniAcctngIfFinalStatsXferStatsEntry ::= SEQUENCE {
+    juniAcctngIfFinalStatsXferStatsSlotNumber         Integer32,
+    juniAcctngIfFinalStatsXferStatsReceived           Unsigned32,
+    juniAcctngIfFinalStatsXferStatsTransferred        Unsigned32,
+    juniAcctngIfFinalStatsXferStatsDropped            Unsigned32 }
+
+juniAcctngIfFinalStatsXferStatsSlotNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..14)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object selects the slot number to display interfaces final statistics
+        transfer statistics for the line module on that slot."      
+    ::= { juniAcctngIfFinalStatsXferStatsEntry 1 }
+
+juniAcctngIfFinalStatsXferStatsReceived OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the total received interfaces final statistics records for the line module."
+    ::= { juniAcctngIfFinalStatsXferStatsEntry 2 }
+
+juniAcctngIfFinalStatsXferStatsTransferred OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the total transferred interfaces final statistics records for the line module."
+    ::= { juniAcctngIfFinalStatsXferStatsEntry 3 }
+
+juniAcctngIfFinalStatsXferStatsDropped OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the total dropped interfaces final statistics records for the line module."
+    ::= { juniAcctngIfFinalStatsXferStatsEntry 4 }
+
+--
+-- The Virtual Router Accounting Control Information 
+--
+juniAcctngVirtualRouterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAcctngVirtualRouterTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Table stores the configuration of  Virtual Routers per collector (File Index) basis. Multiple Virtual Routers can be 
+         configured per collector (file index)"
+    ::= { juniAcctngVirtualRouterControl 1 }
+
+juniAcctngVirtualRouterTableEntry OBJECT-TYPE
+    SYNTAX      JuniAcctngVirtualRouterTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used to determine the starting point entry when using the
+        ifStack schema."
+    INDEX  { juniAcctngVirtualRouterTableIndex }
+    ::= { juniAcctngVirtualRouterTable 1 }
+
+JuniAcctngVirtualRouterTableEntry ::= SEQUENCE {
+    juniAcctngVirtualRouterTableIndex     Integer32,
+    juniAcctngVirtualRouterTableVRName    DisplayString,
+    juniAcctngVirtualRouterTableRowStatus RowStatus }
+
+juniAcctngVirtualRouterTableIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This Index to be used as a starting point in the Virtual Router Table
+        configuration.  The index to be returned in the Virtual Router Table will
+        start from this value, going up."
+    ::= { juniAcctngVirtualRouterTableEntry 1 }
+
+juniAcctngVirtualRouterTableVRName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Virtual Router name(s) space separated."
+    ::= { juniAcctngVirtualRouterTableEntry 2 }
+
+juniAcctngVirtualRouterTableRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table."
+    ::= { juniAcctngVirtualRouterTableEntry 3 }
+--
+-- enterprise schema information
+--
+juniAcctngSelectionSchema OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The root OBJECT IDENTIFIER under which accounting selection tree
+        objects are assigned."
+    ::= { juniAcctngMIB 2 }
+
+
+juniAcctngSelectionSchemaIf        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 1 }
+
+juniAcctngIfInOctets               OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 1 }
+juniAcctngIfInUcastPkts            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 2 }
+juniAcctngIfInDiscards             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 3 }
+juniAcctngIfInErrors               OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 4 }
+juniAcctngIfInUnknownProtos        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 5 }
+juniAcctngIfOutOctets              OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 6 }
+juniAcctngIfOutUcastPkts           OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 7 }
+juniAcctngIfOutDiscards            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 8 }
+juniAcctngIfOutErrors              OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 9 }
+juniAcctngIfCorrelator             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 10 }
+juniAcctngIfInPolicedOctets        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 11 }
+juniAcctngIfInPolicedPkts          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 12 }
+juniAcctngIfInSpoofedPkts          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 13 }
+juniAcctngIfOutPolicedOctets       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 14 }
+juniAcctngIfOutPolicedPkts         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 15 }
+juniAcctngIfOutSchedulerDropOctets OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 16 }
+juniAcctngIfOutSchedulerDropPkts   OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 17 }
+juniAcctngIfLowerInterface         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 18 }
+juniAcctngIfTimeOffset             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIf 19 }
+juniAcctngifInMulticastPkts        OBJECT IDENTIFIER 
+    ::= { juniAcctngSelectionSchemaIf 20 }
+juniAcctngifInBroadcastPkts        OBJECT IDENTIFIER 
+    ::= { juniAcctngSelectionSchemaIf 21 }
+juniAcctngifOutMulticastPkts       OBJECT IDENTIFIER 
+    ::= { juniAcctngSelectionSchemaIf 22 }
+juniAcctngifOutBroadcastPkts       OBJECT IDENTIFIER 
+    ::= { juniAcctngSelectionSchemaIf 23 }
+
+juniAcctngSelectionSchemaIfStack   OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 3 }
+juniAcctngSelectionSchemaSystem    OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 4 }
+
+juniAcctngSelectionSchemaPolicy    OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 5 }
+
+juniAcctngSelectionSchemaIgmp      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 6 }
+
+juniAcctngSelectionSchemaQos      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 7 }
+
+juniAcctngGreenPackets             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 1 }
+juniAcctngUpperGreenPackets        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 2 }
+juniAcctngYellowPackets            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 3 }
+juniAcctngUpperYellowPackets       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 4 }
+juniAcctngRedPackets               OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 5 }
+juniAcctngUpperRedPackets          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 6 }
+juniAcctngGreenBytes               OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 7 }
+juniAcctngUpperGreenBytes          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 8 }
+juniAcctngYellowBytes              OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 9 }
+juniAcctngUpperYellowBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 10 }
+juniAcctngRedBytes                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 11 }
+juniAcctngUpperRedBytes            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaPolicy 12 }
+
+juniAcctngIgmpLowerIndex           OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 1 }
+juniAcctngIgmpRouterIndex          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 2 }
+juniAcctngIgmpDestAddr             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 3 }
+juniAcctngIgmpSourceIndex          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 4 }
+juniAcctngIgmpMulticastGroup       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 5 }
+juniAcctngIgmpLowerIgmpCommand     OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 6 }
+juniAcctngIgmpLowerTimeStamp       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaIgmp 7 }
+
+juniAcctngParentShapingRate         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 1 }
+juniAcctngParentSharedShapRate   OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 2 }
+juniAcctngParentChildWeight          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 3 }
+juniAcctngQueueLength             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 4 }
+juniAcctngForwardedRate          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 5 }
+juniAcctngAggDropRate             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 6 }
+juniAcctngForwardedPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 7 }
+juniAcctngForwardedBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 8 }
+juniAcctngGreenDropPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 9 }
+juniAcctngGreenDropBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 10 }
+juniAcctngYellowDropPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 11 }
+juniAcctngYellowDropBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 12 }
+juniAcctngRedDropPackets          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 13 }
+juniAcctngRedDropBytes             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 14 }
+juniAcctngDropProfile                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 15 }
+juniAcctngQueueProfile                OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 16 }
+juniAcctngSchedulerProfile           OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 17 }
+juniAcctngStatisticsProfile             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 18 }
+juniAcctngShapingMode                OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 19 }
+juniAcctngShapingRate                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 20 }
+juniAcctngBurst                            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 21 }
+juniAcctngAssuredRate                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 22 }
+juniAcctngWeight                          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 23 }
+juniAcctngRedEnabled                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 24 }
+juniAcctngSharedShapingMode       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 25 }
+juniAcctngSharedShapingRate        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 26 }
+juniAcctngByteAdjType                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 27 }
+juniAcctngByteAdjBytes                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 28 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAcctngConformance OBJECT IDENTIFIER ::= { juniAcctngMIB 3 }
+juniAcctngGroups      OBJECT IDENTIFIER ::= { juniAcctngConformance 1 }
+juniAcctngCompliances OBJECT IDENTIFIER ::= { juniAcctngConformance 2 }
+
+--
+-- compliance statements
+--
+juniAcctngCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for switches that implement the Juniper
+        Accounting Control MIB.  This statement became obsolete when the
+        juniAcctngSelectionSubtreeType object was deprecated."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup }
+    ::= { juniAcctngCompliances 1 }                                -- JUNOSe 2.0
+
+juniAcctngCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for switches that implement the Juniper
+        Accounting Control MIB.  This statement became obsolete when selection
+        policy name and type objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup2 }
+    ::= { juniAcctngCompliances 2 }                                -- JUNOSe 3.2
+
+juniAcctngCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for switches that implement the Juniper
+        Accounting Control MIB.  This statement became obsolete when the
+        interface control table was modified."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup3 }
+    ::= { juniAcctngCompliances 3 }                                -- JUNOSe 4.0
+
+juniAcctngCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Obsolete compliance statement for switches that implement the Juniper
+        Accounting Control MIB.  This statement became obsolete when the
+        selection control table was modified."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup4 }
+    ::= { juniAcctngCompliances 4 }                                -- JUNOSe 5.0
+
+juniAcctngCompliance5  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for switches that implement the Juniper
+        Accounting Control MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup5 }
+    ::= { juniAcctngCompliances 5 }                                -- JUNOSe x.0
+
+juniAcctngCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for switches that implement the Juniper
+        Accounting Control MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAcctngBasicGroup6 }
+    ::= { juniAcctngCompliances 6 }                                -- JUNOSe 7.1
+
+
+--
+-- units of conformance
+--
+juniAcctngBasicGroup  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngSelectionType,
+        juniAcctngSelectionMode,
+        juniAcctngSelectionSubtreeType,
+        juniAcctngSelectionMaxIfStackLevels,
+        juniAcctngSelectionIfStackRowStatus,
+        juniAcctngFileXferMode,
+        juniAcctngFileXferIndex,
+        juniAcctngFileXferSecondaryIndex,
+        juniAcctngObsInterfaceAdminStatus,
+        juniAcctngObsInterfaceOperStatus,
+        juniAcctngObsInterfaceRowStatus,
+        juniAcctngObsInterfaceAccntgFileIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing control of the basic
+        collection of accounting data for connection-less networks.  This group
+        became obsolete when juniAcctngSelectionSubtreeType was deprecated."
+    ::= { juniAcctngGroups 1 }
+
+juniAcctngBasicGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngSelectionType,
+        juniAcctngSelectionMode,
+        juniAcctngSelectionMaxIfStackLevels,
+        juniAcctngSelectionIfStackRowStatus,
+        juniAcctngFileXferMode,
+        juniAcctngFileXferIndex,
+        juniAcctngFileXferSecondaryIndex,
+        juniAcctngObsInterfaceAdminStatus,
+        juniAcctngObsInterfaceOperStatus,
+        juniAcctngObsInterfaceRowStatus,
+        juniAcctngObsInterfaceAccntgFileIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing control of the basic
+        collection of accounting data for connection-less networks.  This group
+        became obsolete when selection policy name and type objects were added."
+    ::= { juniAcctngGroups 2 }
+
+juniAcctngBasicGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngSelectionType,
+        juniAcctngSelectionMode,
+        juniAcctngSelectionMaxIfStackLevels,
+        juniAcctngSelectionPolicyName,
+        juniAcctngSelectionPolicyType,
+        juniAcctngSelectionIfStackRowStatus,
+        juniAcctngFileXferMode,
+        juniAcctngFileXferIndex,
+        juniAcctngFileXferSecondaryIndex,
+        juniAcctngObsInterfaceAdminStatus,
+        juniAcctngObsInterfaceOperStatus,
+        juniAcctngObsInterfaceRowStatus,
+        juniAcctngObsInterfaceAccntgFileIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing control of the basic
+        collection of accounting data for connection-less networks.  This group
+        became obsolete when the inteface control table was modified."
+    ::= { juniAcctngGroups 3 }
+
+juniAcctngDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngSelectionSubtreeType }
+    STATUS      deprecated
+    DESCRIPTION
+        "This group contains a deprecated object that is no longer recommended
+        but may still be supported on some implemtations for backward
+        compatibility."
+    ::= { juniAcctngGroups 4 }
+
+juniAcctngBasicGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngInterfaceDescrFormat,
+        juniAcctngInterfaceNumberingMode,
+        juniAcctngFileFormat,
+        juniAcctngSelectionType,
+        juniAcctngSelectionMode,
+        juniAcctngSelectionMaxIfStackLevels,
+        juniAcctngSelectionPolicyName,
+        juniAcctngSelectionPolicyType,
+        juniAcctngSelectionIfStackRowStatus,
+        juniAcctngFileXferMode,
+        juniAcctngFileXferIndex,
+        juniAcctngFileXferSecondaryIndex,
+        juniAcctngInterfaceAdminStatus,
+        juniAcctngInterfaceOperStatus,
+        juniAcctngInterfaceRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "Obsolete collection of objects providing control of the basic
+        collection of accounting data for connection-less networks.  This group
+        became obsolete when the selection control table was modified."
+    ::= { juniAcctngGroups 5 }
+
+juniAcctngBasicGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniAcctngInterfaceDescrFormat,
+        juniAcctngInterfaceNumberingMode,
+        juniAcctngFileFormat,
+        juniAcctngSelectionType,
+        juniAcctngSelectionMode,
+        juniAcctngSelectionMaxIfStackLevels,
+        juniAcctngSelectionPolicyName,
+        juniAcctngSelectionPolicyType,
+        juniAcctngSelectionIfStackRowStatus,
+        juniAcctngSelectionIfCreateDeleteStats,
+        juniAcctngSelectionIfCreateDeleteStatsIfTypes,
+        juniAcctngFileXferMode,
+        juniAcctngFileXferIndex,
+        juniAcctngFileXferSecondaryIndex,
+        juniAcctngInterfaceAdminStatus,
+        juniAcctngInterfaceOperStatus,
+        juniAcctngInterfaceRowStatus,
+	juniAcctngIfFinalStatsXferStatsReceived,
+	juniAcctngIfFinalStatsXferStatsTransferred,
+	juniAcctngIfFinalStatsXferStatsDropped
+ }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing control of the basic collection of
+        accounting data for connection-less networks."
+    ::= { juniAcctngGroups 6 }
+
+juniAcctngBasicGroup6  OBJECT-GROUP
+    OBJECTS {
+    juniAcctngVirtualRouterTableIndex,
+    juniAcctngVirtualRouterTableVRName,
+    juniAcctngVirtualRouterTableRowStatus
+}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing control of the Virtual Router based
+        accounting."
+    ::= { juniAcctngGroups 7 }
+END

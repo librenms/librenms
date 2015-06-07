@@ -1,0 +1,103 @@
+-- Title:  TRANZEO  Private MIB
+--          This Private MIB supports Tranzeo Sixth Generation product line.
+--	Tranzeo Wireless Technologies Inc.
+--	19473 Fraser Way
+--	Pitt Meadows, BC
+--	Canada V3Y 2V4
+--	
+--
+--
+-- Version:    0.2
+-- Date:       Wednesday December 27  2006
+-- Comments:   This is the first private MIB created for Tranzeo.  It will contain basic oid's not already included in MIB-II or 802.11 MIB.
+--    iso(1).org(3).dod(6).internet(1).private(4).enterprises(24575).
+
+
+-- Version  Date  Authors Decription
+--
+-- v0.1    Nov 28    MR, QA Technician
+--          2006
+-- v0.2    Dec 27
+--		2006	   MR, QA Technician
+
+
+TRANZEO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+
+     enterprises, OBJECT-TYPE
+            FROM RFC1155-SMI;
+
+
+tranzeo           OBJECT IDENTIFIER ::= { enterprises 24575 }
+signal           	OBJECT IDENTIFIER ::= { tranzeo 1 }
+
+
+rssi OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the average received signal strength on the current channel. A 0 means no wireless connection."
+   ::= { signal 1 }
+
+signallow OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the lowest received signal strength on the current channel. A 0 means no wireless connection."
+   ::= { rssi 1 }
+
+signalaverage OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the average received signal strength on the current channel. A 0 means no wireless connection."
+   ::= { rssi 2 }
+
+signalhigh OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the highest received signal strength on the current channel. A 0 means no wireless connection."
+   ::= { rssi 3 }
+
+noise OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the noise on the current channel. A 0 means no wireless connection."
+   ::= { signal 2 }
+
+noiselow OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the lowest noise on the current channel. A 0 means no wireless connection."
+   ::= { noise 1 }
+
+noiseaverage OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the average noise on the current channel. A 0 means no wireless connection."
+   ::= { noise 2 }
+
+noisehigh OBJECT-TYPE
+   SYNTAX INTEGER (-110..0)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "This object represents the highest noise on the current channel. A 0 means no wireless connection."
+   ::= { noise 3 }
+
+
+END
+

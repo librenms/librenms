@@ -1,0 +1,354 @@
+CISCOSB-BONJOUR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE,
+    MODULE-IDENTITY                              FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus FROM SNMPv2-TC
+    InetAddress, InetAddressType                 FROM INET-ADDRESS-MIB
+    InterfaceIndex                               FROM IF-MIB
+    switch001                                    FROM CISCOSB-MIB;
+
+
+
+rlBonjour MODULE-IDENTITY
+          LAST-UPDATED "200909210000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                 "The private MIB module definition for Bonjour protocol."
+          REVISION "200904230000Z"
+          DESCRIPTION
+                 "Initial revision."
+         ::= { switch001 114 }
+
+-- -------------------------------------------------------------
+-- global scalar
+-- -------------------------------------------------------------
+
+rlBonjourPublish OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables Bonjour publishing."
+
+
+    ::= {rlBonjour 1 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+
+RlBonjourServiceState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Bonjour service status - (per IP interface)."
+    SYNTAX INTEGER {
+        rlBonjourNotPublished(0),
+        rlBonjourInactive(1),
+        rlBonjourRegistering(2),
+        rlBonjourRunning(3)
+}
+
+RlBonjourOperationState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Bonjour service an L2 interface operation state."
+    SYNTAX INTEGER {
+        up(1),
+        down(2)
+}
+
+RlBonjourOperationReason ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Bonjour service an L2 interface operation state."
+    SYNTAX INTEGER {
+        notExclude(0),
+        include(1),
+        notInclude(2),
+        exclude(3),
+        bonjourDisabled(4),
+        serviceDisabled(5),
+        noIPaddress(6),
+        l2InterfaceDown(7),
+        notPresent(8),
+        unknown(9)
+}
+
+
+
+
+
+-- -------------------------------------------------------------
+-- ---------   Table      --------------------------------------
+-- -------------------------------------------------------------
+
+
+-- ------------------------------------------------------------
+-- ---------   This MIb will not be bound in 750 version, ----------------
+-- ---------   The MIb following rlBonjourStateTable will replace it------
+-- ------------------------------------------------------------
+ rlBonjourStatusTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBonjourStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The table listing the service bonjour status per service and IP interface.
+        In order to keep the table sorted according to the customary lexicographical
+        order of the rlBonjourStatusServiceName strings, rlBonjourStatusServiceName
+        will be padded with blanks. Bonjour will truncate the padded blanks when advertising this service name.
+
+        Using this MIB user can monitor actual state of a service on an IP interface"
+    ::= {rlBonjour 2 }
+
+    rlBonjourStatusEntry  OBJECT-TYPE
+    SYNTAX      RlBonjourStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlBonjourStatusEntry."
+    INDEX    { rlBonjourStatusServiceName,rlBonjourStatusIPInterfaceType, rlBonjourStatusIPInterfaceAddr }
+    ::= {rlBonjourStatusTable  1 }
+
+    RlBonjourStatusEntry ::= SEQUENCE {
+    rlBonjourStatusServiceName     DisplayString ,
+    rlBonjourStatusIPInterfaceType InetAddressType,
+    rlBonjourStatusIPInterfaceAddr InetAddress,
+    rlBonjourStatusState           RlBonjourServiceState
+    }
+
+
+
+    rlBonjourStatusServiceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the service name."
+    ::= { rlBonjourStatusEntry 1 }
+
+
+    rlBonjourStatusIPInterfaceType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates the type of the IP interface
+       on which the Bonjour service should be published."
+    ::= { rlBonjourStatusEntry 2 }
+
+    rlBonjourStatusIPInterfaceAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates the address of the IP interface
+       on which the Bonjour service should be published."
+    ::= { rlBonjourStatusEntry 3 }
+
+    rlBonjourStatusState OBJECT-TYPE
+    SYNTAX     RlBonjourServiceState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies the service state on IP interface of the device."
+    ::= { rlBonjourStatusEntry 4 }
+
+
+ rlBonjourStateTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBonjourStateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The table listing the service bonjour state per service and L2 interface.
+        The services that are displayed here are only those who are supported per project.
+        The L2 interfaces that are displayed  here are either:
+             L2 interfaces with an IP on it
+                    OR
+             L2 interfaces listed in the table below
+        Per each pair (service and L2 interface) table displays:
+            state :
+                UP   - Bonjour published the service on this L2 interface
+                    Not-exclude - the L2 interface has IP address (L2 interface is in UP state)
+                                    AND rlBonjourL2Table is empty
+                                    AND rlBonjourL2Mode is disable
+                    include - the L2 interfaces are listed in the table rlBonjourL2Table
+                                AND rlBonjourL2Mode is enabled
+                Down - Bonjour sent goodbye packets regarding this service on this L2 interface
+                    exclude - the L2 interface is a member of the rlBonjourL2Table
+                              AND rlBonjourL2Mode is disable
+                    Not-Include - rlBonjourL2Table is empty
+                                  AND rlBonjourL2Mode is enable
+                    service disabled - service was removed ue to specific request from L1 manager
+                    No IP address    - the L2 interfaces is listed in the table rlBonjourL2EnableTable
+                                       BUT don't have an IP on it
+                    Not-present      - the L2 interfaces is listed in the table rlBonjourL2EnableTable
+                                       BUT no yet defined (like vlan not created or port in an unconnected salve)
+                    Bonjour disabled - rlBonjourPublish scalar is off
+        Using this MIB user can monitor actual state of a service on an IP interface"
+    ::= {rlBonjour 3 }
+
+    rlBonjourStateEntry  OBJECT-TYPE
+    SYNTAX      RlBonjourStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlBonjourStatusEntry."
+    INDEX    { rlBonjourStateServiceName,rlBonjourStateL2Interface }
+    ::= {rlBonjourStateTable  1 }
+
+    RlBonjourStateEntry ::= SEQUENCE {
+    rlBonjourStateServiceName      DisplayString ,
+    rlBonjourStateL2Interface      InterfaceIndex,
+    rlBonjourStateOperationMode    RlBonjourOperationState,
+    rlBonjourStateOperationReason  RlBonjourOperationReason
+    }
+
+
+
+    rlBonjourStateServiceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the service name."
+    ::= { rlBonjourStateEntry 1 }
+
+
+    rlBonjourStateL2Interface OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates the L2 interface
+       on which the Bonjour service should be published."
+    ::= { rlBonjourStateEntry 2 }
+
+    rlBonjourStateOperationMode OBJECT-TYPE
+    SYNTAX      RlBonjourOperationState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates wether Bonjour is operational on the pair (service + L2 interface)."
+    ::= { rlBonjourStateEntry 3 }
+
+    rlBonjourStateOperationReason OBJECT-TYPE
+    SYNTAX      RlBonjourOperationReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable specifies the reason of the previous field: rlBonjourStateOperationMode."
+    ::= { rlBonjourStateEntry 4 }
+
+ rlBonjourL2Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBonjourL2Entry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The table listing the L2 interfaces on which the user wishes to
+        enable OR disable Bonjour with respect to rlBonjourL2Mode.
+        If rlBonjourL2Mode is set to include AND L2 interface is in this table
+        it does not ensure Bonjour WILL publish services on it.
+        Publication is also dependent on these fundemental conditions:
+            rlBonjourPublish must be on
+            at least one service should be enabled
+            L2 must be present and UP
+            have at least one IP on it
+        If this table is empty AND rlBonjourL2Mode is set to include
+        Bonjour won't operate at all.
+        If rlBonjourL2Mode is set to exclude, and rlBonjourL2Table is empty
+        Bonjour will be published on ALL L2 interfaces answering to the
+        fundemental conditions specified above.
+        If rlBonjourL2Table is NOT empty then Bonjour will operate on
+        ALL L2 interfaces answering to the fundemental conditions specified
+        above BUT NOT members of this list.
+      "
+    ::= {rlBonjour 4 }
+
+    rlBonjourL2Entry    OBJECT-TYPE
+    SYNTAX      RlBonjourL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlBonjourL2Entry."
+    INDEX    { rlBonjourL2Ifindex }
+    ::= {rlBonjourL2Table  1 }
+
+    RlBonjourL2Entry ::= SEQUENCE {
+    rlBonjourL2Ifindex       InterfaceIndex ,
+    rlBonjourL2RowStatus     RowStatus
+    }
+
+    rlBonjourL2Ifindex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the L2 interface."
+    ::= { rlBonjourL2Entry 1 }
+
+    rlBonjourL2RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the L2 interface status manager."
+    ::= { rlBonjourL2Entry 2 }
+
+ rlBonjourL2Mode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        include  (1),
+        exclude  (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "specify whether the L2 interfaces listed in rlBonjourL2Table
+         means include bonjour on these L2 interfaces once they:
+            rlBonjourPublish must be on
+            at least one service should be enabled
+            L2 must be present and UP
+            have at least one IP on it
+         OR  exclude bonjour on these L2 interfaces even if they answer to
+         all the conditions above."
+
+
+    ::= {rlBonjour 5 }
+
+ rlBonjourInstanceName OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Instance Name is given to Bonjour driver by the project part (L1Manager)
+        When a conflict occurs: found another station with the same instance name.
+        Bonjour driver is required to append _m to the given name
+        while m is an incremental integer, increasing on each conflict"
+
+    ::= {rlBonjour 6 }
+
+ rlBonjourHostName OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Host Name is given to Bonjour driver by the project part (L1Manager)
+        When a conflict occurs: found another station with the same host name.
+        Bonjour driver is required to append _m to the given name
+        while m is an incremental integer, increasing on each conflict"
+
+    ::= {rlBonjour 7 }
+
+END

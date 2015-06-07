@@ -1,0 +1,314 @@
+ENTERASYS-VLAN-AUTHORIZATION-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-vlan-authorization-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' VLAN Authorization MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright June, 2004 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    dot1dBasePortEntry
+        FROM BRIDGE-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysVlanAuthorizationMIB MODULE-IDENTITY
+    LAST-UPDATED "200406021922Z"  -- Wed Jun  2 19:22 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks, Inc.
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks' enterprise OID pertaining to proprietary
+         extensions to the IETF Q-BRIDGE-MIB, as specified in RFC2674,
+         pertaining to VLAN authorization, as specified in RFC3580.
+         Specifically, the enabling and disabling of support for the
+         VLAN Tunnel-Type attribute returned from a RADIUS authentication,
+         and how that attribute is applied to the port which initiated
+         the authentication."
+
+    REVISION "200406021922Z"  -- Wed Jun  2 19:22 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module"
+
+    ::= { etsysModules 48 } 
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+VlanAuthEgressStatus  ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The possible egress configurations which may be applied
+         in response to a successful authentication.
+
+         none(1)        No egress manipulation will be made.
+
+         tagged(2)      The authenticating port will be added to the
+                        current egress for the VLAN-ID returned.
+
+         untagged(3)    The authenticating port will be added to the
+                        current untagged egress for the VLAN-ID
+                        returned.
+
+         dynamic(4)     The authenticating port will use information
+                        returned in the authentication response to
+                        modify the current egress lists."
+    SYNTAX      INTEGER {
+                    none(1),
+                    tagged(2),
+                    untagged(3),
+                    dynamic(4)
+                }
+
+
+-- ---------------------------------------------------------- --
+-- MIB Objects
+-- ---------------------------------------------------------- --
+
+etsysVlanAuthorizationObjects
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationMIB 1 }
+
+etsysVlanAuthorizationSystem
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationObjects 1 }
+
+etsysVlanAuthorizationPorts
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationObjects 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Extensions to the VLAN Port Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysVlanAuthorizationEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enable/disable state for the VLAN authorization feature.
+         When disabled, no modifications to the VLAN attributes
+         related to packet switching should be enforced."
+    DEFVAL { disabled }
+    ::= { etsysVlanAuthorizationSystem  1 }
+
+
+-- ---------------------------------------------------------- --
+-- Extensions to the VLAN Port Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysVlanAuthorizationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysVlanAuthorizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extensions to the table that contains information about
+         every port that is associated with this transparent bridge."
+    ::= { etsysVlanAuthorizationPorts 1 }
+
+etsysVlanAuthorizationEntry OBJECT-TYPE
+    SYNTAX      EtsysVlanAuthorizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extensions that support the management of
+         proprietary features for each port of a transparent
+         bridge.  This is indexed by dot1dBasePort."
+    AUGMENTS { dot1dBasePortEntry }
+    ::= { etsysVlanAuthorizationTable 1 }
+
+EtsysVlanAuthorizationEntry ::=
+    SEQUENCE { 
+        etsysVlanAuthorizationStatus         EnabledStatus,
+        etsysVlanAuthorizationAdminEgress    VlanAuthEgressStatus,
+        etsysVlanAuthorizationOperEgress     VlanAuthEgressStatus,
+        etsysVlanAuthorizationVlanID         Integer32
+    }
+
+etsysVlanAuthorizationStatus   OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status for the application of  VLAN
+         authorization on this port, if disabled, the information
+         returned in the VLAN-Tunnel-Type from the authentication
+         will not be applied to the port (although it should be
+         represented in this table).  If enabled, those results
+         will be applied to the port."
+    DEFVAL { enabled }
+    ::= { etsysVlanAuthorizationEntry 1 }
+
+etsysVlanAuthorizationAdminEgress     OBJECT-TYPE
+    SYNTAX      VlanAuthEgressStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the modification of the current vlan egress
+         list (of the vlan returned in the VLAN-Tunnel-Type,
+         and reported by etsysVlanAuthorizationVlanID) upon
+         successful authentication in the following manner:
+
+         none(1)        No egress manipulation will be made.
+
+         tagged(2)      The authenticating port will be added to the
+                        current egress for the VLAN-ID returned.
+
+         untagged(3)    The authenticating port will be added to the
+                        current untagged egress for the VLAN-ID
+                        returned.
+
+         dynamic(4)     The authenticating port will use information
+                        returned in the authentication response to
+                        modify the current egress lists.  This value
+                        is supported only if the device supports a
+                        mechanism through which the egress status may
+                        be returned through the RADIUS response.
+
+         Should etsysVlanAuthorizationEnable become disabled,
+         etsysVlanAuthorizationStatus become disabled for a port,
+         or should etsysVlanAuthorizationVlanID become 0 or 4095,
+         all effect on the port egress MUST be removed."
+    DEFVAL { untagged }
+    ::= { etsysVlanAuthorizationEntry 2 }
+
+etsysVlanAuthorizationOperEgress   OBJECT-TYPE
+    SYNTAX      VlanAuthEgressStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the current state of modification to the current vlan
+         egress list (of the vlan returned in the VLAN-Tunnel-Type)
+         upon successful authentication, if etsysVlanAuthorizationStatus
+         is enabled, in the following manner:
+
+         none(1)        No egress manipulation will be made.
+
+         tagged(2)      The authenticating port will be added to the
+                        current egress for the VLAN-ID returned.
+
+         untagged(3)    The authenticating port will be added to the
+                        current untagged egress for the VLAN-ID
+                        returned.
+
+         The purpose of this leaf is to report, specifically when
+         etsysVlanAuthorizationAdminEgress has been set to dynamic(4),
+         the currently enforced egress modification.  If the port is
+         unauthenticated, or no VLAN-ID has been applied, this leaf
+         should return none(1)."
+    DEFVAL { none }
+    ::= { etsysVlanAuthorizationEntry 3 }
+
+etsysVlanAuthorizationVlanID  OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 1..4094 | 4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 12 bit VLAN identifier for a given port, used to override
+         the PVID of the given port, obtained as a result of an
+         authentication. 
+
+         A value of zero indicates that there is no authenticated VLAN
+         ID for the given port. Should a port become unauthenticated
+         this value MUST be returned to zero.
+
+         A value of 4095 indicates that a the port has been
+         authenticated, but that the VLAN returned could not be applied
+         to the port (possibly because of resource constraints or
+         misconfiguration).  In this instance, the original PVID should
+         still be applied.
+
+         Should the feature become disabled or the session terminate,
+         all effect on the Port VLAN ID MUST be removed."
+    DEFVAL { 0 }
+    ::= { etsysVlanAuthorizationEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysVlanAuthorizationConformance
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationMIB 2 }
+
+etsysVlanAuthorizationGroups
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationConformance 1 }
+
+etsysVlanAuthorizationCompliances
+    OBJECT IDENTIFIER ::= { etsysVlanAuthorizationConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysVlanAuthorizationGroup OBJECT-GROUP
+    OBJECTS {
+        etsysVlanAuthorizationEnable,
+        etsysVlanAuthorizationStatus, 
+        etsysVlanAuthorizationAdminEgress,
+        etsysVlanAuthorizationOperEgress,
+        etsysVlanAuthorizationVlanID
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects relating to VLAN Authorization."
+    ::= { etsysVlanAuthorizationGroups 1 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysVlanAuthorizationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys VLAN Authorization MIB."
+
+    MODULE
+        MANDATORY-GROUPS { etsysVlanAuthorizationGroup }
+
+    ::= { etsysVlanAuthorizationCompliances 1 }
+
+END

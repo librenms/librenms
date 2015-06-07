@@ -1,0 +1,913 @@
+CTRON-POWER-SUPPLY-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-power-supply-mib.txt The power supply MIB
+        --  Revision: 1.01.02
+        --  Part Number:  
+        --  Date: March 26, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific chassis MIB.
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+        --      This MIB describes objects for MMAC+ style power supplies.
+
+        IMPORTS
+                ctps    
+                        FROM CTRON-MIB-NAMES
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+
+
+        --===============    group definitions     ===================
+
+        chPower                 OBJECT IDENTIFIER  ::= { ctps 1 }
+        boardPower              OBJECT IDENTIFIER  ::= { ctps 2 }
+        psPower                 OBJECT IDENTIFIER  ::= { ctps 3 }
+        bbuPower                OBJECT IDENTIFIER  ::= { ctps 4 }
+        termPower               OBJECT IDENTIFIER  ::= { ctps 5 }
+
+        --===============    chPower group          ====================
+
+        --  Chassis Power Group
+        --  Implementation of the Chassis Power group is optional.
+        --  It needs to be supported when an EM is present and operational
+        --  in the chassis.
+        --  This group covers information on the chassis power available.
+
+        chPowerOperationalStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerAC(1),
+                        powerACRedundant(2),
+                        powerDC(3),
+                        powerDCRedundant(4),
+                        battery(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the overall status of the chassis's
+                 power supply in terms of how the power is being delivered
+                 to the chassis."
+            ::= { chPower 1 }
+
+        chPowerMainVoltageStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOK(1),
+                        overCurrent(2),
+                        overVoltage(3),
+                        underVoltage(4)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the state of the main voltage 
+                 rail within the chassis. The power on this rail may
+                 be delivered by AC supplies, DC supplies or battery
+                 supplies."
+            ::= { chPower 2 }
+
+        chPowerMainVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The voltage of the chassis's main voltage rail. This rail
+                 carries power to all the modules in the chassis. It has
+                 an allowable range of 40 volts to 60 volts DC. The value
+                 of this object is the actual voltage * 10."
+            ::= { chPower 3 }
+
+        chPowerTotalSupply  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The total power being supplied by the chassis's power 
+                 supplies to the chassis. The value of this object is the 
+                 actual watts."
+            ::= { chPower 4 }
+
+        chPowerTotalLoad  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The total load being presented by the chassis to the  
+                 chassis's power supplies. The value of 
+                 this object is the actual watts."
+            ::= { chPower 5 }
+
+        chPowerMaxSupply  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum power that could de supplied by the chassis's power 
+                 supplies to the chassis. The value of this object is the 
+                 actual watts."
+            ::= { chPower 6 }
+
+        chPowerMaxLoad  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum load that could be presented by the chassis to the  
+                 chassis's power supplies. The value of 
+                 this object is the actual watts."
+            ::= { chPower 7 }
+
+        chPowerTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChPowerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of power lines or busses on the chassis's backplane."
+            ::= { chPower 8 }
+
+        chPowerEntry  OBJECT-TYPE
+            SYNTAX  ChPowerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module and associated power line."
+            INDEX  { chPowerLineID }
+            ::= { chPowerTable 1 }
+
+        ChPowerEntry  ::=
+            SEQUENCE {
+                chPowerLineID 
+                    INTEGER,
+                chPowerLineType
+                    OBJECT IDENTIFIER,
+                chPowerLineTotalSupply
+                    INTEGER,
+                chPowerLineTotalLoad
+                    INTEGER,
+                chPowerLineMaxSupply
+                    INTEGER,
+                chPowerLineMaxLoad
+                    INTEGER
+            }
+
+        chPowerLineID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A unique value used to identify a particular power line on
+                 the chassis's backplane."
+            ::= { chPowerEntry 1 }
+
+        chPowerLineType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The type of power. For example, a power line that supplies
+                 DC current at a nominal voltage of 40 to 57 volts or a 
+                 power line that supplies AC current at a nominal volatge of
+                 110v."
+            ::= { chPowerEntry 2 }
+
+        chPowerLineTotalSupply  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The total power being supplied by the chassis's power 
+                 supplies to the chassis on this power line. The value 
+                 of this object is the actual watts."
+            ::= { chPowerEntry 3 }
+
+        chPowerLineTotalLoad  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The total load being presented by the chassis to the  
+                 chassis's power supplies on this power line. This value
+                 will be zero if unknown The value of this object is the
+                 actual watts."
+            ::= { chPowerEntry 4 }
+
+        chPowerLineMaxSupply  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum power that could de supplied by the chassis's power 
+                 supplies to the chassison this power line. The value of 
+                 this object is the actual watts."
+            ::= { chPowerEntry 5 }
+
+        chPowerLineMaxLoad  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum load that could be presented by the chassis to the  
+                 chassis's power supplies on this power line. The value of 
+                 this object is the actual watts."
+            ::= { chPowerEntry 6 }
+
+        chPowerDiagVoltageStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOK(1),
+                        overCurrent(2),
+                        overVoltage(3),
+                        underVoltage(4)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the state of the diag voltage 
+                 rail within the chassis."
+            ::= { chPower 9 }
+
+        chPowerDiagVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The voltage of the chassis's diag voltage rail. This rail
+                 carries power to all the modules in the chassis. It has
+                 an allowable range of 4.75 volts to 5.25 volts DC. The value
+                 of this object is the actual voltage * 10."
+            ::= { chPower 10 }
+
+        --===============    boardPower group          ====================
+
+        --  Board Power Group
+        --  This group covers information on the use of power within the 
+        --  chassis by the networking boards.
+
+        boardPowerSlotStatusTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BoardPowerSlotStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of networking modules installed in this chassis."
+            ::= { boardPower 1 }
+
+        boardPowerSlotStatusEntry  OBJECT-TYPE
+            SYNTAX  BoardPowerSlotStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { boardPowerSlotStatusID }
+            ::= { boardPowerSlotStatusTable 1 }
+
+        BoardPowerSlotStatusEntry  ::=
+            SEQUENCE {
+                boardPowerSlotStatusID
+                    INTEGER,
+                boardPowerOperationalStatus 
+                    INTEGER,
+                boardPowerAdminStatus 
+                    INTEGER,
+                boardPowerLocalAdminStatus  
+                    INTEGER,
+                boardPowerLocalStatus  
+                    INTEGER,
+                boardPowerShutdownAdmin
+                    INTEGER,
+                boardPowerPriority  
+                    INTEGER,
+                boardPowerMaxInputPower
+                    INTEGER,
+                boardPowerManagement
+                    INTEGER
+            }
+
+        boardPowerSlotStatusID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this board is
+                 installed. This object is similiar to chSlotID in the
+                 Chassis MIB."
+            ::= { boardPowerSlotStatusEntry 1 }
+
+        boardPowerOperationalStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOn(1),
+                        powerOff(2),
+                        reset(3),
+                        overVoltage(4),
+                        underVoltage(5),
+                        overCurrent(6),
+                        overCurrentShutdown(7),
+                        temperatureShutdown(8),
+                        remotePowerOff(9),
+                        powerConservationShutdown(10),
+                        frontPanelPowerOff(11)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the module's
+                 DC-DC converter power supply."
+            ::= { boardPowerSlotStatusEntry 2 }
+
+        boardPowerAdminStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOn(1),
+                        powerOff(2),
+                        reset(3)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object controls the operation of the module's
+                 DC-DC power supply. If the value 3 is written to 
+                 this object then the value of the object will be
+                 set to 1 after the reset is performed."
+            DEFVAL { powerOn }
+            ::= { boardPowerSlotStatusEntry 3 }
+
+        boardPowerLocalAdminStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        localMode(1),
+                        secureMode(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object controls the operation of the module's
+                 front panel button. In local mode this button may
+                 be used to locally control the operation of the 
+                 DC-DC converter, i.e. power on, power off and 
+                 reset. In secure mode a request the state of the
+                 front panel button is reflected in the object
+                 boardPowerOperationalStatus. In secure mode
+                 the front panel button has no effect locally."
+            DEFVAL { localMode }
+            ::= { boardPowerSlotStatusEntry 4 }
+
+        boardPowerLocalStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        resetRequest(1),
+                        powerDownRequest(2),
+                        powerOnRequest(3),
+                        normal(4)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the state of the module's front
+                 panel button."
+            ::= { boardPowerSlotStatusEntry 5 }
+
+        boardPowerShutdownAdmin  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object controls whether or not the module should 
+                 auto power down due to an fault condition."
+            DEFVAL { disabled }
+            ::= { boardPowerSlotStatusEntry 6 }
+
+        boardPowerPriority  OBJECT-TYPE
+            SYNTAX  INTEGER (1..14)
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The module's power-up and power down priority. This is a
+                 value of 1 to 14 and is used to decide which modules are
+                 allowed to power on in the event that power demand of the
+                 chassis is greater than the total power supply. The default 
+                 value is 14, highest priority. When two modules have equal
+                 priority then the module in the lowest slot wins."
+            DEFVAL { 14 }
+            ::= { boardPowerSlotStatusEntry 7 }
+
+        boardPowerMaxInputPower OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum input power that this module is allowed 
+                 to consume. The value of this object is actual 
+                 watts."
+            ::= { boardPowerSlotStatusEntry 8 }
+
+        boardPowerManagement  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    disabled(1),
+                    enabled(2),
+                    not-supported(7)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "Module power management status."
+            DEFVAL { not-supported }
+            ::= { boardPowerSlotStatusEntry 9 }
+
+        boardPowerSlotTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BoardPowerSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of networking modules and associated power lines 
+                 installed in this chassis."
+            ::= { boardPower 2 }
+
+        boardPowerSlotEntry  OBJECT-TYPE
+            SYNTAX  BoardPowerSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module and associated power line."
+            INDEX  { boardPowerSlotID, boardPowerID }
+            ::= { boardPowerSlotTable 1 }
+
+        BoardPowerSlotEntry  ::=
+            SEQUENCE {
+                boardPowerSlotID
+                    INTEGER,
+                boardPowerID 
+                    INTEGER,
+                boardPowerType
+                    OBJECT IDENTIFIER,
+                boardPowerStatus 
+                    INTEGER,
+                boardPowerVoltage 
+                    INTEGER,
+                boardPowerCurrent
+                    INTEGER,
+                boardPowerMaxVoltage 
+                    INTEGER,
+                boardPowerMinVoltage 
+                    INTEGER,
+                boardPowerMaxPower
+                    INTEGER
+            }
+
+        boardPowerSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this board is
+                 installed. This object is similiar to chSlotID in the 
+                 Chassis MIB."
+            ::= { boardPowerSlotEntry 1 }
+
+        boardPowerID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A unique value used to identify a particular power line."
+            ::= { boardPowerSlotEntry 2 }
+
+        boardPowerType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The type of power. For example, a power line that supplies
+                 DC current at a nominal voltage of 40 to 57 volts or a 
+                 power line that supplies AC current at a nominal volatge of
+                 110v."
+            ::= { boardPowerSlotEntry 3 }
+
+        boardPowerStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOK(1),
+                        powerOff(2),
+                        overCurrent(3),
+                        overVoltage(4),
+                        underVoltage(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of this power line."
+            ::= { boardPowerSlotEntry 4 }
+
+        boardPowerVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The voltage reading for the power line. The value of this
+                 object is actual voltage * 100."
+            ::= { boardPowerSlotEntry 5 }
+
+        boardPowerCurrent  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The current reading for the power line. The value of this
+                 object is the actual amperage * 100. If this reading is not
+                 implemented then value will be zero."
+            ::= { boardPowerSlotEntry 6 }
+
+        boardPowerMaxVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum voltage for this power line. If the voltage 
+                 reading for this power line is greater than this value
+                 then the power line is considered to be in an overvolatge
+                 condition. The value of this object is in voltage * 100."
+            ::= { boardPowerSlotEntry 7 }
+
+        boardPowerMinVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The minimum voltage for this power line. If the voltage 
+                 reading for this power line is less than this value
+                 then the power line is considered to be in an undervolatge
+                 condition. The value of this object is voltage * 100."
+            ::= { boardPowerSlotEntry 8 }
+
+        boardPowerMaxPower  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum power for this power line. If the power calculated 
+                 for this power line is greater than this value then the 
+                 power line is considered to be in an overload condition.
+                 The value of this object is in watts."
+            ::= { boardPowerSlotEntry 9 }
+
+        --===============    psPower group          ====================
+
+        --  AC and DC Power Supply Power Group
+        --  This group covers information on the use of power within the 
+        --  chassis by the networking boards.
+
+        psPowerSlotStatusTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF PsPowerSlotStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of AC & DC power supplies installed in this chassis."
+            ::= { psPower 1 }
+
+        psPowerSlotStatusEntry  OBJECT-TYPE
+            SYNTAX  PsPowerSlotStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 power supply."
+            INDEX  { psPowerSlotStatusID }
+            ::= { psPowerSlotStatusTable 1 }
+
+        PsPowerSlotStatusEntry  ::=
+            SEQUENCE {
+                psPowerSlotStatusID
+                    INTEGER,
+                psPowerOperationalStatus 
+                    INTEGER,
+                psPowerAdminStatus 
+                    INTEGER,
+                psPowerMaxOutputPower
+                    INTEGER
+            }
+
+        psPowerSlotStatusID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this AC power 
+                 supply is installed. This object is similiar
+                 to chSlotID in the Chassis MIB."
+            ::= { psPowerSlotStatusEntry 1 }
+
+        psPowerOperationalStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOn(1),
+                        powerOff(2),
+                        reset(3),
+                        overVoltage(4),
+                        underVoltage(5),
+                        overCurrent(6),
+                        overCurrentShutdown(7),
+                        temperatureShutdown(8),
+                        remotePowerOff(9)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the module's
+                 DC-DC converter power supply."
+            ::= { psPowerSlotStatusEntry 2 }
+
+        psPowerAdminStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOn(1),
+                        powerOff(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object controls the operation of power supply."
+            DEFVAL { powerOn }
+            ::= { psPowerSlotStatusEntry 3 }
+
+        psPowerMaxOutputPower   OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum power that this power supply is allowed 
+                 to ouput. The value of this object is watts."
+            ::= { psPowerSlotStatusEntry 4 }
+
+        psPowerSlotTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF PsPowerSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of power supplies and associated power lines
+                 installed in this chassis."
+            ::= { psPower 2 }
+
+        psPowerSlotEntry  OBJECT-TYPE
+            SYNTAX  PsPowerSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 power line on a particular power supply."
+            INDEX  { psPowerSlotID, psPowerID }
+            ::= { psPowerSlotTable 1 }
+
+        PsPowerSlotEntry  ::=
+            SEQUENCE {
+                psPowerSlotID
+                    INTEGER,
+                psPowerID 
+                    INTEGER,
+                psPowerType
+                    OBJECT IDENTIFIER,
+                psPowerStatus 
+                    INTEGER,
+                psPowerAdmin 
+                    INTEGER,
+                psPowerVoltage 
+                    INTEGER,
+                psPowerCurrent
+                    INTEGER,
+                psPowerLineFrequency  
+                    INTEGER,
+                psPowerMaxVoltage 
+                    INTEGER,
+                psPowerMinVoltage 
+                    INTEGER,
+                psPowerMaxPower
+                    INTEGER
+            }
+
+        psPowerSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this Power
+                 supply is installed.  This object is similiar to
+                 chSlotID in the Chassis MIB."
+            ::= { psPowerSlotEntry 1 }
+
+        psPowerID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A unique value used to identify a particular power line."
+            ::= { psPowerSlotEntry 2 }
+
+        psPowerType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The type of power.  For example, a power line that supplies
+                 DC current at a nominal voltage of 40 to 57 volts or a 
+                 power line that supplies AC current at a nominal volatge of
+                 110v."
+            ::= { psPowerSlotEntry 3 }
+
+        psPowerStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOK(1),
+                        powerOff(2),
+                        overCurrent(3),
+                        overVoltage(4),
+                        underVoltage(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the power line."
+            ::= { psPowerSlotEntry 4 }
+
+        psPowerAdmin  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOn(1),
+                        powerOff(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object controls the operation of power supply."
+            DEFVAL { powerOn }
+            ::= { psPowerSlotEntry 5 }
+
+        psPowerVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The voltage reading for the power line. The value of this
+                 object is the actual voltage * 100."
+            ::= { psPowerSlotEntry 6 }
+
+        psPowerCurrent  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The current reading for the power line. The value of this
+                 object is amperage * 100. If this reading is not implemented 
+                 then value will be zero."
+            ::= { psPowerSlotEntry 7 }
+
+        psPowerLineFrequency  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The line frequency for the power line. The value of this
+                 object is the actual frequency in Hertz * 10. If this 
+                 reading is not implemented then value will be zero."
+            ::= { psPowerSlotEntry 8 }
+
+        psPowerMaxVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum voltage for this power line. If the voltage 
+                 reading for this power line is greater than this value
+                 then the power line is considered to be in an over volatge
+                 condition. The value of this object is voltage * 100."
+            ::= { psPowerSlotEntry 9 }
+
+        psPowerMinVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The minimum voltage for this power line. If the voltage 
+                 reading for this power line is greater than this value
+                 then the power line is considered to be in an over volatge
+                 condition. The value of this object is voltage * 100."
+            ::= { psPowerSlotEntry 10 }
+
+        psPowerMaxPower  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The maximum power for this power line. If the power calculated 
+                 for this power line is greater than this value then the 
+                 power line is considered to be in an overload condition.
+                 The value of this object is watts."
+            ::= { psPowerSlotEntry 11 }
+
+        --===============    bbuPower group          ====================
+
+        --  Battery Backup Unit Power Group
+        --  This group covers information on the use of power within the 
+        --  chassis by the battery backup unit.
+
+        --===============    termPower group          ====================
+
+        --  INB Termination Module Power Group
+        --  This group covers information on the use of power within the 
+        --  chassis by the INB termination modules.
+
+        termPowerStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        powerOK(1),
+                        overCurrent(2),
+                        overVoltage(3),
+                        underVolatge(4),
+                        overPower(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the chassis's termination 
+                 voltage rail."
+            ::= { termPower 1 }
+
+        termPowerVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The voltage of the chassis's termination voltage rail. 
+                 This rail carries power to INB terminator cards in the
+                 chassis.  It has an allowalble range of 3.3 Volt + or -
+                 5%.The value of this object is voltage * 100."
+            ::= { termPower 2 }
+
+        termPowerCurrent  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The current on the chassis's termination voltage rail.
+                 The value of this object is the actual amperage * 100.
+                 If this reading is not implemented then the value will 
+                 be zero."
+            ::= { termPower 3 }
+
+        termPowerModule1Status  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        normal(1),
+                        iNBaFault(2),
+                        iNBbFault(3),
+                        fault(4),
+                        termModuleNotInstalled(5),
+                        unknown(6)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the state of the INB termination 
+                 module number 1. A value of normal(1) reflects that
+                 both busses are normal. A value of fault(4) reflects
+                 that both busses are in a fault condition."
+            ::= { termPower 4 }
+
+        termPowerModule2Status  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        normal(1),
+                        iNBaFault(2),
+                        iNBbFault(3),
+                        fault(4),
+                        termModuleNotInstalled(5),
+                        unknown(6)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the state of the INB termination 
+                 module number 2. A value of normal(1) reflects that 
+                 both busses are normal. A value of fault(4) reflects 
+                 that both busses are in a fault condition."
+            ::= { termPower 5 }
+
+END

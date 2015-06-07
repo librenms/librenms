@@ -1,0 +1,239 @@
+RBTWS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB
+        ;
+
+rbtwsSystemMib MODULE-IDENTITY
+    LAST-UPDATED "200703151414Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "System objects for Enterasys Networks wireless switches.
+
+        Copyright 2007 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200703140007Z"
+    DESCRIPTION "v2.0.0: Added new objects to support CPU load
+                and memory (RAM) usage details:
+                for last few seconds (''instant''),
+                minute, 5 minutes, hour, day, 3 days
+                (for 6.0 release)"
+
+    REVISION "200611090004Z"
+    DESCRIPTION "v1.0.3: Removed unused imports"
+
+    REVISION "200606060003Z"
+    DESCRIPTION "v1.0.2: Initial version, for 5.0 release"
+
+    ::= { rbtwsMibs 8 }
+
+
+-- Textual Conventions
+
+RbtwsSysCpuLoad ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "CPU load in percents"
+    SYNTAX      Unsigned32 (0..100)
+
+RbtwsSysMemoryAmount ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Memory amount in KBytes (1024 octets)"
+    SYNTAX      Unsigned32
+
+
+-- Object definitions
+
+--
+-- The System MIB Tree
+--
+
+rbtwsSysObjects    OBJECT IDENTIFIER ::= { rbtwsSystemMib 1 }
+rbtwsSysDataObjects  OBJECT IDENTIFIER ::= { rbtwsSysObjects 1 }
+
+
+rbtwsSysCpuMemoryUsedBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "CPU memory used in bytes.
+        Deprecated by rbtwsSysCpuMemoryInstantUsage."
+    ::= { rbtwsSysDataObjects 1 }
+
+rbtwsSysCpuMemoryTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "CPU total physical memory in bytes.
+        Deprecated by rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysDataObjects 2 }
+
+rbtwsSysFlashMemoryUsedBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flash memory used in bytes."
+    ::= { rbtwsSysDataObjects 3 }
+
+rbtwsSysFlashMemoryTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flash memory available in bytes."
+    ::= { rbtwsSysDataObjects 4 }
+
+rbtwsSysCpuAverageLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load average since system startup."
+    ::= { rbtwsSysDataObjects 5 }
+
+-- Totals
+
+rbtwsSysCpuMemorySize OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum available CPU Memory (RAM) in KBytes.
+        This is the memory available to the Wireless Switch software.
+        May be less than physical RAM size."
+    ::= { rbtwsSysDataObjects 6 }
+
+-- Reserving rbtwsSysDataObjects 7-10 for future scalars indicating totals
+
+
+rbtwsSysCpuLoadDetail         OBJECT IDENTIFIER ::= { rbtwsSysDataObjects 11 }
+rbtwsSysCpuMemoryUsageDetail  OBJECT IDENTIFIER ::= { rbtwsSysDataObjects 12 }
+
+
+-- CPU load details:
+
+rbtwsSysCpuInstantLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU instant load (for last few seconds)."
+    ::= { rbtwsSysCpuLoadDetail 1 }
+
+rbtwsSysCpuLastMinuteLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last minute."
+    ::= { rbtwsSysCpuLoadDetail 2 }
+
+rbtwsSysCpuLast5MinutesLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last 5 minutes."
+    ::= { rbtwsSysCpuLoadDetail 3 }
+
+rbtwsSysCpuLastHourLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last hour."
+    ::= { rbtwsSysCpuLoadDetail 4 }
+
+rbtwsSysCpuLastDayLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last day."
+    ::= { rbtwsSysCpuLoadDetail 5 }
+
+rbtwsSysCpuLast3DaysLoad OBJECT-TYPE
+    SYNTAX      RbtwsSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last 3 days."
+    ::= { rbtwsSysCpuLoadDetail 6 }
+
+
+-- Memory usage details
+
+rbtwsSysCpuMemoryInstantUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Instant memory usage (RAM) in KBytes (for last few seconds).
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 1 }
+
+rbtwsSysCpuMemoryLastMinuteUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last minute in KBytes.
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 2 }
+
+rbtwsSysCpuMemoryLast5MinutesUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last 5 minutes in KBytes.
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 3 }
+
+rbtwsSysCpuMemoryLastHourUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last hour in KBytes.
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 4 }
+
+rbtwsSysCpuMemoryLastDayUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last day in KBytes.
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 5 }
+
+rbtwsSysCpuMemoryLast3DaysUsage OBJECT-TYPE
+    SYNTAX      RbtwsSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last 3 days in KBytes.
+        Ranges between 0 and rbtwsSysCpuMemorySize."
+    ::= { rbtwsSysCpuMemoryUsageDetail 6 }
+
+
+END

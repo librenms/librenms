@@ -1,0 +1,1064 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   IpAddress,
+	   TimeTicks,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+	   ArubaSwitchRole,
+       ArubaActiveState,
+       ArubaCardType
+	   		FROM ARUBA-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+	wlsxEnterpriseMibModules
+           FROM ARUBA-MIB;
+
+   wlsxSystemExtMIB MODULE-IDENTITY 
+       LAST-UPDATED "0707300652Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            System level information about the Aruba controller."
+       REVISION        "0707300652Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 2 }
+
+   wlsxSystemExtGroup       OBJECT IDENTIFIER ::= { wlsxSystemExtMIB 1 }
+   wlsxSystemExtTableGenNumberGroup OBJECT IDENTIFIER ::= { wlsxSystemExtMIB 2 }
+
+   -- wlsxSystemExtGroup contains objects to describe a controller.
+
+   wlsxSysExtSwitchIp OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Controller IP as configured by the user. This IP address uniquely 
+			identifies the controller."
+        ::= { wlsxSystemExtGroup 1 }
+
+   wlsxSysExtHostname OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..32))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Name of the controller."
+        ::= { wlsxSystemExtGroup 2 }
+
+   wlsxSysExtModelName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..32))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Model Name of the controller."
+        ::= { wlsxSystemExtGroup 3 }
+
+   wlsxSysExtSwitchRole OBJECT-TYPE
+        SYNTAX      ArubaSwitchRole
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Role of this controller in the Aruba Domain."
+        ::= { wlsxSystemExtGroup 4 }
+
+   wlsxSysExtSwitchMasterIp OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 Switch IP of the master controller.
+			"
+        ::= { wlsxSystemExtGroup 5 }
+
+   wlsxSysExtSwitchDate OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			System notion of the local date and time of day.
+			"
+        ::= { wlsxSystemExtGroup 6 }
+
+   wlsxSysExtSwitchBaseMacaddress OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			The Base MAC address of the controller.
+			"
+        ::= { wlsxSystemExtGroup 7 }
+
+   wlsxSysExtFanTrayAssemblyNumber OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			Assembly number of the Fan tray.
+			"
+        ::= { wlsxSystemExtGroup 8 }
+
+   wlsxSysExtFanTraySerialNumber OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			Serial number of the Fan tray
+			"
+        ::= { wlsxSystemExtGroup 9 }
+
+   wlsxSysExtInternalTemparature OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			Internal temparature in the controller.
+			"
+        ::= { wlsxSystemExtGroup 10 }
+
+   wlsxSysExtLicenseSerialNumber OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			The license serial number of the controller.
+			"
+        ::= { wlsxSystemExtGroup 11 }
+         
+   wlsxSysExtSwitchLicenseCount OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 The number of licenses installed on the controller
+			"
+        ::= { wlsxSystemExtGroup 12 }
+
+ -- Table lists all the processors and their corresponding Load.
+
+   wlsxSysExtProcessorTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtProcessorEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			The table of processors contained by the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 13 } 
+
+   wlsxSysExtProcessorEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtProcessorEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the controller.
+	  "
+	  INDEX { sysExtProcessorID}
+      ::= { wlsxSysExtProcessorTable 1 } 
+
+   WlsxSysExtProcessorEntry ::=
+     SEQUENCE {
+         sysExtProcessorID		Integer32,
+         sysExtProcessorDescr 	DisplayString,
+		 sysExtProcessorLoad	Integer32
+     }
+
+   sysExtProcessorID OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Processor Index.
+            "
+        ::= { wlsxSysExtProcessorEntry 1 }
+
+   sysExtProcessorDescr OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+			Description of the processor.
+            "
+        ::= { wlsxSysExtProcessorEntry 2 }
+
+   sysExtProcessorLoad OBJECT-TYPE
+        SYNTAX       Integer32 (0..100)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			The average, over the last minute, of the percentage of
+			time that this processor was not idle.
+			"
+        ::= { wlsxSysExtProcessorEntry 3 }
+
+   -- Table contains all the storage devices in the controller and their
+   -- utilization numbers.
+
+   wlsxSysExtStorageTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtStorageEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The table of Storage-devices contained by the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 14 } 
+
+   wlsxSysExtStorageEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtStorageEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 	An entry for one long-term storage device contained by the 
+				controller.
+			 "
+	  INDEX { sysExtStorageIndex }
+      ::= { wlsxSysExtStorageTable 1 } 
+
+   WlsxSysExtStorageEntry ::=
+     SEQUENCE {
+         sysExtStorageIndex		Integer32,
+         sysExtStorageType 		INTEGER,
+		 sysExtStorageSize		Integer32,
+		 sysExtStorageUsed		Integer32,
+		 sysExtStorageName		DisplayString
+   }
+
+   sysExtStorageIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Index into the table.
+            "
+        ::= { wlsxSysExtStorageEntry 1 }
+
+   sysExtStorageType OBJECT-TYPE
+        SYNTAX      INTEGER {
+						ram(1),
+						flashMemory(2)
+					}
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Type of the storage.
+            "
+        ::= { wlsxSysExtStorageEntry 2 }
+
+   sysExtStorageSize OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total size of the storage filesystem in MB.
+            "
+        ::= { wlsxSysExtStorageEntry 3 }
+
+   sysExtStorageUsed OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Used Storage in MB.
+            "
+        ::= { wlsxSysExtStorageEntry 4 }
+
+   sysExtStorageName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the storage filesystem.
+            "
+        ::= { wlsxSysExtStorageEntry 5 }
+
+-- This table describes the memory utilization of the controller
+
+   wlsxSysExtMemoryTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtMemoryEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The memory status of the controller
+		"
+	
+      ::= { wlsxSystemExtGroup 15 } 
+
+   wlsxSysExtMemoryEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtMemoryEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+		An entry for one memory region on the controller.  Currently,
+		only the control processor memory is monitored.
+	     "
+	  INDEX { sysExtMemoryIndex }
+      ::= { wlsxSysExtMemoryTable 1 } 
+
+   WlsxSysExtMemoryEntry ::=
+     SEQUENCE {
+     sysExtMemoryIndex	Integer32,
+	 sysExtMemorySize	Integer32,
+	 sysExtMemoryUsed	Integer32,
+	 sysExtMemoryFree	Integer32
+   }
+
+   sysExtMemoryIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Index into the table.
+            "
+        ::= { wlsxSysExtMemoryEntry 1 }
+
+   sysExtMemorySize OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Total memory in KB.
+            "
+        ::= { wlsxSysExtMemoryEntry 2 }
+
+   sysExtMemoryUsed OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Used memory in KB.
+            "
+        ::= { wlsxSysExtMemoryEntry 3 }
+
+   sysExtMemoryFree OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Free memory in KB.
+            "
+        ::= { wlsxSysExtMemoryEntry 4 }
+
+-- This table lists the different Hardware Modules in the controller.
+
+   wlsxSysExtCardTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtCardEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The table of Hardware modules in the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 16 } 
+
+   wlsxSysExtCardEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtCardEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 	An entry for one Hardware Module in the controller.
+			 "
+	  INDEX { sysExtCardSlot }
+      ::= { wlsxSysExtCardTable 1 } 
+
+   WlsxSysExtCardEntry ::=
+     SEQUENCE {
+		 sysExtCardSlot						Integer32,
+         sysExtCardType 					ArubaCardType,
+		 sysExtCardNumOfPorts				Integer32,
+		 sysExtCardNumOfFastethernetPorts	Integer32,
+		 sysExtCardNumOfGigPorts			Integer32,
+		 sysExtCardSerialNo					DisplayString,
+		 sysExtCardAssemblyNo				DisplayString,
+		 sysExtCardManufacturingDate		DisplayString,
+		 sysExtCardHwRevision				DisplayString,
+		 sysExtCardFpgaRevision				DisplayString,
+		 sysExtCardSwitchChip				DisplayString,
+		 sysExtCardStatus					ArubaActiveState,
+		 sysExtCardUserSlot					Integer32
+   }
+
+   sysExtCardSlot OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Slot in which this card is located, offset by one.  For the user-visible
+			slot number see sysExtCardUserSlot
+            "
+        ::= { wlsxSysExtCardEntry 1 }
+
+   sysExtCardType OBJECT-TYPE
+         SYNTAX      ArubaCardType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Type of the Card.
+            "
+        ::= { wlsxSysExtCardEntry 2 }
+
+   sysExtCardNumOfPorts OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+		    Number of data ports on the card.	
+            "
+        ::= { wlsxSysExtCardEntry 3 }
+
+   sysExtCardNumOfFastethernetPorts OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of Fastethernet ports on the card.
+            "
+        ::= { wlsxSysExtCardEntry 4 }
+
+   sysExtCardNumOfGigPorts OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of Gigabit ethernet ports on the card.
+            "
+        ::= { wlsxSysExtCardEntry 5 }
+
+   sysExtCardSerialNo OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Serial number of the card.
+            "
+        ::= { wlsxSysExtCardEntry 6 }
+
+   sysExtCardAssemblyNo OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Assembly Number of the card.
+            "
+        ::= { wlsxSysExtCardEntry 7 }
+
+   sysExtCardManufacturingDate OBJECT-TYPE
+        SYNTAX      DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Card manufacturing date.
+            "
+        ::= { wlsxSysExtCardEntry 8 }
+
+   sysExtCardHwRevision OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Hardware revision of the card.
+            "
+        ::= { wlsxSysExtCardEntry 9 }
+
+   sysExtCardFpgaRevision OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Fpga revision number.
+            "
+        ::= { wlsxSysExtCardEntry 10 }
+
+   sysExtCardSwitchChip OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Switching Chip version.
+            "
+        ::= { wlsxSysExtCardEntry 11 }
+
+   sysExtCardStatus OBJECT-TYPE
+        SYNTAX      ArubaActiveState
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Status of the card.
+            "
+        ::= { wlsxSysExtCardEntry 12 }
+
+   sysExtCardUserSlot OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			User-visible (zero-based) slot number.
+            "
+        ::= { wlsxSysExtCardEntry 13 }
+
+-- This table lists the Fans in the controller.
+
+   wlsxSysExtFanTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtFanEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The table of all the fans in the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 17 } 
+
+   wlsxSysExtFanEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtFanEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 	An entry for one fan.
+			 "
+	  INDEX { sysExtFanIndex }
+      ::= { wlsxSysExtFanTable 1 } 
+
+   WlsxSysExtFanEntry ::=
+     SEQUENCE {
+         sysExtFanIndex			Integer32,
+		 sysExtFanStatus		ArubaActiveState
+   }
+
+   sysExtFanIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Index into the table.
+            "
+        ::= { wlsxSysExtFanEntry 1 }
+
+   sysExtFanStatus OBJECT-TYPE
+         SYNTAX      ArubaActiveState
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Status of the Fan.
+            "
+        ::= { wlsxSysExtFanEntry 2 }
+
+-- This table lists the Power supplies in the controller.
+
+   wlsxSysExtPowerSupplyTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtPowerSupplyEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The table of Power supplies in the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 18 } 
+
+   wlsxSysExtPowerSupplyEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtPowerSupplyEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 An entry for one power supply.
+			 "
+	  INDEX { sysExtPowerSupplyIndex }
+      ::= { wlsxSysExtPowerSupplyTable 1 } 
+
+   WlsxSysExtPowerSupplyEntry ::=
+     SEQUENCE {
+         sysExtPowerSupplyIndex			Integer32,
+		 sysExtPowerSupplyStatus		ArubaActiveState
+   }
+
+   sysExtPowerSupplyIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Index into the table.
+            "
+        ::= { wlsxSysExtPowerSupplyEntry 1 }
+
+   sysExtPowerSupplyStatus OBJECT-TYPE
+         SYNTAX      ArubaActiveState
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Status of the power supply.
+            "
+        ::= { wlsxSysExtPowerSupplyEntry 2 }
+
+-- Switch List Table contains all the controllers in the domain. This table is 
+-- valid only, when queried from the master controller.
+
+   wlsxSysExtSwitchListTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtSwitchListEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"This Table will list all the controllers in the Aruba Domain.
+		 It will be populated only on the master controller. Local controllers
+		 return empty table.
+		"
+	
+      ::= { wlsxSystemExtGroup 19 } 
+
+     wlsxSysExtSwitchListEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysExtSwitchListEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Switch List Entry"
+	  INDEX { sysExtSwitchIPAddress}
+      ::= { wlsxSysExtSwitchListTable 1 } 
+
+     WlsxSysExtSwitchListEntry ::=
+     SEQUENCE {
+         sysExtSwitchIPAddress	IpAddress,
+         sysExtSwitchRole 		ArubaSwitchRole,
+		 sysExtSwitchLocation	DisplayString,
+		 sysExtSwitchSWVersion	DisplayString,
+		 sysExtSwitchStatus		ArubaActiveState,
+		 sysExtSwitchName		DisplayString,
+		 sysExtSwitchSerNo      DisplayString
+     }
+
+     sysExtSwitchIPAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			IP Address of the controller.
+            "
+        ::= { wlsxSysExtSwitchListEntry 1 }
+
+     sysExtSwitchRole OBJECT-TYPE
+        SYNTAX      ArubaSwitchRole
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Role of the controller.
+            "
+        ::= { wlsxSysExtSwitchListEntry 2 }
+
+     sysExtSwitchLocation OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Location of the controller
+            "
+        ::= { wlsxSysExtSwitchListEntry 3 }
+
+     sysExtSwitchSWVersion OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Software version the controller is running.
+            "
+        ::= { wlsxSysExtSwitchListEntry 4 }
+
+     sysExtSwitchStatus OBJECT-TYPE
+        SYNTAX      ArubaActiveState
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Status of the controller.
+            "
+        ::= { wlsxSysExtSwitchListEntry 5 }
+
+     sysExtSwitchName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..128))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Host name of the controller.
+            "
+        ::= { wlsxSysExtSwitchListEntry 6 }
+
+     sysExtSwitchSerNo OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Serial number of the controller.
+            "
+        ::= { wlsxSysExtSwitchListEntry 7 }
+
+-- The license table lists all valid licenses installed on the controller
+
+   wlsxSysExtSwitchLicenseTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysExtLicenseEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"This table lists all licenses installed on the controller.
+		"
+	
+      ::= { wlsxSystemExtGroup 20 } 
+
+     wlsxSysExtLicenseEntry OBJECT-TYPE 
+	 	SYNTAX      WlsxSysExtLicenseEntry
+	 	MAX-ACCESS   not-accessible		
+     	STATUS       current 
+     	DESCRIPTION 
+             "License Entry"
+	  	INDEX { sysExtLicenseIndex }
+      ::= { wlsxSysExtSwitchLicenseTable 1 } 
+
+     WlsxSysExtLicenseEntry ::=
+     SEQUENCE {
+     	 sysExtLicenseIndex         Integer32,
+         sysExtLicenseKey			DisplayString,
+         sysExtLicenseInstalled		DisplayString,
+         sysExtLicenseExpires		DisplayString,
+         sysExtLicenseFlags			DisplayString,
+         sysExtLicenseService 		DisplayString
+     }
+
+     sysExtLicenseIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			License ID number
+            "
+        ::= { wlsxSysExtLicenseEntry 1 }
+
+     sysExtLicenseKey OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License Key
+            "
+        ::= { wlsxSysExtLicenseEntry 2 }
+
+     sysExtLicenseInstalled OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License installation time
+            "
+        ::= { wlsxSysExtLicenseEntry 3 }
+
+     sysExtLicenseExpires OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License expiry time
+            "
+        ::= { wlsxSysExtLicenseEntry 4 }
+
+     sysExtLicenseFlags OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License flags; E - enabled; A - auto-generated;
+			               R - reboot required to activate
+            "
+        ::= { wlsxSysExtLicenseEntry 5 }
+
+     sysExtLicenseService OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The service enabled by this license.
+            "
+        ::= { wlsxSysExtLicenseEntry 6 }
+
+   wlsxSysExtMMSCompatLevel OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 Lists the compatibility level of this controller with the MMS
+			"
+        ::= { wlsxSystemExtGroup 21 }
+
+   wlsxSysExtMMSConfigID OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 This Object represents the value of the MMS Configuration ID in the controller.
+			"
+        ::= { wlsxSystemExtGroup 22 }
+
+   wlsxSysExtControllerConfigID OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 This Object represents the value of the Controller's Configuration ID.
+			"
+        ::= { wlsxSystemExtGroup 23 }
+
+   wlsxSysExtIsMMSConfigUpdateEnabled OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects indicates whether the controller is configured to accept configuration snapshots from MMS.
+			"
+        ::= { wlsxSystemExtGroup 24 }
+
+   wlsxSysExtSwitchLastReload OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..128))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 The reason for the last controller reload
+			"
+        ::= { wlsxSystemExtGroup 25 }
+
+   wlsxSysExtLastStatsReset OBJECT-TYPE
+        SYNTAX       TimeTicks
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 Last time switch stats was reset
+			"
+        ::= { wlsxSystemExtGroup 26 }
+
+
+   wlsxSysExtUserTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the user table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 1 }
+
+   wlsxSysExtAPBssidTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the AP BSSID table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 2 }
+
+
+   wlsxSysExtAPRadioTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the Radio table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 3 }
+
+
+   wlsxSysExtAPTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the AP table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 4 }
+
+
+   wlsxSysExtSwitchListTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the Switch list table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 5 }
+
+
+   wlsxSysExtPortTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the port table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 6 }
+
+
+   wlsxSysExtVlanTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the Vlan table was 
+			modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 7 }
+
+
+   wlsxSysExtVlanInterfaceTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the Vlan Interface table 
+			was modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 8 }
+
+   wlsxSysExtLicenseTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the license table
+			was modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 9 }
+
+   wlsxSysExtMonAPTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the monitored AP table
+			was modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 10 }
+
+   wlsxSysExtMonStationTableGenNumber OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			This objects denotes the number of times the monitored station table
+			was modified since reboot.
+			"
+        ::= { wlsxSystemExtTableGenNumberGroup 11 }
+
+
+END
+

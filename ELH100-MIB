@@ -1,0 +1,1839 @@
+ELH100-MIB DEFINITIONS ::= BEGIN
+-- Cabletron ELH100 Dual-Speed Hub private MIB version 1.0
+--
+-- Date released:
+--
+-- Development History
+--
+-- 1999/3/10 Created.
+--
+-- This is the Management Information Base for Cabletron ELH100  Dual-Speed Hub
+-- systems.
+
+
+IMPORTS
+        OBJECT-TYPE                      FROM RFC-1212
+        DisplayString, PhysAddress       FROM RFC1213-MIB
+        enterprises, Counter, IpAddress  FROM RFC1155-SMI;
+
+
+cabletron                OBJECT IDENTIFIER ::= { enterprises 52 }
+cabletronOEM             OBJECT IDENTIFIER ::= { cabletron 259 }
+cabletronRepeaters       OBJECT IDENTIFIER ::= { cabletronOEM 10 }
+cabletronELH100          OBJECT IDENTIFIER ::= { cabletronRepeaters 3}
+
+cabletronELH100Common             OBJECT IDENTIFIER ::= { cabletronELH100 1 }
+cabletronELH100BasicCapability    OBJECT IDENTIFIER ::= { cabletronELH100 2 }
+cabletronELH100PerfMonCapability  OBJECT IDENTIFIER ::= { cabletronELH100 3}
+cabletronELH100SwitchCapability   OBJECT IDENTIFIER ::= { cabletronELH100 4}
+cabletronELH100BackupCapability   OBJECT IDENTIFIER ::= { cabletronELH100 5}
+cabletronELH100SecurityCapability OBJECT IDENTIFIER ::= { cabletronELH100 6}
+
+
+-- Common MIB definitions
+
+    elh100System OBJECT IDENTIFIER ::= { cabletronELH100Common 1 }
+
+    elh100MajorVer OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Software major version"
+        ::= { elh100System 1 }
+
+    elh100MinorVer OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Software minor version"
+        ::= { elh100System 2 }
+
+    elh100HardwareVer  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Hardware version of system board"
+        ::= { elh100System 3 }
+
+-- Community Group.
+--     The community group is optional. It defines the community strings
+--     accepted by the system.
+
+elh100CommunityMgt         OBJECT IDENTIFIER ::= { cabletronELH100Common 2 }
+
+elh100CommunityTable OBJECT-TYPE
+    SYNTAX              SEQUENCE OF Elh100CommunityEntry
+    ACCESS              not-accessible
+    STATUS              mandatory
+    DESCRIPTION        "Community table"
+   ::= { elh100CommunityMgt 3 }
+
+elh100CommunityEntry   OBJECT-TYPE
+    SYNTAX              Elh100CommunityEntry
+    ACCESS              not-accessible
+    STATUS              mandatory
+    INDEX { elh100CommunityIndex }
+    ::= { elh100CommunityTable 1 }
+
+Elh100CommunityEntry ::= SEQUENCE {
+   elh100CommunityIndex               INTEGER,                -- Read only
+   elh100CommunityRowCreation   INTEGER,       -- Read write
+   elh100CommunityString               DisplayString,           -- Read write
+   elh100CommunityStatus               INTEGER                  -- Read write
+}
+
+elh100CommunityIndex          OBJECT-TYPE
+   SYNTAX               INTEGER
+   ACCESS               read-only
+   STATUS               mandatory
+   DESCRIPTION
+        "Index in community table."
+   ::= { elh100CommunityEntry 1 }
+
+elh100CommunityRowCreation      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                                valid (1),
+                                invalid(2)
+                          }
+    ACCESS              read-write
+    STATUS              mandatory
+    DESCRIPTION
+       "The status of this row entry. Before add a row into table, it should
+        be created first. Set Valid(1) to a row will create this row.
+        To delete a row from this table, set this object for the row to invalid(2).
+        Row sets for new rows with a row status set to invalid(2) return a BAD
+        VALUE error.  This object will always read as valid(1).
+
+        If no more rows can be added to the end of the table, then a row set
+        to create a new row will return BAD VALUE.
+
+        When rows are deleted from this table, the indexes of the other rows
+        do not change.  In other words, this table can be 'sparse' or have
+        'holes'.  Deleted entries can be re-created using a row set with
+        a row status of valid(1)."
+   ::= { elh100CommunityEntry 2 }
+
+elh100CommunityString      OBJECT-TYPE
+    SYNTAX             DisplayString (SIZE (1..20))
+    ACCESS              read-write
+    STATUS              mandatory
+    DESCRIPTION
+       "The community string that is required for any requests coming
+        from this host.  The default value for this object is 'public'."
+   ::= { elh100CommunityEntry 3 }
+
+elh100CommunityStatus         OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        invalid(1),
+        readOnly(2),
+        readWrite(3)
+     }
+    ACCESS              read-write
+    STATUS              mandatory
+    DESCRIPTION
+       "Access mode of the community."
+   ::= { elh100CommunityEntry 4 }
+
+
+-- Trap manager group
+--
+--   The trap manager group is optional. It is used by the agent to
+--   define trap managers of the agent. The trap managers are
+--   network manager to receive trap or alarm messages from the agent.
+--   All network managers that can send correct community is able to
+--   obtain information from the device, but only trap managers receive
+--   alarm messages. It requires the community group.
+
+     elh100TrapManagerMgt     OBJECT IDENTIFIER ::= { cabletronELH100Common 3 }
+
+elh100TrapManagerTable       OBJECT-TYPE
+    SYNTAX               SEQUENCE OF Elh100TrapManagerEntry
+    ACCESS                not-accessible
+    STATUS                mandatory
+    DESCRIPTION
+       "A list of IP trap destination entries."
+    ::= { elh100TrapManagerMgt 2 }
+
+elh100TrapMgtEntry    OBJECT-TYPE
+    SYNTAX              Elh100TrapManagerEntry
+    ACCESS              not-accessible
+    STATUS              mandatory
+    DESCRIPTION
+       "A destination entry which defines the IP address to which traps are sent
+        for a community."
+    INDEX { elh100TrapMgtIndex }
+    ::= { elh100TrapManagerTable 1 }
+
+Elh100TrapManagerEntry ::= SEQUENCE {
+    elh100TrapMgtIndex                     INTEGER,
+    elh100TrapMgtRowCreation               INTEGER,
+    elh100TrapMgtCommunityString           DisplayString,
+    elh100TrapMgtIpAddress                 IpAddress
+}
+
+
+
+elh100TrapMgtIndex    OBJECT-TYPE
+    SYNTAX              INTEGER
+    ACCESS              read-only
+    STATUS              mandatory
+    DESCRIPTION
+       "A value that uniquely identifies this IPTrap Entry."
+    ::= { elh100TrapMgtEntry 1 }
+
+elh100TrapMgtRowCreation   OBJECT-TYPE
+    SYNTAX                INTEGER {
+                                        valid(1),
+                                        invalid(2)
+                                  }
+    ACCESS                read-write
+    STATUS                mandatory
+    DESCRIPTION
+       "The status of this row entry. Before add a row into table, it should
+        be created first. Set valid(1) to a row will create this row.
+        To delete a row from this table, set this object for the row to invalid(2).
+        Row sets for new rows with a row status set to invalid(2) return a BAD
+        VALUE error.  This object will always read as valid(1).
+
+        If no more rows can be added to the end of the table, then a row set
+        to create a new row will return BAD VALUE.
+
+        When rows are deleted from this table, the indexes of the other rows
+        do not change.  In other words, this table can be 'sparse' or have
+        'holes'.  Deleted entries can be re-created using a row set with
+        a row status of valid(1)."
+    ::= { elh100TrapMgtEntry 2 }
+
+elh100TrapMgtCommunityString   OBJECT-TYPE
+    SYNTAX                DisplayString  (SIZE(1..20))
+    ACCESS                read-write
+    STATUS                mandatory
+    DESCRIPTION
+       "A community name to which this destination IP address
+        belongs."
+    ::= { elh100TrapMgtEntry 3 }
+
+elh100TrapMgtIpAddress     OBJECT-TYPE
+    SYNTAX                IpAddress
+    ACCESS                read-write
+    STATUS                mandatory
+    DESCRIPTION
+       "The IP address to send traps to on behalf of this entry."
+    ::= { elh100TrapMgtEntry 4 }
+
+--  Download Group
+--
+--   The download group is used to trigger download operation of the
+--   agent device to get a new version of software with TFTP protocol
+--   from a server computer. The manager can select to upgrade
+--   software temporarily or permanently, and to run new software
+--   immediately or until next power up
+--
+
+    elh100DownloadMgt         OBJECT IDENTIFIER ::= { cabletronELH100Common 4 }
+
+     elh100DownloadServerIP   OBJECT-TYPE
+       SYNTAX  IpAddress
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION "The file server of the download file"
+       ::= { elh100DownloadMgt 1 }
+
+     elh100DownloadFilename  OBJECT-TYPE
+       SYNTAX  OCTET STRING
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION  "The file name to download"
+        ::= { elh100DownloadMgt 2 }
+
+     elh100DownloadMode OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   permanent(1),
+                   temporary(2)
+               }
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+           "Permanent upgrade stores download software into permanent
+            storage of the agent device. Temporary upgrade just put
+            download software in RAM, often for a test only."
+         ::= { elh100DownloadMgt 3 }
+
+     elh100DownloadAction OBJECT-TYPE
+        SYNTAX INTEGER {
+                  run(1),
+                  noRun(2)
+               }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "elh100DownloadAction triggers the download operation.  The run option
+           starts new software execution after download is complete.
+           The noRun option does not start new software execution. The
+           new software will be effective after next restart. Note that
+           noRun option is useful only when the download is permanent."
+           ::= { elh100DownloadMgt 4}
+
+
+--  Restart Group
+--
+--  Restart group is used to reset the agent machine
+--
+    elh100Restart  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "A write to restart the machine. Only three values are
+                       accepted:
+
+                       normal     -- 0,
+                       coldstart  -- 1,
+                       warmstart  -- 2."
+
+
+        ::= { cabletronELH100Common 5 }
+
+-- Dual-Speed Hub Basic Capability
+
+cabletronELH100StackInfo       OBJECT IDENTIFIER ::=  { cabletronELH100BasicCapability 1 }
+
+   stackInusedIP                   OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+               "The IP address which is in used in the Dual-Speed Hub system. "
+                        ::= { cabletronELH100StackInfo 1 }
+
+   stackInusedNetMask              OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                "The subnet mask which is in used in the Dual-Speed Hub system."
+                ::= { cabletronELH100StackInfo 2 }
+
+   stackInusedGateway     OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The prefered gateway used to send traps."
+                ::= { cabletronELH100StackInfo 3 }
+
+
+   stackBootpIP         OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION  "The IP address  of the BOOTP server that last
+                            responded. If no BOOP server has responded,
+                            then this object will be '0.0.0.0'."
+              ::= { cabletronELH100StackInfo 4 }
+
+   stackTemporalIP                   OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                "Used to change the IP address of the Dual-Speed Hub system. "
+                        ::= { cabletronELH100StackInfo 5 }
+
+   stackTemporalNetMask              OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                "Used to change the subnet mask of the Dual-Speed Hub system. "
+                ::= { cabletronELH100StackInfo 6 }
+
+   stackTemporalGateway              OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to change the prefered gateway to send traps."
+                ::= { cabletronELH100StackInfo 7 }
+
+
+   stackBootpEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable-bootp(1),
+                enable-bootp(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION  "This object allows the users to enable/disable
+                        generation of BOOTP requests."
+
+              ::= { cabletronELH100StackInfo 8 }
+
+   ipInformationReset OBJECT-TYPE
+                SYNTAX  INTEGER {
+                  noReset(1),
+                  reset(2)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                 "Setting the stackIP, stackNetMask,stackGateway,
+               and stackBootUpIP will not make these parameters take
+               effect immediately. They will take effect when ipInformationReset is
+               set to reset(2)."
+                ::= { cabletronELH100StackInfo 9 }
+
+   stackHealthMonitor        OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE (256) )
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION "< FOR  cabletronELH100 Dual-Speed Hub DEFINITION : >
+
+             There are two kinds of hub :
+             12 ports need (1+ 12 + 1 + 1 + 1 + 1 +1 +1 +1) 20 bytes
+             and 24 ports need (1+ 24 + 1 + 1 + 1 + 1 +1 +1 +1) 32 bytes
+
+             The maximun size :
+             256 bytes (total for 8 hubs)=8 hub * (1+ 24 + 1 + 1 + 1 +1 +1 +1 +1) byte
+                 |
+             byte256 byte255......................byte2 byte1
+                                                        |
+                                                      bit7 bit6 ... bit1 bit0
+
+            Use the first byte of each hub to indicate whether 20 or 32 bytes is used.
+
+             BYTE 1: total number ports of a hub
+                     00001100 : 12 ports
+                     |      |
+                  bit7...  bit0
+                     00011000 : 24 ports
+                     |      |
+                  bit7...  bit0
+
+           For 12 ports hub
+             BYTE 2 - 13 : port status for port 1 - 12 port
+
+                     *BYTE 2 : port status for port 1
+
+                        bit 0-4 : LED status
+                                bit 0 : link status
+                                        0 - no link; 1 - link
+                                bit 1 : partition status
+                                        0 - no part.; 1 - part.
+                                bit 2 : port operation status
+                                        0 - disabled; 1 - enabled
+                                bit 3-4 : port type status
+                                        00 - not present
+                                        01 - tenMb
+                                        10 - onehundredMb
+                                        11 - reserved
+                          bit 5-7 : reserved
+
+         BYTE 14-25 :reserved
+
+           BYTE 26 : Expansion Port (EP) status1
+
+                      bit 0-3: EP Type
+                              0000 - not present
+                              0010 - Internal Switch
+                              0011 - External 100Base-TX
+                              0100 - External 100Base-FX(ST)
+                              0101 - External 100Base-FX(SC)
+                              0110 - Internal + External 100Base-TX
+                              0111 - Internal + External 100Base-FX(ST)
+                              1000 - Internal + External 100Base-FX(SC)
+                              1001 - Unknown switch module
+                              1010 - Undertermined
+
+                        bit 4-7: reserved
+
+           BYTE 27 : Expansion Port (EP) status2
+
+                      bit 0-3 : LED status
+                              bit 0 : 10M port status
+                                      0 - disable; 1 - enable
+                              bit 1 : 100M port status
+                                      0 - disable; 1 - enable
+                              bit 2 : uplink port status
+                                      0 - disable; 1 - enable
+                              bit 3 : Uplink port half/full duplex status
+                                      1 - full duplex; 0 - half duplex
+
+                      bit 4  : EP collision led status
+                              0 - off; 1 - on
+
+                      bit 5-6 :
+                              bit 3 : tx LED status
+                                      0 - off; 1 - tx on
+                              bit 4 : rx LED status
+                                      0 - off; 1 - rx on
+
+                      bit 7-8 : reserved
+
+             BYTE 28 : tenMb segment traffic/collision
+                       bit 0-1 : tenMb traffic LED status
+                             00 - no traffic
+                        01 - low traffic
+                        10 - middle traffic
+                        11 - high traffic
+
+                        bit 2-5 : tenMb collision LED status
+                             0000 - none
+                         0001 - 1 %
+                         0010 - 3 %
+                         0011 - 5 %
+                         0100 - 10 %
+                         0101 - >= 15 %
+
+                        bit 6-7 : reserved
+
+            BYTE 29 : onehundredMb segment traffic/collision /Power/Switch LED status
+
+                      bit 0-1 : onehundredMb traffic LED status
+                             00 - no traffic
+                        01 - low traffic
+                        10 - middle traffic
+                        11 - high traffic
+
+                        bit 2-5 : onehundredMb collision LED status
+                             0000 - none
+                         0001 - 1 %
+                         0010 - 3 %
+                         0011 - 5 %
+                         0100 - 10 %
+                         0101 - >= 15 %
+
+                        bit 6 : Power LED
+                          0 - OFF; 1 - ON
+                        bit 7 : Switch LED
+                          0 - OFF; 1 - ON
+
+
+
+            BYTE 30 :SNMP agent & switch status
+
+                      bit 0:  internal switch bit
+                              0 - not exist; 1 - exist
+                 bit 1:  internal switch status
+                              0 - inactive; 1 - active
+                      bit 2:  expension switch bit
+                              0 - bad; 1 - good
+                      bit 3:  expension switch status
+                              0 - inactive; 1 - active
+                      bit 4:  agent bit
+                              0 - not exist; 1 - exist
+                      bit 5 : master status
+                          0 - Slave; 1 - Master
+                      bit 6 - 7 : reserved
+
+         BYTE 31 : Rmon status
+                 bit 0 : rmon bit
+                              0 - not exist; 1 - exist
+                      bit 1 - 2 :rmon segment
+                              00 - all stack
+                       01 - segment tenMb
+                       10 - segment onehundredMb
+                       11 - reserved
+
+                      bit 3 - 5 : RMON group Status
+                              000 - not-present
+                       001 - disabled
+                              010 - Rmon-4Group
+                              011 - Rmon-7Group
+                              100 - Rmon-all
+                       101 to 111 - reserved
+
+                 bit 6 -7 : reserved
+
+
+
+            BYTE 32 : Hub Position(Hub ID)/Bus Termination
+
+                     bit 0 - 3 : hub position
+
+                              0000 - invalid
+                              0001 - 1
+                              0010 - 2
+                              0011 - 3
+                              0100 - 4
+                              0101 - 5
+                              0110 - 6
+                              0111 - 7
+                              1000 - 8
+                              1001 to 1111 - reserved
+
+                     bit 4 : termination status
+                              0 - not end hub
+                              1 - end hub in the stack
+
+                     bit 5 - 7 : reserved
+
+          For 24 ports hub
+             BYTE 2 - 25 : port status for port 1 - 24 port
+
+                     *BYTE 2 : port status for port 1
+
+                        bit 0-4 : LED status
+                                bit 0 : link status
+                                        0 - no link; 1 - link
+                                bit 1 : partition status
+                                        0 - no part.; 1 - part.
+                                bit 2 : port operation status
+                                        0 - disabled; 1 - enabled
+                                bit 3-4 : port type status
+                                        00 - not present
+                                        01 - tenMb
+                                        10 - onehundredMb
+                                        11 - reserved
+                        bit 5-7 : reserved
+
+          BYTE 26 : Expansion Port (EP) status1
+
+                      bit 0-3: EP Type
+                              0000 - not present
+                              0010 - Internal Switch
+                              0011 - External 100Base-TX
+                              0100 - External 100Base-FX(ST)
+                              0101 - External 100Base-FX(SC)
+                              0110 - Internal + External 100Base-TX
+                              0111 - Internal + External 100Base-FX(ST)
+                              1000 - Internal + External 100Base-FX(SC)
+                              1001 - Unknown switch module
+                              1010 - Undertermined
+
+                        bit 4-7: reserved
+
+           BYTE 27 : Expansion Port (EP) status2
+
+                      bit 0-3 : LED status
+                              bit 0 : 10M port status
+                                      0 - disable; 1 - enable
+                              bit 1 : 100M port status
+                                      0 - disable; 1 - enable
+                              bit 2 : uplink port status
+                                      0 - disable; 1 - enable
+                              bit 3 : Uplink port half/full duplex status
+                                      1 - full duplex; 0 - half duplex
+
+                      bit 4  : EP collision led status
+                              0 - off; 1 - on
+
+                      bit 5-6 :
+                              bit 3 : tx LED status
+                                      0 - off; 1 - tx on
+                              bit 4 : rx LED status
+                                      0 - off; 1 - rx on
+
+                      bit 7-8 : reserved
+
+             BYTE 28 : tenMb segment traffic/collision
+                       bit 0-1 : tenMb traffic LED status
+                             00 - no traffic
+                        01 - low traffic
+                        10 - middle traffic
+                        11 - high traffic
+
+                        bit 2-5 : tenMb collision LED status
+                             0000 - none
+                         0001 - 1 %
+                         0010 - 3 %
+                         0011 - 5 %
+                         0100 - 10 %
+                         0101 - >= 15 %
+
+                        bit 6-7 : reserved
+
+            BYTE 29 : onehundredMb segment traffic/collision /Power/Switch LED status
+
+                      bit 0-1 : onehundredMb traffic LED status
+                             00 - no traffic
+                        01 - low traffic
+                        10 - middle traffic
+                        11 - high traffic
+
+                        bit 2-5 : onehundredMb collision LED status
+                             0000 - none
+                         0001 - 1 %
+                         0010 - 3 %
+                         0011 - 5 %
+                         0100 - 10 %
+                         0101 - >= 15 %
+
+                        bit 6 : Power LED
+                          0 - OFF; 1 - ON
+                        bit 7 : Switch LED
+                          0 - OFF; 1 - ON
+
+
+            BYTE 30 :SNMP agent & switch status
+
+                      bit 0:  internal switch bit
+                              0 - not exist; 1 - exist
+                 bit 1:  internal switch status
+                              0 - inactive; 1 - active
+                      bit 2:  expension switch bit
+                              0 - bad; 1 - good
+                      bit 3:  expension switch status
+                              0 - inactive; 1 - active
+                      bit 4:  agent bit
+                              0 - not exist; 1 - exist
+                      bit 5 : master status
+                          0 - Slave; 1 - Master
+                      bit 6 - 7 : reserved
+
+         BYTE 31 : Rmon status
+                 bit 0 : rmon bit
+                              0 - not exist; 1 - exist
+                      bit 1 - 2 :rmon segment
+                              00 - all stack
+                       01 - segment tenMb
+                       10 - segment onehundredMb
+                       11 - reserved
+
+                      bit 3 - 5 : RMON group Status
+                              000 - not-present
+                       001 - disabled
+                              010 - Rmon-4Group
+                              011 - Rmon-7Group
+                              100 - Rmon-all
+                       101 to 111 - reserved
+
+                 bit 6 -7 : reserved
+
+
+
+            BYTE 32 : Hub Position(Hub ID)/Bus Termination
+
+                     bit 0 - 3 : hub position
+
+                              0000 - invalid
+                              0001 - 1
+                              0010 - 2
+                              0011 - 3
+                              0100 - 4
+                              0101 - 5
+                              0110 - 6
+                              0111 - 7
+                              1000 - 8
+                              1001 to 1111 - reserved
+
+                     bit 4 : termination status
+                              0 - not end hub
+                              1 - end hub in the stack
+
+                     bit 5 - 7 : reserved"
+
+                ::= { cabletronELH100StackInfo 10 }
+
+--   Basic Group Object   --
+--   Def                  --
+
+cabletronELH100AgentInfo       OBJECT IDENTIFIER ::=  { cabletronELH100BasicCapability 2 }
+
+nicAttachSegment OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The ifIndex of the segment to which the agent's
+        Ethernet NIC (Network Interface Controller) is connected.
+        ifIndex 1 is the 100Mbps NIC;  ifIndex 2 is the 10Mbps NIC.
+        The factory setting is ifIndex 1."
+    ::= { cabletronELH100AgentInfo 1 }
+
+serialNumberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SerialNumberEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines the unit serial numbers tracked by the agent.
+        A maximum of 6 serial numbers are tracked."
+    ::= { cabletronELH100AgentInfo 2 }
+
+serialNumberEntry OBJECT-TYPE
+    SYNTAX      SerialNumberEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { sNIndex }
+    ::= { serialNumberTable 1 }
+
+SerialNumberEntry ::= SEQUENCE {
+    sNIndex
+        INTEGER,
+    serialNumber
+        OCTET STRING,
+    sNCurrentUnitID
+        INTEGER
+}
+
+sNIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The index of the serial number being referenced.  Indexes are
+        always sequential, starting with 1."
+    ::= { serialNumberEntry 1 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The serial number.  Every ELH100 unit has a unique serial number."
+    ::= { serialNumberEntry 2 }
+
+sNCurrentUnitID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The current unit ID of the unit with this serial number.  If
+        the unit with this serial number is not currently in the stack,
+        this object's value is 255.
+
+        If this object does not match sNIndex, it may mean that the unit
+        has been moved.  The configurations in the following tables may
+        be affected:
+            backplaneTable
+            portTable
+            switchPortTable
+            backupPortTable
+            intrusionTable
+            rptrPortTable (RFC2108)"
+    ::= { serialNumberEntry 3 }
+
+telnetMaxSessions OBJECT-TYPE
+    SYNTAX      INTEGER (0..2)
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The maximum number of Telnet sessions that may be
+        active at one time. The factory setting is 2."
+    ::= { cabletronELH100AgentInfo 3 }
+
+telnetAutoLogoutEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Setting this object to enabled(1) causes the agent to
+        automatically close Telnet sessions when no activity has occurred
+        for telnetAutoLogoutTimeout minutes.  Setting this object to
+        disabled(2) disables automatic logout.  The factory setting is
+        enabled(1)."
+    ::= { cabletronELH100AgentInfo 4 }
+
+telnetAutoLogoutTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (1..99)
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of minutes of inactivity after which the
+        agent may automatically close a Telnet session.  Telnet auto-logout
+        is active only when telnetAutoLogoutEnable is set to enabled(1).
+        The factory setting is 10 minutes."
+    ::= { cabletronELH100AgentInfo 5 }
+
+vT100RefreshInterval OBJECT-TYPE
+    SYNTAX      INTEGER {
+        seconds5(5),
+        seconds30(30),
+        seconds60(60),
+        seconds120(120),
+        seconds180(180),
+        seconds300(300)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The interval for automatic statistics refresh for
+        VT100 screens.  The factory setting is seconds30(30)."
+    ::= {cabletronELH100AgentInfo 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  GroupTableInformation
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+cabletronELH100gGroupInfo       OBJECT IDENTIFIER ::=  { cabletronELH100BasicCapability 3 }
+
+groupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GroupEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines basic configuration information for each
+        unit in the stack."
+    ::= { cabletronELH100gGroupInfo 1 }
+
+groupEntry OBJECT-TYPE
+    SYNTAX      GroupEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { groupID }
+    ::= { groupTable 1 }
+
+GroupEntry ::= SEQUENCE {
+    groupID
+        INTEGER,
+    groupType
+        INTEGER,
+    groupCounterReset
+        INTEGER,
+    mgmtModuleStatus
+        INTEGER,
+    mgmtModuleDatabaseVersion
+        OCTET STRING,
+    switchModuleType
+        INTEGER,
+    switchModuleActive
+        INTEGER
+}
+
+groupID OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the group being referenced.  Groups are numbered in
+        top-down order, with the top group being group 1.  Attempts to
+        reference nonexistent groups are rejected with an error-status
+        of noSuchName(2)."
+    ::= { groupEntry 1 }
+
+groupType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notPresent(1),
+        unknown(2),
+        elh100-12tx(3),    -- 12-port 10/100 repeater
+        elh100-24tx(4)     -- 24-port 10/100 repeater
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The type of group."
+    ::= { groupEntry 2 }
+
+groupCounterReset OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noReset(1),
+        reset(2)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Setting this object to reset(2) causes the agent to reset all
+        RFC1757 and RFC2108 counters for all ports on this group.  This
+        object always returns noReset(1) when read.  Attempts to set
+        this object to noReset(1) are rejected with an error-status
+        of badValue(3)."
+    ::= { groupEntry 3 }
+
+mgmtModuleStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notPresent(1),    -- management module not installed
+        active(2),        -- management module is active agent in stack
+        standby(3)        -- management module is in standby mode
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The status of this group's management module.  Only one management
+        module in a stack is allowed to act as the active agent.  A value
+        of notPresent(1) indicates that there is no management module in
+        this group.  A value of active(2) means that this group's management
+        module is acting as the stack's active agent.  A value of standby(3)
+        means that this group contains a management module, but it is not
+        the active agent."
+    ::= { groupEntry 4 }
+
+mgmtModuleDatabaseVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (64))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The configuration database version number of this managing agent.
+        If a management module is not present, this object's value is a
+        zero-length string.
+
+        Each management agent contains a database version that is determined
+        by the version of the agent's firmware.  Different firmware versions
+        MAY or MAY NOT have the same database version number.  Usually a
+        database version number changes only when new features are added.
+
+        Database version numbers are used to determine which components
+        of non-volatile configuration may be synchronized between active
+        and standby management modules.  A component belonging to a higher
+        (newer) database version may not be present in a lower (older)
+        database version;  in this case, the component will not be updated
+        in the older database."
+    ::= { groupEntry 5 }
+
+switchModuleType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notPresent(1),
+        unknown(2),
+        internalSwitch10-100(3),
+        mediaTX-10-100(4),
+        mediaFX-SC(5),
+        mediaFX-ST(6),
+        switchMediaTX-10-100(7),
+        switchMediaFX-SC(8),
+        switchMediaFX-ST(9)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The type of the switch module."
+    ::= { groupEntry 6 }
+
+switchModuleActive OBJECT-TYPE
+    SYNTAX      INTEGER {
+        active(1),        -- switch is hardware-enabled
+        notActive(2),     -- switch is hardware-disabled
+        notApplicable(3)  -- not a switch or switch not present
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates whether or not a switch module is active.  In
+        order to avoid network loops, the switch hardware allows
+        only one switch to bridge the stack's common 10Mbps and
+        100Mbps backplanes.  Redundant switches are automatically
+        disabled.  Note that this restriction does not apply to
+        switches that bridge one or more micro-isolated segments.
+
+        Individual switch ports may be administratively enabled/disabled
+        using the object switchPortAdminStatus.  If the switch is
+        hardware-disabled, the switch is disabled no matter what its
+        administrative status."
+    ::= { groupEntry 7 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  BackplaneTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+backplaneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BackplaneEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table provides backplane isolation/connection status for
+        each unit's 100Mbps and 10Mbps segments."
+    ::= { cabletronELH100gGroupInfo 2 }
+
+backplaneEntry OBJECT-TYPE
+    SYNTAX      BackplaneEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { backplaneGroupID, backplaneSegmentID }
+    ::= { backplaneTable 1 }
+
+BackplaneEntry ::= SEQUENCE {
+    backplaneGroupID
+        INTEGER,
+    backplaneSegmentID
+        INTEGER,
+    backplaneIsolated
+        INTEGER
+}
+
+backplaneGroupID OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the segment being referenced.  Groups are numbered
+        in top-down order, with the top group being group 1.  Attempts to
+        reference nonexistent groups are rejected with an error-status of
+        noSuchName(2)."
+    ::= { backplaneEntry 1 }
+
+backplaneSegmentID OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tenMbps(10),
+        oneHundredMbps(100)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The segment ID of the segment being referenced."
+    ::= { backplaneEntry 2 }
+
+backplaneIsolated OBJECT-TYPE
+    SYNTAX      INTEGER {
+        isolated(1),
+        attached(2)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The status of the segment's connection to the
+        backplane bus.  The factory setting is attached(2)."
+    ::= { backplaneEntry 3 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  PortTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100PortInfo       OBJECT IDENTIFIER ::=  { cabletronELH100BasicCapability 4 }
+
+portTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines basic configuration information for each
+        repeater port in the stack."
+    ::= { cabletronELH100PortInfo 1 }
+
+portEntry OBJECT-TYPE
+    SYNTAX      PortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { portGroupID, portID }
+    ::= { portTable 1 }
+
+PortEntry ::= SEQUENCE {
+    portGroupID
+        INTEGER,
+    portID
+        INTEGER,
+    portLinkSpeed
+        INTEGER,
+    portSpeedConfig
+        INTEGER
+}
+
+portGroupID OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the repeater port being referenced.  Groups are
+        numbered in top-down order, with the top group being group 1.
+        Attempts to reference nonexistent groups are rejected with an
+        error-status of noSuchName(2)."
+    ::= { portEntry 1 }
+
+portID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The port ID of the repeater port being referenced."
+    ::= { portEntry 2 }
+
+portLinkSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noLink(1),
+        tenMbps(10),
+        oneHundredMbps(100)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The speed at which the port is currently operating.  If
+        there is no link on the port, this object returns noLink(1)."
+    ::= { portEntry 3 }
+
+portSpeedConfig OBJECT-TYPE
+    SYNTAX      INTEGER {
+        autoNegotiate(1),
+        tenMbps(10),
+        oneHundredMbps(100)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Selects the speed at which the port operates.  The
+        factory setting is autoNegotiate(1)."
+    ::= { portEntry 4 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  PerfMonAgentInfo scalars
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100PerfMonAgentInfo    OBJECT IDENTIFIER ::=  { cabletronELH100PerfMonCapability 1 }
+
+perfMonAgentCRCErrors OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of valid-length packets with CRC errors received
+        on the agent's MAC port."
+    ::= { cabletronELH100PerfMonAgentInfo 1 }
+
+perfMonAgentAlignmentErrors OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of valid-length packets with alignment errors received
+        on the agent's MAC port."
+    ::= { cabletronELH100PerfMonAgentInfo 2 }
+
+perfMonAgentCollisions OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of collisions detected on the agent's MAC port."
+   ::= { cabletronELH100PerfMonAgentInfo 3 }
+
+perfMonAgentTotalPortIsolates OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of times the agent's MAC port became isolated.  Port
+        isolation occurs only during 100Mbps operation."
+    ::= { cabletronELH100PerfMonAgentInfo 4 }
+
+perfMonAgentSymbolErrors OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of packets with symbol errors received on the agent's
+        MAC port.  Symbol errors occur only during 100Mbps operation."
+    ::= { cabletronELH100PerfMonAgentInfo 5 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  SwitchPortTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100SwitchInfo    OBJECT IDENTIFIER ::=  { cabletronELH100SwitchCapability 1 }
+
+switchPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwitchPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table provides configuration information about each port
+        on each switch module in the stack."
+    ::= { cabletronELH100SwitchInfo 1 }
+
+switchPortEntry OBJECT-TYPE
+    SYNTAX      SwitchPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { switchPortGroupID, switchPortID }
+    ::= { switchPortTable 1 }
+
+SwitchPortEntry ::= SEQUENCE {
+    switchPortGroupID
+        INTEGER,
+    switchPortID
+        INTEGER,
+    switchPortAdminStatus
+        INTEGER,
+    switchPortSpeed
+        INTEGER,
+    switchPortDuplex
+        INTEGER,
+    switchPortLink
+        INTEGER
+}
+
+switchPortGroupID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the switch module port being referenced.  Groups
+        are numbered in top-down order, with the top group being group 1.
+        If a switch module is not installed on the group, then a
+        GetNextRequest skips the entry.  Attempts to reference nonexistent
+        groups are rejected with an error-status of noSuchName(2)."
+    ::= { switchPortEntry 1 }
+
+switchPortID OBJECT-TYPE
+    SYNTAX      INTEGER (1..3)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The port ID of the switch module port being referenced.  Port 1
+        is always the internal 100Mbps port.  Port 2 is always the
+        internal 10Mbps port;  note that this port is inactive on
+        media modules.  Port 3 is always the external port;  note that
+        this port is inactive on internal switch modules."
+    ::= { switchPortEntry 2 }
+
+switchPortAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),       -- switch port enabled
+        disabled(2),      -- switch port disabled
+        notApplicable(3)  -- switch or port not present or cannot be managed
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The administrative status of the port.  Setting this
+        object to enabled(1) enables the port.  Setting this object to
+        disabled(2) disables the port.  On media modules, port 2 (the
+        internal 10Mbps port) cannot be managed.  The external port
+        cannot be managed on any module.  In these cases, attempts to
+        set this object are rejected with an error-status of badValue(3).
+        The factory setting for manageable ports is enabled(1).
+
+        Note that if switchModuleActive is notActive(2), then the
+        switch is disabled no matter what its administrative status."
+    ::= { switchPortEntry 3 }
+
+switchPortSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noLink(1),
+        tenMbps(10),
+        oneHundredMbps(100)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The speed at which the switch port is currently operating.
+        If the port is inactive (port 2 on media modules and port 3
+        on internal switch modules), noLink(1) is returned."
+    ::= { switchPortEntry 4 }
+
+switchPortDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+        halfDuplex(1),
+        fullDuplex(2),
+        notApplicable(3)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The duplex mode in which the switch port is currently operating.
+        If the port is inactive (port 2 on media modules and port 3
+        on internal switch modules), notApplicable(3) is returned."
+    ::= { switchPortEntry 5 }
+
+switchPortLink OBJECT-TYPE
+    SYNTAX      INTEGER {
+        link(1),
+        noLink(2)
+    }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates if link is detected on the port.  If the port is
+        inactive (port 2 on media modules and port 3 on internal switch
+        modules), noLink(2) is returned."
+    ::= { switchPortEntry 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  SwitchPortStatsTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100SwitchStatsInfo    OBJECT IDENTIFIER ::=  { cabletronELH100SwitchCapability 2 }
+
+switchPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwitchPortStatsEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table provides statistics on each port on each switch
+        module in the stack.  Note that statistics for the external
+        port on media and switch/media modules are unavailable to the
+        agent and are reported as 0.  Statistics for port 2 (the internal
+        10Mbps port) on media modules are also reported as 0."
+    ::= { cabletronELH100SwitchStatsInfo 1 }
+
+switchPortStatsEntry OBJECT-TYPE
+    SYNTAX      SwitchPortStatsEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { switchPortStatsGroupID, switchPortStatsID }
+    ::= { switchPortStatsTable 1 }
+
+SwitchPortStatsEntry ::= SEQUENCE {
+    switchPortStatsGroupID
+        INTEGER,
+    switchPortStatsID
+        INTEGER,
+    switchPortReadableFrames
+        Counter,
+    switchPortReadableOctets
+        Counter,
+    switchPortFCSErrors
+        Counter,
+    switchPortAlignmentErrors
+        Counter,
+    switchPortFramesTooLong
+        Counter,
+    switchPortShortEvents
+        Counter,
+    switchPortRunts
+        Counter,
+    switchPortCollisions
+        Counter,
+    switchPortLateEvents
+        Counter,
+    switchPortVeryLongEvents
+        Counter,
+    switchPortDataRateMismatches
+        Counter,
+    switchPortAutoPartitions
+        Counter,
+    switchPortBroadcastPackets
+        Counter,
+    switchPortMulticastPackets
+        Counter,
+    switchPortIsolates
+        Counter
+}
+
+switchPortStatsGroupID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the switch module port being referenced.  If the
+        group is not present, or if there is no switch module installed
+        in the group, GetRequests and SetRequests are rejected with an
+        error-status of noSuchName(2).  GetNextRequests skip entries for
+        nonexistent modules."
+    ::= { switchPortStatsEntry 1 }
+
+switchPortStatsID OBJECT-TYPE
+    SYNTAX      INTEGER (1..3)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The port ID of the switch module port being referenced.  Port 1 is
+        always the internal 100Mbps port.  Port 2 is always the internal
+        10Mbps port.  Port 3 is always the external port.  Note that port
+        2 is inactive on media modules and port 3 is inactive on internal
+        switch modules.
+
+        Note:  Statistics for the external port are unavailable to the
+        agent and are reported as 0."
+    ::= { switchPortStatsEntry 2 }
+
+switchPortReadableFrames OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of valid frames received by the port."
+    ::= { switchPortStatsEntry 3 }
+
+switchPortReadableOctets OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of octets (bytes) in all valid frames received
+        by the port."
+    ::= { switchPortStatsEntry 4 }
+
+switchPortFCSErrors OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of valid-length frames received by the port that
+        had FCS (frame check sequence) errors."
+    ::= { switchPortStatsEntry 5 }
+
+switchPortAlignmentErrors OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of valid-length frames received by the port that
+        had alignment errors."
+    ::= { switchPortStatsEntry 6 }
+
+switchPortFramesTooLong OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of frames received by the port that were longer
+        than 1518 bytes."
+    ::= { switchPortStatsEntry 7 }
+
+switchPortShortEvents OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of frames received by the port that were shorter
+        than 82 bits."
+    ::= { switchPortStatsEntry 8 }
+
+switchPortRunts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of frames received by the port that were longer
+        than 82 bits but shorter than 512 bits (64 bytes)."
+    ::= { switchPortStatsEntry 9 }
+
+switchPortCollisions OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of collisions detected on the port."
+    ::= { switchPortStatsEntry 10 }
+
+switchPortLateEvents OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of collisions detected on the port that occurred
+        later than 512 bit-times into the transmission of a packet."
+    ::= { switchPortStatsEntry 11 }
+
+switchPortVeryLongEvents OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of times any activity continued for more than
+        4 to 7.5 milliseconds."
+    ::= { switchPortStatsEntry 12 }
+
+switchPortDataRateMismatches OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of times the incoming data rate mismatched the local
+        clock source enough to cause a FIFO overflow or underflow."
+    ::= { switchPortStatsEntry 13 }
+
+switchPortAutoPartitions OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of times this port was auto-partitioned by the
+        hardware.  In 100Mbps mode, a port auto-partitions when it
+        detects more than 60 consecutive collisions.  In 10Mbps mode,
+        a port auto-partitions after 32 consecutive collisions."
+    ::= { switchPortStatsEntry 14 }
+
+switchPortBroadcastPackets OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of good broadcast frames received by the port."
+    ::= { switchPortStatsEntry 15 }
+
+switchPortMulticastPackets OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of good multicast (not broadcast) frames received
+        by the port."
+    ::= { switchPortStatsEntry 16 }
+
+switchPortIsolates OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of times this port was auto-isolated by the hardware.
+        This occurs only during 100Mbps operation.  A port auto-isolates
+        when it transmits more than 2 consecutive false carrier events."
+    ::= { switchPortStatsEntry 17 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  BackupPortTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100BackupInfo    OBJECT IDENTIFIER ::=  { cabletronELH100BackupCapability 1 }
+
+backupPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BackupPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table allows configuration of backup port pairs."
+    ::=  { cabletronELH100BackupInfo 1 }
+
+backupPortEntry OBJECT-TYPE
+    SYNTAX      BackupPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { backupIndex }
+    ::=  { backupPortTable 1 }
+
+BackupPortEntry ::= SEQUENCE {
+    backupIndex
+        INTEGER,
+    backupPriPortGroup
+        INTEGER,
+    backupPriPortPort
+        INTEGER,
+    backupSecPortGroup
+        INTEGER,
+    backupSecPortPort
+        INTEGER,
+    backupPortAction
+        INTEGER
+}
+
+backupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..72)
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The index of the Backup table entry being referenced.  Indexes
+        may be nonconsecutive."
+    ::= { backupPortEntry 1 }
+
+backupPriPortGroup OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Group ID of the primary port.  Attempts to set this
+        object to a nonexistent group are rejected with an error-status
+        of badValue(3).  If this object belongs to an empty entry, it
+        returns a value of 255."
+    ::= { backupPortEntry 2 }
+
+backupPriPortPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Port number of the primary port.  Attempts to set this
+        object to a nonexistent port are rejected with an error-status
+        of badValue(3).  If this object belongs to an empty entry, it
+        returns a value of 255."
+    ::= { backupPortEntry 3 }
+
+backupSecPortGroup OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Group ID of the secondary port.  The secondary port
+        may be on any group in the stack.  Attempts to set this object
+        to a nonexistent unit are rejected with an error-status of
+        badValue(3).  If this object belongs to an empty entry, it
+        returns a value of 255."
+    ::= { backupPortEntry 4 }
+
+backupSecPortPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Port number of the secondary port.  Attempts to set this
+        object to a nonexistent port are rejected with an error-status
+        of badValue(3).  If this object belongs to an empty entry, it
+        returns a value of 255."
+    ::= { backupPortEntry 5 }
+
+backupPortAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(1),
+        active(2),
+        standby(3),
+        backup(4),
+        invalid(5),
+        delete(6)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The status of backup port monitoring for this port
+        pair.  Setting this object to active(2) enables the primary
+        port, disables the secondary port, and activates backup port
+        monitoring.
+
+        Once backup port monitoring is activated, the value of this object
+        is reported as standby(3) until a triggering event occurs.  A
+        triggering event may be loss of link after link was active, port
+        auto-partition, or port auto-isolate (100Mbps ports only).  After
+        a triggering event occurs, the primary port is disabled, the
+        secondary port is enabled, and the value of this object is reported
+        as backup(4).  A RFC2108 rptrHealthInfo trap is transmitted.  To
+        re-enable the primary port and re-activate backup port monitoring,
+        set this object to active(2).
+
+        To disable backup port monitoring for the port pair, set this
+        object to inactive(1).  To remove the port pair from the backup
+        table, set this object to delete(6).  The enable/disable statuses
+        of the ports do not change when they are deactivated or deleted;
+        use rptrPortAdminStatus (RFC2108) to set the ports to the desired
+        state.
+
+        A value of invalid(5) indicates that one or both of the units
+        for which this entry was originally configured is not currently
+        in the stack.  Backup port monitoring is disabled.  The agent
+        makes this determination by tracking the serial numbers on the
+        units in the stack.
+
+        The values standby(3), backup(4), and invalid(5) are read-only.
+        Attempts to set this object to either of these values are rejected
+        with an error-status of badValue(3)."
+    ::= { backupPortEntry 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+--  IntrusionTable
+--
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+cabletronELH100SecurityInfo    OBJECT IDENTIFIER ::=  { cabletronELH100SecurityCapability 1 }
+
+securityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SecurityEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table allows configuration of port-level intrusion detection."
+    ::=  { cabletronELH100SecurityInfo 1 }
+
+securityEntry OBJECT-TYPE
+    SYNTAX      SecurityEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    INDEX       { securityGroupID, securityPortID }
+    ::=  { securityTable 1 }
+
+SecurityEntry ::= SEQUENCE {
+    securityGroupID
+        INTEGER,
+    securityPortID
+        INTEGER,
+    securityAddr
+        PhysAddress,
+    securityAutoLearnAction
+        INTEGER,
+    securityEnable
+        INTEGER
+}
+
+securityGroupID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The group ID of the port being referenced.  Groups are numbered
+        in top-down order, with the top group being group 1.  Attempts to
+        reference nonexistent units are rejected with an error-status
+        of noSuchName(2)."
+    ::= { securityEntry 1 }
+
+securityPortID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The port ID of the port being referenced.  Attempts to
+        reference nonexistent ports are rejected with an error-status
+        of noSuchName(2)."
+    ::= { securityEntry 2 }
+
+securityAddr OBJECT-TYPE
+    SYNTAX      PhysAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The authorized MAC address for this port.
+        This address may be configured through auto-learning if
+        securityAutoLearnAction is set to active(2).  Otherwise,
+        the authorized MAC address may be configured by a SetRequest
+        on this object.  SNMP SetRequests are rejected unless
+        securityAutoLearnAction is set to inactive(1)."
+    ::= { securityEntry 3 }
+
+securityAutoLearnAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(1),
+        active(2),
+        learned(3)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Selects the auto-learning function for the port.
+        Setting this object to inactive(1) disables auto-learning;
+        the user must set securityAddr in order to specify the
+        authorized MAC address.
+
+        Setting this object to active(2) enables auto-learning of
+        the port's authorized MAC address.  The agent first sets
+        the authorized MAC address to 0, then learns the source
+        address of the first error-free frame received by the
+        port.  The newly-learned authorized address is reflected in
+        securityAddr, and the status of this object changes
+        to learned(3).
+
+        The value learned(3) is read-only.  Attempts to set this object
+        to learned(3) are rejected with an error-status of badValue(3)."
+    ::= { securityEntry 4 }
+
+securityEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(1),
+        warningAndDisable(2)
+    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Setting this object to warningAndDisable(2) enables
+        intrusion detection on the port.  When an intruder is detected,
+        a RFC2108 rptrInfoHealth trap is transmitted and the port is
+        disabled.  An intruder is detected only after it transmits a packet.
+        A passive (non-transmitting) intruder cannot be detected.
+
+        Setting this object to inactive(1) disables intrusion detection
+        for the port."
+    ::= { securityEntry 5 }
+
+END

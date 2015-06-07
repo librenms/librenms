@@ -1,0 +1,1359 @@
+CTRON-IGMP-MIB DEFINITIONS ::= BEGIN
+
+        -- This module provides authoritative definitions for Cabletron's
+        -- enterprise-specific IGMP MIB.
+        --
+        -- This module will be extended, as additional sub-sections
+        -- of this naming tree are defined.
+        --
+
+        -- Cabletron Systems reserves the right to make changes in
+        -- specification and other information contained in this document
+        -- without prior notice.  The reader should consult Cabletron Systems
+        -- to determine whether any such changes have been made.
+        --
+        -- In no event shall Cabletron Systems be liable for any incidental,
+        -- indirect, special, or consequential damages whatsoever (including
+        -- but not limited to lost profits) arising out of or related to this
+        -- document or the information contained in it, even if Cabletron
+        -- Systems has been advised of, known, or should have known, the
+        -- possibility of such damages.
+        --
+        -- Cabletron grants vendors, end-users, and other interested parties
+        -- a non-exclusive license to use this Specification in connection
+        -- with the management of Cabletron products.
+
+        -- Copyright (1999-2005) Enterasys Networks
+
+        -- Note: This design of this MIB owes much to the designers of
+        -- the Internet Group Management Protocol MIB.
+
+        --
+        -- This module will be extended, as needed.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    dot1dBasePort
+        FROM BRIDGE-MIB
+    PortList, VlanId
+        FROM Q-BRIDGE-MIB
+    ctIGMPBranch
+        FROM CTRON-MIB-NAMES;
+
+ctIGMP  MODULE-IDENTITY
+    LAST-UPDATED "200505092030Z"  -- Mon May  9 20:30 GMT 2005
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+    DESCRIPTION
+            "This MIB module defines a portion of the SNMP enterprise MIBs
+             under the Cabletron enterprise OID pertaining to configuration
+             of IGMP."
+
+    REVISION    "200505092030Z"  -- Mon May  9 20:30 GMT 2005
+    DESCRIPTION
+            " Added the IgmpProtocolClassTc, and IgmpProtocolIdTc
+              TEXTUAL CONVENTIONS, added the 
+              ctIGMPProtocolClassificationTable."
+
+    REVISION    "200503152038Z"  -- Tue Mar 15 20:38 GMT 2005
+    DESCRIPTION
+            "Deprecated the ctIGMPPolicyTable and the ctIGMPStaticTable.
+             Added ctIGMPStaticGroupTable, ctIGMPExtCacheTable,
+             ctIGMPDiscoveredRouterTable, ctIGMPPortTable, and the
+             ctIGMPStatsCntrs groups."
+
+    REVISION    "200312101456Z"  -- Wed Dec 10 14:56 GMT 2003
+    DESCRIPTION
+            "Added the ctIGMPStaticEntry Table for static multicast
+             configuration."
+    ::= { ctIGMPBranch 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+IgmpPortModeTc  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention maps out possible igmp port modes."
+    SYNTAX  INTEGER {
+                      reporter(1),
+                      source(2)
+                    }
+
+IgmpProtocolClassTc  ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention describes the possible ways
+         IGMP can classify received frames."
+    SYNTAX  INTEGER {
+                      multicastData(1),
+                      routingProtocol(2),
+                      ignore(3)
+                    }
+
+IgmpProtocolIdTc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Bit definitions for each of the IP protocol numbers assigned by
+         IANA."
+    SYNTAX BITS {
+        hopopt       (0), -- IPv6 Hop-by-Hop Option            [RFC1883]
+        icmp         (1), -- Internet Control Message           [RFC792]
+        igmp         (2), -- Internet Group Management         [RFC1112]
+        ggp          (3), -- Gateway-to-Gateway                 [RFC823]
+        ip           (4), -- IP in IP (encapsulation)          [RFC2003]
+        st           (5), -- Stream                    [RFC1190,RFC1819]
+        tcp          (6), -- Transmission Control               [RFC793]
+        cbt          (7), -- CBT                             [Ballardie]
+        egp          (8), -- Exterior Gateway Protocol     [RFC888,DLM1]
+        igp          (9), -- any private interior gateway         [IANA]
+                          -- (used by Cisco for their IGRP)
+        bbnRccMon   (10), -- BBN RCC Monitoring                    [SGC]
+        nvpII       (11), -- Network Voice Protocol         [RFC741,SC3]
+        pup         (12), -- PUP                             [PUP,XEROX]
+        argus       (13), -- ARGUS                                [RWS4]
+        emcon       (14), -- EMCON                                 [BN7]
+        xnet        (15), -- Cross Net Debugger            [IEN158,JFH2]
+        chaos       (16), -- Chaos                                 [NC3]
+        udp         (17), -- User Datagram                  [RFC768,JBP]
+        mux         (18), -- Multiplexing                    [IEN90,JBP]
+        dcnMeas     (19), -- DCN Measurement Subsystems           [DLM1]
+        hmp         (20), -- Host Monitoring                [RFC869,RH6]
+        prm         (21), -- Packet Radio Measurement              [ZSU]
+        xnsIdp      (22), -- XEROX NS IDP               [ETHERNET,XEROX]
+        trunk1      (23), -- Trunk-1                              [BWB6]
+        trunk2      (24), -- Trunk-2                              [BWB6]
+        leaf1       (25), -- Leaf-1                               [BWB6]
+        leaf2       (26), -- Leaf-2                               [BWB6]
+        rdp         (27), -- Reliable Data Protocol         [RFC908,RH6]
+        irtp        (28), -- Internet Reliable Transaction  [RFC938,TXM]
+        isoTp4      (29), -- ISO Transport Protocol Class 4 [RFC905,RC77]
+        netblt      (30), -- Bulk Data Transfer Protocol    [RFC969,DDC1]
+        mfeNsp      (31), -- MFE Network Services Protocol  [MFENET,BCH2]
+        meritInp    (32), -- MERIT Internodal Protocol             [HWB]
+        sep         (33), -- Sequential Exchange Protocol        [JC120]
+        x3pc        (34), -- Third Party Connect Protocol         [SAF3]
+        idpr        (35), -- Inter-Domain Policy Routing Protocol [MXS1] 
+        xtp         (36), -- XTP                                   [GXC]
+        ddp         (37), -- Datagram Delivery Protocol            [WXC]
+        idprCmtp    (38), -- IDPR Control Message Transport Proto [MXS1]
+        tpPlusPlus  (39), -- TP++ Transport Protocol               [DXF]
+        il          (40), -- IL Transport Protocol            [Presotto]
+        ipv6        (41), -- Ipv6                              [Deering]    
+        sdrp        (42), -- Source Demand Routing Protocol       [DXE1]
+        ipv6Route   (43), -- Routing Header for IPv6           [Deering]
+        ipv6Frag    (44), -- Fragment Header for IPv6          [Deering]
+        idrp        (45), -- Inter-Domain Routing Protocol   [Sue Hares]
+        rsvp        (46), -- Reservation Protocol           [Bob Braden]
+        gre         (47), -- General Routing Encapsulation     [Tony Li]
+        mhrp        (48), -- Mobile Host Routing Protocol[David Johnson]
+        bna         (49), -- BNA                          [Gary Salamon]
+        esp         (50), -- Encap Security Payload            [RFC2406]
+        ah          (51), -- Authentication Header             [RFC2402]
+        inlsp       (52), -- Integrated Net Layer Security  TUBA [GLENN]
+        swipe       (53), -- IP with Encryption                    [JI6]
+        narp        (54), -- NBMA Address Resolution Protocol  [RFC1735]
+        mobile      (55), -- IP Mobility                       [Perkins]
+        tlsp        (56), -- Transport Layer Security Protocol   [Oberg]
+                          -- using Kryptonet key management
+        skip        (57), -- SKIP                              [Markson]
+        ipv6Icmp    (58), -- ICMP for IPv6                     [RFC1883]
+        ipv6NoNxt   (59), -- No Next Header for IPv6           [RFC1883]
+        ipv6Opts    (60), -- Destination Options for IPv6      [RFC1883]
+        ipProt61    (61), -- any host internal protocol           [IANA]
+        cftp        (62), -- CFTP                            [CFTP,HCF2]
+        ipProt63    (63), -- any local network                    [IANA]
+        satExpak    (64), -- SATNET and Backroom EXPAK             [SHB]
+        kryptolan   (65), -- Kryptolan                            [PXL1]
+        rvd         (66), -- MIT Remote Virtual Disk Protocol      [MBG]
+        ippc        (67), -- Internet Pluribus Packet Core         [SHB]
+        ipProt64    (68), -- any distributed file system          [IANA]
+        satMon      (69), -- SATNET Monitoring                     [SHB]
+        visa        (70), -- VISA Protocol                        [GXT1]
+        ipcv        (71), -- Internet Packet Core Utility          [SHB]
+        cpnx        (72), -- Computer Protocol Network Executive  [DXM2]
+        cphb        (73), -- Computer Protocol Heart Beat         [DXM2]
+        wsn         (74), -- Wang Span Network                     [VXD]
+        pvp         (75), -- Packet Video Protocol                 [SC3]
+        brSatMon    (76), -- Backroom SATNET Monitoring            [SHB]
+        sunNd       (77), -- SUN ND PROTOCOL-Temporary             [WM3]
+        wbMon       (78), -- WIDEBAND Monitoring                   [SHB]
+        wbExpak     (79), -- WIDEBAND EXPAK                        [SHB]
+        isoIp       (80), -- ISO Internet Protocol                 [MTR]
+        vmtp        (81), -- VMTP                                 [DRC3]
+        secureVmtp  (82), -- SECURE-VMTP                          [DRC3]
+        vines       (83), -- VINES                                 [BXH]
+        ttp         (84), -- TTP                                   [JXS]
+        nsfnetIgp   (85), -- NSFNET-IGP                            [HWB]
+        dgp         (86), -- Dissimilar Gateway Protocol     [DGP,ML109]
+        tcf         (87), -- TCF                                  [GAL5]
+        eigrp       (88), -- EIGRP                           [CISCO,GXS]
+        ospfIgp     (89), -- OSPFIGP                      [RFC1583,JTM4]
+        spriteRpc   (90), -- Sprite RPC Protocol            [SPRITE,BXW]
+        larp        (91), -- Locus Address Resolution Protocol     [BXH]
+        mtp         (92), -- Multicast Transport Protocol          [SXA]
+        ax25        (93), -- AX.25 Frames                         [BK29]
+        ipip        (94), -- IP-within-IP Encapsulation Protocol   [JI6]
+        micp        (95), -- Mobile Internetworking Control Pro.   [JI6]
+        sccSp       (96), -- Semaphore Communications Sec. Pro.    [HXH]
+        etherIp     (97), -- Ethernet-within-IP Encapsulation  [RFC3378]
+        encap       (98), -- Encapsulation Header         [RFC1241,RXB3]
+        ipProt99    (99), -- any private encryption scheme        [IANA]
+        gmtp       (100), -- GMTP                                 [RXB5]
+        ifmp       (101), -- Ipsilon Flow Management Protocol   [Hinden]
+        pnni       (102), -- PNNI over IP                       [Callon]
+        pim        (103), -- Protocol Independent Multicast  [Farinacci]
+        aris       (104), -- ARIS                              [Feldman]
+        scps       (105), -- SCPS                                [Durst]
+        qnx        (106), -- QNX                                [Hunter]
+        an         (107), -- Active Networks                    [Braden]
+        ipComp     (108), -- IP Payload Compression Protocol   [RFC2393]
+        snp        (109), -- Sitara Networks Protocol          [Sridhar]
+        compaqPeer (110), -- Compaq Peer Protocol                [Volpe]
+        ipxInIp    (111), -- IPX in IP                             [Lee]
+        vrrp       (112), -- Virtual Router Redundancy Protocol [RFC3768]
+        pgm        (113), -- PGM Reliable Transport Protocol  [Speakman]
+        ipProt114  (114), -- any 0-hop protocol                   [IANA]
+        l2tp       (115), -- Layer Two Tunneling Protocol        [Aboba]
+        ddx        (116), -- D-II Data Exchange (DDX)           [Worley] 
+        iatp       (117), -- Interactive Agent Transfer Protocol [Murphy]
+        stp        (118), -- Schedule Transfer Protocol            [JMP]
+        srp        (119), -- SpectraLink Radio Protocol       [Hamilton]
+        uti        (120), -- UTI                              [Lothberg]
+        smp        (121), -- Simple Message Protocol            [Ekblad]
+        sm         (122), -- SM                              [Crowcroft]
+        ptp        (123), -- Performance Transparency Protocol   [Welzl]
+        isisIpv4   (124), -- ISIS over IPv4                 [Przygienda]
+        fire       (125), --                                 [Partridge]
+        crtp       (126), -- Combat Radio Transport Protocol   [Sautter]
+        crudp      (127), -- Combat Radio User Datagram        [Sautter]
+        sscopmce   (128), --                                     [Waber]
+        iplt       (129), --                                  [Hollbach]
+        sps        (130), -- Secure Packet Shield             [McIntosh] 
+        pipe       (131), -- Private IP Encapsulation within IP  [Petri]
+        sctp       (132), -- Stream Control Transmission Protocol [Stewart]
+        fc         (133), -- Fibre Channel                   [Rajagopal]
+        rsvpE2eIgn (134), -- RSVP-E2E-IGNORE                   [RFC3175]
+        mobHeader  (135), -- Mobility Header                   [RFC3775]
+        udpLite    (136), -- UDPLite                           [RFC3828]
+        mpls       (137), -- MPLS-in-IP  [RFC-ietf-mpls-in-ip-or-gre-08.txt]
+        ipProto138 (138), -- Unassigned                           [IANA]
+        ipProto139 (139), -- Unassigned                           [IANA]
+        ipProto140 (140), -- Unassigned                           [IANA]
+        ipProto141 (141), -- Unassigned                           [IANA]
+        ipProto142 (142), -- Unassigned                           [IANA]
+        ipProto143 (143), -- Unassigned                           [IANA]
+        ipProto144 (144), -- Unassigned                           [IANA]
+        ipProto145 (145), -- Unassigned                           [IANA]
+        ipProto146 (146), -- Unassigned                           [IANA]
+        ipProto147 (147), -- Unassigned                           [IANA]
+        ipProto148 (148), -- Unassigned                           [IANA]
+        ipProto149 (149), -- Unassigned                           [IANA]
+        ipProto150 (150), -- Unassigned                           [IANA]
+        ipProto151 (151), -- Unassigned                           [IANA]
+        ipProto152 (152), -- Unassigned                           [IANA]
+        ipProto153 (153), -- Unassigned                           [IANA]
+        ipProto154 (154), -- Unassigned                           [IANA]
+        ipProto155 (155), -- Unassigned                           [IANA]
+        ipProto156 (156), -- Unassigned                           [IANA]
+        ipProto157 (157), -- Unassigned                           [IANA]
+        ipProto158 (158), -- Unassigned                           [IANA]
+        ipProto159 (159), -- Unassigned                           [IANA]
+        ipProto160 (160), -- Unassigned                           [IANA]
+        ipProto161 (161), -- Unassigned                           [IANA]
+        ipProto162 (162), -- Unassigned                           [IANA]
+        ipProto163 (163), -- Unassigned                           [IANA]
+        ipProto164 (164), -- Unassigned                           [IANA]
+        ipProto165 (165), -- Unassigned                           [IANA]
+        ipProto166 (166), -- Unassigned                           [IANA]
+        ipProto167 (167), -- Unassigned                           [IANA]
+        ipProto168 (168), -- Unassigned                           [IANA]
+        ipProto169 (169), -- Unassigned                           [IANA]
+        ipProto170 (170), -- Unassigned                           [IANA]
+        ipProto171 (171), -- Unassigned                           [IANA]
+        ipProto172 (172), -- Unassigned                           [IANA]
+        ipProto173 (173), -- Unassigned                           [IANA]
+        ipProto174 (174), -- Unassigned                           [IANA]
+        ipProto175 (175), -- Unassigned                           [IANA]
+        ipProto176 (176), -- Unassigned                           [IANA]
+        ipProto177 (177), -- Unassigned                           [IANA]
+        ipProto178 (178), -- Unassigned                           [IANA]
+        ipProto179 (179), -- Unassigned                           [IANA]
+        ipProto180 (180), -- Unassigned                           [IANA]
+        ipProto181 (181), -- Unassigned                           [IANA]
+        ipProto182 (182), -- Unassigned                           [IANA]
+        ipProto183 (183), -- Unassigned                           [IANA]
+        ipProto184 (184), -- Unassigned                           [IANA]
+        ipProto185 (185), -- Unassigned                           [IANA]
+        ipProto186 (186), -- Unassigned                           [IANA]
+        ipProto187 (187), -- Unassigned                           [IANA]
+        ipProto188 (188), -- Unassigned                           [IANA]
+        ipProto189 (189), -- Unassigned                           [IANA]
+        ipProto190 (190), -- Unassigned                           [IANA]
+        ipProto191 (191), -- Unassigned                           [IANA]
+        ipProto192 (192), -- Unassigned                           [IANA]
+        ipProto193 (193), -- Unassigned                           [IANA]
+        ipProto194 (194), -- Unassigned                           [IANA]
+        ipProto195 (195), -- Unassigned                           [IANA]
+        ipProto196 (196), -- Unassigned                           [IANA]
+        ipProto197 (197), -- Unassigned                           [IANA]
+        ipProto198 (198), -- Unassigned                           [IANA]
+        ipProto199 (199), -- Unassigned                           [IANA]
+        ipProto200 (200), -- Unassigned                           [IANA]
+        ipProto201 (201), -- Unassigned                           [IANA]
+        ipProto202 (202), -- Unassigned                           [IANA]
+        ipProto203 (203), -- Unassigned                           [IANA]
+        ipProto204 (204), -- Unassigned                           [IANA]
+        ipProto205 (205), -- Unassigned                           [IANA]
+        ipProto206 (206), -- Unassigned                           [IANA]
+        ipProto207 (207), -- Unassigned                           [IANA]
+        ipProto208 (208), -- Unassigned                           [IANA]
+        ipProto209 (209), -- Unassigned                           [IANA]
+        ipProto210 (210), -- Unassigned                           [IANA]
+        ipProto211 (211), -- Unassigned                           [IANA]
+        ipProto212 (212), -- Unassigned                           [IANA]
+        ipProto213 (213), -- Unassigned                           [IANA]
+        ipProto214 (214), -- Unassigned                           [IANA]
+        ipProto215 (215), -- Unassigned                           [IANA]
+        ipProto216 (216), -- Unassigned                           [IANA]
+        ipProto217 (217), -- Unassigned                           [IANA]
+        ipProto218 (218), -- Unassigned                           [IANA]
+        ipProto219 (219), -- Unassigned                           [IANA]
+        ipProto220 (220), -- Unassigned                           [IANA]
+        ipProto221 (221), -- Unassigned                           [IANA]
+        ipProto222 (222), -- Unassigned                           [IANA]
+        ipProto223 (223), -- Unassigned                           [IANA]
+        ipProto224 (224), -- Unassigned                           [IANA]
+        ipProto225 (225), -- Unassigned                           [IANA]
+        ipProto226 (226), -- Unassigned                           [IANA]
+        ipProto227 (227), -- Unassigned                           [IANA]
+        ipProto228 (228), -- Unassigned                           [IANA]
+        ipProto229 (229), -- Unassigned                           [IANA]
+        ipProto230 (230), -- Unassigned                           [IANA]
+        ipProto231 (231), -- Unassigned                           [IANA]
+        ipProto232 (232), -- Unassigned                           [IANA]
+        ipProto233 (233), -- Unassigned                           [IANA]
+        ipProto234 (234), -- Unassigned                           [IANA]
+        ipProto235 (235), -- Unassigned                           [IANA]
+        ipProto236 (236), -- Unassigned                           [IANA]
+        ipProto237 (237), -- Unassigned                           [IANA]
+        ipProto238 (238), -- Unassigned                           [IANA]
+        ipProto239 (239), -- Unassigned                           [IANA]
+        ipProto240 (240), -- Unassigned                           [IANA]
+        ipProto241 (241), -- Unassigned                           [IANA]
+        ipProto242 (242), -- Unassigned                           [IANA]
+        ipProto243 (243), -- Unassigned                           [IANA]
+        ipProto244 (244), -- Unassigned                           [IANA]
+        ipProto245 (245), -- Unassigned                           [IANA]
+        ipProto246 (246), -- Unassigned                           [IANA]
+        ipProto247 (247), -- Unassigned                           [IANA]
+        ipProto248 (248), -- Unassigned                           [IANA]
+        ipProto249 (249), -- Unassigned                           [IANA]
+        ipProto250 (250), -- Unassigned                           [IANA]
+        ipProto251 (251), -- Unassigned                           [IANA]
+        ipProto252 (252), -- Unassigned                           [IANA]
+        ipProto253 (253), -- Use for experimentation and testing [RFC3692] 
+        ipProto254 (254), -- Use for experimentation and testing [RFC3692] 
+        ipProto255 (255)  -- Reserved                             [IANA]
+    }
+--
+-- ctIGMP Config
+--
+ctIGMPConfig OBJECT IDENTIFIER      ::= { ctIGMP 1 }
+
+ctIGMPNewDefaultState OBJECT-TYPE
+     SYNTAX     INTEGER {
+                        enable(1),
+                        disable(2) }
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+          "This object defines the state in which IGMP will view new VLAN IDs 
+           added to the system.  A value of Enable (1), indicates that IGMP will
+           create entries for all new VLANs in the ENABLE state.  A value of 
+           Disable (2), indicates IGMP will create entries for all new VLANs in
+           the DISABLED or 'not in service' state."
+     DEFVAL { disable }
+     ::= { ctIGMPConfig 1 }
+
+ctIGMPMibRev OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "This object defines the revision of the IGMP MIB in the firmware."
+     ::= { ctIGMPConfig 2 }
+
+ctIGMPMibRevString OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "This object is a textual representation of the revision of the IGMP
+           MIB in the firmware."
+     ::= { ctIGMPConfig 3 }
+
+ctIGMPConfigGroupTblFullAction OBJECT-TYPE
+     SYNTAX    INTEGER {
+                        routers(1),
+                          flood(2) }
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+          "This object defines the behavior of IGMP when its group table
+           is full.  The user may choose to send multicast frames to
+           known routers, or flood these frames to the vlan."
+     DEFVAL  { 2 }
+     ::= { ctIGMPConfig 4 }
+
+--
+-- The ctIGMP Vlan Table
+--
+
+ctIGMPVlanTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CtIGMPVlanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The (conceptual) table listing the VLANs on which IGMP
+          is enabled."
+     ::= { ctIGMP 2 }
+
+ctIGMPVlanEntry OBJECT-TYPE
+     SYNTAX     CtIGMPVlanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "An entry (conceptual row) representing a VLAN on
+          which IGMP is enabled."
+     INDEX { ctIGMPVlanId }
+     ::= { ctIGMPVlanTable 1 }
+
+CtIGMPVlanEntry      ::= SEQUENCE {
+     ctIGMPVlanId                       VlanId,
+     ctIGMPVlanQueryInterval            Integer32,
+     ctIGMPVlanStatus                   RowStatus,
+     ctIGMPVlanVersion                  INTEGER,
+     ctIGMPVlanQuerier                  IpAddress,
+     ctIGMPVlanQueryMaxResponseTime     Integer32,
+     ctIGMPVlanRobustness               Integer32,
+     ctIGMPVlanLastMembQueryIntvl       Integer32,
+     ctIGMPVlanQuerierUpTime            Integer32,
+     ctIGMPVlanQuerierExpiryTime        Integer32,
+     ctIGMPVlanQuerierIP                IpAddress
+     }
+
+ctIGMPVlanId OBJECT-TYPE
+     SYNTAX     VlanId
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The VlanId value of the Vlan for which IGMP is enabled."
+     ::= { ctIGMPVlanEntry 1 }
+
+ctIGMPVlanQueryInterval OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "seconds"
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The frequency at which IGMP Host-Query packets are
+          transmitted on this Vlan."
+     REFERENCE
+          "Network Working Group RFC2236, November 1997. Section 8.2"
+     DEFVAL { 125 }
+     ::= { ctIGMPVlanEntry 2 }
+
+ctIGMPVlanStatus OBJECT-TYPE
+     SYNTAX     RowStatus
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The activation of a row enables IGMP on the Vlan. The
+          destruction of a row disables IGMP on the Vlan."
+     ::= { ctIGMPVlanEntry 3 }
+
+ctIGMPVlanVersion OBJECT-TYPE
+     SYNTAX     INTEGER {
+                        version1(1),
+                        version2(2) }
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The version of IGMP which is running on this Vlan.
+          This object can be used to configure a switch capable of
+          either value. For IGMP to function correctly, all
+          and routers on a Vlan must be configured to run the
+          same version of IGMP on that Vlan."
+     REFERENCE
+          "Network Working Group RFC2236, November 1997. Section 4"
+     DEFVAL { version2 }
+     ::= { ctIGMPVlanEntry 4 }
+
+ctIGMPVlanQuerier OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The address of the IGMP Querier on the Vlan to which
+          this switch is attached."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 3"
+     ::= { ctIGMPVlanEntry 5 }
+
+ctIGMPVlanQueryMaxResponseTime OBJECT-TYPE
+     SYNTAX     Integer32 (1..25)
+     UNITS      "seconds"
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The maximum query response time advertised in IGMPv2
+          queries on this Vlan."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 8.3"
+     DEFVAL { 10 }
+     ::= { ctIGMPVlanEntry 6 }
+
+
+ctIGMPVlanRobustness OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The Robustness Variable allows tuning for the expected
+          packet loss on a Vlan. If a Vlan is expected to be
+          lossy, the Robustness Variable may be increased. IGMP is
+          robust to (Robustness Variable-1) packet losses."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 8.1"
+     DEFVAL { 2 }
+     ::= { ctIGMPVlanEntry 7 }
+
+ctIGMPVlanLastMembQueryIntvl OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "tenths of seconds"
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The Last Member Query Interval is the Max Response Time
+          inserted into Group-Specific Queries sent in response to
+          Leave Group messages, and is also the amount of time between
+          Group-Specific Query messages. This value may be tuned to
+          modify the leave latency of the network. A reduced value
+          results in reduced time to detect the loss of the last
+          member of a group."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 8.8"
+     DEFVAL { 10 }
+     ::= { ctIGMPVlanEntry 8 }
+
+
+ctIGMPVlanQuerierUpTime OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "seconds"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of seconds since ctIGMPVlanQuerier was last
+         changed."
+     ::= { ctIGMPVlanEntry 9 }
+
+ctIGMPVlanQuerierExpiryTime OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "seconds"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The number of seconds remaining before the Other Querier
+          Present Timer expires. If the local system is the querier,
+          the value of this object is zero."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 8.5"
+     ::= { ctIGMPVlanEntry 10 }
+
+ctIGMPVlanQuerierIP OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+          "The source IP address used by a switch when acting as IGMP
+           querier for a Vlan. The value chosen must be in the valid
+           IP address space for any attached routed interface(s) on
+           the Vlan. A value of 0.0.0.0 indicates that the switch will
+           not act as querier for the Vlan."
+     REFERENCE
+         "Network Working Group RFC2236, November 1997. Section 7"
+--     DEFVAL {"0.0.0.0"}
+     ::= { ctIGMPVlanEntry 11 }
+
+--
+-- The IGMP Cache Table
+--
+
+ctIGMPCacheTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CtIGMPCacheEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The (conceptual) table listing the IP multicast groups for
+          vlans with members on a particular interface."
+     ::= { ctIGMP 3 }
+
+ctIGMPCacheEntry OBJECT-TYPE
+     SYNTAX     CtIGMPCacheEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "An entry (conceptual row) in the ctIGMPCacheTable."
+     INDEX { ctIGMPCacheAddress, ctIGMPCacheVlanId, ctIGMPCacheIfIndex }
+     ::= { ctIGMPCacheTable 1 }
+
+CtIGMPCacheEntry      ::= SEQUENCE {
+     ctIGMPCacheAddress                 IpAddress,
+     ctIGMPCacheVlanId                  VlanId,
+     ctIGMPCacheIfIndex                 InterfaceIndex,
+     ctIGMPCacheLastReporter            IpAddress,
+     ctIGMPCacheUpTime                  TimeTicks,
+     ctIGMPCacheExpiryTime              TimeTicks,
+     ctIGMPCacheVersion1HostTimer       Integer32
+     }
+
+ctIGMPCacheAddress OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The IP multicast group address for which this entry
+          contains information."
+     ::= { ctIGMPCacheEntry 1 }
+
+ctIGMPCacheVlanId OBJECT-TYPE
+     SYNTAX     VlanId
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The VlanId for which this entry contains information."
+     ::= { ctIGMPCacheEntry 2 }
+
+ctIGMPCacheIfIndex OBJECT-TYPE
+     SYNTAX     InterfaceIndex
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The interface for which this entry contains information for
+          an IP multicast group address."
+     ::= { ctIGMPCacheEntry 3 }
+
+ctIGMPCacheLastReporter OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The IP address of the source of the last membership report
+          received for this IP Multicast group address on this
+          interface. If no membership report has been received, this
+          object has the value 0.0.0.0."
+     ::= { ctIGMPCacheEntry 4 }
+
+ctIGMPCacheUpTime OBJECT-TYPE
+     SYNTAX     TimeTicks
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The time since the system joined this group address, or
+          zero if the system is not currently a member."
+     ::= { ctIGMPCacheEntry 5 }
+
+ctIGMPCacheExpiryTime OBJECT-TYPE
+     SYNTAX     TimeTicks
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The minimum amount of time remaining before this entry will
+          be aged out."
+     ::= { ctIGMPCacheEntry 6 }
+
+ctIGMPCacheVersion1HostTimer OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "seconds"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The time remaining until the local switch will assume that
+          there are no longer any IGMP version 1 members on the IP
+          subnet attached to this interface.  Upon hearing any IGMPv1
+          Membership Report, this value is reset to the group
+          membership timer.  While this time remaining is non-zero,
+          the local switch ignores any IGMPv2 Leave messages for this
+          group that it receives on this interface."
+     REFERENCE
+          "Network Working Group RFC2236, November 1997. Section 8.11"
+    ::= { ctIGMPCacheEntry 7 }
+
+--
+-- The IGMP Receiver Policy Table
+--
+
+ctIGMPPolicyTable           OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CtIGMPPolicyEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+          "The (conceptual) table listing the IGMP group policy
+          for vlans with members on a particular interface."
+     ::= { ctIGMP 4 }
+
+ctIGMPPolicyEntry           OBJECT-TYPE
+     SYNTAX     CtIGMPPolicyEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+          "An entry (conceptual row) in the ctigmpPolicyTable."
+     INDEX { ctIGMPPolicyAddress, ctIGMPPolicyVlanId, ctIGMPPolicyIfIndex }
+     ::= { ctIGMPPolicyTable 1 }
+
+CtIGMPPolicyEntry      ::= SEQUENCE {
+             
+        ctIGMPPolicyAddress     IpAddress,
+        ctIGMPPolicyVlanId      Integer32,
+        ctIGMPPolicyIfIndex     InterfaceIndex,
+        ctIGMPPolicyStatus      RowStatus,
+        ctIGMPPolicyInclusion   INTEGER
+     }
+
+ctIGMPPolicyAddress         OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+          "The IP multicast group address for which this entry
+          contains information. A value of 224.0.0.0 indicates
+          all multicast groups."
+     ::= { ctIGMPPolicyEntry 1 }
+
+ctIGMPPolicyVlanId          OBJECT-TYPE
+     SYNTAX     Integer32 (1..4094)
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+          "The VlanId for which this entry contains information."
+     ::= { ctIGMPPolicyEntry 2 }
+
+ctIGMPPolicyIfIndex         OBJECT-TYPE
+     SYNTAX     InterfaceIndex
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+          "The interface for which this entry contains information for
+          an IP multicast group address. A value of zero indicates all
+          ports."
+     ::= { ctIGMPPolicyEntry 3 }
+
+ctIGMPPolicyStatus          OBJECT-TYPE
+     SYNTAX     RowStatus
+     MAX-ACCESS read-create
+     STATUS     deprecated
+     DESCRIPTION
+          "The activation of a row enables IGMP policy for this entry.
+           The destruction of a row disables any IGMP policy for this
+           entry."
+     ::= { ctIGMPPolicyEntry 4 }
+
+ctIGMPPolicyInclusion       OBJECT-TYPE
+     SYNTAX     INTEGER {
+                        include(1),
+                        exclude(2) }
+     MAX-ACCESS read-create
+     STATUS     deprecated
+     DESCRIPTION
+          "The IGMP policy for this entry."
+     DEFVAL { exclude }
+     ::= { ctIGMPPolicyEntry 5 }
+
+--
+-- The ctIGMPStaticEntry Table
+--
+ctIGMPStaticTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtIGMPStaticEntry
+    MAX-ACCESS    not-accessible
+    STATUS        deprecated
+    DESCRIPTION
+         "The (conceptual) table listing the static IGMP entries."
+    ::= { ctIGMP 5 }
+
+ctIGMPStaticEntry OBJECT-TYPE
+    SYNTAX        CtIGMPStaticEntry
+    MAX-ACCESS    not-accessible
+    STATUS        deprecated
+    DESCRIPTION
+         "An entry (conceptual row) representing a static entry that
+         IGMP will act upon."
+    INDEX { ctIGMPStaticGroupAddress, ctIGMPStaticVlanId }
+::= { ctIGMPStaticTable 1 }
+
+CtIGMPStaticEntry ::= SEQUENCE {
+        ctIGMPStaticGroupAddress                IpAddress,
+        ctIGMPStaticVlanId                      Integer32,
+        ctIGMPStaticOutPortList                 PortList,
+        ctIGMPStaticRowStatus                   RowStatus
+     }
+
+ctIGMPStaticGroupAddress OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS        deprecated
+    DESCRIPTION
+         " The IP multicast group address for IGMP to send
+         multicast data to."
+    ::= { ctIGMPStaticEntry 1 }
+
+ctIGMPStaticVlanId OBJECT-TYPE
+    SYNTAX        Integer32 (1..4094)
+    MAX-ACCESS    not-accessible
+    STATUS        deprecated
+    DESCRIPTION
+         "The VlanId for IGMP to send multicast data to."
+    ::= { ctIGMPStaticEntry 2 }
+
+ctIGMPStaticOutPortList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+         "The set of ports configured by management for this multicast
+          group and this VLAN to which multicast group-addressed
+          data frames are to be forwarded."
+    ::= { ctIGMPStaticEntry 3 }
+
+ctIGMPStaticRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        deprecated
+    DESCRIPTION
+         "The activation of a row creates a static entry.
+          The destruction of a row deletes a static entry."
+    ::= { ctIGMPStaticEntry 4 }
+
+
+
+--
+-- The ctIGMPStaticGroup Table
+--
+ctIGMPStaticGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtIGMPStaticGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The (conceptual) table listing the static IGMP entries."
+    ::= { ctIGMP 6 }
+
+ctIGMPStaticGroupEntry OBJECT-TYPE
+    SYNTAX        CtIGMPStaticGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An entry (conceptual row) representing a static entry that
+         IGMP will act upon."
+    INDEX { ctIGMPStaticGroupIPAddress,
+            ctIGMPStaticGroupVlanId,
+            ctIGMPStaticGroupSourceIPAddress }
+::= { ctIGMPStaticGroupTable 1 }
+
+CtIGMPStaticGroupEntry ::= SEQUENCE {
+        ctIGMPStaticGroupIPAddress                   IpAddress,
+        ctIGMPStaticGroupVlanId                      VlanId,
+        ctIGMPStaticGroupSourceIPAddress             IpAddress,
+        ctIGMPStaticGroupIncludeList                 PortList,
+        ctIGMPStaticGroupExcludeList                 PortList,
+        ctIGMPStaticGroupRowStatus                   RowStatus
+     }
+
+ctIGMPStaticGroupIPAddress OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The IP multicast group address for IGMP to send
+         multicast data to."
+    ::= { ctIGMPStaticGroupEntry 1 }
+
+ctIGMPStaticGroupVlanId OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The VlanId for IGMP to send multicast data to."
+    ::= { ctIGMPStaticGroupEntry 2 }
+
+ctIGMPStaticGroupSourceIPAddress OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The IP source address of this entry. For IGMP Version 2,
+          use 0.0.0.0"
+    ::= { ctIGMPStaticGroupEntry 3 }
+
+ctIGMPStaticGroupIncludeList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "The set of ports configured by management for this multicast
+          group and this VLAN to which multicast group-addressed
+          data frames are to be forwarded."
+    ::= { ctIGMPStaticGroupEntry 4 }
+
+ctIGMPStaticGroupExcludeList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         " The set of ports configured by management for this multicast
+           group and this VLAN for which received IGMP reports will not
+           be accepted."
+    ::= { ctIGMPStaticGroupEntry 5 }
+
+ctIGMPStaticGroupRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The activation of a row creates a static entry.
+          The destruction of a row deletes a static entry.
+          Not in service disables a static entry"
+    ::= { ctIGMPStaticGroupEntry 6 }
+
+--
+-- The IGMP Extended Cache Table
+--
+
+ctIGMPExtCacheTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CtIGMPExtCacheEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          "The (conceptual) table listing the IP multicast groups for
+          vlans with members on a particular interface. This table
+          provides a version 3 capable ctIGMPCacheTable, with a bridge
+          portlist leaf vs mib2 interface index."
+     ::= { ctIGMP 7 }
+
+ctIGMPExtCacheEntry OBJECT-TYPE
+     SYNTAX     CtIGMPExtCacheEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          " An entry (conceptual row) in the ctIGMPCacheTable."
+     INDEX { ctIGMPExtCacheAddress,
+             ctIGMPExtCacheVlanId,
+             ctIGMPExtCacheSourceIPAddress }
+     ::= { ctIGMPExtCacheTable 1 }
+
+CtIGMPExtCacheEntry      ::= SEQUENCE {
+     ctIGMPExtCacheAddress              IpAddress,
+     ctIGMPExtCacheVlanId               VlanId,
+     ctIGMPExtCacheSourceIPAddress      IpAddress,
+     ctIGMPExtCacheLastReporter         IpAddress,
+     ctIGMPExtCacheUpTime               TimeTicks,
+     ctIGMPExtCacheExpiryTime           TimeTicks,
+     ctIGMPExtCacheVersion1HostTimer    Integer32,
+     ctIGMPExtCacheOutPortList          PortList,
+     ctIGMPExtCacheSrcPort              INTEGER
+     }
+
+ctIGMPExtCacheAddress OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          " The IP multicast group address for this entry."
+     ::= { ctIGMPExtCacheEntry 1 }
+
+ctIGMPExtCacheVlanId OBJECT-TYPE
+     SYNTAX     VlanId
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          " The VlanId for this entry"
+     ::= { ctIGMPExtCacheEntry 2 }
+
+ctIGMPExtCacheSourceIPAddress OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+          " The IP source address of this entry."
+     ::= { ctIGMPExtCacheEntry 3 }
+
+ctIGMPExtCacheLastReporter OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          " The IP address of the source of the last membership report
+          received for this IP Multicast group address on this
+          interface. If no membership report has been received, this
+          object has the value 0.0.0.0."
+     ::= { ctIGMPExtCacheEntry 4 }
+
+ctIGMPExtCacheUpTime OBJECT-TYPE
+     SYNTAX     TimeTicks
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          " The time since the system joined this group address, or
+          zero if the system is not currently a member."
+     ::= { ctIGMPExtCacheEntry 5 }
+
+ctIGMPExtCacheExpiryTime OBJECT-TYPE
+     SYNTAX     TimeTicks
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          " The minimum amount of time remaining before this entry will
+          be aged out."
+     ::= { ctIGMPExtCacheEntry 6 }
+
+ctIGMPExtCacheVersion1HostTimer OBJECT-TYPE
+     SYNTAX     Integer32
+     UNITS      "seconds"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          " The time remaining until the local switch will assume that
+          there are no longer any IGMP version 1 members on the IP
+          subnet attached to this interface.  Upon hearing any IGMPv1
+          Membership Report, this value is reset to the group
+          membership timer.  While this time remaining is non-zero,
+          the local switch ignores any IGMPv2 Leave messages for this
+          group that it receives on this interface."
+     REFERENCE
+          "Network Working Group RFC2236, November 1997. Section 8.11"
+    ::= { ctIGMPExtCacheEntry 7 }
+
+ctIGMPExtCacheOutPortList OBJECT-TYPE
+     SYNTAX     PortList
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          " The set of bridge ports for this multicast group, VLAN, and
+           source IP address, to which multicast group-addressed
+           data frames are being forwarded." 
+     ::= { ctIGMPExtCacheEntry 8 }
+
+ctIGMPExtCacheSrcPort OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+          " The source bridge port of the multicast data stream if available"
+     ::= { ctIGMPExtCacheEntry 9 }
+
+--
+-- The ctIGMPDiscoveredRouter Table
+--
+ctIGMPDiscoveredRouterTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtIGMPDiscoveredRouterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The (conceptual) table listing the routers seen on particular ports
+          of a vlan through either protocol snooping or ICMP Router Discovery."
+    ::= { ctIGMP 8 }
+
+ctIGMPDiscoveredRouterEntry OBJECT-TYPE
+    SYNTAX        CtIGMPDiscoveredRouterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An entry representing the routers seen on particular ports on a
+          given vlan id."
+    INDEX { ctIGMPDiscoveredRouterVlanId }
+::= { ctIGMPDiscoveredRouterTable 1 }
+
+CtIGMPDiscoveredRouterEntry ::= SEQUENCE {
+        ctIGMPDiscoveredRouterVlanId            VlanId,
+        ctIGMPDiscoveredRouterPortList          PortList,
+        ctIGMPDiscoveredRouterEgressPortList    PortList,
+        ctIGMPDiscoveredRouterStaticPortList    PortList
+     }
+
+ctIGMPDiscoveredRouterVlanId OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The VlanId for IGMP to send multicast data to."
+    ::= { ctIGMPDiscoveredRouterEntry 2 }
+
+ctIGMPDiscoveredRouterPortList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The set of bridge ports that IGMP has seen routing 
+          protocols, IGMP queries, or ICMP Router Discovery frames on."
+    ::= { ctIGMPDiscoveredRouterEntry 3 }
+
+ctIGMPDiscoveredRouterEgressPortList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The set of bridge ports that IGMP believes has valid
+          egress."
+    ::= { ctIGMPDiscoveredRouterEntry 4 }
+
+ctIGMPDiscoveredRouterStaticPortList OBJECT-TYPE
+    SYNTAX        PortList
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         " The set of bridge ports to flood all multicast frames to for
+            this vlan id. This leaf is OPTIONAL"
+    ::= { ctIGMPDiscoveredRouterEntry 5 }
+
+--
+-- ctIGMPPort Table
+--
+ctIGMPPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtIGMPPortTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The (conceptual) table listing a bridge port's bindings to multicast
+          group addresses, vlan ids, and source addresses."
+    ::= { ctIGMP 9 }
+
+ctIGMPPortTableEntry OBJECT-TYPE
+    SYNTAX        CtIGMPPortTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An entry representing the binding of bridge port to multicast group
+          address, vlan id, and source IP address."
+    INDEX { ctIGMPPortMode,
+            dot1dBasePort,
+            ctIGMPPortTableGroupAddress,
+            ctIGMPPortTableVlanId,
+            ctIGMPPortTableSourceIPAddress }
+    ::= { ctIGMPPortTable 1 }
+
+CtIGMPPortTableEntry ::= SEQUENCE {
+        ctIGMPPortMode                          IgmpPortModeTc,
+        ctIGMPPortTableGroupAddress             IpAddress,
+        ctIGMPPortTableVlanId                   VlanId,
+        ctIGMPPortTableSourceIPAddress          IpAddress,
+        ctIGMPPortTableExpireTime               Integer32
+        }
+
+ctIGMPPortMode OBJECT-TYPE
+   SYNTAX         IgmpPortModeTc
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+        "The mode of the given bridge port."
+   ::= { ctIGMPPortTableEntry 1 }
+
+ctIGMPPortTableGroupAddress OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+        " The multicast group address bound to this port entry."
+   ::= { ctIGMPPortTableEntry 2 }
+
+ctIGMPPortTableVlanId OBJECT-TYPE
+   SYNTAX         VlanId
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+        " The vlan id bound to this port entry."
+   ::= { ctIGMPPortTableEntry 3 }
+
+ctIGMPPortTableSourceIPAddress OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+        " The IP source address bound to this port entry."
+   ::= { ctIGMPPortTableEntry 4 }
+
+ctIGMPPortTableExpireTime OBJECT-TYPE
+   SYNTAX         Integer32
+   UNITS          "seconds"
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+        " The time in seconds that this port will expire in."
+   ::= { ctIGMPPortTableEntry 5 }
+
+--
+-- IGMP Statistics/Counters
+--
+
+ctIGMPStatsCntrs OBJECT IDENTIFIER      ::= { ctIGMP 10 }
+
+ctIGMPStatsCntrsGroupFull OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " Flag to indicate if the group table is full(true) or not(false)."
+    ::= { ctIGMPStatsCntrs 1 }
+
+ctIGMPStatsCntrsNumV1QueriesSent OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 1 queries this device has sent out."
+    ::= { ctIGMPStatsCntrs 2 }
+
+ctIGMPStatsCntrsNumV2QueriesSent OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 2 queries this device has sent out."
+    ::= { ctIGMPStatsCntrs 3 }
+
+ctIGMPStatsCntrsNumV3QueriesSent OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 3 queries this device has sent out."
+    ::= { ctIGMPStatsCntrs 4 }
+
+ctIGMPStatsCntrsNumGSQueriesSent OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of Group Specific queries this device has sent out."
+    ::= { ctIGMPStatsCntrs 5 }
+
+ctIGMPStatsCntrsNumQueriesRcvd OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP queries this device has seen from the network."
+    ::= { ctIGMPStatsCntrs 6 }
+
+ctIGMPStatsCntrsNumV1ReportsRcvd OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 1 reports this device has received."
+    ::= { ctIGMPStatsCntrs 7 }
+
+ctIGMPStatsCntrsNumV2ReportsRcvd OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 2 reports this device has received."
+    ::= { ctIGMPStatsCntrs 8 }
+
+ctIGMPStatsCntrsNumV3ReportsReceived OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP Version 3 reports this device has received."
+    ::= { ctIGMPStatsCntrs 9 }
+
+ctIGMPStatsCntrsNumLeavesReceived OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of IGMP leaves this device has received."
+    ::= { ctIGMPStatsCntrs 10 }
+
+ctIGMPStatsCntrsNumDroppedFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         " The number of frames dropped by IGMP on this device."
+    ::= { ctIGMPStatsCntrs 11 }
+
+---
+--- Protocol Classification table
+---
+
+
+
+ctIGMPProtocolClassificationTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtIGMPProtocolClassificationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         " This table contains a listing of how IGMP will
+           classify received IP protocol frames. For example,
+           for a UDP multicast frame received which is IP type 17,
+           IGMP can classify that frame in one of three ways.
+           It can be classified as a multicast data frame, a routing protocol,
+           or it can be ignored. A user may have a need to multicast
+           TCP frames, but still want to send them ONLY to IGMP clients.
+           To do this one would set protocol id 6(TCP) to 'multicastPata'"
+    ::= { ctIGMP 11 }
+
+ctIGMPProtocolClassificationEntry OBJECT-TYPE
+    SYNTAX        CtIGMPProtocolClassificationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         " An entry representing the binding of IP protocol id, to
+           the IGMP classification of a received frame."
+    INDEX { ctIGMPProtocolClassification }
+    ::= { ctIGMPProtocolClassificationTable 1 }
+
+CtIGMPProtocolClassificationEntry ::= SEQUENCE {
+    ctIGMPProtocolClassification            IgmpProtocolClassTc,
+    ctIGMPProtocolIdentifier                IgmpProtocolIdTc
+    }
+
+ctIGMPProtocolClassification OBJECT-TYPE
+    SYNTAX        IgmpProtocolClassTc
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         " The classification of this protocol id.
+           1 - Classify as multicast data frame.
+           2 - Classify as a routing protocol.
+           3 - Classify as Ignore."
+    ::= { ctIGMPProtocolClassificationEntry 1}
+
+ctIGMPProtocolIdentifier OBJECT-TYPE
+    SYNTAX        IgmpProtocolIdTc
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         " The set of IP protocol ids to apply the classification to.
+           Example: If this set has protocols(bits) 1 and 5 set to a
+           '1', and the classification is 'multicastData', this will
+           force IGMP to treat received frames with IP protocol ids of
+           1 and 5 as 'multicast data', and forward those frames to 
+           IGMP joined clients. Similarly if ids 1 and 5 were set to 
+           'routing protocol' then IGMP would treat received frames with
+           these ids as routing protocols, etc. "
+    ::= { ctIGMPProtocolClassificationEntry 2}
+END

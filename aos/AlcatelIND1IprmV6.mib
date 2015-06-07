@@ -1,0 +1,368 @@
+ALCATEL-IND1-IPRMV6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IANAipRouteProtocol
+        FROM IANA-RTPROTO-MIB
+    Ipv6Address, Ipv6IfIndex
+        FROM IPV6-TC
+    routingIND1Iprm
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1IPRMV6MIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of IPRMv6 global configuration parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Iprm 2 }
+
+alcatelIND1IPRMV6MIBObjects  OBJECT IDENTIFIER ::= { alcatelIND1IPRMV6MIB 1 }
+
+alaIprmV6Config  OBJECT IDENTIFIER ::= { alcatelIND1IPRMV6MIBObjects 1 }
+
+-- IPv6 Route Table
+
+alaIprmV6RouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaIprmV6RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "IPRM's IPv6 Routing table. This table contains
+       an entry for each valid IPv6 unicast route that
+       can be used for packet forwarding determination.  
+       It is for display purposes only."
+    ::= { alaIprmV6Config 1 }
+
+alaIprmV6RouteEntry OBJECT-TYPE
+    SYNTAX     AlaIprmV6RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A routing entry."
+    INDEX {
+        alaIprmV6RouteDest,
+        alaIprmV6RoutePfxLength,
+        alaIprmV6RouteNextHop,
+        alaIprmV6RouteProtocol,
+        alaIprmV6RouteIfIndex
+        }
+    ::= { alaIprmV6RouteTable 1 }
+
+AlaIprmV6RouteEntry ::=
+    SEQUENCE {
+        alaIprmV6RouteDest      Ipv6Address,
+        alaIprmV6RoutePfxLength INTEGER,
+        alaIprmV6RouteNextHop   Ipv6Address,
+        alaIprmV6RouteProtocol  IANAipRouteProtocol,
+        alaIprmV6RouteIfIndex   Ipv6IfIndex,
+        alaIprmV6RouteMetric    Unsigned32,
+        alaIprmV6RouteValid     TruthValue
+    }
+
+alaIprmV6RouteDest OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The destination IPv6 address of this route."
+    ::= { alaIprmV6RouteEntry 1 }
+
+alaIprmV6RoutePfxLength OBJECT-TYPE
+    SYNTAX     INTEGER(0..128)
+    UNITS      "bits"
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Indicates the prefix length of the destination
+        address."
+    ::= { alaIprmV6RouteEntry 2 }
+
+alaIprmV6RouteNextHop OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "On remote routes, the address of the next
+        system en route;  otherwise, ::0
+        ('00000000000000000000000000000000'H in ASN.1
+        string representation)."
+    ::= { alaIprmV6RouteEntry 3 }
+
+alaIprmV6RouteProtocol OBJECT-TYPE
+    SYNTAX     IANAipRouteProtocol
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The protocol that this route was learned from"
+    ::= { alaIprmV6RouteEntry 4 }
+
+alaIprmV6RouteIfIndex OBJECT-TYPE
+    SYNTAX     Ipv6IfIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value which uniquely identifies the local
+        interface through which the next hop of this
+        route should be reached."
+    ::= { alaIprmV6RouteEntry 5 }
+
+alaIprmV6RouteMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The routing metric for this route. The
+        semantics of this metric are determined by the
+        routing protocol specified in the route's
+        ipv6RouteProtocol value."
+    ::= { alaIprmV6RouteEntry 6 }
+
+alaIprmV6RouteValid OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "If this value is true(1) IPRM believes the
+        route is being used.  If this value is false(2),
+        the route is currently not being used and is
+        considered a backup route."
+    ::= { alaIprmV6RouteEntry 7 }
+
+
+-- IPRM's IPv6 Static Routes Table
+
+alaIprmV6StaticRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF AlaIprmV6StaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "Table allowing the creation and removal of IPv6 Static Routes."
+    ::= { alaIprmV6Config 2 }
+
+alaIprmV6StaticRouteEntry OBJECT-TYPE
+    SYNTAX   AlaIprmV6StaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "An IPv6 static route entered by the user"
+    INDEX {
+        alaIprmV6StaticRouteDest,
+        alaIprmV6StaticRoutePfxLength,
+        alaIprmV6StaticRouteNextHop,
+        alaIprmV6StaticRouteIfIndex
+        }
+    ::= { alaIprmV6StaticRouteTable 1 }
+
+AlaIprmV6StaticRouteEntry ::=
+    SEQUENCE {
+        alaIprmV6StaticRouteDest      Ipv6Address,
+        alaIprmV6StaticRoutePfxLength INTEGER,
+        alaIprmV6StaticRouteNextHop   Ipv6Address,
+        alaIprmV6StaticRouteIfIndex   Ipv6IfIndex,
+        alaIprmV6StaticRouteMetric    Unsigned32,
+        alaIprmV6StaticRouteStatus    RowStatus
+    }
+
+alaIprmV6StaticRouteDest OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The destination IPv6 address of this static route.
+       This object may not take a multicast address value."
+    ::= { alaIprmV6StaticRouteEntry 1 }
+
+alaIprmV6StaticRoutePfxLength OBJECT-TYPE
+    SYNTAX      INTEGER(0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates the prefix length of the destination
+        address."
+    ::= { alaIprmV6StaticRouteEntry 2 }
+
+alaIprmV6StaticRouteNextHop OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address of the next hop towards the
+        destination."
+    ::= { alaIprmV6StaticRouteEntry 3 }
+
+alaIprmV6StaticRouteIfIndex OBJECT-TYPE
+    SYNTAX      Ipv6IfIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value which uniquely identifies the local
+        interface through which the next hop of this
+        route should be reached."
+    ::= { alaIprmV6StaticRouteEntry 4 }
+
+alaIprmV6StaticRouteMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The routing metric for this route. The lower the
+        value, the higher the priority for the static 
+        route."
+    DEFVAL      { 1 }
+    ::= { alaIprmV6StaticRouteEntry 5 }
+
+alaIprmV6StaticRouteStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Used to control the addition and removal of static 
+        routes."
+    ::= { alaIprmV6StaticRouteEntry 6 }
+
+
+-- IPRM's IPV6 Route Preference Configurations
+
+alaIprmV6RtPrefLocal OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on IPv6 Local Routes."
+    DEFVAL      { 1 }
+    ::= { alaIprmV6Config 3 }
+
+alaIprmV6RtPrefStatic OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on IPv6 Static Routes."
+    DEFVAL      { 2 }
+    ::= { alaIprmV6Config 4 }
+
+alaIprmV6RtPrefOspf OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on IPv6 Ospf Routes."
+    DEFVAL      { 110 }
+    ::= { alaIprmV6Config 5 }
+
+alaIprmV6RtPrefRip OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on IPv6 RIP Routes."
+    DEFVAL      { 120 }
+    ::= { alaIprmV6Config 6 }
+
+alaIprmV6RtPrefEbgp OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on External IPv6 BGP Routes."
+    DEFVAL      { 190 }
+    ::= { alaIprmV6Config 7 }
+
+alaIprmV6RtPrefIbgp OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Internal IPv6 BGP Routes."
+    DEFVAL      { 200 }
+    ::= { alaIprmV6Config 8 }
+
+
+-- conformance information
+
+alcatelIND1IPRMV6MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPRMV6MIB 2 }
+alcatelIND1IPRMV6MIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1IPRMV6MIBConformance 1 }
+alcatelIND1IPRMV6MIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1IPRMV6MIBConformance 2 }
+
+-- compliance statements
+
+alaIprmV6Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running IPRM
+            and implementing the ALCATEL-IND1-IPRMV6 MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaIprmV6ConfigMIBGroup }
+
+    ::= { alcatelIND1IPRMV6MIBCompliances 1 }
+
+-- units of conformance
+
+alaIprmV6ConfigMIBGroup OBJECT-GROUP
+    OBJECTS {   alaIprmV6RouteMetric, alaIprmV6RouteValid, 
+                alaIprmV6StaticRouteMetric, alaIprmV6StaticRouteStatus, 
+                alaIprmV6RtPrefLocal, alaIprmV6RtPrefStatic, 
+                alaIprmV6RtPrefOspf, alaIprmV6RtPrefRip,
+                alaIprmV6RtPrefEbgp, alaIprmV6RtPrefIbgp
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of the IPRM Module supporting IPv6 routes."
+    ::= { alcatelIND1IPRMV6MIBGroups 1 }
+
+
+END
+

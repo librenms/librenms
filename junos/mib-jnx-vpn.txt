@@ -1,0 +1,1125 @@
+--
+-- read-write/read-create objects have been changed to read-only
+-- since this implmentation does not support write/create access.
+--
+JUNIPER-VPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Counter64, Gauge32, Integer32,
+    TimeTicks, Unsigned32
+                                      FROM SNMPv2-SMI
+    InetAddress, InetAddressType
+                                      FROM INET-ADDRESS-MIB
+    InterfaceIndexOrZero
+                                      FROM IF-MIB
+    TEXTUAL-CONVENTION, RowStatus, StorageType
+                                      FROM SNMPv2-TC
+    SnmpAdminString
+                                      FROM SNMP-FRAMEWORK-MIB
+    jnxMibs
+                                      FROM JUNIPER-SMI;
+
+jnxVpnMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150000Z"
+    ORGANIZATION "IETF Provider Provisioned VPNs WG"
+    CONTACT-INFO
+        "        Kireeti Kompella
+         Postal: Juniper Networks, Inc.
+                 1194 Mathilda Ave
+                 Sunnyvale, CA 94089
+            Tel: +1 408 745 2000
+         E-mail: kireeti@juniper.net"
+    DESCRIPTION
+        "Extended VPN MIB module to support VPN Identifier for locally switched
+         L2 circuits."
+
+    -- revision history
+    REVISION "201010150000Z"
+    DESCRIPTION
+	"Corrected DISPLAY-HINT for TEXTUAL-CONVENTIONs associated with a
+	 JnxVpnIdentifier."
+    REVISION "201008270000Z"
+    DESCRIPTION
+        "Corrected related TEXTUAL-CONVENTIONs associated with a JnxVpnIdentifier."
+    REVISION "200204212128Z"
+    DESCRIPTION
+        "A VPN MIB module that allows one to configure and monitor
+         several types of Provider Provisioned VPNs. Initial revision."
+    ::= { jnxMibs 26 }
+
+jnxVpnMIBNotifications OBJECT IDENTIFIER ::= { jnxVpnMIB 0 }
+jnxVpnMibObjects       OBJECT IDENTIFIER ::= { jnxVpnMIB 1 }
+jnxVpnMIBConformance   OBJECT IDENTIFIER ::= { jnxVpnMIB 2 }
+
+-- Textual Conventions
+
+JnxVpnName ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Name of the VPN." 
+    SYNTAX     OCTET STRING (SIZE (1..128))
+
+JnxVpnType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Type of the VPN.  The following types have been defined:
+         bgpIpVpn:   RFC 4364 VPNs;
+         bgpL2Vpn:   BGP-based Layer 2 VPNs (see
+                     draft-kompella-ppvpn-l2vpn);
+         bgpVpls:    BGP-based VPLS (see draft-kompella-ppvnp-vpls);
+         l2Circuit:  LDP-based point-to-point Layer 2 circuits (see
+                     RFC 4906);
+         ldpVpls:    LDP-based VPLS (see
+                     draft-lasserre-vkompella-ppvpn-vpls);
+         opticalVpn: BGP-based Optical (port based) VPNs (see
+                     draft-ouldbrahim-bgpgmpls-ovpn);
+         vpOxc:      Virtual Private Optical Cross-Connect (see
+                     draft-ouldbrahim-ppvpn-vpoxc);
+         ccc:        proprietary Layer 2 circuit;
+         bgpAtmVpn:  ATM over MPLS (draft to be published)."
+    SYNTAX      INTEGER {
+        other(1),
+        bgpIpVpn(2),
+        bgpL2Vpn(3),
+        bgpVpls(4),
+        l2Circuit(5),
+        ldpVpls(6),
+        opticalVpn(7),
+        vpOxc(8),
+        ccc(9),
+        bgpAtmVpn(10)
+    }
+
+JnxVpnIdentifierType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Type of the VPN Identifier.  This includes Route
+         Distinguishers, Route Targets, and VC IDs.
+
+         none(0)                 This value MUST be used if the value of the
+                                 corresponding JnxVpnIdentifier object is a
+                                 zero-length string.
+
+         other(1)                A VPN identifier that does not match one of
+                                 the types defined in this MIB.
+
+         routeDistinguisher(2)   A VPN identifier as defined by the
+                                 JnxVpnRouteDistinguisher textual convention.
+
+         routeDistinguisher0(3)   A VPN identifier as defined by the
+                                 JnxVpnRouteDistinguisher0 textual convention.
+
+         routeDistinguisher1(4)  A VPN identifier as defined by the
+                                 JnxVpnRouteDistinguisher1 textual convention.
+
+         routeDistinguisher2(5)  A VPN identifier as defined by the
+                                 JnxVpnRouteDistinguisher2 textual convention.
+
+         routeTarget(6)          A VPN identifier as defined by the
+                                 JnxVpnRouteTarget textual convention.
+
+         routeTarget0(7)         A VPN identifier as defined by the
+                                 JnxVpnRouteTarget0 textual convention.
+
+         routeTarget1(8)         A VPN identifier as defined by the
+                                 JnxVpnRouteTarget1 textual convention.
+
+         routeTarget2(9)         A VPN identifier as defined by the
+                                 JnxVpnRouteTarget2 textual convention.
+
+         vcId(10)                A VPN identifier as defined by the
+                                 JnxVpnVCIdentifier textual convention.
+
+         localSwitch(11)         A VPN identifier as defined by the
+                                 JnxVpnLocalSwitchIdentifier textual convention."
+    SYNTAX  INTEGER {
+        none(0),
+        other(1),
+        routeDistinguisher(2),
+        routeDistinguisher0(3),
+        routeDistinguisher1(4),
+        routeDistinguisher2(5),
+        routeTarget(6),
+        routeTarget0(7),
+        routeTarget1(8),
+        routeTarget2(9),
+        vcId(10),
+        localSwitch(11)
+    }
+
+JnxVpnIdentifier ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Syntax for a VPN identifier.  A VPN Identifier is always
+         interpreted within the context of an jnxVpnIdentifierType
+         value.  The jnxVpnIdentifierType object which defines the
+         context must be registered immediately before the object
+         which uses the VpnIdentifier textual convention.  In other
+         words, the object identifiers for the jnxVpnIdentifierType
+         object and the jnxVpnIdentifier object MUST have the same
+         length and the last sub-identifier of the jnxVpnIdentifierType  
+         object MUST be 1 less than the last sub-identifier of the
+         jnxVpnIdentifier object."
+    SYNTAX      OCTET STRING(SIZE (0..256))
+
+JnxVpnRouteDistinguisher ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:1x:1x:1x:1x:1x:1x:1x"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Generic Route Distinguisher."
+    REFERENCE
+        "BGP/MPLS VPNs, RFC 4364."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteDistinguisher0 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-2d:4d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 0 Route Distinguisher."
+    REFERENCE
+        "BGP/MPLS VPNs, RFC 4364."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteDistinguisher1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-1d.1d.1d.1d:2d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 1 Route Distinguisher."
+    REFERENCE
+        "BGP/MPLS VPNs, RFC 4364."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteDistinguisher2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-4d:2d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 2 Route Distinguisher."
+    REFERENCE
+        "BGP/MPLS VPNs, RFC 4364."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteTarget ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:1x:1x:1x:1x:1x:1x:1x"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Generic Route Target."
+    REFERENCE
+        "BGP Extended Communities Attribute, RFC 4360."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteTarget0 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-4d:2d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 00 Route Target."
+    REFERENCE
+        "BGP Extended Communities Attribute, RFC 4360."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnRouteTarget1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-1d.1d.1d.1d:2d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 01 Route Target."
+    REFERENCE
+        "BGP Extended Communities Attribute, RFC 4360."
+     SYNTAX      OCTET STRING(SIZE (8))        
+
+JnxVpnRouteTarget2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x-2d:4d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a Type 02 Route Target."
+    REFERENCE
+        "BGP Extended Communities Attribute, RFC 4360."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnVCIdentifier ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d:4d"
+    STATUS      current 
+    DESCRIPTION
+        "Represents a PE ID, VC ID pair.  The PE ID is the Router ID
+         of the remote PE.  The VC ID follows the description given
+         in draft-martini-l2circuit-trans."
+    SYNTAX      OCTET STRING(SIZE (8))
+
+JnxVpnMultiplexor ::= TEXTUAL-CONVENTION
+    STATUS      current  
+    DESCRIPTION 
+        "Syntax for a VPN multiplexor/demultiplexor within a
+         Pseudo-Wire Tunnel."
+    SYNTAX      Unsigned32
+
+JnxVpnLocalSwitchIdentifier ::= TEXTUAL-CONVENTION
+    STATUS      current 
+    DESCRIPTION
+        "The string representing the name of two interfaces that are being 
+         locally switched separated by a colon."
+    SYNTAX      OCTET STRING(SIZE (1..256))
+
+
+-- vpnInfo
+
+jnxVpnInfo OBJECT IDENTIFIER ::= { jnxVpnMibObjects 1 }
+
+jnxVpnConfiguredVpns OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of configured VPNs."
+    ::= { jnxVpnInfo 1 }
+
+jnxVpnActiveVpns OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of active VPNs."
+    ::= { jnxVpnInfo 2 }
+
+jnxVpnNextIfIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Next free VPN interface index."
+    ::= { jnxVpnInfo 3 }
+
+jnxVpnNextPwIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Next free Pseudo-Wire index."
+    ::= { jnxVpnInfo 4 }
+
+jnxVpnNextRTIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Next free Route Target index."
+    ::= { jnxVpnInfo 5 }
+
+-- vpnTable
+
+jnxVpnTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxVpnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table of Configured VPNs."
+    ::= { jnxVpnMibObjects 2 }
+
+jnxVpnEntry OBJECT-TYPE
+    SYNTAX     JnxVpnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about a particular VPN."
+    INDEX { jnxVpnType, jnxVpnName }
+    ::= { jnxVpnTable 1 }
+
+JnxVpnEntry ::=
+    SEQUENCE {
+        -- Indices
+        jnxVpnType                   JnxVpnType,
+        jnxVpnName                   JnxVpnName,
+        -- Conceptual row information
+        jnxVpnRowStatus              RowStatus,
+        jnxVpnStorageType            StorageType,
+        -- Configured information
+        jnxVpnDescription            SnmpAdminString,
+        jnxVpnIdentifierType         JnxVpnIdentifierType,
+        jnxVpnIdentifier             JnxVpnIdentifier,
+        -- Dynamic information
+        jnxVpnConfiguredSites        Gauge32,
+        jnxVpnActiveSites            Gauge32,
+        jnxVpnLocalAddresses         Gauge32,
+        jnxVpnTotalAddresses         Gauge32,
+        jnxVpnAge                    TimeTicks
+    }
+
+jnxVpnType OBJECT-TYPE
+    SYNTAX     JnxVpnType
+    MAX-ACCESS not-accessible
+--    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of the VPN."
+    ::= { jnxVpnEntry 1 }
+
+jnxVpnName OBJECT-TYPE
+    SYNTAX     JnxVpnName
+    MAX-ACCESS not-accessible
+--    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Name of the VPN.  This should ideally be unique in the
+         Service Provider's domain; at a minimum, it MUST be
+         unique per Provider Edge router."
+    ::= { jnxVpnEntry 2 }
+
+jnxVpnRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a
+         row in this table."
+    ::= { jnxVpnEntry 3 }
+
+jnxVpnStorageType OBJECT-TYPE 
+    SYNTAX     StorageType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable indicates the storage type for this object."
+    ::= { jnxVpnEntry 4 }
+
+jnxVpnDescription OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "String describing the VPN."
+    ::= { jnxVpnEntry 5 }
+
+jnxVpnIdentifierType OBJECT-TYPE
+    SYNTAX     JnxVpnIdentifierType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of the following JnxVpnIdentifier."
+    ::= { jnxVpnEntry 6 }
+
+jnxVpnIdentifier OBJECT-TYPE
+    SYNTAX     JnxVpnIdentifier
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "In the case of BGP VPNs, this is the Route Distinguisher
+         for the VPN.  In the case of LDP VPNs, this is the VC ID
+         for the circuit.  A value of all zeros indicates that the
+         neither a Route Distinguisher nor a VC ID is configured
+         for the VPN."
+    ::= { jnxVpnEntry 7 }
+
+jnxVpnConfiguredSites OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of sites configured in the VPN.  Must be set
+         to zero if not applicable."
+    ::= { jnxVpnEntry 8 }
+
+jnxVpnActiveSites OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of active sites (i.e., sites whose state is
+         active) in the VPN."
+    ::= { jnxVpnEntry 9 }
+
+jnxVpnLocalAddresses OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of addresses learned from the CE device."
+    ::= { jnxVpnEntry 10 }
+
+jnxVpnTotalAddresses OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of addresses in the VPN RIB."
+    ::= { jnxVpnEntry 11 }
+
+jnxVpnAge OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The age (i.e., time from creation till now) of this
+         VPN in hundredths of a second."
+    ::= { jnxVpnEntry 12 }
+
+-- vpn interface table
+
+jnxVpnIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxVpnIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table of VPN Interfaces."
+    ::= { jnxVpnMibObjects 3 }
+
+jnxVpnIfEntry OBJECT-TYPE
+    SYNTAX     JnxVpnIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about a particular VPN
+         interface."
+    INDEX { jnxVpnIfVpnType, jnxVpnIfVpnName, jnxVpnIfIndex }
+    ::= { jnxVpnIfTable 1 }
+
+JnxVpnIfEntry ::=
+    SEQUENCE {
+        -- Indices
+        jnxVpnIfVpnType              JnxVpnType,
+        jnxVpnIfVpnName              JnxVpnName,
+        jnxVpnIfIndex                Unsigned32,
+        -- Conceptual row information
+        jnxVpnIfRowStatus            RowStatus,
+        jnxVpnIfStorageType          StorageType,
+        -- Configured information
+        jnxVpnIfAssociatedPw         Unsigned32,
+        jnxVpnIfProtocol             INTEGER,
+        jnxVpnIfInBandwidth          Unsigned32,
+        jnxVpnIfOutBandwidth         Unsigned32,
+        -- Dynamic information
+        jnxVpnIfStatus               INTEGER
+    }
+
+jnxVpnIfVpnType OBJECT-TYPE
+    SYNTAX     JnxVpnType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Type of the VPN to which this interface belongs."
+    ::= { jnxVpnIfEntry 1 }
+
+jnxVpnIfVpnName OBJECT-TYPE
+    SYNTAX     JnxVpnName
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Name of the VPN to which this interface belongs."
+    ::= { jnxVpnIfEntry 2 }
+
+jnxVpnIfIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The index of this interface in the VPN.  Each interface
+         in the VPN is given a unique index.  The RowStatus says
+         whether a given interface (i.e., a row in this table)
+         is valid or not. Note: this index MUST NOT be zero."
+    ::= { jnxVpnIfEntry 3 }
+
+jnxVpnIfRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a
+         row in this table."
+    ::= { jnxVpnIfEntry 4 }
+
+jnxVpnIfStorageType OBJECT-TYPE 
+    SYNTAX     StorageType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable indicates the storage type for this object."
+    ::= { jnxVpnIfEntry 5 }
+
+jnxVpnIfAssociatedPw OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Index of associated Pseudo-wire, if any, in which case
+         the index MUST be non-zero.  If none, then this index
+         MUST be zero."
+    ::= { jnxVpnIfEntry 6 }
+
+jnxVpnIfProtocol OBJECT-TYPE
+    SYNTAX     INTEGER {
+        other(0),
+        frameRelay(1),
+        atmAal5(2),
+        atmCell(3),
+        ethernetVlan(4),
+        ethernet(5),
+        ciscoHdlc(6),
+        ppp(7),
+        cem(8),
+        atmVcc(9),
+        atmVpc(10),
+        vpls(11),
+        ipInterworking(12),
+        snapInterworking(13),
+        frameRelayPort(15),
+        satope1(17),
+        satopt1(18),
+        static(20),
+        rip(21),
+        ospf(22),
+        bgp(23),
+        satope3(24),
+        satopt3(25),
+        cesop(26),
+        atmTrunkNNI(129),
+        atmTrunkUNI(130)
+    }
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Protocol running over this VPN interface.  The values up to
+         10 are taken from draft-martini-l2circuit-trans-mpls-08.txt;
+         the value for vpls is taken from
+         draft-lasserre-vkompella-ppvpn-vpls-01.txt.  The values
+         from 20-23 are used when the VPN is a Layer 3 VPN."
+    ::= { jnxVpnIfEntry 7 }
+
+jnxVpnIfInBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Maximum bandwidth that the CE connected over this VPN i/f
+         can send to the PE, in Kilo (i.e., 1000) Bytes per second.
+         A value of zero means there is no configured maximum."
+    ::= { jnxVpnIfEntry 8 }
+
+jnxVpnIfOutBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Maximum bandwidth that the PE can send to the CE over this
+         VPN interface, in Kilo (i.e., 1000) Bytes per second.  A
+         value of zero means there is no configured maximum."
+    ::= { jnxVpnIfEntry 9 }
+
+jnxVpnIfStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown(0),
+        noLocalInterface(1),
+        disabled(2),
+        encapsulationMismatch(3),
+        down(4),
+        up(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status of this interface."
+    ::= { jnxVpnIfEntry 10 }
+
+-- vpnPwTable
+
+jnxVpnPwTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxVpnPwEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table of Pseudo-Wire Connections."
+    ::= { jnxVpnMibObjects 4 }
+
+jnxVpnPwEntry OBJECT-TYPE
+    SYNTAX     JnxVpnPwEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about a particular VPN."
+    INDEX { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+    ::= { jnxVpnPwTable 1 }
+
+JnxVpnPwEntry ::=    
+    SEQUENCE {
+        -- Indices
+        jnxVpnPwVpnType              JnxVpnType,
+        jnxVpnPwVpnName              JnxVpnName,
+        jnxVpnPwIndex                Unsigned32,
+        -- Conceptual row information
+        jnxVpnPwRowStatus            RowStatus,
+        jnxVpnPwStorageType          StorageType,
+        -- Information about the Pseudo-Wire
+        jnxVpnPwAssociatedInterface  Unsigned32,
+        jnxVpnPwLocalSiteId          Unsigned32,
+        jnxVpnPwRemoteSiteId         Unsigned32,
+        jnxVpnRemotePeIdAddrType     InetAddressType,
+        jnxVpnRemotePeIdAddress      InetAddress,
+        jnxVpnPwTunnelType           INTEGER,
+        jnxVpnPwTunnelName           SnmpAdminString,
+        jnxVpnPwReceiveDemux         JnxVpnMultiplexor,
+        jnxVpnPwTransmitDemux        JnxVpnMultiplexor,
+        -- Status information
+        jnxVpnPwStatus               INTEGER,
+        jnxVpnPwTunnelStatus         INTEGER,
+        jnxVpnPwRemoteSiteStatus     INTEGER,
+        jnxVpnPwTimeUp               TimeTicks,
+        jnxVpnPwTransitions          Gauge32,
+        jnxVpnPwLastTransition       TimeTicks,
+        -- Performance data
+        jnxVpnPwPacketsSent          Counter64,
+        jnxVpnPwOctetsSent           Counter64,
+        jnxVpnPwPacketsReceived      Counter64,
+        jnxVpnPwOctetsReceived       Counter64,
+        jnxVpnPwLRPacketsSent        Counter32,
+        jnxVpnPwLROctetsSent         Counter32,
+        jnxVpnPwLRPacketsReceived    Counter32,
+        jnxVpnPwLROctetsReceived     Counter32
+    }
+
+jnxVpnPwVpnType OBJECT-TYPE
+    SYNTAX     JnxVpnType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The type of the VPN to which this Pseudo-Wire belongs."
+    ::= { jnxVpnPwEntry 1 }
+
+jnxVpnPwVpnName OBJECT-TYPE
+    SYNTAX     JnxVpnName
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the VPN to which this Pseudo-Wire belongs."
+    ::= { jnxVpnPwEntry 2 }
+
+jnxVpnPwIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The index of this Pseudo-Wire in the VPN.  Each Pseudo
+         Wire in the VPN is given a unique index.  The RowStatus
+         says whether a given Pseudo Wire (i.e., a row in this
+         table) is valid or not. Note: this index MUST NOT be zero."
+    ::= { jnxVpnPwEntry 3 }
+
+jnxVpnPwRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a
+         row in this table."
+    ::= { jnxVpnPwEntry 4 }
+
+jnxVpnPwStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable indicates the storage type for this object."
+    ::= { jnxVpnPwEntry 5 }
+
+jnxVpnPwAssociatedInterface OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VPN index of the interface associated with this Pseudo
+         Wire, if any.  If there is no interface associated with
+         this Pseudo Wire, a value of zero is to be returned."
+    ::= { jnxVpnPwEntry 6 }
+
+jnxVpnPwLocalSiteId OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local site identifier for this Pseudo-Wire.  If there
+         is no local site identifier, a value of zero is to be
+         returned."
+    ::= { jnxVpnPwEntry 7 }
+
+jnxVpnPwRemoteSiteId OBJECT-TYPE
+    SYNTAX     Unsigned32
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote site (i.e., the site at the other end of this
+         Pseudo-Wire) identifier.  If there is no remote site
+         identifier, a value of zero is to be returned."
+    ::= { jnxVpnPwEntry 8 }
+
+jnxVpnRemotePeIdAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+--    MAX-ACCESS    read-create
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of address assigned to the remote PE."
+    ::= { jnxVpnPwEntry 9 }
+
+jnxVpnRemotePeIdAddress OBJECT-TYPE
+    SYNTAX        InetAddress
+--    MAX-ACCESS    read-create
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The address of the remote PE, i.e., the router at the
+         other end of the Pseudo-Wire."
+    ::= { jnxVpnPwEntry 10 }
+
+jnxVpnPwTunnelType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        static(1),
+        gre(2),
+        l2tpv3(3),
+        ipSec(4),
+        ldp(5),
+        rsvpTe(6),
+        crLdp(7)
+    }
+--    MAX-ACCESS    read-create
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of the tunnel over which the Pseudo-Wire is
+         carried.  If several Pseudo-Wires can be carried in one
+         tunnel, each Pseudo-Wire is identified by the multiplexor/
+         demultiplexor within this tunnel."
+    ::= { jnxVpnPwEntry 11 }
+
+jnxVpnPwTunnelName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The name of the Tunnel over which this Pseudo-Wire is
+         carried, if any."
+    ::= { jnxVpnPwEntry 12 }
+
+jnxVpnPwReceiveDemux OBJECT-TYPE
+    SYNTAX     JnxVpnMultiplexor
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the demultiplexor that identifies received
+         packets as belonging to this Pseudo-Wire, if any."
+    ::= { jnxVpnPwEntry 13 }
+
+jnxVpnPwTransmitDemux OBJECT-TYPE
+    SYNTAX     JnxVpnMultiplexor
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the demultiplexor that identifies transmitted
+         packets as belonging to this Pseudo-Wire, if any."
+    ::= { jnxVpnPwEntry 14 }
+
+jnxVpnPwStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown(0),
+        down(1),
+        up(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status of the Pseudo-Wire."
+    ::= { jnxVpnPwEntry 15 }
+
+jnxVpnPwTunnelStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown(0),
+        down(1),
+        testing(2),
+        up(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status of the PE-to-PE tunnel over which the Pseudo-
+         Wire is carried."
+    ::= { jnxVpnPwEntry 16 }
+
+jnxVpnPwRemoteSiteStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown(0),
+        outOfRange(1),
+        down(2),
+        up(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status of the interface at the remote end of the
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 17 }
+
+jnxVpnPwTimeUp OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total time in hundredths of a second that this
+         Pseudo-Wire has been operational."
+    ::= { jnxVpnPwEntry 18 }
+
+jnxVpnPwTransitions OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of state transitions (up -> down and
+         down -> up) this Tunnel has undergone."
+    ::= { jnxVpnPwEntry 19 }
+
+jnxVpnPwLastTransition OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The time in hundredths of a second since the last
+         transition occurred on this Tunnel."
+    ::= { jnxVpnPwEntry 20 }
+
+jnxVpnPwPacketsSent OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been sent over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 21 }
+
+jnxVpnPwOctetsSent OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have been sent over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 22 }
+
+jnxVpnPwPacketsReceived OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been received over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 23 }
+
+jnxVpnPwOctetsReceived OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have been received over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 24 }
+
+jnxVpnPwLRPacketsSent OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been sent over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 25 }
+
+jnxVpnPwLROctetsSent OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have been sent over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 26 }
+
+jnxVpnPwLRPacketsReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been received over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 27 }
+
+jnxVpnPwLROctetsReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have been received over this
+         Pseudo-Wire."
+    ::= { jnxVpnPwEntry 28 }
+
+-- Route Target table
+
+jnxVpnRTTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxVpnRTEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table of Route Targets for a VPN."
+    ::= { jnxVpnMibObjects 5 }
+
+jnxVpnRTEntry OBJECT-TYPE
+    SYNTAX     JnxVpnRTEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about a particular VPN."
+    INDEX { jnxVpnRTVpnType, jnxVpnRTVpnName, jnxVpnRTIndex }
+    ::= { jnxVpnRTTable 1 }
+
+JnxVpnRTEntry ::=
+    SEQUENCE {
+        -- Indices
+        jnxVpnRTVpnType     JnxVpnType,
+        jnxVpnRTVpnName     JnxVpnName,
+        jnxVpnRTIndex       Unsigned32,
+        -- Conceptual row information
+        jnxVpnRTRowStatus   RowStatus,
+        jnxVpnRTStorageType StorageType,
+        -- Route Target information
+        jnxVpnRTType        JnxVpnIdentifierType,
+        jnxVpnRT            JnxVpnIdentifier,
+        jnxVpnRTFunction    INTEGER 
+    }
+
+jnxVpnRTVpnType OBJECT-TYPE
+    SYNTAX     JnxVpnType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The type of the VPN for which this list of Route Targets
+         are defined."
+    ::= { jnxVpnRTEntry 1 }
+
+jnxVpnRTVpnName OBJECT-TYPE
+    SYNTAX     JnxVpnName
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The name of the VPN for which this list of Route Targets
+         are defined."
+    ::= { jnxVpnRTEntry 2 }
+
+jnxVpnRTIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index within the list of Route Targets that specifies
+         individual Route Targets that define the VPN.  Note: this
+         index MUST NOT be zero."
+    ::= { jnxVpnRTEntry 3 }
+
+jnxVpnRTRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a
+         row in this table."
+    ::= { jnxVpnRTEntry 4 }
+
+jnxVpnRTStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable indicates the storage type for this object."
+    ::= { jnxVpnRTEntry 5 }
+
+jnxVpnRTType OBJECT-TYPE
+    SYNTAX     JnxVpnIdentifierType
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of the following Route Target.  This can one of
+         'routeTarget[012]' or 'none'."
+    ::= { jnxVpnRTEntry 6 }
+
+jnxVpnRT OBJECT-TYPE
+    SYNTAX     JnxVpnIdentifier
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Route Target for the VPN.  If the jnxVpnRTType is
+         'none', this value should be all zeros."
+    ::= { jnxVpnRTEntry 7 }
+
+jnxVpnRTFunction OBJECT-TYPE
+   SYNTAX        INTEGER { import(1), export(2), both(3) }
+--    MAX-ACCESS read-create
+    MAX-ACCESS read-only
+   STATUS        current
+   DESCRIPTION
+       "The route target export distribution type."
+    ::= { jnxVpnRTEntry 8 }
+
+--
+-- definition of VPN notifications
+--
+
+jnxVpnIfUp NOTIFICATION-TYPE
+    OBJECTS         { jnxVpnIfVpnType, jnxVpnIfVpnName, jnxVpnIfIndex }
+    STATUS          current
+    DESCRIPTION
+        "A jnxVpnIfUp notification is generated when the interface
+         with index jnxVpnIfIndex belonging to the VPN named jnxVpnIfVpnName 
+         of type jnxVpnIfVpnType transitions out of the 'down' state."
+   ::= { jnxVpnMIBNotifications 1 }
+
+jnxVpnIfDown NOTIFICATION-TYPE
+    OBJECTS         { jnxVpnIfVpnType, jnxVpnIfVpnName, jnxVpnIfIndex }
+    STATUS          current
+    DESCRIPTION
+       "A jnxVpnIfDown notification is generated when the interface
+        with index jnxVpnIfIndex belonging to the VPN named jnxVpnIfVpnName 
+        of type jnxVpnIfVpnType transitions to the 'down' state."
+    ::= { jnxVpnMIBNotifications 2 }
+
+jnxVpnPwUp NOTIFICATION-TYPE
+    OBJECTS         { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+    STATUS          current
+    DESCRIPTION
+        "A jnxVpnPwUp notification is generated when the Pseudo-Wire
+         with index jnxVpnPwIndex belonging to the VPN named jnxVpnPwVpnName 
+         of type jnxVpnPwVpnType transitions out of the 'down' state."
+    ::= { jnxVpnMIBNotifications 3 }
+
+jnxVpnPwDown NOTIFICATION-TYPE
+    OBJECTS         { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+    STATUS          current
+    DESCRIPTION
+        "A jnxVpnPwDown notification is generated when the Pseudo-Wire
+         with index jnxVpnPwIndex belonging to the VPN named jnxVpnPwVpnName 
+         of type jnxVpnPwVpnType transitions to the 'down' state."
+     ::= { jnxVpnMIBNotifications 4 }
+
+-- End of JUNIPER VPN MIB
+
+END

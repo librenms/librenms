@@ -1,0 +1,1160 @@
+-- Start - JUNIPER-WX-GLOBAL-MIB Module
+
+JUNIPER-WX-GLOBAL-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-IDENTITY, 
+	OBJECT-TYPE, 
+	Integer32 
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	jnxWxMibRoot
+		FROM JUNIPER-SMI;
+
+jnxWxGrpModule MODULE-IDENTITY
+    LAST-UPDATED    "200804081400Z"
+    ORGANIZATION    "Juniper Networks, Inc"
+    CONTACT-INFO    "
+          Customer Support
+          Juniper Networks, Inc.
+          1194 North Mathilda Avenue
+          Sunnyvale, CA  94089
+          support@juniper.net"
+
+    DESCRIPTION
+      "Juniper Networks enterprise MIB module for WAN
+       Acceleration (WX) product-line from software release
+       version JWOS 6.0 onwards.
+       "
+    ::= { jnxWxMibRoot 1 }
+
+jnxWxGrp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "The MIB group containing all status, statistics, events
+       and configuration information for WX product-line
+       from software release version JWOS 6.0 onwards.
+      "
+    ::= { jnxWxGrpModule 1 }
+
+jnxWxGrpStatus OBJECT-IDENTITY
+  STATUS  current
+  DESCRIPTION
+      "The MIB group containing status related information.
+      "
+  ::= { jnxWxGrp 1 }
+
+jnxWxGrpStats OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains statisitics related information.
+       It contains system, acceleration, compression and
+       wan performance data.
+      "
+    ::= { jnxWxGrp 2 }
+
+jnxWxGrpEvents OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains events related information.
+      "
+    ::= { jnxWxGrp 3 }
+
+jnxWxGrpConf OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains configuration related information.
+      "
+    ::= { jnxWxGrp 4 }
+
+  -- OID registrations for WX product lines
+  -- These OIDs are never queried by management stations.
+  -- They can be returned as product identifiers in responses.
+
+jnxWxGrpProduct OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains product related information.
+      "
+    ::= { jnxWxGrp 5 }
+
+jnxWxGrpProductWxc250 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        Sequence Caching Model 250"
+      ::= { jnxWxGrpProduct 1 }
+
+jnxWxGrpProductWxc500 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        Sequence Caching Model 500"
+      ::= { jnxWxGrpProduct 2 }
+
+jnxWxGrpProductWxc590 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        Sequence Caching Model 590"
+      ::= { jnxWxGrpProduct 3 }
+
+jnxWxGrpProductWxc1800 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        WAN Acceleration Model 1800
+        New in Phoenix"
+      ::= { jnxWxGrpProduct 4 }
+
+jnxWxGrpProductWxc2600 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        WAN Acceleration Model 2600
+        New in Phoenix"
+      ::= { jnxWxGrpProduct 5 }
+
+jnxWxGrpProductWxc3400 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        WAN Acceleration Model 3400
+        New in Phoenix"
+      ::= { jnxWxGrpProduct 6 }
+
+jnxWxGrpProductWxc7800 OBJECT-IDENTITY
+      STATUS          current
+      DESCRIPTION       "
+        WAN Acceleration Model 7800
+        New in Phoenix"
+      ::= { jnxWxGrpProduct 7 }
+
+
+END
+
+-- End - JUNIPER-WX-GLOBAL-MIB Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-STATUS-MIB Module
+
+JUNIPER-WX-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	jnxWxGrpStatus
+		FROM JUNIPER-WX-GLOBAL-MIB;
+
+------------------------------
+-- System Status Group --
+------------------------------
+
+jnxWxGrpStatusSys OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains WX system status information.
+      "
+    ::= { jnxWxGrpStatus 1 }
+
+jnxWxGrpStatusSysModel OBJECT-TYPE
+    SYNTAX INTEGER {
+        wxc250(1),
+        wxc500(2),
+        wxc590(3),
+        wxc1800(4),
+        wxc2600(5),
+        wxc3400(6),
+        wxc7800(7),
+        other(8)
+      }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The device model number.
+      "
+    ::= { jnxWxGrpStatusSys 1 }
+
+jnxWxGrpStatusSysSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The software version for this device.
+      "
+    ::= { jnxWxGrpStatusSys 2 }
+
+jnxWxGrpStatusSysHwVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The hardware version for this device.
+      "
+    ::= { jnxWxGrpStatusSys 3 }
+
+------------------------------
+-- Application Status Group --
+------------------------------
+jnxWxGrpStatusApp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains application status information.
+      "
+    ::= { jnxWxGrpStatus 2 }
+
+jnxWxGrpStatusAppMonCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Number of applications currently being monitored.
+      "
+    ::= { jnxWxGrpStatusApp 1 }
+
+jnxWxGrpStatusAppTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxWxGrpStatusAppEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table displays the application level status.
+       It contains information for only the applications currently
+       being monitored.
+      "
+    ::= { jnxWxGrpStatusApp 2 }
+
+jnxWxGrpStatusAppEntry OBJECT-TYPE
+    SYNTAX  JnxWxGrpStatusAppEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A row in jnxWxGrpStatusAppTable.
+      "
+    INDEX   { jnxWxGrpStatusAppId }
+    ::= { jnxWxGrpStatusAppTable 1 }
+
+JnxWxGrpStatusAppEntry ::=
+    SEQUENCE
+    {
+      jnxWxGrpStatusAppId
+        Integer32,
+      jnxWxGrpStatusAppName
+        DisplayString,
+      jnxWxGrpStatusAppType
+        INTEGER
+    }
+
+jnxWxGrpStatusAppId OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The unique application ID.
+      "
+    ::= { jnxWxGrpStatusAppEntry 1 }
+
+jnxWxGrpStatusAppName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The application name.
+      "
+    ::= { jnxWxGrpStatusAppEntry 2 }
+
+jnxWxGrpStatusAppType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        default(1),
+        ftp(2)
+      }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The application type.
+      "
+    ::= { jnxWxGrpStatusAppEntry 3 }
+
+------------------------------
+-- Remote WX Status Group --
+------------------------------
+jnxWxGrpStatusRemoteWx OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains remote WX status information.
+      "
+    ::= { jnxWxGrpStatus 3 }
+
+jnxWxGrpStatusRemoteWxMonCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Number of remote WXs currently being monitored.
+      "
+    ::= { jnxWxGrpStatusRemoteWx 1 }
+
+jnxWxGrpStatusRemoteWxTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxWxGrpStatusRemoteWxEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table displays the application level status.
+       It contains information for only the applications currently
+       being monitored.
+      "
+    ::= { jnxWxGrpStatusRemoteWx 2 }
+
+jnxWxGrpStatusRemoteWxEntry OBJECT-TYPE
+    SYNTAX  JnxWxGrpStatusRemoteWxEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A row in jnxWxGrpStatusRemoteWxTable.
+      "
+    INDEX   { jnxWxGrpStatusRemoteWxId }
+    ::= { jnxWxGrpStatusRemoteWxTable 1 }
+
+JnxWxGrpStatusRemoteWxEntry ::=
+    SEQUENCE
+    {
+      jnxWxGrpStatusRemoteWxId
+        Integer32,
+      jnxWxGrpStatusRemoteWxName
+        DisplayString,
+      jnxWxGrpStatusRemoteWxType
+        INTEGER
+    }
+
+jnxWxGrpStatusRemoteWxId OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The unique Remote WX ID.
+      "
+    ::= { jnxWxGrpStatusRemoteWxEntry 1 }
+
+jnxWxGrpStatusRemoteWxName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The remote WX name.
+      "
+    ::= { jnxWxGrpStatusRemoteWxEntry 2 }
+
+jnxWxGrpStatusRemoteWxType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        wx-device(1),
+        wx-client(2),
+        non-wx-device(3)
+      }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The remote WX type.
+      "
+    ::= { jnxWxGrpStatusRemoteWxEntry 3 }
+
+END
+
+-- End - JUNIPER-WX-STATUS-MIB Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-STATS-MIB Module
+
+JUNIPER-WX-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-IDENTITY,
+	OBJECT-TYPE, 
+	Counter64
+		FROM SNMPv2-SMI
+	jnxWxGrpStats
+		FROM JUNIPER-WX-GLOBAL-MIB
+	jnxWxGrpStatusAppId, 
+	jnxWxGrpStatusRemoteWxId 
+		FROM JUNIPER-WX-STATUS-MIB;
+
+------------------------------------------
+-- System Statistics Group --
+------------------------------------------
+jnxWxGrpStatsSys OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains statistics at the system level.
+      "
+    ::= { jnxWxGrpStats 1 }
+
+------------------------------------------
+-- System Passthrough Statistics --
+------------------------------------------
+jnxWxGrpStatsSysPt OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains passthrough statistics.
+      "
+    ::= { jnxWxGrpStatsSys 1 }
+
+jnxWxGrpStatsSysPtAppDefMatchBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru byte count because of application definition.
+       " 
+    ::= { jnxWxGrpStatsSysPt 1 }
+
+jnxWxGrpStatsSysPtAppDefMatchPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru packet count because of application definition.
+      "
+    ::= { jnxWxGrpStatsSysPt 2 }
+
+jnxWxGrpStatsSysPtNoRemoteWxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru byte count due to no Remote WX.
+      "
+    ::= { jnxWxGrpStatsSysPt 3 }
+
+jnxWxGrpStatsSysPtNoRemoteWxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru packet count due to no Remote WX.
+      "
+    ::= { jnxWxGrpStatsSysPt 4 }
+
+jnxWxGrpStatsSysPtNonTcpProtoBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru byte count because protocol is non-TCP.
+      "
+    ::= { jnxWxGrpStatsSysPt 5 }
+
+jnxWxGrpStatsSysPtNonTcpProtoPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru packet count because protocol is non-TCP.
+      " 
+    ::= { jnxWxGrpStatsSysPt 6 }
+
+jnxWxGrpStatsSysPtNonIpBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru byte count because of non-IP traffic like
+       Appletalk, IPX, etc.
+      "
+    ::= { jnxWxGrpStatsSysPt 7 }
+
+jnxWxGrpStatsSysPtNonIpPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru packet count because of non-IP traffic like
+       Appletalk, IPX, etc.
+      "
+    ::= { jnxWxGrpStatsSysPt 8 }
+
+jnxWxGrpStatsSysPtFragIpBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru because of fragmented IP packets.
+      "
+    ::= { jnxWxGrpStatsSysPt 9 }
+
+jnxWxGrpStatsSysPtFragIpPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru because of fragmented IP bytes.
+      "
+    ::= { jnxWxGrpStatsSysPt 10 }
+
+jnxWxGrpStatsSysPtVlanBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru due to VLAN bytes.
+      "
+    ::= { jnxWxGrpStatsSysPt 11 }
+
+jnxWxGrpStatsSysPtVlanPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru due to VLAN packets.
+      "
+    ::= { jnxWxGrpStatsSysPt 12 }
+
+jnxWxGrpStatsSysPtMcastBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru due to Multicast bytes.
+      "
+    ::= { jnxWxGrpStatsSysPt 13 }
+
+jnxWxGrpStatsSysPtMcastPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Passthru due to Multicast packets.
+      "
+    ::= { jnxWxGrpStatsSysPt 14 }
+
+-----------------------------------
+-- System Compression Statistics --
+-----------------------------------
+jnxWxGrpStatsSysComp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains Compression statistics at the system level.
+      "
+    ::= { jnxWxGrpStatsSys 2 }
+
+jnxWxGrpStatsSysCompFailAppDefDisableBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when compression failed because application
+       definition did not enable compression.
+      "
+    ::= { jnxWxGrpStatsSysComp 1 }
+
+jnxWxGrpStatsSysCompFailAppDefDisablePkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when compression failed because application
+       definition did not enable compression.
+      "
+    ::= { jnxWxGrpStatsSysComp 2 }
+
+jnxWxGrpStatsSysCompFailTcpAcclToRemoteBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when compression failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysComp 3 }
+
+jnxWxGrpStatsSysCompFailTcpAcclToRemotePkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when compression failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysComp 4 }
+
+jnxWxGrpStatsSysCompFailResCrunchBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when compression failed due to
+       resource crunch.
+      "
+    ::= { jnxWxGrpStatsSysComp 5 }
+
+jnxWxGrpStatsSysCompFailAlgoLimitBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when compression failed because of
+       algorithmic limitations.
+      "
+    ::= { jnxWxGrpStatsSysComp 6 }
+
+jnxWxGrpStatsSysCompTcpAcclFailedBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when compression failed because of
+       TCP acceleration error.
+      "
+    ::= { jnxWxGrpStatsSysComp 7 }
+
+jnxWxGrpStatsSysCompTcpAcclFailedPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when compression failed because of
+       TCP acceleration error.
+      "
+    ::= { jnxWxGrpStatsSysComp 8 }
+
+----------------------------
+-- System CIFS Statistics --
+----------------------------
+jnxWxGrpStatsSysCifs OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains CIFS statistics at the system level.
+      "
+    ::= { jnxWxGrpStatsSys 3 }
+
+jnxWxGrpStatsSysCifsFailAppDefBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when CIFS acceleration failed because
+       application definition did not enable CIFS.
+      "
+    ::= { jnxWxGrpStatsSysCifs 1 }
+
+jnxWxGrpStatsSysCifsFailAppDefPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when CIFS acceleration failed because
+       application definition did not enable CIFS.
+      "
+    ::= { jnxWxGrpStatsSysCifs 2 }
+
+jnxWxGrpStatsSysCifsFailTcpAcclToRemoteBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when CIFS failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysCifs 3 }
+
+jnxWxGrpStatsSysCifsFailTcpAcclToRemotePkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when CIFS failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysCifs 4 }
+
+jnxWxGrpStatsSysCifsFailTcpAcclFailedBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when CIFS failed because TCP
+       acceleration to remote WX failed.
+			"
+    ::= { jnxWxGrpStatsSysCifs 5 }
+
+jnxWxGrpStatsSysCifsFailTcpAcclFailedPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when CIFS failed because TCP
+       acceleration to remote WX failed.
+      "
+    ::= { jnxWxGrpStatsSysCifs 6 }
+
+------------------------------
+-- System Exchange Statistics 
+------------------------------
+
+jnxWxGrpStatsSysExchange OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains Exchange statistics at the system level.
+      "
+    ::= { jnxWxGrpStatsSys 4 }
+
+jnxWxGrpStatsSysExchangeFailAppDefBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when Exchange acceleration failed because
+       application definition did not enable CIFS.
+      "
+    ::= { jnxWxGrpStatsSysExchange 1 }
+
+jnxWxGrpStatsSysExchangeFailAppDefPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when Exchange acceleration failed because
+       application definition did not enable CIFS.
+      "
+    ::= { jnxWxGrpStatsSysExchange 2 }
+
+jnxWxGrpStatsSysExchangeFailTcpAcclToRemoteBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when Exchange failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysExchange 3 }
+
+jnxWxGrpStatsSysExchangeFailTcpAcclToRemotePkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when Exchange failed because TCP
+       acceleration was not configured to remote WX.
+      "
+    ::= { jnxWxGrpStatsSysExchange 4 }
+
+jnxWxGrpStatsSysExchangeFailTcpAcclFailedBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Byte count when Exchange failed because TCP
+       acceleration to remote WX failed.
+			"
+    ::= { jnxWxGrpStatsSysExchange 5 }
+
+jnxWxGrpStatsSysExchangeFailTcpAcclFailedPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "Packet count when Exchange failed because TCP
+       acceleration to remote WX failed.
+      "
+    ::= { jnxWxGrpStatsSysExchange 6 }
+
+jnxWxGrpStatsAccl OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains general acceleration statistics.
+      "
+    ::= { jnxWxGrpStats 2 }
+
+------------------------------------------------------------------
+-- TCP Acceleration Statistics for each Application and Remote Wx 
+------------------------------------------------------------------
+
+jnxWxGrpStatsTcpAcclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxWxGrpStatsTcpAcclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table displays the TCP acceleration statistics
+       for each application per remote WX currently being monitored.
+      "
+    ::= { jnxWxGrpStatsAccl 1 }
+
+jnxWxGrpStatsTcpAcclEntry OBJECT-TYPE
+    SYNTAX  JnxWxGrpStatsTcpAcclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A row in jnxWxGrpStatsTcpAcclTable.
+      "
+    INDEX   { jnxWxGrpStatusAppId, jnxWxGrpStatusRemoteWxId }
+    ::= { jnxWxGrpStatsTcpAcclTable 1 }
+
+JnxWxGrpStatsTcpAcclEntry ::=
+    SEQUENCE
+    {
+      jnxWxGrpStatsTcpAcclPtFlows
+        Counter,
+      jnxWxGrpStatsTcpAcclProxyFlows
+        Counter,
+      jnxWxGrpStatsTcpAcclPtFlowsDiff
+        Counter,
+      jnxWxGrpStatsTcpAcclProxyRequestsDiff
+        Counter,
+      jnxWxGrpStatsTcpAcclProxyFlowsDiff
+        Counter,
+      jnxWxGrpStatsTcpAcclFailedToProxyDiff
+        Counter
+    }
+
+jnxWxGrpStatsTcpAcclPtFlows OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of flows that are currently passthru.
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 1 }
+
+jnxWxGrpStatsTcpAcclProxyFlows OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of flows that are currently being proxied.
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 2 }
+
+jnxWxGrpStatsTcpAcclPtFlowsDiff OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of flows that went passthru for this app in 
+       last interval (10 sec). These will be delta stats.
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 3 }
+
+jnxWxGrpStatsTcpAcclProxyRequestsDiff OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of proxy flow request received in last sampling 
+       interval (10 sec). These will be delta stats.
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 4 }
+
+jnxWxGrpStatsTcpAcclProxyFlowsDiff OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of flows we decided to proxy in last sampling 
+       interval (10 sec). These will be delta stats.
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 5 }
+
+jnxWxGrpStatsTcpAcclFailedToProxyDiff OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of flows that could not be proxied for whatever 
+       reasons in last sampling interval (10 sec).
+      "
+    ::= { jnxWxGrpStatsTcpAcclEntry 6 }
+
+--------------------------------
+-- Compression Statistics Group 
+--------------------------------
+
+jnxWxGrpStatsComp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains compression statistics.
+      "
+    ::= { jnxWxGrpStats 3 }
+
+
+jnxWxGrpStatsCompTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxWxGrpStatsCompEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table displays the compression statistics
+       for each application per remote WX currently being monitored.
+      "
+    ::= { jnxWxGrpStatsComp 1 }
+
+jnxWxGrpStatsCompEntry OBJECT-TYPE
+    SYNTAX  JnxWxGrpStatsCompEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A row in jnxWxGrpStatsCompTable.
+      "
+    INDEX   { jnxWxGrpStatusAppId, jnxWxGrpStatusRemoteWxId }
+    ::= { jnxWxGrpStatsCompTable 1 }
+
+JnxWxGrpStatsCompEntry ::=
+    SEQUENCE
+    {
+      jnxWxGrpStatsCompBytesIn
+        Counter64,
+      jnxWxGrpStatsCompBytesOut
+        Counter64,
+      jnxWxGrpStatsCompCacheHits
+        Counter64,
+      jnxWxGrpStatsCompCacheMisses
+        Counter64
+    }
+
+jnxWxGrpStatsCompBytesIn OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of bytes in.
+      "
+    ::= { jnxWxGrpStatsCompEntry 1 }
+
+jnxWxGrpStatsCompBytesOut OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of bytes out.
+      "
+    ::= { jnxWxGrpStatsCompEntry 2 }
+
+jnxWxGrpStatsCompCacheHits OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of cache hits.
+      "
+    ::= { jnxWxGrpStatsCompEntry 3 }
+
+jnxWxGrpStatsCompCacheMisses OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of cache misses.
+      "
+    ::= { jnxWxGrpStatsCompEntry 4 }
+
+
+jnxWxGrpStatsWanPerf OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+      "This group contains WAN performance statistics.
+      "
+    ::= { jnxWxGrpStats 4 }
+
+jnxWxGrpStatsWanPerfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxWxGrpStatsWanPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table displays the WAN performance statistics
+       for each application per remote WX currently being monitored.
+      "
+    ::= { jnxWxGrpStatsWanPerf 1 }
+
+jnxWxGrpStatsWanPerfEntry OBJECT-TYPE
+    SYNTAX  JnxWxGrpStatsWanPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A row in jnxWxGrpStatsWanPerfTable.
+      "
+    INDEX   { jnxWxGrpStatusAppId, jnxWxGrpStatusRemoteWxId }
+    ::= { jnxWxGrpStatsWanPerfTable 1 }
+
+JnxWxGrpStatsWanPerfEntry ::=
+    SEQUENCE
+    {
+      jnxWxGrpStatsWanPerfBytesToWan
+        Counter64,
+      jnxWxGrpStatsWanPerfBytesFromWan
+        Counter64
+    }
+
+jnxWxGrpStatsWanPerfBytesToWan OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of bytes to WAN.
+      "
+    ::= { jnxWxGrpStatsWanPerfEntry 1 }
+
+jnxWxGrpStatsWanPerfBytesFromWan OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of bytes from WAN.
+      "
+    ::= { jnxWxGrpStatsWanPerfEntry 2 }
+
+END
+
+--End - JUNIPER-WX-STATS-MIB Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-EVENT-MIB Module
+
+JUNIPER-WX-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-IDENTITY,
+	OBJECT-TYPE, 
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	jnxWxGrpEvents
+		FROM JUNIPER-WX-GLOBAL-MIB;
+
+------------------------------
+-- Events Group --
+------------------------------
+
+jnxWxGrpEventV2 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "
+       Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+       have a zero as the next-to-last sub-identifier (as specified
+       in RFC1902).
+       "
+    ::= { jnxWxGrpEvents 0 }
+
+  -- Objects sent only in events
+
+jnxWxGrpEventDescr OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS    current
+    DESCRIPTION
+      "
+       String that provides a textual description of the event.
+      "
+    ::= { jnxWxGrpEvents 1 }
+
+ -- Event descriptions
+
+jnxWxGrpEventPowerSupplyFailure NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+      "One or more sources of power to the system have failed.
+      A redundant power-supply has presumably taken over.
+      "
+    ::= { jnxWxGrpEventV2 1 }
+
+jnxWxGrpEventPowerSupplyOk NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+      "One or more previously failed sources of power is now
+      working normally. The transition to normal condition happened
+      without the system having to be restarted.
+      "
+    ::= { jnxWxGrpEventV2 2 }
+
+jnxWxGrpEventLicenseWillExpire NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "The license for the system is about to
+      expire shortly. When it eventually does
+      expire, the system will switch over to
+      and stay in pass-through mode."
+    ::= { jnxWxGrpEventV2 3 }
+
+jnxWxGrpEventThruputLimitExceeded NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "The throughput of traffic through the device
+      has exceeded the limit for which it has
+      been licensed."
+    ::= { jnxWxGrpEventV2 4 }
+
+jnxWxGrpEventLicenseExpired NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "The license for the system expired.
+      As a result, the system will switch over to
+      and stay in pass-through mode."
+    ::= { jnxWxGrpEventV2 5 }
+
+jnxWxGrpEventClientLimitExceeded NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "Exceeded licensed maximum concurrent client connections. 
+       Please contact Juniper Networks to obtain a new license 
+       with higher number of concurrent client connections."
+    ::= { jnxWxGrpEventV2 6 }
+
+jnxWxGrpEventInFailSafeMode NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+      "This trap is sent when the device boots up in fail-safe mode.
+      This can happen for one of the following reasons:
+      Fail-safe reboot was explicitly initiated by the user.
+      The device rebooted automatically too many times because of
+      the failure of internal consistency checks or the failure of
+      tests that verify proper operation of the device."
+    ::= { jnxWxGrpEventV2 7 }
+
+jnxWxGrpEventInterfaceSpeedMismatch NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "A mismatch is detected between the local and remote
+      interface settings. This can happen due to a mismatch
+      in the local and remote interface speed or mode. "
+    ::= { jnxWxGrpEventV2 8 }
+
+jnxWxGrpEventInterfaceSpeedOk NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "A mismatch previously detected between the local and remote
+      interface settings is now resolved. The local and remote 
+      interface speed and mode are matched. "
+    ::= { jnxWxGrpEventV2 9 }
+
+jnxWxGrpEventInterfaceDuplexMismatch NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "A possible mismatch was detected between the duplex settings
+      of either the local or remote interface and that of the
+      device attached to that interface. The interface (local
+      or remote) is identified by the 'ifIndex' object.
+
+      Note that this notification is quite different from
+      jnxWxGrpEventInterfaceSpeedMismatch, which compares the
+      local and remote interfaces on the same WX device."
+    ::= { jnxWxGrpEventV2 10 }
+
+jnxWxGrpEventLoginFailure NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "A user's login attempt via the console/ssh/web server
+      failed due to incorrect username or password."
+    ::= { jnxWxGrpEventV2 11 }
+
+jnxWxGrpEventDiskFailure NOTIFICATION-TYPE
+    OBJECTS { jnxWxGrpEventDescr }
+    STATUS  current
+    DESCRIPTION
+      "A hard disk failed on the system. The system was rebooted,
+      and will now operate without the downed disk, at a degraded
+      performance. Dictionary accumulated until this point was lost."
+    ::= { jnxWxGrpEventV2 12 }
+END
+
+-- END - Juniper-WX-EVENT-MIB objects
+
+-- ========================================================================

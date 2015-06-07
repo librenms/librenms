@@ -1,0 +1,932 @@
+-- *****************************************************************
+-- CISCO-ENVMON-MIB.my:  CISCO Environmental Monitor MIB file
+--
+-- November 1994 Sandra C. Durham/Jeffrey T. Johnson
+--
+-- Copyright (c) 1994-2001, 2002 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+CISCO-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Gauge32,
+        Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        TruthValue
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ciscoMgmt
+                FROM CISCO-SMI;
+
+
+ciscoEnvMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "200311250000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 W Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                   Tel: +1 800 553-NETS
+
+                E-mail: cs-snmp@cisco.com"
+        DESCRIPTION
+                "The MIB module to describe the status of the Environmental
+                Monitor on those devices which support one."
+        REVISION        "200311250000Z"
+        DESCRIPTION
+                "Added ciscoEnvMonMIBMiscNotifGroup."
+        REVISION        "200210150000Z"
+        DESCRIPTION
+                "Added c7600(12) as values for ciscoEnvMonPresent"
+        REVISION        "200207170000Z"
+        DESCRIPTION
+                "Added optional groups ciscoEnvMonEnableStatChangeGroup
+                 and ciscoEnvMonStatChangeNotifGroup."
+        REVISION        "200202040000Z"
+        DESCRIPTION
+                "Added osr7600(11) as values 
+                for ciscoEnvMonPresent"        
+        REVISION        "200108300000Z"
+        DESCRIPTION
+                "Added c10000(10) as values for ciscoEnvMonPresent"
+        REVISION        "200108160000Z"
+        DESCRIPTION
+                "Added cat4000(9) as values for ciscoEnvMonPresent"
+        REVISION        "200105070000Z"
+        DESCRIPTION
+                "Added cat6000(7),ubr7200(8) 
+                as values for ciscoEnvMonPresent"
+        REVISION        "200001310000Z"
+        DESCRIPTION
+                "Add notFunctioning to CiscoEnvMonState.
+                "
+        REVISION        "9810220000Z"
+        DESCRIPTION
+                "Renamed enumerated value internalRPS(5) as 
+                 internalRedundant(5) and added description for
+                 ciscoEnvMonSupplySource enumerated values.
+                "
+        REVISION        "9808050000Z"
+        DESCRIPTION
+                "Add enumerated value internalRPS(5) to 
+                ciscoEnvMonSupplySource.
+                "
+        REVISION        "9611120000Z"
+        DESCRIPTION
+                "Add monitoring support for c3600 series router"
+        REVISION        "9508150000Z"
+        DESCRIPTION
+                "Specify a correct (non-negative) range for several
+                index objects."
+        REVISION        "9503130000Z"
+        DESCRIPTION
+                "Miscellaneous changes including monitoring support
+                for c7000 series redundant power supplies."
+
+        ::= { ciscoMgmt 13 }
+
+
+CiscoEnvMonState ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.
+
+                 warning(2):        the environment is bad, such as temperature
+                                    above normal operation range but not too
+                                    high.
+
+                 critical(3):       the environment is very bad, such as
+                                    temperature much higher than normal
+                                    operation limit.
+
+                 shutdown(4):       the environment is the worst, the system
+                                    should be shutdown immediately.
+
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.
+
+                 notFunctioning(6): the environmental monitor does not 
+                                    function properly, such as a temperature
+                                    sensor generates a abnormal data like
+                                    1000 C.
+                "
+        SYNTAX  INTEGER {
+                        normal(1),
+                        warning(2),
+                        critical(3),
+                        shutdown(4),
+                        notPresent(5),
+                        notFunctioning(6)
+                }
+
+CiscoSignedGauge  ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the current value of an entity, as a signed 
+                 integer."
+        SYNTAX  Integer32 
+
+ciscoEnvMonObjects OBJECT IDENTIFIER ::= { ciscoEnvMonMIB 1 }
+
+ciscoEnvMonPresent OBJECT-TYPE
+        SYNTAX     INTEGER {
+                        oldAgs (1),
+                        ags    (2),
+                        c7000  (3),
+                        ci     (4),
+                        cAccessMon (6),
+                        cat6000 (7),
+                        ubr7200 (8),
+                        cat4000 (9),
+                        c10000 (10),
+                        osr7600(11),
+                        c7600  (12)
+                   }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The type of environmental monitor located in the chassis.
+                An oldAgs environmental monitor card is identical to an ags
+                environmental card except that it is not capable of supplying
+                data, and hence no instance of the remaining objects in this
+                MIB will be returned in response to an SNMP query.  Note that
+                only a firmware upgrade is required to convert an oldAgs into
+                an ags card."
+        ::= { ciscoEnvMonObjects 1 }
+
+
+ciscoEnvMonVoltageStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CiscoEnvMonVoltageStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of voltage status maintained by the environmental
+                monitor."
+        ::= { ciscoEnvMonObjects 2 }
+
+ciscoEnvMonVoltageStatusEntry OBJECT-TYPE
+        SYNTAX     CiscoEnvMonVoltageStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the voltage status table, representing the status
+                of the associated testpoint maintained by the environmental
+                monitor."
+        INDEX      { ciscoEnvMonVoltageStatusIndex }
+        ::= { ciscoEnvMonVoltageStatusTable 1 }
+
+CiscoEnvMonVoltageStatusEntry ::=
+        SEQUENCE {
+                ciscoEnvMonVoltageStatusIndex   Integer32 (0..2147483647),
+                ciscoEnvMonVoltageStatusDescr   DisplayString,
+                ciscoEnvMonVoltageStatusValue   CiscoSignedGauge,
+                ciscoEnvMonVoltageThresholdLow  Integer32,
+                ciscoEnvMonVoltageThresholdHigh Integer32,
+                ciscoEnvMonVoltageLastShutdown  Integer32,
+                ciscoEnvMonVoltageState         CiscoEnvMonState
+        }
+
+ciscoEnvMonVoltageStatusIndex OBJECT-TYPE
+        SYNTAX     Integer32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the testpoint being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ciscoEnvMonVoltageStatusEntry 1 }
+
+ciscoEnvMonVoltageStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the testpoint being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { ciscoEnvMonVoltageStatusEntry 2 }
+
+ciscoEnvMonVoltageStatusValue OBJECT-TYPE
+        SYNTAX     CiscoSignedGauge
+        UNITS      "millivolts"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current measurement of the testpoint being instrumented."
+        ::= { ciscoEnvMonVoltageStatusEntry 3 }
+
+ciscoEnvMonVoltageThresholdLow OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "millivolts"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The lowest value that the associated instance of the object
+                ciscoEnvMonVoltageStatusValue may obtain before an emergency
+                shutdown of the managed device is initiated."
+        ::= { ciscoEnvMonVoltageStatusEntry 4 }
+
+ciscoEnvMonVoltageThresholdHigh OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "millivolts"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The highest value that the associated instance of the object
+                ciscoEnvMonVoltageStatusValue may obtain before an emergency
+                shutdown of the managed device is initiated."
+        ::= { ciscoEnvMonVoltageStatusEntry 5 }
+
+ciscoEnvMonVoltageLastShutdown OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "millivolts"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The value of the associated instance of the object
+                ciscoEnvMonVoltageStatusValue at the time an emergency
+                shutdown of the managed device was last initiated.  This
+                value is stored in non-volatile RAM and hence is able to
+                survive the shutdown."
+        ::= { ciscoEnvMonVoltageStatusEntry 6 }
+
+ciscoEnvMonVoltageState OBJECT-TYPE
+        SYNTAX     CiscoEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the testpoint being instrumented."
+        ::= { ciscoEnvMonVoltageStatusEntry 7 }
+
+
+
+ciscoEnvMonTemperatureStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CiscoEnvMonTemperatureStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of ambient temperature status maintained by the
+                environmental monitor."
+        ::= { ciscoEnvMonObjects 3 }
+
+ciscoEnvMonTemperatureStatusEntry OBJECT-TYPE
+        SYNTAX     CiscoEnvMonTemperatureStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the ambient temperature status table, representing
+                the status of the associated testpoint maintained by the
+                environmental monitor."
+        INDEX      { ciscoEnvMonTemperatureStatusIndex }
+        ::= { ciscoEnvMonTemperatureStatusTable 1 }
+
+CiscoEnvMonTemperatureStatusEntry ::=
+        SEQUENCE {
+                ciscoEnvMonTemperatureStatusIndex       Integer32 (0..2147483647),
+                ciscoEnvMonTemperatureStatusDescr       DisplayString,
+                ciscoEnvMonTemperatureStatusValue       Gauge32,
+                ciscoEnvMonTemperatureThreshold         Integer32,
+                ciscoEnvMonTemperatureLastShutdown      Integer32,
+                ciscoEnvMonTemperatureState             CiscoEnvMonState
+        }
+
+
+ciscoEnvMonTemperatureStatusIndex OBJECT-TYPE
+        SYNTAX     Integer32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the testpoint being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ciscoEnvMonTemperatureStatusEntry 1 }
+
+ciscoEnvMonTemperatureStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the testpoint being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { ciscoEnvMonTemperatureStatusEntry 2 }
+
+ciscoEnvMonTemperatureStatusValue OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current measurement of the testpoint being instrumented."
+        ::= { ciscoEnvMonTemperatureStatusEntry 3 }
+
+ciscoEnvMonTemperatureThreshold OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The highest value that the associated instance of the
+                object ciscoEnvMonTemperatureStatusValue may obtain
+                before an emergency shutdown of the managed device is
+                initiated."
+        ::= { ciscoEnvMonTemperatureStatusEntry 4 }
+
+ciscoEnvMonTemperatureLastShutdown OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The value of the associated instance of the object
+                ciscoEnvMonTemperatureStatusValue at the time an emergency
+                shutdown of the managed device was last initiated.  This
+                value is stored in non-volatile RAM and hence is able to
+                survive the shutdown."
+        ::= { ciscoEnvMonTemperatureStatusEntry 5 }
+
+ciscoEnvMonTemperatureState OBJECT-TYPE
+        SYNTAX     CiscoEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the testpoint being instrumented."
+        ::= { ciscoEnvMonTemperatureStatusEntry 6 }
+
+
+
+ciscoEnvMonFanStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CiscoEnvMonFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of fan status maintained by the environmental
+                monitor."
+        ::= { ciscoEnvMonObjects 4 }
+
+ciscoEnvMonFanStatusEntry OBJECT-TYPE
+        SYNTAX     CiscoEnvMonFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the fan status table, representing the status of
+                the associated fan maintained by the environmental monitor."
+        INDEX   { ciscoEnvMonFanStatusIndex }
+        ::= { ciscoEnvMonFanStatusTable 1 }
+
+CiscoEnvMonFanStatusEntry ::=
+        SEQUENCE {
+                ciscoEnvMonFanStatusIndex       Integer32 (0..2147483647),
+                ciscoEnvMonFanStatusDescr       DisplayString,
+                ciscoEnvMonFanState             CiscoEnvMonState
+        }
+
+ciscoEnvMonFanStatusIndex OBJECT-TYPE
+        SYNTAX     Integer32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the fan being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ciscoEnvMonFanStatusEntry 1 }
+
+ciscoEnvMonFanStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the fan being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { ciscoEnvMonFanStatusEntry 2 }
+
+ciscoEnvMonFanState OBJECT-TYPE
+        SYNTAX     CiscoEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the fan being instrumented."
+        ::= { ciscoEnvMonFanStatusEntry 3 }
+
+
+
+ciscoEnvMonSupplyStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CiscoEnvMonSupplyStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of power supply status maintained by the
+                environmental monitor card."
+        ::= { ciscoEnvMonObjects 5 }
+
+ciscoEnvMonSupplyStatusEntry OBJECT-TYPE
+        SYNTAX     CiscoEnvMonSupplyStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the power supply status table, representing the
+                status of the associated power supply maintained by the
+                environmental monitor card."
+        INDEX   { ciscoEnvMonSupplyStatusIndex }
+        ::= { ciscoEnvMonSupplyStatusTable 1  }
+
+CiscoEnvMonSupplyStatusEntry ::=
+        SEQUENCE {
+                ciscoEnvMonSupplyStatusIndex    Integer32 (0..2147483647),
+                ciscoEnvMonSupplyStatusDescr    DisplayString,
+                ciscoEnvMonSupplyState          CiscoEnvMonState,
+                ciscoEnvMonSupplySource         INTEGER
+        }
+
+ciscoEnvMonSupplyStatusIndex OBJECT-TYPE
+        SYNTAX     Integer32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the power supply being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ciscoEnvMonSupplyStatusEntry 1 }
+
+ciscoEnvMonSupplyStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the power supply being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { ciscoEnvMonSupplyStatusEntry 2 }
+
+ciscoEnvMonSupplyState OBJECT-TYPE
+        SYNTAX     CiscoEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the power supply being instrumented."
+        ::= { ciscoEnvMonSupplyStatusEntry 3 }
+
+ciscoEnvMonSupplySource OBJECT-TYPE
+        SYNTAX INTEGER {
+                        unknown(1),
+                        ac(2),
+                        dc(3),
+                        externalPowerSupply(4),
+                        internalRedundant(5)
+                }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The power supply source.
+                 unknown - Power supply source unknown
+                 ac      - AC power supply
+                 dc      - DC power supply
+                 externalPowerSupply - External power supply
+                 internalRedundant - Internal redundant power supply 
+                "
+        ::= { ciscoEnvMonSupplyStatusEntry 4 }
+
+ciscoEnvMonAlarmContacts OBJECT-TYPE
+        SYNTAX BITS {
+                        minorVisual(0),
+                        majorVisual(1),
+                        criticalVisual(2),
+                        minorAudible(3),
+                        majorAudible(4),
+                        criticalAudible(5),
+                        input(6)
+                }
+
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Each bit is set to reflect the respective
+                 alarm being set.  The bit will be cleared
+                 when the respective alarm is cleared."
+        ::= { ciscoEnvMonObjects 6 }
+
+ciscoEnvMonMIBNotificationEnables OBJECT IDENTIFIER ::= { ciscoEnvMonMIB 2 }
+
+ciscoEnvMonEnableShutdownNotification OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ciscoEnvMonShutdownNotification.  A false 
+                value will prevent shutdown notifications 
+                from being generated by this system."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 1 }
+
+ciscoEnvMonEnableVoltageNotification OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ciscoEnvMonVoltageNotification. A false 
+                value will prevent voltage notifications from being 
+                generated by this system. This object is deprecated
+                in favour of ciscoEnvMonEnableStatChangeNotif."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 2 }
+
+ciscoEnvMonEnableTemperatureNotification OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ciscoEnvMonTemperatureNotification.
+                A false value prevents temperature notifications 
+                from being sent by  this entity. This object is 
+                deprecated in favour of 
+                ciscoEnvMonEnableStatChangeNotif."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 3 }
+
+ciscoEnvMonEnableFanNotification OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ciscoEnvMonFanNotification.
+                A false value prevents fan notifications 
+                from being sent by  this entity. This object is 
+                deprecated in favour of 
+                ciscoEnvMonEnableStatChangeNotif."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 4 }
+
+ciscoEnvMonEnableRedundantSupplyNotification OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ciscoEnvMonRedundantSupplyNotification. 
+                A false value prevents redundant supply notifications
+                from being generated by this system. This object is
+                deprecated in favour of 
+                ciscoEnvMonEnableStatChangeNotif."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 5 }
+
+ciscoEnvMonEnableStatChangeNotif OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable indicates whether the system
+                produces the ciscoEnvMonVoltStatusChangeNotif,
+                ciscoEnvMonTempStatusChangeNotif, 
+                ciscoEnvMonFanStatusChangeNotif and  
+                ciscoEnvMonSuppStatusChangeNotif. A false value will 
+                prevent these notifications from being generated by 
+                this system."
+        DEFVAL { false }
+        ::= { ciscoEnvMonMIBNotificationEnables 6 }
+
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ciscoEnvMonMIBNotificationPrefix OBJECT IDENTIFIER ::= { ciscoEnvMonMIB 3 }
+ciscoEnvMonMIBNotifications OBJECT IDENTIFIER ::= { ciscoEnvMonMIBNotificationPrefix 0 }
+
+ciscoEnvMonShutdownNotification NOTIFICATION-TYPE
+        -- no OBJECTS
+        STATUS  current
+        DESCRIPTION
+                "A ciscoEnvMonShutdownNotification is sent if the environmental
+                monitor detects a testpoint reaching a critical state
+                and is about to initiate a shutdown.  This notification 
+                contains no objects so that it may be encoded and sent in the
+                shortest amount of time possible.  Even so, management
+                applications should not rely on receiving such a notification
+                as it may not be sent before the shutdown completes."
+        ::= { ciscoEnvMonMIBNotifications 1 }
+
+
+ciscoEnvMonVoltageNotification NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonVoltageStatusDescr,
+                ciscoEnvMonVoltageStatusValue,
+                ciscoEnvMonVoltageState
+                }
+        STATUS  deprecated
+        DESCRIPTION
+                "A ciscoEnvMonVoltageNotification is sent if the voltage 
+                measured at a given testpoint is outside the normal range 
+                for the testpoint (i.e. is at the warning, critical, or
+                shutdown stage).  Since such a notification is usually 
+                generated before the shutdown state is reached, it can 
+                convey more data and has a better chance of being sent 
+                than does the ciscoEnvMonShutdownNotification.
+                This notification is deprecated in favour of
+                ciscoEnvMonVoltStatusChangeNotif."
+        ::= { ciscoEnvMonMIBNotifications 2 }
+
+
+ciscoEnvMonTemperatureNotification NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonTemperatureStatusDescr,
+                ciscoEnvMonTemperatureStatusValue,
+                ciscoEnvMonTemperatureState
+                }
+        STATUS  deprecated
+        DESCRIPTION
+                "A ciscoEnvMonTemperatureNotification is sent if the 
+                temperature measured at a given testpoint is outside 
+                the normal range for the testpoint (i.e. is at the warning, 
+                critical, or shutdown stage).  Since such a Notification 
+                is usually generated before the shutdown state is reached,
+                it can convey more data and has a better chance of being
+                sent than does the ciscoEnvMonShutdownNotification.
+                This notification is deprecated in favour of 
+                ciscoEnvMonTempStatusChangeNotif."
+        ::= { ciscoEnvMonMIBNotifications 3 }
+
+
+
+ciscoEnvMonFanNotification NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonFanStatusDescr,
+                ciscoEnvMonFanState
+                }
+        STATUS  deprecated
+        DESCRIPTION
+                "A ciscoEnvMonFanNotification is sent if any one of
+                the fans in the fan array (where extant) fails. 
+                Since such a notification is usually generated before 
+                the shutdown state is reached, it can convey more 
+                data and has a better chance of being sent
+                than does the ciscoEnvMonShutdownNotification.
+                This notification is deprecated in favour of
+                ciscoEnvMonFanStatusChangeNotif."
+        ::= { ciscoEnvMonMIBNotifications 4 }
+
+ciscoEnvMonRedundantSupplyNotification NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonSupplyStatusDescr,
+                ciscoEnvMonSupplyState
+                }
+        STATUS  deprecated
+        DESCRIPTION
+                "A ciscoEnvMonRedundantSupplyNotification is sent if
+                the redundant power supply (where extant) fails. 
+                Since such a notification is usually generated before 
+                the shutdown state is reached, it can convey more 
+                data and has a better chance of being sent
+                than does the ciscoEnvMonShutdownNotification.
+                This notification is deprecated in favour of 
+                ciscoEnvMonSuppStatusChangeNotif."
+        ::= { ciscoEnvMonMIBNotifications 5 }
+
+ciscoEnvMonVoltStatusChangeNotif NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonVoltageStatusDescr,
+                ciscoEnvMonVoltageStatusValue,
+                ciscoEnvMonVoltageState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ciscoEnvMonVoltStatusChangeNotif is sent if there is 
+                 change in the state of a device being monitored
+                 by ciscoEnvMonVoltageState."
+        ::= { ciscoEnvMonMIBNotifications 6 }
+
+ciscoEnvMonTempStatusChangeNotif NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonTemperatureStatusDescr,
+                ciscoEnvMonTemperatureStatusValue,
+                ciscoEnvMonTemperatureState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ciscoEnvMonTempStatusChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ciscoEnvMonTemperatureState."
+        ::= { ciscoEnvMonMIBNotifications 7 }
+
+ciscoEnvMonFanStatusChangeNotif NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonFanStatusDescr,
+                ciscoEnvMonFanState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ciscoEnvMonFanStatusChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ciscoEnvMonFanState."
+        ::= { ciscoEnvMonMIBNotifications 8 }
+
+ciscoEnvMonSuppStatusChangeNotif NOTIFICATION-TYPE
+        OBJECTS {
+                ciscoEnvMonSupplyStatusDescr,
+                ciscoEnvMonSupplyState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ciscoEnvMonSupplyStatChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ciscoEnvMonSupplyState."
+        ::= { ciscoEnvMonMIBNotifications 9 }
+
+-- conformance information
+
+ciscoEnvMonMIBConformance OBJECT IDENTIFIER ::= { ciscoEnvMonMIB 4 }
+ciscoEnvMonMIBCompliances OBJECT IDENTIFIER ::= { ciscoEnvMonMIBConformance 1 }
+ciscoEnvMonMIBGroups      OBJECT IDENTIFIER ::= { ciscoEnvMonMIBConformance 2 }
+
+
+-- compliance statements
+
+ciscoEnvMonMIBCompliance MODULE-COMPLIANCE
+        STATUS  deprecated
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Cisco Environmental Monitor MIB. This is
+                deprecated and new compliance
+                ciscoEnvMonMIBComplianceRev1 is added."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ciscoEnvMonMIBGroup }
+        ::= { ciscoEnvMonMIBCompliances 1 }
+
+ciscoEnvMonMIBComplianceRev1 MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Cisco Environmental Monitor MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ciscoEnvMonMIBGroupRev,
+                                   ciscoEnvMonMIBNotifGroup }
+
+        GROUP   ciscoEnvMonEnableStatChangeGroup
+        DESCRIPTION
+                "The ciscoEnvMonEnableStatChangeGroup is optional. 
+                 This group is applicable for implementations which
+                 need status change notifications for environmental
+                 monitoring."
+
+        GROUP   ciscoEnvMonStatChangeNotifGroup
+        DESCRIPTION
+                "The ciscoEnvMonStatChangeNotifGroup is optional. 
+                 This group is applicable for implementations which
+                 need status change notifications for environmental
+                 monitoring."
+
+        ::= { ciscoEnvMonMIBCompliances 2 }
+
+-- units of conformance
+
+ciscoEnvMonMIBGroup OBJECT-GROUP
+        OBJECTS {
+                ciscoEnvMonPresent,
+
+                ciscoEnvMonVoltageStatusDescr,
+                ciscoEnvMonVoltageStatusValue,
+                ciscoEnvMonVoltageThresholdLow,
+                ciscoEnvMonVoltageThresholdHigh,
+                ciscoEnvMonVoltageLastShutdown,
+                ciscoEnvMonVoltageState,
+
+                ciscoEnvMonTemperatureStatusDescr,
+                ciscoEnvMonTemperatureStatusValue,
+                ciscoEnvMonTemperatureThreshold,
+                ciscoEnvMonTemperatureLastShutdown,
+                ciscoEnvMonTemperatureState,
+
+                ciscoEnvMonFanStatusDescr,
+                ciscoEnvMonFanState,
+
+                ciscoEnvMonSupplyStatusDescr,
+                ciscoEnvMonSupplyState,
+                ciscoEnvMonSupplySource,
+
+                ciscoEnvMonAlarmContacts,
+
+                ciscoEnvMonEnableShutdownNotification,
+                ciscoEnvMonEnableVoltageNotification,
+                ciscoEnvMonEnableTemperatureNotification,
+                ciscoEnvMonEnableFanNotification,
+                ciscoEnvMonEnableRedundantSupplyNotification
+
+        }
+        STATUS  deprecated
+        DESCRIPTION
+                "A collection of objects providing environmental 
+                monitoring capability to a cisco chassis. This group 
+                is deprecated in favour of ciscoEnvMonMIBGroupRev."
+        ::= { ciscoEnvMonMIBGroups 1 }
+
+ciscoEnvMonMIBGroupRev OBJECT-GROUP
+        OBJECTS {
+                ciscoEnvMonPresent,
+
+                ciscoEnvMonVoltageStatusDescr,
+                ciscoEnvMonVoltageStatusValue,
+                ciscoEnvMonVoltageThresholdLow,
+                ciscoEnvMonVoltageThresholdHigh,
+                ciscoEnvMonVoltageLastShutdown,
+                ciscoEnvMonVoltageState,
+
+                ciscoEnvMonTemperatureStatusDescr,
+                ciscoEnvMonTemperatureStatusValue,
+                ciscoEnvMonTemperatureThreshold,
+                ciscoEnvMonTemperatureLastShutdown,
+                ciscoEnvMonTemperatureState,
+
+                ciscoEnvMonFanStatusDescr,
+                ciscoEnvMonFanState,
+
+                ciscoEnvMonSupplyStatusDescr,
+                ciscoEnvMonSupplyState,
+                ciscoEnvMonSupplySource,
+
+                ciscoEnvMonAlarmContacts,
+
+                ciscoEnvMonEnableShutdownNotification
+
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing environmental 
+                 monitoring capability to a cisco chassis."
+        ::= { ciscoEnvMonMIBGroups 2 }
+
+ciscoEnvMonEnableStatChangeGroup OBJECT-GROUP
+        OBJECTS {
+                ciscoEnvMonEnableStatChangeNotif
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing enabling/disabling
+                 of the status change notifications for environmental 
+                 monitoring."
+        ::= { ciscoEnvMonMIBGroups 3 }
+
+ciscoEnvMonMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                ciscoEnvMonShutdownNotification
+        }
+        STATUS current
+        DESCRIPTION
+                "A notification group providing shutdown notification
+                 for environmental monitoring. "
+        ::= { ciscoEnvMonMIBGroups 4 }
+
+ciscoEnvMonStatChangeNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                 ciscoEnvMonVoltStatusChangeNotif,
+                 ciscoEnvMonTempStatusChangeNotif,
+                 ciscoEnvMonFanStatusChangeNotif,
+                 ciscoEnvMonSuppStatusChangeNotif
+        }
+        STATUS   current
+        DESCRIPTION
+                 "A collection of notifications providing the status 
+                  change for environmental monitoring."
+        ::= { ciscoEnvMonMIBGroups 5 }
+
+ciscoEnvMonMIBMiscNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                 ciscoEnvMonVoltageNotification,
+                 ciscoEnvMonTemperatureNotification,
+                 ciscoEnvMonFanNotification,
+                 ciscoEnvMonRedundantSupplyNotification
+        }
+        STATUS   deprecated
+        DESCRIPTION
+                 "A collection of various notifications for the 
+                 enviromental monitoring mib module. The notifications
+                 the group and the group are both in deprecated state.
+                 The notifications in the group were deprecated in 
+                 favour of notifications in
+                 ciscoEnvMonStatChangeNotifGroup."
+        ::= { ciscoEnvMonMIBGroups 6 }
+
+END

@@ -1,0 +1,275 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-T1E1-STATS-MIB.my:  Altiga T1/E1 Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-T1E1-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+         FROM SNMPv2-SMI
+      RowStatus
+         FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsT1E1, alT1E1Group
+         FROM ALTIGA-MIB
+      alT1E1MibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaT1E1StatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga T1/E1 Statistics MIB models counters and objects that are
+          of management interest.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alT1E1MibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsT1E1Global OBJECT IDENTIFIER ::= { alStatsT1E1 1 }
+
+alT1E1StatsTable     OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlT1E1StatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "The T1/E1 interface statistics MIB."
+   ::= { alStatsT1E1 2 }
+
+alT1E1StatsEntry     OBJECT-TYPE
+   SYNTAX         AlT1E1StatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "An entry the alT1E1StatsTable."
+   INDEX    { alT1E1StatsSlot, alT1E1StatsConn }
+   ::= { alT1E1StatsTable 1 }
+
+AlT1E1StatsEntry ::= SEQUENCE {
+   alT1E1StatsRowStatus    RowStatus,
+   alT1E1StatsSlot         Integer32,
+   alT1E1StatsConn         Integer32,
+   alT1E1StatsLineStatus   INTEGER,
+   alT1E1StatsElapsedSecs  Counter32,
+   alT1E1StatsBPVs         Counter32,
+   alT1E1StatsESs          Counter32,
+   alT1E1StatsSESs         Counter32,
+   alT1E1StatsBESs         Counter32,
+   alT1E1StatsSEFSs        Counter32,
+   alT1E1StatsUASs         Counter32,
+   alT1E1StatsLCVs         Counter32,
+   alT1E1StatsCSSs         Counter32,
+   alT1E1StatsDMs          Counter32,
+   alT1E1StatsPCVs         Counter32,
+   alT1E1StatsLESs         Counter32
+}
+
+alT1E1StatsRowStatus    OBJECT-TYPE
+   SYNTAX         RowStatus
+   MAX-ACCESS     read-create
+   STATUS         current
+   DESCRIPTION
+          "The status of this row."
+   ::= { alT1E1StatsEntry 1 }
+
+alT1E1StatsSlot         OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The physical slot for this T1/E1 port. Part of the index."
+   ::= { alT1E1StatsEntry 2 }
+   
+alT1E1StatsConn         OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The physical connector for this T1/E1 port. Part of the index."
+   ::= { alT1E1StatsEntry 3 }
+   
+alT1E1StatsLineStatus   OBJECT-TYPE
+   SYNTAX INTEGER {
+      init (1),
+      up (2),
+      red (3),
+      blue (4),
+      yellow (5),
+      loopback (6)
+   }
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The current status of the line."
+   ::= { alT1E1StatsEntry 4 }
+   
+alT1E1StatsElapsedSecs  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of seconds this T1/E1 port has been running."
+   ::= { alT1E1StatsEntry 5 }
+   
+alT1E1StatsBPVs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of bipolar violations detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 6 }
+   
+alT1E1StatsESs    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of errored seconds detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 7 }
+   
+alT1E1StatsSESs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of severly errored secondss detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 8 }
+   
+alT1E1StatsBESs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of bursty errored seconds detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 9 }
+   
+alT1E1StatsSEFSs  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of severly errored framing seconds detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 10 }
+   
+alT1E1StatsUASs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of unavailable seconds detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 11 }
+   
+alT1E1StatsLCVs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of line coding violations detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 12 }
+   
+alT1E1StatsCSSs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of controlled slips detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 13 }
+   
+alT1E1StatsDMs    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of degraded minutes detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 14 }
+   
+alT1E1StatsPCVs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of path coding violations detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 15 }
+   
+alT1E1StatsLESs      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of line errored seconds detected on this T1/E1 port."
+   ::= { alT1E1StatsEntry 16 }
+   
+altigaT1E1StatsMibConformance OBJECT IDENTIFIER ::= { altigaT1E1StatsMibModule 1 }
+altigaT1E1StatsMibCompliances OBJECT IDENTIFIER ::= { altigaT1E1StatsMibConformance 1 }
+
+altigaT1E1StatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga T1/E1 Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaT1E1StatsGroup
+   }
+   ::= { altigaT1E1StatsMibCompliances 1 }
+
+altigaT1E1StatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alT1E1StatsRowStatus,
+      alT1E1StatsSlot,
+      alT1E1StatsConn,
+      alT1E1StatsLineStatus,   
+      alT1E1StatsElapsedSecs,  
+      alT1E1StatsBPVs,         
+      alT1E1StatsESs,          
+      alT1E1StatsSESs,         
+      alT1E1StatsBESs,         
+      alT1E1StatsSEFSs,        
+      alT1E1StatsUASs,         
+      alT1E1StatsLCVs,         
+      alT1E1StatsCSSs,         
+      alT1E1StatsDMs,          
+      alT1E1StatsPCVs,         
+      alT1E1StatsLESs         
+   }
+   STATUS   current
+   DESCRIPTION
+          "The objects for T1/E1 configuration."
+   ::= { alT1E1Group 2 }
+
+END
+

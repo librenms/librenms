@@ -1,0 +1,1635 @@
+-- *******************************************************************
+-- Juniper enterprise specific DHCP MIB.
+--
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-JDHCP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, 
+    Counter32, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    ifIndex,InterfaceIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime, MacAddress
+        FROM SNMPv2-TC 
+    jnxJdhcpMibRoot
+        FROM JUNIPER-SMI;
+
+jnxJdhcpMIB  MODULE-IDENTITY
+    LAST-UPDATED "201107090000Z" --  July 9, 2011
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+        "The JUNOS DHCP MIB for the Juniper Networks enterprise."
+
+    -- revision history
+    REVISION      "201107090000Z"
+    DESCRIPTION   "Add scalar for pkts dropped due to recovery in progress"
+    REVISION      "201103150000Z"
+    DESCRIPTION   "Add OIDs to the Interface Statistics Table"
+    REVISION      "201101250000Z"
+    DESCRIPTION   "Add Interface Statistics Table"
+    REVISION      "201004190000Z"
+    DESCRIPTION   "Creation Date"
+    ::= { jnxJdhcpMibRoot 61 }
+    
+
+-- Managed object groups
+jnxJdhcpLocalServerObjects   OBJECT IDENTIFIER ::= { jnxJdhcpMIB 1 }
+jnxJdhcpRelayObjects         OBJECT IDENTIFIER ::= { jnxJdhcpMIB 2 }
+
+-- Managed objects for DHCP Local Server
+jnxJdhcpLocalServerStatistics OBJECT IDENTIFIER
+    ::= { jnxJdhcpLocalServerObjects 1 }
+jnxJdhcpLocalServerBindings   OBJECT IDENTIFIER
+    ::= { jnxJdhcpLocalServerObjects 2 }
+jnxJdhcpLocalServerTraps    OBJECT IDENTIFIER
+    ::= { jnxJdhcpLocalServerObjects 3 }
+jnxJdhcpLocalServerTrapVars   OBJECT IDENTIFIER 
+    ::= { jnxJdhcpLocalServerObjects 4 }
+jnxJdhcpLocalServerIfcStats   OBJECT IDENTIFIER
+    ::= { jnxJdhcpLocalServerObjects 5 }
+
+-- DHCP Local Server Statistics
+jnxJdhcpLocalServerTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped."
+    ::= { jnxJdhcpLocalServerStatistics 1}
+
+jnxJdhcpLocalServerBadHardwareDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped due to bad hardware address."
+    ::= { jnxJdhcpLocalServerStatistics 2}
+
+jnxJdhcpLocalServerBadBootpOpcodeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to not BOOTP message."
+    ::= { jnxJdhcpLocalServerStatistics 3}
+
+jnxJdhcpLocalServerBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpLocalServerStatistics 4}
+
+jnxJdhcpLocalServerBadAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to invalid server address."
+    ::= { jnxJdhcpLocalServerStatistics 5}
+
+jnxJdhcpLocalServerNoAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no available addresses."
+    ::= { jnxJdhcpLocalServerStatistics 6}
+
+jnxJdhcpLocalServerNoInterfaceDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no interface match."
+    ::= { jnxJdhcpLocalServerStatistics 7}
+
+jnxJdhcpLocalServerNoRoutingInstanceDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no routing instance match."
+    ::= { jnxJdhcpLocalServerStatistics 8}
+
+jnxJdhcpLocalServerNoLocalAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no valid local address."
+    ::= {  jnxJdhcpLocalServerStatistics 9}
+
+jnxJdhcpLocalServerShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to packet too short."
+    ::= { jnxJdhcpLocalServerStatistics 10}
+
+jnxJdhcpLocalServerBadReadDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to send error."
+    ::= { jnxJdhcpLocalServerStatistics 11}
+
+jnxJdhcpLocalServerBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to send error."
+    ::= { jnxJdhcpLocalServerStatistics 12}
+
+jnxJdhcpLocalServerAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpLocalServerStatistics 13}
+
+jnxJdhcpLocalServerDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpLocalServerStatistics 14}
+
+jnxJdhcpLocalServerLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpLocalServerStatistics 15}
+
+jnxJdhcpLocalServerBootRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Boot Request packets received."
+    ::= { jnxJdhcpLocalServerStatistics 16}
+
+jnxJdhcpLocalServerDhcpDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Decline packets received."
+    ::= { jnxJdhcpLocalServerStatistics 17}
+
+jnxJdhcpLocalServerDhcpDiscoverReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Discover packets received."
+    ::= { jnxJdhcpLocalServerStatistics 18}
+
+jnxJdhcpLocalServerDhcpInformReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP inform packets received."
+    ::= { jnxJdhcpLocalServerStatistics 19}
+
+jnxJdhcpLocalServerDhcpReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP release packets received."
+    ::= { jnxJdhcpLocalServerStatistics 20}
+
+jnxJdhcpLocalServerDhcpRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP request packets received."
+    ::= { jnxJdhcpLocalServerStatistics 21}
+
+jnxJdhcpLocalServerDhcpBootReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Boot Reply packets sent."
+    ::= { jnxJdhcpLocalServerStatistics 22}
+
+jnxJdhcpLocalServerDhcpOfferSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Offer packets sent."
+    ::= { jnxJdhcpLocalServerStatistics 23}
+
+jnxJdhcpLocalServerDhcpAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Ack packets sent."
+    ::= { jnxJdhcpLocalServerStatistics 24}
+
+jnxJdhcpLocalServerDhcpNakSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Nak packets sent."
+    ::= { jnxJdhcpLocalServerStatistics 25}
+
+jnxJdhcpLocalServerForceRenewSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Force Renew packets sent."
+    ::= { jnxJdhcpLocalServerStatistics 26}
+
+jnxJdhcpLocalServerTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpLocalServerStatistics 27}
+
+jnxJdhcpLocalServerSwitchDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to switchover recovery in progress."
+    ::= { jnxJdhcpLocalServerStatistics 28}
+
+
+-- DHCP Local Server Bindings Table
+
+jnxJdhcpLocalServerBindingsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpLocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address bindings maintained by this JUNOS DHCP Local Server."
+    ::= { jnxJdhcpLocalServerBindings 1 }
+
+jnxJdhcpLocalServerBindingsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpLocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCP Local Server."
+    INDEX     { jnxJdhcpLocalServerBindingsIpAddress }
+    ::= { jnxJdhcpLocalServerBindingsTable 1 }
+
+JnxJdhcpLocalServerBindingsEntry ::= SEQUENCE {
+    jnxJdhcpLocalServerBindingsIpAddress                    IpAddress,
+    jnxJdhcpLocalServerBindingsMacAddress                   MacAddress,
+    jnxJdhcpLocalServerBindingsState                        INTEGER,
+    jnxJdhcpLocalServerBindingsLeaseEndTime                 DateAndTime,
+    jnxJdhcpLocalServerBindingsLeaseExpireTime              Unsigned32,
+    jnxJdhcpLocalServerBindingsLeaseStartTime               DateAndTime,
+    jnxJdhcpLocalServerBindingsIncomingClientInterface      DisplayString,
+    jnxJdhcpLocalServerBindingsClientInterfaceVlanId        Unsigned32,
+    jnxJdhcpLocalServerBindingsDemuxInterfaceName           DisplayString,
+    jnxJdhcpLocalServerBindingsServerIpAddress              IpAddress,
+    jnxJdhcpLocalServerBindingsBootpRelayAddress            IpAddress,
+    jnxJdhcpLocalServerBindingsPreviousBootpRelayAddress    IpAddress,
+    jnxJdhcpLocalServerBindingsClientPoolName               DisplayString,
+    jnxJdhcpLocalServerBindingsClientProfileName            DisplayString
+    }
+
+jnxJdhcpLocalServerBindingsIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in the bindings table."
+    ::= { jnxJdhcpLocalServerBindingsEntry 1 }
+
+jnxJdhcpLocalServerBindingsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address associated with this entry in the bindings
+        table and corresponding to the IP Address denoted by the table index."
+    ::= { jnxJdhcpLocalServerBindingsEntry 2 }
+
+jnxJdhcpLocalServerBindingsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    init(1),
+                    selecting(2),
+                    requesting(3),
+                    release(4),
+                    bound(5),
+                    renewing(6),
+                    rebinding(7)  }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state associated with this entry in the bindings table."
+    ::= { jnxJdhcpLocalServerBindingsEntry 3 }
+
+jnxJdhcpLocalServerBindingsLeaseEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease expires on this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 4 }
+
+jnxJdhcpLocalServerBindingsLeaseExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining until the lease expires for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 5 }
+
+jnxJdhcpLocalServerBindingsLeaseStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease was started for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 6 }
+
+jnxJdhcpLocalServerBindingsIncomingClientInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The incoming interface for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 7 }
+
+jnxJdhcpLocalServerBindingsClientInterfaceVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 8 }
+
+jnxJdhcpLocalServerBindingsDemuxInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The demux interface for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 9 }
+
+jnxJdhcpLocalServerBindingsServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpLocalServerBindingsEntry 10 }
+
+jnxJdhcpLocalServerBindingsBootpRelayAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The BOOTP relay Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpLocalServerBindingsEntry 11 }
+
+jnxJdhcpLocalServerBindingsPreviousBootpRelayAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Previous BOOTP relay Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpLocalServerBindingsEntry 12 }
+
+jnxJdhcpLocalServerBindingsClientPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The client pool name for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 13 }
+
+jnxJdhcpLocalServerBindingsClientProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The client pool name for this binding."
+    ::= { jnxJdhcpLocalServerBindingsEntry 14 }
+
+-- DHCP Local Server Interface Statistics Table
+
+jnxJdhcpLocalServerIfcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpLocalServerIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of interface statistics maintained by this JUNOS DHCP Local Server."
+    ::= { jnxJdhcpLocalServerIfcStats 1 }
+
+jnxJdhcpLocalServerIfcStatsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpLocalServerIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCP Local Server."
+    INDEX     { jnxJdhcpLocalServerIfcStatsIfIndex }
+    ::= { jnxJdhcpLocalServerIfcStatsTable 1 }
+
+JnxJdhcpLocalServerIfcStatsEntry ::= SEQUENCE {
+    jnxJdhcpLocalServerIfcStatsIfIndex                     InterfaceIndex,
+    jnxJdhcpLocalServerIfcStatsTotalDropped                Counter32,
+    jnxJdhcpLocalServerIfcStatsBadHardwareDropped          Counter32,
+    jnxJdhcpLocalServerIfcStatsBadBootpOpcodeDropped       Counter32,
+    jnxJdhcpLocalServerIfcStatsBadOptionsDropped           Counter32,
+    jnxJdhcpLocalServerIfcStatsBadAddressDropped           Counter32,
+    jnxJdhcpLocalServerIfcStatsNoAddressDropped            Counter32,
+    jnxJdhcpLocalServerIfcStatsNoInterfaceCfgDropped       Counter32,
+    jnxJdhcpLocalServerIfcStatsNoLocalAddressDropped       Counter32,
+    jnxJdhcpLocalServerIfcStatsShortPacketDropped          Counter32,
+    jnxJdhcpLocalServerIfcStatsBadSendDropped              Counter32,
+    jnxJdhcpLocalServerIfcStatsAuthenticationDropped       Counter32,
+    jnxJdhcpLocalServerIfcStatsDynamicProfileDropped       Counter32,
+    jnxJdhcpLocalServerIfcStatsLicenseDropped              Counter32,
+    jnxJdhcpLocalServerIfcStatsBootRequestReceived         Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpDeclineReceived         Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpDiscoverReceived        Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpInformReceived          Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpReleaseReceived         Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpRequestReceived         Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpBootReplySent           Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpOfferSent               Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpAckSent                 Counter32,
+    jnxJdhcpLocalServerIfcStatsDhcpNakSent                 Counter32,
+    jnxJdhcpLocalServerIfcStatsForceRenewSent              Counter32,
+    jnxJdhcpLocalServerIfcStatsTotalLeaseCount             Counter32,
+    jnxJdhcpLocalServerIfcStatsBadDhcpOpcodeDropped        Counter32,
+    jnxJdhcpLocalServerIfcStatsNoOptionsDropped            Counter32,
+    jnxJdhcpLocalServerIfcStatsHopLimitDropped             Counter32,
+    jnxJdhcpLocalServerIfcStatsTtlExpiredDropped           Counter32,
+    jnxJdhcpLocalServerIfcStatsBadUdpCksumDropped          Counter32,
+    jnxJdhcpLocalServerIfcStatsOption60Dropped             Counter32
+    }
+
+-- According to IF-MIB.txt and interface index is an Integer 32 (1 - 2147483647) 
+-- This will correlate with an IFL in DHCP
+
+jnxJdhcpLocalServerIfcStatsIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which this entry
+            contains information."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 1}
+
+jnxJdhcpLocalServerIfcStatsTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 2}
+
+jnxJdhcpLocalServerIfcStatsBadHardwareDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped due to bad hardware address."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 3}
+
+jnxJdhcpLocalServerIfcStatsBadBootpOpcodeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to not BOOTP message."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 4}
+
+jnxJdhcpLocalServerIfcStatsBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 5}
+
+jnxJdhcpLocalServerIfcStatsBadAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to invalid server address."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 6}
+
+jnxJdhcpLocalServerIfcStatsNoAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no available addresses."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 7}
+
+jnxJdhcpLocalServerIfcStatsNoInterfaceCfgDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no interface match."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 8}
+
+jnxJdhcpLocalServerIfcStatsNoLocalAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no valid local address."
+    ::= {  jnxJdhcpLocalServerIfcStatsEntry 9}
+
+jnxJdhcpLocalServerIfcStatsShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to packet too short."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 10}
+
+jnxJdhcpLocalServerIfcStatsBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to send error."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 11}
+
+jnxJdhcpLocalServerIfcStatsAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 12}
+
+jnxJdhcpLocalServerIfcStatsDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 13}
+
+jnxJdhcpLocalServerIfcStatsLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 14}
+
+jnxJdhcpLocalServerIfcStatsBootRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Boot Request packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 15}
+
+jnxJdhcpLocalServerIfcStatsDhcpDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Decline packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 16}
+
+jnxJdhcpLocalServerIfcStatsDhcpDiscoverReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Discover packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 17}
+
+jnxJdhcpLocalServerIfcStatsDhcpInformReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP inform packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 18}
+
+jnxJdhcpLocalServerIfcStatsDhcpReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP release packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 19}
+
+jnxJdhcpLocalServerIfcStatsDhcpRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP request packets received."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 20}
+
+jnxJdhcpLocalServerIfcStatsDhcpBootReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Boot Reply packets sent."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 21}
+
+jnxJdhcpLocalServerIfcStatsDhcpOfferSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Offer packets sent."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 22}
+
+jnxJdhcpLocalServerIfcStatsDhcpAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Ack packets sent."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 23}
+
+jnxJdhcpLocalServerIfcStatsDhcpNakSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Nak packets sent."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 24}
+
+jnxJdhcpLocalServerIfcStatsForceRenewSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Force Renew packets sent."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 25}
+
+jnxJdhcpLocalServerIfcStatsTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 26}
+
+jnxJdhcpLocalServerIfcStatsBadDhcpOpcodeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped with bad DHCP opcode."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 27}
+
+jnxJdhcpLocalServerIfcStatsNoOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped with no options."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 28}
+
+jnxJdhcpLocalServerIfcStatsHopLimitDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to hop limit violation."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 29}
+
+jnxJdhcpLocalServerIfcStatsTtlExpiredDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to ttl expiration."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 30}
+
+jnxJdhcpLocalServerIfcStatsBadUdpCksumDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad UDP checksum."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 31}
+
+jnxJdhcpLocalServerIfcStatsOption60Dropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad option 60."
+    ::= { jnxJdhcpLocalServerIfcStatsEntry 32}
+
+
+-- Managed objects for DHCP Relay
+jnxJdhcpRelayStatistics OBJECT IDENTIFIER
+    ::= { jnxJdhcpRelayObjects 1 }
+jnxJdhcpRelayBindings   OBJECT IDENTIFIER
+    ::= { jnxJdhcpRelayObjects 2 }
+jnxJdhcpRelayTraps    OBJECT IDENTIFIER
+    ::= { jnxJdhcpRelayObjects 3 }
+jnxJdhcpRelayTrapVars   OBJECT IDENTIFIER 
+    ::= { jnxJdhcpRelayObjects 4 }
+jnxJdhcpRelayIfcStats   OBJECT IDENTIFIER
+    ::= { jnxJdhcpRelayObjects 5 }
+
+-- DHCP RelayStatistics
+jnxJdhcpRelayTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped."
+    ::= { jnxJdhcpRelayStatistics 1}
+
+jnxJdhcpRelayBadHardwareDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped due to bad hardware address."
+    ::= { jnxJdhcpRelayStatistics 2}
+
+jnxJdhcpRelayBadBootpOpcodeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to not BOOTP message."
+    ::= { jnxJdhcpRelayStatistics 3}
+
+jnxJdhcpRelayBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpRelayStatistics 4}
+
+jnxJdhcpRelayBadAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to invalid server address."
+    ::= { jnxJdhcpRelayStatistics 5}
+
+jnxJdhcpRelayNoAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no available addresses."
+    ::= { jnxJdhcpRelayStatistics 6}
+
+jnxJdhcpRelayNoInterfaceDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no interface match."
+    ::= { jnxJdhcpRelayStatistics 7}
+
+jnxJdhcpRelayNoRoutingInstanceDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no routing instance match."
+    ::= { jnxJdhcpRelayStatistics 8}
+
+jnxJdhcpRelayNoLocalAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no valid local address."
+    ::= {  jnxJdhcpRelayStatistics 9}
+
+jnxJdhcpRelayShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to packet too short."
+    ::= { jnxJdhcpRelayStatistics 10}
+
+jnxJdhcpRelayBadReadDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to read error."
+    ::= { jnxJdhcpRelayStatistics 11}
+
+jnxJdhcpRelayBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to send error."
+    ::= { jnxJdhcpRelayStatistics 12}
+
+jnxJdhcpRelayOption82Dropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to failure to add Option 82."
+    ::= { jnxJdhcpRelayStatistics 13}
+
+jnxJdhcpRelayOption60Dropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to configure to drop."
+    ::= { jnxJdhcpRelayStatistics 14}
+
+jnxJdhcpRelayAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpRelayStatistics 15}
+
+jnxJdhcpRelayDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpRelayStatistics 16}
+
+jnxJdhcpRelayLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpRelayStatistics 17}
+
+jnxJdhcpRelayBootRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Boot Request packets received."
+    ::= { jnxJdhcpRelayStatistics 18}
+
+jnxJdhcpRelayDhcpDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Decline packets received."
+    ::= { jnxJdhcpRelayStatistics 19}
+
+jnxJdhcpRelayDhcpDiscoverReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Discover packets received."
+    ::= { jnxJdhcpRelayStatistics 20}
+
+jnxJdhcpRelayDhcpInformReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP inform packets received."
+    ::= { jnxJdhcpRelayStatistics 21}
+
+jnxJdhcpRelayDhcpReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP release packets received."
+    ::= { jnxJdhcpRelayStatistics 22}
+
+jnxJdhcpRelayDhcpRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP request packets received."
+    ::= { jnxJdhcpRelayStatistics 23}
+
+jnxJdhcpRelayDhcpBootReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Boot Reply packets sent."
+    ::= { jnxJdhcpRelayStatistics 24}
+
+jnxJdhcpRelayDhcpOfferSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Offer packets sent."
+    ::= { jnxJdhcpRelayStatistics 25}
+
+jnxJdhcpRelayDhcpAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Ack packets sent."
+    ::= { jnxJdhcpRelayStatistics 26}
+
+jnxJdhcpRelayDhcpNakSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Nak packets sent."
+    ::= { jnxJdhcpRelayStatistics 27}
+
+jnxJdhcpRelayForceRenewSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Force Renew packets sent."
+    ::= { jnxJdhcpRelayStatistics 28}
+
+jnxJdhcpRelayTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpRelayStatistics 29}
+
+jnxJdhcpRelaySwitchDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to switchover recovery in progress."
+    ::= { jnxJdhcpRelayStatistics 30}
+
+-- DHCP Relay Bindings Table
+
+jnxJdhcpRelayBindingsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpRelayBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address bindings maintained by this JUNOS DHCP Relay."
+    ::= { jnxJdhcpRelayBindings 1 }
+
+jnxJdhcpRelayBindingsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpRelayBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCP Relay."
+    INDEX     { jnxJdhcpRelayBindingsIpAddress }
+    ::= { jnxJdhcpRelayBindingsTable 1 }
+
+JnxJdhcpRelayBindingsEntry ::= SEQUENCE {
+    jnxJdhcpRelayBindingsIpAddress                    IpAddress,
+    jnxJdhcpRelayBindingsLeaseState                   INTEGER,
+    jnxJdhcpRelayBindingsLeaseEndTime                 DateAndTime,
+    jnxJdhcpRelayBindingsLeaseExpireTime              Unsigned32,
+    jnxJdhcpRelayBindingsLeaseStartTime               DateAndTime,
+    jnxJdhcpRelayBindingsIncomingClientInterface      DisplayString,
+    jnxJdhcpRelayBindingsClientInterfaceVlanId        Unsigned32,
+    jnxJdhcpRelayBindingsDemuxInterfaceName           DisplayString,
+    jnxJdhcpRelayBindingsServerIpAddress              IpAddress,
+    jnxJdhcpRelayBindingsServerInterface              DisplayString,
+    jnxJdhcpRelayBindingsBootpRelayAddress            IpAddress,
+    jnxJdhcpRelayBindingsPreviousBootpRelayAddress    IpAddress,
+    jnxJdhcpRelayBindingsClientProfileName            DisplayString
+    }
+
+jnxJdhcpRelayBindingsIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in the bindings table."
+    ::= { jnxJdhcpRelayBindingsEntry 1 }
+
+jnxJdhcpRelayBindingsLeaseState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    init(1),
+                    selecting(2),
+                    requesting(3),
+                    release(4),
+                    bound(5),
+                    renewing(6),
+                    rebinding(7)  }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state associated with this entry in the bindings table."
+    ::= { jnxJdhcpRelayBindingsEntry 2 }
+
+jnxJdhcpRelayBindingsLeaseEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease expires on this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 3 }
+
+jnxJdhcpRelayBindingsLeaseExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining until the lease expires for this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 4 }
+
+jnxJdhcpRelayBindingsLeaseStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease was started for this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 5 }
+
+jnxJdhcpRelayBindingsIncomingClientInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The incoming interface or this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 6 }
+
+jnxJdhcpRelayBindingsClientInterfaceVlanId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID for this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 7 }
+
+jnxJdhcpRelayBindingsDemuxInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The demux interface for this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 8 }
+
+jnxJdhcpRelayBindingsServerIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpRelayBindingsEntry 9 }
+
+jnxJdhcpRelayBindingsServerInterface  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The demux interface for this binding."
+    ::= { jnxJdhcpRelayBindingsEntry 10 }
+
+jnxJdhcpRelayBindingsBootpRelayAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with the Bootp Relay for this entry in the bindings table."
+    ::= { jnxJdhcpRelayBindingsEntry 11 }
+
+jnxJdhcpRelayBindingsPreviousBootpRelayAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with the Previous Bootp Relay for this entry in the bindings table."
+    ::= { jnxJdhcpRelayBindingsEntry 12 }
+
+jnxJdhcpRelayBindingsClientProfileName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The display client profile name."
+    ::= { jnxJdhcpRelayBindingsEntry 13 }
+
+-- DHCP Relay Interface Statistics Table
+
+jnxJdhcpRelayIfcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpRelayIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of interface statistics maintained by this JUNOS DHCP Relay."
+    ::= { jnxJdhcpRelayIfcStats 1 }
+
+jnxJdhcpRelayIfcStatsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpRelayIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCP Relay."
+    INDEX     { jnxJdhcpRelayIfcStatsIfIndex }
+    ::= { jnxJdhcpRelayIfcStatsTable 1 }
+
+JnxJdhcpRelayIfcStatsEntry ::= SEQUENCE {
+    jnxJdhcpRelayIfcStatsIfIndex                     InterfaceIndex,
+    jnxJdhcpRelayIfcStatsTotalDropped                Counter32,
+    jnxJdhcpRelayIfcStatsBadHardwareDropped          Counter32,
+    jnxJdhcpRelayIfcStatsBadBootpOpcodeDropped       Counter32,
+    jnxJdhcpRelayIfcStatsBadOptionsDropped           Counter32,
+    jnxJdhcpRelayIfcStatsBadAddressDropped           Counter32,
+    jnxJdhcpRelayIfcStatsNoAddressDropped            Counter32,
+    jnxJdhcpRelayIfcStatsNoInterfaceCfgDropped       Counter32,
+    jnxJdhcpRelayIfcStatsNoLocalAddressDropped       Counter32,
+    jnxJdhcpRelayIfcStatsShortPacketDropped          Counter32,
+    jnxJdhcpRelayIfcStatsBadSendDropped              Counter32,
+    jnxJdhcpRelayIfcStatsAuthenticationDropped       Counter32,
+    jnxJdhcpRelayIfcStatsDynamicProfileDropped       Counter32,
+    jnxJdhcpRelayIfcStatsLicenseDropped              Counter32,
+    jnxJdhcpRelayIfcStatsBootRequestReceived         Counter32,
+    jnxJdhcpRelayIfcStatsDhcpDeclineReceived         Counter32,
+    jnxJdhcpRelayIfcStatsDhcpDiscoverReceived        Counter32,
+    jnxJdhcpRelayIfcStatsDhcpInformReceived          Counter32,
+    jnxJdhcpRelayIfcStatsDhcpReleaseReceived         Counter32,
+    jnxJdhcpRelayIfcStatsDhcpRequestReceived         Counter32,
+    jnxJdhcpRelayIfcStatsDhcpBootReplySent           Counter32,
+    jnxJdhcpRelayIfcStatsDhcpOfferSent               Counter32,
+    jnxJdhcpRelayIfcStatsDhcpAckSent                 Counter32,
+    jnxJdhcpRelayIfcStatsDhcpNakSent                 Counter32,
+    jnxJdhcpRelayIfcStatsForceRenewSent              Counter32,
+    jnxJdhcpRelayIfcStatsTotalLeaseCount             Counter32,
+    jnxJdhcpRelayIfcStatsBadDhcpOpcodeDropped        Counter32,
+    jnxJdhcpRelayIfcStatsNoOptionsDropped            Counter32,
+    jnxJdhcpRelayIfcStatsHopLimitDropped             Counter32,
+    jnxJdhcpRelayIfcStatsTtlExpiredDropped           Counter32,
+    jnxJdhcpRelayIfcStatsBadUdpCksumDropped          Counter32,
+    jnxJdhcpRelayIfcStatsOption82Dropped             Counter32
+    }
+
+jnxJdhcpRelayIfcStatsIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which this entry
+            contains information."
+    ::= { jnxJdhcpRelayIfcStatsEntry 1}
+
+jnxJdhcpRelayIfcStatsTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped."
+    ::= { jnxJdhcpRelayIfcStatsEntry 2}
+
+jnxJdhcpRelayIfcStatsBadHardwareDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets dropped due to bad hardware address."
+    ::= { jnxJdhcpRelayIfcStatsEntry 3}
+
+jnxJdhcpRelayIfcStatsBadBootpOpcodeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to not BOOTP message."
+    ::= { jnxJdhcpRelayIfcStatsEntry 4}
+
+jnxJdhcpRelayIfcStatsBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpRelayIfcStatsEntry 5}
+
+jnxJdhcpRelayIfcStatsBadAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to invalid server address."
+    ::= { jnxJdhcpRelayIfcStatsEntry 6}
+
+jnxJdhcpRelayIfcStatsNoAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no available addresses."
+    ::= { jnxJdhcpRelayIfcStatsEntry 7}
+
+jnxJdhcpRelayIfcStatsNoInterfaceCfgDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no interface match."
+    ::= { jnxJdhcpRelayIfcStatsEntry 8}
+
+jnxJdhcpRelayIfcStatsNoLocalAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to no valid local address."
+    ::= {  jnxJdhcpRelayIfcStatsEntry 9}
+
+jnxJdhcpRelayIfcStatsShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to packet too short."
+    ::= { jnxJdhcpRelayIfcStatsEntry 10}
+
+jnxJdhcpRelayIfcStatsBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to send error."
+    ::= { jnxJdhcpRelayIfcStatsEntry 11}
+
+jnxJdhcpRelayIfcStatsAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpRelayIfcStatsEntry 12}
+
+jnxJdhcpRelayIfcStatsDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpRelayIfcStatsEntry 13}
+
+jnxJdhcpRelayIfcStatsLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpRelayIfcStatsEntry 14}
+
+jnxJdhcpRelayIfcStatsBootRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Boot Request packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 15}
+
+jnxJdhcpRelayIfcStatsDhcpDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Decline packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 16}
+
+jnxJdhcpRelayIfcStatsDhcpDiscoverReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Discover packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 17}
+
+jnxJdhcpRelayIfcStatsDhcpInformReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP inform packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 18}
+
+jnxJdhcpRelayIfcStatsDhcpReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP release packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 19}
+
+jnxJdhcpRelayIfcStatsDhcpRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP request packets received."
+    ::= { jnxJdhcpRelayIfcStatsEntry 20}
+
+jnxJdhcpRelayIfcStatsDhcpBootReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Boot Reply packets sent."
+    ::= { jnxJdhcpRelayIfcStatsEntry 21}
+
+jnxJdhcpRelayIfcStatsDhcpOfferSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Offer packets sent."
+    ::= { jnxJdhcpRelayIfcStatsEntry 22}
+
+jnxJdhcpRelayIfcStatsDhcpAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Ack packets sent."
+    ::= { jnxJdhcpRelayIfcStatsEntry 23}
+
+jnxJdhcpRelayIfcStatsDhcpNakSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Nak packets sent."
+    ::= { jnxJdhcpRelayIfcStatsEntry 24}
+
+jnxJdhcpRelayIfcStatsForceRenewSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Force Renew packets sent."
+    ::= { jnxJdhcpRelayIfcStatsEntry 25}
+
+jnxJdhcpRelayIfcStatsTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpRelayIfcStatsEntry 26}
+
+jnxJdhcpRelayIfcStatsBadDhcpOpcodeDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped with bad DHCP opcode."
+    ::= { jnxJdhcpRelayIfcStatsEntry 27}
+
+jnxJdhcpRelayIfcStatsNoOptionsDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped with no options."
+    ::= { jnxJdhcpRelayIfcStatsEntry 28}
+
+jnxJdhcpRelayIfcStatsHopLimitDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to hop limit violation."
+    ::= { jnxJdhcpRelayIfcStatsEntry 29}
+
+jnxJdhcpRelayIfcStatsTtlExpiredDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to ttl expiration."
+    ::= { jnxJdhcpRelayIfcStatsEntry 30}
+
+jnxJdhcpRelayIfcStatsBadUdpCksumDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to bad UDP checksum."
+    ::= { jnxJdhcpRelayIfcStatsEntry 31}
+
+jnxJdhcpRelayIfcStatsOption82Dropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to failure to add Option 82."
+    ::= { jnxJdhcpRelayIfcStatsEntry 32}
+
+-- Objects used for traps
+jnxJdhcpLocalServerLastDetected  OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The time the duplicate client was last detected"
+    ::= { jnxJdhcpLocalServerTrapVars 1 }
+
+jnxJdhcpRouterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..257))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VRF ID in JUNOS. Represented as the Logical Router (LR)
+         Name followed by the Router Instance (RI) Name."
+    ::= { jnxJdhcpLocalServerTrapVars 2 }
+
+jnxJdhcpLocalServerMacAddress  OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The MAC address of the client that changed interfaces."
+    ::= { jnxJdhcpLocalServerTrapVars 3 }
+
+jnxJdhcpLocalServerInterfaceName  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The interface where the DHCP client was detected"
+    ::= { jnxJdhcpLocalServerTrapVars 4 }
+
+jnxJdhcpLocalServerInterfaceLimit  OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The number of clients supported on this interface."
+    ::= { jnxJdhcpLocalServerTrapVars 5 }
+
+jnxJdhcpLocalServerEventSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    debug(0),
+                    warning(1),
+                    critical(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The level of error. "
+    ::= { jnxJdhcpLocalServerTrapVars 6 }
+
+jnxJdhcpLocalServerEventString  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The text of the event string associated with the health event."
+    ::= { jnxJdhcpLocalServerTrapVars 7 }
+
+jnxJdhcpRelayRouterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..257))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VRF ID in JUNOS. Represented as the Logical Router (LR)
+         Name followed by the Router Instance (RI) Name."
+    ::= { jnxJdhcpRelayTrapVars 1 }
+
+jnxJdhcpRelayInterfaceName  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The interface where the DHCP client was detected"
+    ::= { jnxJdhcpRelayTrapVars 2 }
+
+jnxJdhcpRelayInterfaceLimit  OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The number of clients supported on this interface."
+    ::= { jnxJdhcpRelayTrapVars 3 }
+
+
+-- Notifications
+
+jnxJdhcpLocalServerDuplicateClient  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRouterName,
+        jnxJdhcpLocalServerMacAddress,
+        jnxJdhcpLocalServerInterfaceName,
+        jnxJdhcpLocalServerLastDetected }
+    STATUS      current
+    DESCRIPTION
+        "Reports the first occurance of detection of a DHCP client that
+         changed interfaces."
+    ::= { jnxJdhcpLocalServerTraps 1 }
+
+jnxJdhcpLocalServerInterfaceLimitExceeded  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRouterName,
+        jnxJdhcpLocalServerInterfaceName,
+        jnxJdhcpLocalServerInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the limit of clients has been exceeded on an interface."
+    ::= { jnxJdhcpLocalServerTraps 2 }
+
+jnxJdhcpLocalServerInterfaceLimitAbated  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRouterName,
+        jnxJdhcpLocalServerInterfaceName,
+        jnxJdhcpLocalServerInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the number of clients on an interface has fallen
+        below the limit allowed on that interface."
+    ::= { jnxJdhcpLocalServerTraps 3 }
+
+jnxJdhcpLocalServerHealth NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRouterName,
+        jnxJdhcpLocalServerEventSeverity,
+        jnxJdhcpLocalServerEventString }
+    STATUS      current
+    DESCRIPTION
+        "Reports when a health event occurs in the Local Server 
+         application."
+    ::= { jnxJdhcpLocalServerTraps 4 }
+
+-- Relay Notifications
+
+jnxJdhcpRelayInterfaceLimitExceeded  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRelayRouterName,
+        jnxJdhcpRelayInterfaceName,
+        jnxJdhcpRelayInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the limit of clients has been exceeded on an interface."
+    ::= { jnxJdhcpRelayTraps 1 }
+
+jnxJdhcpRelayInterfaceLimitAbated  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpRelayRouterName,
+        jnxJdhcpRelayInterfaceName,
+        jnxJdhcpRelayInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the number of clients on an interface has fallen
+        below the limit allowed on that interface."
+    ::= { jnxJdhcpRelayTraps 2 }
+
+
+END
+
+

@@ -1,0 +1,73 @@
+CT-FPS-SERVICES-MIB DEFINITIONS ::= BEGIN
+
+    --  ct-fps-services-mib.txt
+    --  Revision: 01.00.00
+    --  Part Number:
+    --  Date: December 2, 1996
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific chassis MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 95 Cabletron Systems
+
+        --  This mib contains objects that are an extenstion to the
+        --  standard chassis MIB.
+
+
+        IMPORTS
+                ctFPSServices           FROM CTRON-MIB-NAMES
+                OBJECT-TYPE             FROM RFC-1212;
+
+    --  This group is used to regulate traffic flow from the FPS
+
+    ctFPSActivity  OBJECT IDENTIFIER ::= { ctFPSServices 1 }
+
+
+    ctLookUpFwdActivity OBJECT-TYPE
+       SYNTAX  INTEGER  {
+               disable(1),
+               enable(2)
+                        }
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+                  ""
+       ::= { ctFPSActivity 1 }
+
+    ctINBActivity  OBJECT-TYPE
+       SYNTAX  INTEGER  {
+               disable(1),
+               enable(2)
+                        }
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+                  ""
+       ::= { ctFPSActivity 2 }
+
+END

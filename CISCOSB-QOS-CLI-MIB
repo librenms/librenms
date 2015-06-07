@@ -1,0 +1,4196 @@
+CISCOSB-QOS-CLI-MIB DEFINITIONS ::= BEGIN
+
+-- Version:    7.46
+-- Date:       04 Jan 2007
+-- 28 May 2003 Changed UNITS clause of rlQosPolicerCir to kbps
+-- 28 May 2003 Added QoS Access Control Element table two indexes (rlQosAceTidxTable)
+-- 29 Sep 2003 Add textual convention to QosObjectMode (service).
+-- 15 Nov 2004 Add DSCP to Queue Default map table
+-- 27 Jan 2005 Add new advanced action : trustCosDscp
+-- 07 Feb 2005 Add vpt,ether-type,tcp-flags,icmp-type,icmp-code,igmp-type to ClassTupleType
+--             Add ip-ICMP,ip-IGMP To AceObjectType
+--             Add vpt,ethertype To ClassOffsetType
+-- 14 March 2005 Add   rlQosPortRateLimitStatus,rlQosCirPortRateLimit, rlQosCbsPortRateLimit
+--                to   rlQosIfPolicyTable
+-- 17-Apr-2005 Added rlQosDscpToDpTable
+-- 06-Apr-2006 Added branch rlQosStatistics and tables:
+-- 08-May-2006 Added innerVlan to ClassOffsetType And inner-vlan to ClassTupleType
+-- 11-Dec-2006 Added rlQosClassifierUtilization
+-- 24-Dec-2006 Changed rlQosTypeQueue1 ... rlQosTypeQueue8 fields in
+--                       rlQosQueueProfileTable from read-create to read-write
+-- 24-Dec-2006 Added new MIB: rlQosPortToProfileMappingTable
+-- 31-Dec-2006 Added support for Time Based ACL
+-- 04-Jan-2007 Added rlQosTimeBasedAclTable
+-- 17-Apr-2007 Added IPv6 ACL support
+--             Change rlQosOffsetTable to deprecated
+-- 6-Jun-2007  Added rlQosClassifierUtilizationSystem
+-- 18-Jan-2008 Add rlQosClassifierUtilizationRulesNumber  to rlQosClassifierUtilizationEntry
+-- 01-Jun-2009 Add udp-port-range-start-src, udp-port-range-end-src,
+--                 udp-port-range-start-dest, udp-port-range-end-dest,
+--                 tcp-port-range-start-src, tcp-port-range-end-src,
+--                 tcp-port-range-start-dest, tcp-port-range-end-dest, to ClassTupleType
+--             Add rlQosAceTidxTuple9, rlQosAceTidxTuple10 to rlQosAceTidxTable
+-- 18-Aug-2009 Removed Time Based Tables : code moved to general TimeBasedInfrastrucure
+-- 22-Oct-2009 Added rlQosAceTidxTuple11 to rlQosAceTidxTable in order to keep Src MAC addr of Dynamic ACLs
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Counter32,
+    Gauge32, Unsigned32, IpAddress, TimeTicks   FROM SNMPv2-SMI
+    InterfaceIndex,InterfaceIndexOrZero         FROM IF-MIB
+    TruthValue, RowStatus, RowPointer,
+    TEXTUAL-CONVENTION,DisplayString            FROM SNMPv2-TC
+    Counter64, OBJECT-TYPE                      FROM SNMPv2-SMI
+    PortList,VlanId                             FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB
+    Percents,switch001                          FROM CISCOSB-MIB
+    StatisticsDPType,StatisticsClearActionType  FROM CISCOSB-POLICY-MIB;
+
+
+rlQosCliMib MODULE-IDENTITY
+        LAST-UPDATED "200604040000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "Added:
+                     StatisticsCntrNumOfBitsType
+                     StatisticsCntrType
+                     rlQosStatistics
+                     rlQosPortPolicyStatisticsTable
+                     rlQosSinglePolicerStatisticsTable
+                     rlQosAggregatePolicerStatisticsTable
+                     rlQosOutQueueStatisticsTable
+                     rlQosGlobalStatisticsCntrsTable."
+        REVISION "200602120000Z"
+        DESCRIPTION
+                "The private MIB module definition for Quality Of Service CLI
+                 in CISCOSB devices."
+        REVISION "200602120000Z"
+        DESCRIPTION
+                 "Editorial changes to support new MIB compilers."
+        REVISION "200503140000Z"
+        DESCRIPTION
+                 "Add rlQosPortRateLimitStatus,rlQosCirPortRateLimit, rlQosCbsPortRateLimit
+                  to   rlQosIfPolicyTable"
+        REVISION "200502070000Z"
+        DESCRIPTION
+                "Add vpt,ether-type,tcp-flags,icmp-type,icmp-code,igmp-type to ClassTupleType
+                 Add mac-Offset,ip-ICMP,ip-IGMP To AceObjectType
+                 Add vpt,ethertype To ClassOffsetType"
+        REVISION "200501270000Z"
+        DESCRIPTION
+                "Add new advanced action : trustCosDscp"
+        REVISION "200411150000Z"
+        DESCRIPTION
+                "Add DSCP to Queue Default map table."
+        REVISION "200309290000Z"
+        DESCRIPTION
+                "Add textual convention to QosObjectMode (service)."
+        REVISION "200309210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause, changed IMPORT, removed ranges in
+                 SEQUENCE elements, changed access of rlQosCliQosMode, rlQosCliBasicModeCfg and
+                 rlQosMaxNumOfAce."
+        REVISION "200504170000Z"
+        DESCRIPTION
+                "Added rlQosDscpToDpTable"
+
+        ::= { switch001 88 }
+
+
+ClassOffsetType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 6 offset types:
+         1- Absolute-start of the packet.
+         2- Layer 2-start of MAC header.
+         3- MPLS-start of MPLS header.
+         4- Layer 3-start of layer 3 header.
+         5- Layer 4-start of layer 4 header.
+         6- Layer 5-after TCP/UDP header.
+         7- VLAN.
+         8- input device port.
+         9- input device port.
+         10-VPT.
+         11-EtherType.
+         12-innerVlan.
+         13-Layer 3 IPv6 - start of layer 3 IPv6 header"
+    SYNTAX  INTEGER {
+         packetStart(1),
+         layer2-start(2),
+         mpls-start(3),
+         layer3-start(4),
+         layer4-start(5),
+         layer5-start(6),
+         vlan(7),
+         in-port(8),
+         out-port(9),
+         vpt(10),
+         ethertype(11),
+         inner-vlan(12),
+         layer3-ipv6-start(13)
+        }
+
+ClassTupleType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of Tuple types "
+    SYNTAX  INTEGER {
+         protocol(1),
+         ip-src(2),
+         ip-dest(3),
+         dscp(4),
+         ip-precedence(5),
+         udp-port-src(6),
+         udp-port-dest(7),
+         tcp-port-src(8),
+         tcp-port-dest(9),
+         mac-src(10),
+         mac-dest(11),
+         vlan(12),
+         in-port(13),
+         out-port(14),
+         general(15),
+         vpt(16),
+         ether-type(17),
+         tcp-flags(18),
+         icmp-type(19),
+         icmp-code(20),
+         igmp-type(21),
+         inner-vlan(22),
+         ipv6-src(23),
+         ipv6-dest(24),
+         udp-port-range-start-src(25),
+         udp-port-range-end-src(26),
+         udp-port-range-start-dest(27),
+         udp-port-range-end-dest(28),
+         tcp-port-range-start-src(29),
+         tcp-port-range-end-src(30),
+         tcp-port-range-start-dest(31),
+         tcp-port-range-end-dest(32)
+        }
+
+AceActionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 4 ACE Actions:
+         1- Permit- permit to the traffic that define
+                by the parameters.
+         2- Deny- deny the traffic that define
+                by the parameter.
+         3- Deny-DisablePort deny the traffic that defined
+                by the parameters and disable the port.
+         4- Deny-LogInput deny the traffic that defined
+                by the parameters and log incoming traffic.
+                 5- Permit-LogInput permit the traffic that defined
+                by the parameters and log incoming traffic."
+    SYNTAX  INTEGER {
+         permit(1),
+         deny(2),
+         deny-DisablePort(3),
+         deny-LogInput(4),
+         permit-LogInput(5)
+         }
+
+AceObjectType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 13 ACE types:
+        1- IP ACE.
+        2- IP-TCP ACE.
+        3- IP-UDP ACE.
+        4- IP-offset ACE.
+        5- MAC ACE.
+        6- MAC-offset ACE.
+        7- IP-ICMP ACE.
+        8- IP-IGMP ACE.
+        9- IPv6 ACE.
+        10- IPv6-TCP ACE.
+        11- IPv6-UDP ACE.
+        12- IPv6-offset ACE.
+        13- IPv6-ICMP ACE."
+    SYNTAX  INTEGER {
+        ip(1),
+        ip-TCP(2),
+        ip-UDP(3),
+        ip-Offset(4),
+        mac(5),
+        mac-Offset(6),
+        ip-ICMP(7),
+        ip-IGMP(8),
+        ipv6(9),
+        ipv6-TCP(10),
+        ipv6-UDP(11),
+        ipv6-Offset(12),
+        ipv6-ICMP(13)
+        }
+
+AclObjectType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 3 ACL types:
+         1- MAC ACL.
+         2- IPv4 ACL.
+         3- IPv6 ACL."
+    SYNTAX  INTEGER {
+         mac(1),
+         ip(2),
+         ipv6(3)
+         }
+
+ClassMapType ::= TEXTUAL-CONVENTION
+   STATUS  current
+   DESCRIPTION
+       "Specifies one of 2 Class-map types:
+        1- Match all. logical and between all statements.
+        2- Match any. logical or between all statements."
+  SYNTAX  INTEGER {
+       matchAll(1),
+       matchAny(2)
+       }
+
+ClassMapAction ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 8 Class-map actios:
+         1- none - action not specified - use default action.
+         2 -Mark IP-Precedence.
+         3- Mark DSCP.
+         4- Set Egress queue
+         5- Mark VPT
+         6- Choose queue by global trust mode."
+    SYNTAX  INTEGER {
+        none(1),
+        setIP-Precedence(2),
+        setDSCP(3),
+        setQueue(4),
+        setCos(5),
+        trust(6)
+--v750 - trust mode it done by globalTrustMode field in RlQosModeGlobalCfgEntry.
+--       the class map action is changed to "trust"
+--v750 depcrated    trustCos(6),
+--v750 depcrated    trustDSCP(7),
+--v750 depcrated    trustTCP-UDPport(8),
+--v750 depcrated    trustCosDscp(9)
+        }
+
+MarkVlanAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the mark vlan action type in the class map table.
+      1 - noMark - No vlan marking
+      2 - mark  - mark vlan tagged.
+      3 - markNestedVlan - add vlan tag to the packet. "
+    SYNTAX  INTEGER {
+        noMark(1),
+        mark(2),
+        markNestedVlan(3)
+    }
+
+RedirectAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "Specifies the packet redirection options.
+     Redirection is applied only on permitted packets.
+      1 - disabled  - no redirect
+      2 - trap - trap to local_host (CPU)
+      3 - redirectToInterface - redirect to a output interface (port, trunk or vlan)
+      4 - redirectToAllPorts - redirect to all ports, except the ingress port.
+      5 - mirror - forward the packet and sent a copy to local_host (CPU)
+      6 - analyzerPort - forward the packet and sent a copy to egress port.
+      7 - loopback - redirect the packet the the port it was received.
+      8 - redirectToPortGroup - send to group of ports, defined in rlUserAssignedVidxTable table
+      9 - mirror_and_redirectToInterface - send the packet to interface and send a copy to local_host(CPU)
+      10 -mirror_and_redirectToInterfacesGroup - send the packet to group of ports and send a copy to local_host(CPU)  "
+    SYNTAX  INTEGER {
+        disabled(1),
+        trap(2),
+        redirectToInterface(3),
+        redirectToAllPorts(4),
+        mirror(5),
+        analyzerPort(6),
+        loopback(7),
+        redirectToPortGroup(8),
+        mirrorAndRedirectToInterface(9),
+        mirrorAndRedirectToInterfacesGroup(10)
+    }
+
+PolicerType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 3 Policer types:
+         1- Single policer only per one class map.
+         2- Aggregate policer can be applied to several
+            class maps.
+         3- Cascade policer."
+    SYNTAX  INTEGER {
+        single(1),
+        aggregate(2),
+        cascade(3)
+        }
+
+
+PolicerAction ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 4 Policer Action:
+         1- No Action
+         2- Drop out of profile packets.
+         3- Remark out of profile packets.
+         4- Remark to explicit value out of profile packets
+         5- this policer is part of cascade chain"
+    SYNTAX  INTEGER {
+        none(1),
+        drop(2),
+        remark(3),
+        explicit-remark(4),
+        cascadePointer(5)
+        }
+
+QosGlobalMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 3 QoS mode:
+         1- disable no QoS on the system
+         2- Basic Qos mode only trust mode with ACL are enabled.
+         3- Advance mode all Qos option are enabled.
+         4- Service Mode -v750 DEPEREACTED!!!  all Qos option are enabled only in
+            service mode configuration"
+    SYNTAX  INTEGER {
+        disable(1),
+        basic(2),
+        advance(3)
+--v750 deprecated        service(4)
+}
+
+QosTrustMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of 6 QoS trust mode:
+          - none.- v750 DEPRECATED - same as globalMode = disable. means that only ACL can be applied.
+         - 802.1p. queue is set by the VPT field.
+         - DSCP. queue is set by the DSCP field
+         - v750 deprecated. replaced with new scalar rlQosDscpMutationEnable .
+           DSCP-Mutation. the DSCP mutate in the ingress and
+            then the queue is set by the DSCP
+          - tcp/udp.-  v750 - DEPRECATED - not supported. the queue is set by the l4 port number.
+          - cos-dscp. Queue is set for l2 traffic
+             by VPT field and for l3 traffic by DSCP field. "
+    SYNTAX  INTEGER {
+--deprecated        none(1),
+        cos(1),
+        dscp(2),
+--v750 deprecated :  dscp-mutation(3),
+--deprecated tcp-upd(5),
+        cos-dscp(3)
+}
+
+BinaryStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Specifies Disable or enable."
+    SYNTAX  INTEGER {
+        disable(1),
+        enable(2)
+}
+
+QueueType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Queue type Ef or WRR."
+    SYNTAX  INTEGER {
+        ef(1),
+        wrr(2)
+}
+
+AclDefaultAction ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Default action when the ACL reach end point."
+    SYNTAX  INTEGER {
+        deny-all(1),
+        forward-all(2),
+        application-specific(3)
+}
+
+InterfaceType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Interface type."
+    SYNTAX  INTEGER {
+        vlan(1),
+        port(2)
+}
+
+StatisticsCntrNumOfBitsType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The counter can be of different sizes - 32 bit, 48 bit, 64 bit. Maximum is 64."
+   SYNTAX INTEGER {
+      uint32(32),
+      uint48(48),
+      uint64(64)
+}
+
+
+StatisticsCntrType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The counter can be of different types, depends on actions adhered to
+                    rules that the counter is working on."
+   SYNTAX INTEGER {
+      statisticsCntrTypeSetDSCP(1),
+      statisticsCntrTypeDeny(2)
+}
+
+
+RlQosTimeBasedAclWeekPeriodicList  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION  "Bitmap that includes days of week.
+                 Each bit in the bitmap associated with corresponding day of the week."
+    SYNTAX      BITS {
+            monday(0),
+            tuesday(1),
+            wednesday(2),
+            thursday(3),
+            friday(4),
+            saturday(5),
+            sunday(6)
+}
+
+RlQosAceTidxActionDropType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The Action Drop Type."
+   SYNTAX INTEGER {
+      hardDrop(1),
+      softDrop(2)
+}
+
+RlQosApplicationDefaultActionType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Application default actions."
+   SYNTAX INTEGER {
+      forward(1),
+      hard-Drop(2),
+      soft-Drop(3),
+      trap(4)
+}
+--  CLI QOS MODE Scalar
+
+rlQosCliQosMode OBJECT-TYPE
+    SYNTAX     QosGlobalMode
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+        " *********This Scalar is deprecated - rlQosGlobalCfgEntry - replaces its
+        functionality***************
+        This scalar define in which mode the
+         system will work: basic , advance or none."
+    ::= { rlQosCliMib 1 }
+
+-- CLI QoS Basic Mode Config Scalar
+rlQosCliBasicModeCfg OBJECT-TYPE
+    SYNTAX     QosTrustMode
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+        "*********This Scalar is deprecated - rlQosGlobalCfgEntry - replaces its
+        functionality***************
+         This scalar define in which trust mode the
+                 system will work:802.1p or DSCP or
+                 DSCP-Mutation or TCP/UDP or none or vpt-dscp."
+    ::= { rlQosCliMib 2 }
+
+-- Maximum Number of ACE per system Scalar
+
+rlQosMaxNumOfAce OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This scalar define the max number of aces."
+    ::= { rlQosCliMib 3 }
+
+ -- QoS Offset Table
+
+rlQosOffsetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosOffsetEntry
+    MAX-ACCESS not-accessible
+    STATUS deprecated
+    DESCRIPTION
+        "This table specifies Offset Table information"
+    ::= { rlQosCliMib 4 }
+
+rlQosOffsetEntry OBJECT-TYPE
+    SYNTAX     RlQosOffsetEntry
+    MAX-ACCESS not-accessible
+    STATUS     deprecated
+    DESCRIPTION
+        "Each entry in this table describes one classifier field.
+        The information includes: Offset Type the offset the mask and the
+        Pattern.
+        if the type is vlan then the value will be the vlan tag.
+        if the Type is in/out port it will be the device in/out port.
+        The index is sequential integer represent by rlQosOffsetIndex"
+    INDEX { rlQosOffsetIndex }
+    ::= { rlQosOffsetTable 1 }
+
+RlQosOffsetEntry ::= SEQUENCE {
+    rlQosOffsetIndex        INTEGER,
+    rlQosOffsetType         ClassOffsetType,
+    rlQosOffsetValue        INTEGER,
+    rlQosOffsetMask         INTEGER,
+    rlQosOffsetPattern      INTEGER,
+    rlQosOffsetTuplePointer INTEGER,
+    rlQosOffsetStatus       RowStatus
+    }
+
+rlQosOffsetIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     deprecated
+    DESCRIPTION
+        "An arbitrary incremental Index
+         for the offset table."
+    ::= { rlQosOffsetEntry 1 }
+
+rlQosOffsetType OBJECT-TYPE
+    SYNTAX     ClassOffsetType
+    MAX-ACCESS read-create
+    STATUS     deprecated
+    DESCRIPTION
+        "Start of the offset."
+    ::= { rlQosOffsetEntry 2 }
+
+rlQosOffsetValue OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-create
+    STATUS     deprecated
+    DESCRIPTION
+        "The Offset value."
+    ::= { rlQosOffsetEntry 3 }
+
+rlQosOffsetMask OBJECT-TYPE
+    SYNTAX     INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS     deprecated
+    DESCRIPTION
+        "Define which bit to be extracted from the offset."
+    ::= { rlQosOffsetEntry 4 }
+
+
+rlQosOffsetPattern OBJECT-TYPE
+    SYNTAX     INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS     deprecated
+    DESCRIPTION
+        "The value to match too."
+    ::= { rlQosOffsetEntry 5 }
+
+rlQosOffsetTuplePointer OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-create
+    STATUS     deprecated
+    DESCRIPTION
+        "Pointer for the relevant Tuple."
+    ::= { rlQosOffsetEntry 6 }
+
+rlQosOffsetStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosOffsetEntry 7 }
+
+
+ -- QoS Tuple Table
+
+
+rlQosTupleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosTupleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies Tuple Table information"
+    ::= { rlQosCliMib 5 }
+
+rlQosTupleEntry OBJECT-TYPE
+    SYNTAX     RlQosTupleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table describes one Tuple.
+        The information includes: Tuple Type and the Tuples values.
+        The index is sequential integer represent by rlQosTupleIndex"
+    INDEX { rlQosTupleIndex }
+    ::= { rlQosTupleTable 1 }
+
+RlQosTupleEntry ::= SEQUENCE {
+    rlQosTupleIndex         INTEGER,
+    rlQosTupleType          ClassTupleType,
+    rlQosTupleValue1        INTEGER,
+    rlQosTupleValue2        OCTET STRING,
+    rlQosTupleStatus        RowStatus
+    }
+
+rlQosTupleIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An arbitrary incremental Index
+         for the offset table."
+    ::= { rlQosTupleEntry 1 }
+
+rlQosTupleType OBJECT-TYPE
+    SYNTAX     ClassTupleType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Start of the offset."
+    ::= { rlQosTupleEntry 2 }
+
+rlQosTupleValue1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The Tuple no.1 value can be regular integer
+         values only."
+    ::= { rlQosTupleEntry 3 }
+
+rlQosTupleValue2 OBJECT-TYPE
+    SYNTAX     OCTET STRING(SIZE(0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The Tuple no.2 value can be IPv4/IPv6/MAC address
+         or protocol number with mask"
+    ::= { rlQosTupleEntry 4 }
+
+
+rlQosTupleStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosTupleEntry 5 }
+
+-- QoS Access Control Element table
+
+
+rlQosAceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosAceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table specifies ACE table information"
+    ::= { rlQosCliMib 6 }
+
+rlQosAceEntry OBJECT-TYPE
+    SYNTAX     RlQosAceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table describes one Classifier Element.
+        The information includes: Action the ACE's Type the up to 8 tuples
+        pointers. The index is sequential integer represent by rlQosAceIndex"
+    INDEX { rlQosAceIndex }
+    ::= { rlQosAceTable 1 }
+
+RlQosAceEntry ::= SEQUENCE {
+    rlQosAceIndex          INTEGER,
+    rlQosAceAction         AceActionType,
+    rlQosAceType           AceObjectType,
+    rlQosAceTuple1         INTEGER,
+    rlQosAceTuple2         INTEGER,
+    rlQosAceTuple3         INTEGER,
+    rlQosAceTuple4         INTEGER,
+    rlQosAceTuple5         INTEGER,
+    rlQosAceTuple6         INTEGER,
+    rlQosAceTuple7         INTEGER,
+    rlQosAceTuple8         INTEGER,
+    rlQosAceAccount        BinaryStatus,
+    rlQosAceStatus         RowStatus
+    }
+
+rlQosAceIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary incremental Index
+         for the ACE table."
+    ::= { rlQosAceEntry 1 }
+
+rlQosAceAction OBJECT-TYPE
+    SYNTAX AceActionType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Action to take."
+    ::= { rlQosAceEntry 2 }
+
+rlQosAceType OBJECT-TYPE
+    SYNTAX AceObjectType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Type"
+    ::= { rlQosAceEntry 3 }
+
+rlQosAceTuple1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 4 }
+
+rlQosAceTuple2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 5 }
+
+rlQosAceTuple3 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 6 }
+
+rlQosAceTuple4 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 7 }
+
+rlQosAceTuple5 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 8 }
+
+rlQosAceTuple6 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 9 }
+
+rlQosAceTuple7 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 10 }
+
+rlQosAceTuple8 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple 1 pointer."
+    ::= { rlQosAceEntry 11 }
+
+rlQosAceAccount OBJECT-TYPE
+    SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Accounting state.
+         When set to 'enabled' than appropriate statistic's
+         counter is provided for an ACE."
+    ::= { rlQosAceEntry 12 }
+
+rlQosAceStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosAceEntry 13 }
+
+
+-- QoS Access Control List table
+
+
+
+
+rlQosAclTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosAclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies ACL table information"
+    ::= { rlQosCliMib 7 }
+
+rlQosAclEntry OBJECT-TYPE
+    SYNTAX RlQosAclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one Classifier Element.
+         The information includes: Action and the row status. The ACE pointer
+         are in the ACL-ACE reference table.
+         The index is sequential integer represent by rlQosAceIndex"
+    INDEX { rlQosAclIndex }
+    ::= { rlQosAclTable 1 }
+
+RlQosAclEntry ::= SEQUENCE {
+    rlQosAclIndex               INTEGER,
+    rlQosAclName                DisplayString,
+    rlQosAclType                AclObjectType,
+    rlQosAclStatus              RowStatus,
+    rlQosAclNumOfAces           INTEGER
+    }
+
+rlQosAclIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary incremental Index
+                 for the ACE table."
+    ::= { rlQosAclEntry 1 }
+
+rlQosAclName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Name ACL."
+    ::= { rlQosAclEntry 2 }
+
+
+rlQosAclType OBJECT-TYPE
+    SYNTAX AclObjectType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACL Type."
+    ::= { rlQosAclEntry 3 }
+
+rlQosAclStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosAclEntry 4 }
+
+rlQosAclNumOfAces OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Holds number of aces in the acl."
+    ::= { rlQosAclEntry 5 }
+
+
+
+--QoS ACE ACL refernce table
+
+
+rlQosAclAceRefTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosAclAceRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the ACE to ACL
+         relationship."
+    ::= { rlQosCliMib 8 }
+
+rlQosAclAceRefEntry OBJECT-TYPE
+    SYNTAX RlQosAclAceRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the relationship
+         between ACE to ACL. Show which ACE include in one ACL.
+         The index is the ACE pointer represent
+         by rlQosAclAceRefAcePointer"
+    INDEX { rlQosAclAceRefAcePointer }
+    ::= { rlQosAclAceRefTable 1 }
+
+RlQosAclAceRefEntry ::= SEQUENCE {
+    rlQosAclAceRefAcePointer    INTEGER,
+    rlQosAclAceRefAclPointer    INTEGER,
+    rlQosAclAceRefStatus        RowStatus
+    }
+
+rlQosAclAceRefAcePointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Index is the ACE pointer"
+    ::= { rlQosAclAceRefEntry 1 }
+
+rlQosAclAceRefAclPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACL index Pointer"
+    ::= { rlQosAclAceRefEntry 2 }
+
+rlQosAclAceRefStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosAclAceRefEntry 3 }
+
+
+-- QoS Class-Map table
+
+
+rlQosClassMapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosClassMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies CCL table information"
+    ::= { rlQosCliMib 9 }
+
+rlQosClassMapEntry OBJECT-TYPE
+    SYNTAX RlQosClassMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one Class Map Element.
+        The information includes: Classes Name,Class Action,
+        Policer pointer, and 1 match statements.
+        The index is sequential integer represent by rlQosClassMapIndex"
+    INDEX { rlQosClassMapIndex }
+    ::= { rlQosClassMapTable 1 }
+
+RlQosClassMapEntry ::= SEQUENCE {
+    rlQosClassMapIndex          INTEGER,
+    rlQosClassMapName           DisplayString,
+    rlQosClassMapType           ClassMapType,
+    rlQosClassMapAction         ClassMapAction,
+    rlQosClassMapMarkValue      INTEGER,
+    rlQosClassMapPolicer        INTEGER,
+    rlQosClassMapMatch1         INTEGER,
+    rlQosClassMapMatch2         INTEGER,
+    rlQosClassMapMarkVlan       MarkVlanAction,
+    rlQosClassMapNewVlan        INTEGER,
+    rlQosClassMapRedirectAction RedirectAction,
+    rlQosClassMapDestInterface  INTEGER,
+    rlQosClassMapStatus         RowStatus,
+    rlQosClassMapMatch3         INTEGER,
+    rlQosClassMapTrapId         INTEGER,
+    rlQosClassMapCounterEnable  TruthValue,
+    rlQosClassMapTunnelIdx      Unsigned32
+    }
+
+
+rlQosClassMapIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Class Map Index"
+    ::= { rlQosClassMapEntry 1 }
+
+rlQosClassMapName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Name of the Class Map."
+    ::= { rlQosClassMapEntry 2 }
+
+
+rlQosClassMapType OBJECT-TYPE
+    SYNTAX ClassMapType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Class map type"
+    DEFVAL {1}
+    ::= { rlQosClassMapEntry 3 }
+
+rlQosClassMapAction OBJECT-TYPE
+    SYNTAX ClassMapAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Class Map Action."
+    DEFVAL {1}
+    ::= { rlQosClassMapEntry 4 }
+
+rlQosClassMapMarkValue OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Mark value when mark action has been chosen in
+         Class Map Action field."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 5 }
+
+rlQosClassMapPolicer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policer  pointer. 0-means no policer."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 6 }
+rlQosClassMapMatch1  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Match ACL 1 pointer."
+    ::= { rlQosClassMapEntry 7 }
+
+rlQosClassMapMatch2  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Match ACL 2 pointer."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 8 }
+
+rlQosClassMapMarkVlan  OBJECT-TYPE
+    SYNTAX MarkVlanAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If 'mark', than the classified
+         traffic will be remarked with new VLAN id.
+         If 'disabled' VLAN id is not changed.
+         If markNestedVlan, if the egress interface defined as
+         VLAN tagged member then a new VLAN tag is added  to the packet."
+    DEFVAL {1}
+    ::= { rlQosClassMapEntry 9 }
+
+rlQosClassMapNewVlan  OBJECT-TYPE
+    SYNTAX INTEGER(0..4095)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If rlQosClassMapMarkVlan is not 'noMark',
+         than the classified traffic will be
+         remarked with new VLAN id.
+         The value of this field sets new VLAN id."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 10 }
+
+rlQosClassMapRedirectAction  OBJECT-TYPE
+    SYNTAX RedirectAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifiy the redirection action."
+    DEFVAL {disabled}
+    ::= { rlQosClassMapEntry 11 }
+
+rlQosClassMapDestInterface  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Relevant if rlQosClassMapRedirect is either
+        'redirectToInterface' or 'analyzerPort' or 'toMultipleInterfaces'.
+        Specified the output interface the packet is redireted to or
+        the port that gets copy of the packet in addition to the port
+        it was forwarded."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 12 }
+
+rlQosClassMapStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosClassMapEntry 13 }
+
+rlQosClassMapMatch3  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Match ACL 3 pointer."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 14 }
+
+rlQosClassMapTrapId  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If now zero, Indicates the trap type id the matched packets arrives with,
+        relevant when RedirectAction is trap or mirror."
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 15 }
+
+rlQosClassMapCounterEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable counting per class map.
+        Counts packets matche the class map rules."
+    DEFVAL {false}
+    ::= { rlQosClassMapEntry 16 }
+
+rlQosClassMapTunnelIdx  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If not zero, then the tunnel data pointed by rlQosClassMapTunnelIdx
+        is added to the packet"
+    DEFVAL {0}
+    ::= { rlQosClassMapEntry 17 }
+
+--- QoS Policer table
+
+
+rlQosPolicerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies All the Policers in the system Information"
+    ::= { rlQosCliMib 10 }
+
+rlQosPolicerEntry OBJECT-TYPE
+    SYNTAX RlQosPolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one policer.
+        The information includes: Policer name, Policer type, Committed Rate,
+        Committed Burst, Out-of-Profile Action.
+        The index is sequential integer represent by rlQosPolicerIndex"
+    INDEX { rlQosPolicerIndex }
+    ::= { rlQosPolicerTable 1 }
+
+RlQosPolicerEntry ::= SEQUENCE {
+    rlQosPolicerIndex            INTEGER,
+    rlQosPolicerName             DisplayString,
+    rlQosPolicerType             PolicerType,
+    rlQosPolicerCir              Unsigned32,
+    rlQosPolicerCbs              Unsigned32,
+    rlQosPolicerAction           PolicerAction,
+    rlQosPolicerCasPointerRemVal INTEGER,
+    rlQosPolicerStatus           RowStatus
+    }
+
+rlQosPolicerIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Policer Index."
+    ::= { rlQosPolicerEntry 1 }
+
+rlQosPolicerName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Name of the Policer."
+    ::= { rlQosPolicerEntry 2 }
+
+
+rlQosPolicerType OBJECT-TYPE
+    SYNTAX PolicerType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policer type"
+    ::= { rlQosPolicerEntry 3 }
+
+rlQosPolicerCir OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Committed rate value."
+    ::= { rlQosPolicerEntry 4 }
+rlQosPolicerCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS      "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Committed rate Value."
+    ::= { rlQosPolicerEntry 5 }
+
+rlQosPolicerAction OBJECT-TYPE
+    SYNTAX PolicerAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Out of profile Action."
+    ::= { rlQosPolicerEntry 6 }
+
+rlQosPolicerCasPointerRemVal OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Pointer to use whan the type is
+         cascade policer. 0-means no cascade policer. It can also be
+         Remark value in case of explicit remark"
+    ::= { rlQosPolicerEntry 7 }
+
+rlQosPolicerStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosPolicerEntry 8 }
+
+
+
+
+
+-- QoS Police-Map table
+
+
+
+rlQosPolicyMapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPolicyMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies Policy Map Table Information"
+    ::= { rlQosCliMib 11 }
+
+rlQosPolicyMapEntry OBJECT-TYPE
+    SYNTAX RlQosPolicyMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one policy map.
+        The information includes: Index, Policy Map name,
+        Up to 6 class map names.
+        The index is sequential integer represent by rlQosPolicerIndex"
+    INDEX { rlQosPolicyMapIndex }
+    ::= { rlQosPolicyMapTable 1 }
+
+RlQosPolicyMapEntry ::= SEQUENCE {
+    rlQosPolicyMapIndex          INTEGER,
+    rlQosPolicyMapName           DisplayString,
+    rlQosPolicyMapStatus         RowStatus
+    }
+
+rlQosPolicyMapIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Policy map Index."
+    ::= { rlQosPolicyMapEntry 1 }
+
+rlQosPolicyMapName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policy map Name."
+    ::= { rlQosPolicyMapEntry 2 }
+
+rlQosPolicyMapStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosPolicyMapEntry 3 }
+
+
+--QoS Policy Class map refernce table
+
+
+rlQosPolicyClassRefTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPolicyClassRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The relationship
+         between policy map to class map"
+    ::= { rlQosCliMib 12 }
+
+rlQosPolicyClassRefEntry OBJECT-TYPE
+    SYNTAX RlQosPolicyClassRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the connection
+         between class-map entry to policy map by using pointers.
+         The index is Class map pointer
+         represent by rlQosPolicyClassRefClassPointer"
+    INDEX { rlQosPolicyClassRefClassPointer }
+    ::= { rlQosPolicyClassRefTable 1 }
+
+RlQosPolicyClassRefEntry ::= SEQUENCE {
+    rlQosPolicyClassRefClassPointer     INTEGER,
+    rlQosPolicyClassRefPolicyPointer    INTEGER,
+    rlQosPolicyClassRefStatus           RowStatus
+    }
+
+rlQosPolicyClassRefClassPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Index is the Class-map pointer"
+    ::= { rlQosPolicyClassRefEntry 1 }
+
+rlQosPolicyClassRefPolicyPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policy map index Pointer"
+    ::= { rlQosPolicyClassRefEntry 2 }
+
+rlQosPolicyClassRefStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosPolicyClassRefEntry 3 }
+
+
+
+
+--   QoS Interface Policy table
+
+
+
+
+rlQosIfPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosIfPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies for each interface
+                        the Policy Map attach to it"
+    ::= { rlQosCliMib 13 }
+
+rlQosIfPolicyEntry OBJECT-TYPE
+    SYNTAX RlQosIfPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes what policy
+         Map attached to specific Interface.
+         The index is Interface Index represent by rlIfIndex and
+         the interface type represent by rlIfType"
+    INDEX { rlIfIndex,
+            rlIfType }
+    ::= { rlQosIfPolicyTable 1 }
+
+RlQosIfPolicyEntry ::= SEQUENCE {
+        rlIfIndex                      INTEGER,
+        rlIfType                       InterfaceType,
+        rlQosIfPolicyMapPointerIn      INTEGER,
+        rlQosIfPolicyMapPointerOut     INTEGER,
+        rlQosIfTrustActive             BinaryStatus,
+        rlQosPortShaperStatus          BinaryStatus,
+        rlQosCirPortShaper             INTEGER,
+        rlQosCbsPortShaper             INTEGER,
+        rlQosIfProfilePointer          DisplayString,
+        rlQosQueueProfilePointer       DisplayString,
+        rlQosQueueShapeProfilePointer  INTEGER,
+        rlQosAclDefaultAction          AclDefaultAction,
+        rlQosIfPolicyMapStatus         RowStatus,
+        rlQosIfAclIn                   INTEGER,
+        rlQosIfAclOut                  INTEGER,
+        rlQosIfPolicerIn               INTEGER,
+        rlQosPortRateLimitStatus       BinaryStatus,
+        rlQosCirPortRateLimit          INTEGER,
+        rlQosCbsPortRateLimit          INTEGER,
+        rlQosIfIpv6AclIn               INTEGER,
+        rlQosIfIpv6AclOut              INTEGER
+    }
+
+rlIfIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface Index."
+    ::= { rlQosIfPolicyEntry 1 }
+
+rlIfType OBJECT-TYPE
+    SYNTAX InterfaceType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface Type(vlan/port)."
+    ::= { rlQosIfPolicyEntry 2 }
+
+rlQosIfPolicyMapPointerIn OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policy map pointer Input."
+    ::= { rlQosIfPolicyEntry 3 }
+
+rlQosIfPolicyMapPointerOut OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policy map pointer Output."
+    ::= { rlQosIfPolicyEntry 4 }
+
+rlQosIfTrustActive OBJECT-TYPE
+   SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Interface Basic Mode Trust is active or not ."
+    ::= { rlQosIfPolicyEntry 5 }
+
+
+rlQosPortShaperStatus OBJECT-TYPE
+    SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If there is shaper on the port"
+    ::= { rlQosIfPolicyEntry 6 }
+
+rlQosCirPortShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS      "bps"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The CIR for the port shaper.
+         N/A when the shper is disabled"
+    ::= { rlQosIfPolicyEntry 7}
+
+rlQosCbsPortShaper OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS      "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The CBS for the port shaper.
+         N/A when the shper is disabled"
+    ::= { rlQosIfPolicyEntry 8 }
+
+rlQosIfProfilePointer OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Interface Profile name pointer."
+    ::= { rlQosIfPolicyEntry 9 }
+
+rlQosQueueProfilePointer OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        " Queue Profile name pointer."
+    ::= { rlQosIfPolicyEntry 10 }
+
+rlQosQueueShapeProfilePointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        " Queue shape Profile pointer."
+    ::= { rlQosIfPolicyEntry 11 }
+
+
+rlQosAclDefaultAction OBJECT-TYPE
+    SYNTAX AclDefaultAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        " When one ACL is enterd then what to do for the last rull."
+    ::= { rlQosIfPolicyEntry 12 }
+
+rlQosIfPolicyMapStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosIfPolicyEntry 13 }
+
+rlQosIfAclIn OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Index of an ACL in the rlQosAclTable, which is applied
+         to the ingress of an interface.
+         0 - means no ACL applied."
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 14 }
+
+rlQosIfAclOut OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Index of an ACL in the rlQosAclTable, which is applied
+         to the egress of an interface.
+         0 - means no ACL applied."
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 15 }
+
+rlQosIfPolicerIn OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Index of an Policer in the rlQosPolicerTable, which is applied
+         to the ingress of an interface.
+         0 - means no Policer applied."
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 16 }
+
+rlQosPortRateLimitStatus OBJECT-TYPE
+    SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "If there is Rate limit on the port"
+    DEFVAL {disable}
+    ::= { rlQosIfPolicyEntry 17 }
+
+rlQosCirPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS      "bps"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The CIR for the port rate limit.
+         N/A when the Rate limit is disabled"
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 18}
+
+rlQosCbsPortRateLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS      "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The CBS for the port Rate limit.
+         N/A when the Rate limit is disabled"
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 19 }
+
+rlQosIfIpv6AclIn OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Index of an IPv6 ACL in the rlQosAclTable, which is applied
+         to the ingress of an interface.
+         0 - means no ACL applied."
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 20 }
+
+rlQosIfIpv6AclOut OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Index of an IPv6 ACL in the rlQosAclTable, which is applied
+         to the egress of an interface.
+         0 - means no ACL applied."
+    DEFVAL {0}
+    ::= { rlQosIfPolicyEntry 21 }
+
+-- QoS Interface Profile table
+
+
+
+rlQosIfProfileCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosIfProfileCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies for each Queue the Tail
+         Drop or WRED parameters and the EF of WRR
+         parameters."
+    ::= { rlQosCliMib 14 }
+
+rlQosIfProfileCfgEntry OBJECT-TYPE
+    SYNTAX RlQosIfProfileCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one queue
+         parameters: Tail-drop threshold for drop precedence
+         0,1,3 and the WRED min-max threshold and the probability
+         factor for Drop precedence 0,1,2 and the WRED Q factor
+         and the EF priority and the WRR weight.
+         The index is Interface Index represent by rlIfProfileName
+         and queue-id represent by rlQosQueueId"
+    INDEX { rlIfProfileName,
+            rlQosQueueId
+                  }
+    ::= { rlQosIfProfileCfgTable 1 }
+
+RlQosIfProfileCfgEntry ::= SEQUENCE {
+        rlIfProfileName          DisplayString,
+        rlQosQueueId             INTEGER,
+        rlQosTdThersholdDp0      INTEGER,
+        rlQosTdThersholdDp1      INTEGER,
+        rlQosTdThersholdDp2      INTEGER,
+        rlQosRedMinDp0           INTEGER,
+        rlQosRedMaxDp0           INTEGER,
+        rlQosRedProbDp0          INTEGER,
+        rlQosRedMinDp1           INTEGER,
+        rlQosRedMaxDp1           INTEGER,
+        rlQosRedProbDp1          INTEGER,
+        rlQosRedMinDp2           INTEGER,
+        rlQosRedMaxDp2           INTEGER,
+        rlQosRedProbDp2          INTEGER,
+        rlQosRedQweight          INTEGER,
+        rlQosIfprofileStatus     RowStatus
+    }
+
+rlIfProfileName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface Index."
+    ::= { rlQosIfProfileCfgEntry 1 }
+
+rlQosQueueId OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Queue id Index."
+    ::= { rlQosIfProfileCfgEntry 2 }
+
+rlQosTdThersholdDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 0."
+    ::= { rlQosIfProfileCfgEntry 3 }
+rlQosTdThersholdDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 1."
+    ::= { rlQosIfProfileCfgEntry 4 }
+rlQosTdThersholdDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Tail Drop Threshold for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 5 }
+rlQosRedMinDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 6 }
+rlQosRedMaxDp0 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 0."
+    ::= { rlQosIfProfileCfgEntry 7 }
+rlQosRedProbDp0 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 0."
+    ::= { rlQosIfProfileCfgEntry 8 }
+rlQosRedMinDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 9 }
+rlQosRedMaxDp1 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 1."
+    ::= { rlQosIfProfileCfgEntry 10 }
+rlQosRedProbDp1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 1."
+    ::= { rlQosIfProfileCfgEntry 11 }
+rlQosRedMinDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Min Threshold for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 12 }
+rlQosRedMaxDp2 OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED Max Threshold for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 13 }
+rlQosRedProbDp2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "WRED probability for Drop Precedence 2."
+    ::= { rlQosIfProfileCfgEntry 14 }
+rlQosRedQweight OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Q factor for WRED."
+    ::= { rlQosIfProfileCfgEntry 15 }
+
+rlQosIfprofileStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosIfProfileCfgEntry 16 }
+
+
+-- QoS DSCP Mutation Map
+
+
+rlQosDscpMutationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosDscpMutationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         Mutation table"
+    ::= { rlQosCliMib 15 }
+
+rlQosDscpMutationEntry OBJECT-TYPE
+    SYNTAX RlQosDscpMutationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DSCP for the packet.
+         The index is Old DSCP represent by rlQosOldDscp"
+    INDEX { rlQosOldDscp }
+    ::= { rlQosDscpMutationTable 1 }
+
+RlQosDscpMutationEntry ::= SEQUENCE {
+        rlQosOldDscp                INTEGER,
+        rlQosNewDscp                INTEGER
+    }
+
+rlQosOldDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Old DSCP."
+    ::= { rlQosDscpMutationEntry 1 }
+
+rlQosNewDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "New DSCP."
+    ::= { rlQosDscpMutationEntry 2 }
+
+
+
+-- QoS DSCP Police Transmit(Remark) map
+
+
+
+rlQosDscpRemarkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosDscpRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         Remark table"
+    ::= { rlQosCliMib 16 }
+
+rlQosDscpRemarkEntry OBJECT-TYPE
+    SYNTAX RlQosDscpRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DSCP for the packet.
+         The index is Old DSCP represent by rlQosOldDscp"
+    INDEX { rlQosRmOldDscp }
+    ::= { rlQosDscpRemarkTable 1 }
+
+RlQosDscpRemarkEntry ::= SEQUENCE {
+        rlQosRmOldDscp                INTEGER,
+        rlQosRmNewDscp                INTEGER
+    }
+
+rlQosRmOldDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Old DSCP."
+    ::= { rlQosDscpRemarkEntry 1 }
+
+rlQosRmNewDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "New DSCP."
+    ::= { rlQosDscpRemarkEntry 2 }
+
+
+
+--  QoS CoS (VPT) to Queue map
+
+
+rlQosCosQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosCosQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The Cos
+         to queue map table"
+    ::= { rlQosCliMib 17 }
+
+rlQosCosQueueEntry OBJECT-TYPE
+    SYNTAX RlQosCosQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes queue ID.
+         The index is CoS represent by rlQosCosIndex"
+    INDEX { rlQosCosIndex }
+    ::= { rlQosCosQueueTable 1 }
+
+RlQosCosQueueEntry::= SEQUENCE {
+        rlQosCosIndex                INTEGER,
+        rlQosCosQueueId                INTEGER
+    }
+
+rlQosCosIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..7)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "CoS value (0-7)."
+    ::= { rlQosCosQueueEntry 1 }
+
+rlQosCosQueueId OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Queue ID."
+    ::= { rlQosCosQueueEntry 2 }
+
+
+
+
+
+--  QoS DSCP to Queue (VPT) map
+
+
+
+rlQosDscpQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosDscpQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         to Queue map table"
+    ::= { rlQosCliMib 18 }
+
+rlQosDscpQueueEntry OBJECT-TYPE
+    SYNTAX RlQosDscpQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The
+         Queue Number.
+         The index is DSCP represent by rlQosDscpIndex"
+    INDEX { rlQosDscpIndex }
+    ::= { rlQosDscpQueueTable 1 }
+
+RlQosDscpQueueEntry ::= SEQUENCE {
+        rlQosDscpIndex                INTEGER,
+        rlQosQueueNum                 INTEGER
+    }
+
+rlQosDscpIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DSCP value."
+    ::= { rlQosDscpQueueEntry 1 }
+
+rlQosQueueNum OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Queue Number."
+    ::= { rlQosDscpQueueEntry 2 }
+
+
+
+-- QoS TCP port to Queue map
+
+
+
+rlQosTcpPortQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosTcpPortQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies TCP
+         Port to Queue map table"
+    ::= { rlQosCliMib 19 }
+
+rlQosTcpPortQueueEntry OBJECT-TYPE
+    SYNTAX RlQosTcpPortQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The
+         Queue Number.
+         The index is TCP/UDP port represent by rlQosTcpUdpPort"
+    INDEX { rlQosTcpPort }
+    ::= { rlQosTcpPortQueueTable 1 }
+
+RlQosTcpPortQueueEntry ::= SEQUENCE {
+        rlQosTcpPort                  INTEGER,
+        rlQosTcpQueueValue            INTEGER,
+        rlQosTcpPortQueueStatus       RowStatus
+    }
+
+rlQosTcpPort OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TCP port number."
+    ::= { rlQosTcpPortQueueEntry 1 }
+
+rlQosTcpQueueValue OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Queue Number."
+    ::= { rlQosTcpPortQueueEntry 2 }
+
+rlQosTcpPortQueueStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosTcpPortQueueEntry 3 }
+
+
+-- QoS UDP port to Queue map
+
+
+
+rlQosUdpPortQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosUdpPortQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies UDP
+         Port to Queue map table"
+    ::= { rlQosCliMib 20 }
+
+rlQosUdpPortQueueEntry OBJECT-TYPE
+    SYNTAX RlQosUdpPortQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The
+         Queue Number.
+         The index is UDP port represent by rlQosTcpUdpPort"
+    INDEX { rlQosUdpPort }
+    ::= { rlQosUdpPortQueueTable 1 }
+
+RlQosUdpPortQueueEntry ::= SEQUENCE {
+        rlQosUdpPort                  INTEGER,
+        rlQosUdpQueueValue            INTEGER,
+        rlQosUdpPortQueueStatus       RowStatus
+    }
+
+rlQosUdpPort OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "UDP port number."
+    ::= { rlQosUdpPortQueueEntry 1 }
+
+rlQosUdpQueueValue OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Queue value."
+    ::= { rlQosUdpPortQueueEntry 2 }
+
+rlQosUdpPortQueueStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosUdpPortQueueEntry 3 }
+
+-- CLI QoS Number of EF Scalar
+
+rlQosEfManageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosEfManageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies UDP
+         Port to DSCP map table"
+    ::= { rlQosCliMib 21 }
+
+rlQosEfManageEntry OBJECT-TYPE
+    SYNTAX RlQosEfManageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This Table describes The
+         EF management for the system.
+         The index is UDP port represent by rlQosEfQueueId"
+    INDEX { rlQosEfQueueId }
+    ::= { rlQosEfManageTable 1 }
+
+RlQosEfManageEntry ::= SEQUENCE {
+        rlQosEfQueueId                INTEGER,
+        rlQosEfState                  BinaryStatus,
+        rlQosEfPriority               INTEGER
+    }
+
+rlQosEfQueueId OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Queue-ID."
+    ::= { rlQosEfManageEntry 1 }
+
+rlQosEfState OBJECT-TYPE
+    SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable"
+    ::= { rlQosEfManageEntry 2 }
+
+rlQosEfPriority OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The priority of the queue"
+    ::= { rlQosEfManageEntry 3 }
+
+
+-- CLI QoS Queue Profile
+
+rlQosQueueProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosQueueProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the queue managment profiles "
+    ::= { rlQosCliMib 22 }
+
+rlQosQueueProfileEntry OBJECT-TYPE
+    SYNTAX RlQosQueueProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The
+         queue managment profile Value.
+         The index is profile name represent by rlQueueProfileName"
+    INDEX { rlQueueProfileName }
+    ::= { rlQosQueueProfileTable 1 }
+
+RlQosQueueProfileEntry ::= SEQUENCE {
+        rlQueueProfileName          DisplayString,
+        rlQosTypeQueue1             QueueType,
+        rlQosValueQueue1            INTEGER,
+        rlQosTypeQueue2             QueueType,
+        rlQosValueQueue2            INTEGER,
+        rlQosTypeQueue3             QueueType,
+        rlQosValueQueue3            INTEGER,
+        rlQosTypeQueue4             QueueType,
+        rlQosValueQueue4            INTEGER,
+        rlQosTypeQueue5             QueueType,
+        rlQosValueQueue5            INTEGER,
+        rlQosTypeQueue6             QueueType,
+        rlQosValueQueue6            INTEGER,
+        rlQosTypeQueue7             QueueType,
+        rlQosValueQueue7            INTEGER,
+        rlQosTypeQueue8             QueueType,
+        rlQosValueQueue8            INTEGER,
+        rlQosQueueProfileStatus     RowStatus,
+        rlQosNumOfIfConnections     INTEGER
+    }
+
+rlQueueProfileName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Profile name for the Queue profile."
+    ::= { rlQosQueueProfileEntry 1 }
+
+rlQosTypeQueue1 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 2 }
+
+rlQosValueQueue1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 3 }
+
+rlQosTypeQueue2 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 4 }
+
+rlQosValueQueue2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 5 }
+rlQosTypeQueue3 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 6 }
+
+rlQosValueQueue3 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 7 }
+
+rlQosTypeQueue4 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 8 }
+
+rlQosValueQueue4 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 9 }
+
+rlQosTypeQueue5 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 10 }
+
+    rlQosValueQueue5 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 11 }
+
+rlQosTypeQueue6 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 12 }
+
+rlQosValueQueue6 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 13 }
+rlQosTypeQueue7 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 14}
+
+rlQosValueQueue7 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 15 }
+
+rlQosTypeQueue8 OBJECT-TYPE
+    SYNTAX QueueType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "EF or WRR"
+    ::= { rlQosQueueProfileEntry 16 }
+
+rlQosValueQueue8 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "for EF read-only for wrr the weight"
+    ::= { rlQosQueueProfileEntry 17 }
+
+rlQosQueueProfileStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosQueueProfileEntry 18 }
+
+rlQosNumOfIfConnections OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "how many time this entry connected to the if policy table"
+    ::= { rlQosQueueProfileEntry 19 }
+
+
+
+-- CLI QoS Queue Shape Profile
+
+
+
+rlQosQueueShapeProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosQueueShapeProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the queue shaper profile"
+    ::= { rlQosCliMib 23 }
+
+rlQosQueueShapeProfileEntry OBJECT-TYPE
+    SYNTAX RlQosQueueShapeProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes The
+         shaper profile for all queues.
+         The index sequencial index represent by rlQosQueueShapeIndex"
+    INDEX { rlQosQueueShapeIndex}
+    ::= { rlQosQueueShapeProfileTable 1 }
+
+RlQosQueueShapeProfileEntry ::= SEQUENCE {
+        rlQosQueueShapeIndex           INTEGER,
+        rlQosCirQueue1                 INTEGER,
+        rlQosCbsQueue1                 INTEGER,
+        rlQosCirQueue2                 INTEGER,
+        rlQosCbsQueue2                 INTEGER,
+        rlQosCirQueue3                 INTEGER,
+        rlQosCbsQueue3                 INTEGER,
+        rlQosCirQueue4                 INTEGER,
+        rlQosCbsQueue4                 INTEGER,
+        rlQosCirQueue5                 INTEGER,
+        rlQosCbsQueue5                 INTEGER,
+        rlQosCirQueue6                 INTEGER,
+        rlQosCbsQueue6                 INTEGER,
+        rlQosCirQueue7                 INTEGER,
+        rlQosCbsQueue7                 INTEGER,
+        rlQosCirQueue8                 INTEGER,
+        rlQosCbsQueue8                 INTEGER,
+        rlQosQueueShapeProfileStatus   RowStatus
+    }
+
+rlQosQueueShapeIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Profile Index."
+    ::= { rlQosQueueShapeProfileEntry 1 }
+
+rlQosCirQueue1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue1 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 2 }
+
+rlQosCbsQueue1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue1 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 3 }
+
+rlQosCirQueue2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue2 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 4 }
+
+rlQosCbsQueue2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue2 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 5 }
+
+rlQosCirQueue3 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue3 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 6 }
+
+rlQosCbsQueue3 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue3 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 7 }
+
+rlQosCirQueue4 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue4 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 8 }
+
+rlQosCbsQueue4 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue4 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 9 }
+
+rlQosCirQueue5 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue5 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 10 }
+
+rlQosCbsQueue5 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue5 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 11 }
+
+rlQosCirQueue6 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue6 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 12 }
+
+rlQosCbsQueue6 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue6 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 13 }
+
+rlQosCirQueue7 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue7 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 14 }
+
+rlQosCbsQueue7 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue7 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 15 }
+
+rlQosCirQueue8 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CIR for Queue8 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 16 }
+
+rlQosCbsQueue8 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "CBS for Queue8 0 for not active"
+    ::= { rlQosQueueShapeProfileEntry 17 }
+
+rlQosQueueShapeProfileStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosQueueShapeProfileEntry 18 }
+
+-- ACL counters table
+
+rlQosAclCounterTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosAclCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  table is used to show statistics for
+         ACL applied on an interface."
+    ::= { rlQosCliMib 24 }
+
+rlQosAclCounterEntry OBJECT-TYPE
+    SYNTAX  RlQosAclCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This entry shows value of conter for a
+         particular ACE of an ACL."
+    INDEX  {  rlQosAclCounterInterface,
+              rlQosAclCounterAclIndex,
+              rlQosAclCounterAceIndex}
+    ::= { rlQosAclCounterTable 1 }
+
+RlQosAclCounterEntry ::= SEQUENCE  {
+    rlQosAclCounterInterface          InterfaceIndex,
+    rlQosAclCounterAclIndex           INTEGER,
+    rlQosAclCounterAceIndex           INTEGER,
+    rlQosAclCounterValue              Counter32
+}
+
+rlQosAclCounterInterface OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Interface Index on which ACL is applied."
+    ::= { rlQosAclCounterEntry 1 }
+
+rlQosAclCounterAclIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Index of ACL, which was applied on the IfIndex."
+    ::= { rlQosAclCounterEntry 2 }
+
+rlQosAclCounterAceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Index of ACE, which is belong to an ACL."
+    ::= { rlQosAclCounterEntry 3 }
+
+rlQosAclCounterValue OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The value of the ACE counter."
+    ::= { rlQosAclCounterEntry 4 }
+
+
+-- Free indexes table
+
+rlQosFreeIndexesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosFreeIndexesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  table is used to get free indexes of tables to create
+         new entries. The algorithm for free indexes depends on
+         table's type:
+         Tuple table      - first free index.
+         Offset table     - first free index.
+         ACE table        - last used index + ACE indexes delta.
+         ACL table        - first free index.
+         Class Map table  - last used index + Class Map indexes delta.
+         Policy Map table - first free index.
+         Policer Table    - first free index.
+         The ACE indexes delta and Class Map indexes delta are used
+         to supply QoS MIB user easy insert entry capabilities.
+         Values of these deltas depend on the MIB implementation.
+         The 'Get and increment' approach is used in all cases. "
+    ::= { rlQosCliMib 25 }
+
+rlQosFreeIndexesEntry OBJECT-TYPE
+    SYNTAX  RlQosFreeIndexesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get free index for particular table."
+    INDEX  {  rlQosFreeIndexesTableId}
+    ::= { rlQosFreeIndexesTable 1 }
+
+RlQosFreeIndexesEntry ::= SEQUENCE  {
+    rlQosFreeIndexesTableId           INTEGER,
+    rlQosFreeIndexesValue             INTEGER
+}
+
+rlQosFreeIndexesTableId OBJECT-TYPE
+    SYNTAX INTEGER {
+        tuple (1),
+        offset(2),
+        ace(3),
+        acl(4),
+        class(5),
+        policy(6),
+        policer(7),
+        shaper(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Identification of the table, for which free index
+         is retrieved."
+    ::= { rlQosFreeIndexesEntry 1 }
+
+rlQosFreeIndexesValue OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Free index for table. 0 means no free entries."
+    ::= { rlQosFreeIndexesEntry 2 }
+
+-- names to indexes table
+
+rlQosNamesToIndexesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosNamesToIndexesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to get the ACL,Class-Map and Policy-Map
+          indexes from the name."
+    ::= { rlQosCliMib 26 }
+
+rlQosNamesToIndexesEntry OBJECT-TYPE
+    SYNTAX  RlQosNamesToIndexesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get index form particular name and table type."
+    INDEX  {  rlQosNamesToIndexesTableId,
+              rlQosNamesToIndexesName}
+    ::= { rlQosNamesToIndexesTable 1 }
+
+RlQosNamesToIndexesEntry ::= SEQUENCE  {
+    rlQosNamesToIndexesTableId           INTEGER,
+    rlQosNamesToIndexesName              DisplayString,
+    rlQosNamesToIndexesValue             INTEGER
+}
+
+rlQosNamesToIndexesTableId OBJECT-TYPE
+    SYNTAX INTEGER {
+        acl(1),
+        class(2),
+        policy(3),
+        policer(4)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identification of the table, for which the index
+         is retrieved."
+    ::= { rlQosNamesToIndexesEntry 1 }
+
+rlQosNamesToIndexesName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The name of the entry"
+    ::= { rlQosNamesToIndexesEntry 2 }
+
+rlQosNamesToIndexesValue OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the index for table"
+    ::= { rlQosNamesToIndexesEntry 3 }
+
+-- Stack Control Queue number
+rlQosStackControlQueue OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This scalar object defines queue ID, which is
+         used for stack control information transfer.
+         For standalone systems the scalar value equals 0.
+         This scalar object can be used for warning messages
+         when users assign a QoS map item, or a Class to the
+         stack control queue."
+    ::= { rlQosCliMib 27 }
+
+-- Stack Control CoS
+rlQosStackControlCos OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This scalar object defines CoS (VPT), which is used
+         for stack control information transfer.
+         For standalone systems the scalar value equals 8
+         (not valid for VPT).
+         This scalar object can be used for warning messages
+         when users assign a stack control CoS to a non-stacking
+         control queue."
+    ::= { rlQosCliMib 28 }
+
+
+
+
+
+-- Cos to Queue Default map table
+
+rlQosCosQueueDefaultMapTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosCosQueueDefaultMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to set default 802.1p map (vpt to queue)"
+    ::= { rlQosCliMib 29 }
+
+rlQosCosQueueDefaultMapEntry OBJECT-TYPE
+    SYNTAX  RlQosCosQueueDefaultMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get index form particular name and table type."
+    INDEX  {  rlQosCosQueueDefaultMapVpt }
+    ::= { rlQosCosQueueDefaultMapTable 1 }
+
+RlQosCosQueueDefaultMapEntry ::= SEQUENCE  {
+    rlQosCosQueueDefaultMapVpt           INTEGER,
+    rlQosCosQueueDefaultMapQueueId       INTEGER
+}
+
+rlQosCosQueueDefaultMapVpt OBJECT-TYPE
+    SYNTAX INTEGER (0..7)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "vlan priority tag , 3 bits of priority which determine
+        the service class."
+    ::= { rlQosCosQueueDefaultMapEntry 1 }
+
+rlQosCosQueueDefaultMapQueueId OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "the queue id vary from the first queue id to Max Number of queues supported"
+
+    ::= { rlQosCosQueueDefaultMapEntry 2 }
+
+
+-- Predefined ACLs interface table
+
+rlQosPredefBlockAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosPredefBlockAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used apply predefined ACLs to interfaces.
+         Predefined ACLs is ACL to filter particular protocol or
+         protocol's family. These ACL may operate simultaneously
+         with IP and MAC ACLs."
+    ::= { rlQosCliMib 30 }
+
+
+rlQosPredefBlockAclEntry OBJECT-TYPE
+    SYNTAX  RlQosPredefBlockAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to apply predefined ACLs to the interface."
+    INDEX { rlQosPredefBlockAclIfIndex, rlQosPredefBlockAclIfType }
+    ::= { rlQosPredefBlockAclTable 1 }
+
+
+RlQosPredefBlockAclEntry ::= SEQUENCE  {
+    rlQosPredefBlockAclIfIndex    InterfaceIndex,
+    rlQosPredefBlockAclIfType     InterfaceType,
+    rlQosPredefBlockAclMask       OCTET STRING,
+    rlQosPredefBlockAclStatus     RowStatus
+}
+
+rlQosPredefBlockAclIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "IfIndex of port/trunk or VLAN tag of VLAN
+         on which predefined ACLa will be configured."
+    ::= { rlQosPredefBlockAclEntry 1 }
+
+rlQosPredefBlockAclIfType OBJECT-TYPE
+    SYNTAX InterfaceType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface Type(vlan/port)."
+    ::= { rlQosPredefBlockAclEntry 2 }
+
+
+rlQosPredefBlockAclMask OBJECT-TYPE
+--    SYNTAX      BITS {
+--            LLCNetBueiNetBios(0),
+--            IPNetBueiNetBios(1)
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This bitmap defines predefined ACL which are applied
+         on an interface. The table below defines bitmasks for
+         supported predefined ACL.
+         Protocol/Family     bitmask Description
+         =====================================================
+         LLC NetBuei/NetBios 0x01    ACL filters out LLC encapsulated
+                                      NetBuei/NetBios frames
+         IP NetBuei/NetBios  0x02    ACL filters out IP encapsulated
+                                      NetBuei/NetBios frames
+         "
+    ::= { rlQosPredefBlockAclEntry 3 }
+
+rlQosPredefBlockAclStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosPredefBlockAclEntry 4 }
+
+
+ -- QoS Access Control Element table two indexes
+
+
+rlQosAceTidxTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosAceTidxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table specifies ACE table with two index information"
+    ::= { rlQosCliMib 31 }
+
+rlQosAceTidxEntry OBJECT-TYPE
+    SYNTAX     RlQosAceTidxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table describes one Classifier Element.
+        The information includes: Action the ACE's Type the up to 11 tuples
+        pointers. The index is sequential integer represent by
+        rlQosAceTidxAclIndex ACL index and rlQosAceTidxIndex ACE index"
+    INDEX { rlQosAceTidxAclIndex,
+            rlQosAceTidxIndex}
+    ::= { rlQosAceTidxTable 1 }
+
+RlQosAceTidxEntry ::= SEQUENCE {
+    rlQosAceTidxAclIndex       INTEGER,
+    rlQosAceTidxIndex          INTEGER,
+    rlQosAceTidxAction         AceActionType,
+    rlQosAceTidxType           AceObjectType,
+    rlQosAceTidxTuple1         INTEGER,
+    rlQosAceTidxTuple2         INTEGER,
+    rlQosAceTidxTuple3         INTEGER,
+    rlQosAceTidxTuple4         INTEGER,
+    rlQosAceTidxTuple5         INTEGER,
+    rlQosAceTidxTuple6         INTEGER,
+    rlQosAceTidxTuple7         INTEGER,
+    rlQosAceTidxTuple8         INTEGER,
+    rlQosAceTidxAccount        BinaryStatus,
+    rlQosAceTidxStatus         RowStatus,
+    rlQosAceTidxTimeRange      DisplayString,
+    rlQosAceTidxTimeRangeIsActive TruthValue,
+    rlQosAceTidxTuple9         INTEGER,
+    rlQosAceTidxTuple10        INTEGER,
+    rlQosAceTidxTuple11        INTEGER,
+    rlQosAceTidxActionDropType RlQosAceTidxActionDropType
+
+    }
+
+rlQosAceTidxAclIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary incremental Index
+         for the ACL ACE connection."
+    ::= { rlQosAceTidxEntry 1 }
+
+rlQosAceTidxIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary incremental Index
+         for the ACE table."
+    ::= { rlQosAceTidxEntry 2 }
+
+rlQosAceTidxAction OBJECT-TYPE
+    SYNTAX AceActionType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Action to take."
+    ::= { rlQosAceTidxEntry 3 }
+
+rlQosAceTidxType OBJECT-TYPE
+    SYNTAX AceObjectType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Type"
+    ::= { rlQosAceTidxEntry 4 }
+
+rlQosAceTidxTuple1 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 5 }
+
+rlQosAceTidxTuple2 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 6 }
+
+rlQosAceTidxTuple3 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 7 }
+
+rlQosAceTidxTuple4 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 8 }
+
+rlQosAceTidxTuple5 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 9 }
+
+rlQosAceTidxTuple6 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 10 }
+
+rlQosAceTidxTuple7 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 11 }
+
+rlQosAceTidxTuple8 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 12 }
+
+rlQosAceTidxAccount OBJECT-TYPE
+    SYNTAX BinaryStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Accounting state.
+         When set to 'enabled' than appropriate statistic's
+         counter is provided for an ACE."
+    ::= { rlQosAceTidxEntry 13 }
+
+rlQosAceTidxStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosAceTidxEntry 14 }
+
+rlQosAceTidxTimeRange OBJECT-TYPE
+    SYNTAX     DisplayString( SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "ACE time range name."
+    ::= { rlQosAceTidxEntry 15 }
+
+rlQosAceTidxTimeRangeIsActive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "ACE time range is rule active state shows is ACE currently active or not."
+    ::= { rlQosAceTidxEntry 16 }
+
+rlQosAceTidxTuple9 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 17 }
+
+rlQosAceTidxTuple10 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 18 }
+
+rlQosAceTidxTuple11 OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACE Tuple pointer."
+    ::= { rlQosAceTidxEntry 19 }
+
+
+rlQosAceTidxActionDropType OBJECT-TYPE
+    SYNTAX RlQosAceTidxActionDropType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This field is valid only if AceActionType is
+        deny or deny-DisablePort."
+    ::= { rlQosAceTidxEntry 20 }
+
+
+rlQosMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 11
+         1 - original version
+         2 - Add new two MIB's items.
+             - rlQosAceTidxTable - Ace table with two indexes
+             - rlQosMibVersion.
+             Change the unit in Policer table from bps to kbps
+         3 - Add new MIB's value for Textual convention QosObjectMode
+         4 - Add new MIBs rlQosDscpQueueDefaultMapTable
+         5 - Add new advanced action : trustCosDscp
+         6 - Add vpt,ether-type,tcp-flags,icmp-type,icmp-code,igmp-type to ClassTupleType
+             Add ip-ICMP,ip-IGMP To AceObjectType
+             Add vpt,ethertype To ClassOffsetType
+         7-  Add rlQosPortRateLimitStatus,rlQosCirPortRateLimit, rlQosCbsPortRateLimit
+             to   rlQosIfPolicyTable
+         8 - Add Added rlQosDscpToDpTable
+         9 - Add statistics
+         10 - Add innerVlan to ClassOffsetType And inner-vlan to ClassTupleType
+         11 - Added rlQosCPUSafeGuardEnable"
+    ::= { rlQosCliMib 32 }
+
+-- DSCP to Queue Default map table
+
+rlQosDscpQueueDefaultMapTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosDscpQueueDefaultMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to set default dscp to queue map"
+    ::= { rlQosCliMib 33 }
+
+rlQosDscpQueueDefaultMapEntry OBJECT-TYPE
+    SYNTAX  RlQosDscpQueueDefaultMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get index form particular name and table type."
+    INDEX  {  rlQosDscpQueueDefaultMapDscp }
+    ::= { rlQosDscpQueueDefaultMapTable 1 }
+
+RlQosDscpQueueDefaultMapEntry ::= SEQUENCE  {
+    rlQosDscpQueueDefaultMapDscp           INTEGER,
+    rlQosDscpQueueDefaultMapQueueId       INTEGER
+}
+
+rlQosDscpQueueDefaultMapDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "dscp , 6 bits of priority which determine
+        the service class."
+    ::= { rlQosDscpQueueDefaultMapEntry 1 }
+
+rlQosDscpQueueDefaultMapQueueId OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "the queue id vary from the first queue id to Max Number of queues supported"
+
+    ::= { rlQosDscpQueueDefaultMapEntry 2 }
+
+-- QoS DSCP to DP Map
+
+
+rlQosDscpToDpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosDscpToDpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The DSCP
+         To Dp table"
+    ::= { rlQosCliMib 34 }
+
+rlQosDscpToDpEntry OBJECT-TYPE
+    SYNTAX RlQosDscpToDpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         DP for the packet.
+         The index is DSCP represent by rlQosDscp"
+    INDEX { rlQosDscp }
+    ::= { rlQosDscpToDpTable 1 }
+
+RlQosDscpToDpEntry ::= SEQUENCE {
+        rlQosDscp                INTEGER,
+        rlQosDp                  INTEGER
+    }
+
+rlQosDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Packet DSCP."
+    ::= { rlQosDscpToDpEntry 1 }
+
+rlQosDp OBJECT-TYPE
+    SYNTAX INTEGER (0..2)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "New DP."
+    ::= { rlQosDscpToDpEntry 2 }
+
+
+rlQosStatistics
+        OBJECT IDENTIFIER ::= { rlQosCliMib 35 }
+
+rlQosPortPolicyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPortPolicyStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics counter for policies with specific actions "
+    ::= { rlQosStatistics 1 }
+
+rlQosPortPolicyStatisticsEntry OBJECT-TYPE
+    SYNTAX RlQosPortPolicyStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per port.
+        The index is port represent by rlIfIndex.
+        In each entry represents counter, it's type , it's size and whether it's enabled."
+    INDEX { rlIfIndex,rlIfType, rlQosPortPolicyStatisticsCntrType }
+    ::= { rlQosPortPolicyStatisticsTable 1 }
+
+RlQosPortPolicyStatisticsEntry::= SEQUENCE {
+        rlQosPortPolicyStatisticsCntrType        StatisticsCntrType,
+        rlQosPortPolicyStatisticsCntrNumOfBits   StatisticsCntrNumOfBitsType,
+        rlQosPortPolicyStatisticsEnableCounting  TruthValue,
+        rlQosPortPolicyStatisticsCounterValue    Counter64
+    }
+
+rlQosPortPolicyStatisticsCntrType          OBJECT-TYPE
+    SYNTAX StatisticsCntrType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Counter type."
+    ::= { rlQosPortPolicyStatisticsEntry 1 }
+
+rlQosPortPolicyStatisticsCntrNumOfBits          OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits."
+    ::= { rlQosPortPolicyStatisticsEntry 2 }
+
+rlQosPortPolicyStatisticsEnableCounting     OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication whether the counter is enabled."
+    DEFVAL { false }
+    ::= { rlQosPortPolicyStatisticsEntry 3 }
+
+rlQosPortPolicyStatisticsCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter value."
+    ::= { rlQosPortPolicyStatisticsEntry 4 }
+
+
+rlQosSinglePolicerStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosSinglePolicerStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics counters per QoS meter "
+    ::= { rlQosStatistics 2 }
+
+rlQosSinglePolicerStatisticsEntry OBJECT-TYPE
+    SYNTAX RlQosSinglePolicerStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per meter. The index is port represent by                 RlQosMeterStatisticsPort and RlQosMeterStatisticsPolicerPointer. In each entry there are fields representing whether the counter for the meter is enabled and two counters value - for in-profile bytes and for out-of-profile bytes. "
+    INDEX { rlIfIndex, rlQosPolicerIndex }
+    ::= { rlQosSinglePolicerStatisticsTable 1 }
+
+RlQosSinglePolicerStatisticsEntry::= SEQUENCE {
+        rlQosSinglePolicerStatisticsInProfileCounterValue     Counter64,
+        rlQosSinglePolicerStatisticsInProfileCntrNumOfBits    StatisticsCntrNumOfBitsType,
+        rlQosSinglePolicerStatisticsOutProfileCounterValue    Counter64,
+        rlQosSinglePolicerStatisticsOutProfileCntrNumOfBits   StatisticsCntrNumOfBitsType,
+        rlQosSinglePolicerStatisticsStatus                    RowStatus
+}
+
+rlQosSinglePolicerStatisticsInProfileCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " Counter value of in profile traffic."
+    ::= { rlQosSinglePolicerStatisticsEntry 1 }
+
+rlQosSinglePolicerStatisticsInProfileCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for in profile counter."
+    ::= { rlQosSinglePolicerStatisticsEntry 2 }
+
+rlQosSinglePolicerStatisticsOutProfileCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " Counter value of Out Profile traffic."
+    ::= { rlQosSinglePolicerStatisticsEntry 3 }
+
+rlQosSinglePolicerStatisticsOutProfileCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for out profile counter."
+    ::= { rlQosSinglePolicerStatisticsEntry 4 }
+
+rlQosSinglePolicerStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlQosSinglePolicerStatisticsEntry 5 }
+
+
+rlQosAggregatePolicerStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosAggregatePolicerStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics counters per QoS aggregate meter "
+    ::= { rlQosStatistics 3 }
+
+rlQosAggregatePolicerStatisticsEntry OBJECT-TYPE
+    SYNTAX RlQosAggregatePolicerStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per aggregate meter.
+        The index is rlQosPolicerIndex.
+        In each entry there are fields representing whether the counter for the
+        meter is enabled and three counters values - for green, yellow and red
+        profiles bytes. "
+    INDEX { rlQosPolicerIndex }
+    ::= { rlQosAggregatePolicerStatisticsTable 1 }
+
+RlQosAggregatePolicerStatisticsEntry::= SEQUENCE {
+        rlQosAggregatePolicerStatisticsInProfileCounterValue      Counter64,
+        rlQosAggregatePolicerStatisticsInProfileCntrNumOfBits     StatisticsCntrNumOfBitsType,
+        rlQosAggregatePolicerStatisticsOutProfileCounterValue     Counter64,
+        rlQosAggregatePolicerStatisticsOutProfileCntrNumOfBits    StatisticsCntrNumOfBitsType,
+        rlQosAggregatePolicerStatisticsStatus                     RowStatus
+}
+
+rlQosAggregatePolicerStatisticsInProfileCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter value of In Profile amount of bytes."
+    ::= { rlQosAggregatePolicerStatisticsEntry 1}
+
+rlQosAggregatePolicerStatisticsInProfileCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for In Profile ."
+    ::= { rlQosAggregatePolicerStatisticsEntry 2 }
+
+rlQosAggregatePolicerStatisticsOutProfileCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " Counter value of Out Profile amount of bytes."
+    ::= { rlQosAggregatePolicerStatisticsEntry 3 }
+
+rlQosAggregatePolicerStatisticsOutProfileCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for Out Profile."
+    ::= { rlQosAggregatePolicerStatisticsEntry 4 }
+
+rlQosAggregatePolicerStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlQosAggregatePolicerStatisticsEntry 5 }
+
+rlQosOutQueueStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosOutQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics counters per VLAN/Port/Queue/Drop Precedence "
+    ::= { rlQosStatistics 4 }
+
+rlQosOutQueueStatisticsEntry OBJECT-TYPE
+    SYNTAX RlQosOutQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes counter per any permutation of
+        Port/VLAN/Queue/Drop Precedence. Each of the above can a group off 'All'.
+        The index is port represent by rlQosOutQueueStatisticsCountrID.
+        In each entry there are fields representing
+        whether the counter is enabled and counters value. "
+    INDEX {rlQosOutQueueStatisticsCountrID}
+    ::= { rlQosOutQueueStatisticsTable 1 }
+
+RlQosOutQueueStatisticsEntry::= SEQUENCE {
+       rlQosOutQueueStatisticsCountrID                 INTEGER,
+       rlQosOutQueueStatisticsIfIndexList              PortList,
+       rlQosOutQueueStatisticsPortAll                  TruthValue,
+       rlQosOutQueueStatisticsVlan                     INTEGER,
+       rlQosOutQueueStatisticsVlanAll                  TruthValue,
+       rlQosOutQueueStatisticsQueue                    INTEGER,
+       rlQosOutQueueStatisticsQueueAll                 TruthValue,
+       rlQosOutQueueStatisticsDP                       StatisticsDPType,
+       rlQosOutQueueStatisticsDPAll                    TruthValue,
+       rlQosOutQueueStatisticsCounterTailDropValue     Counter64,
+       rlQosOutQueueStatisticsCounterAllValue          Counter64,
+       rlQosOutQueueStatisticsCntrNumOfBits            StatisticsCntrNumOfBitsType,
+       rlQosOutQueueStatisticsStatus                   RowStatus
+}
+
+rlQosOutQueueStatisticsCountrID OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Counter id, the key of the table."
+    ::= { rlQosOutQueueStatisticsEntry  1 }
+
+rlQosOutQueueStatisticsIfIndexList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Port for which the flow is counted."
+    ::= { rlQosOutQueueStatisticsEntry 2 }
+
+rlQosOutQueueStatisticsPortAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the port is configured as range of all the ports"
+    ::= {rlQosOutQueueStatisticsEntry  3 }
+
+rlQosOutQueueStatisticsVlan OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VLAN for which the flow is counted."
+    ::= { rlQosOutQueueStatisticsEntry  4 }
+
+rlQosOutQueueStatisticsVlanAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the VLAN is configured as range of all the VLANS"
+    ::= { rlQosOutQueueStatisticsEntry  5 }
+
+rlQosOutQueueStatisticsQueue OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Queue for which the flow is counted."
+    ::= { rlQosOutQueueStatisticsEntry  6 }
+
+
+rlQosOutQueueStatisticsQueueAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the queue is configured as range of all the Queues"
+    ::= { rlQosOutQueueStatisticsEntry  7 }
+
+rlQosOutQueueStatisticsDP OBJECT-TYPE
+    SYNTAX StatisticsDPType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Drop Precedence for which the flow is counted."
+    ::= { rlQosOutQueueStatisticsEntry  8 }
+
+rlQosOutQueueStatisticsDPAll  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication for whether the DP is configured as range of all the DPs"
+    ::= { rlQosOutQueueStatisticsEntry  9}
+
+
+rlQosOutQueueStatisticsCounterTailDropValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The counter for tail dropped value."
+    ::= { rlQosOutQueueStatisticsEntry  10 }
+
+rlQosOutQueueStatisticsCounterAllValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The counter for all traffic value."
+    ::= { rlQosOutQueueStatisticsEntry  11 }
+
+rlQosOutQueueStatisticsCntrNumOfBits       OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits for the counter."
+    ::= { rlQosOutQueueStatisticsEntry 12 }
+
+rlQosOutQueueStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlQosOutQueueStatisticsEntry  13 }
+
+
+-- Global Counter for statistics
+
+rlQosGlobalStatisticsCntrsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosGlobalStatisticsCntrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies statistics global counters  for specific rules for all ports
+        that they are connected to "
+    ::= { rlQosStatistics 5 }
+
+rlQosGlobalStatisticsCntrsEntry OBJECT-TYPE
+    SYNTAX RlQosGlobalStatisticsCntrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents global counter."
+    INDEX {rlQosGlobalStatisticsCntrsType}
+    ::= { rlQosGlobalStatisticsCntrsTable 1 }
+
+RlQosGlobalStatisticsCntrsEntry::= SEQUENCE {
+       rlQosGlobalStatisticsCntrsType            StatisticsCntrType,
+       rlQosGlobalStatisticsCntrsNumOfBits       StatisticsCntrNumOfBitsType,
+       rlQosGlobalStatisticsCntrsCounterValue    Counter64,
+       rlQosGlobalStatisticsStatus               RowStatus
+}
+
+rlQosGlobalStatisticsCntrsType          OBJECT-TYPE
+    SYNTAX StatisticsCntrType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter type."
+    ::= { rlQosGlobalStatisticsCntrsEntry 1 }
+
+rlQosGlobalStatisticsCntrsNumOfBits          OBJECT-TYPE
+    SYNTAX StatisticsCntrNumOfBitsType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter size in bits."
+    ::= { rlQosGlobalStatisticsCntrsEntry 2 }
+
+rlQosGlobalStatisticsCntrsCounterValue OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter value."
+    ::= { rlQosGlobalStatisticsCntrsEntry 3 }
+
+rlQosGlobalStatisticsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry.
+         It is used to delete an entry from this table."
+    ::= { rlQosGlobalStatisticsCntrsEntry 4 }
+
+    -- clear scalar
+
+rlQosClearCounters OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar indicates to clear all the counters."
+    ::= { rlQosStatistics 6 }
+
+-- CLI QoS Classifier Utilization
+
+    rlQosClassifierUtilization OBJECT IDENTIFIER
+      ::= { rlQosCliMib 36 }
+
+    rlQosClassifierUtilizationTable OBJECT-TYPE
+      SYNTAX         SEQUENCE OF RlQosClassifierUtilizationEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A table containing Classifier utilization information.
+           Each row represents objects for a particular Unit
+           present in this system."
+      ::= { rlQosClassifierUtilization 1 }
+
+    rlQosClassifierUtilizationEntry OBJECT-TYPE
+      SYNTAX         RlQosClassifierUtilizationEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A Single entry containing Classifier utilization information."
+      INDEX          { rlQosClassifierUtilizationUnitId }
+      ::= { rlQosClassifierUtilizationTable 1 }
+
+    RlQosClassifierUtilizationEntry ::= SEQUENCE {
+      rlQosClassifierUtilizationUnitId            Unsigned32,
+      rlQosClassifierUtilizationPercent           Unsigned32,
+      rlQosClassifierUtilizationRulesNumber       Unsigned32,
+      rlQosClassifierUtilizationFreeRulesNumber   Unsigned32
+    }
+
+     rlQosClassifierUtilizationUnitId OBJECT-TYPE
+      SYNTAX         Unsigned32  (1..4294967295)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "The Unit ID of this Classifier. must be unique per entry.
+            This is an index into the table."
+      ::= { rlQosClassifierUtilizationEntry 1 }
+
+
+    rlQosClassifierUtilizationPercent OBJECT-TYPE
+      SYNTAX         Unsigned32  (0..100)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The classifier utilization percentage. "
+      DEFVAL { 0 }
+      ::= { rlQosClassifierUtilizationEntry 2 }
+
+   rlQosClassifierUtilizationRulesNumber OBJECT-TYPE
+      SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The classifier utilization number of used rules, in short rules resolution."
+      DEFVAL { 0 }
+      ::= { rlQosClassifierUtilizationEntry 3 }
+
+   rlQosClassifierUtilizationFreeRulesNumber OBJECT-TYPE
+      SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The classifier utilization number of not used yet rules on the unit, in short rules resolution."
+      DEFVAL { 0 }
+      ::= { rlQosClassifierUtilizationEntry 4 }
+
+rlQosClassifierUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..100)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The system classifier utilization percentage. "
+      ::= { rlQosClassifierUtilization 2 }
+
+rlQosClassifierRulesNumberUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of used rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 3 }
+
+rlQosClassifierFreeRulesNumUtilizationSystem OBJECT-TYPE
+   SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of free rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 4 }
+
+rlQosClassifierMaxRulesNumberUtilizationSystem OBJECT-TYPE
+    SYNTAX         Unsigned32  (0..4294967295)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Maximum number of rules per system, in short rule resolution "
+      ::= { rlQosClassifierUtilization 5 }
+
+
+
+-- CLI QoS Port to Profile Mapping Table
+
+rlQosPortToProfileMappingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPortToProfileMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table maps between port and profile"
+    ::= { rlQosCliMib 37 }
+
+rlQosPortToProfileMappingEntry OBJECT-TYPE
+    SYNTAX RlQosPortToProfileMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes
+         mapping between port and profile"
+    INDEX { rlQosPort }
+    ::= { rlQosPortToProfileMappingTable 1 }
+
+RlQosPortToProfileMappingEntry ::= SEQUENCE {
+        rlQosPort                   INTEGER,
+        rlQosProfileName            DisplayString
+    }
+
+rlQosPort OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Port number"
+    ::= { rlQosPortToProfileMappingEntry 1 }
+
+rlQosProfileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "profile"
+    ::= { rlQosPortToProfileMappingEntry 2 }
+
+
+
+rlQosCPUSafeGuardEnable OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar enables/disables CPU Safeguard."
+    ::= { rlQosCliMib 38 }
+
+--QoS Policy Class map priotiry refernce table
+
+
+rlQosPolicyClassPriorityRefTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosPolicyClassPriorityRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies The relationship
+         between policy map to class map"
+    ::= { rlQosCliMib 39 }
+
+
+rlQosPolicyClassPriorityRefEntry OBJECT-TYPE
+    SYNTAX RlQosPolicyClassPriorityRefEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the connection
+         between class-map entry to policy map by using pointers.
+         The index is Class map pointer
+         represent by rlQosPolicyClassRefClassPointer.
+         It is also specifies the class-map priotiry in the policy-map, which set the
+         rules order within the policy-map"
+    INDEX { rlQosPolicyClassPriorityRefPriority, rlQosPolicyClassPriorityRefClassPointer}
+    ::= { rlQosPolicyClassPriorityRefTable 1 }
+
+RlQosPolicyClassPriorityRefEntry ::= SEQUENCE {
+    rlQosPolicyClassPriorityRefPriority        INTEGER,
+    rlQosPolicyClassPriorityRefClassPointer    INTEGER,
+    rlQosPolicyClassPriorityRefPolicyPointer   INTEGER,
+    rlQosPolicyClassPriorityRefStatus          RowStatus
+    }
+
+rlQosPolicyClassPriorityRefPriority OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The class-map priority within the policy-map"
+    ::= { rlQosPolicyClassPriorityRefEntry 1 }
+
+rlQosPolicyClassPriorityRefClassPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Class-map index Pointer"
+    ::= { rlQosPolicyClassPriorityRefEntry 2 }
+
+rlQosPolicyClassPriorityRefPolicyPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Policy map index Pointer"
+    ::= { rlQosPolicyClassPriorityRefEntry 3 }
+
+rlQosPolicyClassPriorityRefStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosPolicyClassPriorityRefEntry 4 }
+
+rlQosDenyAceStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosDenyAceStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table holds statistics for deny ACEs."
+    ::= { rlQosCliMib 42 }
+
+rlQosDenyAceStatisticsEntry  OBJECT-TYPE
+    SYNTAX RlQosDenyAceStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table holds number of hits for deny ACEs
+         attached to specific Interface."
+    INDEX { rlQosDenyAceStatisticsIfIndex }
+    ::= { rlQosDenyAceStatisticsTable 1 }
+
+RlQosDenyAceStatisticsEntry ::= SEQUENCE {
+        rlQosDenyAceStatisticsIfIndex      INTEGER,
+        rlQosDenyAceStatisticsIfCounter    INTEGER
+    }
+
+rlQosDenyAceStatisticsIfIndex      OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface Index."
+    ::= { rlQosDenyAceStatisticsEntry  1 }
+
+rlQosDenyAceStatisticsIfCounter    OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of hits on deny ACEs for this interface."
+    ::= { rlQosDenyAceStatisticsEntry  2 }
+
+rlQosDenyAceStatisticsOtherFlowCounter OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of hits on deny ACEs for 'Other'-type flow."
+    ::= { rlQosCliMib  43 }
+
+rlQosDenyAceStatisticsClearIfCounters OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Keeps ifIndex a port or trunk or vlan that
+         its hit counters should be reset.
+                 If the value is 0 then all interfaces counters must be reset. "
+    ::= { rlQosCliMib 44 }
+
+rlQosDenyAceStatisticsClearOtherFlowCounter OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar indicates clearing 'Other'-type flow counter operation."
+    ::= { rlQosCliMib 45 }
+
+rlQosModeGlobalCfgTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosModeGlobalCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table responsible to set the global qos mode configuration:
+        qos mode, qos trust mode, and if port are trusted by default in qos advanced
+        mode."
+    ::= { rlQosCliMib 46 }
+
+rlQosModeGlobalCfgEntry OBJECT-TYPE
+    SYNTAX RlQosModeGlobalCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table responsible to set the global qos mode configuration:
+        qos mode, qos trust mode, and if port are trusted by default in qos advanced
+        mode.
+        Current implemnetaion assumes only one entry exist."
+    INDEX { rlQosGlobalIndex}
+    ::= { rlQosModeGlobalCfgTable 1 }
+
+RlQosModeGlobalCfgEntry ::= SEQUENCE {
+    rlQosGlobalIndex                  INTEGER,
+    rlQosGlobalQoSMode                QosGlobalMode,
+    rlQosBasicGlobalTrustMode         QosTrustMode,
+    rlQosAdvcGlobalTrustMode          QosTrustMode,
+    rlQoSPortTrustAdvancedMode        TruthValue,
+    rlQosDscpMutationEnable           TruthValue,
+    rlQosModeGlobalCfgStatus          RowStatus
+    }
+
+rlQosGlobalIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry index - currenly only one entry can exist, indexes hard coded with value '1'."
+    ::= { rlQosModeGlobalCfgEntry 1 }
+
+rlQosGlobalQoSMode OBJECT-TYPE
+    SYNTAX     QosGlobalMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlQosCliQosMode.
+        Defines the global qos operation mode: disable, basic or advnaced. "
+    ::= { rlQosModeGlobalCfgEntry 2 }
+
+rlQosBasicGlobalTrustMode OBJECT-TYPE
+    SYNTAX     QosTrustMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlQosCliBasicModeCfg.
+        Defines the global qos trust operation mode relevant for qos basic mode. "
+    ::= { rlQosModeGlobalCfgEntry 3 }
+
+rlQosAdvcGlobalTrustMode OBJECT-TYPE
+    SYNTAX     QosTrustMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field replaces deprecated scalar rlQosCliBasicModeCfg.
+        Defines the global qos trust operation mode relevant for qos advanced mode. "
+    ::= { rlQosModeGlobalCfgEntry 4 }
+
+rlQoSPortTrustAdvancedMode OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field specified whether ports are set to trused or not-trusted by
+        default when switching to qos advanced mode."
+    DEFVAL{ false }
+    ::= { rlQosModeGlobalCfgEntry 5 }
+
+rlQosDscpMutationEnable  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This field indicates if dscp to dscp mutation mode is enable.
+        It can be set to true in the following terms:
+        1.rlQosGlobalTrustMode is in {dscp, vpt-dscp} ( rlQosGlobalQoSMode must be basic or advanced)
+        2.if rlQosGlobalQoSMode is advanced then rlQoSPortTrustAdvancedMode must be set to true."
+    DEFVAL{ false }
+    ::= { rlQosModeGlobalCfgEntry 6 }
+
+rlQosModeGlobalCfgStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This status of entry action.
+        In current implementation only one entry exist, therefor only status = active is
+        acceptable."
+    ::= { rlQosModeGlobalCfgEntry 7 }
+
+-- ClassMapCounterTable
+rlQosClassMapCounterTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosClassMapCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  table is used to show statistics for
+         ACL applied on an interface."
+    ::= { rlQosCliMib 47 }
+
+rlQosClassMapCounterEntry OBJECT-TYPE
+    SYNTAX  RlQosClassMapCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This entry returns the value of the class map counter.
+        Entry is added/deleted to this MIB when counting is enabled/disabled
+        on the class map.
+        The counter is set to zero upon reading its value."
+    INDEX  {  rlQosClassMapIndex }
+    ::= { rlQosClassMapCounterTable 1 }
+
+RlQosClassMapCounterEntry ::= SEQUENCE {
+    rlQosClassMapCounterValue           Counter64
+}
+rlQosClassMapCounterValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This field returns the current value of the class map counter. "
+    ::= { rlQosClassMapCounterEntry 2 }
+
+--- rlQosApplicationTrapIdTable
+rlQosApplicationTrapIdTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlQosApplicationTrapIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  read only table is used to get the trapId
+        assisated to application wants to use the trap action in
+        the class map table"
+    ::= { rlQosCliMib 48 }
+
+rlQosApplicationTrapIdEntry OBJECT-TYPE
+    SYNTAX  RlQosApplicationTrapIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This entry holds the trapId for application using the trap
+        action in the class map table."
+    INDEX  { IMPLIED rlQosApplicationName }
+    ::= { rlQosApplicationTrapIdTable 1 }
+
+RlQosApplicationTrapIdEntry ::= SEQUENCE {
+    rlQosApplicationName           DisplayString,
+    rlQosApplicationTrapId         INTEGER
+}
+rlQosApplicationName OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This field represents the application name and traffic type. "
+    ::= { rlQosApplicationTrapIdEntry 1 }
+
+rlQosApplicationTrapId OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This field defines the trap id to be use in the class map entry. "
+    ::= { rlQosApplicationTrapIdEntry 2 }
+
+-- RevitalR 1-Feb-2012: add new scalar to define application-specific default action
+rlQoSApplicationDefaultAction OBJECT-TYPE
+    SYNTAX     RlQosApplicationDefaultActionType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar specifies application-specific default action"
+    ::= { rlQosCliMib 49 }
+
+rlQosLogInputInterfacesAceMatchedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosLogInputInterfacesAceMatchedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table holds a list and  of ACE matched log-input option interfaces."
+    ::= { rlQosCliMib 50 }
+
+rlQosLogInputInterfacesAceMatchedEntry  OBJECT-TYPE
+    SYNTAX RlQosLogInputInterfacesAceMatchedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table holds only one entry of port list and vlan list."
+    INDEX { rlQosLogInputInterfacesAceMatchedIndex }
+    ::= { rlQosLogInputInterfacesAceMatchedTable 1 }
+
+RlQosLogInputInterfacesAceMatchedEntry ::= SEQUENCE {
+        rlQosLogInputInterfacesAceMatchedIndex                  INTEGER,
+        rlQosLogInputInterfacesAceMatchedPorts                  PortList,
+        rlQosLogInputInterfacesAceMatchedVlanList1to1024        VlanList1,
+        rlQosLogInputInterfacesAceMatchedVlanList1025to2048     VlanList2,
+        rlQosLogInputInterfacesAceMatchedVlanList2049to3072     VlanList3,
+        rlQosLogInputInterfacesAceMatchedVlanList3073to4094     VlanList4
+    }
+
+rlQosLogInputInterfacesAceMatchedIndex      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "An index is entrie's sequence."
+    ::= { rlQosLogInputInterfacesAceMatchedEntry  1 }
+
+
+rlQosLogInputInterfacesAceMatchedPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "the matched log-input ACEs port list"
+    ::= { rlQosLogInputInterfacesAceMatchedEntry 2}
+
+rlQosLogInputInterfacesAceMatchedVlanList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 1 to 1024."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 3}
+
+rlQosLogInputInterfacesAceMatchedVlanList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 1025 to 2048."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 4}
+
+
+rlQosLogInputInterfacesAceMatchedVlanList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 2049 to 3072."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 5}
+
+rlQosLogInputInterfacesAceMatchedVlanList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "the matched log-input ACEs vlan list from 3073 to 4094."
+
+   ::= { rlQosLogInputInterfacesAceMatchedEntry 6}
+
+
+
+
+END
+

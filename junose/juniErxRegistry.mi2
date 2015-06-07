@@ -1,0 +1,1141 @@
+
+-- *****************************************************************************
+-- Juniper-ERX-Registry
+--
+-- Juniper Networks enterprise SNMP MIB.
+--   Registry for first generation E-series (ERX) edge router product entities.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002 - 2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ERX-Registry  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    juniAdmin
+        FROM Juniper-Registry;
+
+juniErxRegistry  MODULE-IDENTITY
+    LAST-UPDATED "200607220543Z"  -- 22-Jul-06 11:13 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "Juniper first generation E-series (ERX) edge router product family
+        system-specific object identification values.  This module defines
+        AutonomousType (OID) values for all the physical entity types
+        (entPhysicalVendorType).  This module will be updated whenever a new
+        type of module or other hardware becomes available in first generation
+        E-series systems."
+    -- Revision History
+    REVISION    "200607220543Z"  -- 22-Jul-06 11:13 AM EDT  - JUNOSe 8.1
+    DESCRIPTION
+        "Obsolete erxSrp5Plus SRP."
+    REVISION    "200606231607Z"  -- 23-Jun-06 12:07 PM EDT  - JUNOSe 8.0
+    DESCRIPTION
+        "Obsolete line cards: CT1-FULL, ERX-X21-V35-MOD, HSSI-3F,
+        CE1-FULL."
+    REVISION    "200604031043Z"  -- 03-Apr-06 04:13 PM EST  - JUNOSe 8.0
+    DESCRIPTION
+        "changed status of erxSrp5Plus, erxSrp310, erxSrp5g1gEcc,
+        erxSrp5g2gEcc to deprecated."
+    REVISION    "200605021453Z"  -- 02-May-06 10:53 AM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Deprecated line cards: CT1-FULL, ERX-X21-V35-MOD, HSSI-3F,
+        CE1-FULL."
+    REVISION    "200604121305Z"  -- 12-Apr-06 09:05 AM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Changed the status of the E3-3A board to obsolete."
+    REVISION    "200603311312Z"  -- 31-Mar-06 06:42 PM EST  - JUNOSe 7.2
+    DESCRIPTION
+        "Changed the status of erxSrp5, erxSrp40, erxSrp40Plus, board
+        to obsolete. Added new boards (erxSrp10g1gEcc,
+        erxSrp10g2gEcc, erxSrp5g1gEcc, erxSrp5g2gEcc)."
+    REVISION    "200602280822Z"  -- 28-Feb-06 01:52 PM EST  - JUNOSe 7.1
+    DESCRIPTION
+        "Added new board (erxSrp40g2gEc2)."
+    REVISION    "200509211548Z"  -- 21-Sep-05 11:48 AM EDT  - JUNOSe 7.1
+    DESCRIPTION
+        "Changed the status of the CT3, CT3 I/O, T3-3F, T3-3A,
+         E3-3F, 10/100 FE-2 and 10/100 FE-2 I/O boards to obsolete."
+    REVISION    "200405251832Z"  -- 25-May-04 02:32 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "Added support for the Fe8 FX IOA."
+    REVISION    "200311122020Z"  -- 12-Nov-03 03:20 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added Hybrid line module and Hybrid IOA modules.
+         Added GE2 line module and GE2 IOA module."
+    REVISION    "200311121930Z"  -- 12-Nov-03 02:30 PM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Rebranded the ERX as an E-series product."
+    REVISION    "200307172107Z"  -- 17-Jul-03 05:07 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added ERX-310 hardware support.
+         Added new Service module."
+    REVISION    "200210211500Z"  -- 21-Oct-02 11:00 AM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added 256M versions of OCx ATM and GE/FE modules."
+    REVISION    "200210161850Z"  -- 16-Oct-02 02:50 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added support for OC12 channelized ATM/POS I/O adapters.
+         Added support fo OC48 line card and I/O adapter.
+         Added 12 port T3/E3 redundant midplane support."
+    REVISION    "200210101851Z"  -- 10-Oct-02 02:51 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added SRP module with 40 gbps plus switch fabric.
+         Added Vitrual Tunneling Server (VTS) module.
+         Added X.21/V.35 Server module and I/O adapter.
+         Added OC12 APS I/O adapters.
+         Added redundant midplane spare I/O adapters."
+    REVISION    "200205081234Z"  -- 08-May-02 08:34 AM EDT  - JUNOSe 3.4
+    DESCRIPTION
+        "Added GE SFP IOA module."
+    REVISION    "200205071405Z"  -- 07-May-02 10:05 AM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Added SRP modules with 5 gbps and 40 gbps 'plus' switch fabrics."
+    REVISION    "200108201608Z"  -- 20-Aug-01 12:08 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added 12 port T3/E3 channelized modules."
+    REVISION    "200106121827Z"  -- 12-Jun-01 02:27 PM EDT  - JUNOSe 3.1
+    DESCRIPTION
+        "Added High Speed Serial Interface (HSSI) modules."
+    REVISION    "200106042011Z"  -- 04-Jun-01 04:11 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this SNMP management information module."
+    ::= { juniAdmin 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--  ERX physical entity identifiers.
+--  The OID values under juniErxEntPhysicalType are used by the SNMP agent in
+--  the ERX product as the AutonomousType values for the entPhysicalVendorType
+--  varbinds for the ERX objects in the entPhysicalTable.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniErxEntPhysicalType OBJECT IDENTIFIER ::= { juniErxRegistry 1 }
+
+
+--
+-- Chassis class
+--
+erxChassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a generic first generation E-series (ERX)
+        chassis.  This identifies an 'overall' physical entity for any ERX
+        system."
+    ::= { juniErxEntPhysicalType 1 }
+
+erx700Chassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a first generation E-series (ERX) 7-slot
+        chassis.  This is the 'overall' physical entity for an ERX-700 or
+        ERX-705 system (Product Code: BASE-7)."
+    ::= { erxChassis 1 }
+
+erx1400Chassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a first generation E-series (ERX) 14-slot
+        chassis.  This is the 'overall' physical entity for an ERX-1400 system
+        (Product Code: BASE-14)."
+    ::= { erxChassis 2 }
+
+erx1440Chassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a first generation E-series (ERX) 14-slot
+        chassis.  This is the 'overall' physical entity for an ERX-1440 system
+        (Product Code: BASE-1440)."
+    ::= { erxChassis 3 }
+
+erx310ACChassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a first generation E-series (ERX) 3-slot
+        chassis.  This is the 'overall' physical entity for an ERX-310 system
+        with AC power (Product Code: EX3-BS310AC-SYS)."
+    ::= { erxChassis 4 }
+
+erx310DCChassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a first generation E-series (ERX) 3-slot
+        chassis.  This is the 'overall' physical entity for an ERX-310 system
+        with redundant DC power (Product Code: EX3-BS310DC-SYS)."
+    ::= { erxChassis 5 }
+
+
+--
+-- Fan class
+--
+erxFanAssembly  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX fan assembly."
+    ::= { juniErxEntPhysicalType 2 }
+
+erx700FanAssembly  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 7-slot fan assembly with four fans and
+        two -12 volt, 15 watt power converters (Product Code: FAN-7)."
+    ::= { erxFanAssembly 1 }
+
+erx1400FanAssembly  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 14-slot fan assembly with six fans and
+        two -24 volt, 50 watt power converters (Product Code: FAN-14)."
+    ::= { erxFanAssembly 2 }
+
+erx300FanAssembly  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3-slot fan assembly (Product Code:
+        EX3-FANTRAY-FRU)."
+    ::= { erxFanAssembly 3 }
+
+
+--
+-- Power Supply class
+--
+erxPowerInput  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX power distribution unit."
+    ::= { juniErxEntPhysicalType 3 }
+
+erxPdu  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-700, ERX-705 or ERX-1400 power
+        distribution unit (Product Code: PDU)."
+    ::= { erxPowerInput 1 }
+
+erx1440Pdu  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-1440 power distribution unit (Product
+        Code: ERX-PDU-40-FRU)."
+    ::= { erxPowerInput 2 }
+
+erx300ACPdu  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3-slot AC power supply and power
+        distribution unit (Product Code: EX3-ACPWR-FRU)."
+    ::= { erxPowerInput 3 }
+
+erx300DCPdu  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3-slot DC power distribution unit
+        (Product Code: EX3-DCPSDIST-PNL)."
+    ::= { erxPowerInput 4 }
+
+
+--
+-- Backplane class
+--
+erxMidplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX midplane."
+    ::= { juniErxEntPhysicalType 4 }
+
+erx700Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 7-slot midplane."
+    ::= { erxMidplane 1 }
+
+erx1400Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-1400 (10G 14-slot) midplane."
+    ::= { erxMidplane 2 }
+
+erx1Plus1RedundantT1E1Midplane  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX 1 + 1 redundant T1/E1 midplane (Product
+        Code: REDMID-T1/E1/1/1).  This product has reached End-of-life."
+    ::= { erxMidplane 3 }
+
+erx2Plus1RedundantT1E1Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 + 1 redundant T1/E1 midplane (Product
+        Code: REDMID-T1/E1/2/1)."
+    ::= { erxMidplane 4 }
+
+erx3Plus1RedundantT1E1Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 + 1 redundant T1/E1 midplane (Product
+        Code: REDMID-T1/E1/3/1)."
+    ::= { erxMidplane 5 }
+
+erx4Plus1RedundantT1E1Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 + 1 redundant T1/E1 midplane (Product
+        Code: REDMID-T1/E1/4/1)."
+    ::= { erxMidplane 6 }
+
+erx5Plus1RedundantT1E1Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 5 + 1 redundant T1/E1 midplane (Product
+        Code: REDMID-T1/E1/5/1)."
+    ::= { erxMidplane 7 }
+
+erx1Plus1RedundantT3E3Midplane  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX 1 + 1 redundant CT3/T3/E3 midplane
+        (Product Code: REDMID-T3/E3/1/1).  This product has reached
+        End-of-life."
+    ::= { erxMidplane 8 }
+
+erx2Plus1RedundantT3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 + 1 redundant CT3/T3/E3 midplane
+        (Product Code: REDMID-T3/E3/2/1)."
+    ::= { erxMidplane 9 }
+
+erx3Plus1RedundantT3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 + 1 redundant CT3/T3/E3 midplane
+        (Product Code: REDMID-T3/E3/3/1)."
+    ::= { erxMidplane 10 }
+
+erx4Plus1RedundantT3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 + 1 redundant CT3/T3/E3 midplane
+        (Product Code: REDMID-T3/E3/4/1)."
+    ::= { erxMidplane 11 }
+
+erx5Plus1RedundantT3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 5 + 1 redundant CT3/T3/E3 midplane
+        (Product Code: REDMID-T3/E3/5/1)."
+    ::= { erxMidplane 12 }
+
+erx1Plus1RedundantOcMidplane  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX 1 + 1 redundant OC3/OC12 midplane
+        (Product Code: REDMID-OC/1/1).  This product has reached End-of-life."
+    ::= { erxMidplane 13 }
+
+erx2Plus1RedundantOcMidplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 + 1 redundant OC3/OC12 midplane
+        (Product Code: REDMID-OC/2/1)."
+    ::= { erxMidplane 14 }
+
+erx3Plus1RedundantOcMidplane  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 + 1 redundant OC3/OC12 midplane
+        (Product Code: REDMID-OC/3/1).  This product has reached End-of-life."
+    ::= { erxMidplane 15 }
+
+erx4Plus1RedundantOcMidplane  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 + 1 redundant OC3/OC12 midplane
+        (Product Code: REDMID-OC/4/1).  This product has reached End-of-life."
+    ::= { erxMidplane 16 }
+
+erx5Plus1RedundantOcMidplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 5 + 1 redundant OC3/OC12 midplane
+        (Product Code: REDMID-OC/5/1)."
+    ::= { erxMidplane 17 }
+
+erx2Plus1Redundant12T3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 + 1 redundant 12 port T3/E3 midplane
+        (Product Code: ERX-12T3-2-1-RMD)."
+    ::= { erxMidplane 18 }
+
+erx5Plus1Redundant12T3E3Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 5 + 1 redundant 12 port T3/E3 midplane
+        (Product Code: ERX-12T3-5-1-RMD)."
+    ::= { erxMidplane 19 }
+
+erx1440Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-1440 (40G 14-slot) midplane."
+    ::= { erxMidplane 20 }
+
+erx300Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3-slot midplane."
+    ::= { erxMidplane 21 }
+
+erx2Plus1RedundantCOcMidplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 + 1 redundant channelized OC3/OC12
+        midplane (Product Code: ERX-COCX-2-1-RMD)."
+    ::= { erxMidplane 22 }
+
+erx5Plus1RedundantCOcMidplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 5 + 1 redundant channelized OC3/OC12
+        midplane (Product Code: ERX-COCX-5-1-RMD)."
+    ::= { erxMidplane 23 }
+
+
+--
+-- Module class - SRP
+--
+erxSrpModule  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP)
+        module."
+    ::= { juniErxEntPhysicalType 5 }
+
+erxSrp5  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 5 Gbps switch fabric (Product Code: SRP-5).  This product has
+        reached End-of-life."
+    ::= { erxSrpModule 1 }
+
+erxSrp10  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 10 Gbps switch fabric (Product Code: SRP-10).  This product has
+        reached End-of-life."
+    ::= { erxSrpModule 2 }
+
+erxSrp10Ecc  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 10 Gbps switch fabric with ECC (Product Code: SRP-10-ECC)."
+    ::= { erxSrpModule 3 }
+
+erxSrp40  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 40 Gbps switch fabric with ECC (Product Code: SRP-40-ECC).  This
+        product has reached End-of-life."
+    ::= { erxSrpModule 4 }
+
+erxSrp5Plus  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 5 Gbps 'plus' switch fabric (Product Code: ERX-5ECC-SRP)."
+    ::= { erxSrpModule 5 }
+
+erxSrp40Plus  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 40 Gbps 'plus' switch fabric (Product Code: ERX-40EC2-SRP)."
+    ::= { erxSrpModule 6 }
+
+erxSrp310  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        for the ERX-310 (Product Code: EX3-SRP-MOD)."
+    ::= { erxSrpModule 7 }
+
+erxSrp40g2gEc2  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 40 Gbps 'plus' switch fabric and 2GB memory (Product Code:
+        ERX-40G2GEC2-SRP)."
+    ::= { erxSrpModule 8 }
+
+erxSrp10g1gEcc  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 10 Gbps switch fabric and 1GB memory (Product Code:
+        ERX-10G1GECC-SRP)."
+    ::= { erxSrpModule 9 }
+
+erxSrp10g2gEcc  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 10 Gbps switch fabric and 2GB memory (Product Code:
+        ERX-10G2GECC-SRP)."
+    ::= { erxSrpModule 10 }
+
+erxSrp5g1gEcc  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 5 Gbps 'plus' switch fabric and 1GB memory (Product Code:
+        ERX-5G1GECC-SRP)."
+    ::= { erxSrpModule 11 }
+
+erxSrp5g2gEcc  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX Switch and Router Processor (SRP) module
+        with 5 Gbps 'plus' switch fabric and 2GB memory (Product Code:
+        ERX-5G2GECC-SRP)."
+    ::= { erxSrpModule 12 }
+
+--
+-- Module class - SRP I/O Adapter
+--
+erxSrpIoAdapter  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX SRP I/O adapter."
+    ::= { juniErxEntPhysicalType 6 }
+
+erxSrpIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-700/705/1400/1440 SRP I/O adapter
+        (Product Code: SRP_I/O)."
+    ::= { erxSrpIoAdapter 1 }
+
+erxSrp310Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX-310 SRP I/O adapter (Product Code:
+        EX3-SRP-IOA)."
+    ::= { erxSrpIoAdapter 2 }
+
+
+--
+-- Module class - Line Card
+--
+erxLineModule  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX line module."
+    ::= { juniErxEntPhysicalType 7 }
+
+erxCt1  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 24 port T1 fully channelized line module
+        (Product Code: CT1-FULL)."
+    ::= { erxLineModule 1 }
+
+erxCe1  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 20 port E1 fully channelized line module
+        (Product Code: CE1-FULL)."
+    ::= { erxLineModule 2 }
+
+erxCt3  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port T3 channelized line module
+        (Product Code: CT3-3).  This product has reached End-of-life."
+    ::= { erxLineModule 4 }
+
+erxT3Atm  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port T3 unchannelized cell service line
+        module (Product Code: T3-3A).  This product has reached End-of-life."
+    ::= { erxLineModule 5 }
+
+erxT3Frame  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port T3 unchannelized packet service
+        line module (Product Code: T3-3F).  This product has reached
+        End-of-life."
+    ::= { erxLineModule 6 }
+
+erxE3Atm  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port E3 unchannelized cell service
+        line module (Product Code: E3-3A)."
+    ::= { erxLineModule 7 }
+
+erxE3Frame  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port E3 unchannelized packet service
+        line module (Product Code: E3-3F).  This product has reached
+        End-of-life."
+    ::= { erxLineModule 8 }
+
+erxOc3  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port Optical Carrier 3 (OC-3/STM-1)
+        SONET/SDH line module (Product Code: OC3-2).  This product has reached
+        End-of-life."
+    ::= { erxLineModule 9 }
+
+erxOc3Oc12Atm  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3/OC12 multi-personality cell service
+        line module (Product Code: OC3/OC12-ATM)."
+    ::= { erxLineModule 10 }
+
+erxOc3Oc12Pos  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3/OC12 multi-personality packet service
+        line module (Product Code: OC3/OC12-POS)."
+    ::= { erxLineModule 11 }
+
+erxCOcx  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3/STM1 and OC12/STM4 channelized line
+        module (Product Code: COCX/STMX-F0)."
+    ::= { erxLineModule 12 }
+
+erxFe2  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port fast (10/100) Ethernet line
+        module (Product Code: 10/100_FE-2).  This product has reached
+        End-of-life."
+    ::= { erxLineModule 13 }
+
+erxGeFe  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX multi-personality gigabit or fast
+        (10/100) Ethernet line module (Product Code: GE/FE-8)."
+    ::= { erxLineModule 14 }
+
+erxTunnelService  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX L2TP LNS and GRE Tunnel Service line
+        module (Product Code: TUNNEL-SERVICE)."
+    ::= { erxLineModule 15 }
+
+erxHssi  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port High Speed Serial Interface (HSSI)
+        line module (Product Code: HSSI-3F)."
+    ::= { erxLineModule 16 }
+
+erxVts  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX Virtual Tunnelling Server (VTS) line
+        module (Product Code: ERX-IPSEC-MOD)."
+    ::= { erxLineModule 17 }
+
+erxCt3P12  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 12 port T3 channelized line module
+        (Product Code: CT3-12-F0)."
+    ::= { erxLineModule 18 }
+
+erxV35  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX X.21/V.35 server line module (Product
+        Code: ERX-X21-V35-MOD)."
+    ::= { erxLineModule 19 }
+
+erxUt3E3Ocx  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC12, quad OC3 or 12 port T3/E3 server
+        line module (Product Code: ERX-UT3E3OCX-MOD)."
+    ::= { erxLineModule 20 }
+
+erxOc48  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC-48/STM-16 SONET/SDH line
+        module (Product Code: ERX-OC48ST16-MOD)."
+    ::= { erxLineModule 21 }
+
+erxOc3Oc12Atm256M  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3/OC12 multi-personality cell service
+        line module with 256mb of memory (Product Code: ERX-OCXA256M-MOD)."
+    ::= { erxLineModule 22 }
+
+erxGeFe256M  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX multi-personality gigabit or fast
+        (10/100) Ethernet line module with 256mb of memory (Product Code:
+        ERX-GEFE256M-MOD)."
+    ::= { erxLineModule 23 }
+
+erxService  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX L2TP LNS and GRE Tunnel Service line
+        module with 256mb of memory and NAT and firewall capabilities (Product
+        Code: ERX-SERVICE-MOD)."
+    ::= { erxLineModule 24 }
+
+erxOc3Hybrid  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3 multi-personality cell service line
+        module (Product Code: [450-00050-00])."
+    ::= { erxLineModule 25 }
+
+erxGe2  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 2 port GE line module (Product Code:
+        [450-00044-00])."
+    ::= { erxLineModule 26 }
+
+
+--
+-- Module class - Line Card I/O Adapter
+--
+erxLineIoAdapter  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX I/O adapter for a line module."
+    ::= { juniErxEntPhysicalType 8 }
+
+erxCt1Ioa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 24 port T1/J1 channelized I/O adapter
+        (Product Code: CT1-FULL-I/O)."
+    ::= { erxLineIoAdapter 1 }
+
+erxCe1Ioa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 20 port E1 channelized RJ48 I/O adapter
+        (Product Code: CE1-FULL-I/O)."
+    ::= { erxLineIoAdapter 2 }
+
+erxCe1TIoa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 20 port E1 channelized Telco I/O adapter
+        (Product Code: CE1-FULL-I/OT)."
+    ::= { erxLineIoAdapter 3 }
+
+erxCt3Ioa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port T3/E3 channelized I/O adapter
+        (Product Code: CT3/T3-3_I/O).  This product has reached End-of-life."
+    ::= { erxLineIoAdapter 4 }
+
+erxE3Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port E3 I/O adapter (Product Code:
+        E3-3_I/O)."
+    ::= { erxLineIoAdapter 5 }
+
+erxOc3Mm2Ioa  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port OC3/STM1 multi-mode I/O adapter
+        (Product Code: OC3-2M_I/O).  This product has reached End-of-life."
+    ::= { erxLineIoAdapter 6 }
+
+erxOc3Sm2Ioa  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port OC3/STM1 single-mode I/O
+        adapter (Product Code: OC3-2S_I/O).  This product has reached
+        End-of-life."
+    ::= { erxLineIoAdapter 7 }
+
+erxOc3Mm4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM1 multi-mode I/O adapter
+        (Product Code: OC3-4MM_I/O)."
+    ::= { erxLineIoAdapter 8 }
+
+erxOc3SmIr4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM single-mode intermediate-
+        reach I/O adapter (Product Code: OC3-4SM_I/O)."
+    ::= { erxLineIoAdapter 9 }
+
+erxOc3SmLr4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM1 single-mode long-reach
+        I/O adapter (Product Code: OC3-4LH-I/O)."
+    ::= { erxLineIoAdapter 10 }
+
+erxCOc3Mm4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM channelized multi-mode I/O
+        adapter (Product Code: COC3F0-MM-I/O)."
+    ::= { erxLineIoAdapter 11 }
+
+erxCOc3SmIr4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM1 channelized single-mode
+        intermediate-reach I/O adapter (Product Code: COC3F0-SM-I/O)."
+    ::= { erxLineIoAdapter 12 }
+
+erxCOc3SmLr4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM1 channelized single-mode
+        long-reach I/O adapter (Product Code: ERX-COC3-4LH-IOA)."
+    ::= { erxLineIoAdapter 13 }
+
+erxOc12Mm1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 multi-mode I/O
+        adapter (Product Code: OC12-MM_I/O)."
+    ::= { erxLineIoAdapter 14 }
+
+erxOc12SmIr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 single-mode
+        intermediate-reach I/O adapter (Product Code: OC12-SM_I/O)."
+    ::= { erxLineIoAdapter 15 }
+
+erxOc12SmLr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 single-mode
+        long-reach I/O adapter (Product Code: OC12-LH-I/O)."
+    ::= { erxLineIoAdapter 16 }
+
+erxCOc12Mm1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        (OC3/STM1 or OC1/STM0) multi-mode I/O adapter (Product Code:
+        COC12F0-MM-I/O)."
+    ::= { erxLineIoAdapter 17 }
+
+erxCOc12SmIr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        (OC3/STM1 or OC1/STM0) single-mode intermediate-reach I/O adapter
+        (Product Code: COC12F0-SM-I/O)."
+    ::= { erxLineIoAdapter 18 }
+
+erxCOc12SmLr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        (OC3/STM1 or OC1/STM0) single-mode long-reach I/O adapter (Product Code:
+        ERX-COC12-LH-IOA)."
+    ::= { erxLineIoAdapter 19 }
+
+erxFe2Ioa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port 10/100 Fast Ethernet I/O
+        adapter (Product Code: 10/100_FE-2_I/O).  This product has reached
+        End-of-life."
+    ::= { erxLineIoAdapter 20 }
+
+erxFe8Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 8 port 10/100 Fast Ethernet I/O adapter
+        (Product Code: FE-8_I/O)."
+    ::= { erxLineIoAdapter 21 }
+
+erxGeMm1Ioa  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX single port Gigabit Ethernet multi-mode
+        I/O adapter (Product Code: GE_M_I/O).  This product has reached
+        End-of-life."
+    ::= { erxLineIoAdapter 22 }
+
+erxGeSm1Ioa  OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The vendor type ID for an ERX single port Gigabit Ethernet single-mode
+        I/O adapter (Product Code: GE_S_I/O).  This product has reached
+        End-of-life."
+    ::= { erxLineIoAdapter 23 }
+
+erxHssiIoa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX 3 port High Speed Serial Interface (HSSI)
+        I/O adapter (Product Code: HSSI-3-I/O)."
+    ::= { erxLineIoAdapter 24 }
+
+erxCt3P12Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 12 port T3 channelized and unchannelized
+        I/O adapter (Product Code: T312-F0-F3-I/O)."
+    ::= { erxLineIoAdapter 25 }
+
+erxV35Ioa  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The vendor type ID for an ERX X.21/V.35 I/O adapter (Product Code:
+        ERX-X21-V35-IOA)."
+    ::= { erxLineIoAdapter 26 }
+
+erxGeSfpIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port Gigabit Ethernet SFP I/O
+        adapter (Product Code: ERX-GIGESFP-IOA)."
+    ::= { erxLineIoAdapter 27 }
+
+erxUe3P12Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 12 port unchannelized E3 I/O adapter
+        (Product Code: E3-12-F3-I/O)."
+    ::= { erxLineIoAdapter 28 }
+
+erxT3Atm4Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port T3 I/O adapter (Product Code:
+        ERX-4T3ATM-IOA)."
+    ::= { erxLineIoAdapter 29 }
+
+erxCOc12Mm1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        multi-mode with 1+1 Automatic Protection Switching (APS) I/O adapter
+        (Product Code: ERX-COC12-MA-IOA)."
+    ::= { erxLineIoAdapter 30 }
+
+erxCOc12SmIr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        single-mode intermediate-reach with 1+1 Automatic Protection Switching
+        (APS) I/O adapter (Product Code: ERX-COC12-SA-IOA)."
+    ::= { erxLineIoAdapter 31 }
+
+erxCOc12SmLr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        single-mode long-reach with 1+1 Automatic Protection Switching (APS) I/O
+        adapter (Product Code: ERX-COC12-LA-IOA)."
+    ::= { erxLineIoAdapter 32 }
+
+erxOc12Mm1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 multi-mode with 1+1
+        Automatic Protection Switching (APS) I/O adapter (Product Code:
+        ERX-OC12MM-A-IOA)."
+    ::= { erxLineIoAdapter 33 }
+
+erxOc12SmIr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 single-mode
+        intermediate-reach with 1+1 Automatic Protection Switching (APS) I/O
+        adapter (Product Code: ERX-OC12SM-A-IOA)."
+    ::= { erxLineIoAdapter 34 }
+
+erxOc12SmLr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 single-mode
+        long-reach with 1+1 Automatic Protection Switching (APS) I/O adapter
+        (Product Code: ERX-OC12LH-A-IOA)."
+    ::= { erxLineIoAdapter 35 }
+
+erxCOc12AtmPosMm1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        multi-mode ATM/POS I/O adapter (Product Code: ERX-1COC12MM-IOA)."
+    ::= { erxLineIoAdapter 36 }
+
+erxCOc12AtmPosSmIr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        single-mode intermediate-reach ATM/POS I/O adapter (Product Code:
+        ERX-1COC12SM-IOA)."
+    ::= { erxLineIoAdapter 37 }
+
+erxCOc12AtmPosSmLr1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized
+        single-mode long-reach ATM/POS I/O adapter (Product Code:
+        ERX-1COC12LH-IOA)."
+    ::= { erxLineIoAdapter 38 }
+
+erxCOc12AtmPosMm1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized ATM/POS
+        multi-mode with 1+1 Automatic Protection Switching (APS) I/O adapter
+        (Product Code: ERX-2COC12MM-IOA)."
+    ::= { erxLineIoAdapter 39 }
+
+erxCOc12AtmPosSmIr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized ATM/POS
+        single-mode intermediate-reach with 1+1 Automatic Protection Switching
+        (APS) I/O adapter (Product Code: ERX-2COC12SM-IOA)."
+    ::= { erxLineIoAdapter 40 }
+
+erxCOc12AtmPosSmLr1ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC12/STM4 channelized ATM/POS
+        single-mode long-reach with 1+1 Automatic Protection Switching (APS) I/O
+        adapter (Product Code: ERX-2COC12LH-IOA)."
+    ::= { erxLineIoAdapter 41 }
+
+erxT1E1RedundantIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX T1/E1 redundant midplane spare I/O
+        adapter (Product Code: PNL-RDMD-T1/E1)."
+    ::= { erxLineIoAdapter 42 }
+
+erxT3E3RedundantIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX T3/E3 redundant midplane spare I/O
+        adapter (Product Code: PNL-RDMD-T3/E3)."
+    ::= { erxLineIoAdapter 43 }
+
+erxCt3RedundantIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX channelized T3 redundant midplane spare
+        I/O adapter (Product Code: ERX-12PT3E3-PNL)."
+    ::= { erxLineIoAdapter 44 }
+
+erxOcxRedundantIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX OC3/OC12 redundant midplane spare I/O
+        adapter (Product Code: PNL-RDMD-OCX)."
+    ::= { erxLineIoAdapter 45 }
+
+erxCOcxRedundantIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX channelized OC3/OC12 redundant midplane
+        spare I/O adapter (Product Code: ERX-COCXPNL-IOA)."
+    ::= { erxLineIoAdapter 46 }
+
+erxOc3Mm4ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM4 multi-mode with 1+1
+        Automatic Protection Switching (APS) I/O adapter (Product Code:
+        ERX-OC3M-APS-IOA)."
+    ::= { erxLineIoAdapter 47 }
+
+erxOc3SmIr4ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM4 single-mode
+        intermediate-reach with 1+1 Automatic Protection Switching (APS) I/O
+        adapter (Product Code: ERX-OC3S-APS-IOA)."
+    ::= { erxLineIoAdapter 48 }
+
+erxOc3SmLr4ApsIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 4 port OC3/STM4 single-mode long-reach
+        with 1+1 Automatic Protection Switching (APS) I/O adapter (Product Code:
+        ERX-OC3L-APS-IOA)."
+    ::= { erxLineIoAdapter 49 }
+
+erxOc48Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX single port OC48/STM16 I/O adapter
+        (Product Code: ERX-OC48ST16-IOA)."
+    ::= { erxLineIoAdapter 50 }
+
+erxOc3Atm2Ge1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port OC3 ATM plus single port
+        Gigabit Ethernet I/O adapter (Product Code: [450-00057-00])."
+    ::= { erxLineIoAdapter 51 }
+
+erxOc3Atm2Pos2Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port OC3 ATM plus dual port OC3 POS
+        I/O adapter (Product Code: [450-00054-00])."
+    ::= { erxLineIoAdapter 52 }
+
+erxGe2Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX dual port Gigabit Ethernet SFP I/O
+        adapter (Product Code: [450-00073-00])."
+    ::= { erxLineIoAdapter 53 }
+
+erxFe8FxIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an ERX 8 port 100 Fast Ethernet SFP optical I/O adapter
+        (Product Code: 450-00081-00)."
+    ::= { erxLineIoAdapter 54 }
+
+END
+

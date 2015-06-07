@@ -1,0 +1,397 @@
+ENTERASYS-MIB-ORG DEFINITIONS ::= BEGIN
+
+--  enterasys-mib-org.txt
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' MIB OIDs.  
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys
+--  Networks to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys Networks products.
+
+--  Copyright October, (2000-2006) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysMibOrg MODULE-IDENTITY
+    LAST-UPDATED "200603061353Z"  -- Mon Mar  6 13:53 UTC 2006
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID.
+
+         This module defines OBJECT-IDENTIFIER(s) to be used for 
+         the registration of MODULE-IDENTITY in all Enterasys Networks'
+         MIB modules.
+
+         The naming of OIDs should be based upon the name of the
+         MODULE-IDENTITY for which they are the base OID.  For example,
+         if the MODULE-IDENTITY for the MIB is fooBarMIB then the
+         OBJECT IDENTIFIER should be named fooBarOID.
+
+         All Enterasys MIBs should follow the format specified by
+         enterasys-mib-template.txt."
+
+    REVISION    "200603061353Z"  -- Mon Mar  6 13:53 UTC 2006
+    DESCRIPTION "Added an OID for the etsysNetflowMIB."
+
+    REVISION    "200511141648Z"  -- Mon Nov 14 16:48 UTC 2005
+    DESCRIPTION "Added an OID for the etsysMgmtAuthNotificationMIB."
+
+    REVISION    "200501262218Z"  -- Wed Jan 26 22:18 GMT 2005
+    DESCRIPTION "Added an OID for the etsysMauMibExtMIB."
+
+    REVISION    "200501251541Z"  -- Tue Jan 25 15:41 GMT 2005
+    DESCRIPTION "Added an OID for the etsysTacacsClientMIB."
+
+    REVISION    "200501122100Z"  -- Wed Jan 12 21:00 GMT 2005
+    DESCRIPTION "Added an OID for the etsysIfMibExtMIB."
+
+    REVISION    "200408241329Z"  -- Tue Aug 24 13:29 GMT 2004
+    DESCRIPTION "Added an OID for the etsysLicenseKeyOidsMIB."
+
+    REVISION    "200408192120Z"  -- Thu Aug 19 21:20 GMT 2004
+    DESCRIPTION "Added an OID for the etsysClassOfServiceMIB."
+
+    REVISION    "200408171703Z"  -- Tue Aug 17 17:03 GMT 2004
+    DESCRIPTION "Added an OID for the etsysLicenseKeyMIB."
+
+    REVISION    "200408131657Z"  -- Fri Aug 13 16:57 GMT 2004
+    DESCRIPTION "Added an OID for the etsysMultiUser8021xMIB."
+
+    REVISION    "200408052025Z"  -- Thu Aug  5 20:25 GMT 2004
+    DESCRIPTION "Added an OID for the etsysLinkFlapMIB."
+
+    REVISION    "200407291859Z"  -- Thu Jul 29 18:59 GMT 2004
+    DESCRIPTION "Added an OID for the etsysAAAPolicyMIB."
+
+    REVISION    "200407281624Z"  -- Wed Jul 28 16:24 GMT 2004
+    DESCRIPTION "Added OIDs for the etsysPowerEthernetMibExtMIB and
+                 the etsysResourceUtilizationMIB."
+
+    REVISION    "200406021340Z"  -- Wed Jun  2 13:40 GMT 2004
+    DESCRIPTION "Added an OID for the etsysVlanAuthorizationMIB."
+
+    REVISION    "200404022253Z"  -- Fri Apr  2 22:53 GMT 2004
+    DESCRIPTION "Added an OID for the etsysImageValidationMIB and
+                 one for the etsysMultiAuthMIB."
+
+    REVISION    "200402132000Z"  -- Fri Feb 13 20:00 GMT 2004
+    DESCRIPTION "Added an OID for the etsysThreatNotificationMIB."
+
+    REVISION    "200402031533Z"  -- Tue Feb  3 15:33 GMT 2004
+    DESCRIPTION "Added an OID for the etsysUpnTcMIB."
+
+    REVISION    "200311141601Z"  -- Fri Nov 14 16:01 GMT 2003
+    DESCRIPTION "Added OIDs for the etsysFlowLimitingMIB
+                 and the etsysIPsecIsakmpIkeDoiTcMIB."
+
+    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    DESCRIPTION "Corrected the postal code in the CONTACT-INFO clause."
+
+    REVISION    "200310211539Z"  -- Tue Oct 21 15:39 GMT 2003
+    DESCRIPTION "Added OID for the etsysVirtualPrivateNetworkMIB."
+
+    REVISION    "200310161216Z"  -- Thu Oct 16 12:16 GMT 2003
+    DESCRIPTION "Added OID for the etsysConvergenceEndPointMIB."
+
+    REVISION    "200308192053Z"  -- Tue Aug 19 20:53 GMT 2003
+    DESCRIPTION "Added OID for the etsysServiceLevelReportingMIB."
+
+    REVISION    "200306131809Z"  -- Fri Jun 13 18:09 GMT 2003
+    DESCRIPTION "Added OID for the etsysSntpClientMIB."
+
+    REVISION    "200305162007Z"  -- Fri May 16 20:07 GMT 2003
+    DESCRIPTION "Added OID for the etsysFirewallMIB."
+
+    REVISION    "200212201519Z"  -- Fri Dec 20 15:19 GMT 2002
+    DESCRIPTION "Added OIDs for the etsysIetfpBridgeMibExtMIB and
+                 for the etsysJumboEthernetFrameMIB."
+
+    REVISION    "200212132054Z"  -- Fri Dec 13 20:54 GMT 2002
+    DESCRIPTION "Added OIDs for the etsysIetfBridgeMibExtMIB and
+                 for the etsysWiFiProtectedAccessMIB.  Corrected
+                 the comments for the etsysSshServerMIB."
+
+    REVISION    "200211012120Z"  -- Fri Nov  1 21:20 GMT 2002
+    DESCRIPTION "Added OID for the etsysTlsMIB."
+
+    REVISION    "200210082027Z"  -- Tue Oct  8 20:27 GMT 2002
+    DESCRIPTION "Added OID for the etsysSpanningTreeDiagnosticMIB."
+
+    REVISION    "200209252003Z"  -- Wed Sep 25 20:03 GMT 2002
+    DESCRIPTION "Added OID for the etsysMstpMIB."
+
+    REVISION    "200209131930Z"  -- Fri Sep 13 19:30 GMT 2002
+    DESCRIPTION "Added OID for the etsysRadiusAcctClientMIB."
+
+    REVISION    "200208071851Z"  -- Wed Aug  7 18:51 GMT 2002
+    DESCRIPTION "Added OID for the etsysSecureShellServerMIB."
+
+    REVISION    "200207181531Z"  -- Thu Jul 18 15:31 GMT 2002
+    DESCRIPTION "Added OID for the etsysMACAuthenticationMIB.
+                 Changed postal address and phone number in
+                 MODULE-IDENTITY."
+
+    REVISION    "200206242134Z"  -- Mon Jun 24 21:34 GMT 2002
+    DESCRIPTION "Added OIDs for the etsysSyslogMessageMIB and
+                 the etsysSnmpPersistenceMIB."
+
+    REVISION    "200205071755Z"  -- Tue May  7 17:55 GMT 2002
+    DESCRIPTION "Added OID for the etsysVlanInterfaceMIB."
+
+    REVISION    "200204051501Z"  -- Fri Apr  5 15:01 GMT 2002
+    DESCRIPTION "Added OID for the etsysMACLockingMIB.  Changed
+                 postal address and phone number in MODULE-IDENTITY."
+
+    REVISION    "200203142054Z"  -- Thu Mar 14 20:54 GMT 2002
+    DESCRIPTION "Added OIDs for the etsysEncr8021xConfigMIB and
+                 the etsysEncr8021xRekeyingMIB."
+
+    REVISION    "200202202002Z"  -- Wed Feb 20 20:02 GMT 2002
+    DESCRIPTION "Added OIDs for the etsysFileManagementMIB,
+                 etsysConfigurationManagementMIB, etsys8021xRekeyingMIB,
+                 and the etsys8021xExtensionsMIB."
+
+    REVISION    "200201241823Z"  -- Thu Jan 24 18:23 GMT 2002
+    DESCRIPTION "Commented out the rest of the OIDs defined in
+                 this file.  Issues with the NetSNMP stack that
+                 is currently used by NetSight."
+
+    REVISION    "200108161300Z"
+    DESCRIPTION "Corrected MIB names & OIDs for the etsysDot11ExtMIB
+                 and etsysR2MgmtMIB."
+
+    REVISION    "200108141930Z"
+    DESCRIPTION "Added OIDs for the etsysConfigurationChangeMIB,
+                 etsysDiagnosticMessageMIB, and etsysSyslogClientMIB."
+
+    REVISION    "200105221300Z"
+    DESCRIPTION "Added OID for the etsysPwaMIB."
+
+    REVISION    "200104022100Z"
+    DESCRIPTION "Added OIDs for the etsysRoamAbout2MIB, etsysESwitchMIB."
+
+    REVISION    "200101241700Z"
+    DESCRIPTION "Added OID for the etsysWBridgeMIB."
+
+    REVISION    "200011281400Z"
+    DESCRIPTION "Added OID for the etsysPolicyProfileMIB."
+
+    REVISION    "200010031844Z"
+    DESCRIPTION "The initial version of this MIB module."
+    ::= { etsysModules 3 }
+
+-- This leaf is in use as the MODULE-IDENTITY in ENTERASYS-MIB-NAMES.
+-- etsysModuleName                 OBJECT IDENTIFIER ::= { etsysModules 1 }
+
+-- OID for the enterasysOidsMib.
+-- etsysModuleOID                  OBJECT IDENTIFIER ::= { etsysModules 2 }
+
+-- This leaf is in use as the MODULE-IDENTITY in ENTERASYS-MIB-ORG.
+-- etsysMibOrg                     OBJECT IDENTIFIER ::= { etsysModules 3 }
+
+-- OID for the etsysRadiusAuthClientMIB.
+-- etsysRadiusAuthClientOID        OBJECT IDENTIFIER ::= { etsysModules 4 }
+
+-- OID for the etsysRadiusAuthClientEncryptMIB.
+-- etsysRadiusAuthClientEncryptOID OBJECT IDENTIFIER ::= { etsysModules 5 }
+
+-- OID for the etsysPolicyProfileMIB.
+-- etsysPolicyProfileOID           OBJECT IDENTIFIER ::= { etsysModules 6 }
+
+-- OID for the etsysWBridgeMIB.
+-- etsysWBridgeOID                 OBJECT IDENTIFIER ::= { etsysModules 7 }
+
+-- OID for the etsysPwaMIB.
+-- etsysPwaOID                     OBJECT IDENTIFIER ::= { etsysModules 8 }
+
+-- OID for the etsysDot11ExtMIB.
+-- etsysDot11ExtOID                OBJECT IDENTIFIER ::= { etsysModules 9 }
+
+-- OID for the etsysESwitchMIB.
+-- etsysESwitchOID                 OBJECT IDENTIFIER ::= { etsysModules 10 }
+
+-- OID for the etsysR2MgmtMIB.
+-- etsysR2MgmtOID                  OBJECT IDENTIFIER ::= { etsysModules 11 }
+
+-- OID for the etsysConfigurationChangeMIB.
+-- etsysConfigurationChangeOID     OBJECT IDENTIFIER ::= { etsysModules 12 }
+
+-- OID for the etsysDiagnosticMessageMIB.
+-- etsysDiagnosticMessageOID       OBJECT IDENTIFIER ::= { etsysModules 13 }
+
+-- OID for the etsysSyslogClientMIB.
+-- etsysSyslogClientOID            OBJECT IDENTIFIER ::= { etsysModules 14 }
+
+-- OID for the etsysFileManagementMIB.
+-- etsysFileManagementOID          OBJECT IDENTIFIER ::= { etsysModules 15 }
+
+-- OID for the etsysConfigurationManagementMIB.
+-- etsysConfigurationManagementOID OBJECT IDENTIFIER ::= { etsysModules 16 }
+
+-- OID for the etsys8021xRekeyingMIB.
+-- etsys8021xRekeyingOID           OBJECT IDENTIFIER ::= { etsysModules 17 }
+
+-- OID for the etsys8021xExtensionsMIB.
+-- etsys8021xExtensionsOID         OBJECT IDENTIFIER ::= { etsysModules 18 }
+
+-- OID for the etsysEncr8021xConfigMIB.
+-- etsysEncr8021xConfigOID         OBJECT IDENTIFIER ::= { etsysModules 19 }
+
+-- OID for the etsysEncr8021xRekeyingMIB.
+-- etsysEncr8021xRekeyingOID       OBJECT IDENTIFIER ::= { etsysModules 20 }
+
+-- OID for the etsysMACLockingMIB.
+-- etsysMACLockingOID              OBJECT IDENTIFIER ::= { etsysModules 21 }
+
+-- OID for the etsysVlanInterfaceMIB.
+-- etsysVlanInterfaceOID           OBJECT IDENTIFIER ::= { etsysModules 22 }
+
+-- OID for the etsysSyslogMessageMIB.
+-- etsysSyslogMessageOID           OBJECT IDENTIFIER ::= { etsysModules 23 }
+
+-- OID for the etsysSnmpPersistenceMIB.
+-- etsysSnmpPersistenceOID         OBJECT IDENTIFIER ::= { etsysModules 24 }
+
+-- OID for the etsysMACAuthenticationMIB.
+-- etsysMACAuthenticationOID       OBJECT IDENTIFIER ::= { etsysModules 25 }
+
+-- OID for the etsysSshServerMIB.
+-- etsysSshServerOID               OBJECT IDENTIFIER ::= { etsysModules 26 }
+
+-- OID for the etsysRadiusAcctClientMIB.
+-- etsysRadiusAcctClientOID        OBJECT IDENTIFIER ::= { etsysModules 27 }
+
+-- OID for the etsysMstpMIB.
+-- etsysMstpOID                    OBJECT IDENTIFIER ::= { etsysModules 28 }
+
+-- OID for the etsysSpanningTreeDiagnosticMIB.
+-- etsysSpanningTreeDiagnosticOID  OBJECT IDENTIFIER ::= { etsysModules 29 }
+
+-- OID for the etsysTlsMIB.
+-- etsysTlsOID                     OBJECT IDENTIFIER ::= { etsysModules 30 }
+
+-- OID for the etsysIetfBridgeMibExtMIB.
+-- etsysIetfBridgeMibExtOID        OBJECT IDENTIFIER ::= { etsysModules 31 }
+
+-- OID for the etsysWiFiProtectedAccessMIB.
+-- etsysWiFiProtectedAccessOID     OBJECT IDENTIFIER ::= { etsysModules 32 }
+
+-- OID for the etsysIetfpBridgeMibExtMIB.
+-- etsysIetfpBridgeMibExtOID       OBJECT IDENTIFIER ::= { etsysModules 33 }
+
+-- OID for the etsysJumboEthernetFrameMIB.
+-- etsysJumboEthernetFrameOID      OBJECT IDENTIFIER ::= { etsysModules 34 }
+
+-- OID for the etsysIeee8023LagMibExtMIB.
+-- etsysIeee8023LagMibExtOID       OBJECT IDENTIFIER ::= { etsysModules 35 }
+
+-- OID for the etsysSecureShellServerMIB.
+-- etsysSecureShellServerOID       OBJECT IDENTIFIER ::= { etsysModules 36 }
+
+-- OID for the etsysFirewallMIB.
+-- etsysFirewallOID                OBJECT IDENTIFIER ::= { etsysModules 37 }
+
+-- OID for the etsysSntpClientMIB.
+-- etsysSntpClientOID              OBJECT IDENTIFIER ::= { etsysModules 38 }
+
+-- OID for the etsysServiceLevelReportingMIB.
+-- etsysServiceLevelReportingOID   OBJECT IDENTIFIER ::= { etsysModules 39 }
+
+-- OID for the etsysConvergenceEndPointMIB.
+-- etsysConvergenceEndPointOID     OBJECT IDENTIFIER ::= { etsysModules 40 }
+
+-- OID for the etsysVirtualPrivateNetworkMIB.
+-- etsysVirtualPrivateNetworkOID   OBJECT IDENTIFIER ::= { etsysModules 41 }
+
+-- OID for the etsysIPsecIsakmpIkeDoiTcMIB.
+-- etsysIPsecIsakmpIkeDoiTcOID     OBJECT IDENTIFIER ::= { etsysModules 42 }
+
+-- OID for the etsysFlowLimitingMIB.
+-- etsysFlowLimitingOID            OBJECT IDENTIFIER ::= { etsysModules 43 }
+
+-- OID for the etsysUpnTcMIB.
+-- etsysUpnTcOID                   OBJECT IDENTIFIER ::= { etsysModules 44 }
+
+-- OID for the etsysThreatNotificationMIB.
+-- etsysThreatNotificationOID      OBJECT IDENTIFIER ::= { etsysModules 45 }
+
+-- OID for the etsysMutliAuthMIB.
+-- etsysMultiAuthOID               OBJECT IDENTIFIER ::= { etsysModules 46 }
+
+-- OID for the etsysImageValidationMIB.
+-- etsysImageValidationOID         OBJECT IDENTIFIER ::= { etsysModules 47 }
+
+-- OID for the etsysVlanAuthorizationMIB.
+-- etsysVlanAuthorizationOID       OBJECT IDENTIFIER ::= { etsysModules 48 }
+
+-- OID for the etsysResourceUtilizationMIB.
+-- etsysResourceUtilizationOID     OBJECT IDENTIFIER ::= { etsysModules 49 }
+
+-- OID for the etsysPowerEthernetMibExtMIB.
+-- etsysPowerEthernetMibExtOID     OBJECT IDENTIFIER ::= { etsysModules 50 }
+
+-- OID for the etsysAAAPolicyMIB.
+-- etsysAAAPolicyOID               OBJECT IDENTIFIER ::= { etsysModules 51 }
+
+-- OID for the etsysLinkFlapMIB.
+-- etsysLinkFlapOID                OBJECT IDENTIFIER ::= { etsysModules 52 }
+
+-- OID for the etsysMultiUser8021xMIB.
+-- etsysMultiUser8021xOID          OBJECT IDENTIFIER ::= { etsysModules 53 }
+
+-- OID for the etsysLicenseKeyMIB.
+-- etsysLicenseKeyOID              OBJECT IDENTIFIER ::= { etsysModules 54 }
+
+-- OID for the etsysClassOfServiceMIB.
+-- etsysClassOfServiceOID          OBJECT IDENTIFIER ::= { etsysModules 55 }
+
+-- OID for the etsysLicenseKeyOidsMIB.
+-- etsysLicenseKeyOidsOID          OBJECT IDENTIFIER ::= { etsysModules 56 }
+
+-- OID for the etsysIfMibExtMIB.
+-- etsysIfMibExtOID                OBJECT IDENTIFIER ::= { etsysModules 57 }
+
+-- OID for the etsysTacacsClientMIB.
+-- etsysTacacsClientOID            OBJECT IDENTIFIER ::= { etsysModules 58 }
+
+-- OID for the etsysMauMibExtMIB.
+-- etsysMauMibExtOID               OBJECT IDENTIFIER ::= { etsysModules 59 }
+
+-- OID for the etsysMgmtAuthNotificationMIB.
+-- etsysMgmtAuthNotificationMibOID OBJECT IDENTIFIER ::= { etsysModules 60 }
+
+-- OID for the etsysMgmtAuthNotificationMIB.
+-- etsysNetflowMibOID              OBJECT IDENTIFIER ::= { etsysModules 61 }
+
+END

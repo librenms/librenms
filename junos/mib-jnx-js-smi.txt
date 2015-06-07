@@ -1,0 +1,57 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2002-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-JS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+		jnxJsMibRoot 		FROM JUNIPER-SMI;
+
+
+
+-- 
+-- This MIB file added the nodes to create the Juniper Security 
+-- tree structure under the object node: jnxJsObjects.
+-- In general, the prefix jnxJs is used to name the object identifiers
+-- and to designate them.    
+-- 
+-- The jnxJsSecurity node is designed to provide a branch for the security
+-- related MIB defintions specific to the JS products.  
+-- 
+
+--
+-- Object identifier added as the basis for identifying other JS nodes.
+-- 
+jnxJsSecurity                   OBJECT IDENTIFIER ::= { jnxJsMibRoot 1 }
+
+
+--
+-- next level object identifiers under jnxJsSecurity
+-- 
+jnxJsIf                         OBJECT IDENTIFIER ::= { jnxJsSecurity 1 }
+jnxJsAuth                       OBJECT IDENTIFIER ::= { jnxJsSecurity 2 }
+jnxJsCertificates               OBJECT IDENTIFIER ::= { jnxJsSecurity 3 }
+jnxJsPolicies                   OBJECT IDENTIFIER ::= { jnxJsSecurity 4 }
+jnxJsIPSecVpn                   OBJECT IDENTIFIER ::= { jnxJsSecurity 5 }
+
+-- Removed the resource node since there is no object implemented.
+--  
+-- jnxJsResources                  OBJECT IDENTIFIER ::= { jnxJsSecurity 6 }
+
+jnxJsNAT                        OBJECT IDENTIFIER ::= { jnxJsSecurity 7 }
+jnxJsScreening                  OBJECT IDENTIFIER ::= { jnxJsSecurity 8 }
+jnxJsDhcp                       OBJECT IDENTIFIER ::= { jnxJsSecurity 9 }
+jnxJsDnsRoot                    OBJECT IDENTIFIER ::= { jnxJsSecurity 10 }
+jnxJsIdpRoot                    OBJECT IDENTIFIER ::= { jnxJsSecurity 11 }
+jnxJsSPUMonitoringRoot          OBJECT IDENTIFIER ::= { jnxJsSecurity 12 }
+jnxJsUTMRoot                    OBJECT IDENTIFIER ::= { jnxJsSecurity 13 }
+jnxJsChassisCluster             OBJECT IDENTIFIER ::= { jnxJsSecurity 14 }
+jnxVoip                         OBJECT IDENTIFIER ::= { jnxJsSecurity 15 }
+jnxJsPacketMirror               OBJECT IDENTIFIER ::= { jnxJsSecurity 16 }
+jnxLsysSecurityProfile          OBJECT IDENTIFIER ::= { jnxJsSecurity 17 }
+END 

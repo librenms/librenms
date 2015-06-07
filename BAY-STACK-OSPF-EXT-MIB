@@ -1,0 +1,475 @@
+
+BAY-STACK-OSPF-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    AreaID, RouterID
+        FROM OSPF-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackOspfExtMib MODULE-IDENTITY
+    LAST-UPDATED    "200609260000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks OSPF Extension MIB
+
+         Copyright 2005 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200609260000Z" -- 26 Sept 2006
+    DESCRIPTION "v7:  Added bsoeOspfVirtIfExtType."
+
+    REVISION "200609140000Z" -- 14 Sept 2006
+    DESCRIPTION "v6:  Added bsoeOspfVirtIfExtTable and
+                      bsoeVirtIfMessageDigestTable."
+
+    REVISION "200606130000Z" -- 13 June 2006
+    DESCRIPTION "v5:  Fleshed out some DESCRIPTION clauses."
+
+    REVISION "200512010000Z" -- 1 December 2005
+    DESCRIPTION "v4:  Fix range of bsoeOspfIfExtPrimaryMd5Key."
+
+    REVISION "200510200000Z" -- 20 October 2005
+    DESCRIPTION "v3:  Added bsoeOspfIfExtType and bsoeOspfNbrExtTable." 
+
+    REVISION "200510110000Z" -- 11 October 2005
+    DESCRIPTION "v2:  Added bsoeApplyRedistribute."
+
+    REVISION "200509080000Z" -- 08 September 2005
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 14 }
+
+bsoeNotifications OBJECT IDENTIFIER ::= { bayStackOspfExtMib 0 }
+bsoeObjects       OBJECT IDENTIFIER ::= { bayStackOspfExtMib 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Scalar Objects
+-- -------------------------------------------------------------
+
+bsoeScalars OBJECT IDENTIFIER ::= { bsoeObjects 1 }
+
+bsoeApplyRedistribute OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          none(0),
+                          direct(1),
+                          static(2),
+                          rip(3),
+                          ospf(4),
+                          bgp(5)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to implement the ospf 'ip ospf apply redistribute'
+         command when the 'bgp|direct|rip|static' parameter is used.  Setting
+         it will cause the 'apply' to occur for the specified protocol.  The
+         value returned is always none(0)."
+    ::= { bsoeScalars 1 }
+
+-- -------------------------------------------------------------
+-- OSPF Interface Extensions Table
+-- -------------------------------------------------------------
+
+bsoeOspfIfExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsoeOspfIfExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Extensions to the ospfIfTable from RFC 1850."
+    ::= { bsoeObjects 2 }
+
+bsoeOspfIfExtEntry OBJECT-TYPE
+    SYNTAX BsoeOspfIfExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that augments the ospfIfTable.  There
+         will be an entry in this table for each entry in the
+         ospfIfTable."
+    INDEX { bsoeOspfIfIpAddress, bsoeOspfAddressLessIf }
+    ::= { bsoeOspfIfExtTable 1 }
+
+BsoeOspfIfExtEntry ::=
+    SEQUENCE {
+        bsoeOspfIfIpAddress             IpAddress,
+        bsoeOspfAddressLessIf           Integer32,
+        bsoeOspfIfExtAdvertiseWhenDown  TruthValue,
+        bsoeOspfIfExtPrimaryMd5Key      Integer32,
+        bsoeOspfIfExtMtuIgnore          TruthValue,
+        bsoeOspfIfExtType               INTEGER
+    }
+
+bsoeOspfIfIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The IP address of this OSPF interface."
+    ::= { bsoeOspfIfExtEntry 1 }
+ 
+bsoeOspfAddressLessIf OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "For the purpose of easing  the  instancing  of
+           addressed   and  addressless  interfaces;  This
+           variable takes the value 0 on  interfaces  with
+           IP  Addresses,  and  the corresponding value of
+           ifIndex for interfaces having no IP Address."
+    ::= { bsoeOspfIfExtEntry 2 }
+
+bsoeOspfIfExtAdvertiseWhenDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Equivalent to rcIpConfAdvertiseWhenDown (allows
+                 this flag to be accessed by interface IP rather
+                 than by ifIndex)."
+    DEFVAL { false }
+    ::= { bsoeOspfIfExtEntry 3 }
+ 
+bsoeOspfIfExtPrimaryMd5Key OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Primary key, if it exists.  If there are no keys
+                 present, this object will be 0."
+    ::= { bsoeOspfIfExtEntry 4 }
+
+bsoeOspfIfExtMtuIgnore OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates whether to ignore mtu checking in ospf bdb."
+    DEFVAL { false }
+    ::= { bsoeOspfIfExtEntry 5 }
+
+bsoeOspfIfExtType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          other(1),
+                          passive(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object is an extension to the standard object
+                 ospfIfType.  When the value of this object is other(1),
+                 then the type of the interface is given by ospfIfType.
+                 Otherwise, the value of this object indicates the type
+                 of the interface, and the value of ospfIfType is invalid.
+                 In the latter case, an implementation may simply not
+                 return the corresponding instance of ospfIfType."
+    DEFVAL { other }
+    ::= { bsoeOspfIfExtEntry 6 }
+
+-- -------------------------------------------------------------
+-- OSPF Message Digest Table
+-- -------------------------------------------------------------
+
+bsoeMessageDigestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsoeMessageDigestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A table of message digest keys"
+    ::= { bsoeObjects 3 }
+
+bsoeMessageDigestEntry OBJECT-TYPE
+    SYNTAX BsoeMessageDigestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A message digest key"
+    INDEX { bsoeMessageDigestIpAddress,
+            bsoeMessageDigestAddressLessIf,
+            bsoeMessageDigestIndex,
+            bsoeMessageDigestType }
+    ::= { bsoeMessageDigestTable 1 }
+
+BsoeMessageDigestEntry ::=
+    SEQUENCE {
+        bsoeMessageDigestIpAddress      IpAddress,
+        bsoeMessageDigestAddressLessIf  Integer32,
+        bsoeMessageDigestIndex          Integer32,
+        bsoeMessageDigestType           INTEGER,
+        bsoeMessageDigestKey            OCTET STRING,
+        bsoeMessageDigestRowStatus      RowStatus
+    }
+
+bsoeMessageDigestIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The IP address of this OSPF interface."
+    ::= { bsoeMessageDigestEntry 1 }
+
+bsoeMessageDigestAddressLessIf OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "For the purpose of easing  the  instancing  of
+           addressed   and  addressless  interfaces;  This
+           variable takes the value 0 on  interfaces  with
+           IP  Addresses,  and  the corresponding value of
+           ifIndex for interfaces having no IP Address."
+    ::= { bsoeMessageDigestEntry 2 }
+ 
+bsoeMessageDigestIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An arbitrary index value for this digest value."
+    ::= { bsoeMessageDigestEntry 3 }
+
+bsoeMessageDigestType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            md5(1)
+                        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The type of digest value.  Currently only MD5
+                 is supported."
+    ::= { bsoeMessageDigestEntry 4 }
+
+bsoeMessageDigestKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The key value.  When retrieved, the value is always
+                 an empty string.  Setting this will change the key."
+    ::= { bsoeMessageDigestEntry 5 }
+
+bsoeMessageDigestRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation and deletion of rows in this table.
+                 The value of bsoeMessageDigestKey must be set before
+                 a row can be made active.  There are no restrictions
+                 on setting the value of bsoeMessageDigestKey while
+                 a row is active."
+    ::= { bsoeMessageDigestEntry 6 }
+
+-- -------------------------------------------------------------
+-- OSPF Neighbor Extensions Table
+-- -------------------------------------------------------------
+
+bsoeOspfNbrExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsoeOspfNbrExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Extensions to the ospfNbrTable from RFC 1850."
+    ::= { bsoeObjects 4 }
+
+bsoeOspfNbrExtEntry OBJECT-TYPE
+    SYNTAX BsoeOspfNbrExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that augments the ospfNbrTable.  There
+         will be an entry in this table for each entry in the
+         ospfNbrTable."
+    INDEX { bsoeOspfNbrExtIpAddr, bsoeOspfNbrExtAddressLessIndex }
+    ::= { bsoeOspfNbrExtTable 1 }
+
+BsoeOspfNbrExtEntry ::=
+    SEQUENCE {
+        bsoeOspfNbrExtIpAddr            IpAddress,
+        bsoeOspfNbrExtAddressLessIndex  InterfaceIndex,
+        bsoeOspfNbrExtInterfaceAddr     IpAddress
+    }
+
+bsoeOspfNbrExtIpAddr OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION ""
+    ::= { bsoeOspfNbrExtEntry 1 }
+
+bsoeOspfNbrExtAddressLessIndex OBJECT-TYPE
+    SYNTAX   InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION ""
+    ::= { bsoeOspfNbrExtEntry 2 }
+
+bsoeOspfNbrExtInterfaceAddr OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION ""
+    ::= { bsoeOspfNbrExtEntry 3 }
+
+-- -------------------------------------------------------------
+-- OSPF Virtual Interface Extensions Table
+-- -------------------------------------------------------------
+
+bsoeOspfVirtIfExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsoeOspfVirtIfExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Extensions to the ospfVirtIfTable from RFC 1850."
+    ::= { bsoeObjects 5 }
+
+bsoeOspfVirtIfExtEntry OBJECT-TYPE
+    SYNTAX BsoeOspfVirtIfExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that augments the ospfVirtIfTable.
+         There will be an entry in this table for each entry
+         in the ospfVirtIfTable."
+    INDEX { bsoeOspfVirtIfExtAreaId, bsoeOspfVirtIfExtNeighbor }
+    ::= { bsoeOspfVirtIfExtTable 1 }
+
+BsoeOspfVirtIfExtEntry ::=
+    SEQUENCE {
+        bsoeOspfVirtIfExtAreaId             AreaID,
+        bsoeOspfVirtIfExtNeighbor           RouterID,
+        bsoeOspfVirtIfExtPrimaryMd5Key      Integer32,
+        bsoeOspfVirtIfExtType               INTEGER
+    }
+
+bsoeOspfVirtIfExtAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The  Transit  Area  that  the   Virtual   Link
+                 traverses.  By definition, this is not 0.0.0.0"
+    ::= { bsoeOspfVirtIfExtEntry 1 }
+ 
+bsoeOspfVirtIfExtNeighbor OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The Router ID of the Virtual Neighbor."
+    ::= { bsoeOspfVirtIfExtEntry 2 }
+
+bsoeOspfVirtIfExtPrimaryMd5Key OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Primary key, if it exists.  If there are no keys
+                 present, this object will be 0."
+    ::= { bsoeOspfVirtIfExtEntry 3 }
+
+bsoeOspfVirtIfExtType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    manual(1),
+                    automatic(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object indicates whether the virtual link
+                 was created manually or automatically."
+    ::= { bsoeOspfVirtIfExtEntry 4 }
+
+-- -------------------------------------------------------------
+-- OSPF Virtual Interface Message Digest Table
+-- -------------------------------------------------------------
+
+bsoeVirtIfMessageDigestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsoeVirtIfMessageDigestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A table of message digest keys for virtual
+                 interfaces"
+    ::= { bsoeObjects 6 }
+
+bsoeVirtIfMessageDigestEntry OBJECT-TYPE
+    SYNTAX BsoeVirtIfMessageDigestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A message digest key for a virtual interface"
+    INDEX { bsoeVirtIfMessageDigestAreaId,
+            bsoeVirtIfMessageDigestNeighbor,
+            bsoeVirtIfMessageDigestIndex,
+            bsoeVirtIfMessageDigestType }
+    ::= { bsoeVirtIfMessageDigestTable 1 }
+
+BsoeVirtIfMessageDigestEntry ::=
+    SEQUENCE {
+        bsoeVirtIfMessageDigestAreaId         AreaID,
+        bsoeVirtIfMessageDigestNeighbor       RouterID,
+        bsoeVirtIfMessageDigestIndex          Integer32,
+        bsoeVirtIfMessageDigestType           INTEGER,
+        bsoeVirtIfMessageDigestKey            OCTET STRING,
+        bsoeVirtIfMessageDigestRowStatus      RowStatus
+    }
+
+bsoeVirtIfMessageDigestAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The  Transit  Area  that  the   Virtual   Link
+                 traverses.  By definition, this is not 0.0.0.0"
+    ::= { bsoeVirtIfMessageDigestEntry 1 }
+
+bsoeVirtIfMessageDigestNeighbor OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The Router ID of the Virtual Neighbor."
+    ::= { bsoeVirtIfMessageDigestEntry 2 }
+ 
+bsoeVirtIfMessageDigestIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An arbitrary index value for this digest value."
+    ::= { bsoeVirtIfMessageDigestEntry 3 }
+
+bsoeVirtIfMessageDigestType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            md5(1)
+                        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The type of digest value.  Currently only MD5
+                 is supported."
+    ::= { bsoeVirtIfMessageDigestEntry 4 }
+
+bsoeVirtIfMessageDigestKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The key value.  When retrieved, the value is always
+                 an empty string.  Setting this will change the key."
+    ::= { bsoeVirtIfMessageDigestEntry 5 }
+
+bsoeVirtIfMessageDigestRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation and deletion of rows in this table.
+                 The value of bsoeVirtIfMessageDigestKey must be set before
+                 a row can be made active.  There are no restrictions
+                 on setting the value of bsoeVirtIfMessageDigestKey while
+                 a row is active."
+    ::= { bsoeVirtIfMessageDigestEntry 6 }
+
+-- -------------------------------------------------------------
+-- Notifications
+-- -------------------------------------------------------------
+
+END
+

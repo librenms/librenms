@@ -1,0 +1,3331 @@
+CISCOSB-AAA DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB AAA Private Extension
+-- Version:    7.46
+-- Date:       01-Mar-2007
+-- 03-Jun-2003 Changed upper bound of rlRadiusGlobalDefaultDeadtime to 2000
+-- 31-Jul-2003 A new field rlRadiusServerUsage was added to rlRadiusServerEntry
+-- 31-Jul-2003 Group rlAAAEap was added
+-- 22-Sep-2003 Group rlTacacs was added
+-- 11-Nov-2004 Scalar rlAAAAuditingEnable
+-- 13-Dec-2004 MIBs for TIC support
+--  a. New fields were added:
+--      rlAAALineLockedState
+--      rlAAALineConsFailedLogins
+--      rlAAALinePasswordValidTime
+--      rlAAALinePasswordExpieryDate
+--      rlAAALocalLockedState
+--      rlAAALocalConsFailedLogins
+--      rlAAALocalPasswordValidTime
+--      rlAAALocalPasswordExpieryDate
+--  b. New scalars
+--      rlAAAMinPasswordLength
+--      rlAAAPasswordHistSize
+--      rlAAAPasswordHistHoldTime
+--      rlAAASuccLoginWriteToFile
+--      rlAAAUnlockUserName
+--      rlAAAUnlockSystemPassword
+--  c. New tables
+--      rlAAALocalLoginHistTable
+--      rlAAALinePassLoginHistTable
+--      rlAAASystemLoginHistTable
+--      rlAAASysPassStatTable
+--      rlAAALockedLineTable
+-- 07-Jul-2005 Added field rlAAALocalLoginMrid
+-- 30-Oct-2005 Added new table rlAAASystemPasswordVerificationAndSettingTable
+-- 14-Mar-2006 NimrodS Added fields rlAAAUserLoginDate And rlAAAUserLoginDurationMS
+--                     to rlAAAUserTable
+-- 04-Jun-2006 Added new scalars
+--                  rlAAAAccountingMngMethod
+--                  rlAAAAccountingDot1xMethod
+--
+--  11-Jan-2007 Added Inet support
+--              rlAAAUserTable
+--              rlAAALocalLoginHistTable
+--              rlAAALinePassLoginHistTable
+--              rlAAASystemLoginHistTable
+-- 10-Apr-2007 AlexeyK Added IPv6 support
+--                  rlRadiusServerInetTable
+--                  rlRadiusGlobalIPv6DefaultSource
+--
+-- 09-Aug-2009 vkuk : password complexity and local user password global aging
+--              Added:
+--                  rlAAAPasswordComplexityEnabled
+--                  rlAAAPasswordComplexityMinCharClasses
+--                  rlAAAPasswordComplexityNotOldPasswordEnabled
+--                  rlAAAPasswordComplexityCharRepeat
+--                  rlAAAPasswordComplexityNotUserNameEnabled
+--                  rlAAAPasswordComplexityNotManufacturerEnabled
+--                  rlAAAPasswordGlobalAgingTime
+--                  rlAAALocalUserPasswordVerificationAndSettingTable
+--              Changed rlAAALocalUserTable - added field :
+--                  rlAAALocalPasswordCreationDate
+-- 21-Jun-2010 vkuk : system password global aging
+--                  rlAAACreationDateSystemPasswordLevel15
+IMPORTS
+    switch001, rlRadius,rlAAAEap                      FROM CISCOSB-MIB
+    Unsigned32, IpAddress,Counter32,
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    TruthValue, RowStatus, DisplayString,
+    DateAndTime, TimeStamp,
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv6 FROM INET-ADDRESS-MIB; -- RFC2851
+
+rlAAA MODULE-IDENTITY
+        LAST-UPDATED "201006210000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Authentication, Authorization and Accounting
+                 in CISCOSB devices."
+        REVISION "201006210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 79 }
+
+RlAAAMethodtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Method list type."
+    SYNTAX INTEGER {
+        rlAAAMethodDeny(0),
+        rlAAAMethodLinePassword(1),
+        rlAAAMethodSystemPassword(2),
+        rlAAAMethodLocalUserTable(3),
+        rlAAAMethodRadius(4),
+        rlAAAMethodTacacs(5),
+        rlAAAMethodSucceed(6)
+}
+
+RlAAAServiceType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Line service type.rlAAAServiceTypeDontCare must be the maximum value in the enum."
+   SYNTAX INTEGER {
+      rlAAAServiceTypeDontCare(0),
+      rlAAAServiceTypeTelnet(1),
+      rlAAAServiceTypeHttp(2),
+      rlAAAServiceTypeSsh(3),
+      rlAAAServiceTypeHttps(4),
+      rlAAAServiceTypeSnmp(5),
+      rlAAAServiceTypeSshPubkey(6)
+}
+
+RlAAALinePortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Line physical port type,the
+                rlAAAPortDontCare must be the maximum value in the enum."
+    SYNTAX INTEGER {
+        rlAAAPortDontCare(0),
+        rlAAAPortNetwork(1),
+        rlAAAPortConsole(2)
+}
+
+rlAAAMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 3. The difference in rlAAACreationDateSystemPasswordLevel15 and
+        rlAAALocalUserEntry."
+    ::= { rlAAA 1 }
+
+
+rlAAARetries OBJECT-TYPE
+   SYNTAX       INTEGER (1..5)
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Determines the number of retries for each method
+                      (Radius, local passwords, local users table and
+                      tacacs)."
+   ::= { rlAAA 2 }
+
+
+rlAAARadiusEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use Radius. When to use
+                      Radius exactly       depends on its position in the
+                      methods list. "
+   ::= { rlAAA 3 }
+
+rlAAATacacsEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use Tacacs. When to use
+                      Tacacs exactly       depends on its position in the
+                      methods list."
+   ::= { rlAAA 4 }
+
+rlAAALocalUserEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use the local users table.
+                      When to use the       table exactly depends on its
+                      position in the methods list. "
+   ::= { rlAAA 5 }
+
+rlAAASystemPasswordEnabled
+   OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use the system password.
+                      When to use the       passwords exactly depends on its
+                      position in the methods list. "
+   ::= { rlAAA 6 }
+
+rlAAALinePasswordEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use the line password.
+                     When to use the       passwords exactly depends on its
+                     position in the methods list. "
+   ::= { rlAAA 7 }
+
+rlAAAAlwaysSuccessEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies whether AAA will use the always success method.
+                      When to use that       method exactly depends on its
+                      position in the methods list. "
+   ::= { rlAAA 8 }
+
+--
+-- suppoted methods
+--
+
+rlAAARadiusSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether Radius is supported in AAA. If the
+                      value is false Radius will not be used as an
+                      authentication and accounting method. If the value
+                      is true Radius will be used by AAA for authentication and
+                      accounting if the the AAA was configured to do so
+                      (by setting the appropriate mibs)."
+   ::= { rlAAA 9 }
+
+   rlAAATacacsSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether Tacacs+ is supported in AAA. If the
+                      value is       false Tacacs+ will not be used as an
+                      authentication and accounting       method. If the value
+                      is true Tacacs+ will be used by AAA for authentication and
+                      accounting if the the AAA was configured to do so
+                      (by setting the appropriate mibs)."
+   ::= { rlAAA 10 }
+
+rlAAALocalUserSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether the local users db is supported in
+                      AAA.If the value is false the local users db will not be
+                      used as an authentication and accounting method. If the
+                      value is true the local users db will be used by AAA for
+                      authentication and accounting method if the the AAA was
+                      configured to do so (by setting the appropriate mibs)."
+   ::= { rlAAA 11 }
+
+rlAAASystemPasswordSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether system password is supported in AAA.
+                      If the value is false system password will not be used as
+                      an authentication and accounting method. If the value is
+                      true the system password will be used by AAA for
+                      authentication and accounting method if the the AAA was
+                      configured to do so (by setting the appropriate mibs)."
+   ::= { rlAAA 12 }
+
+rlAAALinePasswordSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether line password is supported in AAA.
+                     If the value is false line password will not be used as an
+                     authentication and accounting method. If the value is true
+                     the line password will be used by AAA for authentication and
+                     accounting method if the the AAA was configured
+                      to do so (by setting the appropriate mibs)."
+   ::= { rlAAA 13 }
+
+rlAAALineAlwaysSuccessSupported OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "This mib show whether line always success method is
+                      supported in AAA.If the value is false always success
+                      method will not be used as an authentication and
+                      accounting method. If the value is true the always
+                      success method will be used by AAA for authentication and
+                      accounting method if the the AAA was configured
+                      to do so (by setting the appropriate mibs)."
+   ::= { rlAAA 14 }
+
+--
+-- method list table
+--
+
+
+rlAAAMethodListTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlAAAMethodListEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The table specifies all methods list per method name."
+   ::= { rlAAA 15 }
+
+rlAAAMethodListEntry OBJECT-TYPE
+   SYNTAX  RlAAAMethodListEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlAAAMethodListName}
+   ::= { rlAAAMethodListTable 1 }
+
+RlAAAMethodListEntry ::= SEQUENCE {
+   rlAAAMethodListName              DisplayString,
+   rlAAAMethodType1                  RlAAAMethodtype,
+   rlAAAMethodType2                   RlAAAMethodtype,
+   rlAAAMethodType3                   RlAAAMethodtype,
+   rlAAAMethodType4                   RlAAAMethodtype,
+   rlAAAMethodType5                   RlAAAMethodtype,
+   rlAAAMethodType6                   RlAAAMethodtype,
+   rlAAAMethodType7                   RlAAAMethodtype,
+   rlAAAMethodListStatus              RowStatus,
+   rlAAAAuthorizeEnable               INTEGER
+
+}
+
+rlAAAMethodListName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(3..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Line Method List Name"
+   ::= { rlAAAMethodListEntry 1 }
+
+rlAAAMethodType1  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " first method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 2 }
+
+rlAAAMethodType2  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " second method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 3 }
+
+
+rlAAAMethodType3  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "3th method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 4 }
+
+rlAAAMethodType4  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " 4th method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 5 }
+
+rlAAAMethodType5  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "5th method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 6 }
+
+
+rlAAAMethodType6  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " 6th method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 7 }
+
+
+rlAAAMethodType7  OBJECT-TYPE
+   SYNTAX RlAAAMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " 7th method type that will be used in the method
+                        linked list."
+   ::= { rlAAAMethodListEntry 8 }
+
+rlAAAMethodListStatus     OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "method list status can be destroy or createAndGo"
+   ::= { rlAAAMethodListEntry 9 }
+
+rlAAAAuthorizeEnable     OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "flag that indicates whether authorizatoin is enabled"
+   ::= { rlAAAMethodListEntry 10 }
+
+
+--
+-- Line table
+--
+--- AAA  MIBs for TIC support
+--- Added read only fields to show if a user is locked,
+--- password expiry date and number of consecutive failed logins.
+--- New read write field to set the expiry time for a password.
+--
+-- Line table
+--
+
+rlAAALineTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlAAALineEntry
+  MAX-ACCESS  not-accessible
+  STATUS current
+  DESCRIPTION      "The table specifies all lines, their passwords and their
+                    authorizations level .the table ordered lexicography by
+                    the line name. when a new line is being authenticate the
+                    search in line table is from the first entry in table
+                    till it find the first entry that fit application input
+                    line parameters  ."
+  ::= { rlAAA 16 }
+
+rlAAALineEntry OBJECT-TYPE
+   SYNTAX  RlAAALineEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlAAALinePortType,
+           rlAAAIfIndex,
+           rlAAAServiceType}
+::= { rlAAALineTable 1 }
+
+RlAAALineEntry ::= SEQUENCE {
+   rlAAALinePortType                 RlAAALinePortType,
+   rlAAAIfIndex                      Unsigned32,
+   rlAAAServiceType                  RlAAAServiceType,
+   rlAAALineMethodListNameLevel1     DisplayString,
+   rlAAALineMethodListNameLevel2     DisplayString,
+   rlAAALineMethodListNameLevel3     DisplayString,
+   rlAAALineMethodListNameLevel4     DisplayString,
+   rlAAALineMethodListNameLevel5     DisplayString,
+   rlAAALineMethodListNameLevel6     DisplayString,
+   rlAAALineMethodListNameLevel7     DisplayString,
+   rlAAALineMethodListNameLevel8     DisplayString,
+   rlAAALineMethodListNameLevel9     DisplayString,
+   rlAAALineMethodListNameLevel10    DisplayString,
+   rlAAALineMethodListNameLevel11    DisplayString,
+   rlAAALineMethodListNameLevel12    DisplayString,
+   rlAAALineMethodListNameLevel13    DisplayString,
+   rlAAALineMethodListNameLevel14    DisplayString,
+   rlAAALineMethodListNameLevel15    DisplayString,
+   rlAAALinePassword                 DisplayString,
+   rlAAALineStatus                   RowStatus,
+   rlAAALineLockedState              INTEGER,
+   rlAAALineConsFailedLogins         Counter32,
+   rlAAALinePasswordValidTime        Unsigned32,
+   rlAAALinePasswordExpieryDate      DisplayString
+}
+
+
+rlAAALinePortType OBJECT-TYPE
+   SYNTAX RlAAALinePortType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " the physical port type ."
+   ::= { rlAAALineEntry 1 }
+
+rlAAAIfIndex OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-write
+   STATUS current
+  DESCRIPTION    "Identifies the ifindex for which this entry can be used.
+                  If index 0 means don't care (can be used for all if indices).
+                  For port type console the value could be only 0."
+  ::= { rlAAALineEntry 2}
+
+rlAAAServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "the service type"
+   ::= { rlAAALineEntry 3 }
+
+rlAAALineMethodListNameLevel1  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 1 .That name points to the method
+                 list table .It is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 4 }
+
+rlAAALineMethodListNameLevel2  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 2 that name points to the method
+                  list table it is the key in method list table .by that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 5 }
+
+rlAAALineMethodListNameLevel3  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 3 that name points to the method
+                  list table it is the key in method list table .by that way
+                  we can reach the methods list to be used for this line"
+  ::= { rlAAALineEntry 6}
+
+rlAAALineMethodListNameLevel4  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 4-that name points to the method
+                  list table it is the key in method list table .by that way
+                  we can reach the methods list to be used for this line"
+  ::= { rlAAALineEntry 7}
+
+rlAAALineMethodListNameLevel5  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 5 that name points to the method
+                  list table it is the key in method list table .in that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 8}
+
+rlAAALineMethodListNameLevel6  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 6 that name points to the method
+                  list table it is the key in method list table .in that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 9}
+
+rlAAALineMethodListNameLevel7  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 7 that name points to the method
+                  list table it is the key in method list table .in that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 10}
+
+rlAAALineMethodListNameLevel8  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 8 that name points to the method
+                  list table it is the key in method list table .in that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 11}
+
+rlAAALineMethodListNameLevel9  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Method list Name for level 9 that name points to the method
+                  list table it is the key in method list table .in that way
+                  we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 12}
+
+rlAAALineMethodListNameLevel10  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 10 that name points to the method
+                 list table it is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 13}
+
+rlAAALineMethodListNameLevel11  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 11 that name points to the method
+                 list table it is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 14}
+
+rlAAALineMethodListNameLevel12  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 12 that name points to the method
+                 list table it is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 15}
+
+rlAAALineMethodListNameLevel13  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 13 that name points to the method
+                 list table it is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 16}
+
+rlAAALineMethodListNameLevel14  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 14 that name points to the method
+                 list table it is the key in method list table .in that way
+                 we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 17}
+
+  rlAAALineMethodListNameLevel15  OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION    "Method list Name for level 15 that name points to the method
+                    list table it is the key in method list table .in that way
+                    we can reach the methods list to be used for that line"
+  ::= { rlAAALineEntry 18}
+
+rlAAALinePassword OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..160))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION     "Line Password. Zero length password is considered as no
+                   password. Password with zero length means that in case this
+                   password is the method to be used a method fail is returned
+                   and no other method is being used.
+                   allowed formats:
+                   a. Display string starting with '$' for clear text
+                   b. Encrypted password: starts with # sign followed by 32
+                     octets representing Hex Decimal value(in the 0-9 a-f A-F
+                     range)
+                   the $ and # as first octet are a directive to indicate what
+                   is the type of password and are not not  part of it"
+  ::= { rlAAALineEntry 19 }
+
+rlAAALineStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION       "Line status can be destroy or createAndGo"
+  ::= { rlAAALineEntry 20 }
+
+rlAAALineLockedState OBJECT-TYPE
+  SYNTAX INTEGER {
+       locked(0),
+       usable(1)
+  }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "Line locked status"
+  ::= { rlAAALineEntry 21 }
+
+rlAAALineConsFailedLogins OBJECT-TYPE
+  SYNTAX Counter32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "Number of last consecutive failed logins"
+  ::= { rlAAALineEntry 22 }
+
+rlAAALinePasswordValidTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The period of time in days, during which the password,
+         is considered valid for login. Value of 0 means never expired.
+         The actual range is product specific.
+         After this time the system may allow limited number of logins
+         to change the password. "
+    DEFVAL { 0 }
+    ::= { rlAAALineEntry 23}
+
+rlAAALinePasswordExpieryDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "If Line password aging is active, the date on which
+                     The current password will expire.
+                     Otherwise zero size string"
+  ::= { rlAAALineEntry 24 }
+
+
+--
+-- local user db table
+--
+
+---_for rlAAALocalUserTable addition is in BOLD.
+--- Added read only fields to show if a user is locked,
+--- password expiry date and number of consecutive failed logins.
+--- New read write field to set the expiry time for a password.
+
+
+rlAAALocalUserTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALocalUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+   DESCRIPTION        "The table specifies all usernames, their passwords and
+                      their authorizations."
+   ::= { rlAAA 17 }
+
+rlAAALocalUserEntry OBJECT-TYPE
+    SYNTAX  RlAAALocalUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAALocalUserName}
+    ::= { rlAAALocalUserTable 1 }
+
+RlAAALocalUserEntry ::= SEQUENCE {
+    rlAAALocalUserName              DisplayString,
+    rlAAALocalUserPassword          DisplayString,
+    rlAAALocalUserPrivilage         INTEGER,
+    rlAAALocalHostStatus            RowStatus,
+    rlAAALocalLockedState           INTEGER,
+    rlAAALocalConsFailedLogins      Counter32,
+    rlAAALocalPasswordValidTime     Unsigned32,
+    rlAAALocalPasswordExpieryDate   DisplayString,
+    rlAAALocalPasswordCreationDate  DisplayString
+}
+
+rlAAALocalUserName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Local User Name"
+   ::= { rlAAALocalUserEntry 1 }
+
+rlAAALocalUserPassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Local User Password .The password can be null
+                   allowed formats:
+                   a. Display string starting with '$' for clear text
+                   b. Encrypted password: starts with # sign followed by 32
+                     octets representing Hex Decimal value(in the 0-9 a-f A-F
+                     range)
+                   the $ and # as first octet are a directive to indicate what
+                   is the type of password and are not not  part of it"
+
+   ::= { rlAAALocalUserEntry 2 }
+
+rlAAALocalUserPrivilage OBJECT-TYPE
+   SYNTAX INTEGER (1..15)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Local User Privilage"
+   ::= { rlAAALocalUserEntry 3 }
+
+rlAAALocalHostStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Local User status"
+   ::= { rlAAALocalUserEntry 4 }
+
+rlAAALocalLockedState OBJECT-TYPE
+   SYNTAX INTEGER {
+        locked(0),
+        usable(1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Local User locked status"
+   ::= { rlAAALocalUserEntry 5 }
+
+rlAAALocalConsFailedLogins OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Number of last consecutive failed logins"
+   ::= { rlAAALocalUserEntry 6 }
+
+rlAAALocalPasswordValidTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The period of time in days, during which the password,
+         is considered valid for login. Value of 0 means never expired.
+         The actual range is product specific.
+         After this time the system may allow limited number of logins
+         to change the password. "
+    DEFVAL { 0 }
+    ::= { rlAAALocalUserEntry 7 }
+
+rlAAALocalPasswordExpieryDate OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "If User password aging is active, the date on which
+                      The current password will expire.
+                      Otherwise zero size string"
+   ::= { rlAAALocalUserEntry 8 }
+
+rlAAALocalPasswordCreationDate OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The date on which the current password was created.
+                      Otherwise zero size string"
+   ::= { rlAAALocalUserEntry 9 }
+
+--
+-- system password
+--
+
+rlAAASystemPasswordlevel1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "system Password for level 1.
+                   allowed formats:
+                   a. Display string starting with '$' for clear text
+                   b. Encrypted password: starts with # sign followed by 32
+                     octets representing Hex Decimal value(in the 0-9 a-f A-F
+                     range)
+                   the $ and # as first octet are a directive to indicate what
+                   is the type of password and are not not  part of it"
+   ::= { rlAAA 18 }
+
+rlAAASystemPasswordlevel2 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 2
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                       the $ and # as first octet are a directive to indicate what
+                       is the type of password and are not not  part of it"
+   ::= { rlAAA 19 }
+
+rlAAASystemPasswordlevel3 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 3
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                       the $ and # as first octet are a directive to indicate what
+                       is the type of password and are not not  part of it"
+   ::= { rlAAA 20 }
+
+rlAAASystemPasswordlevel4 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 4
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 21 }
+
+rlAAASystemPasswordlevel5 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 5
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 22 }
+
+rlAAASystemPasswordlevel6 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 6
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 23 }
+
+rlAAASystemPasswordlevel7 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 7
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 24 }
+
+rlAAASystemPasswordlevel8 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 8
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 25 }
+
+rlAAASystemPasswordlevel9 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 9
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 26 }
+
+rlAAASystemPasswordlevel10 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 10
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 27 }
+
+rlAAASystemPasswordlevel11 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 11
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 28 }
+
+rlAAASystemPasswordlevel12 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 12
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 29 }
+
+rlAAASystemPasswordlevel13 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 13
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 30 }
+
+rlAAASystemPasswordlevel14 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 14
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not not  part of it"
+   ::= { rlAAA 31 }
+
+rlAAASystemPasswordlevel15 OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "system Password for level 15
+                      allowed formats:
+                      a. Display string starting with '$' for clear text
+                      b. Encrypted password: starts with # sign followed by 32
+                        octets representing Hex Decimal value(in the 0-9 a-f A-F
+                        range)
+                      the $ and # as first octet are a directive to indicate what
+                      is the type of password and are not part of it"
+   ::= { rlAAA 32 }
+
+rlAAAUserTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAAUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+   DESCRIPTION        "The table holds all current users that have been authenticated."
+   ::= { rlAAA 33 }
+
+rlAAAUserEntry OBJECT-TYPE
+    SYNTAX  RlAAAUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAAUserIndex}
+    ::= { rlAAAUserTable 1 }
+
+RlAAAUserEntry ::= SEQUENCE {
+    rlAAAUserIndex             Unsigned32,
+    rlAAAUserServiceType       RlAAAServiceType,
+    rlAAAUserRemoteIpAddress   IpAddress,
+    rlAAAUserName              DisplayString,
+    rlAAAUserLevel             Unsigned32,
+    rlAAAUserIfIndex           Unsigned32,
+    rlAAAUserLoginDate         DateAndTime,
+    rlAAAUserLoginDurationMS   Unsigned32
+}
+
+rlAAAUserIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "User Index"
+   ::= { rlAAAUserEntry 1 }
+
+rlAAAUserServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses. Service dont care is console
+                      terminal."
+   ::= { rlAAAUserEntry 2 }
+
+rlAAAUserRemoteIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAAUserEntry 3 }
+
+rlAAAUserName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAAUserEntry 4 }
+
+rlAAAUserLevel OBJECT-TYPE
+   SYNTAX Unsigned32 (1..15)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User level"
+   ::= { rlAAAUserEntry 5 }
+
+rlAAAUserIfIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User if index."
+   ::= { rlAAAUserEntry 6 }
+
+rlAAAUserLoginDate OBJECT-TYPE
+   SYNTAX DateAndTime
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date of use creation."
+   ::= { rlAAAUserEntry 7 }
+
+rlAAAUserLoginDurationMS OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Time in MS since user login."
+   ::= { rlAAAUserEntry 8 }
+
+rlAAATest OBJECT IDENTIFIER ::= { rlAAA 34 }
+
+rlAAATestPassword OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+    "This variable enables the user supplying the correct code to use the
+     AAA test feature."
+    ::= {rlAAATest 1}
+
+rlAAATestUserTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAATestUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table enables a user to perform a simulation of authentiction."
+    ::= { rlAAATest 2 }
+
+rlAAATestUserEntry OBJECT-TYPE
+    SYNTAX  RlAAATestUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlAAATestUserIndex}
+    ::= { rlAAATestUserTable 1 }
+
+RlAAATestUserEntry ::= SEQUENCE {
+    rlAAATestUserIndex                  Unsigned32,
+    rlAAATestPortType                   RlAAALinePortType,
+    rlAAATestIfIndex                    INTEGER,
+    rlAAATestServiceType                RlAAAServiceType,
+    rlAAATestUserAuthenticationStatus   INTEGER,
+    rlAAATestUserAuthenticationAction   INTEGER,
+    rlAAATestUserInput                  DisplayString,
+    rlAAATestUserStatus                 RowStatus
+}
+
+rlAAATestUserIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "User entry index (the number is used just to identify the user)."
+   ::= { rlAAATestUserEntry 1 }
+
+rlAAATestPortType OBJECT-TYPE
+   SYNTAX RlAAALinePortType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " the physical port type ."
+   ::= { rlAAATestUserEntry 2 }
+
+rlAAATestIfIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " line ifIndex can configue to be zero witch means
+                      Don't-care value"
+   ::= { rlAAATestUserEntry 3}
+
+rlAAATestServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "the service type"
+   ::= { rlAAATestUserEntry 4 }
+
+
+rlAAATestUserAuthenticationStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+       needPassword(1),
+       needUsername(2),
+       success(3),
+       failure(4),
+       aborted(5),
+       deleted(6),
+       waiting(7),
+       usedNewMethod(8)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "Shows the ststus of the operation and what is expected from the
+       'user'."
+   ::= { rlAAATestUserEntry 5 }
+
+rlAAATestUserAuthenticationAction OBJECT-TYPE
+   SYNTAX INTEGER {
+       begin(1),
+       receivePassword(2),
+       receiveUsername(3),
+       abort(4),
+       delete(5),
+       continue(6)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "By setting this field the process moves from one state to another. On
+       creation the value must be begin.
+       When the value of rlAAATestUserAuthenticationStatus is needPassword
+       the value can be set to receivePassword or abort.
+       When the value of rlAAATestUserAuthenticationStatus is needUsername
+       the value can be set to receiveUsername or abort.
+       When the value of rlAAATestUserAuthenticationStatus is success or failure
+       the value can be set to delete or abort.
+       When the value of rlAAATestUserAuthenticationStatus is aborted the value
+       can be set to delete.
+       When the value of rlAAATestUserAuthenticationStatus is deleted the value
+       can not be set to any value.
+       When the value of rlAAATestUserAuthenticationStatus is waiting the value
+       can be set or abort."
+   ::= { rlAAATestUserEntry 6 }
+
+rlAAATestUserInput OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..160))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "If the acion was set to receivePassword than this field should hold
+       the value of the password.
+       If the action was set to receiveUsername than this field should hold
+       the value of the username. "
+   ::= { rlAAATestUserEntry 7 }
+
+rlAAATestUserStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "Entry status. The entry can not be deleted. It will be deleted if
+       unchanged more than 2 minutes."
+   ::= { rlAAATestUserEntry 8 }
+
+---
+--- rlRadius
+---
+
+rlRadiusMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "MIB's version, the current version is 2.
+           1 - original version.
+           2 - field rlRadiusServerUsage was added to rlRadiusServerEntry"
+    ::= { rlRadius 1 }
+
+rlRadiusGlobalDefaultTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this RADIUS
+        server to reply. This MIB is used if the value of the
+        field rlRadiusServerUseGlobalDefaultTimeout is false."
+    ::= { rlRadius 2 }
+
+rlRadiusGlobalDefaultRetries  OBJECT-TYPE
+    SYNTAX INTEGER (1..15)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of times to try contacting this RADIUS server. This MIB
+        is used if the value of the field
+        rlRadiusServerUseGlobalDefaultRetries is false."
+    ::= { rlRadius 3 }
+
+
+rlRadiusGlobalDefaultDeadtime OBJECT-TYPE
+    SYNTAX INTEGER (0..2000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of minutes that any RADIUS server is ignored after
+        it has failed. This MIB is used if the value of the field
+        rlRadiusServerUseGlobalDefaultDeadtime is false."
+    ::= { rlRadius 4 }
+
+rlRadiusGlobalDefaultKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with this RADIUS server. This MIB is
+        used if the value of the field rlRadiusServerUseGlobalDefaultKey
+        is false."
+    ::= { rlRadius 5 }
+
+
+rlRadiusGlobalDefaultSource  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IPv4 address of the interface to use with this server.
+        A value of 0.0.0.0  for this object disables source
+        address  specification. This MIB is used if the value of the
+        field rlRadiusServerUseGlobalDefaultSource is false."
+    ::= { rlRadius 6 }
+
+rlRadiusServerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        servers with which the cliient shares a secret."
+    ::= { rlRadius 7 }
+
+rlRadiusServerEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS
+        server with which the client shares
+        a secret."
+    INDEX      { rlRadiusServerAddress,
+                 rlRadiusServerAuthPortNumber,
+                 rlRadiusServerAcctPortNumber}
+    ::= { rlRadiusServerTable 1 }
+
+RlRadiusServerEntry ::= SEQUENCE {
+    rlRadiusServerAddress                       IpAddress,
+    rlRadiusServerAuthPortNumber                INTEGER,
+    rlRadiusServerAcctPortNumber                INTEGER,
+    rlRadiusServerTimeout                       INTEGER,
+    rlRadiusServerRetries                       INTEGER,
+    rlRadiusServerDeadtime                      INTEGER,
+    rlRadiusServerUseGlobalDefaultKey           TruthValue,
+    rlRadiusServerKey                           DisplayString,
+    rlRadiusServerSource                        IpAddress,
+    rlRadiusServerPriority                      INTEGER,
+    rlRadiusServerStatus                        RowStatus,
+    rlRadiusServerUsage                         INTEGER
+}
+
+rlRadiusServerAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address of the RADIUS server
+        referred to in this table entry."
+    ::= { rlRadiusServerEntry 1 }
+
+rlRadiusServerAuthPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The UDP port the client is using to send authentication
+        requests to this server."
+    ::= { rlRadiusServerEntry 2 }
+
+rlRadiusServerAcctPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The UDP port the client is using to send accounting
+        requests to this server."
+    ::= { rlRadiusServerEntry 3 }
+
+rlRadiusServerTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this RADIUS
+        server to reply. Value of 0 means that rlRadiusGlobalDefaultTimeout."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerEntry 4 }
+
+rlRadiusServerRetries  OBJECT-TYPE
+    SYNTAX INTEGER (0..15)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of times to try contacting this RADIUS server. Value of
+        0 means that rlRadiusGlobalDefaultRetries."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerEntry 5 }
+
+rlRadiusServerDeadtime  OBJECT-TYPE
+    SYNTAX INTEGER (0..2001)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of minutes that any RADIUS server is ignored after
+        it has failed. Value of 2001 means that rlRadiusGlobalDefaultDeadtime
+        will be used."
+    DEFVAL  { 0 }
+    ::= { rlRadiusServerEntry 6 }
+
+rlRadiusServerUseGlobalDefaultKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlRadiusServerKey
+        is ignored and instead the value in the MIB
+        rlRadiusGlobalDefaultKey is used. Otherwise the value in
+        rlRadiusServerKey is used."
+    DEFVAL { false }
+    ::= { rlRadiusServerEntry 7 }
+
+rlRadiusServerKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with this RADIUS server."
+    DEFVAL { "" }
+    ::= { rlRadiusServerEntry 8 }
+
+rlRadiusServerSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "IP address of the interface to use with this server.
+        A value of 0.0.0.0  for this object disables source
+        address  specification. Default value of 255.255.255.255
+        means that rlRadiusGlobalDefaultSource will be used."
+    ::= { rlRadiusServerEntry 9 }
+
+rlRadiusServerPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines the order in which the servers will be used, when 0 is
+        the highest priority. If more than one server share the same
+        priority - they will be used in lexicgoraphic order
+        (the order of entries in this table)."
+    DEFVAL  { 0 }
+    ::= { rlRadiusServerEntry 10 }
+
+rlRadiusServerStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+        ::= { rlRadiusServerEntry 11 }
+
+rlRadiusServerUsage OBJECT-TYPE
+    SYNTAX  INTEGER {
+      userAuthentication(1),
+      portAuthentication(2),
+      all(3),
+      wirelessAuthentication (4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines actions for which the radius server will be used."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerEntry 12 }
+
+--
+-- IPv6 support
+--
+
+rlRadiusServerInetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServerInetEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        servers with which the cliient shares a secret."
+    ::= { rlRadius 8 }
+
+rlRadiusServerInetEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServerInetEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS
+        server with which the client shares
+        a secret."
+    INDEX      { rlRadiusServerInetAddressType,
+                 rlRadiusServerInetAddress,
+                 rlRadiusServerInetAuthPortNumber,
+                 rlRadiusServerInetAcctPortNumber}
+    ::= { rlRadiusServerInetTable 1 }
+
+RlRadiusServerInetEntry ::= SEQUENCE {
+    rlRadiusServerInetAddressType                   InetAddressType,
+    rlRadiusServerInetAddress                       InetAddress,
+    rlRadiusServerInetAuthPortNumber                INTEGER,
+    rlRadiusServerInetAcctPortNumber                INTEGER,
+    rlRadiusServerInetTimeout                       INTEGER,
+    rlRadiusServerInetRetries                       INTEGER,
+    rlRadiusServerInetDeadtime                      INTEGER,
+    rlRadiusServerInetUseGlobalDefaultKey           TruthValue,
+    rlRadiusServerInetKey                           DisplayString,
+    rlRadiusServerInetSourceType                    InetAddressType,
+    rlRadiusServerInetSource                        InetAddress,
+    rlRadiusServerInetPriority                      INTEGER,
+    rlRadiusServerInetStatus                        RowStatus,
+    rlRadiusServerInetUsage                         INTEGER,
+    rlRadiusServerInetLastResponseTime              TimeStamp
+}
+
+rlRadiusServerInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of RADIUS server reffered to
+         in this table entry .IPv6Z type is not supported."
+    ::= { rlRadiusServerInetEntry 1}
+
+rlRadiusServerInetAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the RADIUS server
+        referred to in this table entry.Only one instance
+        of specified address can be added at the same time."
+    ::= { rlRadiusServerInetEntry 2 }
+
+rlRadiusServerInetAuthPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The UDP port the client is using to send authentication
+        requests to this server.The zero value can be used only
+        if rlRadiusServerInetAcctPortNumber value is not zero."
+    ::= { rlRadiusServerInetEntry 3 }
+
+rlRadiusServerInetAcctPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The UDP port the client is using to send accounting
+        requests to this server.The zero value can be used only
+        if rlRadiusServerInetAuthPortNumber value is not zero."
+    ::= { rlRadiusServerInetEntry 4 }
+
+rlRadiusServerInetTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this RADIUS
+        server to reply. Value of 0 means that rlRadiusGlobalDefaultTimeout."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerInetEntry 5 }
+
+rlRadiusServerInetRetries  OBJECT-TYPE
+    SYNTAX INTEGER (0..15)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of times to try contacting this RADIUS server. Value of
+        0 means that rlRadiusGlobalDefaultRetries."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerInetEntry 6 }
+
+rlRadiusServerInetDeadtime  OBJECT-TYPE
+    SYNTAX INTEGER (0..2001)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of minutes that any RADIUS server is ignored after
+        it has failed. Value of 2001 means that rlRadiusGlobalDefaultDeadtime
+        will be used."
+    DEFVAL  { 0 }
+    ::= { rlRadiusServerInetEntry 7 }
+
+rlRadiusServerInetUseGlobalDefaultKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlRadiusServerKey
+        is ignored and instead the value in the MIB
+        rlRadiusGlobalDefaultKey is used. Otherwise the value in
+        rlRadiusServerKey is used."
+    DEFVAL { false }
+    ::= { rlRadiusServerInetEntry 8 }
+
+rlRadiusServerInetKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with this RADIUS server."
+    DEFVAL { "" }
+    ::= { rlRadiusServerInetEntry 9 }
+
+rlRadiusServerInetSourceType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The rlRadiusServerInetSource address type.
+         IPv6Z type not supported"
+    ::= { rlRadiusServerInetEntry 10}
+
+rlRadiusServerInetSource OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "Inet address of the interface to use with this server.
+         To provide backward compatibility the
+         value of 0.0.0.0  for this object will be used to
+         disables source address  specification.
+         Default value of 255.255.255.255 means that
+         rlRadiusGlobalDefaultSource will be used for Ipv4
+         servers and rlRadiusIPv6GlobalDefaultSource
+         will be used for Ipv6 servers.IPv6Z type not supported.
+         Only valid IP address will be used.
+         Application will set default value."
+    ::= { rlRadiusServerInetEntry 11 }
+
+rlRadiusServerInetPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines the order in which the servers will be used, when 0 is
+        the highest priority. If more than one server share the same
+        priority - they will be used in lexicgoraphic order
+        (the order of entries in this table)."
+    DEFVAL  { 0 }
+    ::= { rlRadiusServerInetEntry 12 }
+
+rlRadiusServerInetStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+        ::= { rlRadiusServerInetEntry 13 }
+
+rlRadiusServerInetUsage OBJECT-TYPE
+    SYNTAX  INTEGER {
+      userAuthentication(1),
+      portAuthentication(2),
+      all(3),
+      wirelessAuthentication (4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines actions for which the radius server will be used.
+        WirelessAuthentication will be used if wireless is supported."
+    DEFVAL  { 3 }
+    ::= { rlRadiusServerInetEntry 14 }
+
+rlRadiusServerInetLastResponseTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this server has response.
+            If there is no request to the server,  this object contains a zero value."
+    ::= { rlRadiusServerInetEntry 15 }
+
+rlRadiusGlobalIPv6DefaultSource  OBJECT-TYPE
+    SYNTAX     InetAddressIPv6
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IPv6 address of the interface to use with this server.
+        A NULL value for this object disables source
+        address  specification. "
+    ::= { rlRadius 9 }
+
+--
+-- rlAAAEap
+--
+
+RlAAAEapMethodtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Method list type."
+    SYNTAX INTEGER {
+        rlAAAEapMethodDeny(0),
+        rlAAAEapMethodRadius(1),
+        rlAAAEapMethodSucceed(2)
+}
+
+rlAAAEapMethodListTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlAAAEapMethodListEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The table specifies all methods list per method name."
+   ::= { rlAAAEap 1 }
+
+rlAAAEapMethodListEntry OBJECT-TYPE
+   SYNTAX  RlAAAEapMethodListEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlAAAEapMethodListName}
+   ::= { rlAAAEapMethodListTable 1 }
+
+RlAAAEapMethodListEntry ::= SEQUENCE {
+   rlAAAEapMethodListName              DisplayString,
+   rlAAAEapMethodType1                 RlAAAEapMethodtype,
+   rlAAAEapMethodType2                 RlAAAEapMethodtype,
+   rlAAAEapMethodType3                 RlAAAEapMethodtype,
+   rlAAAEapMethodType4                 RlAAAEapMethodtype,
+   rlAAAEapMethodType5                 RlAAAEapMethodtype,
+   rlAAAEapMethodListStatus            RowStatus
+}
+
+rlAAAEapMethodListName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(3..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Line Method List Name"
+   ::= { rlAAAEapMethodListEntry 1 }
+
+rlAAAEapMethodType1  OBJECT-TYPE
+   SYNTAX RlAAAEapMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " first method type that will be used in the method
+                       linked list."
+   ::= { rlAAAEapMethodListEntry 2 }
+
+rlAAAEapMethodType2  OBJECT-TYPE
+   SYNTAX RlAAAEapMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " second method type that will be used in the method
+                       linked list."
+   ::= { rlAAAEapMethodListEntry 3 }
+
+rlAAAEapMethodType3  OBJECT-TYPE
+   SYNTAX RlAAAEapMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "3th method type that will be used in the method
+                      linked list."
+   ::= { rlAAAEapMethodListEntry 4 }
+
+rlAAAEapMethodType4  OBJECT-TYPE
+   SYNTAX RlAAAEapMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " 4th method type that will be used in the method
+                       linked list."
+   ::= { rlAAAEapMethodListEntry 5 }
+
+rlAAAEapMethodType5  OBJECT-TYPE
+   SYNTAX RlAAAEapMethodtype
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "5th method type that will be used in the method
+                      linked list."
+   ::= { rlAAAEapMethodListEntry 6 }
+
+rlAAAEapMethodListStatus     OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "method list status can be destroy or createAndGo"
+   ::= { rlAAAEapMethodListEntry 7 }
+
+rlAAAEapCurrentMethodList OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(3..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies the method list that will be used for  authentication."
+   ::= { rlAAAEap 2 }
+
+
+--- rlTacacs
+
+RlTacacsConnectionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Specifies TCP connection type between device and TACACS+ server"
+    SYNTAX INTEGER {
+        rlTacacsSingleConnection(0),
+        rlTacacsPerSessionConnection(1)
+}
+
+RlTacacsConnectionStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Specifies the status of TCP connection
+                   between device and TACACS+ server."
+    SYNTAX INTEGER {
+        rlTacacsConnected(0),
+        rlTacacsNotConnected(1)
+}
+
+rlTacacs    OBJECT IDENTIFIER ::= { rlAAA 40 }
+
+rlTacacsMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlTacacs 1 }
+
+rlTacacsGlobalDefaultTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for TACACS+
+        server to reply. This MIB is used if the value of the
+        field rlTacacsServerTimeout is 0."
+    DEFVAL { 5 }
+    ::= { rlTacacs 2 }
+
+rlTacacsGlobalDefaultKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with TACACS+ server. This MIB is
+        used if the value of the field rlTacacsServerUseGlobalDefaultKey
+        is false."
+    DEFVAL { "" }
+    ::= { rlTacacs 3 }
+
+rlTacacsGlobalDefaultSourceIpInterface  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP address of the interface to use with TACACS+ server.
+        A value of 0.0.0.0  for this object disables source
+        address  specification. This MIB is used if the value of the
+        field rlTacacsServerSource is 255.255.255.255."
+    DEFVAL { '00000000'H }
+    ::= { rlTacacs 6 }
+
+rlTacacsServerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlTacacsServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the TACACS+
+        servers with which the cliient shares a secret."
+    ::= { rlTacacs 7 }
+
+rlTacacsServerEntry OBJECT-TYPE
+    SYNTAX     RlTacacsServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a TACACS+
+        server with which the client shares
+        a secret."
+    INDEX      { rlTacacsServerAddress }
+    ::= { rlTacacsServerTable 1 }
+
+RlTacacsServerEntry ::= SEQUENCE {
+    rlTacacsServerAddress                       IpAddress,
+    rlTacacsServerPortNumber                    INTEGER,
+    rlTacacsServerConnectionType                RlTacacsConnectionType,
+    rlTacacsServerConnectionStatus              RlTacacsConnectionStatus,
+    rlTacacsServerTimeout                       INTEGER,
+    rlTacacsServerUseGlobalDefaultKey           TruthValue,
+    rlTacacsServerKey                           DisplayString,
+    rlTacacsServerSourceIpInterface             IpAddress,
+    rlTacacsServerPriority                      INTEGER,
+    rlTacacsServerRowStatus                     RowStatus
+}
+
+rlTacacsServerAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address of the TACACS+ server
+        referred to in this table entry."
+    ::= { rlTacacsServerEntry 1 }
+
+rlTacacsServerPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The TCP port the client establishes connections with this server."
+    DEFVAL { 49 }
+    ::= { rlTacacsServerEntry 2 }
+
+rlTacacsServerConnectionType  OBJECT-TYPE
+   SYNTAX RlTacacsConnectionType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+        "Specifies TCP connection type between device and TACACS+ server.
+        Either a single open connection between device and server
+        (rlTacacsSingleConnection), or open/close connection per
+        communication session (rlTacacsPerSessionConnection)."
+   DEFVAL { rlTacacsPerSessionConnection }
+   ::= { rlTacacsServerEntry 3 }
+
+rlTacacsServerConnectionStatus  OBJECT-TYPE
+   SYNTAX RlTacacsConnectionStatus
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+        "Specifies status TCP connection type between device and TACACS+ server."
+   DEFVAL { rlTacacsConnected }
+   ::= { rlTacacsServerEntry 4 }
+
+rlTacacsServerTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this TACACS+ server to reply.
+        Value of 0 means that rlTacacsGlobalDefaultTimeout value is used."
+    DEFVAL  { 5 }
+    ::= { rlTacacsServerEntry 5 }
+
+rlTacacsServerUseGlobalDefaultKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlTacacsServerKey
+        is ignored and instead the value in the MIB
+        rlTacacsGlobalDefaultKey is used. Otherwise the value in
+        rlTacacsServerKey is used."
+    DEFVAL { false }
+    ::= { rlTacacsServerEntry 6 }
+
+rlTacacsServerKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with this TACACS+ server."
+    DEFVAL { "" }
+    ::= { rlTacacsServerEntry 7 }
+
+rlTacacsServerSourceIpInterface OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "IP address of the interface to use with this server.
+        A value of 0.0.0.0  for this object disables source
+        address  specification. Value of 255.255.255.255 means that
+        rlTacacsGlobalDefaultSourceIpInterface will be used."
+    DEFVAL { '00000000'H }
+    ::= { rlTacacsServerEntry 8 }
+
+rlTacacsServerPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines the order in which the TACACS+ servers will be used,
+        when 0 is the highest priority. If more than one server share the
+        same priority - they will be used in lexicgoraphic order
+        (the order of entries in this table)."
+    DEFVAL  { 0 }
+    ::= { rlTacacsServerEntry 9 }
+
+rlTacacsServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlTacacsServerEntry 10 }
+
+
+rlTacacsGlobalDefaultSourceIPv6Interface  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the interface to use with TACACS+ server.
+        A NULL for this object disables source
+        address specification. This MIB is used if the value of the
+        field rlTacacsServerInetSourceInterface is 255.255.255.255."
+    DEFVAL { '0000000000000000'H }
+    ::= { rlTacacs 8 }
+
+
+rlTacacsServerInetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlTacacsServerInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the TACACS+
+        servers with which the cliient shares a secret."
+    ::= { rlTacacs 9 }
+
+rlTacacsServerInetEntry OBJECT-TYPE
+    SYNTAX RlTacacsServerInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a TACACS+
+        server with which the client shares
+        a secret."
+    INDEX      { rlTacacsServerInetAddressType, rlTacacsServerInetAddress }
+    ::= { rlTacacsServerInetTable 1 }
+
+RlTacacsServerInetEntry ::= SEQUENCE {
+    rlTacacsServerInetAddressType                   InetAddressType,
+    rlTacacsServerInetAddress                       InetAddress,
+    rlTacacsServerInetPortNumber                    INTEGER,
+    rlTacacsServerInetConnectionType                RlTacacsConnectionType,
+    rlTacacsServerInetConnectionStatus              RlTacacsConnectionStatus,
+    rlTacacsServerInetTimeout                       INTEGER,
+    rlTacacsServerInetUseGlobalDefaultKey           TruthValue,
+    rlTacacsServerInetKey                           DisplayString,
+    rlTacacsServerInetSourceInterfaceType           InetAddressType,
+    rlTacacsServerInetSourceInterface               InetAddress,
+    rlTacacsServerInetPriority                      INTEGER,
+    rlTacacsServerInetRowStatus                     RowStatus
+}
+
+rlTacacsServerInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of TACACS+ server reffered to
+         in this table entry .IPv6Z type is not supported."
+    ::= { rlTacacsServerInetEntry 1 }
+
+
+rlTacacsServerInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Inet Address address of the TACACS+ server
+        referred to in this table entry."
+    ::= { rlTacacsServerInetEntry 2 }
+
+rlTacacsServerInetPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The TCP port the client establishes connections with this server."
+    DEFVAL { 49 }
+    ::= { rlTacacsServerInetEntry 3 }
+
+rlTacacsServerInetConnectionType  OBJECT-TYPE
+    SYNTAX RlTacacsConnectionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies TCP connection type between device and TACACS+ server.
+        Either a single open connection between device and server
+        (rlTacacsSingleConnection), or open/close connection per
+        communication session (rlTacacsPerSessionConnection)."
+    DEFVAL { rlTacacsPerSessionConnection }
+    ::= { rlTacacsServerInetEntry 4 }
+
+rlTacacsServerInetConnectionStatus  OBJECT-TYPE
+    SYNTAX RlTacacsConnectionStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies status TCP connection type between device and TACACS+ server."
+    DEFVAL { rlTacacsConnected }
+    ::= { rlTacacsServerInetEntry 5 }
+
+rlTacacsServerInetTimeout  OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time (in seconds) to wait for this TACACS+ server to reply.
+        Value of 0 means that rlTacacsGlobalDefaultTimeout value is used."
+    DEFVAL  { 5 }
+    ::= { rlTacacsServerInetEntry 6 }
+
+rlTacacsServerInetUseGlobalDefaultKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlTacacsServerKey
+        is ignored and instead the value in the MIB
+        rlTacacsGlobalDefaultKey is used. Otherwise the value in
+        rlTacacsServerKey is used."
+    DEFVAL { false }
+    ::= { rlTacacsServerInetEntry 7 }
+
+rlTacacsServerInetKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Secret key to be shared with this TACACS+ server."
+    DEFVAL { "" }
+    ::= { rlTacacsServerInetEntry 8 }
+
+rlTacacsServerInetSourceInterfaceType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the interface to use with this server."
+    ::= { rlTacacsServerInetEntry 9 }
+
+rlTacacsServerInetSourceInterface OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inet address of the interface to use with this server.
+        A value of NULL for this object disables source
+        address specification for this server.
+        A value of 255.255.255.255 maens that the global default
+        rlTacacsGlobalDefaultSourceIpInterface or
+        rlTacacsGlobalDefaultSourceIPv6Interface values are used."
+    ::= { rlTacacsServerInetEntry 10 }
+
+rlTacacsServerInetPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the order in which the TACACS+ servers will be used,
+        when 0 is the highest priority. If more than one server share the
+        same priority - they will be used in lexicgoraphic order
+        (the order of entries in this table)."
+    DEFVAL  { 0 }
+    ::= { rlTacacsServerInetEntry 11 }
+
+rlTacacsServerInetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlTacacsServerInetEntry 12 }
+
+
+---        AAA Login auditing control (SysLog)
+
+rlAAAAuditingEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls whether SysLog messages
+         should be issued on login events"
+    DEFVAL { true }
+    ::= { rlAAA 41 }
+
+rlAAAMinPasswordLength  OBJECT-TYPE
+    SYNTAX INTEGER (0..64)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The minimum length of password for local user authentication
+         defined in field rlAAALocalUserPassword in rlAAALocalUserTable.
+         The value applies only to new or updated user passwords.
+         In actual implementation the range may be reduced to (0 | N-64),
+         where N is a platform dependent (for TIC compatibility N=8) "
+    DEFVAL { 0 }
+    ::= { rlAAA 42 }
+
+---        Password history size
+rlAAAPasswordHistSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of most recent password,
+         previously defined for Local User Table, Line Table,
+         System Password Table for specific entity.
+         This list used for password reusing prevention.
+         Value of 0 means none. Changing the value
+         does not cause the loss of history.
+         History Max size is product specific."
+    DEFVAL { 0 }
+    ::= { rlAAA 43 }
+
+---        Password history hold time
+
+rlAAAPasswordHistHoldTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The time in day, which an old password
+         may be used in password history check.
+   Changing the value does not cause the
+         loss of history."
+
+    DEFVAL { 0 }
+    ::= { rlAAA 44 }
+
+--- controls wether successful logins are written to file
+
+rlAAASuccLoginWriteToFile  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls whether successful logins are
+         written to login file"
+    DEFVAL { true }
+    ::= { rlAAA 45 }
+
+
+---        Read-only table for successful login history - Local Users
+
+rlAAALocalLoginHistTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALocalLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for all users. This table is read-only."
+   ::= { rlAAA 46 }
+
+rlAAALocalLoginHistEntry OBJECT-TYPE
+    SYNTAX  RlAAALocalLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAALocalLoginHistName,
+            rlAAALocalLoginHistIndex}
+    ::= { rlAAALocalLoginHistTable 1 }
+
+RlAAALocalLoginHistEntry ::= SEQUENCE {
+    rlAAALocalLoginHistName              DisplayString,
+    rlAAALocalLoginHistIndex             Unsigned32,
+    rlAAALocalLoginHistServiceType       RlAAAServiceType,
+    rlAAALocalLoginHistRemoteIpAddress   IpAddress,
+    rlAAALocalLoginHistLocalIpAddress    IpAddress,
+    rlAAALocalLoginDateTime              DisplayString,
+    rlAAALocalLoginMrid                  Unsigned32
+}
+
+rlAAALocalLoginHistName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAALocalLoginHistEntry 1 }
+
+rlAAALocalLoginHistIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in History for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAALocalLoginHistEntry 2 }
+
+rlAAALocalLoginHistServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAALocalLoginHistEntry 3 }
+
+rlAAALocalLoginHistRemoteIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAALocalLoginHistEntry 4 }
+
+rlAAALocalLoginHistLocalIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAALocalLoginHistEntry 5 }
+
+rlAAALocalLoginDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAALocalLoginHistEntry 6 }
+
+   rlAAALocalLoginMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAALocalLoginHistEntry 7 }
+
+
+---        Read-only table for successful login history - Line passwords
+
+rlAAALinePassLoginHistTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALinePassLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for Line passwords. This table is read-only."
+   ::= { rlAAA 47 }
+
+rlAAALinePassLoginHistEntry OBJECT-TYPE
+    SYNTAX  RlAAALinePassLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX {rlAAALinePassLoginHistPortType,
+           rlAAALinePassLoginHistIfIndex,
+           rlAAALinePassLoginHistServiceType,
+           rlAAALinePassLoginHistIndex }
+    ::= { rlAAALinePassLoginHistTable 1 }
+
+RlAAALinePassLoginHistEntry ::= SEQUENCE {
+    rlAAALinePassLoginHistPortType          RlAAALinePortType,
+    rlAAALinePassLoginHistIfIndex           Unsigned32,
+    rlAAALinePassLoginHistServiceType       RlAAAServiceType,
+    rlAAALinePassLoginHistIndex             Unsigned32,
+    rlAAALinePassLoginHistActServiceType    RlAAAServiceType,
+    rlAAALinePassLoginHistRemoteIpAddress   IpAddress,
+    rlAAALinePassLoginHistLocalIpAddress    IpAddress,
+    rlAAALinePassLoginDateTime              DisplayString ,
+    rlAAALinePassLoginMrid                     Unsigned32
+}
+
+
+rlAAALinePassLoginHistPortType OBJECT-TYPE
+   SYNTAX RlAAALinePortType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " the physical port type."
+   ::= { rlAAALinePassLoginHistEntry 1 }
+
+rlAAALinePassLoginHistIfIndex OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-write
+   STATUS current
+  DESCRIPTION    "Identifies the ifindex for which this entry can be used.
+                  If index 0 means don't care
+                  (can be used for all if indices).
+                  For port type console the value could be only 0."
+  ::= { rlAAALinePassLoginHistEntry 2}
+
+rlAAALinePassLoginHistServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "the service type"
+   ::= { rlAAALinePassLoginHistEntry 3 }
+
+rlAAALinePassLoginHistIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in History for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAALinePassLoginHistEntry 4 }
+
+rlAAALinePassLoginHistActServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAALinePassLoginHistEntry 5 }
+
+rlAAALinePassLoginHistRemoteIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAALinePassLoginHistEntry 6 }
+
+rlAAALinePassLoginHistLocalIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAALinePassLoginHistEntry 7 }
+
+rlAAALinePassLoginDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAALinePassLoginHistEntry 8 }
+
+
+rlAAALinePassLoginMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAALinePassLoginHistEntry 9 }
+
+---        Read-only table for successful login history - System Passwords
+
+rlAAASystemLoginHistTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAASystemLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for system passwords. This table is read-only."
+   ::= { rlAAA 48 }
+
+rlAAASystemLoginHistEntry OBJECT-TYPE
+    SYNTAX  RlAAASystemLoginHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAASystemLoginHistLevel,
+            rlAAASystemLoginHistIndex}
+    ::= { rlAAASystemLoginHistTable 1 }
+
+RlAAASystemLoginHistEntry ::= SEQUENCE {
+    rlAAASystemLoginHistLevel             INTEGER,
+    rlAAASystemLoginHistIndex             Unsigned32,
+    rlAAASystemLoginHistServiceType       RlAAAServiceType,
+    rlAAASystemLoginHistRemoteIpAddress   IpAddress,
+    rlAAASystemLoginHistLocalIpAddress    IpAddress,
+    rlAAASystemLoginDateTime              DisplayString,
+    rlAAASystemLoginMrid                Unsigned32
+}
+
+rlAAASystemLoginHistLevel OBJECT-TYPE
+   SYNTAX INTEGER (1..15)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAASystemLoginHistEntry 1 }
+
+rlAAASystemLoginHistIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in History for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAASystemLoginHistEntry 2 }
+
+rlAAASystemLoginHistServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAASystemLoginHistEntry 3 }
+
+rlAAASystemLoginHistRemoteIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAASystemLoginHistEntry 4 }
+
+rlAAASystemLoginHistLocalIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAASystemLoginHistEntry 5 }
+
+rlAAASystemLoginDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAASystemLoginHistEntry 6 }
+
+rlAAASystemLoginMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAASystemLoginHistEntry 7 }
+
+
+--
+-- System Passwords status table
+--
+rlAAASysPassStatTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlAAASysPassStatEntry
+  MAX-ACCESS  not-accessible
+  STATUS current
+  DESCRIPTION      "The table specifies all system password and
+                    their security properties: is password locked
+                    due to wrong password, when and how it was locked
+                    or last unsuccessful login information, expiry date
+                    of the password."
+  ::= { rlAAA 49 }
+
+rlAAASysPassStatEntry OBJECT-TYPE
+   SYNTAX  RlAAASysPassStatEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlAAASysPassStatLevel}
+::= { rlAAASysPassStatTable 1 }
+
+RlAAASysPassStatEntry ::= SEQUENCE {
+   rlAAASysPassStatLevel                    INTEGER,
+   rlAAASysPassStatLockedState              INTEGER,
+   rlAAASysPassStatConsFailedLogins         Counter32,
+   rlAAASysPassStatPasswordValidTime        Unsigned32,
+   rlAAASysPassStatPasswordExpieryDate      DisplayString
+}
+
+rlAAASysPassStatLevel OBJECT-TYPE
+  SYNTAX INTEGER (1..15)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "System password level"
+  ::= { rlAAASysPassStatEntry 1 }
+
+rlAAASysPassStatLockedState OBJECT-TYPE
+  SYNTAX INTEGER {
+       locked(0),
+       usable(1)
+  }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "System password locked status"
+  ::= { rlAAASysPassStatEntry 2 }
+
+rlAAASysPassStatConsFailedLogins OBJECT-TYPE
+  SYNTAX Counter32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "Number of last consecutive failed logins"
+  ::= { rlAAASysPassStatEntry 3 }
+
+
+rlAAASysPassStatPasswordValidTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The period of time in days, during which the password,
+         is considered valid for login. Value of 0 means never expired.
+         The actual range is product specific.
+         After this time the system may allow limited number of logins
+         to change the password. "
+    DEFVAL { 0 }
+    ::= { rlAAASysPassStatEntry 4 }
+
+rlAAASysPassStatPasswordExpieryDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION       "If System password aging is active, the date,
+                     on which the current password will expire.
+                     Otherwise zero size string"
+  ::= { rlAAASysPassStatEntry 5 }
+
+---        Number of failures before lock-out (1-5, 0 for disable)
+
+
+rlAAAMaxNumLogAttmpts  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of consecutive unsuccessful login attempts
+         before user is locked. Value of 0 means no limit. The actual range is
+         product specific. TIC requirement is 3."
+    DEFVAL { 0 }
+    ::= { rlAAA 50 }
+
+
+--
+-- Unlock user action scalar
+--
+
+rlAAAUnlockUserName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "An action MIB variable setting with value
+   of Local User Name will unlock this user.
+   The value of this variable is not saved to
+   non volatile storage. Read of this variable
+   always returns zero length display string."
+   ::= { rlAAA 51 }
+
+
+
+--
+-- Unlock user system passwords
+--
+
+rlAAAUnlockSystemPassword OBJECT-TYPE
+   SYNTAX INTEGER (0..15)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "An action MIB variable setting with value
+   of Level will unlock the system password
+   for this level. The value of this variable
+   is not saved to non volatile storage.
+   Read of this variable always returns zero.
+   Zero (0) does no action."
+   ::= { rlAAA 52 }
+
+--
+-- Locked lines table
+--
+
+rlAAALockedLineTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALockedLineEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table specifies lines statuses.
+                        Users cannot access the product from
+                        remote based on a password of the locked line.
+                        This table enables to unlock lines."
+   ::= { rlAAA 53 }
+
+
+rlAAALockedLineEntry OBJECT-TYPE
+   SYNTAX  RlAAALockedLineEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlAAALockedLinePortType,
+           rlAAALockedLineIfIndex,
+           rlAAALockedLineServiceType}
+::= { rlAAALockedLineTable 1 }
+
+RlAAALockedLineEntry ::= SEQUENCE {
+   rlAAALockedLinePortType           RlAAALinePortType,
+   rlAAALockedLineIfIndex            Unsigned32,
+   rlAAALockedLineServiceType        RlAAAServiceType,
+   rlAAALockedLineStatus             INTEGER
+}
+
+rlAAALockedLinePortType OBJECT-TYPE
+   SYNTAX RlAAALinePortType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " the physical port type ."
+   ::= { rlAAALockedLineEntry 1 }
+
+rlAAALockedLineIfIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-write
+    STATUS current
+   DESCRIPTION       "Identifies the ifindex for which this entry can be used.
+                      If index 0 means don't care (can be used for all if indices).
+                      For port type console the value could be only 0."
+   ::= { rlAAALockedLineEntry 2}
+
+rlAAALockedLineServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "the service type"
+   ::= { rlAAALockedLineEntry 3 }
+
+rlAAALockedLineStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+        locked(0),
+        usable(1)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "The entry exists only if a line exist.
+                      Setting this field to value usable results in
+                      resetting the password failure counter,
+                      and unlock a locked user."
+   ::= { rlAAALockedLineEntry 4 }
+
+--
+-- SystemPasswordVerificationAndSetting Table
+--
+
+rlAAASystemPasswordVerificationAndSettingTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAASystemPasswordVerificationAndSettingEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+   DESCRIPTION        "The table specifies per every system level, old and new passwords.
+                       Serves for verification the old password and setting a new password."
+   ::= { rlAAA 54 }
+
+rlAAASystemPasswordVerificationAndSettingEntry OBJECT-TYPE
+    SYNTAX  RlAAASystemPasswordVerificationAndSettingEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row of system password verification and setting table."
+    INDEX { rlAAASystemPasswordSettingPrivilegeLevel}
+    ::= { rlAAASystemPasswordVerificationAndSettingTable 1 }
+
+RlAAASystemPasswordVerificationAndSettingEntry ::= SEQUENCE {
+    rlAAASystemPasswordSettingPrivilegeLevel              INTEGER,
+    rlAAASystemPasswordVerificationOldPassword        DisplayString,
+    rlAAASystemPasswordSettingNewPassword             DisplayString,
+    rlAAASystemPasswordConfirmNewPassword             DisplayString
+}
+
+rlAAASystemPasswordSettingPrivilegeLevel OBJECT-TYPE
+   SYNTAX INTEGER (1..15)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "System password Privelege Level to be set."
+   ::= { rlAAASystemPasswordVerificationAndSettingEntry 1 }
+
+rlAAASystemPasswordVerificationOldPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Old system password to be verified."
+
+   ::= { rlAAASystemPasswordVerificationAndSettingEntry 2 }
+
+rlAAASystemPasswordSettingNewPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "New system password to be set."
+
+   ::= { rlAAASystemPasswordVerificationAndSettingEntry 3 }
+
+rlAAASystemPasswordConfirmNewPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "New system password to be confirmed."
+
+   ::= { rlAAASystemPasswordVerificationAndSettingEntry 4 }
+
+
+--
+-- Accounting
+--
+
+RlAAAAccountingMethod  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Protocols, used for accounting."
+    SYNTAX INTEGER {
+        none(1),
+        radius(2),
+        tacacs(3)
+}
+
+rlAAAAccountingMngMethod OBJECT-TYPE
+        SYNTAX   RlAAAAccountingMethod
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Method, used for accounting of management sessions,
+                     none denotes Accounting is disabled."
+      ::= { rlAAA 55 }
+
+rlAAAAccountingDot1xMethod OBJECT-TYPE
+        SYNTAX   RlAAAAccountingMethod
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Method, used for accounting of 802.1x sessions,
+                     none denotes Accounting is disabled."
+      ::= { rlAAA 56 }
+
+-- INET support MIBS
+
+rlAAAUserInetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAAUserInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+   DESCRIPTION        "The table holds all current users that have been authenticated.
+                        it coexist with rlAAAUserTable to support IPv4 and IPv6"
+   ::= { rlAAA 57 }
+
+rlAAAUserInetEntry OBJECT-TYPE
+    SYNTAX  RlAAAUserInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAAUserInetIndex}
+    ::= { rlAAAUserInetTable 1 }
+
+RlAAAUserInetEntry ::= SEQUENCE {
+    rlAAAUserInetIndex                  Unsigned32,
+    rlAAAUserInetServiceType            RlAAAServiceType,
+    rlAAAUserInetRemoteIpAddressType    InetAddressType,
+    rlAAAUserInetRemoteIpAddress        InetAddress,
+    rlAAAUserInetName                   DisplayString,
+    rlAAAUserInetLevel                  Unsigned32,
+    rlAAAUserInetIfIndex                Unsigned32,
+    rlAAAUserInetLoginDate              DateAndTime,
+    rlAAAUserInetLoginDurationMS        Unsigned32
+}
+
+rlAAAUserInetIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "User Index"
+   ::= { rlAAAUserInetEntry 1 }
+
+rlAAAUserInetServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses. Service dont care is console
+                      terminal."
+   ::= { rlAAAUserInetEntry 2 }
+
+rlAAAUserInetRemoteIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote INET address Type."
+   ::= { rlAAAUserInetEntry 3 }
+
+rlAAAUserInetRemoteIpAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote INET address."
+   ::= { rlAAAUserInetEntry 4 }
+
+rlAAAUserInetName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAAUserInetEntry 5 }
+
+rlAAAUserInetLevel OBJECT-TYPE
+   SYNTAX Unsigned32 (1..15)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User level"
+   ::= { rlAAAUserInetEntry 6 }
+
+rlAAAUserInetIfIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User if index."
+   ::= { rlAAAUserInetEntry 7 }
+
+rlAAAUserInetLoginDate OBJECT-TYPE
+   SYNTAX DateAndTime
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date of use creation."
+   ::= { rlAAAUserInetEntry 8 }
+
+rlAAAUserInetLoginDurationMS OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Time in MS since user login."
+   ::= { rlAAAUserInetEntry 9 }
+
+---        Read-only table for successful login history - Local Users
+
+rlAAALocalLoginHistInetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALocalLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for all users. This table is read-only.
+                       it coexist with rlAAALocalLoginHistTable to support IPv4 and IPv6"
+   ::= { rlAAA 58 }
+
+rlAAALocalLoginHistInetEntry OBJECT-TYPE
+    SYNTAX  RlAAALocalLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAALocalLoginHistInetName,
+            rlAAALocalLoginHistInetIndex}
+    ::= { rlAAALocalLoginHistInetTable 1 }
+
+RlAAALocalLoginHistInetEntry ::= SEQUENCE {
+    rlAAALocalLoginHistInetName                      DisplayString,
+    rlAAALocalLoginHistInetIndex                     Unsigned32,
+    rlAAALocalLoginHistInetServiceType               RlAAAServiceType,
+    rlAAALocalLoginHistInetRemoteIpAddressType     InetAddressType,
+    rlAAALocalLoginHistInetRemoteIpAddress         InetAddress,
+    rlAAALocalLoginHistInetLocalIpAddressType      InetAddressType,
+    rlAAALocalLoginHistInetLocalIpAddress          InetAddress,
+    rlAAALocalLoginHistInetDateTime                  DisplayString,
+    rlAAALocalLoginHistInetMrid                      Unsigned32
+}
+
+rlAAALocalLoginHistInetName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAALocalLoginHistInetEntry 1 }
+
+rlAAALocalLoginHistInetIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in History for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAALocalLoginHistInetEntry 2 }
+
+rlAAALocalLoginHistInetServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAALocalLoginHistInetEntry 3 }
+
+rlAAALocalLoginHistInetRemoteIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address Type."
+   ::= { rlAAALocalLoginHistInetEntry 4 }
+
+rlAAALocalLoginHistInetRemoteIpAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAALocalLoginHistInetEntry 5 }
+
+rlAAALocalLoginHistInetLocalIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address Type on login."
+   ::= { rlAAALocalLoginHistInetEntry 6 }
+
+rlAAALocalLoginHistInetLocalIpAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAALocalLoginHistInetEntry 7 }
+
+rlAAALocalLoginHistInetDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAALocalLoginHistInetEntry 8 }
+
+   rlAAALocalLoginHistInetMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAALocalLoginHistInetEntry 9 }
+
+
+---        Read-only table for successful login history - Line passwords
+
+rlAAALinePassLoginHistInetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALinePassLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for Line passwords. This table is read-only.
+                       it coexist with rlAAALinePassLoginHistTable to support IPv4 and IPv6"
+   ::= { rlAAA 59 }
+
+rlAAALinePassLoginHistInetEntry OBJECT-TYPE
+    SYNTAX  RlAAALinePassLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX {rlAAALinePassLoginHistInetPortType,
+           rlAAALinePassLoginHistInetIfIndex,
+           rlAAALinePassLoginHistInetServiceType,
+           rlAAALinePassLoginHistInetIndex }
+    ::= { rlAAALinePassLoginHistInetTable 1 }
+
+RlAAALinePassLoginHistInetEntry ::= SEQUENCE {
+    rlAAALinePassLoginHistInetPortType                RlAAALinePortType,
+    rlAAALinePassLoginHistInetIfIndex                 Unsigned32,
+    rlAAALinePassLoginHistInetServiceType             RlAAAServiceType,
+    rlAAALinePassLoginHistInetIndex                   Unsigned32,
+    rlAAALinePassLoginHistInetActServiceType          RlAAAServiceType,
+    rlAAALinePassLoginHistInetRemoteInetAddressType   InetAddressType,
+    rlAAALinePassLoginHistInetRemoteInetAddress       InetAddress,
+    rlAAALinePassLoginHistInetLocalInetAddressType    InetAddressType,
+    rlAAALinePassLoginHistInetLocalInetAddress        InetAddress,
+    rlAAALinePassLoginHistInetDateTime                DisplayString ,
+    rlAAALinePassLoginHistInetMrid                    Unsigned32
+}
+
+
+rlAAALinePassLoginHistInetPortType OBJECT-TYPE
+   SYNTAX RlAAALinePortType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       " the physical port type."
+   ::= { rlAAALinePassLoginHistInetEntry 1 }
+
+rlAAALinePassLoginHistInetIfIndex OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-write
+   STATUS current
+  DESCRIPTION    "Identifies the ifindex for which this entry can be used.
+                  If index 0 means don't care
+                  (can be used for all if indices).
+                  For port type console the value could be only 0."
+  ::= { rlAAALinePassLoginHistInetEntry 2}
+
+rlAAALinePassLoginHistInetServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "the service type"
+   ::= { rlAAALinePassLoginHistInetEntry 3 }
+
+rlAAALinePassLoginHistInetIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in HistInetory for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAALinePassLoginHistInetEntry 4 }
+
+rlAAALinePassLoginHistInetActServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAALinePassLoginHistInetEntry 5 }
+
+rlAAALinePassLoginHistInetRemoteInetAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address Type."
+   ::= { rlAAALinePassLoginHistInetEntry 6 }
+
+rlAAALinePassLoginHistInetRemoteInetAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAALinePassLoginHistInetEntry 7 }
+
+
+rlAAALinePassLoginHistInetLocalInetAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address Type on login."
+   ::= { rlAAALinePassLoginHistInetEntry 8 }
+
+rlAAALinePassLoginHistInetLocalInetAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAALinePassLoginHistInetEntry 9 }
+
+rlAAALinePassLoginHistInetDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAALinePassLoginHistInetEntry 10 }
+
+
+rlAAALinePassLoginHistInetMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAALinePassLoginHistInetEntry 11 }
+
+---        Read-only table for successful login history - System Passwords
+
+rlAAASystemLoginHistInetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAASystemLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The table holds successful login history
+                       for system passwords. This table is read-only.
+                       it coexist with rlAAASystemLoginHistTable to support IPv4 and IPv6"
+   ::= { rlAAA 60 }
+
+rlAAASystemLoginHistInetEntry OBJECT-TYPE
+    SYNTAX  RlAAASystemLoginHistInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row definition for this table."
+    INDEX { rlAAASystemLoginHistInetLevel,
+            rlAAASystemLoginHistInetIndex}
+    ::= { rlAAASystemLoginHistInetTable 1 }
+
+RlAAASystemLoginHistInetEntry ::= SEQUENCE {
+    rlAAASystemLoginHistInetLevel                    INTEGER,
+    rlAAASystemLoginHistInetIndex                    Unsigned32,
+    rlAAASystemLoginHistInetServiceType              RlAAAServiceType,
+    rlAAASystemLoginHistInetRemoteInetAddressType    InetAddressType,
+    rlAAASystemLoginHistInetRemoteInetAddress        InetAddress,
+    rlAAASystemLoginHistInetLocalInetAddressType     InetAddressType,
+    rlAAASystemLoginHistInetLocalInetAddress         InetAddress,
+    rlAAASystemLoginHistInetDateTime                 DisplayString,
+    rlAAASystemLoginHistInetMrid                     Unsigned32
+}
+
+rlAAASystemLoginHistInetLevel OBJECT-TYPE
+   SYNTAX INTEGER (1..15)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User Name"
+   ::= { rlAAASystemLoginHistInetEntry 1 }
+
+rlAAASystemLoginHistInetIndex OBJECT-TYPE
+   SYNTAX Unsigned32 (1..10)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Index in History for specific user.
+                      Lower number means more recent login."
+   ::= { rlAAASystemLoginHistInetEntry 2 }
+
+rlAAASystemLoginHistInetServiceType OBJECT-TYPE
+   SYNTAX RlAAAServiceType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The service that the user uses.
+                      Service don't care is console terminal."
+   ::= { rlAAASystemLoginHistInetEntry 3 }
+
+rlAAASystemLoginHistInetRemoteInetAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address Type."
+   ::= { rlAAASystemLoginHistInetEntry 4 }
+
+rlAAASystemLoginHistInetRemoteInetAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "User remote IP address."
+   ::= { rlAAASystemLoginHistInetEntry 5 }
+
+rlAAASystemLoginHistInetLocalInetAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address Type on login."
+   ::= { rlAAASystemLoginHistInetEntry 6 }
+
+rlAAASystemLoginHistInetLocalInetAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "local Ip Address on login."
+   ::= { rlAAASystemLoginHistInetEntry 7 }
+
+rlAAASystemLoginHistInetDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date and time in the SysLog Format:
+                      DD-MMM-YYYY HH:MM:SS"
+   ::= { rlAAASystemLoginHistInetEntry 8 }
+
+rlAAASystemLoginHistInetMrid OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Mrid - indicates to which instance the connection was established "
+   ::= { rlAAASystemLoginHistInetEntry 9 }
+
+--
+-- Password complexity
+--
+
+rlAAAPasswordComplexityEnabled OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Specifies whether password complexity rules
+                     must be applied."
+      ::= { rlAAA 61 }
+
+rlAAAPasswordComplexityMinCharClasses OBJECT-TYPE
+        SYNTAX   INTEGER (0..4)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Indicates minimal number of character classes
+                     from which the password should contain characters
+                     if password complexity enabled.
+                     charater classes are : lower case, upper case,
+                     digits, special characters."
+      ::= { rlAAA 62 }
+
+rlAAAPasswordComplexityNotOldPasswordEnabled OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Specifies whether new password can be as
+                     same as old password if password complexity enabled."
+      ::= { rlAAA 63 }
+
+rlAAAPasswordComplexityCharRepeat OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Indicates that no character in new password can't be
+                     repeated more than 3 times if password complexity enabled."
+      ::= { rlAAA 64 }
+
+rlAAAPasswordComplexityNotUserNameEnabled OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Specifies whether new password can be as
+                     same as user name if password complexity enabled."
+      ::= { rlAAA 65 }
+
+rlAAAPasswordComplexityNotManufacturerEnabled OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Specifies whether new password can be as
+                     same as manufacturer name if password complexity enabled."
+      ::= { rlAAA 66 }
+
+--
+-- Password Global Aging
+--
+
+rlAAAPasswordGlobalAgingTime OBJECT-TYPE
+        SYNTAX   INTEGER (0..365)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION "Determines whether password aging should be applied.
+                     Tic doesn't have to be enabled.
+                     If == 0 then aging is disabled.
+                     Note: Actual aging will not be enabled if system
+                           doesn't have real time clock until, clock is
+                           set either by user or SNTP."
+      ::= { rlAAA 67 }
+
+
+--
+-- rlAAALocalUserVerificationAndSettingTable Table
+--
+
+rlAAALocalUserPasswordVerificationAndSettingTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlAAALocalUserPasswordVerificationAndSettingEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+   DESCRIPTION        "The table specifies per every local user, old and new passwords.
+                       Serves for verification the old password and setting a new password."
+   ::= { rlAAA 68 }
+
+rlAAALocalUserPasswordVerificationAndSettingEntry OBJECT-TYPE
+    SYNTAX  RlAAALocalUserPasswordVerificationAndSettingEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION        "The row of local user password verification and setting table."
+    INDEX { rlAAALocalUserNameString }
+    ::= { rlAAALocalUserPasswordVerificationAndSettingTable 1 }
+
+RlAAALocalUserPasswordVerificationAndSettingEntry ::= SEQUENCE {
+    rlAAALocalUserNameString                     DisplayString,
+    rlAAALocalUserVerificationOldPassword        DisplayString,
+    rlAAALocalUserSettingNewPassword             DisplayString,
+    rlAAALocalUserConfirmNewPassword             DisplayString
+}
+
+rlAAALocalUserNameString OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Local user name."
+   ::= { rlAAALocalUserPasswordVerificationAndSettingEntry 1 }
+
+rlAAALocalUserVerificationOldPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Local user old password to be verified."
+
+   ::= { rlAAALocalUserPasswordVerificationAndSettingEntry 2 }
+
+rlAAALocalUserSettingNewPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Local user new password to be set."
+
+   ::= { rlAAALocalUserPasswordVerificationAndSettingEntry 3 }
+
+rlAAALocalUserConfirmNewPassword OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION    "Local user new password for confirmation."
+
+   ::= { rlAAALocalUserPasswordVerificationAndSettingEntry 4 }
+
+
+---
+---   level 15 system password creation date
+---
+rlAAACreationDateSystemPasswordLevel15 OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "The date on which the system Password for level 15 was created.
+                      Otherwise zero size string"
+   ::= { rlAAA 69 }
+
+---
+---   level 15 system password creation date
+---
+rlAAAPasswordRecoveryDisable OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "if this MIB is set to TRUE then when user will use 'password Recovery'
+                     to the device , the configuration will automatically be erased."
+   DEFVAL { false }
+   ::= { rlAAA 70 }
+
+
+
+END

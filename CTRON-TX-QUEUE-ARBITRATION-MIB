@@ -1,0 +1,202 @@
+CTRON-TX-QUEUE-ARBITRATION-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-tx-queue-arbitration-mib.txt
+--  Revision: 01.00.03
+--  Part Number: 
+--  Date: "200501141756Z"  - Fri Jan 14 17:56 GMT 2005
+
+--  ctron-tx-queue-arbitration-mib.txt
+--  Revision: 01.00.02
+--  Part Number: 
+--  Date: October 5, 1998
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific priority queueing MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright September 1998-2005 Cabletron Systems
+
+IMPORTS
+
+      OBJECT-TYPE
+            FROM RFC-1212
+      ctTxQArb
+            FROM CTRON-MIB-NAMES
+      ifIndex
+            FROM RFC1213-MIB;
+
+-- The ctTxQArb MIB provides configuration for the priority in  
+-- which transmit queues are serviced for Cabletron 
+-- devices that support multiple transmit queues.
+
+
+ctTxQArbConfig  OBJECT IDENTIFIER ::= { ctTxQArb 1 }
+-- The ctTxQArbConfig group manages the selection of priorities
+-- for servicing a specific port group's transmit queues.
+--
+-- The implementation of this group is MANDATORY.
+
+ctTxQBufferConfig  OBJECT IDENTIFIER ::= { ctTxQArb 2 }
+-- The ctTxQBufferConfig group manages the buffer distribution
+-- mechanism for the Tx and Rx queues.
+--
+-- The implementation of this group is OPTIONAL.
+
+
+ctTxQPortGroupMapTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtTxQPortGroupEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "The ctTxQPortGroupMapTable defines the mapping of interfaces
+        to a specific port group."
+     ::= { ctTxQArbConfig 1 }
+
+ctTxQPortGroupEntry OBJECT-TYPE
+    SYNTAX CtTxQPortGroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       definition and control over interfaces supporting multiple transmit
+       queue arbitration."
+    INDEX { ifIndex }
+    ::= { ctTxQPortGroupMapTable 1 }
+
+CtTxQPortGroupEntry ::= SEQUENCE {
+      ctTxQPortGroup
+            INTEGER
+}
+
+ctTxQPortGroup OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "Indicates the transmit queue port group to which the interface
+       claims membership.  The specific interface is indicated
+       by the instancing information."
+    ::= { ctTxQPortGroupEntry 1 }
+    
+ctTxQArbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtTxQArbEntry 
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "A table containing entries to specify the approximate priority
+       for servicing of each transmit queue for each port group on the 
+       device."
+    ::= { ctTxQArbConfig 2 }
+
+ctTxQArbEntry OBJECT-TYPE
+    SYNTAX CtTxQArbEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Specifies the entries in the ctTxQArbTable."
+    INDEX { ctTxQPortGroup }
+    ::= { ctTxQArbTable 1 }
+
+CtTxQArbEntry ::= SEQUENCE {
+    ctTxQArbNumQueues
+        INTEGER,
+    ctTxQArbNumSlices
+        INTEGER,
+    ctTxQArbSetting
+        OCTET STRING
+    }
+
+ctTxQArbNumQueues OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of transmit queues for each port in this port group."
+    ::= { ctTxQArbEntry 2 }
+ 
+ctTxQArbNumSlices OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of 'slices' into which transmit resources are divided.  This
+       determines the resolution with which transmit priority can be allocated
+       to each of the transmit queues.  For example, if the number of slices
+       is 16, then transmit resources may be allocated to each transmit queue
+       in units of 1/16 (6.25% of the total).  The numbers of slices allocated
+       to all queues must add up to the value of this object (i.e., 100%)."
+    ::= { ctTxQArbEntry 3 }
+
+ctTxQArbSetting OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The approximate percentage of a port's transmit resources to
+       be allocated to each transmit queue.  This allows for fine-tuning
+       of the 'strict priority' configuration.
+
+       Under strict priority, the highest queue (ctTxQArbNumQueues - 1)
+       has the highest priority, followed by (ctTxQArbNumQueues - 2), etc.
+       Queue 0 always has the lowest priority.  All entries in a higher
+       priority queue will be transmitted before any entries from the lower
+       priority queues.  This object allows the modification of the strict 
+       priority scheme so that lower priority queues can be guaranteed some
+       access to the transmitter.
+
+       This object is an octet string in which the number of octets corresponds
+       to the number of transmit queues for each port in this port group,
+       as indicated by ctTxQArbNumQueues.  The value of the first octet 
+       represents the number of 'slices' of transmit resources to allocate to 
+       Queue 0, the second octet represents the number for Queue 1, and so
+       forth.  The sum of all the octets in the octet string must add up to 
+       the total number of slices available for the port.
+
+       For example, on a port having 4 transmit queues and where transmit 
+       resources are divided into 16 slices, writing an octet string of 
+       {0x00, 0x04, 0x04, 0x08} would have the following effect:
+
+           At least 50% of the frames transmitted are from Queue 3
+           At least 25% of the frames transmitted are from Queue 2
+           At least 25% of the frames transmitted are from Queue 1
+           No frames will be transmitted from Queue 0 until Queues 1, 2 and 3
+           are empty."
+    ::= { ctTxQArbEntry 4 }
+
+ctTxQBufferOptimizeEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    ACCESS read-write
+    STATUS optional
+    DESCRIPTION
+      "enabled  (1) - optimize system buffer distribution for default CoS queue
+       disabled (2) - use default system buffer distribution."
+    ::= { ctTxQBufferConfig 1 }
+
+END

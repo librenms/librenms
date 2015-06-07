@@ -1,0 +1,424 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-SRVCFG-DEVICE-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--       
+-- =================================================================
+
+        HUAWEI-BRAS-SRVCFG-DEVICE-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwBRASMib                     
+                                FROM HUAWEI-MIB
+                        InterfaceIndex                  
+                                FROM IF-MIB                     
+                        IpAddress, Integer32, OBJECT-TYPE                       
+                                FROM SNMPv2-SMI                 
+                        RowStatus, MacAddress, TruthValue, DisplayString                        
+                                FROM SNMPv2-TC
+                        mplsVpnVrfName
+                                FROM MPLS-VPN-MIB;
+                               
+        
+                hwBRASSrvcfgDevice MODULE-IDENTITY 
+                        LAST-UPDATED "200403041608Z"
+                        ORGANIZATION 
+                                "Huawei Technologies Co., Ltd.
+                                "
+                CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com "
+            
+                DESCRIPTION 
+                        "The MIB contains objects of module SRVCFG."
+                ::= { hwBRASMib 6 }
+        
+                hwSrvcfgDeviceMibObjects OBJECT IDENTIFIER ::= { hwBRASSrvcfgDevice 1 }
+                
+             
+                
+                hwDeviceUserTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwDeviceUserEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of device user."
+                        ::= { hwSrvcfgDeviceMibObjects 1 }
+                
+                hwDeviceUserEntry OBJECT-TYPE
+                        SYNTAX HwDeviceUserEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "Description."
+                        INDEX {mplsVpnVrfName, hwDeviceUserStartIpAddr }
+                        ::= { hwDeviceUserTable 1 }
+                
+                HwDeviceUserEntry ::=
+                        SEQUENCE { 
+                                hwDeviceUserStartIpAddr
+                                        IpAddress,
+                                hwDeviceUserEndIpAddr
+                                        IpAddress,                                        
+                                hwDeviceUserIfIndex
+                                        InterfaceIndex,
+                                hwDeviceUserIfName
+                                        DisplayString,                                        
+                                hwDeviceUserVlan
+                                        Integer32,
+                                hwDeviceUserVpi
+                                        Integer32,
+                                hwDeviceUserVci
+                                        Integer32,
+                                hwDeviceUserMac
+                                        MacAddress,
+                                hwDeviceUserDomain
+                                        DisplayString,
+                                hwDeviceUserStatus
+                                        INTEGER,
+                                hwDeviceUserRowStatus
+                                        RowStatus,
+                                hwDeviceQinQUserVlan
+                                        Integer32
+                         }
+
+                hwDeviceUserStartIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The start ip address of device user."
+                        ::= { hwDeviceUserEntry 1 }
+                        
+                hwDeviceUserEndIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end ip address of device user."
+                        ::= { hwDeviceUserEntry 2 }                        
+                
+                hwDeviceUserIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The index of interface which device user was in."
+                    ::= { hwDeviceUserEntry 3 }
+                    
+                hwDeviceUserIfName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..47))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The name of interface."
+                        ::= { hwDeviceUserEntry 4}
+                                            
+                hwDeviceUserVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vlan of device user."
+                        ::= { hwDeviceUserEntry 5 }
+                
+                hwDeviceUserVpi OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vpi of device user."
+                        ::= { hwDeviceUserEntry 6}
+                
+                hwDeviceUserVci OBJECT-TYPE
+                        SYNTAX Integer32 (0..65534)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vci of device user."
+                        ::= { hwDeviceUserEntry 7}
+                        
+                hwDeviceUserMac OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The MAC address of device user."
+                        ::= { hwDeviceUserEntry 8 }
+
+                hwDeviceUserDomain OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..200))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The domain which device user was part of."
+                        ::= { hwDeviceUserEntry 9 }
+
+                hwDeviceUserStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                ready(0),
+                detecting(1),
+                deleting(2),
+                online(3)
+                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The status of device user."
+                    ::= { hwDeviceUserEntry 10 }
+                
+                hwDeviceUserRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The row status of device user."
+                        ::= { hwDeviceUserEntry 11 }
+                
+                
+
+                hwDeviceQinQUserVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The QinQ vlan of device user."
+                                
+                        ::= { hwDeviceUserEntry 12 }
+
+                        
+              
+               hwDeviceUserTableV2 OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwDeviceUserEntryV2
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of device user.(V2)"
+                        ::= { hwSrvcfgDeviceMibObjects 2 }
+                
+                hwDeviceUserEntryV2 OBJECT-TYPE
+                        SYNTAX HwDeviceUserEntryV2
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "Description.(V2)"
+                        INDEX {hwDeviceUserVrfNameV2, hwDeviceUserStartIpAddrV2 }
+                        ::= { hwDeviceUserTableV2 1 }
+                
+                HwDeviceUserEntryV2 ::=
+                        SEQUENCE { 
+                                hwDeviceUserStartIpAddrV2
+                                        IpAddress,
+                                hwDeviceUserEndIpAddrV2
+                                        IpAddress,                                        
+                                hwDeviceUserIfIndexV2
+                                        InterfaceIndex,
+                                hwDeviceUserIfNameV2
+                                        DisplayString,                                        
+                                hwDeviceUserVlanV2
+                                        Integer32,
+                                hwDeviceUserVpiV2
+                                        Integer32,
+                                hwDeviceUserVciV2
+                                        Integer32,
+                                hwDeviceUserMacV2
+                                        MacAddress,
+                                hwDeviceUserDomainV2
+                                        DisplayString,
+                                hwDeviceUserStatusV2
+                                        INTEGER,  
+                                hwDeviceUserRowStatusV2
+                                        RowStatus,
+                                hwDeviceQinQUserVlanV2
+                                        Integer32,
+                                hwDeviceUserVrfNameV2
+                                        DisplayString
+
+                         }
+
+                hwDeviceUserStartIpAddrV2 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The start ip address of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 1 }
+                        
+                hwDeviceUserEndIpAddrV2 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end ip address of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 2 }                        
+                
+                hwDeviceUserIfIndexV2 OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The index of interface which device user was in.(V2)"
+                    ::= { hwDeviceUserEntryV2 3 }
+                    
+                hwDeviceUserIfNameV2 OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..47))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The name of interface.(V2)"
+                        ::= { hwDeviceUserEntryV2 4}
+                                            
+                hwDeviceUserVlanV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vlan of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 5 }
+                
+                hwDeviceUserVpiV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vpi of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 6}
+                
+                hwDeviceUserVciV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..65534)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vci of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 7}
+                        
+                hwDeviceUserMacV2 OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The MAC address of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 8 }
+
+                hwDeviceUserDomainV2 OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..64))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The domain which device user was part of.(V2)"
+                        ::= { hwDeviceUserEntryV2 9 }
+
+                hwDeviceUserStatusV2 OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                ready(0),
+                detecting(1),
+                deleting(2),
+                online(3)
+                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The status of device user.(V2)"
+                    ::= { hwDeviceUserEntryV2 10 }
+                        
+                hwDeviceUserRowStatusV2 OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The row status of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 11 }
+                                        
+                hwDeviceQinQUserVlanV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The QinQ vlan of device user.(V2)"                                
+                        ::= { hwDeviceUserEntryV2 12 }
+
+                hwDeviceUserVrfNameV2 OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..31))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vpn instance of device user.(V2)"
+                        ::= { hwDeviceUserEntryV2 13 }
+
+           --  ============== conformance information ==============
+        hwSrvcfgDeviceConformance OBJECT IDENTIFIER ::= { hwBRASSrvcfgDevice 2 }
+        
+        
+        hwSrvcfgDeviceCompliances OBJECT IDENTIFIER ::= { hwSrvcfgDeviceConformance 1 }
+        hwSrvcfgDeviceCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwDeviceUserGroup,
+                                hwDeviceUserV2Group}  
+                                               
+              ::= { hwSrvcfgDeviceCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwDeviceUserGroups OBJECT IDENTIFIER ::= { hwSrvcfgDeviceConformance 2 } 
+        
+        hwDeviceUserGroup OBJECT-GROUP
+            OBJECTS { 
+                                hwDeviceUserStartIpAddr,
+                                hwDeviceUserEndIpAddr,                                        
+                                hwDeviceUserIfIndex,
+                                hwDeviceUserIfName,                                        
+                                hwDeviceUserVlan,
+                                hwDeviceUserVpi,
+                                hwDeviceUserVci,
+                                hwDeviceUserMac,
+                                hwDeviceUserDomain,
+                                hwDeviceUserStatus,
+                                hwDeviceUserRowStatus,
+                                hwDeviceQinQUserVlan}    
+            STATUS current
+            DESCRIPTION 
+                "The Device User group."
+            ::= { hwDeviceUserGroups 1 }
+            
+        hwDeviceUserV2Group OBJECT-GROUP
+            OBJECTS { 
+                                hwDeviceUserStartIpAddrV2,
+                                hwDeviceUserEndIpAddrV2,                                        
+                                hwDeviceUserIfIndexV2,
+                                hwDeviceUserIfNameV2,                                        
+                                hwDeviceUserVlanV2,
+                                hwDeviceUserVpiV2,
+                                hwDeviceUserVciV2,
+                                hwDeviceUserMacV2,
+                                hwDeviceUserDomainV2,
+                                hwDeviceUserStatusV2,
+                                hwDeviceUserRowStatusV2,
+                                hwDeviceQinQUserVlanV2,
+                                hwDeviceUserVrfNameV2}    
+            STATUS current
+            DESCRIPTION 
+                "The Device User group.(V2)"
+            ::= { hwDeviceUserGroups 2 }
+
+             
+                    
+        --  ============== conformance information define end ==============   
+    
+                        
+        END

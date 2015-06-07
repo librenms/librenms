@@ -1,0 +1,171 @@
+CTRON-ETWMIM-MIB DEFINITIONS ::= BEGIN
+
+        --  ETWMIM-MIB
+        --  Revision: 0.02.00
+        --  Part Number: 2170991
+        --  Date: August 14, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+        -- 
+        -- 
+        IMPORTS
+                        OBJECT-TYPE                     FROM RFC-1212
+                        ctPModuleETWMIM                 FROM CTRON-MIB-NAMES;
+
+
+        etwDbExist OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                exists(1),
+                                no-exists(2)
+                                }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Denotes whether a T1 daughter board is attached to the 
+                         Etwmim card being managed"
+                ::= { ctPModuleETWMIM 1 }
+
+        etwDbEnabled OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object exists if etwDbExist is 1. Setting
+                         this object to 1 will cause the WAN port to use the
+                         daughterboard T1 port. Setting this object to 2
+                         will cause the WAN port to use the synchronous port"
+                ::= { ctPModuleETWMIM 2 }       
+        
+        etwDbFracToggle OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                update-table(1),
+                                display-new(2),
+                                display-old(3),
+                                restore-old(4)
+                                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object exists if etwDbExist is 1.  Setting this
+                        object to 1 will cause the T1 fractional table to be
+                        updated with the new values, as entered. Setting this
+                        object to 2, will cause the T1 fractional table to be
+                        the table as it is being entered. Setting this object
+                        to 3, will cause the T1 fractional table to be the
+                        table that is currently in use, regardless of any
+                        changes being entered.  Setting this object to 4, will
+                        cause any changes that have been made to the fractional
+                        table since the last update-table to be deleted."
+                REFERENCE 
+                        "IETF RFC 1232"
+                ::= { ctPModuleETWMIM 3 }       
+
+        etwFWRev        OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(8))
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Denotes the revision of firmware in the module.
+                        The format of the string is xx.xx.xx, where the first
+                        pair indicates version, and the second pair indicates
+                        revision."
+                ::= { ctPModuleETWMIM 4 }
+
+        etwHWRev        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Denotes the revision of hardware."
+                ::= { ctPModuleETWMIM 5 }
+
+        etwEpimEnabled OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object gives the status of the EPIM port on the
+                        etwmim.  A value of 1 indicates that the hardware has
+                        been set to use the Epim port for the ethernet
+                        connection.  A value of 2 indicates that the hardware
+                        has been set to use the A channel for the ethernet
+                        connection"
+                ::=  { ctPModuleETWMIM 6 }
+
+        etwEpimType             OBJECT-TYPE
+                SYNTAX  OBJECT IDENTIFIER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Identifies the type of EPIM that is present in the
+                        EPIM slot. The value is allocated in the Ctron naming 
+                        tree."
+                ::=     { ctPModuleETWMIM 7 }
+
+        etwEpimLink             OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                link-established(1),
+                                link-not-established(2),
+                                link-unknown(3)
+                                }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object will indicate whether a link is
+                        established on the EPIM link.  A value of 1 indicates
+                        that a link is established. A value of 2 indicates that
+                        a link is not established.  A value of 3 indicates that
+                        the status of the link is unknown or not valid for the
+                        type of Epim installed."
+                ::=     { ctPModuleETWMIM 8 }
+
+        etwClearNvramOnBoot     OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "When set to a 1, the system will clear all persistant
+                         objects, except for the download objects,  from nvram 
+                         on the next system boot"
+                ::=     { ctPModuleETWMIM 9 }
+
+END

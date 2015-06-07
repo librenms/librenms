@@ -1,0 +1,3532 @@
+CTRON-WAN-MIB DEFINITIONS ::= BEGIN
+
+        --  CTRON-WAN-MIB  The Cabletron Wide area MIB.
+        --  Revision: 01.08.06
+        --  Part Number: 2170989
+        --  Date:  May 20, 1998
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+    IMPORTS
+            OBJECT-TYPE             FROM RFC-1212
+            ctWan                   FROM CTRON-MIB-NAMES
+            DisplayString           FROM RFC1213-MIB
+            IpAddress, Counter      FROM RFC1155-SMI;
+
+         -- variables
+                Index ::= INTEGER
+                DLCI  ::= INTEGER
+                -- DisplayString            ::= OCTET STRING
+
+--====================================================================
+    -- Groups
+
+    ctWanConnection OBJECT IDENTIFIER   ::= { ctWan 1 }
+
+    ctWanDs1        OBJECT IDENTIFIER   ::= { ctWan 2 }
+
+    ctWanRs232      OBJECT IDENTIFIER   ::= { ctWan 3 }
+
+    ctFrDcp         OBJECT IDENTIFIER   ::= { ctWan 4 }
+
+    ctDDS           OBJECT IDENTIFIER   ::= { ctWan 5 }
+
+    ctDs1Alarms     OBJECT IDENTIFIER   ::= { ctWan 6 }
+
+    ctIPPQFilters  OBJECT IDENTIFIER   ::= { ctWan 7 }
+
+    ctWanHDSLExt    OBJECT IDENTIFIER   ::= { ctWan 8 }
+
+--  ctWanConnection Group
+--  This group is mandatory for all platforms that have one or more
+--  Wan Connections
+
+    wanNumConnections OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This objects describes the number of wan connections on the
+                platform. A wan connection may have one or two physical ports
+                of which only one can be active at any time."
+        ::= { ctWanConnection 1 }
+
+    wanConnTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanConnEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of wan connection entries. The number of wan
+                connection entries is given by the value of wanNumConnections."
+        ::= { ctWanConnection 2 }
+
+    wanConnEntry OBJECT-TYPE
+        SYNTAX  WanConnEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A wan connection entry containing objects relating to
+                the particular wan connection."
+        INDEX { wanConnIndex }
+        ::= { wanConnTable 1 }
+
+    WanConnEntry ::=
+        SEQUENCE {
+            wanConnIndex
+                INTEGER,
+            wanConnNumPhysPorts
+                INTEGER,
+            wanConnDefaultPhysPort
+                INTEGER,
+            wanConnActivePhysPort
+                INTEGER
+            }
+
+    wanConnIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each wan connection. Its value ranges
+                between 1 and the value wanNumConnections."
+        ::= { wanConnEntry 1 }
+
+    wanConnNumPhysPorts  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of physical ports that exist on this wan
+                 connection."
+        ::= { wanConnEntry 2 }
+
+    wanConnDefaultPhysPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The default physical port for this connection.  This
+                indicates the physical port that should be used on this wan
+                connection. If redundancy is not enabled, this physical port
+                will always be used. If redundancy is enabled, the physical
+                port given here will be considered the primary physical port.
+                The value of this object must be set to the index of a
+                valid physical port (wanPhysPortIndex) for this wan connection."
+        ::= { wanConnEntry 3 }
+
+    wanConnActivePhysPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The physical port that is currently active for this wan
+                connection. The value of this object indicates the
+                wanPhysPortIndex for the active port."
+        ::= { wanConnEntry 4 }
+
+
+    wanPhysPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanPhysPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of the descriptions of the physical ports of this
+                 platform. The number of entries is given by the value
+                 of wanConnNumPhysPort for each Wan Connection."
+        ::= { ctWanConnection 3 }
+
+    wanPhysPortEntry OBJECT-TYPE
+        SYNTAX  WanPhysPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A physical port entry. It contains objects relating to a
+                given physical port"
+        INDEX   { wanPhysPortConnectionIndex, wanPhysPortIndex }
+        ::= { wanPhysPortTable 1 }
+
+    WanPhysPortEntry ::=
+        SEQUENCE {
+            wanPhysPortConnectionIndex
+                INTEGER,
+            wanPhysPortIndex
+                INTEGER,
+            wanPhysPortType
+                INTEGER,
+            wanPhysPortSpecificMib
+                OBJECT IDENTIFIER
+            }
+
+    wanPhysPortConnectionIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A value indicating the wan connection this physical port
+                is located on."
+        ::= { wanPhysPortEntry 1 }
+
+    wanPhysPortIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each physical port on a wan connection.
+                Its value ranges between 1 and the value wanConnNumPhysPorts."
+        ::= { wanPhysPortEntry 2 }
+
+    wanPhysPortType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                t1(2),
+                e1(3),
+                synchronous(4),
+                dds(5),
+                di(6),
+                hdsl(7),
+                bri(8),
+                ds30(9),
+                t1DDS(10)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of physical port that this entry describes. None
+                indicates that the physical port has no connector."
+        ::= { wanPhysPortEntry 3 }
+
+    wanPhysPortSpecificMib OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+         ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object identifies an instance of the index object in
+         the first group of objects in the MIB specific to the
+         physical port."
+        ::= { wanPhysPortEntry 4 }
+
+    wanInterfaceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The interface table for a physical port on a wan connection.
+                It is a list of items that are pertinent to the interfaces
+                that are part of this physical port. The number of entries
+                is dependent on the wanPhysPortType for the interface.
+                If the wanPhysPortType is none, there will be no entries
+                in the table for the port. If the wanPhysPortType is t1,
+                there will be 24 entries in this table for the port.
+                If the wanPhysPortType is e1, there will be 30 entries
+                in this table for the port. If the wanPhysPortType is
+                synchronous, there will be one entry in this table for the
+                port. "
+        ::= { ctWanConnection 4 }
+
+    wanInterfaceEntry OBJECT-TYPE
+        SYNTAX  WanInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A wan connection physical port interface entry. It
+                contains objects relating to an interface that is defined
+                for this physical port and this wan connection."
+        INDEX   { wanInterfaceConnectionIndex, wanInterfacePhysPortIndex,
+                wanInterfaceEntryIndex }
+        ::= { wanInterfaceTable 1}
+
+    WanInterfaceEntry  ::=
+        SEQUENCE {
+            wanInterfaceConnectionIndex
+                INTEGER,
+            wanInterfacePhysPortIndex
+                INTEGER,
+            wanInterfaceEntryIndex
+                INTEGER,
+            wanInterfaceEntryIfIndex
+                INTEGER,
+            wanInterfaceEntryProtocol
+                INTEGER,
+            wanInterfaceEntryCompression
+                INTEGER,
+            wanInterfaceEntryMTU
+                INTEGER,
+            wanInterfaceEntryLineCoding
+                INTEGER,
+            wanInterfaceEntryCrcLength
+                INTEGER,
+            wanInterfaceEntryLexProtocolEnable
+                INTEGER,
+            wanInterfaceEntryLexProtocolStatus
+                INTEGER,
+            wanInterfaceEntryCompRatio
+                OCTET STRING,
+            wanInterfaceEntryCompStatus
+                INTEGER,
+            wanInterfaceEntryBackUpIfEnable
+                INTEGER
+            }
+    wanInterfaceConnectionIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This value is the wan connection that this interface
+                 exists on."
+        ::= { wanInterfaceEntry 1}
+
+    wanInterfacePhysPortIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This value is the physical port of the wan connection
+                that this interface exists on."
+        ::= { wanInterfaceEntry 2}
+
+    wanInterfaceEntryIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each interface of this physical port.
+                It is a value between 1 and the number of interfaces that
+                exist for the current port. The number of interfaces for
+                each type of port is: 24 for a port type (wanPhysPortType)
+                of 't1', 30 for a port type of 'e1',  and 1 for a port type
+                of 'synchronous'. There will be no entries if the port type
+                is 'none'."
+        ::= { wanInterfaceEntry 3}
+
+    wanInterfaceEntryIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this entry
+                in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { wanInterfaceEntry 4}
+
+    wanInterfaceEntryProtocol   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The protocol that should be run on this interface. Values
+                are equivalent to those defined for ifType in Mib-II.
+                Accepted values are product dependent."
+        REFERENCE
+                "rfc-1213, product literature"
+        ::= { wanInterfaceEntry 5}
+
+    wanInterfaceEntryCompression    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on(1),
+                off(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether data compression should take
+                place on this interface."
+        ::= { wanInterfaceEntry 6}
+
+    wanInterfaceEntryMTU    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+         DESCRIPTION
+                "The MTU to be negotiated for this interface. This will not
+                be updated with the actual MTU, which can be found in the
+                ifTable."
+        ::= { wanInterfaceEntry 7}
+
+    wanInterfaceEntryLineCoding OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none (1),
+                jBZS (2),
+                invHDLC (3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object describes the variety of Zero Code suppression
+                on this interface. For an interface on a Ds1 Port, the valid
+                values depend on the value of the Ds1ConfigLineCode object.
+                If that object is set to ds1xB8ZS, then this object can be
+                set to none, JBZS, or InvHDLC. If the value of
+                Ds1ConfigLineCode is set to ds1xAMI, then this object can
+                only be set to JBZS, or InvHDLC.  For an interface on a
+                Synchronous Port, the valid values are none or InvHDLC.
+                JBZS refers to Jammed Bit Zero suppression, which forces a
+                1 bit every 8 bit periods. InvHDLC refers to inverting
+                the HDLC data for the interface. None refers to a mode
+                in which some other means, such as with the Ds1ConfigLineCode
+                object set to dsx1B8ZS, is used to insure pulse density
+                requirements."
+        REFERENCE
+                "rfc-1406"
+        ::= { wanInterfaceEntry 8}
+
+    wanInterfaceEntryCrcLength  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sixteen-bits(1),
+                thirty-two-bits(2)
+                }       
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Length of the CRC for this interface. Not all platforms
+                will allow all options."
+        ::= { wanInterfaceEntry 9}
+
+    wanInterfaceEntryLexProtocolEnable  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+                }
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "This switch acts in concert with the wanInterfaceEntryProtocol
+                object.  To activate LEX, this object should first be set to
+                enable (1), then set the wanInterfaceEntryProtocol to PPP.  The 
+                enable will have no effect if PPP is not selected.  If the
+                wanInterfaceEntryProtocol is selected first, the default NCP of
+                BNCP will be selected.  To De-select LEX, you must set this 
+                object to disable (2), and wanInterfaceEntryProtocol to NONE or
+                reset the device.  Just selecting disable (2) will not tear down
+                the connection."
+        ::= { wanInterfaceEntry 10}
+    
+    wanInterfaceEntryLexProtocolStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                bound (1),
+                unbound (2)
+                }
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object reflects the current state of the link.  The device
+                is said to be bound to the router when the physical link is OK,
+                the LEX negotiation is successful, and the router has been
+                configured correctly to communicate with this particular LAN
+                Extender."
+        ::= { wanInterfaceEntry 11}
+
+    wanInterfaceEntryCompRatio    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ratio of uncompressed to compressed transmitted data. 
+                If the data compression status is off, 1:1 will be displayed"
+
+        ::= { wanInterfaceEntry 12}
+
+    wanInterfaceEntryCompStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on(1),
+                off(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "On indicates that the compression has been successfully
+                 negotiated and is operating. Off indicates that the
+                 compression negotiation has failed and compression is not
+                 operating at this time, or compression has been terminated
+                 by either peer."
+        ::= { wanInterfaceEntry 13}
+
+wanInterfaceEntryBackUpIfEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to select the Call-backup option.
+                 A value of 1 is used to enable the option and a value of
+                 2 to disable it."
+        ::= { wanInterfaceEntry 14}
+
+-- Wan Ds1 Group
+-- This group is required for any platforms that have a t1 or e1 physical port.
+--
+    wanDs1ExtensionsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanDs1ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard ds1 configuration
+                table. It is a list of items that are pertinent to ds1 ports
+                on a platform. There is one entry per ds1 physical port on
+                the platform"
+        ::= { ctWanDs1 1 }
+
+    wanDs1ExtensionsEntry OBJECT-TYPE
+        SYNTAX  WanDs1ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A ds1 extensions entry containing objects relating to
+                 the particular ds1 physical port"
+        INDEX   { wanDs1ExtensionsEntryIndex }
+        ::= { wanDs1ExtensionsTable 1 }
+
+    WanDs1ExtensionsEntry ::=
+        SEQUENCE {
+            wanDs1ExtensionsEntryIndex
+                INTEGER,
+            wanDs1ExtensionsNumInterfaces
+                INTEGER,
+            wanDs1ExtensionsToggleFracTable
+                INTEGER,
+            wanDs1ExtensionsLineBuildOut
+                INTEGER,
+            wanDs1ExtensionsCFADuration
+                INTEGER,
+            wanDs1ExtensionsDIEnable
+                INTEGER,
+            wanDs1ExtensionsTotalValidIntervals
+                Counter,
+            wanDs1ExtensionsBertTestMode
+                INTEGER,
+            wanDs1ExtensionsBertRun
+                INTEGER,
+            wanDs1ExtensionsBertCurrentResults
+                INTEGER,
+            wanDs1ExtensionsBertCumulativeResults
+                INTEGER,
+            wanDs1ExtensionsBertPeakResults
+                INTEGER,
+            wanDs1ExtensionsBertAverageResult
+                INTEGER,
+            wanDs1ExtensionsBertTestPattern
+                INTEGER,
+            wanDs1ExtensionsBertSamplePeriod
+                INTEGER,
+            wanDs1ExtensionsBertNumPeriods
+                Counter,
+            wanDs1ExtensionsBertTestTraps
+                INTEGER,
+            wanDs1ExtensionsBertDataStatus
+                INTEGER
+            }
+
+    wanDs1ExtensionsEntryIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ds1 physical port on the platform."
+        ::= { wanDs1ExtensionsEntry 1 }
+
+    wanDs1ExtensionsNumInterfaces       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of interfaces on this physical port. This
+                number indicates the number of  entries this physical port
+                uses in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { wanDs1ExtensionsEntry 2 }
+
+    wanDs1ExtensionsToggleFracTable     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                update-table(1),
+                display-new(2),
+                display-old(3),
+                restore-old(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Setting this object to 1 will cause the Ds1 Fractional Table
+                 to be updated with the new values, as entered.
+                 Setting this object to 2, will cause the Ds1 Fractional Table
+                 to view as the table being entered.
+                 Setting this object to 3, will cause the Ds1 Fractional Table
+                 to be the table that is currently in use, regardless of
+                 any changes being entered.
+                 Setting this object to 4, will cause any changes that have
+                 been made to the Ds1 Fractional Table since the last
+                 update-table to be deleted.
+                 For physical ports of type synchronous, this object will
+                 have no affect, and will always return a 1."
+        REFERENCE
+                "rfc-1406"
+        ::= { wanDs1ExtensionsEntry 3 }
+
+    wanDs1ExtensionsLineBuildOut        OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                zero(2),
+                minus-7point5(3),
+                minus-15(4),
+                a133to266feet(5),
+                a266to399feet(6),
+                a399to533feet(7),
+                a533to655feet(8)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The line build out setting for this ds1 physical port.
+                Unknown indicates that the setting is neither readable or
+                writable."
+        ::= { wanDs1ExtensionsEntry 4 }
+
+    wanDs1ExtensionsCFADuration OBJECT-TYPE
+        SYNTAX  INTEGER(1..15)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The length of time (in seconds), that the ds1 port will
+                remain in the Carrier Failure Alarm state after the
+                alarm condition has cleared."
+    ::= { wanDs1ExtensionsEntry 5 }
+
+    wanDs1ExtensionsDIEnable    OBJECT-TYPE
+        SYNTAX  INTEGER{
+                enable(1),
+                disable(2),
+                diDataEnabled(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables or disables Drop and Insert functionality on a
+                D/I WPIM.  If enabled, all zero assigned timeslots will 
+                designate D/I interface channels, if disabled all zero 
+                channels will designate dummy channels as on a T1 or E1.
+                If this object is set to diDataEnabled the zero channels
+                will designate D/I interface channels and data to and
+                from the device will be transmitted or received on the
+                D/I port instead of the N/I port."
+        ::= { wanDs1ExtensionsEntry 6 }
+
+    wanDs1ExtensionsTotalValidIntervals OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of  previous  intervals  for  which
+                valid data was collected for the DS1 mib, which
+                is currently RFC1406.  This counter is similar to
+                RFC1406 dsx1ValidIntervals except that the count
+                represents the total number of complete 15 minute
+                intervals since the ds1 interface has been online,
+                and does not stop at the 24 hour period."
+        ::= { wanDs1ExtensionsEntry 7 }
+
+    wanDs1ExtensionsBertTestMode        OBJECT-TYPE
+        SYNTAX  INTEGER{
+        none(1),
+        internal(2),
+        manual(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to request that a type of
+                process be in control of the testing function.
+                This is used to differentiate between automated test 
+                procedures and those manually controlled by a user.  
+                When read, this object reflects which type of process 
+                is actually in control of the testing function.  The 
+                implementation is free to prioritize or deny requests
+                in a proprietary manner."
+        ::= { wanDs1ExtensionsEntry 8 }
+
+    wanDs1ExtensionsBertRun   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+                "Controls the sending of test data over this physical 
+                port.  The data is a pattern described by 
+                wanDs1ExtensionsBertTestPattern." 
+        ::= { wanDs1ExtensionsEntry 9 }
+
+    wanDs1ExtensionsBertCurrentResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the results of the testing for the
+                last completed sampling period.  A non-negative
+                number is the error rate in bits per million bits."
+        ::= { wanDs1ExtensionsEntry 10 }
+
+    wanDs1ExtensionsBertCumulativeResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the total number of errors since the
+                testing was enabled.  It is not a rate."
+        ::= { wanDs1ExtensionsEntry 11 }
+
+    wanDs1ExtensionsBertPeakResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the highest value of 
+                wanDs1ExtensionsBertCurrentResults since the testing 
+                was enabled.  A non-negative number is the error rate 
+                in bits per million bits." 
+        ::= { wanDs1ExtensionsEntry 12 }
+
+    wanDs1ExtensionsBertAverageResult   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the average value of 
+                wanDs1ExtensionsBertCurrentResults since the testing 
+                was enabled.  A non-negative number is the error rate 
+                in bits per million bits." 
+        ::= { wanDs1ExtensionsEntry 13 }
+
+    wanDs1ExtensionsBertTestPattern     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                patternOther(1),
+                pattern1s(2),
+                pattern63(3),
+                pattern511(4),
+                pattern2047(5),
+                pattern3in24(6),
+                patternQRSS(7)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to specify the pattern of the 
+                test data."
+        ::= { wanDs1ExtensionsEntry 14 }
+
+    wanDs1ExtensionsBertSamplePeriod    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is the duration of time in seconds at
+                which the current test results will be periodically
+                written to wanDs1ExtensionsBertCurrentResults.  The 
+                range is 1 to 3600, with a default value of 10."
+        ::= { wanDs1ExtensionsEntry 15 }
+
+    wanDs1ExtensionsBertNumPeriods   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                " The number of sampling periods that have elapsed
+                during the current test run."
+        ::= { wanDs1ExtensionsEntry 16 }
+
+    wanDs1ExtensionsBertTestTraps       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to enable or disable the sending
+                of a trap at the conclusion of the measurement period.
+                The trap will contain the information described by
+                ctDs1BertCurrentResults.  The default value is disabled."
+        ::= { wanDs1ExtensionsEntry 17 }
+
+    wanDs1ExtensionsBertDataStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle(1),
+                waitingForLink(2),
+                waitingForLoopback(3),
+                running(4)
+                }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "This object provides the operating status of the
+                transmission of test data packets."
+        ::= { wanDs1ExtensionsEntry 18 }
+
+-- Wan  Rs232 Group
+--  This group is only required if any physical port on the system can be
+--  classified as rs232-like
+--
+    wanRs232ExtensionsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanRs232ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard rs232-like mib.
+                It is a list of items that are pertinent to rs232-like ports
+                on a platform. There is one entry per synchronous physical
+                port on the platform."
+        REFERENCE
+                "rfc-1317"
+        ::= { ctWanRs232 1 }
+
+    wanRs232ExtensionsEntry OBJECT-TYPE
+        SYNTAX  WanRs232ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A rs232-like extensions entry containing objects relating to
+                the particular rs232-like physical port."
+        INDEX   { wanRs232ExtensionsEntryIndex }
+        ::= { wanRs232ExtensionsTable 1 }
+
+    WanRs232ExtensionsEntry ::=
+        SEQUENCE {
+            wanRs232ExtensionsEntryIndex
+                INTEGER,
+            wanRs232ExtensionsCTSEnable
+                INTEGER,
+            wanRs232ExtensionsDSREnable
+                INTEGER
+            }
+
+    wanRs232ExtensionsEntryIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each rs232-like physical port on
+                the platform."
+        ::= { wanRs232ExtensionsEntry 1 }
+
+    wanRs232ExtensionsCTSEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                 "This object indicates whether the platform should generate
+                CTS. When disabled the platform will not generate CTS, when
+                enabled, the platform will generate CTS.  The actual state
+                of the CTS line is available in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317"
+        DEFVAL { disable }
+        ::= { wanRs232ExtensionsEntry 2 }
+
+    wanRs232ExtensionsDSREnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates whether the platform should generate
+                DSR. When disabled the platform will not generate DSR, when
+                enabled, the platform will generate DSR.  The actual state
+                of the DSR line is available in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317 "
+        DEFVAL { disable }
+        ::= { wanRs232ExtensionsEntry 3 }
+
+--  ctFrDcp Group
+--  This group is mandatory to support Data Compression Protocol 
+--  (DCP following FRF.9) for per virtual circuit basis
+
+    frDcpCircuitTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FrDcpCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table containing data compression information about 
+                specific Data Link Connection Identifiers and corresponding
+                virtual circuit. This information is used to support the
+                frCircuitTable following RFC-1315."
+        ::= { ctFrDcp 1 }
+
+    frDcpCircuitEntry OBJECT-TYPE
+        SYNTAX  FrDcpCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The data compression information regarding a single Data 
+                Link Connection Identifier."
+        INDEX { frDcpCircuitIfIndex, frDcpCircuitDlci }
+        ::= { frDcpCircuitTable 1 }
+
+    FrDcpCircuitEntry ::=
+        SEQUENCE {
+            frDcpCircuitIfIndex
+                 Index,
+            frDcpCircuitDlci
+                 DLCI,
+            frDcpCircuitEnable
+                 INTEGER,
+            frDcpCircuitStatus
+                 INTEGER,
+            frDcpCircuitRatio
+                 OCTET STRING
+            }
+
+    frDcpCircuitIfIndex OBJECT-TYPE
+        SYNTAX  Index
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex value of ifEntry that this DCP virtual circuit 
+                object is layered onto."
+        ::= { frDcpCircuitEntry 1 }
+
+    frDcpCircuitDlci OBJECT-TYPE
+        SYNTAX  DLCI
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Data Link Connection Identifier for this DCP virtual 
+                circuit object."
+        REFERENCE
+                "Draft American National Standard T1.618-1991, Section 3.3.6"
+        ::= { frDcpCircuitEntry 2 }
+
+    frDcpCircuitEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on (1),
+                off (2)          -- default
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether data compression should take place on
+                this particular end side virtual circuit."
+        ::= { frDcpCircuitEntry 3 }
+
+    frDcpCircuitStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on (1),
+                off (2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "On indicates that the compression has been successfully
+                 negotiated and is operating. Off indicates that the
+                 compression negotiation has failed and compression is not
+                 operating at this time, or compression has been terminated
+                 by either peer."
+        ::= { frDcpCircuitEntry 4 }
+
+    frDcpCircuitRatio OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (5))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ratio of uncompressed to compressed transmitted data. 
+                If the data compression status is off, 1:1 will be displayed"
+        ::= { frDcpCircuitEntry 5 }
+
+--
+-- Wan DDS Group
+-- This group is required for any platforms that have a dds physical port.
+--
+
+ddsConfigTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DdsConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The DDS Configuration Table"
+        ::= { ctDDS 1}
+
+ddsConfigEntry  OBJECT-TYPE
+        SYNTAX  DdsConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An Entry in the DDS Configuration Table"
+        INDEX   { ddsLineIndex }
+        ::= { ddsConfigTable 1 }
+
+DdsConfigEntry ::=
+        SEQUENCE {
+            ddsLineIndex
+                INTEGER,
+            ddsIfIndex
+                INTEGER,
+            ddsLineMode
+                INTEGER,
+            ddsLineCoding
+                INTEGER,
+            ddsLoopbackConfig
+                INTEGER,
+            ddsLineStatus
+                INTEGER,
+            ddsTxClockSource
+                INTEGER,
+            ddsPortInSpeed 
+                INTEGER,
+            ddsPortOutSpeed
+                INTEGER
+            }
+
+        ddsLineIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..'7fffffff'h)
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "A unique value for each dds physical port on the 
+                         platform"
+                ::= { ddsConfigEntry 1 }
+
+        ddsIfIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..'7fffffff'h)
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Index associated with this dds physical port"
+                ::= { ddsConfigEntry 2 }
+
+        ddsLineMode OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ddsPri (1),
+                        ddsCc (2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "DDS-PRI is full duplex 56k link, No framing in loop 
+                        data so loop speed is also 56k. Data stream:
+                                --d1 d2 d3 d4 d5 d6 d7--        
+
+                        DDS-CC is full duplex 64k link. Does not require framing
+                        bit but uses a same format as SC, ninth bit position is 
+                        lumped with primary channel and not used for control.
+                        Loop speed is 72k, Primary channel rate is 64k.
+                                --d1 d2 d3 d4 d5 d6 d7 F d8--"
+                ::= { ddsConfigEntry 3 }
+
+        ddsLineCoding OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ddsNone (1),
+                        ddsJBZS (2),
+                        otherLineCode (3)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object describes the variety of Zero Code 
+                        suppression on this interface.  JBZS refers to Jammed 
+                        Bit Zero suppression, which forces a 1 bit every 8 bit 
+                        periods. None refers to a mode in which some other 
+                        means is used to insure pulse density requirements."
+                ::= { ddsConfigEntry 4 }
+
+        ddsLoopbackConfig OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ddsNoLoop (1),
+                        ddsLineLoop (2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This variable represents the loop-back configuration 
+                        of the DDS interface.  ddsNoLoop means the interface is
+                        not in loop-back state, and LineLoop means the the
+                        received data is looped back out."
+                ::= { ddsConfigEntry 5 }
+
+        ddsLineStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ddsNoAlarm (1),
+                        ddsLossOfSignal (2),
+                        ddsOutOfService (3),
+                        ddsOutOfFrame (4)
+                        }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This describes the current operational
+                        status of DDS line."
+                ::= { ddsConfigEntry 6 }        
+
+        ddsTxClockSource OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ddsLoopTiming (1),
+                        ddsLocalTiming (2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The source of Transmit clock.
+                        ddsLoopTiming - indicates that the recovered receive 
+                        clock is used as transmit clock.
+                        ddsLocalTiming - indicates that a local clock source is
+                        used."
+                ::= { ddsConfigEntry 7 }
+
+        ddsPortInSpeed OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        " This variable describes the current operational 
+                         receive speed of DDS line.  It is a read only value
+                         based entirely on DDS type (CC or PRI)."
+                ::= { ddsConfigEntry 8 }        
+        
+        ddsPortOutSpeed OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This variable describes the current operational
+                         transmit speed of DDS line.  It is a read only value
+                         based entirely on DDS type CC or PRI"
+                ::= { ddsConfigEntry 9 }        
+
+--
+-- Wan Alarms Group
+-- This group is required for any platforms that support
+-- Cabletron's WAN Alarm processing functionality
+--
+
+--
+-- DS1 Alarms Global Configuration Variables
+--
+--      These parameters apply globally to the DS1 Alarms
+--      entity.  These variables allow the user to program
+--      DS1 alarm characteristics to be the same for all DS1
+--      lines installed in the device.  The other option
+--      available to the user would be to configure each DS1
+--      line individually, using the parameters in the DS1
+--      Alarms Configuration Table.
+--
+
+        ds1AlarmsGlobalConfigGroup OBJECT IDENTIFIER ::= { ctDs1Alarms 1 }
+
+        ds1AlarmGlobalAdmin     OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Monitoring Application for all DS1 circuits on the 
+                        device."
+                ::= { ds1AlarmsGlobalConfigGroup 1}
+
+        ds1AlarmGlobalAutoRecovery      OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Automatic Recovery feature for all DS1 circuits on 
+                        the device. For those devices that support ds1
+                        alarm monitoring, but do not support the automatic
+                        recovery feature, this object always returns disabled,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 2}
+
+        ds1AlarmGlobalTrapEnable        OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        SNMP Trap generation feature for all DS1 circuits on 
+                        the device.  This object operates in conjunction with 
+                        configuration of objects in the ctron-trap-mib.txt"
+                ::= { ds1AlarmsGlobalConfigGroup 3}
+
+        ds1AlarmGlobalESCount   OBJECT-TYPE
+                SYNTAX  INTEGER (1..300)        -- default is 100
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESInterval to set 
+                        the threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, 
+                        measured in minutes, is exceeded.  The default 
+                        Errored Seconds alarm condition is 100 errored seconds 
+                        over a 6 minute time interval."
+                ::= { ds1AlarmsGlobalConfigGroup 4}
+
+        ds1AlarmGlobalESInterval        OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 6 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ds1AlarmGlobalESCount to 
+                        set the threshold for alarm generation when the number 
+                        of Errored Seconds for a specified time interval, 
+                        measured in minutes, is exceeded.  The default
+                        Errored Seconds alarm condition is 100 errored seconds 
+                        over a 6 minute time interval."
+                ::= { ds1AlarmsGlobalConfigGroup 5}
+
+        ds1AlarmGlobalBPVErrorRate      OBJECT-TYPE 
+                SYNTAX  INTEGER (5..9)  -- default is 6
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the negative exponent of 10, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        over intervals defined by ds1AlarmGlobalBPVInterval.  
+                        For example, for a ds1AlarmGlobalBPVErrorRate value 
+                        of 6 used with a ds1AlarmGlobalBPVInterval of 15, 
+                        an alarm is generated when a 15 minute period has an 
+                        average error rate which exceeds 1 Bipolar Violation 
+                        (Code Violation for E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 6}
+
+        ds1AlarmGlobalBPVInterval       OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 15 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the interval, used in monitoring 
+                        Bipolar Violations (Code Violations for E1)
+                        with thresholds defined by ds1AlarmGlobalBPVErrorRate.
+                        For example, for a ds1AlarmGlobalBPVErrorRate value 
+                        of 6 used with a ds1AlarmGlobalBPVInterval of 15, an 
+                        alarm is generated when a 15 minute period has an 
+                        average error rate which exceeds 1 Bipolar Violation 
+                        (Code Violation for E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 7}
+
+        ds1AlarmGlobalManualRecovery    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        recover(1)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "To cause a manual recovery to occur on all Ds1 circuits, this
+                        object is set to a 1.  It is always read as a 1.  The recovery 
+                        will occur only when automatic recovery is disabled."
+                ::= { ds1AlarmsGlobalConfigGroup 8}
+
+--
+-- DS1 Alarms Configuration Table
+--
+--      The DS1 alarm table structure contains the same information as the
+--      global configuration objects, but allows seperate configuratoin of 
+--      specific DS1 circuits contained on the device
+--
+        ds1AlarmConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF Ds1AlarmConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Table containing objects used to configure DS1 alarm 
+                        functionality on a per DS1 basis."
+                ::= { ctDs1Alarms 2 }
+        
+        ds1AlarmConfigEntry OBJECT-TYPE
+                SYNTAX      Ds1AlarmConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single entry."
+                INDEX       { ds1PhysNum }
+                ::= { ds1AlarmConfigTable 1 }
+        
+        Ds1AlarmConfigEntry ::=
+                SEQUENCE {
+                        ds1PhysNum
+                        INTEGER,
+                        ds1AlarmAdmin
+                        INTEGER,
+                        ds1AlarmAutoRecovery
+                        INTEGER,
+                        ds1AlarmTrapEnable
+                        INTEGER,
+                        ds1AlarmESCount
+                        INTEGER,
+                        ds1AlarmESInterval
+                        INTEGER,
+                        ds1AlarmBPVErrorRate
+                        INTEGER,
+                        ds1AlarmBPVInterval
+                        INTEGER,
+                        ds1AlarmManualRecovery
+                        INTEGER
+                        }
+        
+        ds1PhysNum    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "The value for this object is equal to the value
+                        of a unique physical connection identifier associated
+                        with this DS1 which is clearly labeled on the device.
+                        For those products that do not have a DS1 identifier
+                        labeled on the device, the value for this object is
+                        the same as rfc1406 dsx1LineIndex."
+                ::= { ds1AlarmConfigEntry 1 }
+        
+        ds1AlarmAdmin   OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Monitoring Application for this DS1 circuit."
+                ::= { ds1AlarmConfigEntry 2}
+
+        ds1AlarmAutoRecovery    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Automatic Recovery feature for this DS1 circuit.
+                        For those devices that support ds1
+                        alarm monitoring, but do not support the automatic
+                        recovery feature, this object always returns disabled,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 3}
+
+        ds1AlarmTrapEnable      OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        SNMP Trap generation feature for this DS1 circuit.
+                        This object operates in conjunction with configuration 
+                        of objects in the ctron-trap-mib.txt"
+                ::= { ds1AlarmConfigEntry 4}
+
+        ds1AlarmESCount OBJECT-TYPE
+                SYNTAX  INTEGER (1..300)        -- default is 100
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESInterval to set 
+                        the threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, measured 
+                        in minutes, is exceeded.  The default Errored Seconds 
+                        alarm condition is 100 errored seconds over a 6 minute
+                        time interval."
+                ::= { ds1AlarmConfigEntry 5}
+
+        ds1AlarmESInterval      OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 6 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESCount to set the 
+                        threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, measured 
+                        in minutes, is exceeded.  The default Errored Seconds 
+                        alarm condition is 100 errored seconds over a 6 minute 
+                        time interval."
+                ::= { ds1AlarmConfigEntry 6}
+
+        ds1AlarmBPVErrorRate    OBJECT-TYPE
+                SYNTAX  INTEGER (5..9)  -- default is 6
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the negative exponent of 10, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        over intervals defined by ds1AlarmBPVInterval.  For 
+                        example, for a ds1AlarmBPVErrorRate value of 6 used 
+                        with a ds1AlarmBPVInterval of 15, an alarm is generated 
+                        when a 15 minute period has an average error rate which 
+                        exceeds 1 Bipolar Violation (Code Violation for E1) per
+                        million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 7}
+
+        ds1AlarmBPVInterval     OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 15 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the interval, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        with thresholds defined by ds1AlarmBPVErrorRate.  For 
+                        example, for a ds1AlarmBPVErrorRate value of 6 used 
+                        with a ds1AlarmBPVInterval of 15, an alarm is generated 
+                        when a 15 minute period has an average error rate
+                        which exceeds 1 Bipolar Violation (Code Violation for 
+                        E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 8}
+
+        ds1AlarmManualRecovery  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        recover(1)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "To cause a manual recovery to occur, this object is set
+                        to a 1.  It is always read as a 1.  The recovery will 
+                        occur only when automatic recovery is disabled."
+                ::= { ds1AlarmConfigEntry 9}
+
+--
+-- Wan Internet Protocol Priority Queue Filters Group
+-- This group is required for any platforms that support
+-- Cabletron's WAN IP Priority Queue processing functionality
+--
+
+--
+-- IP PQ Configuration Variables
+--
+--      These parameters apply to the IP Priority Queue
+--      entity.  These variables allow the user to program
+--      IP addresses in a filtering database.  The database
+--      of IP addresses are used when a WAN service is over
+--      subscribed, and the packet would normally be discarded.
+--      If the IP PQ admin status is enabled, and the IP 
+--      address of the packet to be discarded matches one
+--      programmed in the database, an attempt will be made
+--      to use high priority, reserved, resources to transmit
+--      the packet.  The addresses programmed in this table
+--      should be reserved for those packets which MUST be
+--      transmitted.  Some examples would be RIP, and SNMP
+--      packets, who's loss would cause major networking
+--      problems for the system.
+--
+
+        ipPQConfigGroup OBJECT IDENTIFIER ::= { ctIPPQFilters 1 }
+
+        ipPQAdmin       OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the IP Priority Queue
+                        Forwarding Application."
+                ::= { ipPQConfigGroup 1}
+
+        iPPQMaxEntries  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Returns the maximum number of IP address entries 
+                        supported by the IP Priority Queue application on 
+                        this device."
+                ::= { ipPQConfigGroup 2}
+
+        iPPQNumEntries  OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Get the number of IP address entries currently
+                        programmed in the ipPQAddressTable."
+                ::= { ipPQConfigGroup 3}
+
+        iPPQAddAddress OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Add an IP address to the ipPQAddressTable. Always
+                        read as a 0.0.0.0."
+                ::= { ipPQConfigGroup 4 }
+          
+        iPPQDelAddress OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Delete an IP address from the ipPQAddressTable.
+                        Always read as a 0.0.0.0."
+                ::= { ipPQConfigGroup 5 }
+          
+--
+--
+--
+-- IP Priority Queue Address Table
+--
+--      The IP PQ table contains a list of IP adresses used with the 
+--      Priority Queue filtering mechanism. 
+--
+        ipPQAddressTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF IpPQAddressEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Table containing IP addresses, used in an
+                        IP Priority Queue Forwarding function."
+                ::= { ctIPPQFilters 2 }
+        
+        ipPQAddressEntry OBJECT-TYPE
+                SYNTAX      IpPQAddressEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single entry."
+                INDEX       { ipPQAddressId }
+                ::= { ipPQAddressTable 1 }
+        
+        IpPQAddressEntry ::=
+                SEQUENCE {
+                        ipPQAddressId
+                        INTEGER,
+                        ipPQIPAddress
+                        IpAddress
+                        }
+        
+        ipPQAddressId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence
+                        of IP PQ address entries."
+                ::= { ipPQAddressEntry 1 }
+          
+        ipPQIPAddress    OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns an IP address associated with a specific
+                        entry in this table."
+                ::= { ipPQAddressEntry 2 }
+
+    --
+    -- HDSL 15 Minute Performance History Table
+    -- This group provides counters for UnAvailable Seconds and
+    -- Errored Seconds of all HDSL connections
+    --
+
+    ctWanHDSLPerformance15mTable  OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLPerformance15mEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "HDSL 15 minute performance table. This table provides the 
+             accumulated counts of errored seconds (ES) and unavailable 
+             seconds (UAS) for the HDSL line including the local, remote
+             units and any doublers in between during a 15 minutes period
+             for the last 24 hours. 
+
+             The table is indexed by the non-empty slot in the device and
+             the 15-minute history slot within the last 24 hours period."  
+        ::= { ctWanHDSLExt 1 }
+
+    ctWanHDSLPerformance15mEntry OBJECT-TYPE
+        SYNTAX    CtWanHDSLPerformance15mEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries in the 15 minute performance table"
+        INDEX
+            { ctWanHDSLPerformance15mConnIndex, ctWanHDSLPerformance15mSlotIndex }
+        ::= { ctWanHDSLPerformance15mTable 1 }
+
+    CtWanHDSLPerformance15mEntry ::= SEQUENCE { 
+        ctWanHDSLPerformance15mConnIndex
+            INTEGER,
+        ctWanHDSLPerformance15mSlotIndex
+            INTEGER,
+        ctWanHDSLHLULoop1UAS15m
+            INTEGER,
+        ctWanHDSLHLULoop1ES15m
+            INTEGER,
+        ctWanHDSLHLULoop2UAS15m
+            INTEGER,
+        ctWanHDSLHLULoop2ES15m
+            INTEGER,
+        ctWanHDSLHRULoop1UAS15m
+            INTEGER,
+        ctWanHDSLHRULoop1ES15m
+            INTEGER,
+        ctWanHDSLHRULoop2UAS15m
+            INTEGER,
+        ctWanHDSLHRULoop2ES15m
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop1UAS15m
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop1ES15m
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop2UAS15m
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop2ES15m
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop1UAS15m
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop1ES15m
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop2UAS15m
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop2ES15m
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop1UAS15m
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop1ES15m
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop2UAS15m
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop2ES15m
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop1UAS15m
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop1ES15m
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop2UAS15m
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop2ES15m
+            INTEGER
+         }
+ 
+    ctWanHDSLPerformance15mConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify the HDSL connection within the device, indexing from
+             1 to the maximum allowed number of HDSL connections in the
+             device."
+        ::= { ctWanHDSLPerformance15mEntry 1 }
+
+    ctWanHDSLPerformance15mSlotIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Define which 15-minute slot history of the HDSL within the
+             24 hour period. Indexing from 1 - 97 with the first index 
+             representing the current 15-minute history"
+        ::= { ctWanHDSLPerformance15mEntry 2 }
+ 
+    --
+    -- Local line unit's 15 minute performance history
+    --
+
+    ctWanHDSLHLULoop1UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the local line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 3 }
+
+    ctWanHDSLHLULoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the local line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 4 }
+
+    ctWanHDSLHLULoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the local line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 5 }
+
+    ctWanHDSLHLULoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the local line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 6 }
+
+    --
+    -- Remote line unit's 15-minute performance history
+    --
+
+    ctWanHDSLHRULoop1UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the remote line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 7 }
+
+    ctWanHDSLHRULoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the remote line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 8 }
+
+    ctWanHDSLHRULoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the remote line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 9 }
+
+    ctWanHDSLHRULoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the remote line unit during
+             the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 10 }
+
+    --
+    -- Doubler 1's 15-minute performance history
+    --
+
+    ctWanHDSLDb1NetworkLoop1UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the first doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 11 }
+
+    ctWanHDSLDb1NetworkLoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the first doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 12 }
+
+    ctWanHDSLDb1NetworkLoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the first doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 13 }
+
+    ctWanHDSLDb1NetworkLoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the first doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 14 }
+
+    ctWanHDSLDb1CustomerLoop1UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the first doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 15 }
+
+    ctWanHDSLDb1CustomerLoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the first doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 16 }
+
+    ctWanHDSLDb1CustomerLoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the first doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 17 }
+
+    ctWanHDSLDb1CustomerLoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the first doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 18 }
+
+    --
+    -- Doubler 2's 15-minute performance history
+    --
+
+    ctWanHDSLDb2NetworkLoop1UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the second doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 19 }
+
+    ctWanHDSLDb2NetworkLoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the second doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 20 }
+
+    ctWanHDSLDb2NetworkLoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the second doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 21 }
+
+    ctWanHDSLDb2NetworkLoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the second doubler unit's
+             network side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 22 }
+
+    ctWanHDSLDb2CustomerLoop1UAS15m OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the second doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 23 }
+
+    ctWanHDSLDb2CustomerLoop1ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the second doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 24 }
+
+    ctWanHDSLDb2CustomerLoop2UAS15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the second doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 25 }
+
+    ctWanHDSLDb2CustomerLoop2ES15m  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the second doubler unit's
+             customer side during the 15-minute period."
+        ::= { ctWanHDSLPerformance15mEntry 26 }
+
+    --
+    -- HDSL 24 hour Performance History Table 
+    -- This group provides counters for UnAvailable Seconds and
+    -- Errored Seconds of all HDSL connections
+    --
+
+    ctWanHDSLPerformance24hTable  OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLPerformance24hEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "HDSL 24-hour performance table. This table provides the
+             accumulated counts of errored seconds (ES) and unavailable
+             seconds (UAS) for the HDSL line including the local, remote
+             units and any doublers in between during a 24-hour period
+             for the last 7 days.
+ 
+             The table is indexed by the non-empty slot in the device and
+             the 24-hour history slot within the last 7 days period."
+        ::= { ctWanHDSLExt 2 }
+
+    ctWanHDSLPerformance24hEntry  OBJECT-TYPE
+        SYNTAX    CtWanHDSLPerformance24hEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries in the 24-hour ctWanHDSLPerformance table"
+        INDEX
+            { ctWanHDSLPerformance24hConnIndex, ctWanHDSLPerformance24hSlotIndex }
+        ::= { ctWanHDSLPerformance24hTable 1 }
+
+    CtWanHDSLPerformance24hEntry ::= SEQUENCE { 
+        ctWanHDSLPerformance24hConnIndex
+            INTEGER,
+        ctWanHDSLPerformance24hSlotIndex
+            INTEGER,
+        ctWanHDSLHLULoop1UAS24h
+            INTEGER,
+        ctWanHDSLHLULoop1ES24h
+            INTEGER,
+        ctWanHDSLHLULoop2UAS24h
+            INTEGER,
+        ctWanHDSLHLULoop2ES24h
+            INTEGER,
+        ctWanHDSLHRULoop1UAS24h
+            INTEGER,
+        ctWanHDSLHRULoop1ES24h
+            INTEGER,
+        ctWanHDSLHRULoop2UAS24h
+            INTEGER,
+        ctWanHDSLHRULoop2ES24h
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop1UAS24h
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop1ES24h
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop2UAS24h
+            INTEGER,
+        ctWanHDSLDb1NetworkLoop2ES24h
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop1UAS24h
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop1ES24h
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop2UAS24h
+            INTEGER,
+        ctWanHDSLDb1CustomerLoop2ES24h
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop1UAS24h
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop1ES24h
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop2UAS24h
+            INTEGER,
+        ctWanHDSLDb2NetworkLoop2ES24h
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop1UAS24h
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop1ES24h
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop2UAS24h
+            INTEGER,
+        ctWanHDSLDb2CustomerLoop2ES24h
+            INTEGER 
+         }
+
+    --
+    -- Local line unit's 24-hour performance history
+    --
+ 
+    ctWanHDSLPerformance24hConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify the HDSL connection within the device, indexing from
+             1 to the maximum allowed number of HDSL connections in the
+             device."
+        ::= { ctWanHDSLPerformance24hEntry 1 }
+
+    ctWanHDSLPerformance24hSlotIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+           "Define which 24-hour slot history of the HDSL within the
+             last 7 days period. Indexing from 1 - 8 with the first index
+             representing the current 24 hour history"
+        ::= { ctWanHDSLPerformance24hEntry 2 }
+ 
+    ctWanHDSLHLULoop1UAS24h  OBJECT-TYPE
+        SYNTAX     INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the local line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 3 }
+
+    ctWanHDSLHLULoop1ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the local line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 4 }
+
+    ctWanHDSLHLULoop2UAS24h  OBJECT-TYPE
+        SYNTAX     INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the local line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 5 }
+
+    ctWanHDSLHLULoop2ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the local line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 6 }
+
+    --
+    -- Remote line unit's 24 hour performance history
+    --
+
+    ctWanHDSLHRULoop1UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the remote line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 7 }
+
+    ctWanHDSLHRULoop1ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the remote line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 8 }
+
+    ctWanHDSLHRULoop2UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the remote line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 9 }
+
+    ctWanHDSLHRULoop2ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the remote line unit during
+             the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 10 }
+
+    --
+    -- Doubler 1's 15-minute performance history
+    --
+
+    ctWanHDSLDb1NetworkLoop1UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the first doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 11 }
+
+    ctWanHDSLDb1NetworkLoop1ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the first doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 12 }
+
+    ctWanHDSLDb1NetworkLoop2UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the first doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 13 }
+
+    ctWanHDSLDb1NetworkLoop2ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the first doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 14 }
+
+    ctWanHDSLDb1CustomerLoop1UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the first doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 15 }
+
+    ctWanHDSLDb1CustomerLoop1ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the first doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 16 }
+
+    ctWanHDSLDb1CustomerLoop2UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the first doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 17 }
+
+    ctWanHDSLDb1CustomerLoop2ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the first doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 18 }
+
+    --
+    -- Doubler 2's 24-hour performance history
+    --
+
+    ctWanHDSLDb2NetworkLoop1UAS24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the second doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 19 }
+
+    ctWanHDSLDb2NetworkLoop1ES24h  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the second doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 20 }
+
+    ctWanHDSLDb2NetworkLoop2UAS24h OBJECT-TYPE
+        SYNTAX     INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the second doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 21 }
+
+    ctWanHDSLDb2NetworkLoop2ES24h OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the second doubler unit's
+             network side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 22 }
+
+    ctWanHDSLDb2CustomerLoop1UAS24h OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 1 of the second doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 23 }
+
+    ctWanHDSLDb2CustomerLoop1ES24h OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 1 of the second doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 24 }
+
+    ctWanHDSLDb2CustomerLoop2UAS24h OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Unavailable seconds (UAS) on LOOP 2 of the second doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 25 }
+
+    ctWanHDSLDb2CustomerLoop2ES24h OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Errored seconds (ES) on LOOP 2 of the second doubler unit's
+             customer side during the 24-hour period."
+        ::= { ctWanHDSLPerformance24hEntry 26 }
+
+    ----------------------------------------------------
+    -- HDSL Statistics Table
+    -- This group provides HDSL line statistics
+    ----------------------------------------------------
+
+    ctWanHDSLStatisticsTable  OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLStatisticsEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "This table collects the statistics for the Signal noise ratio 
+             (SNR), and the pulse attenuation of the HDSL line, including
+             the local, remote units and the doublers in between." 
+        ::= { ctWanHDSLExt 3 }
+
+    ctWanHDSLStatisticsEntry  OBJECT-TYPE
+        SYNTAX    CtWanHDSLStatisticsEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries of the HDSL statistics table "
+        INDEX
+            { ctWanHDSLStatisticsHLUConnIndex }
+        ::= { ctWanHDSLStatisticsTable 1 }
+
+    CtWanHDSLStatisticsEntry ::= SEQUENCE { 
+        ctWanHDSLStatisticsHLUConnIndex
+            INTEGER,
+        ctWanHDSLSNRHLULoop1
+            INTEGER,
+        ctWanHDSLSNRLowHLULoop1
+            INTEGER,
+        ctWanHDSLSNRHighHLULoop1
+            INTEGER,
+        ctWanHDSLSNRHLULoop2
+            INTEGER,
+        ctWanHDSLSNRLowHLULoop2 
+            INTEGER, 
+        ctWanHDSLSNRHighHLULoop2 
+            INTEGER, 
+        ctWanHDSLPulseAttenuationHLULoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationHLULoop2
+            INTEGER,
+        ctWanHDSLBitStat1HLU
+            INTEGER,
+        ctWanHDSLSNRHRULoop1
+            INTEGER,
+        ctWanHDSLSNRLowHRULoop1 
+            INTEGER, 
+        ctWanHDSLSNRHighHRULoop1 
+            INTEGER, 
+        ctWanHDSLSNRHRULoop2
+            INTEGER,
+        ctWanHDSLSNRLowHRULoop2  
+            INTEGER,  
+        ctWanHDSLSNRHighHRULoop2  
+            INTEGER,  
+        ctWanHDSLPulseAttenuationHRULoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationHRULoop2
+            INTEGER,
+        ctWanHDSLDs1FrameHRU
+            INTEGER,
+        ctWanHDSLSNRDb1NetworkLoop1
+            INTEGER,
+        ctWanHDSLSNRLowDb1NetworkLoop1  
+            INTEGER,  
+        ctWanHDSLSNRHighDb1NetworkLoop1  
+            INTEGER,  
+        ctWanHDSLSNRDb1NetworkLoop2
+            INTEGER,
+        ctWanHDSLSNRLowDb1NetworkLoop2   
+            INTEGER,   
+        ctWanHDSLSNRHighDb1NetworkLoop2   
+            INTEGER,   
+        ctWanHDSLSNRDb1CustomerLoop1
+            INTEGER,
+        ctWanHDSLSNRLowDb1CustomerLoop1   
+            INTEGER,   
+        ctWanHDSLSNRHighDb1CustomerLoop1   
+            INTEGER,   
+        ctWanHDSLSNRDb1CustomerLoop2
+            INTEGER,
+        ctWanHDSLSNRLowDb1CustomerLoop2    
+            INTEGER,   
+        ctWanHDSLSNRHighDb1CustomerLoop2    
+            INTEGER,    
+        ctWanHDSLPulseAttenuationDb1NetworkLoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb1NetworkLoop2
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb1CustomerLoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb1CustomerLoop2
+            INTEGER,
+        ctWanHDSLSNRDb2NetworkLoop1
+            INTEGER,
+        ctWanHDSLSNRLowDb2NetworkLoop1    
+            INTEGER,    
+        ctWanHDSLSNRHighDb2NetworkLoop1    
+            INTEGER,    
+        ctWanHDSLSNRDb2NetworkLoop2
+            INTEGER,
+        ctWanHDSLSNRLowDb2NetworkLoop2    
+            INTEGER,    
+        ctWanHDSLSNRHighDb2NetworkLoop2    
+            INTEGER,    
+        ctWanHDSLSNRDb2CustomerLoop1
+            INTEGER,
+        ctWanHDSLSNRLowDb2CustomerLoop1    
+            INTEGER,   
+        ctWanHDSLSNRHighDb2CustomerLoop1    
+            INTEGER,    
+        ctWanHDSLSNRDb2CustomerLoop2
+            INTEGER,
+        ctWanHDSLSNRLowDb2CustomerLoop2    
+            INTEGER,    
+        ctWanHDSLSNRHighDb2CustomerLoop2     
+            INTEGER,     
+        ctWanHDSLPulseAttenuationDb2NetworkLoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb2NetworkLoop2
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb2CustomerLoop1
+            INTEGER,
+        ctWanHDSLPulseAttenuationDb2CustomerLoop2
+            INTEGER
+         }
+
+    --
+    -- Local line unit's statistics
+    -- 
+
+    ctWanHDSLStatisticsHLUConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify the HDSL connection occupied in the device,
+             indexing from 1 to the maximum allowed connections in
+             the device."
+        ::= { ctWanHDSLStatisticsEntry 1 }
+
+    ctWanHDSLSNRHLULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 2 }
+
+    ctWanHDSLSNRLowHLULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Lowest SNR on LOOP 1 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 3 }
+
+    ctWanHDSLSNRHighHLULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Highest SNR on LOOP 1 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 4 }
+ 
+    ctWanHDSLSNRHLULoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 5 }
+
+    ctWanHDSLSNRLowHLULoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Lowest SNR on LOOP 2 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 6 } 
+ 
+    ctWanHDSLSNRHighHLULoop2  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Highest SNR on LOOP 2 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 7 } 
+ 
+    ctWanHDSLPulseAttenuationHLULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 1 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 8 }
+
+    ctWanHDSLPulseAttenuationHLULoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 2 of the local line unit."
+        ::= { ctWanHDSLStatisticsEntry 9 }
+
+    ctWanHDSLBitStat1HLU  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "A byte value which contains product specific information:
+
+             bit  0 - System in AIS on the local line unit.
+                  1 - System in AIS on the remote line unit.
+                  2 - Channels are reversed on the remote line unit.
+                  3 - Channels are reversed on the doubler 1.
+                  4 - Channels are reversed on the doubler 2.
+                  5 - Power is fed to the next unit on the local line unit.
+                  6 - Power is fed to the next unit on the remote line unit.
+                  7 - Smartloop is active on remote line unit. (HiGain only)"
+        ::= { ctWanHDSLStatisticsEntry 10 }
+
+    --
+    -- Remote line unit's statistics
+    -- 
+
+    ctWanHDSLSNRHRULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of the remote line unit." 
+        ::= { ctWanHDSLStatisticsEntry 11 }
+
+    ctWanHDSLSNRLowHRULoop1  OBJECT-TYPE  
+        SYNTAX    INTEGER  
+        ACCESS    read-only  
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Lowest SNR on LOOP 1 of the remote line unit."  
+        ::= { ctWanHDSLStatisticsEntry 12 }  
+ 
+    ctWanHDSLSNRHighHRULoop1  OBJECT-TYPE 
+        SYNTAX    INTEGER  
+        ACCESS    read-only  
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Highest SNR on LOOP 1 of the remote line unit."  
+        ::= { ctWanHDSLStatisticsEntry 13 }  
+ 
+    ctWanHDSLSNRHRULoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of the remote line unit."
+        ::= { ctWanHDSLStatisticsEntry 14 }
+
+    ctWanHDSLSNRLowHRULoop2  OBJECT-TYPE  
+        SYNTAX    INTEGER  
+        ACCESS    read-only  
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Lowest SNR on LOOP 2 of the remote line unit."  
+        ::= { ctWanHDSLStatisticsEntry 15 }  
+
+ 
+    ctWanHDSLSNRHighHRULoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER  
+        ACCESS    read-only  
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Highest SNR on LOOP 2 of the remote line unit."  
+        ::= { ctWanHDSLStatisticsEntry 16 }  
+ 
+    ctWanHDSLPulseAttenuationHRULoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 1 of the remote line unit."
+        ::= { ctWanHDSLStatisticsEntry 17 }
+
+    ctWanHDSLPulseAttenuationHRULoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 2 of the remote line unit."
+        ::= { ctWanHDSLStatisticsEntry 18 }
+
+    ctWanHDSLDs1FrameHRU        OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Byte value shows DS1 frame and code information for the remote 
+             line unit (HiGain only):
+          
+             bit 0:1 -
+                 0 - frame format is SF.
+                 1 - frame format is ESF.
+                 2 - Frame format is unframed.
+                 3 - no activity.
+ 
+             bit 2:3 -
+                 reserved.
+ 
+             bit 4  -
+                 0 - line code is AMI
+                 1 - line code is B8ZS.
+ 
+             bit 5:7 -
+                 reserved."
+  
+        ::= { ctWanHDSLStatisticsEntry 19 }
+
+    --
+    -- Doubler 1's statistics
+    -- 
+
+    ctWanHDSLSNRDb1NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of doubler 1's network side"
+        ::= { ctWanHDSLStatisticsEntry 20 }
+
+    ctWanHDSLSNRLowDb1NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Lowest SNR on LOOP 1 of doubler 1's network side"
+        ::= { ctWanHDSLStatisticsEntry 21 }
+
+    ctWanHDSLSNRHighDb1NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Highest SNR on LOOP 1 of doubler 1's network side"
+        ::= { ctWanHDSLStatisticsEntry 22 }
+
+    ctWanHDSLSNRDb1NetworkLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of doubler 1's network side."
+        ::= { ctWanHDSLStatisticsEntry 23 }
+
+    ctWanHDSLSNRLowDb1NetworkLoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Lowest SNR on LOOP 2 of doubler 1's network side."
+        ::= { ctWanHDSLStatisticsEntry 24 } 
+ 
+    ctWanHDSLSNRHighDb1NetworkLoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Highest SNR on  LOOP 2 of doubler 1's network side." 
+        ::= { ctWanHDSLStatisticsEntry 25 } 
+ 
+    ctWanHDSLSNRDb1CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 26 }
+
+    ctWanHDSLSNRLowDb1CustomerLoop1  OBJECT-TYPE  
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Lowest SNR on LOOP 1 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 27 }  
+  
+    ctWanHDSLSNRHighDb1CustomerLoop1  OBJECT-TYPE  
+        SYNTAX    INTEGER 
+        ACCESS    read-only  
+        STATUS    mandatory  
+        DESCRIPTION  
+            "Highest SNR on LOOP 1 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 28 }  
+ 
+    ctWanHDSLSNRDb1CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 29 }
+
+    ctWanHDSLSNRLowDb1CustomerLoop2  OBJECT-TYPE   
+        SYNTAX    INTEGER  
+        ACCESS    read-only 
+        STATUS    mandatory   
+        DESCRIPTION   
+            "Lowest SNR on LOOP 2 of doubler 1's customer side."   
+        ::= { ctWanHDSLStatisticsEntry 30 }   
+   
+    ctWanHDSLSNRHighDb1CustomerLoop2  OBJECT-TYPE   
+        SYNTAX    INTEGER  
+        ACCESS    read-only   
+        STATUS    mandatory   
+        DESCRIPTION   
+            "Highest SNR on LOOP 2 of doubler 1's customer side."   
+        ::= { ctWanHDSLStatisticsEntry 31 }   
+ 
+    ctWanHDSLPulseAttenuationDb1NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 1 of doubler 1's network side."
+        ::= { ctWanHDSLStatisticsEntry 32 }
+
+    ctWanHDSLPulseAttenuationDb1NetworkLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 2 of doubler 1's network side."
+        ::= { ctWanHDSLStatisticsEntry 33 }
+
+    ctWanHDSLPulseAttenuationDb1CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 1 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 34 }
+
+    ctWanHDSLPulseAttenuationDb1CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 2 of doubler 1's customer side."
+        ::= { ctWanHDSLStatisticsEntry 35 }
+
+    --
+    -- Doubler 2's Statistics
+    -- 
+
+    ctWanHDSLSNRDb2NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 36 }
+
+    ctWanHDSLSNRLowDb2NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Lowest SNR on LOOP 1 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 37 }
+
+    ctWanHDSLSNRHighDb2NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Highest SNR on LOOP 1 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 38 }
+
+    ctWanHDSLSNRDb2NetworkLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 39 }
+
+    ctWanHDSLSNRLowDb2NetworkLoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory
+        DESCRIPTION 
+            "Lowest SNR on LOOP 2 of doubler 2's network side." 
+        ::= { ctWanHDSLStatisticsEntry 40 } 
+ 
+    ctWanHDSLSNRHighDb2NetworkLoop2  OBJECT-TYPE 
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Highest SNR on LOOP 2 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 41 } 
+ 
+    ctWanHDSLSNRDb2CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 1 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 42 }
+
+    ctWanHDSLSNRLowDb2CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Lowest SNR on LOOP 1 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 43 }
+
+    ctWanHDSLSNRHighDb2CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Highest SNR on LOOP 1 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 44 }
+
+    ctWanHDSLSNRDb2CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Current SNR on LOOP 2 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 45 }
+
+    ctWanHDSLSNRLowDb2CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Lowest SNR on LOOP 2 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 46 } 
+ 
+    ctWanHDSLSNRHighDb2CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only 
+        STATUS    mandatory 
+        DESCRIPTION 
+            "Highest SNR on LOOP 2 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 47 } 
+ 
+    ctWanHDSLPulseAttenuationDb2NetworkLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 1 of doubler 2's network side"
+        ::= { ctWanHDSLStatisticsEntry 48 }
+
+    ctWanHDSLPulseAttenuationDb2NetworkLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 2 of doubler 2's network side."
+        ::= { ctWanHDSLStatisticsEntry 49 }
+
+    ctWanHDSLPulseAttenuationDb2CustomerLoop1  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "pulse Attenuation on LOOP 1 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 50 }
+
+    ctWanHDSLPulseAttenuationDb2CustomerLoop2  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Pulse Attenuation on LOOP 2 of doubler 2's customer side."
+        ::= { ctWanHDSLStatisticsEntry 51 }
+
+    ----------------------------------------------------
+    -- HDSL Test Table
+    ----------------------------------------------------
+
+    ctWanHDSLTestTable  OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLTestEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Test result for the HDSL line, the current test results only
+             apply to the local line unit. "
+        ::= { ctWanHDSLExt 4 }
+
+    ctWanHDSLTestEntry  OBJECT-TYPE
+        SYNTAX    CtWanHDSLTestEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries of the HDSL test results table."
+        INDEX
+            { ctWanHDSLTestHLUConnIndex }
+        ::= { ctWanHDSLTestTable 1 }
+
+    CtWanHDSLTestEntry ::= SEQUENCE { 
+        ctWanHDSLTestHLUConnIndex
+            INTEGER,
+        ctWanHDSLTestMode
+            INTEGER,
+        ctWanHDSLHLUTestResult
+            INTEGER,
+        ctWanHDSLHRUTestResult
+            INTEGER
+     }
+
+    ctWanHDSLTestHLUConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify the slot of the HDSL within the device that the user
+             wants to conduct the line unit test. Slot number start from 
+             1 to maximum slots available in the device."
+        ::= { ctWanHDSLTestEntry 1 }
+
+    ctWanHDSLTestMode  OBJECT-TYPE
+        SYNTAX    INTEGER       
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+            "This object may only be successfully set on a master device.
+             When this object is set, the local unit's test mode is
+             defined by these values when set:
+
+                1 - Normal operation
+                3 - Self test mode
+                4 - PROM check test
+                5 - External RAM test
+                6 - DS1 loop test
+                7 - MUX-DMUX test
+                9 - Analog loopback mode
+               13 - Transceiver mode
+             
+             When getting this object, the value returned represents
+             the last value this object had been set to."
+
+        ::= { ctWanHDSLTestEntry 2 }
+
+    ctWanHDSLHLUTestResult  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Test result for the local line unit (1 - test failed, 0 - success):
+                 bit 0 - 2180 DS1 frame sync test (HiGain only)
+                     1 - 2180 DS1 data test (HiGain only)
+                     2 - LIU DS1 frame sync test (HiGain only)
+                     3 - LIU DS1 data test (HiGain only)
+                     4 - External DS1 frame sync test (HiGain only)
+                     5 - External DS1 data test.
+                     6 - Mux sync test on HDSL LOOP 1
+                     7 - Mux sync test on HDSL LOOP 2
+                     8 - Reserved.
+                     9 - Mux frame error test on HDSL LOOP 1
+                    10 - Mux frame error test on HDSL LOOP 2
+                    11 - Mux CRC test on HDSL LOOP 1
+                    12 - Mux CRC test on HDSL LOOP 2
+                    13 - Mux DL test on HDSL LOOP 1
+                    14 - Mux DL test on HDSL LOOP 2
+                    15 - Analog loopback test.
+                    16 - Digital loop test.
+                    17 - HGF HDSL loop test (HiGain only)
+                    18 - HGF write/readback test (HiGain only)
+                    19 - HGF poll lock test (HiGain only).
+                    20 - HGF activity monitor test (HiGain only).
+                    21 - HGF zeroes TX and detect test (HiGain only).
+                    22 - HGF ones TX and detect test (HiGain only).
+                    23 - Transceiver poll test on HDSL LOOP 1
+                    24 - Transceiver poll test on HDSL LOOP 2
+                    25 - PROM check test.
+                    26 - External RAM test.
+                    27 - Non-Volatile RAM test.
+             "
+        ::= { ctWanHDSLTestEntry 3 }
+
+    ctWanHDSLHRUTestResult  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Test results for the remote line unit,
+             Bit definitions correspond to those defined for
+             ctWanHDSLHLUTestResult. "
+        ::= { ctWanHDSLTestEntry 4 }
+
+    ----------------------------------------------------
+    -- HDSL Alarms Table
+    ----------------------------------------------------
+
+    ctWanHDSLAlarmsTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLAlarmsEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "This table collects the existing alarms information for the HDSL
+             line, including the local, remote line units and the doublers."
+        ::= { ctWanHDSLExt 5 }
+
+    ctWanHDSLAlarmsEntry    OBJECT-TYPE
+        SYNTAX    CtWanHDSLAlarmsEntry
+        ACCESS    not-accessible 
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries for the ctWanHDSL alarms information"
+        INDEX
+            { ctWanHDSLAlarmsHLUConnIndex }
+        ::= { ctWanHDSLAlarmsTable 1 }
+
+    CtWanHDSLAlarmsEntry ::= SEQUENCE { 
+        ctWanHDSLAlarmsHLUConnIndex
+            INTEGER,
+        ctWanHDSLAlarmsBackplane
+            INTEGER,
+        ctWanHDSLAlarmsES
+            INTEGER
+     }
+
+    ctWanHDSLAlarmsHLUConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify which HDSL connection within the device that
+             the user wants to retrieve the alarm information."
+        ::= { ctWanHDSLAlarmsEntry 1 }
+
+    ctWanHDSLAlarmsBackplane  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Specific information that's related to the HDSL alarms, each bit
+             in the two bytes value has the following meaning if set: 
+
+             Bit 0 : Local Loss of Signal on DS1 line (HiGain only).
+                 1 : Remote Loss of Signal on DS1 list (HiGain only).
+                 2 - 7 : reserved.
+                 8 : Loss of Sync word on LOOP 1 of the local line unit.
+                 9 : Loss of Sync word on LOOP 2 of the local line unit. 
+                10  : Loss of Sync word on LOOP 1 of the first doubler.
+                11 : Loss of sync word on LOOP 2 of the first doubler.
+                12 : Loss of Sync word on LOOP 1 of the second doubler.
+                13 : Loss of sync word on LOOP 2 of the second doubler."
+        ::= { ctWanHDSLAlarmsEntry 2 }
+ 
+    ctWanHDSLAlarmsES    OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "A two bytes value for the Errored Second indication of the HDSL 
+             line unit, including local, remote line units and the doublers.
+             each bit in the two bytes value has the following meaning if set: 
+
+             Bit 0 : Errored Second on LOOP 1 of local line unit.
+                 1 : Errored Second on LOOP 2 of local line unit. 
+                 2 : Errored Second on LOOP 1 of remote line unit.
+                 3 : Errored Second on LOOP 2 of remote line unit.  
+                 4 : Errored Second on LOOP 1 of local line unit's network side.
+                 5 : Errored Second on LOOP 2 of local line unit's network side.
+                 6 : Errored Second on LOOP 1 of local line unit's customer side.
+                 7 : Errored Second on LOOP 2 of local line unit's customer side."
+        ::= { ctWanHDSLAlarmsEntry 3 }
+
+    ----------------------------------------------------
+    -- HDSL Alarm History Table
+    ----------------------------------------------------
+
+    ctWanHDSLAlarmHistoryTable  OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLAlarmHistoryEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "HDSL Alarm History table. This table provides the accumulated 
+             counts of Errored Seconds (ES) and Loss of Sync words (LOS)
+             as well as the time stamp of the above events occurred for both
+             of the HDSL loops.
+
+             The time stamps show the date in MMDDYYYYHHMM format."
+        ::= { ctWanHDSLExt 6 }
+ 
+    ctWanHDSLAlarmHistoryEntry  OBJECT-TYPE
+        SYNTAX    CtWanHDSLAlarmHistoryEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries in the Alarm History table"
+        INDEX
+            { ctWanHDSLAlarmHistoryConnIndex }
+        ::= { ctWanHDSLAlarmHistoryTable 1  }
+ 
+    CtWanHDSLAlarmHistoryEntry ::= SEQUENCE { 
+        ctWanHDSLAlarmHistoryConnIndex
+            INTEGER,
+        ctWanHDSLAlHistLLOSFirst
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLLOSLast
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLLOSCurrent
+            INTEGER,
+        ctWanHDSLAlHistLLOSCount
+            INTEGER,
+        ctWanHDSLAlHistRLOSFirst
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistRLOSLast
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistRLOSCurrent
+            INTEGER,
+        ctWanHDSLAlHistRLOSCount
+            INTEGER,
+        ctWanHDSLAlHistLOSW1First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLOSW1Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLOSW1Current
+            INTEGER,
+        ctWanHDSLAlHistLOSW1Count
+            INTEGER,
+        ctWanHDSLAlHistLOSW2First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLOSW2Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistLOSW2Current
+            INTEGER,
+        ctWanHDSLAlHistLOSW2Count
+            INTEGER,
+        ctWanHDSLAlHistES1First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistES1Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistES1Current
+            INTEGER,
+        ctWanHDSLAlHistES1Count
+            INTEGER,
+        ctWanHDSLAlHistES2First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistES2Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistES2Current
+            INTEGER,
+        ctWanHDSLAlHistES2Count
+            INTEGER,
+        ctWanHDSLAlHistMargin1First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistMargin1Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistMargin1Current
+            INTEGER,
+        ctWanHDSLAlHistMargin1Count
+            INTEGER,
+        ctWanHDSLAlHistMargin2First
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistMargin2Last
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistMargin2Current
+            INTEGER,
+        ctWanHDSLAlHistMargin2Count
+            INTEGER,
+        ctWanHDSLAlHistCleared
+            DisplayString(SIZE(12)),
+        ctWanHDSLAlHistClearit
+            INTEGER
+     }
+
+    ctWanHDSLAlarmHistoryConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Defines which HDSL connection's alarm history within the
+             device."
+        ::= { ctWanHDSLAlarmHistoryEntry 1 }
+ 
+    ctWanHDSLAlHistLLOSFirst  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the DS1 Loss Of Signal (LOS) 
+             occurred on the local side of the HDSL."
+        ::= { ctWanHDSLAlarmHistoryEntry 2  }
+
+    ctWanHDSLAlHistLLOSLast  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the DS1 Loss Of Signal (LOS) 
+             occurred on the local side of the HDSL."
+         ::= { ctWanHDSLAlarmHistoryEntry 3  }
+
+    ctWanHDSLAlHistLLOSCurrent  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the DS1 Loss Of Signal (LOS) still occurred on the 
+             local side of the HDSL."
+        ::= { ctWanHDSLAlarmHistoryEntry 4  }
+
+    ctWanHDSLAlHistLLOSCount  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the DS1 Loss Of Signal (LOS) occurred since 
+             we last cleared the alarm history on the local side of the HDSL. 
+             (HiGain only)"
+        ::= { ctWanHDSLAlarmHistoryEntry 5  }
+
+    ctWanHDSLAlHistRLOSFirst  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time  the DS1 Loss Of Signal (LOS) 
+             occurred on the remote side of the HDSL. (HiGain only)"
+        ::= { ctWanHDSLAlarmHistoryEntry 6  }
+ 
+    ctWanHDSLAlHistRLOSLast  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the DS1 Loss Of Signal (LOS) occurred
+             on the remote side of the HDSL. (HiGain only)"
+        ::= { ctWanHDSLAlarmHistoryEntry 7  }
+ 
+    ctWanHDSLAlHistRLOSCurrent  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the DS1 Loss Of Signal (LOS) still occurred on the remote 
+             site of the HDSL. (HiGain only)"
+        ::= { ctWanHDSLAlarmHistoryEntry 8  }
+ 
+    ctWanHDSLAlHistRLOSCount  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the DS1 Loss Of Signal (LOS) occurred since we 
+             last cleared the alarm history on the remote site of the HDSL. 
+             (HiGain only)"
+        ::= { ctWanHDSLAlarmHistoryEntry 9  }
+ 
+    ctWanHDSLAlHistLOSW1First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the Loss Of Sync Word (LOSW) occurred
+             on the LOOP 1 of the HDSL link." 
+        ::= { ctWanHDSLAlarmHistoryEntry 10  }
+ 
+    ctWanHDSLAlHistLOSW1Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the Loss Of Sync Word (LOSW) occurred
+             on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 11  }
+ 
+    ctWanHDSLAlHistLOSW1Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the Loss Of Sync Word (LOSW) still occurred on the LOOP 1 
+             of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 12  }
+ 
+    ctWanHDSLAlHistLOSW1Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the Loss Of Sync Word (LOSW) occurred since we 
+             last cleared the history on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 13  }
+
+    ctWanHDSLAlHistLOSW2First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the Loss Of Sync Word (LOSW) occurred
+             on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 14  }
+ 
+    ctWanHDSLAlHistLOSW2Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the Loss Of Sync Word (LOSW) occurred
+             on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 15  }
+ 
+    ctWanHDSLAlHistLOSW2Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the Loss Of Sync Word (LOSW) still occurred on the LOOP 2 
+             of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 16  }
+ 
+    ctWanHDSLAlHistLOSW2Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the Loss Of Sync Word (LOSW) occurred since we 
+             last cleared the history on the LOOP 2 of the HDSL link. "
+        ::= { ctWanHDSLAlarmHistoryEntry 17  }
+ 
+    ctWanHDSLAlHistES1First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the Errored Seconds (ES) occurred
+             on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 18  }
+ 
+    ctWanHDSLAlHistES1Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the Errored Seconds (ES) occurred
+             on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 19  }
+ 
+    ctWanHDSLAlHistES1Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the Errored Seconds (ES) still occurred on the LOOP 1 of 
+             the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 20  }
+ 
+    ctWanHDSLAlHistES1Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the Errored Seconds (ES) occurred since we last
+             cleared the alarm history on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 21  }
+
+    ctWanHDSLAlHistES2First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the Errored Seconds (ES) occurred
+             on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 22  }
+ 
+    ctWanHDSLAlHistES2Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the Errored Seconds (ES) occurred
+             on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 23  }
+ 
+    ctWanHDSLAlHistES2Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the Errored Seconds (ES) still occurred on the LOOP 2 of 
+             the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 24  }
+ 
+    ctWanHDSLAlHistES2Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the Errored Seconds (ES) occurred since we last
+             cleared the history on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 25  }
+
+    ctWanHDSLAlHistMargin1First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the alarms exceeded the 
+             Margin Threshold on LOOP 1 of the HDSL link." 
+        ::= { ctWanHDSLAlarmHistoryEntry 26  }
+ 
+    ctWanHDSLAlHistMargin1Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time the alarms exceeded the Margin
+             Threshold  on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 27  }
+ 
+    ctWanHDSLAlHistMargin1Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the alarms still exceeded the Margin Threshold
+             on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 28  }
+ 
+    ctWanHDSLAlHistMargin1Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the alarm exceeded the Margin Threshold since 
+             we last cleared the alarm history on the LOOP 1 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 29  }
+
+    ctWanHDSLAlHistMargin2First  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the first time the alarms exceeded the Margin
+             Threshold on LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 30  }
+ 
+    ctWanHDSLAlHistMargin2Last  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12))
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the last time  the alarms exceeded the Margin 
+             Threshold  on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 31  }
+ 
+    ctWanHDSLAlHistMargin2Current  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Set if the alarms still exceeded the Margin Threshold
+             on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 32  }
+ 
+    ctWanHDSLAlHistMargin2Count  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Number of times the alarm exceeded the Margin Threshold since
+             we last cleared the alarm history on the LOOP 2 of the HDSL link."
+        ::= { ctWanHDSLAlarmHistoryEntry 33  }
+
+    ctWanHDSLAlHistCleared  OBJECT-TYPE
+        SYNTAX    DisplayString(SIZE(12)) 
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Time stamp of the time user requested to clear the alarm history."
+        ::= { ctWanHDSLAlarmHistoryEntry 34  }
+
+    ctWanHDSLAlHistClearit  OBJECT-TYPE
+        SYNTAX    INTEGER 
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+            "set to a 1 to  clear the alarm history.
+             A read of this value always returns a 1.
+
+             NOTE: the setting of this object also causes the SNR low
+             value, SNR high value, and the performance history to be
+             reset."
+
+        ::= { ctWanHDSLAlarmHistoryEntry 35  }
+
+    ----------------------------------------------------
+    -- HDSL Loopbacks Table
+    ----------------------------------------------------
+
+    ctWanHDSLLoopbacksTable     OBJECT-TYPE
+        SYNTAX    SEQUENCE OF CtWanHDSLLoopbacksEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+          "HDSL Loopback table. This table provides the certain loopback 
+            settings for the HDSL link."
+        ::= { ctWanHDSLExt 7 }
+
+    ctWanHDSLLoopbacksEntry   OBJECT-TYPE
+        SYNTAX    CtWanHDSLLoopbacksEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+            "Entries in the HDSL Loopback table."
+        INDEX
+            { ctWanHDSLLoopbacksHLUConnIndex }
+        ::= { ctWanHDSLLoopbacksTable 1 }
+
+    CtWanHDSLLoopbacksEntry ::= SEQUENCE { 
+        ctWanHDSLLoopbacksHLUConnIndex
+            INTEGER,
+        ctWanHDSLLoopbacksAdminType
+            INTEGER,
+        ctWanHDSLLoopbacksOperType
+            INTEGER
+     }
+
+    ctWanHDSLLoopbacksHLUConnIndex  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "Identify the HDSL connection within the device"
+        ::= { ctWanHDSLLoopbacksEntry 1 }
+
+    ctWanHDSLLoopbacksAdminType  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-write 
+        STATUS    mandatory
+        DESCRIPTION
+            "This is the requested loopback type for the HDSL.
+
+             loopbacks setting:
+                 1 : Smartjack - loopback to network at remote line unit. 
+                 2 : Loopback to network at local line unit. 
+                 3 : Loopback to network at remote line unit. 
+                 4 : Loopback to customer at local line unit. 
+                 5 : Loopback to customer at remote line unit. 
+                 6 : Loopback to customer at first doubler.
+                 7 : Loopback to customer at second doubler. 
+                 8 : Loopback to network at first doubler.
+                 9 : Loopback to network at second doubler.
+                 10: No loopback (turn loopback off). "
+        ::= { ctWanHDSLLoopbacksEntry 2 }
+
+    ctWanHDSLLoopbacksOperType  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+            "This is the operational loopback type for the HDSL.
+
+             loopbacks setting:
+                 1 : Smartjack - loopback to network at remote line unit. 
+                 2 : Loopback to network at local line unit. 
+                 3 : Loopback to network at remote line unit. 
+                 4 : Loopback to customer at local line unit. 
+                 5 : Loopback to customer at remote line unit. 
+                 6 : Loopback to customer at first doubler.
+                 7 : Loopback to customer at second doubler. 
+                 8 : Loopback to network at first doubler.
+                 9 : Loopback to network at second doubler.
+                 10: No loopback (turn loopback off). "
+        ::= { ctWanHDSLLoopbacksEntry 3 }
+
+END

@@ -1,0 +1,76 @@
+RADLAN-LOCALIZATION-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                RADLAN LOCALIZATION ROS
+--                         This Private MIB supports localization of ROS products
+-- Version:                    7.39
+-- Date:                       15 Mar 2005
+
+
+
+IMPORTS
+    rnd                                     FROM RADLAN-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI
+    DisplayString,
+    TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC;
+
+rlLocalization MODULE-IDENTITY
+         LAST-UPDATED "200503150000Z"
+         ORGANIZATION "Radlan Computer Communications Ltd."
+         CONTACT-INFO
+                "radlan.com"
+         DESCRIPTION
+                "The private MIB module definition for product localization."
+         REVISION "200503150000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { rnd 103 }
+
+RlLanguage ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The language enumeration"
+     SYNTAX INTEGER {
+        original(1),
+        translated(2)
+     }
+
+rlLocalizationMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= {rlLocalization 1}
+
+rlLocalizationLanguage OBJECT-TYPE
+    SYNTAX  RlLanguage
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The language for diagnostic messages, CLI messages and CLI help."
+    ::= {rlLocalization 5}
+
+rlWEBlocalizationLanguage OBJECT-TYPE
+    SYNTAX  RlLanguage
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The language for WEB GUI."
+    ::= {rlLocalization 6}
+
+rlLocalizationFiles OBJECT-TYPE
+    SYNTAX  INTEGER {
+             no-translated-files(1),
+             two-messages-files(2),
+             two-web-files(3),
+             two-messages-and-web-files(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The language for WEB GUI."
+    ::= {rlLocalization 7}
+END
+

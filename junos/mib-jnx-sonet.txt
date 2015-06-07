@@ -1,0 +1,204 @@
+--
+-- Juniper Enterprise Specific MIB: Sonet Interface Management MIB Extension
+-- 
+-- Copyright (c) 2002-2003, 2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-SONET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    jnxMibs, jnxSonetNotifications
+        FROM JUNIPER-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB;
+
+jnxSonet MODULE-IDENTITY
+    LAST-UPDATED "200307182154Z" -- Fri Jul 18 21:54:02 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module defines objects used for managing the
+             sonet/sdh interfaces of Juniper products."
+    REVISION      "200212120000Z" 
+    DESCRIPTION
+               "Added sdh-specific alarms to JnxSonetAlarmId."
+    REVISION      "200208080000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxMibs 20 }
+
+JnxSonetAlarmId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Identifies specific sonet/sdh alarms that may exist on an
+             interface."
+    SYNTAX     BITS {
+                   sonetLolAlarm(0),    -- Sonet Loss of light alarm
+                   sonetPllAlarm(1),    -- Sonet PLL lock alarm 
+                   sonetLofAlarm(2),    -- Sonet Loss of frame alarm 
+                   sonetLosAlarm(3),    -- Sonet Loss of signal alarm 
+                   sonetSefAlarm(4),    -- Sonet Severely errored frame alarm 
+                   sonetLaisAlarm(5),   -- Sonet Line AIS alarm 
+                   sonetPaisAlarm(6),   -- Sonet Path AIS alarm 
+                   sonetLopAlarm(7),    -- Sonet Loss of pointer alarm 
+                   sonetBerrSdAlarm(8), -- Sonet bit err. rate defect alarm,
+                   sonetBerrSfAlarm(9), -- Sonet bit err. rate fault alarm,
+                   sonetLrdiAlarm(10),  -- Sonet Line Remote Defect Ind. alarm 
+                   sonetPrdiAlarm(11),  -- Sonet Path Remote Defect Ind. alarm 
+                   sonetReiAlarm(12),   -- Sonet Remote Error Ind. alarm 
+                   sonetUneqAlarm(13),  -- Sonet Unequipped alarm 
+                   sonetPmisAlarm(14),  -- Sonet Path mismatch alarm (PLM)
+                   sonetLocAlarm(15),   -- Sonet Loss of Cell delineation alarm 
+                   sonetVaisAlarm(16),  -- Sonet VT AIS alarm 
+                   sonetVlopAlarm(17),  -- Sonet VT Loss Of Pointer alarm 
+                   sonetVrdiAlarm(18),  -- Sonet VT Remote Defect Ind. alarm 
+                   sonetVuneqAlarm(19), -- Sonet VT Unequipped alarm 
+                   sonetVmisAlarm(20),  -- Sonet VT label mismatch error 
+                   sonetVlocAlarm(21),  -- Sonet VT Loss of Cell delineation 
+                   sdhLolAlarm(22),     -- SDH Loss of light alarm
+                   sdhPllAlarm(23),     -- SDH PLL lock alarm
+                   sdhLofAlarm(24),     -- SDH Loss of frame alarm 
+                   sdhLosAlarm(25),     -- SDH Loss of signal alarm 
+                   sdhOofAlarm(26),     -- SDH Out of frame alarm 
+                   sdhMsAisAlarm(27),   -- SDH Multiplex Section AIS alarm
+                   sdhHpAisAlarm(28),   -- SDH HP AIS alarm
+                   sdhLopAlarm(29),     -- SDH Loss of pointer alarm 
+                   sdhBerrSdAlarm(30),  -- SDH bit err. rate defect alarm,
+                   sdhBerrSfAlarm(31),  -- SDH bit err. rate fault alarm,
+                   sdhMsFerfAlarm(32),  -- SDH Multiplex Section FERF alarm
+                   sdhHpFerfAlarm(33),  -- SDH HP FERF alarm
+                   sdhMsFebeAlarm(34),  -- SDH Multiplex Section FEBE alarm
+                   sdhHpUneqAlarm(35),  -- SDH HP Unequipped alarm 
+                   sdhHpMisAlarm(36),   -- SDH HP mismatch alarm (PLM)
+                   sdhLocAlarm(37)      -- SDH Loss of Cell delineation alarm 
+               }
+
+--
+-- Sonet alarm information
+--
+
+jnxSonetAlarms OBJECT IDENTIFIER ::= { jnxSonet 1 }
+
+jnxSonetAlarmTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF JnxSonetAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Information about alarms on all the sonet/sdh physical
+                 interfaces on this router."
+	::= { jnxSonetAlarms 1 }
+
+jnxSonetAlarmEntry OBJECT-TYPE
+	SYNTAX     JnxSonetAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Information about alarms on a sonet/sdh physical interface on 
+                 this router."
+	INDEX	{ ifIndex }
+	::= { jnxSonetAlarmTable 1 }
+
+JnxSonetAlarmEntry ::=
+    SEQUENCE {
+	jnxSonetCurrentAlarms
+		JnxSonetAlarmId,
+	jnxSonetLastAlarmId
+		JnxSonetAlarmId,
+        jnxSonetLastAlarmTime
+                TimeTicks,
+        jnxSonetLastAlarmDate
+                DateAndTime,
+        jnxSonetLastAlarmEvent
+                INTEGER
+    }
+
+jnxSonetCurrentAlarms OBJECT-TYPE
+        SYNTAX      JnxSonetAlarmId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"This object identifies all the active sonet/sdh alarms on this
+                 interface."
+	::= { jnxSonetAlarmEntry 1 }
+
+jnxSonetLastAlarmId OBJECT-TYPE
+	SYNTAX      JnxSonetAlarmId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The object identifies the sonet/sdh alarm that most recently
+                 was set or cleared."
+	::= { jnxSonetAlarmEntry 2 }
+
+jnxSonetLastAlarmTime OBJECT-TYPE
+	SYNTAX      TimeTicks
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The value of sysUpTime when the management subsystem learned
+                 of the last alarm event."
+	::= { jnxSonetAlarmEntry 3 }
+
+jnxSonetLastAlarmDate OBJECT-TYPE
+	SYNTAX      DateAndTime
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The system date and time when the management subsystem learned
+                 of the last alarm event."
+	::= { jnxSonetAlarmEntry 4 }
+
+jnxSonetLastAlarmEvent OBJECT-TYPE
+       	SYNTAX      INTEGER {
+                        none    (1),
+                        set     (2),
+                        cleared (3)
+                    }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"This indicates whether the last alarm event set a new alarm
+                 or cleared an existing alarm."
+	::= { jnxSonetAlarmEntry 5 }
+
+
+--
+-- Configuration Management Notifications
+--
+
+jnxSonetNotificationPrefix   OBJECT IDENTIFIER ::= { jnxSonetNotifications 0 }
+
+jnxSonetAlarmSet NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxSonetLastAlarmId, 
+                 jnxSonetCurrentAlarms,
+		 jnxSonetLastAlarmDate }
+       STATUS  current
+       DESCRIPTION
+		"Notification of a recently set sonet/sdh alarm."
+	::= { jnxSonetNotificationPrefix 1 }
+
+jnxSonetAlarmCleared NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxSonetLastAlarmId, 
+                 jnxSonetCurrentAlarms,
+		 jnxSonetLastAlarmDate }
+       STATUS  current
+       DESCRIPTION
+		"Notification of a recently cleared sonet/sdh alarm."
+	::= { jnxSonetNotificationPrefix 2 }
+
+END

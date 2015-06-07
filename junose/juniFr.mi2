@@ -1,0 +1,1790 @@
+
+-- *****************************************************************************
+-- Juniper-FRAME-RELAY-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Frame Relay MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+-- Copyright (c) 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-FRAME-RELAY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeStamp
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    DLCI
+        FROM FRAME-RELAY-DTE-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniFrameRelayMIB  MODULE-IDENTITY
+    LAST-UPDATED "200212131435Z"  -- 13-Dec-02 09:35 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Frame Relay MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200212131435Z"  -- 13-Dec-02 09:35 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added multi-link support."
+    REVISION    "200009261730Z"  -- 26-Sep-00 01:30 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION      "9906010000Z"  -- 01-Jun-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Add support for NNI behavior."
+    REVISION      "9811130000Z"  -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 10 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniFrMlFrBundleName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "MLFR Bundle name.  The bundle name is a characteristic of a MLFR frame
+        relay interface.
+
+        Represents textual information taken from the NVT ASCII graphics
+        character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFrObjects     OBJECT IDENTIFIER ::= { juniFrameRelayMIB 1 }
+
+--
+-- This MIB contains managed objects for each of two interface
+-- layers: Frame Relay interfaces, and Frame Relay subinterfaces.
+-- For each of these layers, management objects are provided to
+-- query for an available interface index, and to create/delete
+-- interfaces of that type. Creating/deleting these interface
+-- types using this MIB has the side effect of creating/deleting
+-- corresponding entries in the Interface MIB ifTable/ifXTable,
+-- and in the Juniper Enterprise Interface MIB juniIfTable.
+--
+juniFrIfLayer        OBJECT IDENTIFIER ::= { juniFrObjects 1 }
+juniFrSubIfLayer     OBJECT IDENTIFIER ::= { juniFrObjects 2 }
+juniFrMlFr           OBJECT IDENTIFIER ::= { juniFrObjects 3 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Frame Relay Interface Layer
+--
+-- This layer is managed with the following elements:
+--
+--  o NextIfIndex (generator for Frame Relay IfIndex selection)
+--  o DLCMI Table (creation/configuration/deletion of Frame Relay interfaces)
+--  o DLCMI Statistics Table (Frame Relay interface statistics)
+--  o Circuit Table (status of Frame Relay circuits)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new Frame Relay interfaces
+--
+juniFrNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniFrDlcmiTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniFrIfLayer 1 }
+
+
+--
+-- The Frame Relay DLCMI Table
+--
+juniFrDlcmiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrDlcmiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for the Data Link Connection Management Interface for
+        the frame relay service on this interface.
+
+        This table represents a superset of functionality specified in the
+        FRAME-RELAY-DTE-MIB.  In particular, it adds attributes that permit the
+        interface to operate as a network-side (DCE) interface."
+    REFERENCE
+        "American National Standard T1.617-1991, Annex D"
+    ::= { juniFrIfLayer 2 }
+
+juniFrDlcmiEntry OBJECT-TYPE
+    SYNTAX      JuniFrDlcmiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular Data Link Connection Management
+        Interface.
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable, and
+        juniFrDlcmiStatsTable.
+
+        Creating/deleting user-side (DTE) entries in this table also causes
+        coresponding entries to be created/deleted in
+        FRAME-RELAY-DTE-MIB.frDlcmiTable.
+
+        The organization and definitions of objects in this table are
+        intentionally aligned closely to those in FRAME-RELAY-DTE-MIB."
+    INDEX     { juniFrDlcmiIfIndex }
+    ::= { juniFrDlcmiTable 1 }
+
+JuniFrDlcmiEntry ::= SEQUENCE {
+    juniFrDlcmiIfIndex                        InterfaceIndex,
+    juniFrDlcmiState                          INTEGER,
+    juniFrDlcmiAddress                        INTEGER,
+    juniFrDlcmiAddressLen                     INTEGER,
+    juniFrDlcmiPollingInterval                Integer32,
+    juniFrDlcmiFullEnquiryInterval            Integer32,
+    juniFrDlcmiErrorThreshold                 Integer32,
+    juniFrDlcmiMonitoredEvents                Integer32,
+    juniFrDlcmiMaxSupportedVCs                DLCI,
+    juniFrDlcmiMulticast                      INTEGER,
+    juniFrDlcmiStatus                         INTEGER,
+    juniFrDlcmiRowStatus                      RowStatus,
+    juniFrDlcmiLowerIfIndex                   InterfaceIndexOrZero,
+    juniFrDlcmiRole                           INTEGER,
+    juniFrDlcmiDcePollingInterval             Integer32,
+    juniFrDlcmiDceErrorThreshold              Integer32,
+    juniFrDlcmiDceMonitoredEvents             Integer32,
+    juniFrDlcmiMultilinkFrBundleName          JuniFrMlFrBundleName }
+
+juniFrDlcmiIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ifEntry."
+    ::= { juniFrDlcmiEntry 1 }
+
+juniFrDlcmiState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noLmiConfigured(1),
+                    lmiRev1(2),
+                    ansiT1617D(3),      -- ANSI T1.617 Annex D
+                    ansiT1617B(4),      -- ANSI T1.617 Annex B
+                    itut933A(5),        -- ITU-T Q933 Annex A
+                    ansiT1617D1994(6) } -- ANSI T1.617a-1994 Annex D
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable states which Data Link Connection Management scheme is
+        active (and by implication, what DLCI it uses) on the Frame Relay
+        interface."
+    REFERENCE
+        "American National Standard T1.617-1991, American National Standard
+        T1.617a-1994, ITU-T Recommendation Q.933 (03/93)."
+    ::= { juniFrDlcmiEntry 2 }
+
+juniFrDlcmiAddress OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    q921(1),           -- 13 bit DLCI
+                    q922March90(2),    -- 11 bit DLCI
+                    q922November90(3), -- 10 bit DLCI
+                    q922(4) }          -- Final Standard
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable states which address format is in use on the Frame Relay
+        interface."
+    DEFVAL    { q922 }
+    ::= { juniFrDlcmiEntry 3 }
+
+juniFrDlcmiAddressLen OBJECT-TYPE
+    SYNTAX      INTEGER     {
+                    twoOctets(2),
+                    threeOctets(3),
+                    fourOctets(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable states the address length in octets.  In the case of Q922
+        format, the length indicates the entire length of the address including
+        the control portion."
+    DEFVAL    { twoOctets }
+    ::= { juniFrDlcmiEntry 4 }
+
+juniFrDlcmiPollingInterval OBJECT-TYPE
+    SYNTAX      Integer32 (5..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the number of seconds between successive status enquiry
+        messages sent by the DTE.
+
+        Pertains to DTE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DTE or NNI."
+    REFERENCE
+        "American National Standard T1.617-1991, Section D.7 Timer T391."
+    DEFVAL    { 10 }
+    ::= { juniFrDlcmiEntry 5 }
+
+juniFrDlcmiFullEnquiryInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of status enquiry intervals that pass before issuance of a full
+        status enquiry message.
+
+        Pertains to DTE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DTE or NNI."
+    REFERENCE
+        "American National Standard T1.617-1991, Section D.7 Counter N391."
+    DEFVAL    { 6 }
+    ::= { juniFrDlcmiEntry 6 }
+
+juniFrDlcmiErrorThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of errors that must be observed within the number of
+        events specified by juniFrDlcmiMonitoredEvents, to declare the interface
+        down.
+
+        'error' is lack of receipt of a Status, in response to an issued Status
+        Enquiry, within the Polling Interval (T391).
+
+        Pertains to DTE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DTE or NNI."
+    REFERENCE
+        "American National Standard T1.617-1991, Section D.5.1 Counter N392."
+    DEFVAL    { 3 }
+    ::= { juniFrDlcmiEntry 7 }
+
+juniFrDlcmiMonitoredEvents OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of status polling intervals over which the error threshold
+        is counted.  For example, if within 'MonitoredEvents' number of events
+        the station receives 'ErrorThreshold' number of errors, the interface is
+        marked as down.
+
+        'status polling interval' is specified by juniFrDlcmiPollingInterval.
+
+        Pertains to DTE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DTE or NNI."
+    REFERENCE
+        "American National Standard T1.617-1991, Section D.5.2 Counter N393."
+    DEFVAL    { 4 }
+    ::= { juniFrDlcmiEntry 8 }
+
+juniFrDlcmiMaxSupportedVCs OBJECT-TYPE
+    SYNTAX      DLCI
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of Virtual Circuits allowed for this interface.
+        Usually dictated by the Frame Relay network.
+
+        In response to a SET, if a value less than zero or higher than the
+        agent's maximal capability is configured, the agent should respond
+        badValue."
+    ::= { juniFrDlcmiEntry 9 }
+
+juniFrDlcmiMulticast OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nonBroadcast(1),
+                    broadcast(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether the Frame Relay interface is using a multicast
+        service."
+    DEFVAL    { nonBroadcast }
+    ::= { juniFrDlcmiEntry 10 }
+
+juniFrDlcmiStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    running(1),       -- init complete, system running
+                    fault(2),         -- error threshold exceeded
+                    initializing(3) } -- system start up
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the Frame Relay interface as determined by
+        the performance of the DLCMI.  If no DLCMI is running, the Frame Relay
+        interface will stay in the running state indefinitely."
+    ::= { juniFrDlcmiEntry 11 }
+
+juniFrDlcmiRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrDlcmiRowStatus
+            juniFrDlcmiState
+            juniFrDlcmiMaxSupportedVCs
+            juniFrDlcmiLowerIfIndex
+            juniFrDlcmiRole
+            juniFrDlcmiMultilinkFrBundleName (Only for multilink frame relay)
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniFrDlcmiIndex must have been determined previously,
+            by reading juniFrNextIfIndex.
+
+            The interface identified by juniFrDlcmiLowerIfIndex must exist, and
+            must be an interface type that permits layering of Frame Relay above
+            it.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table.  If
+        juniFrDlcmiRole is dte(0), a corresponding entry is created/deleted in
+        frDlcmiTable."
+    ::= { juniFrDlcmiEntry 12 }
+
+juniFrDlcmiLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this Frame Relay interface is to
+        be layered.  A value of zero indicates no layering.  An implementation
+        may choose to require that a nonzero value be configured at entry
+        creation.  In case of multilink frame relay support, it will be
+        multilink frame relay interface's ifIndex."
+    ::= { juniFrDlcmiEntry 13 }
+
+juniFrDlcmiRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dte(0),
+                    dce(1),
+                    nni(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the role this interface assumes with respect to the remote
+        end.
+
+        When acting as a DTE, the following objects are not relevant:
+            juniFrDlcmiDcePollingInterval
+            juniFrDlcmiDceErrorThreshold
+            juniFrDlcmiDceMonitoredEvents
+
+        When acting as a DCE, the following objects are not relevant:
+            juniFrDlcmiPollingInterval
+            juniFrDlcmiFullEnquiryInterval
+            juniFrDlcmiErrorThreshold
+            juniFrDlcmiMonitoredEvents "
+    ::= { juniFrDlcmiEntry 14 }
+
+juniFrDlcmiDcePollingInterval OBJECT-TYPE
+    SYNTAX      Integer32 (5..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+
+        "The number of seconds within which a DCE expects to receive a Status
+        Enquiry from the DTE.
+
+        This value corresponds to the T392 timer.
+
+        Pertains to DCE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DCE or NNI."
+    DEFVAL    { 15 }
+    ::= { juniFrDlcmiEntry 15 }
+
+juniFrDlcmiDceErrorThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of errors that must be observed within the number of
+        events specified by juniFrDlcmiDceMonitoredEvents, to declare the
+        interface down.
+
+        'error' is lack of receipt of a Status Enquiry within the interval
+        specified by juniFrDlcmiDcePollingInterval (T392).
+
+        Pertains to DCE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DCE or NNI."
+    DEFVAL    { 2 }
+    ::= { juniFrDlcmiEntry 16 }
+
+juniFrDlcmiDceMonitoredEvents OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of DCE polling intervals over which accumulated errors are
+        counted against the threshold specified in juniFrDlcmiDceErrorThreshold.
+
+        If, within this number of events, the number of errors equals or exceeds
+        the threshold, the interface is declared down.
+
+        The 'DCE polling interval' is specified by
+        juniFrDlcmiDcePollingInterval.
+
+        Pertains to DCE/NNI operation only.  This parameter can be reconfigured
+        only when the Frame Relay interface is acting as a DCE or NNI."
+    DEFVAL    { 2 }
+    ::= { juniFrDlcmiEntry 17 }
+
+juniFrDlcmiMultilinkFrBundleName OBJECT-TYPE
+    SYNTAX      JuniFrMlFrBundleName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This represents multilink frame relay bundle name.  This object must be
+        configured to associate the bundle name to the frame relay major
+        interface to support the multilink frame relay encapsulation.  For
+        non-multilink frame relay, bundle name configuration is not valid and
+        will be ignored."
+    DEFVAL    { "" }
+    ::= { juniFrDlcmiEntry 18 }
+
+
+--
+-- The Frame Relay Data Link Connection Management Interface (DLCMI) Statistics
+-- Table
+--
+juniFrDlcmiStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrDlcmiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for the Data Link Connection Management Interface for
+        the frame relay service on this interface."
+    ::= { juniFrIfLayer 3 }
+
+juniFrDlcmiStatsEntry OBJECT-TYPE
+    SYNTAX      JuniFrDlcmiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for a particular Data Link Connection Management
+        Interface.
+
+        Statistics are not relevant while the juniFrDlcmiState has the value
+        'noLmiConfigured'.
+
+        The DTE statistics are relevant when the corresponding juniFrDlcmiRole
+        is DTE.
+
+        The DTE statistics are relevant when the corresponding juniFrDlcmiRole
+        is DCE."
+    INDEX     { juniFrDlcmiIfIndex }
+    ::= { juniFrDlcmiStatsTable 1 }
+
+JuniFrDlcmiStatsEntry ::= SEQUENCE {
+        juniFrDlcmiStatsDteEnquiries                 Counter32,
+        juniFrDlcmiStatsDteFullEnquiries             Counter32,
+        juniFrDlcmiStatsDteEnquiryResponses          Counter32,
+        juniFrDlcmiStatsDteFullEnquiryResponses      Counter32,
+        juniFrDlcmiStatsDteAsyncUpdates              Counter32,
+        juniFrDlcmiStatsDteUnknownRxMessages         Counter32,
+        juniFrDlcmiStatsDteLossOfSequences           Counter32,
+        juniFrDlcmiStatsDteNoResponseTimeouts        Counter32,
+
+        juniFrDlcmiStatsDceEnquiries                 Counter32,
+        juniFrDlcmiStatsDceFullEnquiries             Counter32,
+        juniFrDlcmiStatsDceEnquiryResponses          Counter32,
+        juniFrDlcmiStatsDceFullEnquiryResponses      Counter32,
+        juniFrDlcmiStatsDceAsyncUpdates              Counter32,
+        juniFrDlcmiStatsDceUnknownRxMessages         Counter32,
+        juniFrDlcmiStatsDceLossOfSequences           Counter32,
+        juniFrDlcmiStatsDceNoResponseTimeouts        Counter32,
+
+        juniFrDlcmiStatsDiscontinuityTime            TimeTicks }
+
+juniFrDlcmiStatsDteEnquiries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Status Enquiries sent (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 1 }
+
+juniFrDlcmiStatsDteFullEnquiries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Full Enquiries sent (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 2 }
+
+juniFrDlcmiStatsDteEnquiryResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Status Enquiry responses received (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 3 }
+
+juniFrDlcmiStatsDteFullEnquiryResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Full Enquiry responses received (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 4 }
+
+juniFrDlcmiStatsDteAsyncUpdates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Asynchronous Updates received (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 5 }
+
+juniFrDlcmiStatsDteUnknownRxMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unknown messages received (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 6 }
+
+juniFrDlcmiStatsDteLossOfSequences OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a discontinuity in sequence numbering of received
+        messages was detected (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 7 }
+
+juniFrDlcmiStatsDteNoResponseTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of timer expirations awaiting a Status message (as DTE)."
+    ::= { juniFrDlcmiStatsEntry 8 }
+
+juniFrDlcmiStatsDceEnquiries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Status Enquiries received (as DCE.)"
+    ::= { juniFrDlcmiStatsEntry 9 }
+
+juniFrDlcmiStatsDceFullEnquiries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Full Enquiries received (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 10 }
+
+juniFrDlcmiStatsDceEnquiryResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Status Enquiry responses sent (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 11 }
+
+juniFrDlcmiStatsDceFullEnquiryResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Full Enquiry responses sent (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 12 }
+
+juniFrDlcmiStatsDceAsyncUpdates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Asynchronous Updates sent (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 13 }
+
+juniFrDlcmiStatsDceUnknownRxMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unknown messages received (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 14 }
+
+juniFrDlcmiStatsDceLossOfSequences OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a discontinuity in sequence numbering of received
+        messages was detected (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 15 }
+
+juniFrDlcmiStatsDceNoResponseTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of timer expirations awaiting a Status Enquiry (as DCE)."
+    ::= { juniFrDlcmiStatsEntry 16 }
+
+juniFrDlcmiStatsDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+
+        "Value of sysUpTime at the most recent event that caused a discontinuity
+        in the monotonic operation of any of the counters in this entry.  Such
+        disruption might be caused by:
+            Hardware insertion/removal.
+            Reconfiguration of juniFrDlcmiState.
+            Reconfiguration of juniFrDlcmiRole.
+
+        Conclusions can be drawn from successive polls of an entry's counters
+        only if the value of this object, simultaneously retrieved in those
+        polls, remains unchanged."
+    ::= { juniFrDlcmiStatsEntry 17 }
+
+
+--
+-- Frame Relay Circuit Table
+--
+juniFrCircuitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about specific Data Link Connections
+        (DLC) or virtual circuits.
+
+        This table mirrors the structure of FRAME-RELAY-DTE-MIB.frCircuitTable,
+        for the purpose of enumerating circuits on both DTE and DCE Frame Relay
+        interfaces."
+    ::= { juniFrIfLayer 4 }
+
+juniFrCircuitEntry OBJECT-TYPE
+    SYNTAX      JuniFrCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The information regarding a single Data Link Connection.
+        Discontinuities in the counters contained in this table are indicated by
+        the value in juniFrCircuitCreationTime."
+    INDEX     { juniFrCircuitIfIndex,
+                juniFrCircuitDlci }
+    ::= { juniFrCircuitTable 1 }
+
+JuniFrCircuitEntry ::= SEQUENCE {
+        juniFrCircuitIfIndex                InterfaceIndex,
+        juniFrCircuitDlci                   DLCI,
+        juniFrCircuitState                  INTEGER,
+        juniFrCircuitReceivedFECNs          Counter32,
+        juniFrCircuitReceivedBECNs          Counter32,
+        juniFrCircuitSentFrames             Counter32,
+        juniFrCircuitSentOctets             Counter32,
+        juniFrCircuitReceivedFrames         Counter32,
+        juniFrCircuitReceivedOctets         Counter32,
+        juniFrCircuitCreationTime           TimeStamp,
+        juniFrCircuitLastTimeChange         TimeStamp,
+        juniFrCircuitCommittedBurst         Integer32,
+        juniFrCircuitExcessBurst            Integer32,
+        juniFrCircuitThroughput             Integer32,
+        juniFrCircuitMulticast              INTEGER,
+        juniFrCircuitType                   INTEGER,
+        juniFrCircuitDiscards               Counter32,
+        juniFrCircuitReceivedDEs            Counter32,
+        juniFrCircuitSentDEs                Counter32,
+        juniFrCircuitLogicalIfIndex         InterfaceIndex,
+        juniFrCircuitRowStatus              RowStatus,
+        juniFrCircuitSentFECNs              Counter32,
+        juniFrCircuitSentBECNs              Counter32 }
+
+juniFrCircuitIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex Value of the ifEntry this virtual circuit is layered onto."
+    ::= { juniFrCircuitEntry 1 }
+
+juniFrCircuitDlci OBJECT-TYPE
+    SYNTAX      DLCI
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Data Link Connection Identifier for this virtual circuit."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.6"
+    ::= { juniFrCircuitEntry 2 }
+
+juniFrCircuitState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(1),
+                    active(2),
+                    inactive(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the particular virtual circuit is operational.  In
+        the absence of a Data Link Connection Management Interface, virtual
+        circuit entries (rows) may be created by setting virtual circuit state
+        to 'active', or deleted by changing Circuit state to 'invalid'.
+
+        Whether or not the row actually disappears is left to the
+        implementation, so this object may actually read as 'invalid' for some
+        arbitrary length of time.  It is also legal to set the state of a
+        virtual circuit to 'inactive' to temporarily disable a given circuit.
+
+        The use of 'invalid' is deprecated in this SNMP Version 2 MIB, in favor
+        of juniFrCircuitRowStatus."
+    DEFVAL    { active }
+    ::= { juniFrCircuitEntry 3 }
+
+juniFrCircuitReceivedFECNs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames received from the network indicating forward
+        congestion since the virtual circuit was created.  This occurs when the
+        remote DTE sets the FECN flag, or when a switch in the network enqueues
+        the frame to a trunk whose transmission queue is congested."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.3"
+    ::= { juniFrCircuitEntry 4 }
+
+juniFrCircuitReceivedBECNs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames received from the network indicating backward
+        congestion since the virtual circuit was created.  This occurs when the
+        remote DTE sets the BECN flag, or when a switch in the network receives
+        the frame from a trunk whose transmission queue is congested."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.4"
+    ::= { juniFrCircuitEntry 5 }
+
+juniFrCircuitSentFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of frames sent from this virtual circuit since it was
+        created."
+    ::= { juniFrCircuitEntry 6 }
+
+juniFrCircuitSentOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets sent from this virtual circuit since it was
+        created.  Octets counted are the full frame relay header and the
+        payload, but do not include the flag characters or CRC."
+    ::= { juniFrCircuitEntry 7 }
+
+juniFrCircuitReceivedFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames received over this virtual circuit since it was
+        created."
+    ::= { juniFrCircuitEntry 8 }
+
+juniFrCircuitReceivedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received over this virtual circuit since it was
+        created.  Octets counted include the full frame relay header, but do not
+        include the flag characters or the CRC."
+    ::= { juniFrCircuitEntry 9 }
+
+juniFrCircuitCreationTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when the virtual circuit was created, whether by
+        the Data Link Connection Management Interface or by a SetRequest."
+    ::= { juniFrCircuitEntry 10 }
+
+juniFrCircuitLastTimeChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when last there was a change in the virtual
+        circuit state"
+    ::= { juniFrCircuitEntry 11 }
+
+juniFrCircuitCommittedBurst OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the maximum amount of data, in bits, that the
+        network agrees to transfer under normal conditions, during the
+        measurement interval.  A value of zero (the default) indicates no
+        commitment."
+    REFERENCE
+        "American National Standard T1.617-1991, Section 6.5.19"
+    DEFVAL    { 0 }
+    ::= { juniFrCircuitEntry 12 }
+
+juniFrCircuitExcessBurst OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the maximum amount of uncommitted data bits
+        that the network will attempt to deliver over the measurement interval.
+
+        By default, if not configured when creating the entry, the Excess
+        Information Burst Size is set to the value of ifSpeed."
+    REFERENCE
+        "American National Standard T1.617-1991, Section 6.5.19"
+    ::= { juniFrCircuitEntry 13 }
+
+juniFrCircuitThroughput OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Throughput is the average number of 'Frame Relay Information Field'
+        bits transferred per second across a user network interface in one
+        direction, measured over the measurement interval.
+
+        If the configured committed burst rate and throughput are both non-zero,
+        the measurement interval, T, is
+
+            T = juniFrCircuitCommittedBurst / juniFrCircuitThroughput.
+
+        If the configured committed burst rate and throughput are both zero, the
+        measurement interval, T, is
+
+            T = juniFrCircuitExcessBurst / ifSpeed
+
+        A value of zero (the default) for throughput indicates no commitment."
+    REFERENCE
+        "American National Standard T1.617-1991, Section 6.5.19"
+    DEFVAL    { 0 }
+    ::= { juniFrCircuitEntry 14 }
+
+juniFrCircuitMulticast OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unicast(1),
+                    oneWay(2),
+                    twoWay(3),
+                    nWay(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this VC is used as a unicast VC (i.e. not
+        multicast) or the type of multicast service subscribed to."
+    REFERENCE
+        "Frame Relay PVC Multicast Service and Protocol Description
+        Implementation:  FRF.7 Frame Relay Forum Technical Committe October 21,
+        1994"
+    DEFVAL    { unicast }
+    ::= { juniFrCircuitEntry 15 }
+
+juniFrCircuitType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    static(1),
+                    dynamic(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indication of whether the VC was manually created (static), or
+        dynamically created (dynamic) via the data link control management
+        interface."
+    ::= { juniFrCircuitEntry 16 }
+
+juniFrCircuitDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound frames dropped because of format errors, or
+        because the VC is inactive."
+    ::= { juniFrCircuitEntry 17 }
+
+juniFrCircuitReceivedDEs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames received from the network indicating that they were
+        eligible for discard since the virtual circuit was created.  This occurs
+        when the remote DTE sets the DE flag, or when in remote DTE's switch
+        detects that the frame was received as Excess Burst data."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.4"
+    ::= { juniFrCircuitEntry 18 }
+
+juniFrCircuitSentDEs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames sent to the network indicating that they were eligible
+        for discard since the virtual circuit was created.  This occurs when the
+        local DTE sets the DE flag, indicating that during Network congestion
+        situations those frames should be discarded in preference of other
+        frames sent without the DE bit set."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.4"
+   ::= { juniFrCircuitEntry 19 }
+
+juniFrCircuitLogicalIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Normally the same value as frDlcmiIfIndex, but different when an
+        implementation associates a virtual ifEntry with a DLC or set of DLCs in
+        order to associate higher layer objects such as the ipAddrEntry with a
+        subset of the virtual circuits on a Frame Relay interface.  The type of
+        such ifEntries is defined by the higher layer object; for example, if
+        PPP/Frame Relay is implemented, the ifType of this ifEntry would be PPP.
+        If it is not so defined, as would be the case with an ipAddrEntry, it
+        should be of type Other."
+    ::= { juniFrCircuitEntry 20 }
+
+juniFrCircuitRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create a new row or modify or destroy an
+        existing row in the manner described in the definition of the RowStatus
+        textual convention.  Writable objects in the table may be written in any
+        RowStatus state."
+    ::= { juniFrCircuitEntry 21 }
+
+juniFrCircuitSentFECNs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames sent to the network indicating forward congestion
+        since the virtual circuit was created.  This occurs when the remote DTE
+        sets the FECN flag, or when a switch in the network enqueues the frame
+        to a trunk whose transmission queue is congested."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.3"
+    ::= { juniFrCircuitEntry 22 }
+
+juniFrCircuitSentBECNs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames sent to the network indicating backward congestion
+        since the virtual circuit was created.  This occurs when the remote DTE
+        sets the BECN flag, or when a switch in the network receives the frame
+        from a trunk whose transmission queue is congested."
+    REFERENCE
+        "American National Standard T1.618-1991, Section 3.3.4"
+    ::= { juniFrCircuitEntry 23 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Frame Relay Subinterface Layer
+--
+-- This layer is managed with the following elements:
+--
+--  o NextIfIndex (generator for Frame Relay subinterface IfIndex selection)
+--  o SubIf Table (creation/configuration/deletion of Frame Relay subinterfaces)
+--  o SubIf Circuit Table (creation/deletion of circuits associated with
+--    subinterfaces)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new Frame Relay Subinterfaces
+--
+juniFrSubIfNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniFrSubIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniFrSubIfLayer 1 }
+
+
+--
+-- The Frame Relay Subinterface Table
+--
+juniFrSubIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for Frame Relay Subinterfaces present in
+        the system."
+    ::= { juniFrSubIfLayer 2 }
+
+juniFrSubIfEntry OBJECT-TYPE
+    SYNTAX      JuniFrSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a Frame Relay Subinterface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created /deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniFrSubIfIndex }
+    ::= { juniFrSubIfTable 1 }
+
+JuniFrSubIfEntry ::= SEQUENCE {
+    juniFrSubIfIndex            InterfaceIndex,
+    juniFrSubIfRowStatus        RowStatus,
+    juniFrSubIfLowerIfIndex     InterfaceIndexOrZero,
+    juniFrSubIfId               Integer32 }
+
+juniFrSubIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the Frame Relay Subinterface.  When creating entries in
+        this table, suitable values for this object are determined by reading
+        juniFrSubNextIfIndex."
+    ::= { juniFrSubIfEntry 1 }
+
+juniFrSubIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrSubIfRowStatus
+            juniFrSubIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniFrSubIfIndex must have been determined previously,
+            by reading juniFrSubIfNextIfIndex.
+
+            The interface identified by juniFrSubIfLowerIfIndex must exist, and
+            must be a Frame Relay interface.
+
+            A positive value configured for juniFrSubIfId must not already be
+            assigned to another subinterface layered onto the same underlying
+            Frame Relay interface.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniFrSubIfEntry 2 }
+
+juniFrSubIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a Frame Relay interface over which this Frame Relay
+        Subinterface is to be layered.  A value of zero indicates no layering.
+        An implementation may choose to require that a nonzero value be
+        configured at entry creation."
+    ::= { juniFrSubIfEntry 3 }
+
+juniFrSubIfId OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An integer identifier for the Frame Relay subinterface, used in
+        conjunction with the command-line interface.  It is provided here for
+        cross-reference purposes only.
+
+        The value must be unique among subinterfaces configured on the same
+        underlying Frame Relay interface.
+
+        If this object is not configured, or is configured with a value of -1, a
+        nonzero value will be allocated internally and can be retrieved from
+        this object after table entry creation has succeeded.
+
+        A value of zero for this object is reserved for future use."
+    DEFVAL    { -1 }
+    ::= { juniFrSubIfEntry 4 }
+
+
+--
+-- The Frame Relay Subinterface Circuit Table
+--
+juniFrSubIfCktTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrSubIfCktEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for Frame Relay circuits configured on
+        Frame Relay Subinterfaces present in the system.
+
+        An implementation may constrain the number of circuits permitted to be
+        configured per Frame Relay Subinterface; in particular, an
+        implementation may restrict each Frame Relay Subinterface to have a
+        single circuit.
+
+        Attributes in this entry can only be configured at entry creation, and
+        remain fixed for the lifetime of the entry."
+    ::= { juniFrSubIfLayer 3 }
+
+juniFrSubIfCktEntry OBJECT-TYPE
+    SYNTAX      JuniFrSubIfCktEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a Frame Relay Subinterface
+        circuit."
+    INDEX     { juniFrSubIfIndex,
+                juniFrSubIfCktDlci }
+    ::= { juniFrSubIfCktTable 1 }
+
+JuniFrSubIfCktEntry ::= SEQUENCE {
+    juniFrSubIfCktDlci          DLCI,
+    juniFrSubIfCktRowStatus     RowStatus }
+
+juniFrSubIfCktDlci OBJECT-TYPE
+    SYNTAX      DLCI
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DLCI of the Frame Relay circuit used by this subinterface."
+    ::= { juniFrSubIfCktEntry 1 }
+
+juniFrSubIfCktRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrSubIfCktRowStatus "
+    ::= { juniFrSubIfCktEntry 2 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Multi-Link Frame Relay (MLFR)
+--
+-- This section defines objects used to manage the MLFR.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The MLFR BundleTable
+--
+juniFrMlFrBundleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrMlFrBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLFR bundles present in the system."
+    ::= { juniFrMlFr 1 }
+
+juniFrMlFrBundleEntry OBJECT-TYPE
+    SYNTAX      JuniFrMlFrBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a Multilink bundle."
+    INDEX     { juniFrMlFrBundleName }
+    ::= { juniFrMlFrBundleTable 1 }
+
+JuniFrMlFrBundleEntry ::= SEQUENCE {
+    juniFrMlFrBundleName       JuniFrMlFrBundleName,
+    juniFrMlFrBundleRowStatus  RowStatus }
+
+juniFrMlFrBundleName OBJECT-TYPE
+    SYNTAX      JuniFrMlFrBundleName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administrative name of the multilink bundle associated with this
+        Frame Relay major interface."
+    ::= { juniFrMlFrBundleEntry 1 }
+
+juniFrMlFrBundleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The rowStatus for this entry.  The following sets are supported:
+             createAndGo(4),
+             destroy(6)
+
+         The following values can be read from this object:
+             active(1) "
+    ::= { juniFrMlFrBundleEntry 2 }
+
+
+--
+-- IfIndex selection for creating new MLFR Link interfaces
+-- in juniFrMlFrLinkConfigTable.
+--
+juniFrMlFrNextLinkIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniFrMlFrLinkConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniFrMlFr 2 }
+
+
+--
+-- The MLFR Link Configuration Table
+--
+juniFrMlFrLinkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrMlFrLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for FR link interfaces present in the
+        system to be added to the multilink bundles."
+    ::= { juniFrMlFr 3 }
+
+juniFrMlFrLinkConfigEntry OBJECT-TYPE
+    SYNTAX      JuniFrMlFrLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of FR link interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniFrMlFrLinkConfigIfIndex }
+    ::= { juniFrMlFrLinkConfigTable 1 }
+
+JuniFrMlFrLinkConfigEntry ::= SEQUENCE {
+    juniFrMlFrLinkConfigIfIndex         InterfaceIndex,
+    juniFrMlFrLinkConfigLowerIfIndex    InterfaceIndexOrZero,
+    juniFrMlFrLinkConfigRowStatus       RowStatus }
+
+juniFrMlFrLinkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the FR link interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniFrMlFrNextLinkIfIndex."
+    ::= { juniFrMlFrLinkConfigEntry 1 }
+
+juniFrMlFrLinkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this FR link interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a non-zero value be configured at entry
+        creation."
+    ::= { juniFrMlFrLinkConfigEntry 2 }
+
+juniFrMlFrLinkConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrMlFrLinkConfigRowStatus
+            juniFrMlFrLinkConfigLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniFrMlFrLinkConfigIfIndex must have been determined
+            previously, by reading juniFrMlFrNextIfIndex.
+
+            The interface identified by juniFrMlFrLinkConfigLowerIfIndex must
+            exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniFrMlFrLinkConfigEntry 3 }
+
+
+--
+-- The MLFR Major interface Configuration Table
+--
+juniFrMlFrMajorConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrMlFrMajorConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for FR major interfaces present in the
+        system which are associated with multilink bundles."
+    ::= { juniFrMlFr 4 }
+
+juniFrMlFrMajorConfigEntry OBJECT-TYPE
+    SYNTAX      JuniFrMlFrMajorConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of FR major interface which
+        have association with the MLFR bundles.  Creating/deleting entries in
+        this table causes corresponding entries for be created/deleted in
+        ifTable/ifXTable/juniIfTable."
+    INDEX     { juniFrMlFrMajorConfigIfIndex }
+    ::= { juniFrMlFrMajorConfigTable 1 }
+
+JuniFrMlFrMajorConfigEntry ::= SEQUENCE {
+    juniFrMlFrMajorConfigIfIndex         InterfaceIndex,
+    juniFrMlFrMajorConfigLowerIfIndex    InterfaceIndex,
+    juniFrMlFrMajorBundleName            JuniFrMlFrBundleName,
+    juniFrMlFrMajorRowStatus             RowStatus }
+
+juniFrMlFrMajorConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the FR Major interface.  When creating entries in this
+        table, suitable values for this object are determined by reading already
+        created FR Major interface values.
+
+        Each multilink bundle will be associated with one FR major interface.
+        This association will be done at the creation of FR major interface
+        (juniFrDlcmiTable) specifying its lower interfce binding as FR link
+        ifIndex(juniFrMlFrLinkConfigTable) and the multilink bundle name."
+    ::= { juniFrMlFrMajorConfigEntry 1 }
+
+juniFrMlFrMajorConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a FR link interface over which this FR Major interface
+        is to be layered.  On sets, the value of this object must equal on of
+        the previously created FR link interfaces created in the
+        juniFrMlFrLinkConfigTable.  On gets, the value of this object is the
+        lexicographically least FR link interface in a potential bundle of FR
+        link interfaces."
+    ::= { juniFrMlFrMajorConfigEntry 2 }
+
+juniFrMlFrMajorBundleName OBJECT-TYPE
+    SYNTAX     JuniFrMlFrBundleName
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The MLFR bundle name administratively assigned."
+    ::= { juniFrMlFrMajorConfigEntry 3 }
+
+juniFrMlFrMajorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrMlFrMajorConfigLowerIfIndex
+            juniFrMlFrMajorBundleName
+            juniFrMlFrMajorConfigRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The interface identified by juniFrMlFrMajorConfigIndex must exist by
+            a creation request to the juniFrDlcmiTable.
+
+            The interface identified by juniFrMlFrMajorConfigLowerIfIndex must
+            exist by a creation request to the juniFrMlFrLinkConfigTable.
+
+            The bundleName specified in juniFrMlFrMajorBundleName must have
+            been created first in the juniFrMlFrBundleTable.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table.  "
+    ::= { juniFrMlFrMajorConfigEntry 4 }
+
+
+--
+-- The MLFR Link Bind Table
+--
+juniFrMlFrLinkBindTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFrMlFrLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for FR Link interfaces to FR major
+        interfaces bindings associated with multilink bundles."
+    ::= { juniFrMlFr 5 }
+
+juniFrMlFrLinkBindEntry OBJECT-TYPE
+    SYNTAX      JuniFrMlFrLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the FR link interface to FR major interface
+        bindingsi associated with multilink bundles."
+    INDEX     { juniFrMlFrBindMajorIfIndex,
+                juniFrMlFrBindLinkIfIndex }
+    ::= { juniFrMlFrLinkBindTable 1 }
+
+JuniFrMlFrLinkBindEntry ::= SEQUENCE {
+    juniFrMlFrBindMajorIfIndex  InterfaceIndex,
+    juniFrMlFrBindLinkIfIndex   InterfaceIndex,
+    juniFrMlFrBindRowStatus     RowStatus }
+
+juniFrMlFrBindMajorIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the FR major interface associated with multilink."
+    ::= { juniFrMlFrLinkBindEntry 1 }
+
+juniFrMlFrBindLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a FR link interface bound by the FR major interface
+        defined by juniFrMlFrBindMajorIfIndex."
+    ::= { juniFrMlFrLinkBindEntry 2 }
+
+juniFrMlFrBindRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFrMlFrBindRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The interfaces identified by juniFrMlFrBindNetworkIfIndex and
+            juniFrMlFrBindLinkIfIndex must be created in the
+            juniFrMlFrMajorConfigTable and juniFrMlFrLinkConfigTable
+            respectively.
+
+            A MLFR bundle must be associated with the juniFrMlFrMajorIfIndex and
+            exist in the juniFrMibFrBundleTable.
+
+        A corresponding entry in ifStackTable is created/destroyed as a result
+        of creating/destroying an entry in this table.
+        Note: This table is read-only table for now. To add links to bundle 
+        make use of juniFrMlFrMajorConfigTable."
+    ::= { juniFrMlFrLinkBindEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniFrTrapControl      OBJECT IDENTIFIER ::= { juniFrameRelayMIB 2 }
+-- juniFrTraps            OBJECT IDENTIFIER ::= { juniFrameRelayMIB 3 }
+-- juniFrTrapPrefix       OBJECT IDENTIFIER ::= { juniFrTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFrConformance OBJECT IDENTIFIER ::= { juniFrameRelayMIB 4 }
+juniFrCompliances OBJECT IDENTIFIER ::= { juniFrConformance 1 }
+juniFrGroups      OBJECT IDENTIFIER ::= { juniFrConformance 2 }
+
+--
+-- compliance statements
+--
+juniFrCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        Frame Relay MIB.  This statement became obsolete when multi-link frame
+        relay support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFrGroup,
+            juniFrSubIfGroup }
+    ::= { juniFrCompliances 1 }                                    -- JUNOSe 1.0
+
+juniFrCompliance2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper Frame
+        Relay MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFrGroup2,
+            juniFrSubIfGroup,
+            juniFrMlFrGroup }
+    ::= { juniFrCompliances 2 }                                    -- JUNOSe 5.0
+
+
+--
+-- units of conformance
+--
+juniFrGroup  OBJECT-GROUP
+    OBJECTS {
+        juniFrNextIfIndex,
+
+        juniFrDlcmiIfIndex,
+        juniFrDlcmiState,
+        juniFrDlcmiAddress,
+        juniFrDlcmiAddressLen,
+        juniFrDlcmiPollingInterval,
+        juniFrDlcmiFullEnquiryInterval,
+        juniFrDlcmiErrorThreshold,
+        juniFrDlcmiMonitoredEvents,
+        juniFrDlcmiMaxSupportedVCs,
+        juniFrDlcmiMulticast,
+        juniFrDlcmiStatus,
+        juniFrDlcmiRowStatus,
+        juniFrDlcmiLowerIfIndex,
+        juniFrDlcmiRole,
+        juniFrDlcmiDcePollingInterval,
+        juniFrDlcmiDceErrorThreshold,
+        juniFrDlcmiDceMonitoredEvents,
+
+        juniFrDlcmiStatsDteEnquiries,
+        juniFrDlcmiStatsDteFullEnquiries,
+        juniFrDlcmiStatsDteEnquiryResponses,
+        juniFrDlcmiStatsDteFullEnquiryResponses,
+        juniFrDlcmiStatsDteAsyncUpdates,
+        juniFrDlcmiStatsDteUnknownRxMessages,
+        juniFrDlcmiStatsDteLossOfSequences,
+        juniFrDlcmiStatsDteNoResponseTimeouts,
+        juniFrDlcmiStatsDceEnquiries,
+        juniFrDlcmiStatsDceFullEnquiries,
+        juniFrDlcmiStatsDceEnquiryResponses,
+        juniFrDlcmiStatsDceFullEnquiryResponses,
+        juniFrDlcmiStatsDceAsyncUpdates,
+        juniFrDlcmiStatsDceUnknownRxMessages,
+        juniFrDlcmiStatsDceLossOfSequences,
+        juniFrDlcmiStatsDceNoResponseTimeouts,
+        juniFrDlcmiStatsDiscontinuityTime,
+
+        juniFrCircuitState,
+        juniFrCircuitReceivedFECNs,
+        juniFrCircuitReceivedBECNs,
+        juniFrCircuitSentFrames,
+        juniFrCircuitSentOctets,
+        juniFrCircuitReceivedFrames,
+        juniFrCircuitReceivedOctets,
+        juniFrCircuitCreationTime,
+        juniFrCircuitLastTimeChange,
+        juniFrCircuitCommittedBurst,
+        juniFrCircuitExcessBurst,
+        juniFrCircuitThroughput,
+        juniFrCircuitMulticast,
+        juniFrCircuitType,
+        juniFrCircuitDiscards,
+        juniFrCircuitReceivedDEs,
+        juniFrCircuitSentDEs,
+        juniFrCircuitLogicalIfIndex,
+        juniFrCircuitRowStatus,
+        juniFrCircuitSentFECNs,
+        juniFrCircuitSentBECNs }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of Frame Relay
+        interfaces in a Juniper product.  This group became obsolete when
+        multi-link frame relay support was added."
+    ::= { juniFrGroups 1 }
+
+juniFrSubIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniFrSubIfNextIfIndex,
+
+        juniFrSubIfRowStatus,
+        juniFrSubIfLowerIfIndex,
+        juniFrSubIfId,
+
+        juniFrSubIfCktRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Frame Relay
+        subinterfaces in a Juniper product."
+    ::= { juniFrGroups 2 }
+
+juniFrGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniFrNextIfIndex,
+
+        juniFrDlcmiIfIndex,
+        juniFrDlcmiState,
+        juniFrDlcmiAddress,
+        juniFrDlcmiAddressLen,
+        juniFrDlcmiPollingInterval,
+        juniFrDlcmiFullEnquiryInterval,
+        juniFrDlcmiErrorThreshold,
+        juniFrDlcmiMonitoredEvents,
+        juniFrDlcmiMaxSupportedVCs,
+        juniFrDlcmiMulticast,
+        juniFrDlcmiStatus,
+        juniFrDlcmiRowStatus,
+        juniFrDlcmiLowerIfIndex,
+        juniFrDlcmiRole,
+        juniFrDlcmiDcePollingInterval,
+        juniFrDlcmiDceErrorThreshold,
+        juniFrDlcmiDceMonitoredEvents,
+        juniFrDlcmiMultilinkFrBundleName,
+
+        juniFrDlcmiStatsDteEnquiries,
+        juniFrDlcmiStatsDteFullEnquiries,
+        juniFrDlcmiStatsDteEnquiryResponses,
+        juniFrDlcmiStatsDteFullEnquiryResponses,
+        juniFrDlcmiStatsDteAsyncUpdates,
+        juniFrDlcmiStatsDteUnknownRxMessages,
+        juniFrDlcmiStatsDteLossOfSequences,
+        juniFrDlcmiStatsDteNoResponseTimeouts,
+        juniFrDlcmiStatsDceEnquiries,
+        juniFrDlcmiStatsDceFullEnquiries,
+        juniFrDlcmiStatsDceEnquiryResponses,
+        juniFrDlcmiStatsDceFullEnquiryResponses,
+        juniFrDlcmiStatsDceAsyncUpdates,
+        juniFrDlcmiStatsDceUnknownRxMessages,
+        juniFrDlcmiStatsDceLossOfSequences,
+        juniFrDlcmiStatsDceNoResponseTimeouts,
+        juniFrDlcmiStatsDiscontinuityTime,
+
+        juniFrCircuitState,
+        juniFrCircuitReceivedFECNs,
+        juniFrCircuitReceivedBECNs,
+        juniFrCircuitSentFrames,
+        juniFrCircuitSentOctets,
+        juniFrCircuitReceivedFrames,
+        juniFrCircuitReceivedOctets,
+        juniFrCircuitCreationTime,
+        juniFrCircuitLastTimeChange,
+        juniFrCircuitCommittedBurst,
+        juniFrCircuitExcessBurst,
+        juniFrCircuitThroughput,
+        juniFrCircuitMulticast,
+        juniFrCircuitType,
+        juniFrCircuitDiscards,
+        juniFrCircuitReceivedDEs,
+        juniFrCircuitSentDEs,
+        juniFrCircuitLogicalIfIndex,
+        juniFrCircuitRowStatus,
+        juniFrCircuitSentFECNs,
+        juniFrCircuitSentBECNs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Frame Relay interfaces
+        in a Juniper product."
+    ::= { juniFrGroups 3 }
+
+juniFrMlFrGroup  OBJECT-GROUP
+    OBJECTS {
+        juniFrMlFrBundleRowStatus,
+
+        juniFrMlFrNextLinkIfIndex,
+
+        juniFrMlFrLinkConfigLowerIfIndex,
+        juniFrMlFrLinkConfigRowStatus,
+
+        juniFrMlFrMajorConfigLowerIfIndex,
+        juniFrMlFrMajorBundleName,
+        juniFrMlFrMajorRowStatus,
+
+        juniFrMlFrBindRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Multilink Frame Relay
+        in a Juniper product."
+    ::= { juniFrGroups 4 }
+
+END

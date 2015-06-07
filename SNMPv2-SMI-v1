@@ -1,0 +1,43 @@
+-- file: rfc1442v.smi - SNMPv1 version of RFC 1442
+
+SNMPv2-SMI-v1 DEFINITIONS ::= BEGIN
+
+          IMPORTS
+                  NetworkAddress, IpAddress, Counter, Gauge,
+                  TimeTicks
+                    FROM RFC1155-SMI
+                  OBJECT-TYPE
+                    FROM RFC-1212;
+
+-- No macro MODULE-IDENTITY in SNMPv1
+-- No macro OBJECT-IDENTITY in SNMPv1
+-- SMI Counter
+Counter-32 ::= Counter
+-- Counter64 - no equivalent in SNMPv1
+-- SMI Gauge
+Gauge-32 ::= Gauge
+Integer-32 ::= INTEGER (-2147483648..2147483647)
+Unsigned-32 ::= Gauge
+-- SMI IpAddress
+-- NsapAddress - no equivalent in SNMPv1
+-- SMI Opaque
+-- SMI TimeTicks
+-- UInteger32 - no equivalent in SNMPv1
+-- Using defintion of macro OBJECT-TYPE from RFC 1212
+-- No macro NOTIFICATION-TYPE in SNMPv1
+
+internet        OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+directory       OBJECT IDENTIFIER ::= { internet 1 }
+mgmt            OBJECT IDENTIFIER ::= { internet 2 }
+experimental    OBJECT IDENTIFIER ::= { internet 3 }
+private         OBJECT IDENTIFIER ::= { internet 4 }
+enterprises     OBJECT IDENTIFIER ::= { private 1 }
+security        OBJECT IDENTIFIER ::= { internet 5 }
+snmpV2          OBJECT IDENTIFIER ::= { internet 6 }
+snmpDomains     OBJECT IDENTIFIER ::= { snmpV2 1 }
+snmpProxys      OBJECT IDENTIFIER ::= { snmpV2 2 }
+snmpModules     OBJECT IDENTIFIER ::= { snmpV2 3 }
+
+
+END
+

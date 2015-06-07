@@ -1,0 +1,735 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-SECSTAT-IP-MONITOR-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              yangyinzhu,2003-03-18,<contents>
+-- =================================================================
+
+HUAWEI-SECSTAT-IP-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwSecStatIPMonitor MODULE-IDENTITY 
+        LAST-UPDATED "200304100900Z"        -- April 10, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-SECSTAT-IP-MONITOR-MIB contains objects to monitor the
+            statistics information for the hosts.
+            "
+        ::= { hwSECSTAT 4 }
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.11
+    hwSECSTAT OBJECT IDENTIFIER ::= { hwDatacomm 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1
+    hwSecStatMonitorObjects OBJECT IDENTIFIER ::= { hwSecStatIPMonitor 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.1
+    hwSecStatClearAllIPInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for clearing the statistics information of All IP.
+            When you want to clear the information, set this OID to 1.
+            "
+        ::= { hwSecStatMonitorObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2
+    hwSecStatIPInInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSecStatIPInInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistic information of packets to the hosts."
+        ::= { hwSecStatMonitorObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1
+    hwSecStatIPInInfoEntry OBJECT-TYPE
+        SYNTAX HwSecStatIPInInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistic information of packets to the hosts."
+        INDEX { hwSecStatIPInInfoIpAddress }
+        ::= { hwSecStatIPInInfoTable 1 }
+    
+    HwSecStatIPInInfoEntry ::=
+        SEQUENCE { 
+            hwSecStatIPInInfoIpAddress
+                IpAddress,
+            hwSecStatIPTcpSessTo
+                Counter64,
+            hwSecStatIPUdpSessTo
+                Counter64,
+            hwSecStatIPIcmpSessTo
+                Counter64,
+            hwSecStatIPConnTo
+                Counter64,
+            hwSecStatIPHalfConnTo
+                Counter64,
+            hwSecStatIPTcpSessSpeedTo
+                Counter64,
+            hwSecStatIPUdpSessSpeedTo
+                Counter64,
+            hwSecStatIPIcmpSessSpeedTo
+                Counter64,
+            hwSecStatIPConnSpeedTo
+                Counter64,
+            hwSecStatIPHalfConnSpeedTo
+                Counter64,
+            hwSecStatIPAclDenyIcmpPktsTo
+                Counter64,
+            hwSecStatIPAclDenyIcmpOctsTo
+                Counter64,
+            hwSecStatIPAclDenyNonIcmpPktsTo
+                Counter64,
+            hwSecStatIPAclDenyNonIcmpOctsTo
+                Counter64,
+            hwSecStatIPBlsDenyPktsTo
+                Counter64,
+            hwSecStatIPAclDftDenyPktsTo
+                Counter64,
+            hwSecStatIPAclDftDenyIcmpPktsTo
+                Counter64,
+            hwSecStatIPIcmpFloodDropPktsTo
+                Counter64,
+            hwSecStatIPUdpFloodDropPktsTo
+                Counter64,
+            hwSecStatIPFtpPktsTo
+                Counter64,
+            hwSecStatIPSmtpPktsTo
+                Counter64,
+            hwSecStatIPHttpPktsTo
+                Counter64,
+            hwSecStatIPH323PktsTo
+                Counter64,
+            hwSecStatIPRtspPktsTo
+                Counter64,
+            hwSecStatClearIPInInfo
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.1
+    hwSecStatIPInInfoIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of host."
+        ::= { hwSecStatIPInInfoEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.2
+    hwSecStatIPTcpSessTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of TCP session to this host."
+        ::= { hwSecStatIPInInfoEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.3
+    hwSecStatIPUdpSessTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of UDP session to this host."
+        ::= { hwSecStatIPInInfoEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.4
+    hwSecStatIPIcmpSessTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ICMP session to this host."
+        ::= { hwSecStatIPInInfoEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.5
+    hwSecStatIPConnTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of session to this host."
+        ::= { hwSecStatIPInInfoEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.6
+    hwSecStatIPHalfConnTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of incomplete session to this host."
+        ::= { hwSecStatIPInInfoEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.7
+    hwSecStatIPTcpSessSpeedTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of TCP session to this host."
+        ::= { hwSecStatIPInInfoEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.8
+    hwSecStatIPUdpSessSpeedTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of UDP session to this host."
+        ::= { hwSecStatIPInInfoEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.9
+    hwSecStatIPIcmpSessSpeedTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of ICMP session to this host."
+        ::= { hwSecStatIPInInfoEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.10
+    hwSecStatIPConnSpeedTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of session to this host."
+        ::= { hwSecStatIPInInfoEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.11
+    hwSecStatIPHalfConnSpeedTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of TCP incomplete session to this host."
+        ::= { hwSecStatIPInInfoEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.12
+    hwSecStatIPAclDenyIcmpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped ICMP packets to this host by ACL"
+        ::= { hwSecStatIPInInfoEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.13
+    hwSecStatIPAclDenyIcmpOctsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of dropped ICMP packets to this host by ACL"
+        ::= { hwSecStatIPInInfoEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.14
+    hwSecStatIPAclDenyNonIcmpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped non ICMP packets to this host by ACL"
+        ::= { hwSecStatIPInInfoEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.15
+    hwSecStatIPAclDenyNonIcmpOctsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of dropped non ICMP packets to this host by ACL"
+        ::= { hwSecStatIPInInfoEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.16
+    hwSecStatIPBlsDenyPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets to this host by blacklist."
+        ::= { hwSecStatIPInInfoEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.17
+    hwSecStatIPAclDftDenyPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets to this host by default ACL."
+        ::= { hwSecStatIPInInfoEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.18
+    hwSecStatIPAclDftDenyIcmpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped ICMP packets to this host by default ACL."
+        ::= { hwSecStatIPInInfoEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.19
+    hwSecStatIPIcmpFloodDropPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets to this host for ICMP Flood attack."
+        ::= { hwSecStatIPInInfoEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.20
+    hwSecStatIPUdpFloodDropPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets to this host for UDP Flood attack."
+        ::= { hwSecStatIPInInfoEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.21
+    hwSecStatIPFtpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FTP packets to this host."
+        ::= { hwSecStatIPInInfoEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.22
+    hwSecStatIPSmtpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SMTP packets to this host."
+        ::= { hwSecStatIPInInfoEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.23
+    hwSecStatIPHttpPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of HTTP packets to this host."
+        ::= { hwSecStatIPInInfoEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.24
+    hwSecStatIPH323PktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of H323 packets to this host."
+        ::= { hwSecStatIPInInfoEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.25
+    hwSecStatIPRtspPktsTo OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RTSP packets to this host."
+        ::= { hwSecStatIPInInfoEntry 25 }
+    
+-- 
+-- This OID is used for clearing the statistics information of this IP.
+-- When you want to clear the information of this IP, set this OID to 1.
+-- 
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.2.1.26
+    hwSecStatClearIPInInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwSecStatIPInInfoEntry 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3
+    hwSecStatIPOutInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSecStatIPOutInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistic information of packets from the hosts."
+        ::= { hwSecStatMonitorObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1
+    hwSecStatIPOutInfoEntry OBJECT-TYPE
+        SYNTAX HwSecStatIPOutInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistic information of packets from the hosts."
+        INDEX { hwSecStatIPOutInfoIpAddress }
+        ::= { hwSecStatIPOutInfoTable 1 }
+    
+    HwSecStatIPOutInfoEntry ::=
+        SEQUENCE { 
+            hwSecStatIPOutInfoIpAddress
+                IpAddress,
+            hwSecStatIPTcpSessFrom
+                Counter64,
+            hwSecStatIPUdpSessFrom
+                Counter64,
+            hwSecStatIPIcmpSessFrom
+                Counter64,
+            hwSecStatIPConnFrom
+                Counter64,
+            hwSecStatIPHalfConnFrom
+                Counter64,
+            hwSecStatIPTcpSessSpeedFrom
+                Counter64,
+            hwSecStatIPUdpSessSpeedFrom
+                Counter64,
+            hwSecStatIPIcmpSessSpeedFrom
+                Counter64,
+            hwSecStatIPConnSpeedFrom
+                Counter64,
+            hwSecStatIPHalfConnSpeedFrom
+                Counter64,
+            hwSecStatIPAclDenyIcmpPktsFrom
+                Counter64,
+            hwSecStatIPAclDenyIcmpOctsFrom
+                Counter64,
+            hwSecStatIPAclDenyNonIcmpPktsFrom
+                Counter64,
+            hwSecStatIPAclDenyNonIcmpOctsFrom
+                Counter64,
+            hwSecStatIPBlsDenyPktsFrom
+                Counter64,
+            hwSecStatIPAclDftDenyPktsFrom
+                Counter64,
+            hwSecStatIPAclDftDenyIcmpPktsFrom
+                Counter64,
+            hwSecStatIPFtpPktsFrom
+                Counter64,
+            hwSecStatIPSmtpPktsFrom
+                Counter64,
+            hwSecStatIPHttpPktsFrom
+                Counter64,
+            hwSecStatIPH323PktsFrom
+                Counter64,
+            hwSecStatIPRtspPktsFrom
+                Counter64,
+            hwSecStatClearIPOutInfo
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.1
+    hwSecStatIPOutInfoIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of host."
+        ::= { hwSecStatIPOutInfoEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.2
+    hwSecStatIPTcpSessFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of TCP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.3
+    hwSecStatIPUdpSessFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of UDP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.4
+    hwSecStatIPIcmpSessFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ICMP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.5
+    hwSecStatIPConnFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of session from this host."
+        ::= { hwSecStatIPOutInfoEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.6
+    hwSecStatIPHalfConnFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of incomplete session from this host."
+        ::= { hwSecStatIPOutInfoEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.7
+    hwSecStatIPTcpSessSpeedFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of TCP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.8
+    hwSecStatIPUdpSessSpeedFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of UDP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.9
+    hwSecStatIPIcmpSessSpeedFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of ICMP session from this host."
+        ::= { hwSecStatIPOutInfoEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.10
+    hwSecStatIPConnSpeedFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of session from this host."
+        ::= { hwSecStatIPOutInfoEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.11
+    hwSecStatIPHalfConnSpeedFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The establishing speed of TCP incomplete session from this host."
+        ::= { hwSecStatIPOutInfoEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.12
+    hwSecStatIPAclDenyIcmpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped ICMP packets from this host by ACL"
+        ::= { hwSecStatIPOutInfoEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.13
+    hwSecStatIPAclDenyIcmpOctsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of dropped ICMP packets from this host by ACL"
+        ::= { hwSecStatIPOutInfoEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.14
+    hwSecStatIPAclDenyNonIcmpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped non ICMP packets from this host by ACL"
+        ::= { hwSecStatIPOutInfoEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.15
+    hwSecStatIPAclDenyNonIcmpOctsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of dropped non ICMP packets from this host by ACL"
+        ::= { hwSecStatIPOutInfoEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.16
+    hwSecStatIPBlsDenyPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets from this host by blacklist."
+        ::= { hwSecStatIPOutInfoEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.17
+    hwSecStatIPAclDftDenyPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped packets from this host by default ACL."
+        ::= { hwSecStatIPOutInfoEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.18
+    hwSecStatIPAclDftDenyIcmpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of dropped ICMP packets from this host by default ACL."
+        ::= { hwSecStatIPOutInfoEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.19
+    hwSecStatIPFtpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of FTP packets from this host."
+        ::= { hwSecStatIPOutInfoEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.20
+    hwSecStatIPSmtpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of SMTP packets from this host."
+        ::= { hwSecStatIPOutInfoEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.21
+    hwSecStatIPHttpPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of HTTP packets from this host."
+        ::= { hwSecStatIPOutInfoEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.22
+    hwSecStatIPH323PktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of H323 packets from this host."
+        ::= { hwSecStatIPOutInfoEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.23
+    hwSecStatIPRtspPktsFrom OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of RTSP packets from this host."
+        ::= { hwSecStatIPOutInfoEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.1.3.1.24
+    hwSecStatClearIPOutInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for clearing the statistics information of this IP.
+            When you want to clear the information of this IP, set this OID to 1.
+            "
+        ::= { hwSecStatIPOutInfoEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.3
+    hwSecStatConformance OBJECT IDENTIFIER ::= { hwSecStatIPMonitor 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.3.1
+    hwSecStatCompliance OBJECT IDENTIFIER ::= { hwSecStatConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.3.2
+    hwSecStatMibGroups OBJECT IDENTIFIER ::= { hwSecStatConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.4.3.2.5
+    hwSecStatIPMonitorGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSecStatIPTcpSessTo, 
+            hwSecStatIPUdpSessTo, 
+            hwSecStatIPIcmpSessTo, 
+            hwSecStatIPConnTo, 
+            hwSecStatIPHalfConnTo, 
+            hwSecStatIPTcpSessSpeedTo, 
+            hwSecStatIPUdpSessSpeedTo, 
+            hwSecStatIPIcmpSessSpeedTo, 
+            hwSecStatIPConnSpeedTo, 
+            hwSecStatIPHalfConnSpeedTo, 
+            hwSecStatIPAclDenyIcmpPktsTo, 
+            hwSecStatIPAclDenyIcmpOctsTo, 
+            hwSecStatIPAclDenyNonIcmpPktsTo, 
+            hwSecStatIPAclDenyNonIcmpOctsTo, 
+            hwSecStatIPAclDftDenyIcmpPktsTo, 
+            hwSecStatIPIcmpFloodDropPktsTo, 
+            hwSecStatIPUdpFloodDropPktsTo, 
+            hwSecStatIPFtpPktsTo, 
+            hwSecStatIPSmtpPktsTo, 
+            hwSecStatIPHttpPktsTo, 
+            hwSecStatIPH323PktsTo, 
+            hwSecStatIPRtspPktsTo, 
+            hwSecStatIPTcpSessFrom, 
+            hwSecStatIPUdpSessFrom, 
+            hwSecStatIPIcmpSessFrom, 
+            hwSecStatIPConnFrom, 
+            hwSecStatIPHalfConnFrom, 
+            hwSecStatIPTcpSessSpeedFrom, 
+            hwSecStatIPUdpSessSpeedFrom, 
+            hwSecStatIPIcmpSessSpeedFrom, 
+            hwSecStatIPConnSpeedFrom, 
+            hwSecStatIPHalfConnSpeedFrom, 
+            hwSecStatIPAclDenyIcmpPktsFrom, 
+            hwSecStatIPAclDenyIcmpOctsFrom, 
+            hwSecStatIPAclDenyNonIcmpPktsFrom, 
+            hwSecStatIPAclDenyNonIcmpOctsFrom, 
+            hwSecStatIPAclDftDenyIcmpPktsFrom, 
+            hwSecStatIPFtpPktsFrom, 
+            hwSecStatIPSmtpPktsFrom, 
+            hwSecStatIPHttpPktsFrom, 
+            hwSecStatIPH323PktsFrom, 
+            hwSecStatIPOutInfoIpAddress, 
+            hwSecStatIPInInfoIpAddress, 
+            hwSecStatClearIPOutInfo, 
+            hwSecStatClearIPInInfo, 
+            hwSecStatClearAllIPInfo, 
+            hwSecStatIPRtspPktsFrom, 
+            hwSecStatIPBlsDenyPktsTo, 
+            hwSecStatIPAclDftDenyPktsTo, 
+            hwSecStatIPBlsDenyPktsFrom, 
+            hwSecStatIPAclDftDenyPktsFrom }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSecStatMibGroups 5 }
+
+END

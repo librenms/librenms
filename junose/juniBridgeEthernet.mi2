@@ -1,0 +1,310 @@
+
+-- *****************************************************************************
+-- Juniper-BRIDGE-ETHERNET-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Bridge Ethernet MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-BRIDGE-ETHERNET-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniBridgeEthernetMIB   MODULE-IDENTITY
+    LAST-UPDATED "200512141710Z"  -- 14-Dec-05 01:10 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net" 
+    DESCRIPTION
+        "The Bridge Ethernet MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200512141710Z"  -- 14-Dec-05 01:10 PM EDT  - JUNOSe 8.0
+    DESCRIPTION
+        "Added interface MTU object."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200009261443Z"  -- 26-Sep-00 10:43 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION    "200003272345Z"  -- 27-Mar-00 06:45 PM EST  - JUNOSe 1.3
+    DESCRIPTION
+        "Obsolete juniBridgedEthProxyArp."
+    REVISION      "9912101830Z"  -- 10-Dec-99 1:30 PM EST
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 31 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgedEthernetObjects     OBJECT IDENTIFIER ::= { juniBridgeEthernetMIB 1 }
+
+-- 
+-- This MIB contains managed objects for the bridged Ethernet
+-- sublayer interface.
+--
+-- Management objects are provided to query for an available
+-- interface index, and to create/delete interfaces of that type.
+-- Creating/deleting these interface types using this MIB has the
+-- side effect of creating/deleting corresponding entries in the
+-- Interface MIB ifTable/ifXTable, and in the Juniper Enterprise
+-- Interface MIB juniIfTable.
+--
+
+juniBridgedEthernetIfLayer  OBJECT IDENTIFIER
+    ::= { juniBridgedEthernetObjects 1 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Bridged Ethernet Interface Layer
+--
+-- This layer is managed with the following elements:
+--
+--  o NextIfIndex (generator for Bridged Ethernet IfIndex selection)
+--  o Interface Table (creation/configuration/deletion of Bridged Ethernet
+--    interfaces)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new Brdiged Ethernet interfaces
+--
+juniBridgedEthernetNextIfIndex  OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniBridgedEthernetIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniBridgedEthernetIfLayer 1 }
+
+
+--
+-- The Bridged Ethernet Interface Table
+--
+juniBridgedEthernetIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniBridgedEthernetIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the BridgedEthernet service on this interface."
+    ::= { juniBridgedEthernetIfLayer 2 }
+
+juniBridgedEthernetIfEntry  OBJECT-TYPE
+    SYNTAX      JuniBridgedEthernetIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular Bridged Ethernet interface. 
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniBridgedEthernetIfIfIndex }
+    ::= { juniBridgedEthernetIfTable 1 }
+
+JuniBridgedEthernetIfEntry ::= SEQUENCE {
+    juniBridgedEthernetIfIfIndex        InterfaceIndex,
+    juniBridgedEthernetProxyArp         INTEGER,
+    juniBridgedEthernetIfLowerIfIndex   InterfaceIndexOrZero,
+    juniBridgedEthernetIfRowStatus      RowStatus,
+    juniBridgedEthernetIfMtu            Integer32 }
+
+juniBridgedEthernetIfIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ifEntry."
+    ::= { juniBridgedEthernetIfEntry 1 }
+
+juniBridgedEthernetProxyArp  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enableRestricted(1),
+                   enableUnrestricted(2),
+                   disable(3) }
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The proxyArp configuration setting for this entry.
+        
+        *** NOTE: This MIB object has been obsoleted. ***"
+    DEFVAL    { enableRestricted }
+    ::= { juniBridgedEthernetIfEntry 2 }
+
+juniBridgedEthernetIfLowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this Bridged Ethernet interface
+        is to be layered.  A value of zero indicates no layering.  An
+        implementation may choose to require that a nonzero value be configured
+        at entry creation."
+    ::= { juniBridgedEthernetIfEntry 3 }
+
+juniBridgedEthernetIfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+            
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniBridgedEthernetIfRowStatus
+            juniBridgedEthernetIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniBridgedEthernetIfIndex must have been determined
+            previously, by reading juniBridgedEthernetNextIfIndex. 
+
+            The interface identified by juniBridgedEthernetIfLowerIfIndex must
+            exist, and must be an interface type that permits layering of
+            Bridged Ethernet above it.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is
+        created/destroyed as a result of creating/destroying an entry in this
+        table."
+    ::= { juniBridgedEthernetIfEntry 4 }
+
+juniBridgedEthernetIfMtu OBJECT-TYPE
+    SYNTAX      Integer32 (64..9180)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured maximum transfer unit (MTU) for this ethernet interface.
+        The operational value is reported in the corresponding Interfaces MIB
+        ifMtu object."
+    DEFVAL    { 1518 }
+    ::= { juniBridgedEthernetIfEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniBridgeEthernetTrapControl  OBJECT IDENTIFIER
+--     ::= { juniBridgeEthernetMIB 2 }
+-- juniBridgedEthernetTraps  OBJECT IDENTIFIER
+--     ::= { juniBridgeEthernetMIB 3 }
+-- juniBridgeEthernetPrefix  OBJECT IDENTIFIER
+--     ::= { juniBridgeEthernetTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniBridgeEthernetConformance  OBJECT IDENTIFIER
+    ::= { juniBridgeEthernetMIB 4 }
+juniBridgeEthernetCompliances  OBJECT IDENTIFIER
+    ::= { juniBridgeEthernetConformance 1 }
+juniBridgeEthernetGroups  OBJECT IDENTIFIER
+    ::= { juniBridgeEthernetConformance 2 }
+
+--
+-- compliance statements
+--
+juniBridgedEthernetCompliance  MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        bridged Ethernet MIB.  This statement became deprecated when
+        additional configuration for Bridged Ethernet was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS { juniBridgedEthernetGroup2 }
+    ::= { juniBridgeEthernetCompliances 1 }                        -- JUNOSe 1.3
+
+juniBridgedEthernetCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        bridged Ethernet MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS { juniBridgedEthernetGroup3 }
+    ::= { juniBridgeEthernetCompliances 2 }                        -- JUNOSe 7.3
+
+--
+-- units of conformance
+--
+juniBridgedEthernetGroup  OBJECT-GROUP
+    OBJECTS {
+        juniBridgedEthernetNextIfIndex,
+        juniBridgedEthernetIfIfIndex,
+        juniBridgedEthernetProxyArp,
+        juniBridgedEthernetIfLowerIfIndex,
+        juniBridgedEthernetIfRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of Bridged Ethernet
+        interfaces in a Juniper product.  This group became obsolete when
+        juniBridgedEthernetProxyArp was made obsolete."
+    ::= { juniBridgeEthernetGroups 1 }
+
+juniBridgedEthernetGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniBridgedEthernetNextIfIndex,
+        juniBridgedEthernetIfIfIndex,
+        juniBridgedEthernetIfLowerIfIndex,
+        juniBridgedEthernetIfRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing management of Bridged Ethernet
+        interfaces in a Juniper product.  This group became deprecated 
+        when the juniBridgedEthernetIfMtu object was added."
+    ::= { juniBridgeEthernetGroups 2 }
+
+juniBridgedEthernetGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniBridgedEthernetNextIfIndex,
+        juniBridgedEthernetIfIfIndex,
+        juniBridgedEthernetIfLowerIfIndex,
+        juniBridgedEthernetIfRowStatus,
+        juniBridgedEthernetIfMtu }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Bridged Ethernet
+        interfaces in a Juniper product."
+    ::= { juniBridgeEthernetGroups 3 }
+
+END

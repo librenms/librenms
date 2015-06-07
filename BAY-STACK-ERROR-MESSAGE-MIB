@@ -1,0 +1,86 @@
+
+BAY-STACK-ERROR-MESSAGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
+
+bayStackErrorMessageMib    MODULE-IDENTITY
+   LAST-UPDATED "200611140000Z"
+   ORGANIZATION "Nortel Networks"
+   CONTACT-INFO ""
+   DESCRIPTION
+       "General BayStack MIB."
+
+   REVISION "200611140000Z" -- 11 Nov 2006
+   DESCRIPTION
+       "Version 1:  Initial version."
+
+   ::= { bayStackMibs 19 }
+
+bsemObjects OBJECT IDENTIFIER ::= { bayStackErrorMessageMib 1 }
+
+bsemErrorMessageTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BsemErrorMessageEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains error messages for failed
+                     SNMP Set requests."
+    ::= { bsemObjects 1 }
+
+bsemErrorMessageEntry OBJECT-TYPE
+    SYNTAX       BsemErrorMessageEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "An error message for a failed SNMP Set request."
+    INDEX        { bsemErrorMessageAddressType,
+                   bsemErrorMessageAddress,
+                   bsemErrorMessageRequestId }
+    ::= { bsemErrorMessageTable 1 }
+
+BsemErrorMessageEntry ::=
+    SEQUENCE {
+        bsemErrorMessageAddressType     InetAddressType,
+        bsemErrorMessageAddress         InetAddress,
+        bsemErrorMessageRequestId       Unsigned32,
+        bsemErrorMessageString          DisplayString
+    }
+
+bsemErrorMessageAddressType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The type of address contained in
+                   bsemErrorMessageAddress."
+    ::= { bsemErrorMessageEntry 1 }
+
+bsemErrorMessageAddress OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The IP address from which the failed SNMP Set
+                   request was received."
+    ::= { bsemErrorMessageEntry 2 }
+
+bsemErrorMessageRequestId OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The request-id of the Set request PDU that failed."
+    ::= { bsemErrorMessageEntry 3 }
+
+bsemErrorMessageString OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The error message for the failed Set request."
+    ::= { bsemErrorMessageEntry 4 }
+
+END
+

@@ -1,0 +1,130 @@
+-- MIB created 10/05/94 13:42:27, by
+--   SMIC (the next generation) version 1.6.15, October 3, 1994.
+
+-- SNMPv2-SMI-v1 DEFINITIONS ::= BEGIN
+
+-- From file: "rfc1442.sm2"
+-- Compile options "X A"
+
+-- SMI Counter32
+-- SMI Counter64
+-- SMI Gauge32
+-- SMI Integer32
+-- SMI IpAddress
+-- SMI NsapAddress
+-- SMI Opaque
+-- SMI TimeTicks
+-- SMI UInteger32
+
+-- internet        OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+-- directory       OBJECT IDENTIFIER ::= { internet 1 }
+-- mgmt            OBJECT IDENTIFIER ::= { internet 2 }
+-- experimental    OBJECT IDENTIFIER ::= { internet 3 }
+-- private         OBJECT IDENTIFIER ::= { internet 4 }
+-- enterprises     OBJECT IDENTIFIER ::= { private 1 }
+-- security        OBJECT IDENTIFIER ::= { internet 5 }
+-- snmpV2          OBJECT IDENTIFIER ::= { internet 6 }
+-- snmpDomains     OBJECT IDENTIFIER ::= { snmpV2 1 }
+-- snmpProxys      OBJECT IDENTIFIER ::= { snmpV2 2 }
+-- snmpModules     OBJECT IDENTIFIER ::= { snmpV2 3 }
+
+
+-- END
+
+
+SNMPv2-TC-v1 DEFINITIONS ::= BEGIN
+
+-- From file: "rfc1443.sm2"
+-- Compile options "X G A"
+
+-- IMPORTS
+--    TimeTicks
+--            FROM SNMPv2-SMI-v1;
+   IMPORTS
+       TimeTicks
+              FROM RFC1155-SMI;
+
+DisplayString ::= OCTET STRING(SIZE(0..255))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+PhysAddress ::= OCTET STRING
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+MacAddress ::= OCTET STRING(SIZE(6))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+TruthValue ::= INTEGER {
+        true(1),
+        false(2)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+TestAndIncr ::= INTEGER(0..2147483647)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+AutonomousType ::= OBJECT IDENTIFIER
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+InstancePointer ::= OBJECT IDENTIFIER
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+RowStatus ::= INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+TimeStamp ::= TimeTicks
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+TimeInterval ::= INTEGER(0..2147483647)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+DateAndTime ::= OCTET STRING(SIZE(8 | 11))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+RowPointer ::= OBJECT IDENTIFIER
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+
+
+END
+
+
+SNMPv2-CONF-v1 DEFINITIONS ::= BEGIN
+
+-- From file: "rfc1444.sm2"
+-- Compile options "X A"
+
+
+END
+
+
+

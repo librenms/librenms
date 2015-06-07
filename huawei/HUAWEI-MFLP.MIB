@@ -1,0 +1,513 @@
+-- ==================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI mac flapping management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Varibles and types be imported
+--
+-- ==================================================================
+HUAWEI-MFLP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hwDatacomm 
+            FROM HUAWEI-MIB
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    VlanId            
+        FROM Q-BRIDGE-MIB   
+    EnabledStatus
+        FROM P-BRIDGE-MIB             
+    IpAddress, OBJECT-TYPE, Unsigned32, MODULE-IDENTITY
+        FROM SNMPv2-SMI;                         
+        
+    hwMFlpMIB MODULE-IDENTITY 
+            LAST-UPDATED "200801021629Z"        
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "Mac flapping management MIB."    
+        ::= { hwDatacomm 160 }        
+
+  
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hwMflpObjects OBJECT IDENTIFIER ::= { hwMFlpMIB 1 }     
+        
+    -- Configured mac flapping table 
+        hwMflpVlanCfgTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMflpVlanCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The mac flapping table.The table that 
+                        contains the mac flapping information 
+                        currently operating in VLAN mode on this device."
+                ::= { hwMflpObjects 1 }
+        
+        hwMflpVlanCfgEntry OBJECT-TYPE
+                SYNTAX HwMflpVlanCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the mac flapping table in VLAN mode."
+                INDEX { hwMflpVlanId }
+                ::= { hwMflpVlanCfgTable 1 }
+        
+        HwMflpVlanCfgEntry ::=
+                SEQUENCE { 
+                        hwMflpVlanId
+                                VlanId,
+                        hwMflpVlanCfgLoopTimes
+                                Unsigned32,
+                        hwMflpVlanCfgDetectCycle
+                                Unsigned32,                    
+                        hwMflpVlanCfgCycles
+                                Unsigned32,
+                        hwMflpVlanCfgAction
+                                INTEGER,
+                        hwMflpVlanCfgBlockTime
+                                Unsigned32,
+                        hwMflpVlanCfgRetryTimes
+                                Unsigned32,                                
+                        hwMflpVlanCfgIfName
+                                DisplayString,
+                        hwMflpVlanCfgAlarmReason
+                                DisplayString,
+                        hwMflpVlanCfgRowstatus
+                                RowStatus                                
+                 }
+        
+        hwMflpVlanId OBJECT-TYPE
+                SYNTAX VlanId
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VLAN ID referring to the VLAN which is correlative to the hwMflpVlanCfg table."
+                ::= { hwMflpVlanCfgEntry 1 }
+
+        hwMflpVlanCfgLoopTimes OBJECT-TYPE
+                SYNTAX Unsigned32 (3..1000)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The number of mac move-times."
+                ::= { hwMflpVlanCfgEntry 2 }
+                
+        hwMflpVlanCfgDetectCycle OBJECT-TYPE
+                SYNTAX Unsigned32 (3..30)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The interval of detecting the mac move-times."
+                ::= { hwMflpVlanCfgEntry 3 }    
+                
+        hwMflpVlanCfgCycles OBJECT-TYPE
+                SYNTAX Unsigned32 (1..15)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The number of interval."
+                ::= { hwMflpVlanCfgEntry 4 }                     
+
+        hwMflpVlanCfgAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                block(1),
+                alarmOnly(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The action switch of this entry. The meanings of
+                         the values are:
+                         block(1), alarmOnly(2)"
+                DEFVAL { block }
+                ::= { hwMflpVlanCfgEntry 5 }
+                                
+        hwMflpVlanCfgBlockTime OBJECT-TYPE
+                SYNTAX Unsigned32 (0..65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The blocked time of the interface.
+                        When the value of hwMflpAction is 1, value of hwMflpBlockTime should be 
+                        between 10 and 65535."
+                ::= { hwMflpVlanCfgEntry 6 }  
+                
+        hwMflpVlanCfgRetryTimes OBJECT-TYPE
+                SYNTAX Unsigned32 (0..5)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The retry times of permanent interdiction."
+                ::= { hwMflpVlanCfgEntry 7 }                
+                
+        hwMflpVlanCfgIfName OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The interface name, only used for trap."
+                    ::= { hwMflpVlanCfgEntry 8 } 
+                        
+        hwMflpVlanCfgAlarmReason OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The alarm reason, only used for trap."
+                    ::= { hwMflpVlanCfgEntry 9 }                  
+                                    
+        hwMflpVlanCfgRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwMflpVlanCfgEntry 10 }    
+    
+        hwMflpVsiCfgTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMflpVsiCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The mac flapping table .The table that 
+                        contains the mac flapping information 
+                        currently operating in VSI mode on this device."
+                ::= { hwMflpObjects 2 }
+        
+        hwMflpVsiCfgEntry OBJECT-TYPE
+                SYNTAX HwMflpVsiCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of The mac flapping table in VSI mode."
+                INDEX { hwMflpVsiName }
+                ::= { hwMflpVsiCfgTable 1 }
+        
+        HwMflpVsiCfgEntry ::=
+                SEQUENCE { 
+                        hwMflpVsiName
+                                OCTET STRING,
+                        hwMflpVsiCfgLoopTimes
+                                Unsigned32,
+                        hwMflpVsiCfgDetectCycle
+                                Unsigned32,                    
+                        hwMflpVsiCfgCycles
+                                Unsigned32,
+                        hwMflpVsiCfgAction
+                                INTEGER,
+                        hwMflpVsiCfgBlockTime
+                                Unsigned32,
+                        hwMflpVsiCfgRetryTimes
+                                Unsigned32,                                
+                        hwMflpVsiCfgBlockPolicy
+                                INTEGER, 
+                        hwMflpVsiCfgAcName
+                                DisplayString,
+                        hwMflpVsiCfgAlarmReason
+                                DisplayString,
+                        hwMflpVsiCfgIpAddr
+                                IpAddress,
+                        hwMflpVsiCfgPwId
+                                Unsigned32,        
+                        hwMflpVsiCfgRowstatus
+                                RowStatus                                
+                 }
+        
+        hwMflpVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..32))
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VSI name referring to the VSI which is correlative to the hwMflpVsiCfg table."
+                ::= { hwMflpVsiCfgEntry 1 }
+
+        hwMflpVsiCfgLoopTimes OBJECT-TYPE
+                SYNTAX Unsigned32 (3..1000)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The number of loop-times."
+                ::= { hwMflpVsiCfgEntry 2 }
+                
+        hwMflpVsiCfgDetectCycle OBJECT-TYPE
+                SYNTAX Unsigned32 (3..30)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The interval of detecting the loop-times."
+                ::= { hwMflpVsiCfgEntry 3 }    
+                
+        hwMflpVsiCfgCycles OBJECT-TYPE
+                SYNTAX Unsigned32 (1..15)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The number of detect-cycle."
+                ::= { hwMflpVsiCfgEntry 4 }                     
+
+        hwMflpVsiCfgAction OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                block(1),
+                alarmOnly(2)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The action switch of this entry. The meanings of
+                         the values are:
+                         block(1), alarmOnly(2)"
+                DEFVAL { block }
+                ::= { hwMflpVsiCfgEntry 5 }
+                                
+        hwMflpVsiCfgBlockTime OBJECT-TYPE
+                SYNTAX Unsigned32 (0..65535)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The blocked time of the interface.
+                        When the value of hwMflpAction is 1, value of hwMflpBlockTime should be 
+                        between 10 and 65535."
+                ::= { hwMflpVsiCfgEntry 6 }  
+                
+        hwMflpVsiCfgRetryTimes OBJECT-TYPE
+                SYNTAX Unsigned32 (0..5)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The retry times of permanent interdiction."
+                ::= { hwMflpVsiCfgEntry 7 }                
+                                
+        hwMflpVsiCfgBlockPolicy OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                default(1),
+                acFirst(2),
+                pwFirst(3),
+                acOnly(4)
+                }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The block policy switch of this entry. The meanings of
+                         the values are:
+                         default(1), acFirst(2), pwFirst(3), acOnly(4)"
+                DEFVAL { default }         
+                ::= { hwMflpVsiCfgEntry 8 }   
+                
+        hwMflpVsiCfgAcName OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The AC interface name, only used for trap."
+                    ::= { hwMflpVsiCfgEntry 9 } 
+                        
+        hwMflpVsiCfgAlarmReason OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The alarm reason, only used for trap."
+                    ::= { hwMflpVsiCfgEntry 10 }                                                                                                        
+
+        hwMflpVsiCfgIpAddr OBJECT-TYPE
+                    SYNTAX IpAddress
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The peer IP address, only used for trap."
+                    ::= { hwMflpVsiCfgEntry 11 }  
+                    
+        hwMflpVsiCfgPwId OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The PW ID, only used for trap."
+                    ::= { hwMflpVsiCfgEntry 12 }                                
+                                    
+        hwMflpVsiCfgRowstatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The operating state of the row."
+                ::= { hwMflpVsiCfgEntry 13 }
+                
+        hwMflpGeneralObjects OBJECT IDENTIFIER ::= { hwMFlpMIB 2 }        
+                
+        hwMflpTrapEnable OBJECT-TYPE
+                SYNTAX EnabledStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the enable sign of MFLP notification."
+                DEFVAL { disable }
+                ::= { hwMflpGeneralObjects 1 }                
+
+--           
+-- MFLP MIB Trap Definitions
+-- 
+        hwMflpMIBTraps OBJECT IDENTIFIER ::= { hwMFlpMIB 3 }
+        
+        hwMflpIfBlock NOTIFICATION-TYPE
+            OBJECTS { hwMflpVlanCfgIfName, hwMflpVlanCfgBlockTime, hwMflpVlanCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface blocked."
+            ::= { hwMflpMIBTraps 1 }
+            
+        hwMflpIfResume NOTIFICATION-TYPE
+            OBJECTS { hwMflpVlanCfgIfName, hwMflpVlanCfgBlockTime, hwMflpVlanCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface resumed."
+            ::= { hwMflpMIBTraps 2 }            
+
+        hwMflpAcBlock NOTIFICATION-TYPE
+            OBJECTS { hwMflpVsiCfgAcName, hwMflpVsiCfgBlockTime, hwMflpVsiCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface blocked."
+            ::= { hwMflpMIBTraps 3 }  
+            
+        hwMflpAcResume NOTIFICATION-TYPE
+            OBJECTS { hwMflpVsiCfgAcName, hwMflpVsiCfgBlockTime, hwMflpVsiCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface resumed."
+            ::= { hwMflpMIBTraps 4 }                       
+
+        hwMflpPwBlock NOTIFICATION-TYPE
+            OBJECTS { hwMflpVsiCfgIpAddr, hwMflpVsiCfgPwId, hwMflpVsiCfgBlockTime, hwMflpVsiCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the PW blocked."
+            ::= { hwMflpMIBTraps 5 } 
+            
+        hwMflpPwResume NOTIFICATION-TYPE
+            OBJECTS { hwMflpVsiCfgIpAddr, hwMflpVsiCfgPwId, hwMflpVsiCfgBlockTime, hwMflpVsiCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the PW resumed."
+            ::= { hwMflpMIBTraps 6 } 
+            
+        hwMflpVlanAlarm NOTIFICATION-TYPE
+            OBJECTS { hwMflpVlanCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates alarm only when loop existed in vlan."
+            ::= { hwMflpMIBTraps 7 }     
+            
+        hwMflpVsiAlarm NOTIFICATION-TYPE
+            OBJECTS { hwMflpVsiCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates alarm only when loop existed in vsi."
+            ::= { hwMflpMIBTraps 8 }                                           
+                
+-- -------------------------------------------------------------
+-- IEEE 802.1Q MIB - Conformance Information
+-- -------------------------------------------------------------
+
+hwMflpConformance OBJECT IDENTIFIER ::= { hwMFlpMIB 4 }
+
+hwMflpCompliances OBJECT IDENTIFIER ::= { hwMflpConformance 1 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+hwMflpFullCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION 
+        "Description."
+    MODULE -- this module
+        MANDATORY-GROUPS { hwMflpVlanCfgGroup, hwMflpVsiCfgGroup, hwMflpTrapEnableGroup, hwMflpTrapGroup }
+    ::= { hwMflpCompliances 1 }
+    
+hwMflpGroups OBJECT IDENTIFIER ::= { hwMflpConformance 2 }    
+
+hwMflpVlanCfgGroup OBJECT-GROUP
+    OBJECTS {
+        hwMflpVlanCfgLoopTimes,
+        hwMflpVlanCfgDetectCycle,                   
+        hwMflpVlanCfgCycles,
+        hwMflpVlanCfgRetryTimes,
+        hwMflpVlanCfgAction,
+        hwMflpVlanCfgBlockTime,
+        hwMflpVlanCfgIfName,
+        hwMflpVlanCfgAlarmReason,        
+        hwMflpVlanCfgRowstatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+        mac flapping table."
+    ::= { hwMflpGroups 1 }    
+    
+hwMflpVsiCfgGroup OBJECT-GROUP
+    OBJECTS {
+        hwMflpVsiCfgLoopTimes,
+        hwMflpVsiCfgDetectCycle,                   
+        hwMflpVsiCfgCycles,
+        hwMflpVsiCfgRetryTimes,
+        hwMflpVsiCfgAction,
+        hwMflpVsiCfgBlockTime,
+        hwMflpVsiCfgBlockPolicy,
+        hwMflpVsiCfgAcName,
+        hwMflpVsiCfgAlarmReason,
+        hwMflpVsiCfgIpAddr,        
+        hwMflpVsiCfgPwId,
+        hwMflpVsiCfgRowstatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+        mac flapping table."
+    ::= { hwMflpGroups 2 }   
+    
+hwMflpTrapEnableGroup OBJECT-GROUP
+    OBJECTS { hwMflpTrapEnable }
+        STATUS current
+        DESCRIPTION 
+            "The Mflp trap enable group."
+        ::= { hwMflpGroups 3 }     
+        
+hwMflpTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+        hwMflpIfBlock, 
+        hwMflpIfResume, 
+        hwMflpAcBlock, 
+        hwMflpAcResume, 
+        hwMflpPwBlock, 
+        hwMflpPwResume,
+        hwMflpVlanAlarm,
+        hwMflpVsiAlarm
+        }
+        STATUS current
+        DESCRIPTION 
+            "Mflp Trap Group."
+        ::= { hwMflpGroups 4 }      
+                
+END

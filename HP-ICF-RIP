@@ -1,0 +1,280 @@
+HP-ICF-RIP DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, IpAddress
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, RowStatus
+            FROM SNMPv2-TC
+        rip2IfConfEntry
+            FROM RIPv2-MIB
+        IANAipRouteProtocol
+            FROM IANA-RTPROTO-MIB
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    hpicfRip MODULE-IDENTITY
+        LAST-UPDATED "200305130217Z" -- May 13, 2003
+        ORGANIZATION "Hewlett-Packard Company
+                      Workgroup Networks Division"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard RIP MIB."
+
+        REVISION     "200305130217Z" -- May 13, 2003
+        DESCRIPTION  "Added an object for configuring a default
+                     administrative distance for RIP routes."
+
+        REVISION     "200111130339Z" -- November 13, 2001
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 13 }
+
+    hpicfRipObjects OBJECT IDENTIFIER ::= { hpicfRip 1 }
+
+    hpicfRipGeneral OBJECT IDENTIFIER ::= { hpicfRipObjects 1 }
+
+    hpicfRipAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the RIP routing protocol."
+        ::= { hpicfRipGeneral 1 }
+
+    hpicfRipDefaultMetric OBJECT-TYPE
+        SYNTAX      INTEGER ( 1..15 )
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Default metric value for routes redistributed to
+                    RIP."
+        ::= { hpicfRipGeneral 2 }
+
+    hpicfRipAutoSummary OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A flag indicating whether RIP should perform
+                    border filtering on subnet routes when crossing
+                    a network boundary.  Interfaces that are configured
+                    for RIPv1 or RIPv1-compatible mode must always
+                    filter subnets at network boundaries.  Interfaces
+                    configured for RIPv2 mode will only filter subnets
+                    if this flag is set to 'true'.  Setting this to
+                    'true' will result in all subnets within a
+                    class-based network to be summarized using a single
+                    route for the subnet number, which can decrease the
+                    size of the routing tables.  However, if any networks
+                    are discontiguous, this flag should be set to 'false'
+                    for proper routing."
+        ::= { hpicfRipGeneral 3 }
+
+    hpicfRipDistance OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The administrative distance to associate with
+                    routes learned by RIP.  Routes with lower distances
+                    are preferred.  By default, RIP routes have
+                    an administrative distance of 120."
+        ::= { hpicfRipGeneral 4 }
+
+
+    hpicfRipIfConfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the rip2IfConfTable."
+        ::= { hpicfRipObjects 2 }
+
+    hpicfRipIfConfEntry OBJECT-TYPE
+        SYNTAX      HpicfIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for a single RIP interface."
+        AUGMENTS    { rip2IfConfEntry }
+        ::= { hpicfRipIfConfTable 1 }
+
+    HpicfIfConfEntry ::=
+        SEQUENCE {
+            hpicfRipIfConfDoPoison          TruthValue,
+            hpicfRipIfConfCost              Integer32
+        }
+
+    hpicfRipIfConfDoPoison OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Flag indicating if router should perform poison
+                    reverse on this interface."
+        DEFVAL      { true }
+        ::= { hpicfRipIfConfEntry 1 }
+
+    hpicfRipIfConfCost OBJECT-TYPE
+        SYNTAX      Integer32 (1..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "RIP metric for this interface."
+        DEFVAL      { 1 }
+        ::= { hpicfRipIfConfEntry 2 }
+
+
+    hpicfRipRedistTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfRipRedistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for configuring route redistribution
+                    into RIP."
+        ::= { hpicfRipObjects 3 }
+
+    hpicfRipRedistEntry OBJECT-TYPE
+        SYNTAX      HpicfRipRedistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table for configuring route
+                    redistribution into RIP from a single source
+                    protocol.  Entries in this table are not
+                    created dynamically.  There will be a single
+                    entry for each supported source protocol."
+        INDEX       { hpicfRipRedistSrcProto }
+        ::= { hpicfRipRedistTable 1 }
+
+    HpicfRipRedistEntry ::=
+        SEQUENCE {
+            hpicfRipRedistSrcProto          IANAipRouteProtocol,
+            hpicfRipRedistEnabled           TruthValue
+        }
+
+    hpicfRipRedistSrcProto OBJECT-TYPE
+        SYNTAX      IANAipRouteProtocol
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Source protocol to redistribute routes from."
+        ::= { hpicfRipRedistEntry 1 }
+
+    hpicfRipRedistEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A flag indicating whether RIP should
+                    redistribute routes from this source protocol."
+        ::= { hpicfRipRedistEntry 2 }
+
+
+    hpicfRipRedistRestrictTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfRipRedistRestrictEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table of route prefixes for filtering out
+                    routes that RIP should not redistribute.  Any
+                    route that is contained by a range in this table
+                    (in other words, has a longer mask than that
+                    specified by hpicfRipRedistRestrictMask and
+                    where the route destination ANDed with the
+                    hpicfRipRedistRestrictMask is equal to
+                    hpicfRipRedistRestrictAddr) will not be
+                    redistributed as an external route by RIP."
+        ::= { hpicfRipObjects 4 }
+
+    hpicfRipRedistRestrictEntry OBJECT-TYPE
+        SYNTAX      HpicfRipRedistRestrictEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A single entry in the table.  Any route,
+                    regardless of source protocol which is
+                    contained within the specified range will not
+                    be redistributed into RIP.  Entries in this
+                    table are created dynamically using the
+                    hpicfRipRedistRestrictStatus object."
+        INDEX       { hpicfRipRedistRestrictAddr,
+                      hpicfRipRedistRestrictMask }
+        ::= { hpicfRipRedistRestrictTable 1 }
+
+    HpicfRipRedistRestrictEntry ::=
+        SEQUENCE {
+            hpicfRipRedistRestrictAddr      IpAddress,
+            hpicfRipRedistRestrictMask      IpAddress,
+            hpicfRipRedistRestrictStatus    RowStatus
+        }
+
+    hpicfRipRedistRestrictAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of the range of route entries
+                    to exclude from redistribution into RIP."
+        ::= { hpicfRipRedistRestrictEntry 1 }
+
+    hpicfRipRedistRestrictMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The mask for the range of route entries to
+                    exclude from redistribution into RIP."
+        ::= { hpicfRipRedistRestrictEntry 2 }
+
+    hpicfRipRedistRestrictStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this entry."
+        ::= { hpicfRipRedistRestrictEntry 3 }
+
+
+    hpicfRipConformance OBJECT IDENTIFIER ::= { hpicfRip 2 }
+
+    hpicfRipGroups OBJECT IDENTIFIER ::= { hpicfRipConformance 1 }
+
+    hpicfRipBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfRipAdminStatus,
+                      hpicfRipDefaultMetric,
+                      hpicfRipAutoSummary }
+        STATUS      current
+        DESCRIPTION "Basic RIP configuration information that is not
+                    present in the standard RIP MIB."
+        ::= { hpicfRipGroups 1 }
+
+    hpicfRipIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfRipIfConfDoPoison,
+                      hpicfRipIfConfCost }
+        STATUS      current
+        DESCRIPTION "RIP interface configuration information that is
+                    not present in the standard RIP MIB."
+        ::= { hpicfRipGroups 2 }
+
+    hpicfRipRedistGroup OBJECT-GROUP
+        OBJECTS     { hpicfRipRedistEnabled,
+                      hpicfRipRedistRestrictStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects for controlling the
+                    redistribution of external routes by RIP."
+        ::= { hpicfRipGroups 3 }
+
+    hpicfRipDistanceGroup OBJECT-GROUP
+        OBJECTS     { hpicfRipDistance }
+        STATUS      current
+        DESCRIPTION "A collection of objects for configuring the
+                    administrative distance of routes learned by RIP."
+        ::= { hpicfRipGroups 4 }
+
+
+    hpicfRipCompliances OBJECT IDENTIFIER ::= { hpicfRipConformance 2 }
+
+    hpicfRipCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Routing switches
+                    that support RIP."
+        MODULE
+            MANDATORY-GROUPS { hpicfRipBaseGroup,
+                               hpicfRipIfGroup }
+
+            GROUP        hpicfRipRedistGroup
+            DESCRIPTION  "This group is mandatory for systems
+                         that support route redistribution."
+        ::= { hpicfRipCompliances 1 }
+
+END

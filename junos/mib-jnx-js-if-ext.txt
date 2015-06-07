@@ -1,0 +1,367 @@
+-- *******************************************************************
+--Juniper enterprise security Interface extension objects MIB.
+--
+--Copyright(c) 2001 - 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+--The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+
+    JUNIPER-JS-IF-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+        Counter64, Counter32,
+        MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+        DisplayString FROM SNMPv2-TC
+
+        ifIndex FROM IF-MIB
+        jnxJsIf FROM JUNIPER-JS-SMI;
+
+
+        jnxJsIfMIB      MODULE-IDENTITY
+            LAST-UPDATED "200705090000Z"-- May 09, 2007
+            ORGANIZATION "Juniper Networks, Inc."
+            CONTACT-INFO
+                "Juniper Technical Assistance Center
+                Juniper Networks, Inc.
+                1194 N.Mathilda Avenue
+                Sunnyvale, CA 94089
+
+                E - mail:support @ juniper.net
+                HTTP://www.juniper.net "
+
+            DESCRIPTION
+                "This module defines the object that are used to monitor
+                the entries in the interfaces pertaining to the security
+                management of the interface."
+
+            REVISION "200705090000Z"-- May 09, 2007
+            DESCRIPTION 
+                "Creation Date"
+            ::= {jnxJsIf 1}
+
+
+    --
+    --node to create the objects
+    --
+    jnxJsIfExtension OBJECT IDENTIFIER ::= {jnxJsIfMIB 1}
+
+
+    --***************************************************************
+    --The Juniper Security interface extension table.
+    -- ***************************************************************
+
+    jnxJsIfMonTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF JnxJsIfMonEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table extend the interface entries to support 
+            security related objects on a particular interface.
+            The table is index by ifIndex."
+        ::= {jnxJsIfExtension 1}
+
+    jnxJsIfMonEntry OBJECT-TYPE
+        SYNTAX JnxJsIfMonEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry pertains to an interface."
+        INDEX {ifIndex}
+        ::= {jnxJsIfMonTable 1}
+
+    JnxJsIfMonEntry ::= SEQUENCE
+    {
+        jnxJsIfMonInIcmp            Counter32,
+        jnxJsIfMonInSelf            Counter32,
+        jnxJsIfMonInVpn             Counter32,
+        jnxJsIfMonInPolicyPermit    Counter64,
+        jnxJsIfMonOutPolicyPermit   Counter64,
+        jnxJsIfMonConn              Counter32,
+        jnxJsIfMonInMcast           Counter32,
+        jnxJsIfMonOutMcast          Counter32,
+        jnxJsIfMonPolicyDeny        Counter32,
+        jnxJsIfMonNoGateParent      Counter32,
+        jnxJsIfMonTcpProxyDrop      Counter32,
+        jnxJsIfMonNoDip             Counter32,
+        jnxJsIfMonNoNspTunnel       Counter32,
+        jnxJsIfMonNoNatCon          Counter32,
+        jnxJsIfMonInvalidZone       Counter32,
+        jnxJsIfMonIpClsFail         Counter32,
+        jnxJsIfMonAuthDrop          Counter32,
+        jnxJsIfMonMultiUserAuthDrop Counter32,
+        jnxJsIfMonLoopMultiDipDrop  Counter32,
+        jnxJsIfMonAddrSpoof         Counter32,
+        jnxJsIfMonLpDrop            Counter32,
+        jnxJsIfMonNullZone          Counter32,
+        jnxJsIfMonNoGate            Counter32,
+        jnxJsIfMonNoMinorSess       Counter32,
+        jnxJsIfMonNvecErr           Counter32,
+        jnxJsIfMonTcpSeq            Counter32,
+        jnxJsIfMonIllegalPak        Counter32,
+        jnxJsIfMonNoRoute           Counter32,
+        jnxJsIfMonAuthFail          Counter32,
+        jnxJsIfMonSaInactive        Counter32,
+        jnxJsIfMonNoSa              Counter32,
+        jnxJsIfMonSelfPktDrop       Counter32
+    }
+
+    jnxJsIfMonInIcmp OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ICMP packets received."
+        ::= {jnxJsIfMonEntry 1}
+
+    jnxJsIfMonInSelf OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets for self received."
+        ::= {jnxJsIfMonEntry 2}
+
+    jnxJsIfMonInVpn OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VPN packets received."
+        ::= {jnxJsIfMonEntry 3}
+
+    jnxJsIfMonInPolicyPermit OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Incoming bytes permitted by policy."
+        ::= {jnxJsIfMonEntry 4}
+
+    jnxJsIfMonOutPolicyPermit OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Outgoing bytes permitted by policy."
+        ::= {jnxJsIfMonEntry 5}
+
+    jnxJsIfMonConn OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Incoming connections established."
+        ::= {jnxJsIfMonEntry 6}
+
+    jnxJsIfMonInMcast OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Multicast packets received."
+        ::= {jnxJsIfMonEntry 7}
+
+    jnxJsIfMonOutMcast OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Multicast packets sent."
+        ::= {jnxJsIfMonEntry 8}
+
+    jnxJsIfMonPolicyDeny OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to policy deny."
+        ::= {jnxJsIfMonEntry 9}
+
+    jnxJsIfMonNoGateParent OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no parent for a gate."
+        ::= {jnxJsIfMonEntry 10}
+
+    jnxJsIfMonTcpProxyDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to syn-attack protection."
+        ::= {jnxJsIfMonEntry 11}
+
+    jnxJsIfMonNoDip OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to dip errors."
+        ::= {jnxJsIfMonEntry 12}
+
+    jnxJsIfMonNoNspTunnel OBJECT-TYPE
+         SYNTAX Counter32
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Packets dropped because no nsp tunnel found."
+        ::= {jnxJsIfMonEntry 13}
+
+    jnxJsIfMonNoNatCon OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no more sessions."
+        ::= {jnxJsIfMonEntry 14}
+
+    jnxJsIfMonInvalidZone OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because an invalid zone received the packet."
+        ::= {jnxJsIfMonEntry 15}
+
+    jnxJsIfMonIpClsFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to IP classification failure."
+        ::= {jnxJsIfMonEntry 16}
+
+    jnxJsIfMonAuthDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to user auth errors."
+        ::= {jnxJsIfMonEntry 17}
+
+    jnxJsIfMonMultiUserAuthDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to multiple user auth in loopback sessions."
+        ::= {jnxJsIfMonEntry 18}
+
+    jnxJsIfMonLoopMultiDipDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to multiple DIP in loopback sessions."
+        ::= {jnxJsIfMonEntry 19}
+
+    jnxJsIfMonAddrSpoof OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to address spoofing."
+        ::= {jnxJsIfMonEntry 20}
+
+    jnxJsIfMonLpDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no loopback."
+        ::= {jnxJsIfMonEntry 21}
+
+    jnxJsIfMonNullZone OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no zone or null-zone binding."
+        ::= {jnxJsIfMonEntry 22}
+
+    jnxJsIfMonNoGate OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no nat gate."
+        ::= {jnxJsIfMonEntry 23}
+
+    jnxJsIfMonNoMinorSess OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no minor session."
+        ::= {jnxJsIfMonEntry 24}
+
+    jnxJsIfMonNvecErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped due to no session for gate."
+        ::= {jnxJsIfMonEntry 25}
+
+    jnxJsIfMonTcpSeq OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because TCP seq number out of window."
+        ::= {jnxJsIfMonEntry 26}
+
+    jnxJsIfMonIllegalPak OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because they didn't make any sense."
+        ::= {jnxJsIfMonEntry 27}
+
+    jnxJsIfMonNoRoute OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because no route present."
+        ::= {jnxJsIfMonEntry 28}
+                        
+    jnxJsIfMonAuthFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because auth failed."
+        ::= {jnxJsIfMonEntry 29}
+
+    jnxJsIfMonSaInactive OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because sa is not active."
+        ::= {jnxJsIfMonEntry 30}
+
+    jnxJsIfMonNoSa OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because no sa found for incoming spi."
+        ::= {jnxJsIfMonEntry 31}
+
+    jnxJsIfMonSelfPktDrop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packets dropped because no one interested in self packets."
+        ::= {jnxJsIfMonEntry 32}
+            
+END

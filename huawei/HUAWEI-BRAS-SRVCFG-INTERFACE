@@ -1,0 +1,1832 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-SRVCFGINTERFACE-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--       
+-- =================================================================
+
+        HUAWEI-BRAS-SRVCFGINTERFACE-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwBRASMib                     
+                                FROM HUAWEI-MIB
+                        InterfaceIndex                  
+                                FROM IF-MIB                     
+                        IpAddress, Integer32, OBJECT-TYPE                       
+                                FROM SNMPv2-SMI                 
+                        RowStatus, MacAddress, TruthValue, DisplayString                        
+                                FROM SNMPv2-TC
+                        EnabledStatus
+                                FROM P-BRIDGE-MIB;
+        
+                hwBRASSrvcfgInterface MODULE-IDENTITY 
+                        LAST-UPDATED "200403041608Z"
+                        ORGANIZATION 
+                                "
+                                Huawei Technologies Co., Ltd.
+                                "
+                CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com 
+                        "
+            
+                DESCRIPTION 
+                        "The MIB contains objects of module SRVCFG INTERFACE."
+                ::= { hwBRASMib 1 }
+        
+                hwSrvcfgInterfaceMibObjects OBJECT IDENTIFIER ::= { hwBRASSrvcfgInterface 1 }
+                
+                hwBRASIfCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwBRASIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                BRAS接口配置表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 1 }
+                
+                hwBRASIfCfgEntry OBJECT-TYPE
+                        SYNTAX HwBRASIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Description.
+                                "
+                        INDEX { hwBRASIfCfgIfIndex }
+                        ::= { hwBRASIfCfgTable 1 }
+
+                HwBRASIfCfgEntry ::=
+                        SEQUENCE { 
+                            hwBRASIfCfgIfIndex
+                                    InterfaceIndex,
+                            hwBRASIfCfgAccessType
+                                    INTEGER,
+                            hwBRASIfCfgBRASIfName
+                                    DisplayString,
+                            hwBRASIfCfgPreAuthDomain
+                                    DisplayString,
+                            hwBRASIfCfgAuthDomain
+                                    DisplayString,
+                            hwBRASIfCfgForceAuthDomain
+                                    INTEGER,
+                            hwBRASIfCfgAcctCpyRdSvr
+                                    DisplayString,
+                            hwBRASIfCfgAuthMethod
+                                    INTEGER,
+                            hwBRASIfCfgNasPortType
+                                    INTEGER,
+                            hwBRASIfCfgLeaseName
+                                    DisplayString,
+                            hwBRASIfCfgLeasePwd
+                                    DisplayString,
+                            hwBRASIfCfgArpInterval
+                                    INTEGER,
+                            hwBRASIfCfgArpFailTimes  
+                                    INTEGER,
+                            hwBRASIfCfgArpProxy
+                                    TruthValue,
+                            hwBRASIfCfgRoamIsp
+                                    TruthValue,                                    
+                            hwBRASIfCfgDhcpBroadCast
+                                    TruthValue,
+                            hwBRASIfCfgHostCar
+                                    INTEGER,
+                            hwBRASIfCfgRowStatus
+                                    RowStatus,
+                            hwBRASIfCfgEapTrigger
+                                    TruthValue,
+                            hwBRASIfCfgWlanSwitch
+                                    INTEGER,
+                            hwBRASIfCfgWlanAuthorization
+                                    TruthValue,
+                            hwBRASIfCfgDhcpShortLease
+                                    INTEGER,
+                            hwBRASIfCfgRoamDomain
+                                    DisplayString,
+                            hwBRASIfVsiName
+                                    DisplayString,
+                            hwBRASIfCfgOption82
+                                    TruthValue,
+                            hwBRASIfVpnInstance
+                                    DisplayString,
+                            hwBRASIfCopyMulticasePerUser
+                                    TruthValue,
+                            hwBRASIfCfgNDProxy
+                                    TruthValue,
+                            hwBRASIfCfgVBasMAC
+                                    MacAddress,
+                            hwBRASIfCfgVBasAuthMode
+                                    INTEGER,
+                            hwBRASIfCfgPermitDomain1
+                                    DisplayString,
+                            hwBRASIfCfgPermitDomain2
+                                    DisplayString,
+                            hwBRASIfCfgPermitDomain3
+                                    DisplayString,
+                            hwBRASIfCfgPermitDomain4
+                                    DisplayString,                            
+                            hwBRASIfCfgAccessDelayType
+                                INTEGER,
+                            hwBRASIfCfgTermlessDelayTime
+                                INTEGER,
+                            hwBRASIfCfgOddMacDelayTime
+                                INTEGER,
+                            hwBRASIfCfgEvenMacDelayTime
+                                INTEGER,
+                            hwBRASIfCfgAccessNodeIdentify
+                                DisplayString,
+                            hwBRASIfCfgAniDelayTime
+                                INTEGER,
+                            hwBRASIfCfgRemoteBackupProfile
+                                    DisplayString   
+                        }
+
+                hwBRASIfCfgIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BRAS接口index
+                        "
+                    ::= { hwBRASIfCfgEntry 1 }
+
+                hwBRASIfCfgAccessType OBJECT-TYPE
+                    SYNTAX INTEGER
+                        {
+                        interface(0),
+                        l2subscriber(1),
+                        l2leasedline(2),
+                        l3leasedline(3),
+                        l3subscriber(6)
+                        }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BRAS接口接入用户类型
+                        "
+                    ::= { hwBRASIfCfgEntry 2 }
+
+                hwBRASIfCfgBRASIfName OBJECT-TYPE
+                    SYNTAX DisplayString(SIZE(1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BRAS接口name
+                        "
+                    ::= { hwBRASIfCfgEntry 3 }
+
+                hwBRASIfCfgPreAuthDomain OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        认证前默认域,--表示恢复为默认值
+                        "
+                    ::= { hwBRASIfCfgEntry 4 }
+
+                hwBRASIfCfgAuthDomain OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        认证时默认域,--表示恢复为默认值
+                        "
+                    ::= { hwBRASIfCfgEntry 5 }
+
+                hwBRASIfCfgForceAuthDomain OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+                none(0),
+                force(1),
+                replace(2)
+                }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        替换认证域方式
+                        "
+                    DEFVAL {0}
+                    ::= { hwBRASIfCfgEntry 6}
+                    
+                hwBRASIfCfgAcctCpyRdSvr OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        RADIUS计费抄送服务器
+                        "
+                    ::= { hwBRASIfCfgEntry 7 }
+
+                hwBRASIfCfgAuthMethod OBJECT-TYPE
+                    SYNTAX INTEGER(1..16)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        认证方式ppp(1)、dot1x(2)、web(4)、fast(8)、bind(16)
+                        "
+                    DEFVAL {1}
+                    ::= { hwBRASIfCfgEntry 8}
+                        
+                hwBRASIfCfgNasPortType OBJECT-TYPE
+                    SYNTAX INTEGER(0..20)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接入端口类型,参见RFC2865的NAS-PORT-TYPE属性，20表示恢复为default value
+                        "
+                    ::= { hwBRASIfCfgEntry 9 }
+
+                hwBRASIfCfgLeaseName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..129))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        VLAN专线用户名
+                        "
+                    ::= { hwBRASIfCfgEntry 10 }
+
+                hwBRASIfCfgLeasePwd OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..128))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        VLAN专线密码
+                        "
+                    ::= { hwBRASIfCfgEntry 11 }
+
+                hwBRASIfCfgArpInterval OBJECT-TYPE
+                    SYNTAX INTEGER(0..121)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        ARP探测间隔,121表示恢复为缺省值
+                        "
+                    DEFVAL { 30 }
+                    ::= { hwBRASIfCfgEntry 12 }
+
+                hwBRASIfCfgArpFailTimes OBJECT-TYPE
+                    SYNTAX INTEGER(2..11)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        ARP探测允许失败Times,11表示恢复为缺省值
+                        "
+                    DEFVAL { 5 }
+                    ::= { hwBRASIfCfgEntry 13 }
+
+                hwBRASIfCfgArpProxy OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否ARP代理
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 14 }
+
+                hwBRASIfCfgRoamIsp OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否允许漫游域
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 15 }
+
+                hwBRASIfCfgDhcpBroadCast OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        DHCP报文是否采用广播方式
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 16 }
+
+                hwBRASIfCfgHostCar OBJECT-TYPE
+                    SYNTAX INTEGER(0..16)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        主机CAR级别,16表示恢复为缺省值
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 17 }
+                    
+                hwBRASIfCfgRowStatus OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        "
+                    ::= { hwBRASIfCfgEntry 18 }
+                    
+                hwBRASIfCfgEapTrigger OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否主动触发EAP认证
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 19 }
+                    
+                hwBRASIfCfgWlanSwitch OBJECT-TYPE
+                    SYNTAX INTEGER(0..1)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        WLAN开关
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 20 }
+                    
+                hwBRASIfCfgWlanAuthorization OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        WLAN接口用户是否接受AS授权
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 21 }
+                    
+                hwBRASIfCfgDhcpShortLease OBJECT-TYPE
+                    SYNTAX INTEGER(9..240)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        DHCP短租期配置
+                        "
+                    DEFVAL { 9 }
+                    ::= { hwBRASIfCfgEntry 22 }
+                
+                hwBRASIfCfgRoamDomain OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        认证时漫游域
+                        "
+                    ::= { hwBRASIfCfgEntry 23 }
+                    
+                hwBRASIfVsiName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..20))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        VSI Name
+                        "
+                    ::= { hwBRASIfCfgEntry 24 }
+                    
+                hwBRASIfCfgOption82 OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        option82 switch
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 25 }
+                    
+                hwBRASIfVpnInstance OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        vpn-instance name
+                        "
+                    ::= { hwBRASIfCfgEntry 26 }                    
+                    
+                hwBRASIfCopyMulticasePerUser OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否按用户复制组播
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 27 }
+
+                hwBRASIfCfgNDProxy OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否ND代理
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfCfgEntry 28 }
+                    
+                hwBRASIfCfgVBasMAC OBJECT-TYPE
+                    SYNTAX MacAddress
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        vbas的MAC地址
+                        "
+                    ::= { hwBRASIfCfgEntry 29 }
+                    
+                hwBRASIfCfgVBasAuthMode OBJECT-TYPE
+                    SYNTAX INTEGER
+                        {
+                        ignore(0),
+                        reject(1)
+                        }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        vbas认证模式
+                        "
+                    DEFVAL { 1 }
+                    ::= { hwBRASIfCfgEntry 30 }
+                    
+                hwBRASIfCfgPermitDomain1 OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接口下允许接入的域1
+                        "
+                    ::= { hwBRASIfCfgEntry 31 }
+                    
+                hwBRASIfCfgPermitDomain2 OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接口下允许接入的域2
+                        "
+                    ::= { hwBRASIfCfgEntry 32 }
+                
+                hwBRASIfCfgPermitDomain3 OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接口下允许接入的域3
+                        "
+                    ::= { hwBRASIfCfgEntry 33 }    
+                     
+                hwBRASIfCfgPermitDomain4 OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接口下允许接入的域4
+                        "
+                    ::= { hwBRASIfCfgEntry 34 }     
+                    
+                    
+                hwBRASIfCfgAccessDelayType OBJECT-TYPE
+                    SYNTAX INTEGER
+                        {   
+                        none(0),
+                        termless(1),   
+                        according-ani(2),
+                        according-mac(3)
+                        }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        响应延时类型
+                        "                    
+                    ::= { hwBRASIfCfgEntry 35 }
+                    
+                hwBRASIfCfgTermlessDelayTime OBJECT-TYPE
+                    SYNTAX INTEGER(0..255)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        无条件响应延时的时间
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 36 }     
+                    
+                hwBRASIfCfgOddMacDelayTime OBJECT-TYPE
+                    SYNTAX INTEGER(0..255)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        根据odd mac响应延时的时间
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 37 }  
+                    
+                hwBRASIfCfgEvenMacDelayTime OBJECT-TYPE
+                    SYNTAX INTEGER(0..255)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        根据even mac响应延时的时间
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 38 }
+                    
+                hwBRASIfCfgAccessNodeIdentify OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        接入点标识
+                        "
+                    ::= { hwBRASIfCfgEntry 39 }
+                    
+                hwBRASIfCfgAniDelayTime OBJECT-TYPE
+                    SYNTAX INTEGER(0..255)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        根据接入点标识响应延时的时间
+                        "
+                    DEFVAL { 0 }
+                    ::= { hwBRASIfCfgEntry 40 }
+                     
+               hwBRASIfCfgRemoteBackupProfile OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        remote-backup-profile配置
+                        "
+                    ::= { hwBRASIfCfgEntry 42 }              
+
+                hwBRASIfVlanTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwBRASIfVlanEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                BRAS接口VLAN表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 2 }
+                
+                hwBRASIfVlanEntry OBJECT-TYPE
+                        SYNTAX HwBRASIfVlanEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Description.
+                                "
+                        INDEX { hwBRASIfVlanIfIndex, hwBRASIfVlanVlanId,hwBRASIfQinQVlanID}
+                        ::= { hwBRASIfVlanTable 1 }
+
+                HwBRASIfVlanEntry ::=
+                        SEQUENCE { 
+                            hwBRASIfVlanIfIndex
+                                    InterfaceIndex,
+                            hwBRASIfVlanVlanId
+                                    INTEGER,
+                            hwBRASIfVlanVlanNumber
+                                    INTEGER,
+                            hwBRASIfVlanAccessLimit
+                                    INTEGER,
+                            hwBRASIfVlanAccessNumber 
+                                    INTEGER,
+                            hwBRASIfVlanBlock 
+                                    TruthValue,
+                            hwBRASIfVlanDevAccessNumber 
+                                    INTEGER,
+                            hwBRASIfVlanSchedulerVcName
+                                    DisplayString,
+                            hwBRASIfVlanSchedulerVcGroupName
+                                    DisplayString,
+                            hwBRASIfVlanSchedulerVpGroupName
+                                    DisplayString,
+                            hwBRASIfQinQVlanID
+                                    INTEGER
+                        }
+
+                hwBRASIfVlanIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BRAS接口index
+                        "
+                    ::= { hwBRASIfVlanEntry 1 }
+
+                hwBRASIfVlanVlanId OBJECT-TYPE
+                    SYNTAX INTEGER(0..4094)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        VLAN号,只有主接口才能指定VLAN0
+                        "
+                    ::= { hwBRASIfVlanEntry 2 }
+
+                hwBRASIfVlanVlanNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..4094)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        表示连续的VLAN number
+                        "
+                    ::= { hwBRASIfVlanEntry 3 }
+
+                hwBRASIfVlanAccessLimit OBJECT-TYPE
+                    SYNTAX INTEGER(0..49153)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        最大接入限制,49153表示恢复为缺省值
+                        "
+                    DEFVAL { 49152 }
+                    ::= { hwBRASIfVlanEntry 4 }
+                    
+                hwBRASIfVlanAccessNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..49152)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        已接入用户number
+                        "
+                    DEFVAL { 49152 }
+                    ::= { hwBRASIfVlanEntry 5 }                    
+                    
+                hwBRASIfVlanBlock OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        阻塞BRAS接口的VLAN
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfVlanEntry 6 }
+                    
+        hwBRASIfVlanDevAccessNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..4096)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        已接入设备用户number
+                        "
+                    ::= { hwBRASIfVlanEntry 7 }
+                    
+                hwBRASIfVlanSchedulerVcName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(0..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        scheduler vc name
+                        "
+                    ::= { hwBRASIfVlanEntry 8 }
+                    
+                hwBRASIfVlanSchedulerVcGroupName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(0..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        scheduler vc-group name
+                        "
+                    ::= { hwBRASIfVlanEntry 9 }
+                    
+                hwBRASIfVlanSchedulerVpGroupName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(0..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        scheduler vp-group name
+                        "
+                    ::= { hwBRASIfVlanEntry 10 }
+
+                hwBRASIfQinQVlanID OBJECT-TYPE
+                    SYNTAX INTEGER(0..4094)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        QinQ VLAN
+                        "
+                    ::= { hwBRASIfVlanEntry 11 }
+                            
+           hwBRASIfPvcTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwBRASIfPvcEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                BAS接口PVC表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 3 }
+                
+                hwBRASIfPvcEntry OBJECT-TYPE
+                        SYNTAX HwBRASIfPvcEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Description.
+                                "
+                        INDEX { hwBRASIfPvcIfIndex, hwBRASIfPvcVpi, hwBRASIfPvcVci }
+                        ::= { hwBRASIfPvcTable 1 }
+
+                HwBRASIfPvcEntry ::=
+                        SEQUENCE { 
+                            hwBRASIfPvcIfIndex
+                                    InterfaceIndex,
+                            hwBRASIfPvcVpi
+                                    INTEGER,
+                            hwBRASIfPvcVci
+                                    INTEGER,                                    
+                            hwBRASIfPvcPvcNumber
+                                    INTEGER,
+                            hwBRASIfPvcAccessLimit
+                                    INTEGER,
+                            hwBRASIfPvcAccessNumber 
+                                    INTEGER,
+                            hwBRASIfPvcBlock 
+                                    TruthValue,
+                            hwBRASIfPvcDevAccessNumber 
+                                    INTEGER,
+                            hwBRASIfPvcSchedulerVcGroupName
+                                    DisplayString,
+                            hwBRASIfPvcSchedulerVpGroupName
+                                    DisplayString
+                        }
+
+               hwBRASIfPvcIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BAS接口index
+                        "
+                    ::= { hwBRASIfPvcEntry 1 }
+                    
+               hwBRASIfPvcVpi OBJECT-TYPE
+                    SYNTAX INTEGER(0..255)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        PVC的VPI号,VPI/VCI不能同时为0
+                        "
+                    ::= { hwBRASIfPvcEntry 2 }
+
+                hwBRASIfPvcVci OBJECT-TYPE
+                    SYNTAX INTEGER(0..65534)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        PVC的VCI号,VPI/VCI不能同时为0
+                        "
+                    ::= { hwBRASIfPvcEntry 3 }
+                    
+                hwBRASIfPvcPvcNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..4094)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        表示连续的PVC number
+                        "
+                    ::= { hwBRASIfPvcEntry 4 }
+
+                hwBRASIfPvcAccessLimit OBJECT-TYPE
+                    SYNTAX INTEGER(0..49153)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        最大接入限制,49153表示恢复为缺省值
+                        "
+                    DEFVAL { 49152 }
+                    ::= { hwBRASIfPvcEntry 5 }
+                    
+                hwBRASIfPvcAccessNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..49152)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        已接入用户number
+                        "
+                    DEFVAL { 49152 }
+                    ::= { hwBRASIfPvcEntry 6 }                    
+                    
+                hwBRASIfPvcBlock OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        阻塞BAS接口的PVC
+                        "
+                    DEFVAL { false }
+                    ::= { hwBRASIfPvcEntry 7 }
+                    
+                hwBRASIfPvcDevAccessNumber OBJECT-TYPE
+                    SYNTAX INTEGER(0..4096)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        已接入设备用户number
+                        "
+                    ::= { hwBRASIfPvcEntry 8 }
+                    
+                hwBRASIfPvcSchedulerVcGroupName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        scheduler vc-group name
+                        "
+                    ::= { hwBRASIfPvcEntry 9 }
+                    
+                hwBRASIfPvcSchedulerVpGroupName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        scheduler vp-group name
+                        "
+                    ::= { hwBRASIfPvcEntry 10 }
+                             
+           hwSTPRelayTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwSTPRelayEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                STP透传专线用户表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 4 }
+                
+                hwSTPRelayEntry OBJECT-TYPE
+                        SYNTAX HwSTPRelayEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "
+                               Description.
+                               "
+                        INDEX { hwSTPRelayIndex }
+                        ::= { hwSTPRelayTable 1 }
+                
+                HwSTPRelayEntry ::=
+                        SEQUENCE { 
+                                hwSTPRelayIndex
+                                        INTEGER,
+                                hwSTPRelayInIfIndex
+                                        InterfaceIndex,                                        
+                                hwSTPRelayOutIfIndex
+                                        InterfaceIndex,
+                                hwSTPRelayRowStatus
+                                        RowStatus,
+                                hwSTPRelayInIfName
+                                        DisplayString,
+                                hwSTPRelayOutIfName
+                                        DisplayString,
+                            hwSTPRelayInMac
+                                    MacAddress,
+                            hwSTPRelayOutMac
+                                    MacAddress
+                         }
+
+                hwSTPRelayIndex OBJECT-TYPE
+                        SYNTAX INTEGER(0..127)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                STP透传专线index
+                                "
+                        ::= { hwSTPRelayEntry 1 }
+                        
+                hwSTPRelayInIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        入接口index
+                        "
+                    ::= { hwSTPRelayEntry 2 }
+                    
+                hwSTPRelayOutIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                出接口index
+                                "
+                        ::= { hwSTPRelayEntry 3 }
+
+                hwSTPRelayRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                行状态
+                                "
+                        ::= { hwSTPRelayEntry 4 }
+                        
+                hwSTPRelayInIfName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..47))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                入接口name
+                                "
+                        ::= { hwSTPRelayEntry 5 }
+                        
+                hwSTPRelayOutIfName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..47))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                出接口name
+                                "
+                        ::= { hwSTPRelayEntry 6 }
+                        
+                hwSTPRelayInMac OBJECT-TYPE
+                    SYNTAX MacAddress
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        stp-relay-line mac-address of in side
+                        "
+                    ::= { hwSTPRelayEntry 7 }
+                    
+                hwSTPRelayOutMac OBJECT-TYPE
+                    SYNTAX MacAddress
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        stp-relay-line mac-address of in side
+                        "
+                    ::= { hwSTPRelayEntry 8 }  
+          
+                  
+            hwPortAccessLimitTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwPortAccessLimitEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                        "
+                        端口接入限制表
+                        "
+                        ::= { hwSrvcfgInterfaceMibObjects 5 }
+                
+                hwPortAccessLimitEntry OBJECT-TYPE
+                        SYNTAX HwPortAccessLimitEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                        "
+                        Description.
+                        "
+                        INDEX { hwPortAccessLimitIfIndex }
+                        ::= { hwPortAccessLimitTable 1 }
+                
+                HwPortAccessLimitEntry ::=
+                        SEQUENCE { 
+                                hwPortAccessLimitIfIndex
+                                        InterfaceIndex,
+                                hwPortAccessLimitLimit
+                                        INTEGER,
+                                hwPortAccessLimitNumber
+                                        INTEGER,
+                                hwPortAccessLimitDevNumber
+                                        INTEGER                                       
+                        }
+                
+                hwPortAccessLimitIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                端口index
+                                "
+                        ::= { hwPortAccessLimitEntry 1 }
+                
+                hwPortAccessLimitLimit OBJECT-TYPE
+                        SYNTAX INTEGER (0..49153)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                端口接入用户限制,49153表示恢复为缺省值
+                                "
+                        ::= { hwPortAccessLimitEntry 2 }
+                        
+                hwPortAccessLimitNumber OBJECT-TYPE
+                        SYNTAX INTEGER (0..49152)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                端口已接入用户number
+                                "
+                        ::= { hwPortAccessLimitEntry 3 }         
+                        
+                hwPortAccessLimitDevNumber OBJECT-TYPE
+                        SYNTAX INTEGER (0..4096)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                端口已接入设备用户number
+                                "
+                        ::= { hwPortAccessLimitEntry 4 }
+                        
+            hwL3SubscriberIspTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwL3SubscriberIspEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Layer 3 认证用户域配置表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 6 }
+                
+                hwL3SubscriberIspEntry OBJECT-TYPE
+                        SYNTAX HwL3SubscriberIspEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "
+                               Description.
+                               "
+                        INDEX { hwL3SubscriberIspStartIp,hwL3SubscriberIspVpnId  }
+                        ::= { hwL3SubscriberIspTable 1 }
+                
+                HwL3SubscriberIspEntry ::=
+                        SEQUENCE { 
+                                hwL3SubscriberIspStartIp
+                                        IpAddress,
+                                hwL3SubscriberIspVpnId
+                                        DisplayString,
+                                hwL3SubscriberIspEndIp
+                                        IpAddress,
+                                hwL3SubscriberIspDomainName
+                                        DisplayString,
+                                hwL3SubscriberIspRowStatus
+                                        RowStatus
+                         }
+
+                hwL3SubscriberIspStartIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Layer 3 认证用户网段起始IP地址
+                                "
+                        ::= { hwL3SubscriberIspEntry 1 }
+
+                hwL3SubscriberIspVpnId OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..19))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Layer 3 认证用户网段VPN instance name
+                                "
+                        ::= { hwL3SubscriberIspEntry 2 }
+
+                hwL3SubscriberIspEndIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Layer 3 认证用户网段结束IP地址
+                                "
+                        ::= { hwL3SubscriberIspEntry 3 }
+
+                hwL3SubscriberIspDomainName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..64))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Layer 3 认证用户网段的预认证域
+                                "
+                        ::= { hwL3SubscriberIspEntry 4 }
+
+                hwL3SubscriberIspRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                行状态
+                                "
+                        ::= { hwL3SubscriberIspEntry 5 }
+                                               
+     srvcfgScalar        OBJECT IDENTIFIER  ::= { hwSrvcfgInterfaceMibObjects 8 }   
+  
+   --
+   --      The SrvCfg Scalar configuration
+   --
+   --      This group of objects describe the global configuration of SrvCfg.
+   
+   
+   hwDhcpOption60DomainInclude     OBJECT-TYPE
+           SYNTAX          TruthValue
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+              "
+              "
+           ::= { srvcfgScalar 1 }
+           
+  hwDhcpOption60PartialMatch     OBJECT-TYPE
+           SYNTAX          TruthValue
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+              "
+              "
+           ::= { srvcfgScalar 2 }
+           
+     hwConnTimeOutTable        OBJECT IDENTIFIER  ::= { hwSrvcfgInterfaceMibObjects 9 }
+  
+  hwConnTimeOutTcp OBJECT-TYPE
+           SYNTAX       INTEGER (1..255)
+           MAX-ACCESS      read-write
+           STATUS        current
+           DESCRIPTION
+              "
+              TCP连接老化时间
+              "
+           DEFVAL { 5 }
+           ::= { hwConnTimeOutTable 1 }
+           
+  hwConnTimeOutUdp OBJECT-TYPE
+           SYNTAX        INTEGER (1..255)
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+              "
+              UDP连接老化时间
+              "
+           DEFVAL { 3 }
+           ::= { hwConnTimeOutTable 2 }
+           
+           hwBRASIfVlanNumTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwBRASIfVlanNumEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                单板VLAN统计表
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 10 }
+                
+                hwBRASIfVlanNumEntry OBJECT-TYPE
+                        SYNTAX HwBRASIfVlanNumEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                Description.
+                                "
+                        INDEX { hwBRASIfSlot }
+                        ::= { hwBRASIfVlanNumTable 1 }
+
+                HwBRASIfVlanNumEntry ::=
+                        SEQUENCE { 
+                            hwBRASIfSlot
+                                    INTEGER,
+                            hwBRASSlotVlanNum
+                                    INTEGER,
+                            hwBRASSLotStaticVlanNum
+                                    INTEGER                           
+                        }
+        
+                hwBRASIfSlot OBJECT-TYPE
+                    SYNTAX INTEGER(0..16)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        单板槽位号，0为trunk槽位
+                        "
+                    ::= { hwBRASIfVlanNumEntry 1 }
+                    
+                hwBRASSlotVlanNum OBJECT-TYPE
+                    SYNTAX INTEGER(0..65536)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        单板生成VLAN统计
+                        "
+                    ::= { hwBRASIfVlanNumEntry 2 }
+                    
+                hwBRASSLotStaticVlanNum OBJECT-TYPE
+                    SYNTAX INTEGER(0..16384)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        单板配置静态VLAN统计
+                        "
+                    ::= { hwBRASIfVlanNumEntry 3 } 
+
+                hwServiceIfCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwServiceIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                描述Service接口下的各项Service配置
+                                "
+                        ::= { hwSrvcfgInterfaceMibObjects 11 }
+                
+                hwServiceIfCfgEntry OBJECT-TYPE
+                        SYNTAX HwServiceIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "
+                                An entry of hwServiceIfCfgTable.
+                                "
+                        INDEX { hwServiceIfCfgIfIndex }
+                        ::= { hwServiceIfCfgTable 1 }
+
+                HwServiceIfCfgEntry ::=
+                        SEQUENCE { 
+                            hwServiceIfCfgIfIndex
+                                    InterfaceIndex,
+                            hwServiceIfCfgIdentificationMode
+                                    INTEGER,
+                            hwServiceIfCfgDomain
+                                    DisplayString,
+                            hwServiceIfCfgUserName
+                                    DisplayString,
+                            hwServiceIfCfgPassword
+                                    DisplayString,
+                            hwServiceIfCfgDetectNum
+                                    Integer32,
+                            hwServiceIfCfgDetectInterval
+                                    Integer32,
+                            hwServiceIfCfgOption82
+                                    TruthValue,
+                            hwServiceIfCfgAccessLimit
+                                    Integer32,
+                            hwServiceIfCfgOption60
+                                    TruthValue,
+                            hwServiceIfCfgIpTriggerEnable
+                                    EnabledStatus,
+                            hwServiceIfCfgArpTriggerEnable
+                                    EnabledStatus,
+                            hwServiceIfCfgIfBlock  
+                                    TruthValue,
+                            hwServiceIfCfgQosProfile
+                                    DisplayString,
+                            hwServiceIfCfgBindingUserPasswordMode
+                                    INTEGER,                                    
+                            hwServiceIfCfgBindingUserNameFormat
+                                    Integer32,
+                            hwServiceIfCfgBindingUserPassword
+                                    DisplayString,
+                            hwServiceIfCfgRowStatus
+                                    RowStatus
+                        }
+
+                hwServiceIfCfgIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        BRAS接口index
+                        "
+                    ::= { hwServiceIfCfgEntry 1 }
+
+                  hwServiceIfCfgIdentificationMode OBJECT-TYPE
+                    SYNTAX INTEGER
+                            {
+                            host(1),
+                            location(2),
+                            ceVlan(3)
+                            }
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        用户的标识模式
+                        从该接口上来的用户按配置的识别模式进行QoS资源的分配和计费
+                        host(1)：根据ip和mac标识一个用户
+                        location(2)：根据option82信息标识一个用户
+                        ce-vlan(3)：根据ce-vlan信息标识一个用户（以QINQ的内层Q来标识用户，如果相同内层Q的一组用户从多个access接口接入）
+                        缺省值：host(1)
+                        该节点不允许修改
+                       "
+                    ::= { hwServiceIfCfgEntry 2 }
+
+                  hwServiceIfCfgDomain OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..20))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        所属域
+                        缺省值：--
+                        取消配置直接下发--
+                        在域下有用户的情况下，不能取消该节点的配置。
+                       "
+                    ::= { hwServiceIfCfgEntry 3 }
+                  
+                  hwServiceIfCfgUserName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        专线用户名
+                        缺省值：--
+                        只有当hwServiceIfCfgIdentificationMode选择l2-lease-line(4)或者l3-lease-line(5)时
+                        ，才下发该节点且必须下发；
+                        下发该节点时必须和hwServiceIfCfgPassword节点绑定下发；
+                        同时创建之后不允许配置
+                       "
+                    ::= { hwServiceIfCfgEntry 4 }
+               
+                    hwServiceIfCfgPassword OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        专线密码
+                        缺省值：--
+                        限制条件见上面的节点
+                       "
+                    ::= { hwServiceIfCfgEntry 5 }
+
+                    hwServiceIfCfgDetectNum OBJECT-TYPE
+                    SYNTAX Integer32(2..10)
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        探测number
+                        缺省值：5 
+                        只有当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)时
+                        ，才可下发该节点，并且为选配节点；
+                       "
+                    ::= { hwServiceIfCfgEntry 6 }
+
+                    hwServiceIfCfgDetectInterval OBJECT-TYPE
+                    SYNTAX Integer32(0..120)
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        两次探测之间的间隔
+                        缺省值：30
+                        单位：S 
+                        只有当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)时，才可下发该节点，并且为选配节点；
+                       "
+                    ::= { hwServiceIfCfgEntry 7 }
+
+                    hwServiceIfCfgOption82 OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否支持Option82
+                        True(1):是
+                        False(2):否
+                        缺省值：False(2):否
+                        用于配置设备信任客户端上报的DHCP Option82信息；
+                        只有当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)时，才可下发该节点，并且为选配节点；
+                       "
+                    ::= { hwServiceIfCfgEntry 8 }
+
+                    hwServiceIfCfgAccessLimit OBJECT-TYPE
+                    SYNTAX Integer32(0..16384)
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        用户接入限制
+                        缺省值：16384
+                        如果接口下在线用户大于配置的限制，配置失败。
+                      "
+                    ::= { hwServiceIfCfgEntry 9 }
+
+                    hwServiceIfCfgOption60 OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否支持Option60 
+                        True(1):是
+                        False(2):否
+                        缺省值：False(2):否
+                        用于配置设备信任客户端上报的DHCP Option60信息；
+                        只有当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)时，才可下发该节点，并且为选配节点；
+                      "
+                    ::= { hwServiceIfCfgEntry 10 }  
+                       
+                    hwServiceIfCfgIpTriggerEnable OBJECT-TYPE
+                    SYNTAX EnabledStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        使能IP报文触发用户上线功能
+                        缺省值：disable去使能
+                        当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)的情况下，才能设置该节点
+                        "      
+                    DEFVAL {disabled}
+                    ::= { hwServiceIfCfgEntry 11 }     
+                    
+                    hwServiceIfCfgArpTriggerEnable OBJECT-TYPE
+                    SYNTAX EnabledStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        使能arp报文触发用户上线功能
+                        缺省值：disable去使能
+                        当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)的情况下，才能设置该节点
+                        "   
+                    DEFVAL {disabled}
+                    ::= { hwServiceIfCfgEntry 12 }
+                  
+                    hwServiceIfCfgIfBlock   OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        是否阻塞
+                        True(1):是
+                        False(2):否
+                        缺省值：False(2):否
+                        只有当hwServiceIfCfgIdentificationMode为非l3-lease-line(5)时，才可下发该节点，并且为选配节点；
+                        "
+                    ::= { hwServiceIfCfgEntry 13 }   
+                    
+                    hwServiceIfCfgQosProfile   OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..31))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        QoS模板
+                        缺省值：--
+                        必须配置已经创建的QoS模板。如果接口下已经配置了 hwServiceIfCfgCarProfile，并且接口下有用户的情况下，该节点不允许配置；
+                        如果在接口下有用户的情况下修改该节点，只影响后续上线的用户，不影响已经上线的用户
+                        "
+                    ::= { hwServiceIfCfgEntry 14 }
+
+                    hwServiceIfCfgBindingUserPasswordMode   OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+                     simple(1),
+                     cipher(2)
+                    }                         
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        用于设置绑定用户名的密码方式，分明文和密文两种, 
+                        1：明文
+                        2：密文
+                        "
+                    ::= { hwServiceIfCfgEntry 15 }  
+                    
+                    hwServiceIfCfgBindingUserNameFormat   OBJECT-TYPE
+                    SYNTAX Integer32(1..7)                         
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        生成绑定用户名格式的版本
+                        mac(1)：使用用户的mac地址构造用户名。
+                        option82(2)：使用用户option82信息构造用户名。
+                        sys-name(3): 使用路由器的主机名构造用户名。
+                        mac+option82 (4)
+                        mac+sys-name(5)
+                        option82+ sys-name(6)
+                        mac+option82+sys-name(7)
+                        缺省情况下：host用户使用mac地址构造用户，cvlan用户使用mac地址构造用户名，location方式用户使用option82＋mac地址构造用户名。
+                        "
+                    ::= { hwServiceIfCfgEntry 16 }
+ 
+                    hwServiceIfCfgBindingUserPassword   OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..16))                         
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "
+                        用于设置绑定用户名的密码，分明文和密文两种, 
+                        明文:区分大小写，不能输入空格和问号等命令行专用字符。
+                        密文：区分大小写，不能输入空格和问号等命令行专用字符。可以是长度为1～16的字符串，这时为明文密码。也可以是长度为24位的字符串，这时位加密后的密码。显示时都是密文
+                        缺省情况下，绑定用户密码为vlan。
+                        "
+                    ::= { hwServiceIfCfgEntry 17 }
+                    
+                   hwServiceIfCfgRowStatus OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "  
+                        行状态
+                        "
+                    ::= { hwServiceIfCfgEntry 18 }
+    --  ============== conformance information ==============
+        hwSrvcfgInterfaceConformance OBJECT IDENTIFIER ::= { hwBRASSrvcfgInterface 2 }
+        
+        
+        hwSrvcfgInterfaceCompliances OBJECT IDENTIFIER ::= { hwSrvcfgInterfaceConformance 1 }
+        hwSrvcfgInterfaceCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "
+                   The compliance statement for systems supporting 
+                the this module.
+                "
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwBRASIfCfgGroup, hwBRASIfVlanGroup, hwBRASIfPvcGroup,
+                            hwSTPRelayServerGroup, hwPortAccessLimitGroup, hwL3SubscriberIspGroup,
+                            hwConnTimeOutGroup, hwSrvcfgScalarGroup, hwBRASIfVlanNumGroup,
+                            hwServiceIfCfgGroup }  
+                                               
+              ::= { hwSrvcfgInterfaceCompliances 1 }  
+     --  ============== groups ==============  
+        hwSrvcfgInterfaceGroups OBJECT IDENTIFIER ::= { hwSrvcfgInterfaceConformance 2 } 
+        
+        hwBRASIfCfgGroup OBJECT-GROUP
+            OBJECTS {
+                            hwBRASIfCfgAccessType,
+                            hwBRASIfCfgBRASIfName,
+                            hwBRASIfCfgPreAuthDomain,
+                            hwBRASIfCfgAuthDomain,
+                            hwBRASIfCfgForceAuthDomain,
+                            hwBRASIfCfgAcctCpyRdSvr,
+                            hwBRASIfCfgAuthMethod,
+                            hwBRASIfCfgNasPortType,
+                            hwBRASIfCfgLeaseName,
+                            hwBRASIfCfgLeasePwd,
+                            hwBRASIfCfgArpInterval,
+                            hwBRASIfCfgArpFailTimes,
+                            hwBRASIfCfgArpProxy,
+                            hwBRASIfCfgRoamIsp,                                    
+                            hwBRASIfCfgDhcpBroadCast,
+                            hwBRASIfCfgHostCar,
+                            hwBRASIfCfgRowStatus,
+                            hwBRASIfCfgEapTrigger,
+                            hwBRASIfCfgWlanSwitch,
+                            hwBRASIfCfgWlanAuthorization,
+                            hwBRASIfCfgDhcpShortLease,
+                            hwBRASIfCfgRoamDomain,
+                            hwBRASIfVsiName,
+                            hwBRASIfCfgOption82,
+                            hwBRASIfVpnInstance,
+                            hwBRASIfCopyMulticasePerUser,
+                            hwBRASIfCfgNDProxy,
+                            hwBRASIfCfgVBasMAC,
+                            hwBRASIfCfgVBasAuthMode,
+                            hwBRASIfCfgPermitDomain1,
+                            hwBRASIfCfgPermitDomain2,
+                            hwBRASIfCfgPermitDomain3,
+                            hwBRASIfCfgPermitDomain4,                        
+                            hwBRASIfCfgAccessDelayType,
+                            hwBRASIfCfgTermlessDelayTime,
+                            hwBRASIfCfgOddMacDelayTime,
+                            hwBRASIfCfgEvenMacDelayTime,
+                            hwBRASIfCfgAccessNodeIdentify,
+                            hwBRASIfCfgAniDelayTime,
+                            hwBRASIfCfgRemoteBackupProfile
+                 }       
+            STATUS current
+            DESCRIPTION 
+                "
+                BRAS接口配置表
+                "
+            ::= { hwSrvcfgInterfaceGroups 1 }
+
+
+        hwBRASIfVlanGroup OBJECT-GROUP
+            OBJECTS {    
+                            hwBRASIfVlanVlanNumber,
+                            hwBRASIfVlanAccessLimit,
+                            hwBRASIfVlanAccessNumber,
+                            hwBRASIfVlanBlock,
+                            hwBRASIfVlanDevAccessNumber,
+                            hwBRASIfVlanSchedulerVcName,
+                            hwBRASIfVlanSchedulerVcGroupName,
+                            hwBRASIfVlanSchedulerVpGroupName    
+                           }          
+            STATUS current
+            DESCRIPTION 
+                "
+                BRAS接口VLAN
+                "
+            ::= { hwSrvcfgInterfaceGroups 2 }
+            
+        hwBRASIfPvcGroup OBJECT-GROUP
+            OBJECTS {                                
+                            hwBRASIfPvcPvcNumber,
+                            hwBRASIfPvcAccessLimit,
+                            hwBRASIfPvcAccessNumber,
+                            hwBRASIfPvcBlock,
+                            hwBRASIfPvcDevAccessNumber,
+                            hwBRASIfPvcSchedulerVcGroupName,
+                            hwBRASIfPvcSchedulerVpGroupName
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                BAS接口PVC
+                "
+            ::= { hwSrvcfgInterfaceGroups 3 }
+            
+        hwSTPRelayServerGroup OBJECT-GROUP
+            OBJECTS {
+                                hwSTPRelayInIfIndex,                                        
+                                hwSTPRelayOutIfIndex,
+                                hwSTPRelayRowStatus,
+                                hwSTPRelayInIfName,
+                                hwSTPRelayOutIfName,
+                            hwSTPRelayInMac,
+                            hwSTPRelayOutMac
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                STP透传专线用户
+                "
+            ::= { hwSrvcfgInterfaceGroups 4 }
+            
+        hwPortAccessLimitGroup OBJECT-GROUP
+            OBJECTS {
+                                hwPortAccessLimitLimit,
+                                hwPortAccessLimitNumber,
+                                hwPortAccessLimitDevNumber
+                }
+            STATUS current
+            DESCRIPTION 
+                "
+                端口接入限制
+                "
+            ::= { hwSrvcfgInterfaceGroups 5 }
+            
+        hwL3SubscriberIspGroup OBJECT-GROUP
+                OBJECTS {
+                                hwL3SubscriberIspEndIp,
+                                hwL3SubscriberIspDomainName,
+                                hwL3SubscriberIspRowStatus
+                }
+            STATUS current
+            DESCRIPTION 
+                "
+                Layer 3 认证用户域配置
+                "
+            ::= { hwSrvcfgInterfaceGroups 6 }             
+                    
+        hwConnTimeOutGroup OBJECT-GROUP
+            OBJECTS { 
+                hwConnTimeOutTcp,
+                hwConnTimeOutUdp
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                "
+            ::= { hwSrvcfgInterfaceGroups 7 }
+            
+        hwSrvcfgScalarGroup OBJECT-GROUP
+            OBJECTS { 
+                hwDhcpOption60DomainInclude,
+                hwDhcpOption60PartialMatch
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                "
+            ::= { hwSrvcfgInterfaceGroups 8 }
+        
+        hwBRASIfVlanNumGroup OBJECT-GROUP
+            OBJECTS {
+                            hwBRASSlotVlanNum,
+                            hwBRASSLotStaticVlanNum 
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                单板VLAN统计
+                "
+            ::= { hwSrvcfgInterfaceGroups 9 }
+            
+        hwServiceIfCfgGroup OBJECT-GROUP
+            OBJECTS {
+                            hwServiceIfCfgIdentificationMode,
+                            hwServiceIfCfgDomain,
+                            hwServiceIfCfgUserName,
+                            hwServiceIfCfgPassword,
+                            hwServiceIfCfgDetectNum,
+                            hwServiceIfCfgDetectInterval,
+                            hwServiceIfCfgOption82,
+                            hwServiceIfCfgAccessLimit,
+                            hwServiceIfCfgOption60,
+                            hwServiceIfCfgIpTriggerEnable,
+                            hwServiceIfCfgArpTriggerEnable,
+                            hwServiceIfCfgIfBlock,
+                            hwServiceIfCfgQosProfile,
+                            hwServiceIfCfgBindingUserPasswordMode,                                    
+                            hwServiceIfCfgBindingUserNameFormat,
+                            hwServiceIfCfgBindingUserPassword,
+                            hwServiceIfCfgRowStatus
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "
+                描述Service接口下的各项Service配置
+                "
+            ::= { hwSrvcfgInterfaceGroups 10 }            
+             
+                    
+        --  ============== conformance information define end ==============                    
+
+                                                    
+        END

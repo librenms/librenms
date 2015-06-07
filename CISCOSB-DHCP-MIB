@@ -1,0 +1,1174 @@
+CISCOSB-DHCP-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                   CISCOSB DHCP Server ROS
+--                          This Private MIB supports the DHCP Server for ROS
+-- Version:                 7.30
+-- Date:                    18 Oct 2003
+
+IMPORTS
+    OBJECT-TYPE, IpAddress, Unsigned32,
+    MODULE-IDENTITY                         	FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus    	FROM SNMPv2-TC
+    SnmpAdminString                         	FROM SNMP-FRAMEWORK-MIB
+    switch001                               	FROM CISCOSB-MIB
+    PortList                                    FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
+
+rsDHCP MODULE-IDENTITY
+          LAST-UPDATED "200310180000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for DHCP server support in CISCOSB devices."
+          REVISION "200310180000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { switch001 38 }
+
+-- unused:
+-- { rsDHCP 1 } .. { rsDHCP 13 }
+
+rsDhcpMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DHCP MIB's version, the current version is 4."
+    ::= { rsDHCP 14 }
+
+-- unused:
+-- { rsDHCP 15 } .. { rsDHCP 21 }
+
+-- =======================================================
+-- DHCP Relay
+-- =======================================================
+rlDhcpRelayMaximalNumberOfNonIpVlans OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximal number non-ip vlans that DHCP relay can be confirued on."
+--  DEFVAL { 0 }
+    ::= { rsDHCP 23 }
+
+rlDhcpRelayCurrentNumberOfNonIpVlans OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current number non-ip vlans that DHCP relay can be confirued on."
+--  DEFVAL { 0 }
+    ::= { rsDHCP 24 }
+
+rlDhcpRelayEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or disable the use of the DHCP relay."
+--  DEFVAL { false }
+    ::= { rsDHCP 25 }
+
+rlDhcpRelayExists   OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows whether the device can function as a DHCP Relay Agent."
+    ::= { rsDHCP 26 }
+
+-- Next Servers Table
+
+rlDhcpRelayNextServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpRelayNextServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The DHCP Relay Next Servers configuration Table"
+    ::= { rsDHCP 27 }
+
+rlDhcpRelayNextServerEntry OBJECT-TYPE
+    SYNTAX RlDhcpRelayNextServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table. DHCP requests are relayed to the
+        specified next server according to their threshold values."
+    INDEX { rlDhcpRelayNextServerIpAddr }
+    ::=  { rlDhcpRelayNextServerTable 1 }
+
+RlDhcpRelayNextServerEntry ::= SEQUENCE {
+      rlDhcpRelayNextServerIpAddr
+         IpAddress,
+      rlDhcpRelayNextServerSecThreshold
+         Unsigned32,
+      rlDhcpRelayNextServerRowStatus
+         RowStatus
+     }
+
+rlDhcpRelayNextServerIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The IPAddress of the next configuration server. DHCP Server may
+       act as a DHCP relay if  this parameter is not equal to 0.0.0.0."
+    ::= { rlDhcpRelayNextServerEntry 1  }
+
+rlDhcpRelayNextServerSecThreshold OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DHCP requests are relayed only if their SEC field is greater or
+        equal to the threshold value in order to allow local DHCP Servers
+        to answer first."
+--  DEFVAL  {0}
+    ::= { rlDhcpRelayNextServerEntry 2 }
+
+rlDhcpRelayNextServerRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable displays the validity or invalidity of the entry.
+        Setting it to 'destroy' has the effect of  rendering it inoperative.
+        The internal effect (row removal) is implementation dependent."
+    ::= { rlDhcpRelayNextServerEntry 3 }
+
+-- =======================================================
+-- DHCP relay Interface Table  - used for backward compatibility
+-- =======================================================
+
+rlDhcpRelayInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpRelayInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The enabled DHCP Relay Interface Table"
+    ::= { rsDHCP 28 }
+
+rlDhcpRelayInterfaceEntry OBJECT-TYPE
+    SYNTAX RlDhcpRelayInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.  The user can add entry when DHCP relay is enabled on Interface."
+    INDEX { rlDhcpRelayInterfaceIfindex}
+    ::=  { rlDhcpRelayInterfaceTable 1 }
+
+RlDhcpRelayInterfaceEntry ::= SEQUENCE {
+      rlDhcpRelayInterfaceIfindex      INTEGER,
+      rlDhcpRelayInterfaceUseGiaddr    TruthValue,  -- obsolete
+      rlDhcpRelayInterfaceRowStatus    RowStatus
+     }
+
+rlDhcpRelayInterfaceIfindex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The Interface on which an user enables a DHCP relay "
+    ::= { rlDhcpRelayInterfaceEntry 1}
+
+rlDhcpRelayInterfaceUseGiaddr OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+        "The flag is used to set a DHCP relay interface to use GiAddr in the standard way. Default is TRUE.
+        The field is not supported."
+    ::= { rlDhcpRelayInterfaceEntry 2 }
+
+rlDhcpRelayInterfaceRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Entry status. Can be destroy, active or createAndGo"
+    ::= { rlDhcpRelayInterfaceEntry 3 }
+
+
+-- =======================================================
+-- DHCP relay interface list Table
+-- =======================================================
+
+rlDhcpRelayInterfaceListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RLDhcpRelayInterfaceListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains one entry. The entry contains port list and vlan lists of interfaces that have configured DHCP relay"
+    ::= { rsDHCP 29}
+
+rlDhcpRelayInterfaceListEntry OBJECT-TYPE
+    SYNTAX RLDhcpRelayInterfaceListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port list and vlan lists of interfaces that have configured DHCP relay."
+    INDEX { rlDhcpRelayInterfaceListIndex }
+    ::= { rlDhcpRelayInterfaceListTable 1 }
+
+RLDhcpRelayInterfaceListEntry::= SEQUENCE {
+        rlDhcpRelayInterfaceListIndex              INTEGER,
+        rlDhcpRelayInterfaceListPortList           PortList,
+        rlDhcpRelayInterfaceListVlanId1To1024      VlanList1,
+        rlDhcpRelayInterfaceListVlanId1025To2048   VlanList2,
+        rlDhcpRelayInterfaceListVlanId2049To3072   VlanList3,
+        rlDhcpRelayInterfaceListVlanId3073To4094   VlanList4
+    }
+
+rlDhcpRelayInterfaceListIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index in the table. Already 1."
+    ::= { rlDhcpRelayInterfaceListEntry 1 }
+
+rlDhcpRelayInterfaceListPortList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DHCP relay Interface Port List."
+    ::= { rlDhcpRelayInterfaceListEntry 2 }
+
+
+rlDhcpRelayInterfaceListVlanId1To1024 OBJECT-TYPE
+    SYNTAX  VlanList1
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       " DHCP relay Interface VlanId List 1."
+    ::= { rlDhcpRelayInterfaceListEntry 3 }
+
+rlDhcpRelayInterfaceListVlanId1025To2048 OBJECT-TYPE
+    SYNTAX  VlanList2
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       " DHCP relay Interface VlanId List 2."
+    ::= { rlDhcpRelayInterfaceListEntry 4 }
+
+rlDhcpRelayInterfaceListVlanId2049To3072 OBJECT-TYPE
+    SYNTAX  VlanList3
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       " DHCP relay Interface VlanId List 3."
+    ::= { rlDhcpRelayInterfaceListEntry 5 }
+
+rlDhcpRelayInterfaceListVlanId3073To4094 OBJECT-TYPE
+    SYNTAX  VlanList4
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       " DHCP relay Interface VlanId List 4."
+    ::= { rlDhcpRelayInterfaceListEntry 6 }
+
+-- =======================================================
+-- DHCP Server
+-- =======================================================
+
+rlDhcpSrvEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or Disable the use of the DHCP Server.
+         For a router product the default value is TRUE. For a switch product the default is FALSE."
+    DEFVAL { false }
+    ::= { rsDHCP 30 }
+
+rlDhcpSrvExists OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows whether the device can function as a DHCP Server."
+    ::= { rsDHCP 31 }
+
+rlDhcpSrvDbLocation OBJECT-TYPE
+    SYNTAX INTEGER {
+        nvram (1),
+        flash (2)
+    }
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "Describes where DHCP Server database is stored."
+    DEFVAL { flash }
+    ::= { rsDHCP 32 }
+
+rlDhcpSrvMaxNumOfClients OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows maximum number of clients that can be
+         supported by DHCP Server dynamic allocation."
+    ::= { rsDHCP 33 }
+
+rlDhcpSrvDbNumOfActiveEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of active (valid) entries stored in database."
+    ::= { rsDHCP 34 }
+
+rlDhcpSrvDbErase OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+        "The value is always false. Setting this variable to true causes erasing all entries in DHCP database."
+    DEFVAL { false }
+    ::= { rsDHCP 35 }
+
+rlDhcpSrvProbeEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or Disable the use of the DHCP probe before allocating an IP address."
+    DEFVAL { false }
+    ::= { rsDHCP 36 }
+
+rlDhcpSrvProbeTimeout OBJECT-TYPE
+    SYNTAX Unsigned32 (300..10000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the peiod of time in milliseconds the DHCP probe will wait before
+        issuing a new trial or deciding that no other device on the network
+        has the IP address which DHCP considers allocating."
+    DEFVAL { 500 }
+    ::= { rsDHCP 37 }
+
+rlDhcpSrvProbeRetries OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates how many times DHCP will probe before deciding that no other
+        device on the network has the IP address which DHCP
+        considers allocating."
+    DEFVAL { 2 }
+    ::= { rsDHCP 38 }
+
+rlDhcpSrvDefaultNetworkPoolName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Contains a default network pool name. Used in case of one network pool only."
+    ::= { rsDHCP 39 }
+
+-- IP Addresses Table
+
+rlDhcpSrvIpAddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "Table of IP Addresses allocated by DHCP Server by static
+      and dynamic allocations."
+    ::= { rsDHCP 45}
+
+rlDhcpSrvIpAddrEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Parameters of DHCP allocated IP Addresses table."
+    INDEX { rlDhcpSrvIpAddrIpAddr }
+    ::= { rlDhcpSrvIpAddrTable 1 }
+
+RlDhcpSrvIpAddrEntry ::= SEQUENCE {
+      rlDhcpSrvIpAddrIpAddr
+         IpAddress,
+      rlDhcpSrvIpAddrIpNetMask
+         IpAddress,
+      rlDhcpSrvIpAddrIdentifier
+         OCTET STRING,
+      rlDhcpSrvIpAddrIdentifierType
+         INTEGER,
+      rlDhcpSrvIpAddrClnHostName
+         SnmpAdminString,
+      rlDhcpSrvIpAddrMechanism
+         INTEGER,
+      rlDhcpSrvIpAddrAgeTime
+         Unsigned32,
+      rlDhcpSrvIpAddrLeaseTime
+         Unsigned32,
+      rlDhcpSrvIpAddrState
+         INTEGER,
+      rlDhcpSrvIpAddrPoolName
+         DisplayString,
+      rlDhcpSrvIpAddrConfParamsName
+         DisplayString,
+      rlDhcpSrvIpAddrRowStatus
+         RowStatus,
+      rlDhcpSrvIpAddrOptionParamsName
+         DisplayString
+      }
+
+rlDhcpSrvIpAddrIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address that was allocated by DHCP Server."
+    ::= { rlDhcpSrvIpAddrEntry 1 }
+
+rlDhcpSrvIpAddrIpNetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The subnet mask associated with the IP address of this entry.
+        The value of the mask is an IP address with all the network bits
+        set to 1 and all the hosts bits set to 0."
+    ::= { rlDhcpSrvIpAddrEntry 2 }
+
+rlDhcpSrvIpAddrIdentifier OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (2..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unique Identifier for client. Either physical address or DHCP Client Identifier."
+    ::= { rlDhcpSrvIpAddrEntry 3 }
+
+rlDhcpSrvIpAddrIdentifierType OBJECT-TYPE
+    SYNTAX INTEGER {
+        physAddr(1),
+        clientId(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifier Type. Either physical address or DHCP Client Identifier."
+    DEFVAL { clientId }
+    ::= { rlDhcpSrvIpAddrEntry 4 }
+
+rlDhcpSrvIpAddrClnHostName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Client Host Name. DHCP Server will use it to update DNS Server.
+        Must be unique per client."
+    ::= { rlDhcpSrvIpAddrEntry 5 }
+
+rlDhcpSrvIpAddrMechanism OBJECT-TYPE
+    SYNTAX INTEGER {
+        manual(1),
+        automatic(2),
+        dynamic(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Mechanism of allocation IP Address by DHCP Server.
+        The only value that can be set by user is manual."
+    DEFVAL { manual }
+    ::= { rlDhcpSrvIpAddrEntry 6 }
+
+rlDhcpSrvIpAddrAgeTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Age time of the IP Address."
+    DEFVAL { 0 }
+    ::= { rlDhcpSrvIpAddrEntry 7 }
+
+rlDhcpSrvIpAddrPoolName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ip address pool name. A unique name for host pool static allocation,
+        or network pool name in case of dynamic allocation."
+    ::= { rlDhcpSrvIpAddrEntry 8 }
+
+rlDhcpSrvIpAddrConfParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable points (serves as key) to appropriate set of parameters
+        in the DHCP Server configuration parameters table."
+    ::= { rlDhcpSrvIpAddrEntry 9 }
+
+rlDhcpSrvIpAddrRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { rlDhcpSrvIpAddrEntry 10 }
+
+rlDhcpSrvIpAddrLeaseTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Lease time of the IP Address. Get a value of network pool lease time at allocation time."
+    DEFVAL { 86400 }
+    ::= { rlDhcpSrvIpAddrEntry 11 }
+
+rlDhcpSrvIpAddrState OBJECT-TYPE
+    SYNTAX INTEGER {
+        pre-allocated(1),
+        valid(2),
+        expired(3),
+        declined(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "State of allocation IP Address by DHCP Server."
+    DEFVAL { valid }
+    ::= { rlDhcpSrvIpAddrEntry 12 }
+
+rlDhcpSrvIpAddrOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of DHCP Option Table."
+    ::= { rlDhcpSrvIpAddrEntry 13 }
+
+-- Dynamic Table
+
+rlDhcpSrvDynamicTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvDynamicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The DHCP Dynamic Server's configuration Table"
+    ::=  { rsDHCP 46 }
+
+rlDhcpSrvDynamicEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvDynamicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table. Parameters sent in
+        as a DHCP Reply to DHCP Request with specified indices"
+    INDEX { rlDhcpSrvDynamicPoolName }
+    ::=  { rlDhcpSrvDynamicTable 1 }
+
+RlDhcpSrvDynamicEntry ::= SEQUENCE {
+      rlDhcpSrvDynamicPoolName
+         DisplayString,
+      rlDhcpSrvDynamicIpAddrFrom
+         IpAddress,
+      rlDhcpSrvDynamicIpAddrTo
+         IpAddress,
+      rlDhcpSrvDynamicIpNetMask
+         IpAddress,
+      rlDhcpSrvDynamicLeaseTime
+         Unsigned32,
+      rlDhcpSrvDynamicProbeEnable
+         TruthValue,
+      rlDhcpSrvDynamicTotalNumOfAddr
+         Unsigned32,
+      rlDhcpSrvDynamicFreeNumOfAddr
+         Unsigned32,
+      rlDhcpSrvDynamicConfParamsName
+         DisplayString,
+      rlDhcpSrvDynamicRowStatus
+         RowStatus,
+      rlDhcpSrvDynamicAvailableNumOfAddr
+         Unsigned32,
+      rlDhcpSrvDynamicNumOfPreallocatedAddr
+         Unsigned32,
+      rlDhcpSrvDynamicNumOfValidAddr
+         Unsigned32,
+      rlDhcpSrvDynamicNumOfExpiredAddr
+         Unsigned32,
+      rlDhcpSrvDynamicNumOfDeclinedAddr
+         Unsigned32,
+      rlDhcpSrvDynamicOptionParamsName
+         DisplayString
+     }
+
+rlDhcpSrvDynamicPoolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of DHCP dynamic addresses pool."
+    ::= { rlDhcpSrvDynamicEntry 1 }
+
+rlDhcpSrvDynamicIpAddrFrom OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The first IP address allocated in this row."
+    ::= { rlDhcpSrvDynamicEntry 2 }
+
+rlDhcpSrvDynamicIpAddrTo OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The last IP address allocated in this row."
+    ::= { rlDhcpSrvDynamicEntry 3 }
+
+rlDhcpSrvDynamicIpNetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The subnet mask associated with the IP addresses of this entry.
+        The value of the mask is an IP address with all the network bits
+        set to 1 and all the hosts bits set to 0."
+    ::= { rlDhcpSrvDynamicEntry 4 }
+
+rlDhcpSrvDynamicLeaseTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Maximum lease-time in seconds granted to a requesting DHCP client.
+        For automatic allocation use 0xFFFFFFFF.
+        To exclude addresses from allocation mechanism, set this value to 0."
+    DEFVAL { 86400 }
+    ::= { rlDhcpSrvDynamicEntry 5 }
+
+rlDhcpSrvDynamicProbeEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or Disable the use of the DHCP probe before allocating the address."
+    DEFVAL { true }
+    ::= { rlDhcpSrvDynamicEntry 6 }
+
+rlDhcpSrvDynamicTotalNumOfAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 7 }
+
+rlDhcpSrvDynamicFreeNumOfAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Free number of addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 8 }
+
+rlDhcpSrvDynamicConfParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable points (serves as key) to appropriate set of parameters
+        in the DHCP Server configuration parameters table."
+    ::= { rlDhcpSrvDynamicEntry 9 }
+
+rlDhcpSrvDynamicRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { rlDhcpSrvDynamicEntry 10 }
+
+rlDhcpSrvDynamicAvailableNumOfAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of available addresses in space - all range minus excluded."
+    ::= { rlDhcpSrvDynamicEntry 11 }
+
+rlDhcpSrvDynamicNumOfPreallocatedAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of preallocated addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 12 }
+
+rlDhcpSrvDynamicNumOfValidAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of Valid (allocated) addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 13 }
+
+rlDhcpSrvDynamicNumOfExpiredAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of expired addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 14 }
+
+rlDhcpSrvDynamicNumOfDeclinedAddr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of declined addresses in space."
+    ::= { rlDhcpSrvDynamicEntry 15 }
+
+rlDhcpSrvDynamicOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of DHCP Option Table."
+    ::= { rlDhcpSrvDynamicEntry 16 }
+
+-- Configuration Parameters Table
+
+rlDhcpSrvConfParamsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvConfParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The DHCP Configuration Parameters Table"
+    ::=  { rsDHCP 47 }
+
+rlDhcpSrvConfParamsEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvConfParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Each entry corresponds to one specific parameters set."
+    INDEX { rlDhcpSrvConfParamsName  }
+    ::=  { rlDhcpSrvConfParamsTable 1 }
+
+RlDhcpSrvConfParamsEntry ::= SEQUENCE {
+    rlDhcpSrvConfParamsName
+       DisplayString,
+    rlDhcpSrvConfParamsNextServerIp
+       IpAddress,
+    rlDhcpSrvConfParamsNextServerName
+       DisplayString,
+    rlDhcpSrvConfParamsBootfileName
+       DisplayString,
+    rlDhcpSrvConfParamsRoutersList
+       DisplayString,
+    rlDhcpSrvConfParamsTimeSrvList
+       DisplayString,
+    rlDhcpSrvConfParamsDnsList
+       DisplayString,
+    rlDhcpSrvConfParamsDomainName
+       SnmpAdminString,
+    rlDhcpSrvConfParamsNetbiosNameList
+       DisplayString,
+    rlDhcpSrvConfParamsNetbiosNodeType
+       INTEGER,
+    rlDhcpSrvConfParamsCommunity
+       DisplayString,
+    rlDhcpSrvConfParamsNmsIp
+       IpAddress,
+    rlDhcpSrvConfParamsOptionsList
+       DisplayString,
+    rlDhcpSrvConfParamsRowStatus
+       RowStatus
+   }
+
+rlDhcpSrvConfParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This value is a unique index for the
+        entry in the rlDhcpSrvConfParamsTable."
+   ::= { rlDhcpSrvConfParamsEntry 1 }
+
+rlDhcpSrvConfParamsNextServerIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP of next server for client to use in configuration process."
+--    DEFVAL { 0.0.0.0 }
+    ::= { rlDhcpSrvConfParamsEntry 2 }
+
+rlDhcpSrvConfParamsNextServerName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The mame of next server for client to use in configuration process."
+    ::= { rlDhcpSrvConfParamsEntry 3 }
+
+rlDhcpSrvConfParamsBootfileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name of file for client to request from next server."
+    ::= { rlDhcpSrvConfParamsEntry 4 }
+
+rlDhcpSrvConfParamsRoutersList   OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of option code 3, which defines default routers list.
+        Each IP address is represented in dotted decimal notation format
+        with ';' between them."
+    ::= { rlDhcpSrvConfParamsEntry 5 }
+
+rlDhcpSrvConfParamsTimeSrvList   OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of option code 4, which defines time servers list.
+        Each IP address is represented in dotted decimal notation format
+        with ';' between them."
+    ::= { rlDhcpSrvConfParamsEntry 6 }
+
+rlDhcpSrvConfParamsDnsList   OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of option code 6, which defines the list of DNSs.
+        Each IP address is represented in dotted decimal notation format
+        with ';' between them."
+    ::= { rlDhcpSrvConfParamsEntry 7 }
+
+rlDhcpSrvConfParamsDomainName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value option code 15, which defines the domain name.."
+    ::= { rlDhcpSrvConfParamsEntry 8 }
+
+rlDhcpSrvConfParamsNetbiosNameList   OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value option code 44, which defines the list of NETBios
+        Name Servers. Each IP address is represented in dotted decimal
+        notation format with ';' between them."
+    ::= { rlDhcpSrvConfParamsEntry 9 }
+
+rlDhcpSrvConfParamsNetbiosNodeType   OBJECT-TYPE
+    SYNTAX INTEGER {
+        b-node(1),
+        p-node(2),
+        m-node(4),
+        h-node(8)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value option code 46, which defines the NETBios node type.
+        The option will be added only if rlDhcpSrvConfParamsNetbiosNameList
+        is not empty."
+    DEFVAL { h-node }
+    ::= { rlDhcpSrvConfParamsEntry 10 }
+
+rlDhcpSrvConfParamsCommunity OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+        "The value of site-specific option 128, which defines Community.
+        The option will be added only if rlDhcpSrvConfParamsNmsIp is set."
+    DEFVAL { "public" }
+    ::= { rlDhcpSrvConfParamsEntry 11 }
+
+rlDhcpSrvConfParamsNmsIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+        "The value of site-specific option 129,
+        which defines IP of Network Manager."
+--    DEFVAL { 0.0.0.0 }
+    ::= { rlDhcpSrvConfParamsEntry 12 }
+
+rlDhcpSrvConfParamsOptionsList   OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+         "The sequence of option segments.  Each option segment
+         is represented by a triplet <code/length/value>.
+         The code defines the code of each supported option.
+         The length defines the length of each supported option.
+         The value defines the value of the supported option.
+         If there is a number of elements in the value field,
+         they are divided by ','. Each element of type IP address
+         in value field is represented in dotted decimal notation
+         format."
+    ::= { rlDhcpSrvConfParamsEntry 13 }
+
+rlDhcpSrvConfParamsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { rlDhcpSrvConfParamsEntry 14 }
+
+
+rlDhcpSrvNumOfNetworkPools OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of network pools (not excluded)."
+    ::= { rsDHCP 48 }
+
+rlDhcpSrvNumOfExcludedPools OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of excluded pools."
+    ::= { rsDHCP 49 }
+
+rlDhcpSrvNumOfHostPools OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of static entries stored in database."
+    ::= { rsDHCP 50 }
+
+rlDhcpSrvNumOfDynamicEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of dynamic and automatic (not static) entries stored in database."
+    ::= { rsDHCP 51 }
+
+rlDhcpSrvNumOfUsedEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of entries (any type) stored in database."
+    ::= { rsDHCP 52 }
+
+rlDhcpSrvNumOfPreAllocatedEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of preallocated entries."
+    ::= { rsDHCP 53 }
+
+rlDhcpSrvNumOfExpiredEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of expired entries."
+    ::= { rsDHCP 54 }
+
+rlDhcpSrvNumOfDeclinedEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of declined entries."
+    ::= { rsDHCP 55 }
+
+rlDhcpSrvNumOfAutomaticEntries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable shows number of automatic entries."
+    ::= { rsDHCP 56 }
+
+
+-- Option Parameters Table
+
+RlDhcpSrvOptionTypeEnum  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip Dhcp server option type enumeration."
+   SYNTAX INTEGER {
+        boolean(1),
+        integer(2),
+        ascii(3),
+        ip(4),
+        hex(5),
+        ip-list(6)
+    }
+
+rlDhcpSrvOptionParamsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvOptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The DHCP Option Parameters Table"
+    ::=  { rsDHCP 57 }
+
+rlDhcpSrvOptionParamsEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Each entry corresponds to one specific parameters set."
+    INDEX { rlDhcpSrvOptionParamsName, rlDhcpSrvOptionParamsCode }
+    ::=  { rlDhcpSrvOptionParamsTable 1 }
+
+RlDhcpSrvOptionParamsEntry ::= SEQUENCE {
+    rlDhcpSrvOptionParamsName
+       DisplayString,
+    rlDhcpSrvOptionParamsCode
+       Unsigned32,
+    rlDhcpSrvOptionParamsType
+       RlDhcpSrvOptionTypeEnum,
+    rlDhcpSrvOptionParamsOrigString
+       DisplayString,
+    rlDhcpSrvOptionParamsDescription
+       DisplayString,
+    rlDhcpSrvOptionParamsRowStatus
+       RowStatus
+   }
+rlDhcpSrvOptionParamsName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This value is a unique index for the
+        entry in the rlDhcpSrvOptionParamsTable."
+   ::= { rlDhcpSrvOptionParamsEntry 1 }
+
+rlDhcpSrvOptionParamsCode OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option code."
+    ::= { rlDhcpSrvOptionParamsEntry 2 }
+
+rlDhcpSrvOptionParamsType OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionTypeEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option type."
+    ::= { rlDhcpSrvOptionParamsEntry 3 }
+
+rlDhcpSrvOptionParamsOrigString OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option value."
+    ::= { rlDhcpSrvOptionParamsEntry 4 }
+
+rlDhcpSrvOptionParamsDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The option description."
+    ::= { rlDhcpSrvOptionParamsEntry 5 }
+
+rlDhcpSrvOptionParamsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { rlDhcpSrvOptionParamsEntry 6 }
+
+-- Auxulary Option Table
+
+rlDhcpSrvAuxOptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpSrvAuxOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The DHCP Auxulary Option Table"
+    ::=  { rsDHCP 58 }
+
+rlDhcpSrvAuxOptionEntry OBJECT-TYPE
+    SYNTAX RlDhcpSrvAuxOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition for this table.
+        Each entry contains pair option code/option type that permitted by option command."
+    INDEX { rlDhcpSrvAuxOptionCode, rlDhcpSrvAuxOptionType }
+    ::=  { rlDhcpSrvAuxOptionTable 1 }
+
+RlDhcpSrvAuxOptionEntry ::= SEQUENCE {
+    rlDhcpSrvAuxOptionCode
+       Unsigned32,
+    rlDhcpSrvAuxOptionType
+       RlDhcpSrvOptionTypeEnum,
+    rlDhcpSrvAuxOptionMinVal
+       Unsigned32,
+    rlDhcpSrvAuxOptionMaxVal
+       Unsigned32
+}
+
+rlDhcpSrvAuxOptionCode OBJECT-TYPE
+    SYNTAX Unsigned32 (1..254)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 1 }
+
+rlDhcpSrvAuxOptionType OBJECT-TYPE
+    SYNTAX RlDhcpSrvOptionTypeEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The option enumeration."
+    ::= { rlDhcpSrvAuxOptionEntry 2 }
+
+rlDhcpSrvAuxOptionMinVal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The minimal value of this option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 3 }
+
+rlDhcpSrvAuxOptionMaxVal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximal value of this option Code."
+    ::= { rlDhcpSrvAuxOptionEntry 4 }
+
+END

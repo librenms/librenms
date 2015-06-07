@@ -1,0 +1,344 @@
+ALCATEL-IND1-LLDP-MED-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32
+					FROM SNMPv2-SMI
+		LldpPortNumber		FROM LLDP-MIB
+		PolicyAppType, Dscp	FROM LLDP-EXT-MED-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP
+							FROM SNMPv2-CONF
+		RowStatus, TruthValue		FROM SNMPv2-TC
+		softentIND1LldpMed	FROM ALCATEL-IND1-BASE;
+
+
+	alcatelIND1LLDPMEDMIB MODULE-IDENTITY
+		LAST-UPDATED "200908110000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+			"Please consult with Customer Service to insure the most appropriate
+			version of this document is used with the products in question:
+
+			Alcatel-Lucent, Enterprise Solutions Division
+			(Formerly Alcatel Internetworking, Incorporated)
+			26801 West Agoura Road
+			Agoura Hills, CA  91301-5122
+			United States Of America
+
+			Telephone:				North America  +1 800 995 2696
+								Latin America  +1 877 919 9526
+								Europe         +31 23 556 0100
+								Asia           +65 394 7933
+								All Other      +1 818 878 4507
+
+			Electronic Mail:		support@ind.alcatel.com
+			World Wide Web:			http://alcatel-lucent.com/wps/portal/enterprise
+			File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+			Network Management Protocol (SNMP) Management Information Base (MIB):
+
+			For the Birds Of Prey Product Line
+			LLDP MED Management Information base for Media Endpoint Discovery Information.
+
+			The right to make changes in specification and other information
+			contained in this document without prior notice is reserved.
+
+			No liability shall be assumed for any incidental, indirect, special, or
+			consequential damages whatsoever arising from or related to this
+			document or the information contained herein.
+
+			Vendors, end-users, and other interested parties are granted
+			non-exclusive license to use this specification in connection with
+			management of the products for which it is intended to be used.
+
+			Copyright (C) 1995-2009 Alcatel-Lucent, Incorporated
+			ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION	"200908110000Z"
+
+		DESCRIPTION
+			"LLDP MED - ALCATEL-LUCENT proprietary MIB"
+		::= { softentIND1LldpMed 1}
+
+----------------------------------------------------------------
+
+	alcatelIND1LLDPMEDMIBObjects OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Branch For LLDP MED Subsystem Managed Objects."
+		::= { alcatelIND1LLDPMEDMIB 1 }
+
+	alcatelIND1LLDPMEDMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIB 2 }
+
+-- This MIB contains the following groups
+	alaLldpMedLocMediaPolicyAttributes OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIBObjects 1}
+
+----------------------------------------------------------------
+       
+----------------------------------------------------------------
+-- LLDP MED MIB
+----------------------------------------------------------------
+
+
+		
+
+---------------------------------------------------------------
+-- LLDP Local Network Policy Table
+---------------------------------------------------------------
+        
+--	DESCRIPTION:
+--	Local Media Policy Information Table
+--
+
+	alaLldpXMedLocMediaPolicyTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF AlaLldpXMedLocMediaPolicyEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	            "This table contains one row per policy type per port
+	             of media policy information (as a part of the MED
+	             organizational extension) on the local system known
+	             to this agent."
+	    ::= { alaLldpMedLocMediaPolicyAttributes 1 }
+
+	alaLldpXMedLocMediaPolicyEntry OBJECT-TYPE
+	    SYNTAX      AlaLldpXMedLocMediaPolicyEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	            "Information about a particular policy on a specific
+	             port component."
+	    INDEX   { alaLldpXMedLocMediaPolicyId}
+	    ::= { alaLldpXMedLocMediaPolicyTable 1 }
+	
+	AlaLldpXMedLocMediaPolicyEntry ::= SEQUENCE {
+		      alaLldpXMedLocMediaPolicyId	      Integer32,
+	              alaLldpXMedLocMediaPolicyAppType        PolicyAppType,
+		      alaLldpXMedLocMediaPolicyVlanType       INTEGER,	
+	              alaLldpXMedLocMediaPolicyVlanID         Integer32,
+	              alaLldpXMedLocMediaPolicyPriority       Integer32,
+	              alaLldpXMedLocMediaPolicyDscp           Dscp,
+	              alaLldpXMedLocMediaPolicyUnknown        TruthValue,
+	              alaLldpXMedLocMediaPolicyTagged         TruthValue,
+		      alaLldpXMedLocMediaPolicyRowStatus      RowStatus
+	}
+	
+	alaLldpXMedLocMediaPolicyId	OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	not-accessible
+	    STATUS      current
+	    DESCRIPTION
+		    "The Network Policy Identifier used to identify each
+		     network policy configured in the system"
+	    ::= { alaLldpXMedLocMediaPolicyEntry 1 }
+
+	alaLldpXMedLocMediaPolicyAppType OBJECT-TYPE
+	    SYNTAX      PolicyAppType
+	    MAX-ACCESS  read-create
+	    STATUS      current
+	    DESCRIPTION
+	            "The media type that defines the primary function of the
+	             application for the policy advertised by an endpoint."
+	    ::= { alaLldpXMedLocMediaPolicyEntry 2 }
+	
+	alaLldpXMedLocMediaPolicyVlanType	OBJECT-TYPE
+            SYNTAX  INTEGER
+        	{
+                	tagged (1),
+                	priorityTagged (2),
+                	untagged (3)
+        	}
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                  "This object defines the type of the object alaLldpXMedLocMediaPolicyVlanID. 
+		   In case of valid VLAN ID 1-4094, the value of this object is tagged.
+		   VLAN ID = 0 is used for priority tagged or untagged VLAN. 
+		   VLAN ID = 0, VLAN Type = priorityTagged means LLDP frames are priority tagged;
+		   VLAN ID = 0, VLAN Type = untagged means LLDP frames are untagged."
+            DEFVAL { tagged }
+            ::= { alaLldpXMedLocMediaPolicyEntry 3 }
+	
+	alaLldpXMedLocMediaPolicyVlanID  OBJECT-TYPE
+	    SYNTAX      Integer32 (0|1..4094|4095)
+	    MAX-ACCESS  read-create
+	    STATUS      current
+	    DESCRIPTION
+	            "An extension of the VLAN Identifier for the port,
+	             as defined in IEEE 802.1P-1998.
+	
+	             A value of 1 through 4094 is used to define a valid PVID.
+	
+	             A value of 0 shall be used if the device is using priority tagged
+	             frames, meaning that only the 802.1p priority level is significant
+	             and the default VID of the ingress port is being used instead.
+	
+	             A value of 4095 is reserved for implementation use."
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 4 }
+	
+	alaLldpXMedLocMediaPolicyPriority  OBJECT-TYPE
+	    SYNTAX      Integer32 (0..7)
+	    MAX-ACCESS  read-create
+	    STATUS      current
+	    DESCRIPTION
+	            "This object contains the value of the 802.1p priority
+	            which is associated with the given port on the
+	            local system."
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 5 }
+	
+	alaLldpXMedLocMediaPolicyDscp  OBJECT-TYPE
+	    SYNTAX      Dscp
+	    MAX-ACCESS  read-create
+	    STATUS      current
+	    DESCRIPTION
+	            "This object contains the value of the Differentiated Service
+	            Code Point (DSCP) as defined in IETF RFC 2474 and RFC 2475
+	            which is associated with the given port on the local system."
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 6 }
+	
+	alaLldpXMedLocMediaPolicyUnknown  OBJECT-TYPE
+	    SYNTAX      TruthValue
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	            "A value of 'true' indicates that the
+	             network policy for the specified application type is
+	             currently unknown.  In this case, the VLAN ID, the
+	             layer 2 priority and the DSCP value fields are ignored.
+	             A value of 'false' indicates that this network policy
+	             is defined."
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 7 }
+	
+	alaLldpXMedLocMediaPolicyTagged  OBJECT-TYPE
+	    SYNTAX      TruthValue
+	    MAX-ACCESS  read-only	
+	    STATUS      current
+	    DESCRIPTION
+	            "A value of 'true' indicates that the application is using a
+	             tagged VLAN.
+	             A value of 'false' indicates that for the specific application
+	             the device either is using an untagged VLAN or does not
+	             support port based VLAN operation.  In this case, both the
+	             VLAN ID and the Layer 2 priority fields are ignored and
+	             only the DSCP value has relevance."
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 8 }
+
+	alaLldpXMedLocMediaPolicyRowStatus	OBJECT-TYPE
+	    SYNTAX	RowStatus
+	    MAX-ACCESS	read-create
+	    STATUS	current
+	    DESCRIPTION
+		    "Status of the row
+		     The writable columns in a row can not be changed if the row
+       	 	     is active. All columns must have a valid value before a row
+        	     can be activated"   
+
+	    ::= { alaLldpXMedLocMediaPolicyEntry 9 }
+	
+---------------------------------------------------------------
+-- LLDP Local Network Policy Port Table
+---------------------------------------------------------------
+        
+--	DESCRIPTION:
+--	Local Media Policy Information Table
+
+	alaLldpXMedLocMediaPolicyPortTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF AlaLldpXMedLocMediaPolicyPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	             "This table contains one row per policy type per port
+	             of media policy information (as a part of the MED
+	             organizational extension) on the local system known
+	             to this agent."
+	    ::= { alaLldpMedLocMediaPolicyAttributes 2 }
+
+	alaLldpXMedLocMediaPolicyPortEntry OBJECT-TYPE
+	    SYNTAX      AlaLldpXMedLocMediaPolicyPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	            "Information about a particular policy on a specific
+	             port component."
+	    INDEX   { alaLldpXMedLocMediaPolicyId, alaLldpXMedLocMediaPolicyPortNumber}
+	    ::= { alaLldpXMedLocMediaPolicyPortTable 1 }
+	
+	AlaLldpXMedLocMediaPolicyPortEntry ::= SEQUENCE {
+		      alaLldpXMedLocMediaPolicyPortNumber      LldpPortNumber,
+		      alaLldpXMedLocMediaPolicyPortRowStatus   RowStatus
+		}
+	
+	alaLldpXMedLocMediaPolicyPortNumber  OBJECT-TYPE
+	    SYNTAX      LldpPortNumber
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+		    "This object is the unique bridge port number."
+
+	    ::= { alaLldpXMedLocMediaPolicyPortEntry 1 }
+	
+	alaLldpXMedLocMediaPolicyPortRowStatus	OBJECT-TYPE
+	    SYNTAX	RowStatus
+	    MAX-ACCESS	read-create
+	    STATUS	current
+	    DESCRIPTION
+		    "Status of the row
+		     The writable columns in a row can not be changed if the row
+       	 	     is active. All columns must have a valid value before a row
+        	     can be activated"   
+
+	    ::= { alaLldpXMedLocMediaPolicyPortEntry 2 }
+
+-- ******************************************************************
+-- CONFORMANCE
+-- ******************************************************************
+
+        alcatelIND1LLDPMEDMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIBConformance 1 }
+        alcatelIND1LLDPMEDMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIBConformance 2 }
+
+-- ******************************************************************
+
+-- ******************************************************************
+-- COMPLIANCE
+-- ******************************************************************
+        alcatelIND1LLDPMEDMIBCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+                "Compliance statement for LLDP MED."
+        MODULE
+        MANDATORY-GROUPS
+        {
+                alaLldpXMedLocMediaPolicyGroup
+        }
+        ::= { alcatelIND1LLDPMEDMIBCompliances 1 }
+
+-- ******************************************************************
+-- MIB Grouping
+-- ******************************************************************
+
+alaLldpXMedLocMediaPolicyGroup	OBJECT-GROUP
+   	OBJECTS
+	{
+	    alaLldpXMedLocMediaPolicyAppType,
+	    alaLldpXMedLocMediaPolicyVlanType,  
+	    alaLldpXMedLocMediaPolicyVlanID,
+	    alaLldpXMedLocMediaPolicyPriority,
+	    alaLldpXMedLocMediaPolicyDscp,
+	    alaLldpXMedLocMediaPolicyUnknown,
+	    alaLldpXMedLocMediaPolicyTagged,
+	    alaLldpXMedLocMediaPolicyRowStatus,
+	    alaLldpXMedLocMediaPolicyPortRowStatus
+	}
+	STATUS	current
+	DESCRIPTION
+		"Collection of objects for management of LLDP MED Local Media Policy Table."
+	::= { alcatelIND1LLDPMEDMIBGroups 1 }
+
+
+END

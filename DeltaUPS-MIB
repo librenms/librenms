@@ -1,0 +1,1666 @@
+--Delta-MIB { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) delta(2254) ups(2) upsv4(4) }
+
+
+DeltaUPS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+delta				OBJECT IDENTIFIER ::=  { enterprises 2254 }
+
+ups					OBJECT IDENTIFIER ::=  { delta 2 }
+
+upsv4				OBJECT IDENTIFIER ::=  { ups 4 }
+
+dupsIdent			OBJECT IDENTIFIER ::=  { upsv4 1 }
+dupsControl			OBJECT IDENTIFIER ::=  { upsv4 2 }
+dupsConfig			OBJECT IDENTIFIER ::=  { upsv4 3 }
+dupsInput			OBJECT IDENTIFIER ::=  { upsv4 4 }
+dupsOutput			OBJECT IDENTIFIER ::=  { upsv4 5 }
+dupsBypass			OBJECT IDENTIFIER ::=  { upsv4 6 }
+dupsBattery			OBJECT IDENTIFIER ::=  { upsv4 7 }
+dupsTest 			OBJECT IDENTIFIER ::=  { upsv4 8 }
+dupsAlarm 			OBJECT IDENTIFIER ::=  { upsv4 9 }
+dupsEnvironment		OBJECT IDENTIFIER ::=  { upsv4 10 }
+dupsTraps			OBJECT IDENTIFIER ::=  { upsv4 20 }
+
+
+----------------------
+-- dups Ident group --
+----------------------
+   dupsIdentManufacturer OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..20))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The name of the UPS manufacturer."
+       ::= { dupsIdent 1 }
+
+   dupsIdentModel OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..31))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The UPS Model designation."
+       ::= { dupsIdent 2 }
+
+   dupsIdentUPSSoftwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..15))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The UPS firmware/software version(s). This variable
+               may or may not has the same value as
+               upsIdentAgentSoftwareVersion in some implementations."
+       ::= { dupsIdent 3 }
+
+   dupsIdentAgentSoftwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..15))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The UPS agent software version. This variable may or
+               may not has the same value as
+               upsIdentUPSSoftwareVersion in some implementations."
+       ::= { dupsIdent 4 }
+
+   dupsIdentName OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..63))
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the UPS. This object should be
+               set by the administrator."
+       ::= { dupsIdent 5 }
+
+   dupsAttachedDevices OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..63))
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the devices attached to the
+               output(s) of the UPS. This object should be set by
+               the administrator."
+       ::= { dupsIdent 6 }
+
+   dupsRatingOutputVA OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal output VA rating."
+       ::= { dupsIdent 7 }
+
+   dupsRatingOutputVoltage OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal output voltage rating."
+       ::= { dupsIdent 8 }
+
+   dupsRatingOutputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal output frequency rating."
+       ::= { dupsIdent 9 }
+
+   dupsRatingInputVoltage OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal input voltage rating."
+       ::= { dupsIdent 10 }
+
+   dupsRatingInputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal input frequency rating."
+       ::= { dupsIdent 11 }
+
+   dupsRatingBatteryVoltage OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal battery voltage rating."
+       ::= { dupsIdent 12 }
+
+   dupsLowTransferVoltUpBound OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The minimum input line voltage upper bound allowed
+               before the UPS system transfers to battery backup."
+       ::= { dupsIdent 13 }
+
+   dupsLowTransferVoltLowBound OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The minimum input line voltage lower bound allowed
+               before the UPS system transfers to battery backup."
+       ::= { dupsIdent 14 }
+
+   dupsHighTransferVoltUpBound OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The maximum input line voltage upper bound allowed
+               before the UPS system transfers to battery backup."
+       ::= { dupsIdent 15 }
+
+   dupsHighTransferVoltLowBound OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The maximum input line voltage lower bound allowed
+               before the UPS system transfers to battery backup."
+       ::= { dupsIdent 16 }
+
+   dupsLowBattTime OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Minutes, time from low battery to low battery shutdown."
+       ::= { dupsIdent 17 }
+
+   dupsOutletRelays OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Number of outlet relay. If it is 0, the function is not
+               available for the UPS."
+       ::= { dupsIdent 18 }
+
+   dupsType OBJECT-TYPE
+       SYNTAX     INTEGER {
+           on-line(1),
+           off-line(2),
+           line-interactive(3),
+           3phase(4),
+           splite-phase(5)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicate the UPS type."
+       ::= { dupsIdent 19 }
+
+------------------------
+-- dups Control group --
+------------------------
+   dupsShutdownType OBJECT-TYPE
+       SYNTAX     INTEGER {
+           output(1),
+           system(2)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "This object determines the nature of the action to be
+               taken at the time when the countdown of the
+               upsShutdownAfterDelay and upsRebootWithDuration
+               objects reaches zero.
+               Setting this object to output(1) indicates that
+               shutdown requests should cause only the output of the
+               UPS to turn off.  Setting this object to system(2)
+               indicates that shutdown requests will cause the entire
+               UPS system to turn off."
+       ::= { dupsControl 1 }
+
+   dupsAutoReboot OBJECT-TYPE
+       SYNTAX     INTEGER {
+           on(1),
+           off(2)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "In backup mode, the UPS may shutdown normally by SDA command, 
+               dry-contact remote shutdown signal or low battery shutdown. 
+               This command is used to determine the unit should restart or 
+               not next time when the power restores"
+       ::= { dupsControl 2 }
+
+   dupsShutdownAction OBJECT-TYPE
+       SYNTAX     INTEGER
+--       UNITS      "Second"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "If the value is greater than 0 the UPS performs
+               shutdown action that defined by ShutdownType after
+               the seconds. 0, aborted."
+       ::= { dupsControl 3 }
+
+   dupsRestartAction OBJECT-TYPE
+       SYNTAX     INTEGER
+--       UNITS      "Minute"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "UPS will restart after the indicated number of minutes.
+                -1, aborted."
+       ::= { dupsControl 4 }
+
+   dupsSetOutletRelay OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicate which outlet relay, from 1,2,3... ."
+       ::= { dupsControl 5 }
+
+   dupsRelayOffDelay OBJECT-TYPE
+       SYNTAX     INTEGER
+--       UNITS      "Second"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Turn the relay off after the seconds. The relay was indicated
+                by SetOutletRelay."
+       ::= { dupsControl 6 }
+
+   dupsRelayOnDelay OBJECT-TYPE
+       SYNTAX     INTEGER
+--       UNITS      "Minute"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Turn the relay on after the seconds. The relay was indicated
+                by SetOutletRelay."
+       ::= { dupsControl 7 }
+
+--------------------------
+-- dups Configure group --
+--------------------------
+   dupsConfigBuzzerAlarm OBJECT-TYPE
+       SYNTAX     INTEGER {
+           alarm(1),
+           silence(2)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "UPS will keep silence but will alarm again when 
+               next power event is occurred"
+       ::= { dupsConfig 1 }
+
+   dupsConfigBuzzerState OBJECT-TYPE
+       SYNTAX     INTEGER {
+           enable(1),
+           disable(2)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "If it is disabled then the UPS is always muted."
+       ::= { dupsConfig 2 }
+
+   dupsConfigSensitivity OBJECT-TYPE
+       SYNTAX     INTEGER {
+           normal(0),
+           reduced(1),
+           low(2)
+       }
+       ACCESS    read-write
+       STATUS    mandatory
+       DESCRIPTION
+               "The seneitivity of the UPS to utility line
+               abnormalities or noises."
+       ::= { dupsConfig 3 }
+
+   dupsConfigLowVoltageTransferPoint OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The minimum input line voltage allowed before the UPS
+               system transfers to battery backup."
+       ::= { dupsConfig 4 }
+
+   dupsConfigHighVoltageTransferPoint OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Volt"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The maximum line voltage allowed before the UPS
+               system transfers to battery backup."
+       ::= { dupsConfig 5 }
+
+   dupsConfigShutdownOSDelay OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Second"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The operating system shutdown delay time when the 
+                input power fail. -1 will disable this option."
+       ::= { dupsConfig 6 }
+
+   dupsConfigUPSBootDelay OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Second"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Delay the UPS startup after power restores. The power
+               quality may not stable when power restores, this 
+               feature let the UPS wait a period of time to startup 
+               the system."
+       ::= { dupsConfig 7 }
+
+   dupsConfigExternalBatteryPack OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicate the number of external battery pack."
+       ::= { dupsConfig 8 }
+
+----------------------
+-- dups Input group --
+----------------------
+   dupsInputNumLines OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The number of input lines utilized in this device."
+       ::= { dupsInput 1 }
+
+   dupsInputFrequency1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current input line 1 frequency to the UPS
+                system in 1/10 Hz."
+	::= { dupsInput 2 }
+
+   dupsInputVoltage1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 1 voltage of the UPS system in 1/10 V."
+	::= { dupsInput 3 }
+
+   dupsInputCurrent1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 1 current to the UPS system in 1/10 A."
+	::= { dupsInput 4 }
+
+   dupsInputFrequency2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current input line 2 frequency to the UPS system
+                in 1/10 Hz."
+	::= { dupsInput 5 }
+
+   dupsInputVoltage2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 2 voltage of the UPS system in 1/10 V."
+	::= { dupsInput 6 }
+
+   dupsInputCurrent2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 2 current to the UPS system in 1/10 A."
+	::= { dupsInput 7 }
+
+   dupsInputFrequency3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current input line 3 frequency to the UPS system
+                in 1/10 Hz."
+	::= { dupsInput 8 }
+
+   dupsInputVoltage3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 3 voltage of the UPS system in 1/10 V."
+	::= { dupsInput 9 }
+
+   dupsInputCurrent3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Input line 3 current to the UPS system in 1/10 A."
+	::= { dupsInput 10 }
+
+-----------------------
+-- dups Output group --
+-----------------------
+   dupsOutputSource OBJECT-TYPE
+       SYNTAX     INTEGER {
+           normal(0),
+           battery(1),
+           bypass(2),
+           reducing(3),
+           boosting(4),
+           manualBypass(5),
+           other(6),
+           none(7)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present source of output power. The enumeration
+               none(7) indicates that there is no source of output
+               power (and therefore no output power), for example,
+               the system has opened the output breaker."
+       ::= { dupsOutput 1 }
+
+   dupsOutputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Hertz"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present output frequency in 1/10 Hz."
+       ::= { dupsOutput 2 }
+
+   dupsOutputNumLines OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The number of output lines utilized in this device."
+       ::= { dupsOutput 3 }
+
+   dupsOutputVoltage1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 1 voltage of the UPS system in 1/10 V."
+	::= { dupsOutput 4 }
+
+   dupsOutputCurrent1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 1 current of the UPS system in 1/10 A."
+	::= { dupsOutput 5 }
+
+   dupsOutputPower1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 1 real power of the UPS system in watts."
+	::= { dupsOutput 6 }
+
+   dupsOutputLoad1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current UPS output line 1 load expressed in percent
+		 of rated capacity."
+	::= { dupsOutput 7 }
+
+   dupsOutputVoltage2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 2 voltage of the UPS system in 1/10 V."
+	::= { dupsOutput 8 }
+
+   dupsOutputCurrent2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 2 current of the UPS system in 1/10 A."
+	::= { dupsOutput 9 }
+
+   dupsOutputPower2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 2 real power of the UPS system in watts."
+	::= { dupsOutput 10 }
+
+   dupsOutputLoad2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current UPS output line 2 load expressed in percent
+		 of rated capacity."
+	::= { dupsOutput 11 }
+
+   dupsOutputVoltage3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 3 voltage of the UPS system in 1/10 V."
+	::= { dupsOutput 12 }
+
+   dupsOutputCurrent3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 3 current of the UPS system in 1/10 A."
+	::= { dupsOutput 13 }
+
+   dupsOutputPower3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Output line 3 real power of the UPS system in watts."
+	::= { dupsOutput 14 }
+
+   dupsOutputLoad3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current UPS output line 3 load expressed in percent
+		 of rated capacity."
+	::= { dupsOutput 15 }
+
+-----------------------
+-- dups Bypass group --
+-----------------------
+   dupsBypassFrequency OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Hertz"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present bypass frequency in 1/10 Hz."
+       ::= { dupsBypass 1 }
+
+   dupsBypassNumLines OBJECT-TYPE
+       SYNTAX     INTEGER
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The number of bypass lines utilized in this device."
+       ::= { dupsBypass 2 }
+
+   dupsBypassVoltage1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 1 voltage of the UPS system in 1/10 V."
+	::= { dupsBypass 3 }
+
+   dupsBypassCurrent1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 1 current of the UPS system in 1/10 A."
+	::= { dupsBypass 4 }
+
+   dupsBypassPower1 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 1 real power of the UPS system in watts."
+	::= { dupsBypass 5 }
+
+   dupsBypassVoltage2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 2 voltage of the UPS system in 1/10 V."
+	::= { dupsBypass 6 }
+
+   dupsBypassCurrent2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 2 current of the UPS system in 1/10 A."
+	::= { dupsBypass 7 }
+
+   dupsBypassPower2 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 2 real power of the UPS system in watts."
+	::= { dupsBypass 8 }
+
+   dupsBypassVoltage3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 3 voltage of the UPS system in 1/10 V."
+	::= { dupsBypass 9 }
+
+   dupsBypassCurrent3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 3 current of the UPS system in 1/10 A."
+	::= { dupsBypass 10 }
+
+   dupsBypassPower3 OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The bypass line 3 real power of the UPS system in watts."
+	::= { dupsBypass 11 }
+
+------------------------
+-- dups Battery group --
+------------------------
+   dupsBatteryCondiction OBJECT-TYPE
+       SYNTAX     INTEGER {
+           good(0),
+           weak(1),
+           replace(2)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The indication of the capacity remaining in the UPS
+               system's batteries when AC normal."
+       ::= { dupsBattery 1 }
+
+   dupsBatteryStatus OBJECT-TYPE
+       SYNTAX     INTEGER {
+           ok(0),
+           low(1),
+           depleted(2)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The indication of the capacity remaining in the UPS
+               system's batteries when AC failed.   A value of ok
+               indicates that the remaining run-time is greater than
+               upsConfigLowBattTime.  A value of low indicates
+               that the remaining battery run-time is less than or
+               equal to upsConfigLowBattTime.  A value of
+               depleted indicates that the UPS will be unable
+               to sustain the present load when and if the utility
+               power is lost (including the possibility that the
+               utility power is currently absent and the UPS is
+               unable to sustain the output)."
+       ::= { dupsBattery 2 }
+
+   dupsBatteryCharge OBJECT-TYPE
+       SYNTAX     INTEGER {
+           floating(0),
+           charging(1),
+           resting(2),
+           discharging(3)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+	           ""
+       ::= { dupsBattery 3 }
+
+   dupsSecondsOnBattery OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "seconds"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "If the unit is on battery power, the elapsed time
+               since the UPS last switched to battery power, or the
+               time since the network management subsystem was last
+               restarted, whichever is less.  Zero shall be returned
+               if the unit is not on battery power."
+       ::= { dupsBattery 4 }
+
+   dupsBatteryEstimatedTime OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "minutes"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Estimated time from backup to low battery shutdown."
+       ::= { dupsBattery 5 }
+
+   dupsBatteryVoltage OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Volt DC"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the present battery voltage 
+               in 1/10 V."
+       ::= { dupsBattery 6 }
+
+   dupsBatteryCurrent OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Amp DC"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present battery current in 1/10 A."
+       ::= { dupsBattery 7 }
+
+   dupsBatteryCapacity OBJECT-TYPE
+       SYNTAX     INTEGER (0..100)
+       UNITS      "percent"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "An estimate of the battery charge remaining expressed
+               as a percent of full charge."
+       ::= { dupsBattery 8 }
+
+   dupsTemperature OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "degrees Centigrade"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The ambient temperature at or near the UPS Battery
+               casing."
+       ::= { dupsBattery 9 }
+
+   dupsLastReplaceDate OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..8))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The last battery replacement date. The format is YYYYMMDD."
+       ::= { dupsBattery 10 }
+
+   dupsNextReplaceDate OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..8))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The next battery replacement date. The format is YYYYMMDD."
+       ::= { dupsBattery 11 }
+
+-------------------
+-- dups Test group 
+-------------------
+   dupsTestType OBJECT-TYPE
+       SYNTAX     INTEGER {
+           abort(0),
+           generalTest(1),
+           batteryTest(2),
+           testFor10sec(3),
+           testUntilBattlow(4)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Perform the UPS Test procedure."
+       ::= { dupsTest 1 }
+
+   dupsTestResultsSummary OBJECT-TYPE
+       SYNTAX     INTEGER {
+           noTestsInitiated(0),
+           donePass(1),
+           inProgress(2),
+           generalTestFail(3),
+           batteryTestFail(4),
+           deepBatteryTestFail(5)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The results of the current or last UPS diagnostics
+               test performed. The values for donePass(1),
+               generalTestFail(3), and batteryTestFail(4) indicate that the
+               test completed either successfully, with a warning, or
+               with an error, respectively.Tests which have not yet
+               concluded are indicated by inProgress(2).  The value
+               noTestsInitiated(0) indicates that no previous test
+               results are available."
+       ::= { dupsTest 2 }
+
+   dupsTestResultsDetail OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Additional information about upsTestResultsSummary.
+               If no additional information available, a zero length
+               string is returned."
+       ::= { dupsTest 3 }
+
+-----------------------
+-- dups Alarm group --
+-----------------------
+   dupsAlarmDisconnect OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS disconnect?"
+       ::= { dupsAlarm 1 }
+
+   dupsAlarmPowerFail OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the input power fail?"
+       ::= { dupsAlarm 2 }
+
+   dupsAlarmBatteryLow OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Are the UPS batteries low?"
+       ::= { dupsAlarm 3 }
+
+   dupsAlarmLoadWarning OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS load percent over the load warning value?"
+       ::= { dupsAlarm 4 }
+
+   dupsAlarmLoadSeverity OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS load percent over the load severity value?"
+       ::= { dupsAlarm 5 }
+
+   dupsAlarmLoadOnBypass OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS load on bypass?"
+       ::= { dupsAlarm 6 }
+
+   dupsAlarmUPSFault OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS general fail?"
+       ::= { dupsAlarm 7 }
+
+   dupsAlarmBatteryGroundFault OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS battery ground fault?"
+       ::= { dupsAlarm 8 }
+
+   dupsAlarmTestInProgress OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS test in progress?"
+       ::= { dupsAlarm 9 }
+
+   dupsAlarmBatteryTestFail OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS test fail?"
+       ::= { dupsAlarm 10 }
+
+   dupsAlarmFuseFailure OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS fuse failure?"
+       ::= { dupsAlarm 11 }
+
+   dupsAlarmOutputOverload OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS output overload?"
+       ::= { dupsAlarm 12 }
+
+   dupsAlarmOutputOverCurrent OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS output overcurrent?"
+       ::= { dupsAlarm 13 }
+
+   dupsAlarmInverterAbnormal OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS inverter abnormal?"
+       ::= { dupsAlarm 14 }
+
+   dupsAlarmRectifierAbnormal OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS rectifier abnormal?"
+       ::= { dupsAlarm 15 }
+
+   dupsAlarmReserveAbnormal OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS reserve abnormal?"
+       ::= { dupsAlarm 16 }
+
+   dupsAlarmLoadOnReserve OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS load on reserve?"
+       ::= { dupsAlarm 17 }
+
+   dupsAlarmOverTemperature OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS over heat?"
+       ::= { dupsAlarm 18 }
+
+   dupsAlarmOutputBad OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Is the UPS output abnormal?"
+       ::= { dupsAlarm 19 }
+
+   dupsAlarmBypassBad OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Is the UPS bypass bad?"
+       ::= { dupsAlarm 20 }
+
+   dupsAlarmUPSOff OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Is the UPS in standby mode?"
+       ::= { dupsAlarm 21 }
+
+   dupsAlarmChargerFail OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS charger fail?"
+       ::= { dupsAlarm 22 }
+
+   dupsAlarmFanFail OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the UPS fan fail?"
+       ::= { dupsAlarm 23 }
+
+   dupsAlarmEconomicMode OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicates whether the UPS is in the economic mode."
+       ::= { dupsAlarm 24 }
+
+   dupsAlarmOutputOff OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicates whether the UPS output is turned off or not."
+       ::= { dupsAlarm 25 }
+
+   dupsAlarmSmartShutdown OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Indicates whether the Smart Shutdown is in progress."
+       ::= { dupsAlarm 26 }
+
+   dupsAlarmEmergencyPowerOff OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "UPS emergency power off."
+       ::= { dupsAlarm 27 }
+
+   dupsAlarmUPSShutdown OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "UPS shutdown."
+       ::= { dupsAlarm 28 }
+
+-----------------------
+-- dups Environment group --
+-----------------------
+
+   dupsEnvTemperature OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "degrees Centigrade"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The ambient environmental temperature."
+       ::= { dupsEnvironment 1 }
+
+   dupsEnvHumidity OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "percentage"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The environmental humidity."
+       ::= { dupsEnvironment 2 }
+
+   dupsEnvSetTemperatureLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "degrees Centigrade"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dupsAlarmOverTemperature on when the environmental
+		temperature over the value."
+       ::= { dupsEnvironment 3 }
+
+   dupsEnvSetHumidityLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "percentage"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dupsAlarmOverHumidity on when the environmental
+		humidity over the value."
+       ::= { dupsEnvironment 4 }
+
+   dupsEnvSetEnvRelay1 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 5 }
+
+   dupsEnvSetEnvRelay2 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 6 }
+
+   dupsEnvSetEnvRelay3 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 7 }
+
+   dupsEnvSetEnvRelay4 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 8 }
+
+   dupsAlarmOverEnvTemperature OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over temperature?"
+       ::= { dupsEnvironment 9 }
+
+   dupsAlarmOverEnvHumidity OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over humidity?"
+       ::= { dupsEnvironment 10 }
+
+   dupsAlarmEnvRelay1 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 11 }
+       
+   dupsAlarmEnvRelay2 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 12 }
+          
+    dupsAlarmEnvRelay3 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 13 }
+
+   dupsAlarmEnvRelay4 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dupsEnvironment 14 }
+
+-----------------------
+-- dups Trap group --
+-----------------------
+
+   dupsCommunicationLost TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: Communication with the UPS failed."
+       ::= 1
+
+   dupsCommunicationEstablished TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Communication with the UPS reestablished."
+       ::= 2
+
+   dupsPowerFail TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"WARNING: Power failed! The UPS is operating on battery power."
+       ::= 3
+
+   dupsPowerRestored TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Power restored! The utility power restored."
+       ::= 4
+
+   dupsLowBattery TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS batteries are low and will soon be exhausted."
+       ::= 5
+
+   dupsReturnFromLowBattery TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS has returned from a low battery condition."
+       ::= 6
+
+   dupsLoadWarning TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Loading percent of the UPS over the Load Warning value."
+       ::= 7
+
+   dupsNoLongerLoadWarning TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Returnd from Load Warning condition."
+       ::= 8
+
+   dupsLoadSeverity TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"Warning: Loading percent of the UPS over the Load Severity value."
+       ::= 9
+
+   dupsNoLongerLoadSeverity TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Returned from Load Severity condition."
+       ::= 10
+
+   dupsLoadOnBypass TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS loads on bypass."
+       ::= 11
+
+   dupsNoLongerLoadOnBypass TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS is not on bypass mode."
+       ::= 12
+
+   dupsUPSFault TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: A general fault caused in the UPS."
+       ::= 13
+
+   dupsReturnFromUPSFault TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS is returned from general fault."
+       ::= 14
+
+   dupsBatteryGroundFault TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS battery ground fault."
+       ::= 15
+
+   dupsNoLongerBatteryFault TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS recovered from battery ground fault."
+       ::= 16
+
+   dupsTestInProgress TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS test in progress."
+       ::= 17
+
+   dupsBatteryTestFail TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS test fail."
+       ::= 18
+
+   dupsFuseFailure TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS fuse failed."
+       ::= 19
+
+   dupsFuseRecovered TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS fuse recovered."
+       ::= 20
+
+   dupsOutputOverload TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS overload!."
+       ::= 21
+
+   dupsNoLongerOverload TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Recovered from UPS overload."
+       ::= 22
+
+   dupsOutputOverCurrent TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS output overcurrent."
+       ::= 23
+
+   dupsNoLongerOutputOverCurrent TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Recovered from UPS overcurrent."
+       ::= 24
+
+   dupsInverterAbnormal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS inverter abnormal."
+       ::= 25
+
+   dupsInverterRecovered TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Recovered from UPS inverter abnormal."
+       ::= 26
+
+   dupsRectifierAbnormal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS rectifier abnormal."
+       ::= 27
+
+   dupsRectifierRecovered TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS recovered from rectifier abnormal."
+       ::= 28
+
+   dupsReserveAbnormal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS rectifier abnormal."
+       ::= 29
+
+   dupsReserveRecovered TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS rectifier abnormal."
+       ::= 30
+
+   dupsLoadOnReserve TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: The UPS load on reserve."
+       ::= 31
+
+   dupsNoLongerLoadOnReserve TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS no longer load on reserve."
+       ::= 32
+
+   dupsEnvOverTemperature TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"WARNING: The environment overtemperature."
+       ::= 33
+
+   dupsNoLongerEnvOverTemperature TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment recovered from overtemperature."
+       ::= 34
+
+   dupsEnvOverHumidity TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"WARNING: The environment overhumidity."
+       ::= 35
+
+   dupsNoLongerEnvOverHumidity TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment recovered from overhumidity."
+       ::= 36
+
+   dupsEnvRelay1Alarm TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay1 is not in normal state."
+       ::= 37
+
+   dupsEnvRelay1Normal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay1 is in normal state."
+       ::= 38
+
+   dupsEnvRelay2Alarm TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay2 is not in normal state."
+       ::= 39
+
+   dupsEnvRelay2Normal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay2 is in normal state."
+       ::= 40
+
+   dupsEnvRelay3Alarm TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay3 is not in normal state."
+       ::= 41
+
+   dupsEnvRelay3Normal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay3 is in normal state."
+       ::= 42
+
+   dupsEnvRelay4Alarm TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay4 is not in normal state."
+       ::= 43
+
+   dupsEnvRelay4Normal TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The environment relay4 is in normal state."
+       ::= 44
+
+   dupsSmartShutdown TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: Smart Shutdown is initiated."
+       ::= 45
+
+   dupsCancelShutdown TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: Cancel UPS Shutdown."
+       ::= 46
+       
+   dupsTestCompleted TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: This trap is sent upon completion of a UPS diagnostic test."
+       ::= 47
+       
+   dupsEPOON TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: This trap is sent when emergency power off is on."
+       ::= 48
+
+   dupsEPOOFF TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: This trap is sent when UPS recover from emergency power off."
+       ::= 49
+
+   dupsOverTemperature TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"SEVER: This trap is sent when the UPS is over heat."
+       ::= 50
+
+   dupsNormalTemperature TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: This trap is sent when UPS recover from over heat."
+       ::= 51
+
+   dupsBattReplace TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"WARNING: The battery needs to be replaced."
+       ::= 52
+
+   dupsReturnFromBattReplace TRAP-TYPE
+       ENTERPRISE dupsTraps
+       DESCRIPTION
+	"INFORMATION: The UPS recovered from battery replacement."
+       ::= 53
+END

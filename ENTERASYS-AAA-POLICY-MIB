@@ -1,0 +1,205 @@
+ENTERASYS-AAA-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysAAAPolicyMIB MODULE-IDENTITY
+    LAST-UPDATED "200407291906Z"  -- Thu Jul 29 19:06 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Enterasys Networks enterprise OID pertaining to the
+         configuration of authentications services."
+
+    REVISION    "200407291906Z"  -- Thu Jul 29 19:06 GMT 2004
+    DESCRIPTION "Initial version of this MIB module."
+
+    ::= { etsysModules 51 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+AAAProtocol ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The remote AAA protocols that can be selected for providing
+         specific AAA services.
+
+           any(1)    - Any, but only one, of the configured remote
+                       AAA protocols will be used.
+
+           none(2)   - No remote AAA protocol will be used.
+
+           radius(3) - RADIUS will be used.
+
+           tacacs(4) - TACACS+ will be used."
+    SYNTAX INTEGER {
+        any(1),
+        none(2),
+        radius(3),
+        tacacs(4)
+    }
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysAAAPolicyObjects      OBJECT IDENTIFIER
+                               ::= { etsysAAAPolicyMIB 1 }
+
+etsysAAAPolicyMgmtAccess   OBJECT IDENTIFIER
+                               ::= { etsysAAAPolicyObjects 1 }
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysAAAMgmtAccessTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF EtsysAAAMgmtAccessEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A table of supported management access protocols and
+         their corresponding authentication, authorization,
+         and accounting (AAA) protocols.  Maintaining the values of
+         the objects in this table across agent reboots is REQUIRED."
+    ::= { etsysAAAPolicyMgmtAccess 1 }
+
+etsysAAAMgmtAccessEntry OBJECT-TYPE
+    SYNTAX         EtsysAAAMgmtAccessEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A particular management access protocol and the remote AAA
+         protocol that should be used to authenticate users requesting
+         access via that protocol."
+    INDEX { etsysAAAMgmtAccessProtocol }
+    ::= { etsysAAAMgmtAccessTable 1 }
+
+EtsysAAAMgmtAccessEntry ::=
+    SEQUENCE {
+        etsysAAAMgmtAccessProtocol          INTEGER,
+        etsysAAAMgmtRemoteAuthProtocol      AAAProtocol,
+        etsysAAAMgmtRemoteAcctProtocol      AAAProtocol
+    }
+
+etsysAAAMgmtAccessProtocol OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       allProtocols(1)
+                   }
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "The management protocol that is represented by this row.
+
+         The values of this parameter are as follows:
+
+         allProtocols(1)  - all management access protocols."
+    ::= { etsysAAAMgmtAccessEntry 1 }
+
+etsysAAAMgmtRemoteAuthProtocol OBJECT-TYPE
+    SYNTAX         AAAProtocol
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "The type of remote AAA protocol to be used for authenticating
+         users seeking management access via the associated protocol.
+
+         When this object has the default value of any(1) the remote
+         AAA protocol will be selected using the following precedence
+         order TACACS+, RADIUS.  A protocol will be selected if, and
+         only if, it is enabled.
+
+         When a remote authentication protocol has been consulted,
+         and the protocol times out, the local password file will be
+         used to authenticate the user.
+
+         If no remote AAA protocol is selected, or the selected remote
+         AAA protocol is not enabled, the local password file will be
+         used to authenticate the user."
+    DEFVAL { any }
+    ::= { etsysAAAMgmtAccessEntry 2 }
+
+etsysAAAMgmtRemoteAcctProtocol OBJECT-TYPE
+    SYNTAX         AAAProtocol
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "The type of remote AAA protocol to be used for handling
+         the accounting information related to management accesses
+         via the associated protocol.
+
+         When this object has the default value of any(1) the remote
+         AAA protocol will be selected using the following precedence
+         order RADIUS, TACACS+.  A protocol will be selected if, and
+         only if, it is enabled."
+    DEFVAL { any }
+    ::= { etsysAAAMgmtAccessEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- Conformance information
+-- -------------------------------------------------------------
+
+etsysAAAPolicyMIBConformance OBJECT IDENTIFIER
+                              ::= { etsysAAAPolicyMIB 2 }
+
+etsysAAAPolicyMIBCompliances OBJECT IDENTIFIER
+                              ::= { etsysAAAPolicyMIBConformance 1 }
+
+etsysAAAPolicyMIBGroups      OBJECT IDENTIFIER
+                              ::= { etsysAAAPolicyMIBConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysAAAPolicyMgmtGroup OBJECT-GROUP
+    OBJECTS {
+        etsysAAAMgmtRemoteAuthProtocol,
+        etsysAAAMgmtRemoteAcctProtocol
+    }
+    STATUS  current
+    DESCRIPTION
+        "The basic collection of objects providing proprietary
+         management of the authentication policy for management
+         protocols of the managed entity."
+    ::= { etsysAAAPolicyMIBGroups 1 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysAAAPolicyMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+          "The compliance statement for Managed entities
+           implementing the Enterasys AAA Policy MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { etsysAAAPolicyMgmtGroup } 
+
+    ::= { etsysAAAPolicyMIBCompliances 1 }
+
+END

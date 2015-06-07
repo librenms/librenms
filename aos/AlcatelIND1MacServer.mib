@@ -1,0 +1,545 @@
+ALCATEL-IND1-MAC-SERVER-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+                OBJECT-TYPE, 
+                OBJECT-IDENTITY,
+                NOTIFICATION-TYPE,
+		MODULE-IDENTITY,
+		Unsigned32		FROM SNMPv2-SMI
+		MacAddress, 
+		RowStatus               FROM SNMPv2-TC
+		entPhysicalIndex        FROM ENTITY-MIB
+		physicalIndex,
+		chassisTrapsDesc,
+		chassisTrapsObj  	FROM ALCATEL-IND1-CHASSIS-MIB
+        	hardentIND1Physical     FROM ALCATEL-IND1-BASE		
+		MODULE-COMPLIANCE, 
+	        OBJECT-GROUP,
+                NOTIFICATION-GROUP      FROM SNMPv2-CONF;
+
+
+alcatelIND1MacServerMIB MODULE-IDENTITY
+    LAST-UPDATED "200704030000Z"
+    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+    
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+    
+     Telephone:               North America  +1 800 995 2696
+                              Latin America  +1 877 919 9526
+                              Europe         +31 23 556 0100
+                              Asia           +65 394 7933
+                              All Other      +1 818 878 4507
+    
+     Electronic Mail:         support@ind.alcatel.com
+     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+    DESCRIPTION
+	"This module describes an authoritative enterprise-specific Simple
+
+        Network Management Protocol (SNMP) Management Information Base (MIB):
+        
+        For the Birds Of Prey Product Line, this is the Chassis Supervision
+	MAC Server MIB for allocating MACs to applications (like routing).
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+        
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+        
+                   Copyright (C) 1995-2007 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+
+    DESCRIPTION
+        "The MIB module for Chassis Supervision Mac Server entity."
+    ::= { hardentIND1Physical 3 }
+
+				      
+    alcatelIND1MacServerMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision MAC Server MIB
+            Subsystem Managed Objects."
+        ::= { alcatelIND1MacServerMIB 1 }
+
+ 
+     alcatelIND1MacServerMIBTraps OBJECT-IDENTITY
+        STATUS deprecated
+        DESCRIPTION
+            "Branch For Chassis Supervision MAC Server MIB
+            Subsystem Traps."
+        ::= { alcatelIND1MacServerMIB 2 }
+
+    alcatelIND1MacServerMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision MAC Server MIB
+            Subsystem Conformance Information."
+        ::= { alcatelIND1MacServerMIB 3 }
+
+
+    alcatelIND1MacServerMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision MAC Server MIB
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1MacServerMIBConformance 1 }
+
+
+    alcatelIND1MacServerMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision MAC Server MIB
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1MacServerMIBConformance 2 }	
+
+
+--
+-- Common definitions 
+--
+
+MacAddrGlobalLocalStatusType ::= INTEGER {
+                notApplicable(1),
+		globallyAdministered(2),
+		locallyAdministered(3),   
+		globallyAdministeredOverlap(4) }
+
+MacRangeIndex ::= INTEGER (1 .. 20)
+
+
+--
+-- MAC Range Table : This table contains the following
+--                        AddressStart
+--                        AddressCount
+--                        GlobalLocal
+--
+
+
+chasMacAddressRangeTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ChasMacAddrRangeTableEntry
+	MAX-ACCESS      not-accessible	
+	STATUS		current
+	DESCRIPTION
+	"Information about the MAC Address Ranges for a particular physical 
+	entity.  This data is only available for the interfacing CMM."
+::= { alcatelIND1MacServerMIBObjects 1 }
+
+
+chasMacAddrRangeTableEntry OBJECT-TYPE
+	SYNTAX		ChasMacAddrRangeTableEntry
+	MAX-ACCESS          not-accessible	
+	STATUS		current
+	DESCRIPTION
+	"Definition of the MAC Address Ranges table entry for a particular 
+	physical entity.  This data is only available for the interfacing CMM.
+        
+        There can be up to MacRangeIndex MAC ranges per physical entity.  
+	The chasMacAddressRangeTable on the Primary should be identical 
+	to the one on the Secondary.
+
+        For creation of a MAC Address range, the following 4 fields in 
+	ChasMacAddrRangeTableEntry are required (must have all 4):
+	     chasMacAddressStart
+	     chasMacAddressCount
+	     chasGlobalLocal
+	     chasMacRowStatus : must be set last
+
+	For deletion of a MAC Address range, the following 2 fields in 
+	ChasMacAddrRangeTableEntry are required (must have all 2):
+	       chasMacRangeIndex
+	      chasMacRowStatus : must be set last"
+	INDEX { entPhysicalIndex, chasMacRangeIndex }
+::= { chasMacAddressRangeTable 1 }
+
+
+ChasMacAddrRangeTableEntry ::= SEQUENCE {
+        chasMacRangeIndex                MacRangeIndex,
+	chasMacAddressStart		 MacAddress,
+	chasMacAddressCount		 INTEGER,
+	chasGlobalLocal  		 MacAddrGlobalLocalStatusType,
+	chasMacRowStatus                 RowStatus				
+}
+
+chasMacRangeIndex OBJECT-TYPE
+        SYNTAX             MacRangeIndex
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION 
+        "Represents the index of the MAC Address range."
+::= { chasMacAddrRangeTableEntry 1 }
+
+chasMacAddressStart OBJECT-TYPE
+	SYNTAX	        MacAddress
+	MAX-ACCESS	read-write
+	STATUS	        current
+	DESCRIPTION 
+	"This is the starting MAC Address in the range.  This
+	field is required for the creation of a MAC Address range."
+::= { chasMacAddrRangeTableEntry 2 }
+
+chasMacAddressCount OBJECT-TYPE
+	SYNTAX	        INTEGER (1..256)
+	MAX-ACCESS	read-write
+	STATUS	        current
+	DESCRIPTION 
+	"This is the number of MAC addresses in the range.  This 
+	field is required for the creation of a MAC Address range."
+::= { chasMacAddrRangeTableEntry 3 }
+
+
+chasGlobalLocal OBJECT-TYPE
+	SYNTAX	        MacAddrGlobalLocalStatusType
+	MAX-ACCESS	read-write
+	STATUS	        current
+	DESCRIPTION "
+	Specifies whether the MAC Address/range is locally/globally 
+	administered.  This field is required for the creation of
+	a MAC Address range."
+::= { chasMacAddrRangeTableEntry 4 }
+
+
+chasMacRowStatus OBJECT-TYPE
+	SYNTAX	        RowStatus
+	MAX-ACCESS	read-write
+	STATUS	        current
+	DESCRIPTION "Row status for creating/deleting mac ranges." 
+::= { chasMacAddrRangeTableEntry 5 }
+
+
+
+--
+-- MAC Allocation Table : This table contains all the allocated MAC addresses 
+--
+
+
+chasMacAddressAllocTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ChasMacAddressAllocTableEntry
+	MAX-ACCESS  	not-accessible
+	STATUS		current
+	DESCRIPTION
+	"Information specifying whether the MAC Address has been allocated 
+	for a particular Mac Range on a physical entity.  This data is only 
+	available for the interfacing CMM."
+::= { alcatelIND1MacServerMIBObjects 2 }
+
+chasMacAddressAllocTableEntry OBJECT-TYPE
+	SYNTAX		ChasMacAddressAllocTableEntry
+	MAX-ACCESS  	not-accessible
+	STATUS		current
+	DESCRIPTION
+	"Definition of the entry chasMacAddressAllocTable for a 
+	particular object managed by a particular application."
+	INDEX { chasAppId, chasObjectId }
+::= { chasMacAddressAllocTable 1 }
+
+ChasMacAddressAllocTableEntry ::= SEQUENCE {
+        chasAppId			Unsigned32,
+        chasObjectId			Unsigned32,
+        chasAllocMacRangeIndex		MacRangeIndex,	
+	chasAllocMacAddress		MacAddress,
+	chasAllocRowStatus		RowStatus
+		
+}
+
+chasAppId OBJECT-TYPE
+        SYNTAX             Unsigned32 (0..65535)
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION 
+        "Represents the Id of the application requesting the allocation of a 
+MAC Address."
+::= { chasMacAddressAllocTableEntry 1 }
+
+chasObjectId OBJECT-TYPE
+        SYNTAX             Unsigned32 (0..65535)
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION 
+        "Represents the Id of the application requesting the allocation/
+deallocation of a MAC Address."
+::= { chasMacAddressAllocTableEntry 2 }
+
+chasAllocMacRangeIndex OBJECT-TYPE
+        SYNTAX           MacRangeIndex
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION 
+        "Represents the object Id for which the MAC Address has been allocated
+/deallocated"
+::= { chasMacAddressAllocTableEntry 3 }
+
+chasAllocMacAddress OBJECT-TYPE
+	SYNTAX	         MacAddress
+	MAX-ACCESS	 read-only
+	STATUS	         current
+	DESCRIPTION 
+	"This the Mac Address that has been allocated."
+::= { chasMacAddressAllocTableEntry 4 }
+
+chasAllocRowStatus OBJECT-TYPE
+	SYNTAX	        RowStatus
+	MAX-ACCESS	read-write
+	STATUS	        current
+	DESCRIPTION "Row status for allocating/deallocating
+	a Mac address for a particular chaAppId/chasObjectId." 
+::= { chasMacAddressAllocTableEntry 5 }
+
+chasMacAddrDupAllocStatusTable  OBJECT IDENTIFIER ::= { 
+alcatelIND1MacServerMIBObjects 3 }
+
+chasMacAddrDuplicationStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+	"Information specifying whether the MAC Address ranges from the EEPROM
+	should be duplicated  with the local bit set.  This will provide
+	additional ranges (locally administered ranges) for allocation.
+	This data is only available for the interfacing CMM."		
+::= { chasMacAddrDupAllocStatusTable 1 }
+
+
+chasMacAddrAllocLocallyAdminStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+	"Information specifying whether ONLY the locally administered MAC 
+	Address should be allocated.  This data is only available for the 
+	interfacing CMM."		
+::= { chasMacAddrDupAllocStatusTable 2 }
+
+--
+--Mac address retention Objects
+--                                        
+chasMacAddrRetentionObjects  OBJECT IDENTIFIER ::= { 
+alcatelIND1MacServerMIBObjects 4 }
+
+chasMacAddrRetentionStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+	"Information specifying the status of MAC Address retention functionality."
+DEFVAL        { disabled }		
+::= { chasMacAddrRetentionObjects 1 }
+
+
+chasPossibleDuplicateMacTrapStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+	"Information specifying the status of duplicate MAC address trap."
+DEFVAL        { disabled }
+::= { chasMacAddrRetentionObjects 2 }
+
+chasRingStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		present (1),
+		notPresent(2)
+	}
+	MAX-ACCESS  	read-only
+	STATUS		current
+	DESCRIPTION
+	"Information specifying the whether the ring is present in the stack or not."
+DEFVAL        { notPresent }
+::= { chasMacAddrRetentionObjects 3 }
+
+chasBaseMacAddrSource OBJECT-TYPE
+	SYNTAX		INTEGER {
+		retained(1),
+		eEPROM(2)
+	}
+	MAX-ACCESS  	read-only
+	STATUS		current
+	DESCRIPTION
+	"Information specifying the source of the currently used System base MAC."
+DEFVAL        { eEPROM }
+::= { chasMacAddrRetentionObjects 4 }
+
+chasBaseMacAddr	 OBJECT-TYPE
+	SYNTAX	      MacAddress
+	MAX-ACCESS  	read-only
+	STATUS		current
+	DESCRIPTION
+	"Base MAC address used in the system currently."
+::= { chasMacAddrRetentionObjects 5 }
+
+chasBaseMacReleaseAction	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		notSignificant(0),
+		releaseMac(1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+	"This object performs the action to release the retained base MAC address"
+::= { chasMacAddrRetentionObjects 6 }
+
+--
+--Mac server traps
+--
+chasTrapMacRangeIndex OBJECT-TYPE
+        SYNTAX             MacRangeIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The mac range index of the involved object."
+::= { chassisTrapsObj 14 }
+
+baseMacAddress OBJECT-TYPE
+        SYNTAX             MacAddress
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The base MAC Address."
+::= { chassisTrapsObj 15 }
+
+chassisTrapsMacOverlap NOTIFICATION-TYPE
+    OBJECTS {
+	physicalIndex, 
+	chasTrapMacRangeIndex	
+    }
+    STATUS        current
+    DESCRIPTION
+       "A MAC range overlap was found in the backplane eeprom"
+::= { chassisTrapsDesc 0 4 }
+  
+chassisTrapsPossibleDuplicateMac NOTIFICATION-TYPE
+    OBJECTS {
+	physicalIndex, 
+	baseMacAddress	
+    }
+    STATUS        current
+    DESCRIPTION
+       "The old PRIMARY element cannot be detected back in the stack. There 
+is a possiblity of duplicate MAC address in the network."
+::= { chassisTrapsDesc 0 5 }
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1MacServerMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Chassis Supervision."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                chasMacAddrRangeGroup			,
+                chasMacAddressAllocGroup		,
+                chasMacAddrDupAllocStatusGroup		,
+		chasTrapsMacOverlapGroup,
+		chasMacAddrRetentionGroup,
+		chasTrapsPossibleDuplicateMacGroup
+            }
+
+        ::= { alcatelIND1MacServerMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    chasMacAddrRangeGroup OBJECT-GROUP
+        OBJECTS
+        {
+		chasMacAddressStart                  ,
+		chasMacAddressCount                  ,
+		chasGlobalLocal                      ,
+		chasMacRowStatus          
+       }
+        STATUS  current 
+        DESCRIPTION
+            "Chassis Supervision MAC Address Range Group."
+        ::= { alcatelIND1MacServerMIBGroups 1 }
+
+    chasMacAddressAllocGroup OBJECT-GROUP
+        OBJECTS
+        {
+		chasAllocMacRangeIndex		,
+		chasAllocMacAddress		,
+                chasAllocRowStatus				          
+       }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision MAC Address Physical Allocation Group."
+        ::= { alcatelIND1MacServerMIBGroups 2 }
+
+    chasMacAddrDupAllocStatusGroup OBJECT-GROUP
+        OBJECTS
+        {
+		chasMacAddrDuplicationStatus        ,
+		chasMacAddrAllocLocallyAdminStatus          
+       }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision MAC Address Physical Duplication Allocation 
+Status Group."
+        ::= { alcatelIND1MacServerMIBGroups 3 }
+
+    chasTrapsMacOverlapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+		chassisTrapsMacOverlap          
+       }
+        STATUS  current
+        DESCRIPTION
+            "MAC range overlap Notification Group."
+        ::= { alcatelIND1MacServerMIBGroups 4 }     
+
+    chasMacAddrRetentionGroup OBJECT-GROUP
+        OBJECTS
+        {
+		chasMacAddrRetentionStatus        ,
+		chasPossibleDuplicateMacTrapStatus,
+		chasRingStatus,
+		chasBaseMacAddrSource,
+		chasBaseMacAddr
+       }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision MAC Address Physical Duplication Allocation 
+Status Group."
+        ::= { alcatelIND1MacServerMIBGroups 5 }
+        
+	chasTrapsPossibleDuplicateMacGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+		chassisTrapsPossibleDuplicateMac          
+       }
+        STATUS  current
+        DESCRIPTION
+            "Duplicate MAC address Notification Group."
+        ::= { alcatelIND1MacServerMIBGroups 6 }
+
+
+END
+
+

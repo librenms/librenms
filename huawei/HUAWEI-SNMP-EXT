@@ -1,0 +1,96 @@
+-- =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI Private Extended SNMP MIB
+-- 
+-- Reference:
+-- Version:     V1.0
+-- History:
+-- 
+-- =================================================================
+
+    HUAWEI-SNMP-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS           
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            ifIndex, ifDescr          
+                FROM RFC1213-MIB
+            DisplayString,TruthValue
+                FROM SNMPv2-TC     
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF  
+            EnabledStatus            
+                FROM P-BRIDGE-MIB         
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+        hwSnmpExtMIB MODULE-IDENTITY 
+            LAST-UPDATED "200801090000Z"        
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd.,
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085
+                Http://www.huawei.com
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "
+                Some attribute of SNMP extended content.
+                "
+            ::= { hwDatacomm 164 }
+        
+    
+    
+    
+    
+        hwSnmpExtMIBObjects OBJECT IDENTIFIER ::= { hwSnmpExtMIB 1 }
+        
+        hwSnmpExtErrorCodeEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enabled or disabled SNMP extended error status."
+            DEFVAL      { disabled }
+            ::= { hwSnmpExtMIBObjects 1 }       
+
+
+-- Module compliance.
+hwSnmpExtConformance OBJECT IDENTIFIER ::= { hwSnmpExtMIB 2 }
+hwSnmpExtGroups
+   OBJECT IDENTIFIER ::= { hwSnmpExtConformance 1 }
+
+hwSnmpExtRuleGroup OBJECT-GROUP
+   OBJECTS {
+      hwSnmpExtErrorCodeEnable
+   }
+   STATUS current
+   DESCRIPTION
+       "Collection of objects needed for SNMP extended configuration."
+
+   ::= { hwSnmpExtGroups 1 }
+   
+hwSnmpExtCompliances
+   OBJECT IDENTIFIER ::= { hwSnmpExtConformance 2 }
+
+hwSnmpExtCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "The compliance statement for implementing
+        the Huawei extended SNMP MIB."
+MODULE
+        MANDATORY-GROUPS {  
+        hwSnmpExtRuleGroup
+        } 
+            
+        ::= { hwSnmpExtCompliances 1 }
+
+END
+--
+-- HUAWEI-SNMP-EXT-MIB.mib
+--

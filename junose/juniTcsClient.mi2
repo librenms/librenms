@@ -1,0 +1,481 @@
+
+-- *****************************************************************************
+-- Juniper-TACACS-Plus-Client-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   TACACS+ Client MIB
+--
+-- Copyright (c) 2002, 2004 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-TACACS-Plus-Client-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TruthValue, TimeStamp
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniTacacsPlusClientMIB  MODULE-IDENTITY
+    LAST-UPDATED "200403021731Z"  -- 02-Mar-04 12:31 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Terminal Access Controller Access Control System Plus (TACACS+)
+        Client MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200403021731Z"  -- 02-Mar-04 12:31 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added juniTacacsPlusClientHostOrder to
+        juniTacacsPlusClientHostConfigTable."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200207121349Z"  -- 12-Jul-02 09:49 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 60 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniKeyString ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A string to keep a TACACS+ key.  It may contain TAB character and/or
+        any character from 0x20 to 0x7e inclusive.  Its lenght is limited to
+        100. For security reasons it always reads as an empty string."
+    SYNTAX      OCTET STRING (SIZE(0..100))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTacacsPlusClientObjects         OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientMIB 1 }
+juniTacacsPlusClientCommonConfig    OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientObjects 1 }
+juniTacacsPlusClientHostConfig      OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientObjects 2 }
+juniTacacsPlusClientHostStats       OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientObjects 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Common parameters shared by all hosts
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTacacsPlusClientDirectedRequest OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRestrictedAndTruncated(1),
+                    disabled(2),
+                    notRestrictedAndNotTruncated(3),
+                    restrictedAndTruncated(4),
+                    restrictedAndNotTruncated(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents directed-request option setting.  In any of the
+        enabled enabled states user name entered as `user@host' will be sent to
+        specified host fot authentication.  If `restricted' is in effect and the
+        specified host is not available client would not try to use other hosts,
+        if `truncated' is in effect, then `@host' part will be stripped before
+        submission for authentication."
+    ::= { juniTacacsPlusClientCommonConfig 1 }
+
+juniTacacsPlusClientTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TACACS+ host response timeout in seconds.  Value 0 means 'not
+        configured, it this case built-in internal timeout value will be used."
+    ::= { juniTacacsPlusClientCommonConfig 2 }
+
+juniTacacsPlusClientKey OBJECT-TYPE
+    SYNTAX      JuniKeyString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the size is non-zero, packets passed between host and client will be
+        encrypted."
+    ::= { juniTacacsPlusClientCommonConfig 3 }
+
+juniTacacsPlusClientSourceIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the value is is not 0.0.0.0 client will use this address as a source
+        IP address for communication with servers.  Changing this value would
+        not affect existing connections."
+    ::= { juniTacacsPlusClientCommonConfig 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Per host parameters
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTacacsPlusClientHostConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTacacsPlusClientHostConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains per host configuration parameters."
+    ::= { juniTacacsPlusClientHostConfig 1 }
+
+juniTacacsPlusClientHostConfigEntry OBJECT-TYPE
+    SYNTAX      JuniTacacsPlusClientHostConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A TACACS+ host statistics table entry."
+    INDEX     { juniTacacsPlusClientHostAddr }
+    ::= { juniTacacsPlusClientHostConfigTable 1 }
+
+JuniTacacsPlusClientHostConfigEntry ::= SEQUENCE {
+    juniTacacsPlusClientHostAddr             IpAddress,
+    juniTacacsPlusClientHostPort             INTEGER,
+    juniTacacsPlusClientHostPrimary          TruthValue,
+    juniTacacsPlusClientHostSingleConnection TruthValue,
+    juniTacacsPlusClientHostTimeout          INTEGER,
+    juniTacacsPlusClientHostKey              JuniKeyString,
+    juniTacacsPlusClientHostStatus           RowStatus,
+    juniTacacsPlusClientHostOrder            INTEGER }
+
+juniTacacsPlusClientHostAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the host."
+    ::= { juniTacacsPlusClientHostConfigEntry 1 }
+
+juniTacacsPlusClientHostPort OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The TCP port of the host."
+    DEFVAL    { 49 }
+    ::= { juniTacacsPlusClientHostConfigEntry 2 }
+
+juniTacacsPlusClientHostPrimary OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Non-directed requests are submitted to the primary host first.  There
+        is only one primary host in the table.  So, setting this object to true,
+        will also change the value of this object in the current primary host.
+        If primary host is deleted or reset, system will assing new primary
+        host.  When the first entry is created it becomes primary regardless of
+        the value of this object."
+    DEFVAL    { false }
+    ::= { juniTacacsPlusClientHostConfigEntry 3 }
+
+juniTacacsPlusClientHostSingleConnection OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Traditionally TACACS+ client creates a new TCP connection for every
+        session.  If this value is true then TACACS+ client will try to use
+        single connection if supported both by client implementation and by the
+        host."
+    DEFVAL    { false }
+    ::= { juniTacacsPlusClientHostConfigEntry 4 }
+
+juniTacacsPlusClientHostTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TACACS+ host response timeout in seconds.  If the value is 0 then the
+        value of juniTacacsPlusClientTimeout will be used instead."
+    ::= { juniTacacsPlusClientHostConfigEntry 5 }
+
+juniTacacsPlusClientHostKey OBJECT-TYPE
+    SYNTAX      JuniKeyString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If size is non-zero, packets passed between host and client will be
+        encrypted with the key, otherwise the value of juniTacacsPlusClientKey
+        will be used for the purpose."
+    DEFVAL    { "" }
+    ::= { juniTacacsPlusClientHostConfigEntry 6 }
+
+juniTacacsPlusClientHostStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status object, only `createAndGo' and 'destroy' are supported."
+    ::= { juniTacacsPlusClientHostConfigEntry 7 }
+
+juniTacacsPlusClientHostOrder OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The search order of this TACACS+ host within all configured
+        TACACS+ hosts.  This MIB object indicates the order in which a
+        TACACS+ request will be sent to the TACACS+ hosts until a response
+        is received. The primary host is always the first host to be
+        contacted.  The remaining hosts will be contacted in the order
+        that they were created.  Should the primary host be deleted,
+        the next host in the search order will become the primary host."
+    ::= { juniTacacsPlusClientHostConfigEntry 8 }
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Host statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTacacsPlusClientHostStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTacacsPlusClientHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains per host statistics."
+    ::= { juniTacacsPlusClientHostStats 1 }
+
+juniTacacsPlusClientHostStatsEntry OBJECT-TYPE
+    SYNTAX      JuniTacacsPlusClientHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A TACACS+ host statistics table entry."
+    AUGMENTS  { juniTacacsPlusClientHostConfigEntry }
+    ::= { juniTacacsPlusClientHostStatsTable 1 }
+
+JuniTacacsPlusClientHostStatsEntry ::= SEQUENCE {
+    juniTacacsPlusClientHostAuthRequests         Counter32,
+    juniTacacsPlusClientHostAuthReplies          Counter32,
+    juniTacacsPlusClientHostAuthPending          Counter32,
+    juniTacacsPlusClientHostAuthTimeouts         Counter32,
+    juniTacacsPlusClientHostAuthorRequests       Counter32,
+    juniTacacsPlusClientHostAuthorReplies        Counter32,
+    juniTacacsPlusClientHostAuthorPending        Counter32,
+    juniTacacsPlusClientHostAuthorTimeouts       Counter32,
+    juniTacacsPlusClientHostAcctRequests         Counter32,
+    juniTacacsPlusClientHostAcctReplies          Counter32,
+    juniTacacsPlusClientHostAcctPending          Counter32,
+    juniTacacsPlusClientHostAcctTimeouts         Counter32,
+    juniTacacsPlusClientHostDiscontinuityTime    TimeStamp }
+
+juniTacacsPlusClientHostAuthRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authentication requests sent to the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 1 }
+
+juniTacacsPlusClientHostAuthReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authentication replies received from the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 2 }
+
+juniTacacsPlusClientHostAuthPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of expected but not received authentication replies from the
+        host."
+    ::= { juniTacacsPlusClientHostStatsEntry 3 }
+
+juniTacacsPlusClientHostAuthTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authentication timeouts for the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 4 }
+
+juniTacacsPlusClientHostAuthorRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authorization requests sent to the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 5 }
+
+juniTacacsPlusClientHostAuthorReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authorization replies received from the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 6 }
+
+juniTacacsPlusClientHostAuthorPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of expected but not received authorization replies from the
+        host."
+    ::= { juniTacacsPlusClientHostStatsEntry 7 }
+
+juniTacacsPlusClientHostAuthorTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of authorization timeouts for the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 8 }
+
+juniTacacsPlusClientHostAcctRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of accounting requests sent to the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 9 }
+
+juniTacacsPlusClientHostAcctReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of accounting replies received from the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 10 }
+
+juniTacacsPlusClientHostAcctPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of expected but not received accounting replies from the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 11 }
+
+juniTacacsPlusClientHostAcctTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of accounting timeouts for the host."
+    ::= { juniTacacsPlusClientHostStatsEntry 12 }
+
+juniTacacsPlusClientHostDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when corresponding juniTacacsPlusHostConfigEntry
+        was created, this object containg zero if host entry was created during
+        system initializatin."
+    ::= { juniTacacsPlusClientHostStatsEntry 13 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTacacsPlusClientConformance OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientMIB 2 }
+juniTacacsPlusClientCompliances OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientConformance 1 }
+juniTacacsPlusClientGroups      OBJECT IDENTIFIER
+    ::= { juniTacacsPlusClientConformance 2 }
+
+juniTacacsPlusCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        TACACS+ Client MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniTacacsPlusClientCommonGroup,
+            juniTacacsPlusClientHostConfigGroup,
+            juniTacacsPlusClientHostStatsGroup }
+    ::= { juniTacacsPlusClientCompliances 1 }                      -- JUNOSe 4.1
+
+juniTacacsPlusCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        TACACS+ Client MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniTacacsPlusClientCommonGroup,
+            juniTacacsPlusClientHostConfigGroup2,
+            juniTacacsPlusClientHostStatsGroup }
+    ::= { juniTacacsPlusClientCompliances 2 }                      -- JUNOSe 5.3
+
+--
+-- units of conformance
+--
+juniTacacsPlusClientCommonGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTacacsPlusClientDirectedRequest,
+        juniTacacsPlusClientTimeout,
+        juniTacacsPlusClientKey,
+        juniTacacsPlusClientSourceIp }
+    STATUS      current
+    DESCRIPTION
+        "This group defines common configuration parameters for all hosts."
+    ::= { juniTacacsPlusClientGroups 1 }
+
+juniTacacsPlusClientHostConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTacacsPlusClientHostPort,
+        juniTacacsPlusClientHostPrimary,
+        juniTacacsPlusClientHostSingleConnection,
+        juniTacacsPlusClientHostTimeout,
+        juniTacacsPlusClientHostKey,
+        juniTacacsPlusClientHostStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete group for defining per host configuration parameters."
+    ::= { juniTacacsPlusClientGroups 2 }
+
+juniTacacsPlusClientHostStatsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTacacsPlusClientHostAuthRequests,
+        juniTacacsPlusClientHostAuthReplies,
+        juniTacacsPlusClientHostAuthPending,
+        juniTacacsPlusClientHostAuthTimeouts,
+        juniTacacsPlusClientHostAuthorRequests,
+        juniTacacsPlusClientHostAuthorReplies,
+        juniTacacsPlusClientHostAuthorPending,
+        juniTacacsPlusClientHostAuthorTimeouts,
+        juniTacacsPlusClientHostAcctRequests,
+        juniTacacsPlusClientHostAcctReplies,
+        juniTacacsPlusClientHostAcctPending,
+        juniTacacsPlusClientHostAcctTimeouts,
+        juniTacacsPlusClientHostDiscontinuityTime }
+    STATUS      current
+    DESCRIPTION
+        "This group defines statistics collected on per host basis."
+    ::= { juniTacacsPlusClientGroups 3 }
+
+juniTacacsPlusClientHostConfigGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniTacacsPlusClientHostPort,
+        juniTacacsPlusClientHostPrimary,
+        juniTacacsPlusClientHostSingleConnection,
+        juniTacacsPlusClientHostTimeout,
+        juniTacacsPlusClientHostKey,
+        juniTacacsPlusClientHostStatus,
+        juniTacacsPlusClientHostOrder }
+    STATUS      current
+    DESCRIPTION
+        "This group defines per host configuration parameters."
+    ::= { juniTacacsPlusClientGroups 4 }
+
+END

@@ -1,0 +1,285 @@
+
+-- *****************************************************************************
+-- Juniper-BRIDGE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Bridge MIB
+--
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-BRIDGE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniBridgeMIB  MODULE-IDENTITY
+    LAST-UPDATED "200311042039Z"  -- 04-Nov-03 03:39 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The Bridge MIB for the Juniper enterprise."
+    -- Revision History
+    REVISION    "200311042039Z"  -- 04-Nov-03 03:39 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+         "Import MacAddress from SNMPv2-TC."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+         "Initial version of this MIB module."
+    ::= { juniMibs 63 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgeIfLayer          OBJECT IDENTIFIER ::= { juniBridgeMIB 1 }
+juniBridgeAgeLayer         OBJECT IDENTIFIER ::= { juniBridgeMIB 2 }
+juniBridgeMiscCounters     OBJECT IDENTIFIER ::= { juniBridgeMIB 3 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- Bridge INTERFACE LAYER
+--
+-- The set of objects supports the Bridge interface specific configurations.
+--
+-- Management objects are provided to query for an available interface index,
+-- and to create/delete interface of this type.
+-- Creating/deleting interface of this type using this MIB has
+-- the side effect of creating/deleting corresponding entries
+-- in the Interface MIB ifTable/ifXTable, and in the Juniper
+-- Enterprise Interface MIB juniIfTable.
+-- /////////////////////////////////////////////////////////////////////////////
+
+juniBridgeIfNextIfIndex  OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniBridgeIfTable.
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniBridgeIfLayer 1 }
+
+--
+-- The Bridge Interface Table
+--
+juniBridgeIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniBridgeIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for Bridge interfaces present in the
+        system."
+    ::= { juniBridgeIfLayer 2 }
+
+juniBridgeIfEntry  OBJECT-TYPE
+    SYNTAX      JuniBridgeIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a Bridge interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniBridgeIfIndex }
+    ::= { juniBridgeIfTable 1 }
+
+JuniBridgeIfEntry ::= SEQUENCE {
+    juniBridgeIfIndex           InterfaceIndex,
+    juniBridgeIfRowStatus       RowStatus,
+    juniBridgeIfLowerIfIndex    InterfaceIndexOrZero,
+    juniBridgeSPolicyIndex      Unsigned32,
+    juniBridgeIfMaxLearnCount   Unsigned32 }
+
+juniBridgeIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the Bridge interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniBridgeIfNextIfIndex."
+    ::= { juniBridgeIfEntry 1 }
+
+juniBridgeIfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniBridgeIfRowStatus
+            juniBridgeIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+            A value for juniBridgeIfIndex must have been determined previously,
+            by reading juniBridgeIfNextIfIndex.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is
+        created/destroyed as a result of creating/destroying an entry in this
+        table."
+    ::= { juniBridgeIfEntry 2 }
+
+juniBridgeIfLowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this Bridge interface to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniBridgeIfEntry 3 }
+
+juniBridgeSPolicyIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The index of the associated subscriber policy."
+    ::= { juniBridgeIfEntry 4 }
+
+juniBridgeIfMaxLearnCount  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries that can be learned on this interface."
+    ::= { juniBridgeIfEntry 5 }
+
+
+-- //////////////////////////////////////////////////////////////////////////
+-- Bridge Age Table
+--
+-- The set of objects supports the Bridge Age Table information.
+-- //////////////////////////////////////////////////////////////////////////
+juniBridgeAgeTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniBridgeAgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about unicast entries for which the
+        bridge has aging information."
+    ::= { juniBridgeAgeLayer 1 }
+
+juniBridgeAgeEntry  OBJECT-TYPE
+    SYNTAX      JuniBridgeAgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific unicast MAC address for which the bridge
+        has some forwarding and/or filtering information."
+    INDEX     { juniBridgeMacAddress }
+    ::= { juniBridgeAgeTable 1 }
+
+JuniBridgeAgeEntry ::= SEQUENCE {
+    juniBridgeMacAddress    MacAddress,
+    juniBridgeAge           Unsigned32 }
+
+juniBridgeMacAddress  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unicast MAC address for which the bridge has aging information."
+::= { juniBridgeAgeEntry 1 }
+
+juniBridgeAge  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The age of this entry in the forwarding table."
+::= { juniBridgeAgeEntry 2 }
+
+juniBridgeDupMacCounter  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of duplicate mac entries found for this bridge group.
+        A duplicate mac address is considered duplicate if found on more than
+        one interface(port)."
+    ::= { juniBridgeMiscCounters 1 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholder follows.
+-- juniBridgeTrapControl  OBJECT IDENTIFIER ::= { juniBridgeMIB 5 }
+-- juniBridgeTraps        OBJECT IDENTIFIER ::= { juniBridgeMIB 6 }
+-- juniBridgePrefix       OBJECT IDENTIFIER ::= { juniBridgeTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgeConformance OBJECT IDENTIFIER ::= { juniBridgeMIB 4 }
+juniBridgeCompliances OBJECT IDENTIFIER ::= { juniBridgeConformance 1 }
+juniBridgeGroups      OBJECT IDENTIFIER ::= { juniBridgeConformance 2 }
+
+--
+-- compliance statements
+--
+juniBridgeCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Bridge MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniBridgeGroup }
+    ::= { juniBridgeCompliances 1 }                                -- JUNOSe 5.0
+
+
+--
+-- units of conformance
+--
+juniBridgeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniBridgeIfNextIfIndex,
+
+        juniBridgeIfRowStatus,
+        juniBridgeIfLowerIfIndex,
+        juniBridgeSPolicyIndex,
+        juniBridgeIfMaxLearnCount,
+
+        juniBridgeAge,
+        juniBridgeDupMacCounter }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of bridges in a Juniper
+        product."
+    ::= { juniBridgeGroups 1 }                                     -- JUNOSe 5.0
+
+END

@@ -1,0 +1,294 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-FILTER-STATS-MIB.my:  Altiga Filter Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-FILTER-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks, Counter32
+         FROM SNMPv2-SMI
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsFilter, alFilterGroup
+         FROM ALTIGA-MIB
+      alFilterMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaFilterStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Filter Statistics MIB models counters and objects that are
+          of management interest for filters.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            ICMP:       Internet Control Message Protocol
+
+            MIB:        Management Information Base
+
+            Rx:         Received
+
+            TCP:        Transmission Control Protocol
+
+            Tx:         Transmitted
+
+            UDP:        User Datagram Protocol
+
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alFilterMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsFilterGlobal  OBJECT IDENTIFIER ::= { alStatsFilter 1 }
+
+alFilterStatsTable      OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlFilterStatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "The list of filter statistics."
+   ::= { alStatsFilter 2 }
+
+alFilterStatsEntry      OBJECT-TYPE
+   SYNTAX         AlFilterStatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "An entry in the alFilterStatsTable."
+   INDEX       { alFilterStatsInterfaceId }
+   ::= { alFilterStatsTable 1 }
+
+AlFilterStatsEntry ::= SEQUENCE {
+   alFilterStatsInterfaceId         Integer32,
+   alFilterStatsStartTime           TimeTicks,
+   alFilterStatsInPktsFiltered      Counter32,
+   alFilterStatsOutPktsFiltered     Counter32,
+   alFilterStatsInPktsRx            Counter32,
+   alFilterStatsOutPktsRx           Counter32,
+   alFilterStatsInPktsTx            Counter32,
+   alFilterStatsOutPktsTx           Counter32,
+   alFilterStatsInShortTcpHdr       Counter32,
+   alFilterStatsOutShortTcpHdr      Counter32,
+   alFilterStatsInShortUdpHdr       Counter32,
+   alFilterStatsOutShortUdpHdr      Counter32,
+   alFilterStatsInTcpFragDiscard    Counter32,
+   alFilterStatsOutTcpFragDiscard   Counter32,
+   alFilterStatsInIcmpFragDiscard   Counter32,
+   alFilterStatsOutIcmpFragDiscard  Counter32
+}
+
+alFilterStatsInterfaceId   OBJECT-TYPE
+   SYNTAX         Integer32 (0..65535)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The primary index of this row, the IP interface ID."
+   ::= { alFilterStatsEntry 1 }
+
+alFilterStatsStartTime     OBJECT-TYPE
+   SYNTAX         TimeTicks
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Start time the filter became active."
+   ::= { alFilterStatsEntry 2 }
+
+alFilterStatsInPktsFiltered   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound packets discarded on this interface."
+   ::= { alFilterStatsEntry 3 }
+
+alFilterStatsOutPktsFiltered  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound packets discarded on this interface."
+   ::= { alFilterStatsEntry 4 }
+
+alFilterStatsInPktsRx      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound packets received on this interface."
+   ::= { alFilterStatsEntry 5 }
+
+alFilterStatsOutPktsRx     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound packets received on this interface.
+       This count includes filtered (dropped) packets."
+   ::= { alFilterStatsEntry 6 }
+
+alFilterStatsInPktsTx      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound packets forwarded on this interface."
+   ::= { alFilterStatsEntry 7 }
+
+alFilterStatsOutPktsTx     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound packets forwarded on this interface.
+       This count does not include filtered packets."
+   ::= { alFilterStatsEntry 8 }
+
+alFilterStatsInShortTcpHdr OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound TCP packets discarded on this interface
+       because the header was incomplete."
+   ::= { alFilterStatsEntry 9 }
+
+alFilterStatsOutShortTcpHdr   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound TCP packets discarded on this interface
+       because the header was incomplete."
+   ::= { alFilterStatsEntry 10 }
+
+alFilterStatsInShortUdpHdr OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound UDP packets discarded on this interface
+       because the header was incomplete."
+   ::= { alFilterStatsEntry 11 }
+
+alFilterStatsOutShortUdpHdr   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound UDP packets discarded on this interface
+       because the header was incomplete."
+   ::= { alFilterStatsEntry 12 }
+
+alFilterStatsInTcpFragDiscard OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound TCP packets discarded on this interface
+       because packet was fragmented."
+   ::= { alFilterStatsEntry 13 }
+
+alFilterStatsOutTcpFragDiscard   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound TCP packets discarded on this interface
+       because packet was fragmented."
+   ::= { alFilterStatsEntry 14 }
+
+alFilterStatsInIcmpFragDiscard   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of inbound ICMP packets discarded on this interface
+       because packet was fragmented."
+   ::= { alFilterStatsEntry 15 }
+
+alFilterStatsOutIcmpFragDiscard  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The total number of outbound ICMP packets discarded on this interface
+       because packet was fragmented."
+   ::= { alFilterStatsEntry 16 }
+
+altigaFilterStatsMibConformance OBJECT IDENTIFIER ::= { altigaFilterStatsMibModule 1 }
+altigaFilterStatsMibCompliances OBJECT IDENTIFIER ::= { altigaFilterStatsMibConformance 1 }
+
+altigaFilterStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga Filter Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaFilterStatsGroup
+   }
+   ::= { altigaFilterStatsMibCompliances 1 }
+
+altigaFilterStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alFilterStatsInterfaceId,
+      alFilterStatsStartTime,
+      alFilterStatsInPktsFiltered,
+      alFilterStatsOutPktsFiltered,
+      alFilterStatsInPktsRx,
+      alFilterStatsOutPktsRx,
+      alFilterStatsInPktsTx,
+      alFilterStatsOutPktsTx,
+      alFilterStatsInShortTcpHdr,
+      alFilterStatsOutShortTcpHdr,
+      alFilterStatsInShortUdpHdr,
+      alFilterStatsOutShortUdpHdr,
+      alFilterStatsInTcpFragDiscard,
+      alFilterStatsOutTcpFragDiscard,
+      alFilterStatsInIcmpFragDiscard,
+      alFilterStatsOutIcmpFragDiscard
+   }
+   STATUS   current
+   DESCRIPTION
+          "The objects for filter statistics."
+   ::= { alFilterGroup 2 }
+
+END
+
+
+
+
+
+
+
+
+

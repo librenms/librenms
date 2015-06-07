@@ -1,0 +1,2310 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Alteon WebSystems, Inc. 2001
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: tigonPhysical.mib,v $
+-- Revision 1.1.1.1  2004/11/01 16:55:42  maxbaker
+-- initial import
+--
+-- Revision ge_rrekha/7 2001/11/08 19:29:40 rrekha
+-- 	Added MIB objects vlanCurCfgStg/vlanNewCfgStg.
+-- 
+-- Revision ge_rrekha/5 2001/11/07 00:28:10 rrekha
+-- 	Removed the range on agPortCurCfgBwmContract/agPortNewCfgBwmContract
+-- 	and vlanCurCfgBwmContract/vlanNewCfgBwmContract since the size
+-- 	of the table can vary. This range should be obtained from the
+-- 	the max table size.
+-- 
+-- Revision ge_rrekha/3 2001/10/18 18:06:43 rrekha
+-- 	Marked the old port mirroring MIBs as obsolete since they are 
+-- 	no longer supported.
+-- 
+-- Revision test_smiao/13 2001/10/12 02:42:04 smiao
+-- 	Added LinkTrap and broadcast pkt stats for port.
+-- 
+-- Revision test_smiao/11 2001/10/11 23:54:41 smiao
+-- 	Added physical interface info/stats in port table.
+-- 
+-- Revision test_smiao/9 2001/09/18 18:08:02 smiao
+-- 	Implemented VLAN bit map for spanning tree group.
+-- 
+-- Revision test_smiao/7 2001/08/31 18:14:15 smiao
+-- 	Implemented add/remove vlans for spanning tree groups.
+-- 
+-- Revision test_smiao/5 2001/07/13 23:06:27 smiao
+-- 	Initial checked in for multiple spanning tree in SNMP and webUI.
+-- 
+-- Revision genie_rekha/10 2001/07/12 19:29:11 rekha
+-- 	SNMP support for port-based and vlan-based port mirroring.
+-- 
+-- Revision genie_rekha/8 2001/05/29 22:54:39 rekha
+-- 	Removed 'other' from most of the enumerations.
+-- 
+-- Revision test_smiao/3 2001/05/09 22:39:23 smiao
+-- 	Added operational command for port mirroring in webUI and SNMP.
+-- 
+-- Revision work_rmundhra/7 2001/03/06 23:09:26 rmundhra
+-- 	Removed Mib entry agCurCfgPortLinkTrap
+-- 	and agNewCfgPortLinkTrap as we can configure via
+-- 	ifLinkUpDownTrapEnable defined in rfc1573.mib.
+-- 
+-- Revision work_rmundhra/4 2001/03/01 17:16:43 rmundhra
+-- 	Added SNMP support for configuring LinkTrap enabled/disabled.
+-- 
+-- Revision genie_rekha/5 2001/02/16 00:12:49 rekha
+-- 	Fixed 10218: Added MIB object for port mirroring timeout.
+-- 
+-- Revision genie_rekha/2 2001/02/08 18:18:03 rekha
+-- 	As part of the code cleanup split the Tigon MIB into smaller
+-- 	modules. Instead of altswitch.mib these 5 new modules should be
+-- 	used.
+-- 
+-- $EndLog$
+-- 
+-- Version 10.0.x
+--
+
+ALTEON-TS-PHYSICAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Counter, Gauge, TimeTicks 
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    PhysAddress, DisplayString
+        FROM RFC1213-MIB
+    switch 
+        FROM ALTEON-ROOT-MIB
+    stats, information, agent, operCmds
+        FROM ALTEON-TIGON-SWITCH-MIB;
+
+vlans             OBJECT IDENTIFIER ::= { switch 4 }
+portmirroring     OBJECT IDENTIFIER ::= { switch 6 }
+trunkgroup        OBJECT IDENTIFIER ::= { switch 7 }
+spannTreeGrpCfg   OBJECT IDENTIFIER ::= { switch 19 }
+
+agPortConfig      OBJECT IDENTIFIER ::= { agent 3 }
+
+mirroring         OBJECT IDENTIFIER ::= { switch 18 }
+mirrPortMirr      OBJECT IDENTIFIER ::= { mirroring 1 }
+mirrVlanMirr      OBJECT IDENTIFIER ::= { mirroring 2 }
+
+portCpuStats	  OBJECT IDENTIFIER ::= { stats  17 }
+port-stats	  OBJECT IDENTIFIER ::= { stats  26 }
+
+port-info	  OBJECT IDENTIFIER ::= { information 1 }
+
+-- Agent Port Table
+
+agPortTableMaxEnt OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the port configuration host table."
+    ::= { agPortConfig 1 }
+
+agPortCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of port configuration in the current_configuration block."
+    ::= { agPortConfig 2 }
+
+agPortCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the port table in the current_configuration block."
+    INDEX   { agPortCurCfgIndx }
+    ::= { agPortCurCfgTable 1 }
+
+AgPortCurCfgTableEntry ::= SEQUENCE {
+    agPortCurCfgIndx           INTEGER,
+    agPortCurCfgPrefLink       INTEGER,
+    agPortCurCfgBackLink       INTEGER,
+    agPortCurCfgState          INTEGER,
+    agPortCurCfgVlanTag        INTEGER,
+    agPortCurCfgStp            INTEGER,
+    agPortCurCfgRmon           INTEGER,
+    agPortCurCfgPVID           INTEGER,
+    agPortCurCfgFastEthAutoNeg INTEGER,
+    agPortCurCfgFastEthSpeed   INTEGER,
+    agPortCurCfgFastEthMode    INTEGER,
+    agPortCurCfgFastEthFctl    INTEGER,
+    agPortCurCfgGigEthAutoNeg  INTEGER,
+    agPortCurCfgGigEthFctl     INTEGER,
+    agPortCurCfgPortName       DisplayString,
+    agPortCurCfgBwmContract    INTEGER,
+    agPortCurCfgDiscardNonIPs  INTEGER,
+    agPortCurCfgLinkTrap       INTEGER
+    }
+
+agPortCurCfgIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the row in port configurations table."
+    ::= { agPortCurCfgTableEntry 1 }
+
+agPortCurCfgPrefLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        fast-ethernet(2),
+        gigabit-ethernet(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the preferred link."
+    ::= { agPortCurCfgTableEntry 2 }
+
+agPortCurCfgBackLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        fast-ethernet(2),
+        gigabit-ethernet(3),
+        none(4)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the backup link."
+    ::= { agPortCurCfgTableEntry 3 }
+
+agPortCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the state of the port."
+    ::= { agPortCurCfgTableEntry 4 }
+
+agPortCurCfgVlanTag OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is VLAN tag state of the port"
+    ::= { agPortCurCfgTableEntry 5 }
+
+agPortCurCfgStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn Spanning Tree on or off for the port."
+    ::= { agPortCurCfgTableEntry 6 }
+
+agPortCurCfgRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn RMON on or off on the port."
+   ::= { agPortCurCfgTableEntry 7 }
+
+agPortCurCfgPVID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The default VLAN ID for the port."
+    ::= { agPortCurCfgTableEntry 8 }
+
+agPortCurCfgFastEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for fast Ethernet connection."
+    ::= { agPortCurCfgTableEntry 9 }
+
+agPortCurCfgFastEthSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        mbs10or100(4)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Selects the port speed for fast Ethernet connection."
+    ::= { agPortCurCfgTableEntry 10 }
+
+agPortCurCfgFastEthMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3),
+        full-or-half-duplex(4)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to select port mode for fast Ethernet connection."
+    ::= { agPortCurCfgTableEntry 11 }
+
+agPortCurCfgFastEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Selects the port flow control for fast Ethernet connection."
+    ::= { agPortCurCfgTableEntry 12 }
+
+agPortCurCfgGigEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 13 }
+
+agPortCurCfgGigEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to select port flow control for
+         gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 14 }
+
+agPortCurCfgPortName	OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The switch port name."
+    ::= { agPortCurCfgTableEntry 15 }
+
+agPortCurCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The switch port Bandwidth Management contract number."
+    ::= { agPortCurCfgTableEntry 16 }
+
+agPortCurCfgDiscardNonIPs OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable to discard all non-IP traffic on the switch port."
+    ::= { agPortCurCfgTableEntry 17 }
+
+agPortCurCfgLinkTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates whether linkUp/linkDown traps should be
+        generated for this interface.
+
+        By default, this object should have the value
+        enabled(1) for interfaces which do not operate on
+        'top' of any other interface (as defined in the
+        ifStackTable), and disabled(2) otherwise."
+    ::= { agPortCurCfgTableEntry 18 }
+
+agPortNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of port configuration in the new_configuration block."
+    ::= { agPortConfig 3 }
+
+agPortNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the port configuration table in the new_configuration block."
+    INDEX   { agPortNewCfgIndx }
+    ::= { agPortNewCfgTable 1 }
+
+AgPortNewCfgTableEntry ::= SEQUENCE {
+    agPortNewCfgIndx           INTEGER,
+    agPortNewCfgPrefLink       INTEGER,
+    agPortNewCfgBackLink       INTEGER,
+    agPortNewCfgState          INTEGER,
+    agPortNewCfgVlanTag        INTEGER,
+    agPortNewCfgStp            INTEGER,
+    agPortNewCfgRmon           INTEGER,
+    agPortNewCfgPVID           INTEGER,
+    agPortNewCfgFastEthAutoNeg INTEGER,
+    agPortNewCfgFastEthSpeed   INTEGER,
+    agPortNewCfgFastEthMode    INTEGER,
+    agPortNewCfgFastEthFctl    INTEGER,
+    agPortNewCfgGigEthAutoNeg  INTEGER,
+    agPortNewCfgGigEthFctl     INTEGER,
+    agPortNewCfgPortName       DisplayString,
+    agPortNewCfgBwmContract    INTEGER,
+    agPortNewCfgDiscardNonIPs  INTEGER,
+    agPortNewCfgLinkTrap       INTEGER
+    }
+
+agPortNewCfgIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the row in port configurations table."
+    ::= { agPortNewCfgTableEntry 1 }
+
+agPortNewCfgPrefLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        fast-ethernet(2),
+        gigabit-ethernet(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the preferred link."
+    ::= { agPortNewCfgTableEntry 2 }
+
+agPortNewCfgBackLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        fast-ethernet(2),
+        gigabit-ethernet(3),
+        none(4)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the backup link."
+    ::= { agPortNewCfgTableEntry 3 }
+
+agPortNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the state of the port."
+    ::= { agPortNewCfgTableEntry 4 }
+
+agPortNewCfgVlanTag OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is VLAN tag state of the port"
+    ::= { agPortNewCfgTableEntry 5 }
+
+agPortNewCfgStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn Spanning Tree on or off for the port."
+    ::= { agPortNewCfgTableEntry 6 }
+
+agPortNewCfgRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn RMON on or off on the port."
+    ::= { agPortNewCfgTableEntry 7 }
+
+agPortNewCfgPVID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The default VLAN ID for the port."
+    ::= { agPortNewCfgTableEntry 8 }
+
+agPortNewCfgFastEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for fast Ethernet connection."
+    ::= { agPortNewCfgTableEntry 9 }
+
+agPortNewCfgFastEthSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        mbs10or100(4)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Selects the port speed for fast Ethernet connection."
+    ::= { agPortNewCfgTableEntry 10 }
+ 
+agPortNewCfgFastEthMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3),
+        full-or-half-duplex(4)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to select port mode for fast Ethernet connection."
+    ::= { agPortNewCfgTableEntry 11 }
+
+agPortNewCfgFastEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Selects the port flow control for fast Ethernet connection."
+    ::= { agPortNewCfgTableEntry 12 }
+
+agPortNewCfgGigEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 13 }
+
+agPortNewCfgGigEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object is used to select port flow control for
+         gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 14 }
+
+agPortNewCfgPortName	OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..63))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The switch port name."
+    ::= { agPortNewCfgTableEntry 15 }
+
+agPortNewCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The switch port Bandwidth Management contract number."
+    ::= { agPortNewCfgTableEntry 16 }
+
+agPortNewCfgDiscardNonIPs OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable to discard all non-IP traffic on the switch port."
+    ::= { agPortNewCfgTableEntry 17 }
+
+agPortNewCfgLinkTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory 
+    DESCRIPTION
+        "Indicates whether linkUp/linkDown traps should be
+        generated for this interface.
+
+        By default, this object should have the value
+        enabled(1) for interfaces which do not operate on
+        'top' of any other interface (as defined in the
+        ifStackTable), and disabled(2) otherwise."
+    ::= { agPortNewCfgTableEntry 18 }
+
+-- VLAN group
+
+vlanMaxEnt OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the VLAN configuration table."
+    ::= { vlans 1 }
+
+vlanCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VlanCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VLAN configuration."
+    ::= { vlans 2 }
+
+vlanCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  VlanCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the VLAN configuration table."
+    INDEX  { vlanCurCfgVlanId }
+    ::= { vlanCurCfgTable 1 }
+
+VlanCurCfgTableEntry ::= SEQUENCE {
+    vlanCurCfgVlanId 		INTEGER,
+    vlanCurCfgVlanName 		DisplayString,
+    vlanCurCfgPorts 		OCTET STRING,
+    vlanCurCfgState 		INTEGER,
+    vlanCurCfgJumbo 		INTEGER,
+    vlanCurCfgBwmContract	INTEGER,
+    vlanCurCfgStg  	        INTEGER
+    }
+
+vlanCurCfgVlanId OBJECT-TYPE
+    SYNTAX  INTEGER  (1..4094)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN identifier."
+    ::= { vlanCurCfgTableEntry 1 }
+
+vlanCurCfgVlanName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN name."
+    ::= { vlanCurCfgTableEntry 2 }
+
+vlanCurCfgPorts	OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port list in the VLAN. The ports are presented in bitmap format.
+	 in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ port 8
+             ||    ||  
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+
+         where x : 1 - The represented port belongs to the VLAN
+		   0 - The represented port does not belong to the VLAN"
+    ::= { vlanCurCfgTableEntry 3 }
+
+vlanCurCfgState	OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable a VLAN"
+    ::= { vlanCurCfgTableEntry 4 }
+
+vlanCurCfgJumbo OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or Disable the Jumbo frame support for the VLAN "
+    ::= { vlanCurCfgTableEntry 5 }
+
+vlanCurCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Default contract number the VLAN "
+    ::= { vlanCurCfgTableEntry 6 }
+
+vlanCurCfgStg OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Spanning Tree Group for the VLAN."
+    ::= { vlanCurCfgTableEntry 7 }
+
+vlanNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VlanNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VLAN configuration."
+    ::= { vlans 3 }
+
+vlanNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  VlanNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the VLAN configuration table."
+    INDEX  { vlanNewCfgVlanId }
+    ::= { vlanNewCfgTable 1 }
+
+VlanNewCfgTableEntry ::= SEQUENCE {
+    vlanNewCfgVlanId 		INTEGER,
+    vlanNewCfgVlanName 		DisplayString,
+    vlanNewCfgPorts 		OCTET STRING,
+    vlanNewCfgState 		INTEGER,
+    vlanNewCfgJumbo 		INTEGER,
+    vlanNewCfgAddPort 		INTEGER,
+    vlanNewCfgRemovePort	INTEGER,
+    vlanNewCfgDelete 		INTEGER,
+    vlanNewCfgBwmContract	INTEGER,
+    vlanNewCfgStg  	        INTEGER
+    }
+
+vlanNewCfgVlanId OBJECT-TYPE
+    SYNTAX  INTEGER  (1..4094)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN identifier."
+    ::= { vlanNewCfgTableEntry 1 }
+
+vlanNewCfgVlanName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN name."
+    ::= { vlanNewCfgTableEntry 2 }
+
+vlanNewCfgPorts	OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port list in the VLAN.  The ports are presented in bitmap format.
+         in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ port 8
+             ||    ||  
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+
+         where x : 1 - The represented port belongs to the VLAN
+	           0 - The represented port does not belong to the VLAN"
+    ::= { vlanNewCfgTableEntry 3 }
+
+vlanNewCfgState	OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable a VLAN"
+    ::= { vlanNewCfgTableEntry 4 }
+
+vlanNewCfgJumbo OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or Disable the Jumbo frame support for the VLAN "
+    ::= { vlanNewCfgTableEntry 5 }
+
+vlanNewCfgAddPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The port to be added to the specified VLAN.  A '0' value is 
+         returned when read."
+    ::= { vlanNewCfgTableEntry 6 }
+
+vlanNewCfgRemovePort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The port to be removed from the specified VLAN.  A '0'
+         value is returned when read."
+    ::= { vlanNewCfgTableEntry 7 }
+
+vlanNewCfgDelete OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to create or delete a VLAN.
+         other(1) is returned always when read.
+         The following values are writable: delete(2)...to delete a VLAN"
+    ::= { vlanNewCfgTableEntry 8 }
+
+vlanNewCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Default contract number for the VLAN."
+    ::= { vlanNewCfgTableEntry 9 }
+
+vlanNewCfgStg OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The Spanning Tree Group for the VLAN."
+    ::= { vlanNewCfgTableEntry 10 }
+
+-- Port Mirroring Group
+
+pmCurCfgMonitoringPort OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The port number of the monitoring port."
+    ::= { portmirroring 1 }
+
+pmNewCfgMonitoringPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+        "The port number of the monitoring port."
+    ::= { portmirroring 2 }
+
+pmCurCfgMirroredPort OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+	"The port number of the mirrored port."
+    ::= { portmirroring 3 }
+
+pmNewCfgMirroredPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+        "The port number of the mirrored port."
+    ::= { portmirroring 4 }
+
+pmCurCfgMonitoredTraffic OBJECT-TYPE
+    SYNTAX  INTEGER {
+	none(2),
+	received(3),
+	transmitted(4),
+	both(5)
+	}
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+	"The type of traffic to be monitored with respect to the mirrored 
+         port."
+    ::= { portmirroring 5 }
+
+pmNewCfgMonitoredTraffic OBJECT-TYPE
+    SYNTAX  INTEGER {
+	none(2),
+	received(3),
+	transmitted(4),
+	both(5)
+        }
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+        "The type of traffic to be monitored with respect to the
+         mirrored port."
+    ::= { portmirroring 6 }
+
+pmCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(2),
+	disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The state of Port mirroring."
+    ::= { portmirroring 7 }
+ 
+pmNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(2),
+	disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+        "The state of Port mirroring."
+    ::= { portmirroring 8 }
+
+pmCurCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..86400)
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+	"The mirroring timeout value in seconds."
+    ::= { portmirroring 9 }
+
+pmNewCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..86400)
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+	"The mirroring timeout value in seconds."
+    ::= { portmirroring 10 }
+
+-- Trunk Group Group
+
+trunkGroupTableMaxSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of entries in trunk group table."
+    ::= { trunkgroup 1 }
+
+trunkGroupCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TrunkGroupCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of trunk group configuration."
+    ::= { trunkgroup 2 }
+
+trunkGroupCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  TrunkGroupCurCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the trunk group configuration table."
+    INDEX   { trunkGroupCurCfgIndex }
+    ::= { trunkGroupCurCfgTable 1 }
+
+TrunkGroupCurCfgTableEntry ::= SEQUENCE {
+    trunkGroupCurCfgIndex         INTEGER,
+    trunkGroupCurCfgPorts         OCTET STRING,
+    trunkGroupCurCfgState         INTEGER,
+    trunkGroupCurCfgBwmContract   INTEGER
+    }
+ 
+trunkGroupCurCfgIndex OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The identifier of the trunk group."
+    ::= { trunkGroupCurCfgTableEntry 1 }
+ 
+trunkGroupCurCfgPorts OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port list in the trunk group. The ports are presented in 
+         bitmap format.
+ 
+         in receiving order:
+ 
+             OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ port 8
+             ||    ||  
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+
+         where x : 1 - The represented port belongs to the trunk group
+                   0 - The represented port does not belong to the trunk group"
+    ::= { trunkGroupCurCfgTableEntry 2 }
+ 
+trunkGroupCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        enable(1),
+        disable(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable a trunk group."
+    ::= { trunkGroupCurCfgTableEntry 3 }
+ 
+trunkGroupCurCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Default BW contract of a trunk group."
+    ::= { trunkGroupCurCfgTableEntry 4 }
+ 
+-- Trunk-Group  New configuration
+
+trunkGroupNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TrunkGroupNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of trunk group configuration."
+    ::= { trunkgroup 3 }
+
+trunkGroupNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  TrunkGroupNewCfgTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the trunk group configuration table."
+    INDEX   { trunkGroupNewCfgIndex }
+    ::= { trunkGroupNewCfgTable 1 }
+
+TrunkGroupNewCfgTableEntry ::= SEQUENCE {
+    trunkGroupNewCfgIndex          INTEGER,
+    trunkGroupNewCfgPorts          OCTET STRING,
+    trunkGroupNewCfgAddPort        INTEGER,
+    trunkGroupNewCfgRemovePort     INTEGER,
+    trunkGroupNewCfgState          INTEGER,
+    trunkGroupNewCfgDelete         INTEGER,
+    trunkGroupNewCfgBwmContract    INTEGER
+    }
+ 
+trunkGroupNewCfgIndex OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The identifier of the trunk group."
+    ::= { trunkGroupNewCfgTableEntry 1 }
+ 
+trunkGroupNewCfgPorts OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port list in the trunk group.  The ports are presented
+         in bitmap format.
+
+         in receiving order:
+
+             OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ port 8
+             ||    ||  
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+ 
+         where x : 1 - The represented port belongs to the trunk group
+                   0 - The represented port does not belong to the trunk group"
+    ::= { trunkGroupNewCfgTableEntry 2 }
+ 
+trunkGroupNewCfgAddPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The port to be added in the trunk group. When read, 0 is returned."
+    ::= { trunkGroupNewCfgTableEntry 3 }
+
+trunkGroupNewCfgRemovePort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The port to be deleted from the trunk group. when read, 0
+	 is returned."
+    ::= { trunkGroupNewCfgTableEntry 4 }
+
+trunkGroupNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        enable(1),
+        disable(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable a trunk group."
+    ::= { trunkGroupNewCfgTableEntry 5 }
+ 
+trunkGroupNewCfgDelete OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Setting the value to delete(2) will delete the entire
+         row. When read, other(1) is returned."
+    ::= { trunkGroupNewCfgTableEntry 6 }
+
+trunkGroupNewCfgBwmContract OBJECT-TYPE
+    SYNTAX  INTEGER  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Default BW contract of a trunk group."
+    ::= { trunkGroupNewCfgTableEntry 7 }
+
+--
+-- Spanning Tree Group Configuration
+--
+-- This group specifies the additional configurations that are not
+-- covered by the Bridge MIB (RFC 1493).
+-- The relative Spanning Tree information can be retrieved or configured
+-- using Bridge MIB with an unique community string for each group specified
+-- in entLogicalTable of Entity MIB (RFC 2037).
+--
+stgCurCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF StgCurCfgTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The table of Spanning Tree Groups configuration in the current_config."
+    ::= { spannTreeGrpCfg 1 }
+
+stgCurCfgTableEntry OBJECT-TYPE
+    SYNTAX StgCurCfgTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information about a particular Spanning Tree Group configuration."
+    INDEX { stgCurCfgIndex }
+    ::= { stgCurCfgTable 1 }
+
+StgCurCfgTableEntry ::= SEQUENCE {
+    stgCurCfgIndex      INTEGER,
+    stgCurCfgState      INTEGER,
+    stgCurCfgVlanBmap1	OCTET STRING,	
+    stgCurCfgVlanBmap2	OCTET STRING	
+    }
+
+stgCurCfgIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of a particular Spanning Tree Group.  This is also
+         index to the entLogicalTable of Entity MIB."
+    ::= { stgCurCfgTableEntry 1 }
+
+stgCurCfgState OBJECT-TYPE
+    SYNTAX INTEGER {
+        on(1),
+        off(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Turn on of off Spanning Tree operation of a particular Spanning
+         Tree Group."
+    ::= { stgCurCfgTableEntry 2 }
+
+stgCurCfgVlanBmap1 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256)) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The vlans applied to the spanning tree group.  The vlans are 
+         presented in bitmap format. This string displays vlan number
+	 from 1 to 2048.
+
+	 in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ vlan 9
+             ||    ||  
+             ||    ||___ vlan 8
+             ||    |____ vlan 7
+             ||      .    .   .
+             ||_________ vlan 2
+             |__________ vlan 1 (as index to stgCurCfgTable)
+
+         where x : 1 - The represented vlan applied to the spanning tree. 
+		   0 - The represented vlan not applied to the spanning tree"
+    ::= { stgCurCfgTableEntry 3 }
+
+stgCurCfgVlanBmap2 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256)) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The vlans applied to the spanning tree group.  The vlans are 
+         presented in bitmap format. This string displays vlan number
+	 from 2049 to 4096.
+
+	 in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ vlan 2057 
+             ||    ||  
+             ||    ||___ vlan 2056 
+             ||    |____ vlan 2055 
+             ||      .    .   .
+             ||_________ vlan 2050 
+             |__________ vlan 2049 (as index to stgCurCfgTable)
+
+         where x : 1 - The represented vlan applied to the spanning tree. 
+		   0 - The represented vlan not applied to the spanning tree"
+    ::= { stgCurCfgTableEntry 4 }
+
+
+stgNewCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF StgNewCfgTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The table of Spanning Tree Groups configuration in the new_config."
+    ::= { spannTreeGrpCfg 2 }
+
+stgNewCfgTableEntry OBJECT-TYPE
+    SYNTAX StgNewCfgTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information about a particular Spanning Tree Group configuration."
+    INDEX { stgNewCfgIndex }
+    ::= { stgNewCfgTable 1 }
+
+StgNewCfgTableEntry ::= SEQUENCE {
+    stgNewCfgIndex      INTEGER,
+    stgNewCfgState      INTEGER,
+    stgNewCfgDefaultCfg INTEGER,
+    stgNewCfgAddVlan    INTEGER,
+    stgNewCfgRemoveVlan INTEGER,
+    stgNewCfgVlanBmap1	OCTET STRING,
+    stgNewCfgVlanBmap2	OCTET STRING
+    }
+
+stgNewCfgIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of a particular Spanning Tree Group.  This is also
+         index to the entLogicalTable of Entity MIB."
+    ::= { stgNewCfgTableEntry 1 }
+
+stgNewCfgState OBJECT-TYPE
+    SYNTAX INTEGER {
+        on(1),
+        off(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Turn on of off Spanning Tree operation of a particular Spanning
+         Tree Group."
+    ::= { stgNewCfgTableEntry 2 }
+
+stgNewCfgDefaultCfg OBJECT-TYPE
+    SYNTAX INTEGER {
+        default-config(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Setting the value to default-config(1) will set the default
+         configuration as recommended by IEEE 802.1D for a particular
+         Spanning Tree Group.  default-config (1) is always returned 
+	 When read, but it does not mean anything."
+    ::= { stgNewCfgTableEntry 3 }
+
+stgNewCfgAddVlan OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The vlan to be added to the specified Spanning Tree Group.  A 
+         '0' value is returned when read." 
+    ::= {stgNewCfgTableEntry 4 }
+
+stgNewCfgRemoveVlan OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The vlan to be removed from the specified Spanning Tree Group.
+         A '0' value is returned when read."
+    ::= { stgNewCfgTableEntry 5 }
+
+stgNewCfgVlanBmap1 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256)) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The vlans applied to the spanning tree group.  The vlans are 
+         presented in bitmap format. This string displays vlan number
+	 from 1 to 2048.
+
+	 in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ vlan 9
+             ||    ||  
+             ||    ||___ vlan 8
+             ||    |____ vlan 7
+             ||      .    .   .
+             ||_________ vlan 2
+             |__________ vlan 1 (as index to stgCurCfgTable)
+
+         where x : 1 - The represented vlan applied to the spanning tree. 
+		   0 - The represented vlan not applied to the spanning tree"
+    ::= { stgNewCfgTableEntry 6 }
+
+stgNewCfgVlanBmap2 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256)) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The vlans applied to the spanning tree group.  The vlans are 
+         presented in bitmap format. This string displays vlan number
+	 from 2049 to 4096.
+
+	 in receiving order:
+
+	     OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             ||    || |_ vlan 2057 
+             ||    ||  
+             ||    ||___ vlan 2056 
+             ||    |____ vlan 2055 
+             ||      .    .   .
+             ||_________ vlan 2050 
+             |__________ vlan 2049 (as index to stgCurCfgTable)
+
+         where x : 1 - The represented vlan applied to the spanning tree. 
+		   0 - The represented vlan not applied to the spanning tree"
+    ::= { stgNewCfgTableEntry 7 }
+
+stgCurCfgPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF StgCurCfgPortTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The table of Spanning Tree Group port configuration in the
+         current_config."
+    ::= { spannTreeGrpCfg 3 }
+
+stgCurCfgPortTableEntry OBJECT-TYPE
+    SYNTAX StgCurCfgPortTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information about port configuration of a particular Spanning Tree
+         Group."
+    INDEX { stgCurCfgStgIndex, stgCurCfgPortIndex }
+    ::= { stgCurCfgPortTable 1 }
+
+StgCurCfgPortTableEntry ::= SEQUENCE {
+    stgCurCfgStgIndex      INTEGER,
+    stgCurCfgPortIndex     INTEGER,
+    stgCurCfgPortState     INTEGER
+    }
+
+stgCurCfgStgIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of a particular Spanning Tree Group.  This is also
+         index to the entLogicalTable of Entity MIB."
+    ::= { stgCurCfgPortTableEntry 1 }
+
+stgCurCfgPortIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The port identifier of a particular Spanning Tree Group."
+    ::= { stgCurCfgPortTableEntry 2 }
+
+stgCurCfgPortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        on(1),
+        off(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Turn on of off Spanning Tree operation of a particular port of a
+         Spanning Tree Group."
+    ::= { stgCurCfgPortTableEntry 3 }
+
+
+stgNewCfgPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF StgNewCfgPortTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The table of Spanning Tree Group port configuration in the
+         new_config."
+    ::= { spannTreeGrpCfg 4 }
+
+stgNewCfgPortTableEntry OBJECT-TYPE
+    SYNTAX StgNewCfgPortTableEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information about port configuration of a particular Spanning Tree
+         Group."
+    INDEX { stgNewCfgStgIndex, stgNewCfgPortIndex }
+    ::= { stgNewCfgPortTable 1 }
+
+StgNewCfgPortTableEntry ::= SEQUENCE {
+    stgNewCfgStgIndex      INTEGER,
+    stgNewCfgPortIndex     INTEGER,
+    stgNewCfgPortState     INTEGER
+    }
+
+stgNewCfgStgIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of a particular Spanning Tree Group.  This is also
+         index to the entLogicalTable of Entity MIB."
+    ::= { stgNewCfgPortTableEntry 1 }
+
+stgNewCfgPortIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The port identifier of a particular Spanning Tree Group."
+    ::= { stgNewCfgPortTableEntry 2 }
+
+stgNewCfgPortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        on(1),
+        off(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Turn on of off Spanning Tree operation of a particular port of a
+         Spanning Tree Group."
+    ::= { stgNewCfgPortTableEntry 3 }
+
+-- Complete Port Mirroring 
+
+-- Port-based port mirroring
+
+pmCurCfgPortMirrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of port-based port mirroring."
+    ::= { mirrPortMirr 1 }
+ 
+pmNewCfgPortMirrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of port-based port mirroring."
+    ::= { mirrPortMirr 2 }
+
+pmCurCfgPortMonitorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PmCurCfgPortMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of monitoring ports."
+    ::= { mirrPortMirr 3 }
+
+pmCurCfgPortMonitorEntry OBJECT-TYPE
+    SYNTAX  PmCurCfgPortMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the monitoring port table."
+    INDEX   { pmCurCfgPmirrMoniPortIndex, pmCurCfgPmirrMirrPortIndex }
+    ::= { pmCurCfgPortMonitorTable 1 }
+
+PmCurCfgPortMonitorEntry ::= SEQUENCE {
+    pmCurCfgPmirrMoniPortIndex       INTEGER,
+    pmCurCfgPmirrMirrPortIndex       INTEGER,
+    pmCurCfgPmirrDirection           INTEGER
+    }
+
+pmCurCfgPmirrMoniPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The monitoring port number." 
+    ::= { pmCurCfgPortMonitorEntry 1 }
+
+pmCurCfgPmirrMirrPortIndex OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The mirrored port number" 
+    ::= { pmCurCfgPortMonitorEntry 2 }
+
+pmCurCfgPmirrDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+	in(1),
+	out(2),
+	both(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of traffic to be monitored with respect to the
+         mirrored port."
+    ::= { pmCurCfgPortMonitorEntry 3 }
+
+pmNewCfgPortMonitorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PmNewCfgPortMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of monitoring ports."
+    ::= { mirrPortMirr 4 }
+
+pmNewCfgPortMonitorEntry OBJECT-TYPE
+    SYNTAX  PmNewCfgPortMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the monitoring port table."
+    INDEX   { pmNewCfgPmirrMoniPortIndex, pmNewCfgPmirrMirrPortIndex }
+    ::= { pmNewCfgPortMonitorTable 1 }
+
+PmNewCfgPortMonitorEntry ::= SEQUENCE {
+    pmNewCfgPmirrMoniPortIndex          INTEGER,
+    pmNewCfgPmirrMirrPortIndex          INTEGER,
+    pmNewCfgPmirrDirection              INTEGER,
+    pmNewCfgPmirrDelete                 INTEGER
+    }
+
+pmNewCfgPmirrMoniPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The monitoring port number." 
+    ::= { pmNewCfgPortMonitorEntry 1 }
+
+pmNewCfgPmirrMirrPortIndex OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The mirrored port number" 
+    ::= { pmNewCfgPortMonitorEntry 2 }
+
+pmNewCfgPmirrDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+	in(1),
+	out(2),
+	both(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of traffic to be monitored with respect to the
+         mirrored port."
+    ::= { pmNewCfgPortMonitorEntry 3 }
+
+pmNewCfgPmirrDelete OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Setting the value to delete(2) will delete the entire
+         row. When read, other(1) is returned."
+    ::= { pmNewCfgPortMonitorEntry 4 }
+
+-- Vlan-based port mirroring
+
+pmCurCfgVlanMirrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of vlan-based port mirroring."
+    ::= { mirrVlanMirr 1 }
+ 
+pmNewCfgVlanMirrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of vlan-based port mirroring."
+    ::= { mirrVlanMirr 2 }
+
+pmCurCfgVlanMonitorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PmCurCfgVlanMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of vlan based port mirroring."
+    ::= { mirrVlanMirr 3 }
+
+pmCurCfgVlanMonitorEntry OBJECT-TYPE
+    SYNTAX  PmCurCfgVlanMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the monitoring vlan table."
+    INDEX   { pmCurCfgVmirrMoniPortIndex, pmCurCfgVmirrMirrVlanIndex }
+    ::= { pmCurCfgVlanMonitorTable 1 }
+
+PmCurCfgVlanMonitorEntry ::= SEQUENCE {
+    pmCurCfgVmirrMoniPortIndex       INTEGER,
+    pmCurCfgVmirrMirrVlanIndex       INTEGER,
+    pmCurCfgVmirrDirection           INTEGER
+    }
+
+pmCurCfgVmirrMoniPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The monitoring port number." 
+    ::= { pmCurCfgVlanMonitorEntry 1 }
+
+pmCurCfgVmirrMirrVlanIndex OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The mirrored vlan number" 
+    ::= { pmCurCfgVlanMonitorEntry 2 }
+
+pmCurCfgVmirrDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+	in(1),
+	out(2),
+	both(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of traffic to be monitored with respect to the
+         mirrored vlan."
+    ::= { pmCurCfgVlanMonitorEntry 3 }
+
+pmNewCfgVlanMonitorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PmNewCfgVlanMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of vlan-based port mirroring."
+    ::= { mirrVlanMirr 4 }
+
+pmNewCfgVlanMonitorEntry OBJECT-TYPE
+    SYNTAX  PmNewCfgVlanMonitorEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the monitoring vlan table."
+    INDEX   { pmNewCfgVmirrMoniPortIndex, pmNewCfgVmirrMirrVlanIndex }
+    ::= { pmNewCfgVlanMonitorTable 1 }
+
+PmNewCfgVlanMonitorEntry ::= SEQUENCE {
+    pmNewCfgVmirrMoniPortIndex          INTEGER,
+    pmNewCfgVmirrMirrVlanIndex          INTEGER,
+    pmNewCfgVmirrDirection              INTEGER,
+    pmNewCfgVmirrDelete                 INTEGER
+    }
+
+pmNewCfgVmirrMoniPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The monitoring port number." 
+    ::= { pmNewCfgVlanMonitorEntry 1 }
+
+pmNewCfgVmirrMirrVlanIndex OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The mirrored vlan number" 
+    ::= { pmNewCfgVlanMonitorEntry 2 }
+
+pmNewCfgVmirrDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+	in(1),
+	out(2),
+	both(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of traffic to be monitored with respect to the
+         mirrored vlan."
+    ::= { pmNewCfgVlanMonitorEntry 3 }
+
+pmNewCfgVmirrDelete OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Setting the value to delete(2) will delete the entire
+         row. When read, other(1) is returned."
+    ::= { pmNewCfgVlanMonitorEntry 4 }
+
+-- Port CPU utilization table
+
+portCpuStatsUtilTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortCpuStatsUtilTableEntry 
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of port CPU utilization."
+    ::= { portCpuStats 1 }
+
+portCpuStatsUtilTableEntry OBJECT-TYPE
+    SYNTAX  PortCpuStatsUtilTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the port CPU utilization table."
+    INDEX   { portCpuStatsUtilIndx }
+    ::= { portCpuStatsUtilTable 1 }
+
+PortCpuStatsUtilTableEntry ::= SEQUENCE {
+    portCpuStatsUtilIndx 	    INTEGER,
+    portCpuAStatsUtil1Second	    INTEGER,
+    portCpuBStatsUtil1Second	    INTEGER,
+    portCpuAStatsUtil4Seconds	    INTEGER,
+    portCpuBStatsUtil4Seconds       INTEGER,
+    portCpuAStatsUtil64Seconds      INTEGER,
+    portCpuBStatsUtil64Seconds      INTEGER
+    }
+
+portCpuStatsUtilIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port index."
+    ::= { portCpuStatsUtilTableEntry 1 }
+
+portCpuAStatsUtil1Second OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU A over 1 second. It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 2}
+ 
+portCpuBStatsUtil1Second OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU B over 1 second. It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 3}
+
+portCpuAStatsUtil4Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU A over 4 seconds.
+         It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 4}
+ 
+portCpuBStatsUtil4Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU B over 4 seconds.
+         It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 5}
+
+portCpuAStatsUtil64Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU A over 64 seconds.
+	 It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 6}
+ 
+portCpuBStatsUtil64Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of port CPU B over 64 seconds.
+	 It shows the percentage."
+    ::= { portCpuStatsUtilTableEntry 7}
+
+
+-- Information Group
+
+-- This group represents run-time status of the system
+
+-- Port information table
+
+portInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortInfoTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of port information."
+    ::= { port-info 1 }
+
+portInfoTableEntry OBJECT-TYPE
+    SYNTAX  PortInfoTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the port information table."
+    INDEX   { portInfoIndx }
+    ::= { portInfoTable 1 }
+
+PortInfoTableEntry ::= SEQUENCE {
+    portInfoIndx        	INTEGER,
+    portInfoSpeed       	INTEGER,
+    portInfoMode        	INTEGER,
+    portInfoFlowCtrl    	INTEGER,
+    portInfoLink        	INTEGER,
+    portInfoPhyIfDescr  	DisplayString,
+    portInfoPhyIfType   	INTEGER,
+    portInfoPhyIfMtu    	INTEGER,
+    portInfoPhyIfPhysAddress  	PhysAddress,
+    portInfoPhyIfOperStatus	INTEGER, 
+    portInfoPhyIfLastChange	TimeTicks	
+    }
+
+portInfoIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port index."
+    ::= { portInfoTableEntry 1 }
+
+portInfoSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        mbs1000(4),
+        any(5)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current operational speed of the port."
+    ::= { portInfoTableEntry 2 }
+
+portInfoMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current operational mode of the port."
+    ::= { portInfoTableEntry 3 }
+
+portInfoFlowCtrl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current operational flow control of the port."
+    ::= { portInfoTableEntry 4 }
+
+portInfoLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        up(1),
+        down(2),
+        disabled(3),
+        inoperative(4) -- unrecognized PCI device
+        }
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+         "The current operational link status of the port."
+     ::= { portInfoTableEntry 5 }
+
+portInfoPhyIfDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "A textual string containing information about the
+	    interface.  This string should include the name of
+	    the manufacturer, the product name and the version
+	    of the hardware interface."
+    ::= { portInfoTableEntry 6 }
+
+portInfoPhyIfType OBJECT-TYPE
+    SYNTAX  INTEGER {
+		other(1),          -- none of the following
+		regular1822(2),
+		hdh1822(3),
+		ddn-x25(4),
+		rfc877-x25(5),
+		ethernet-csmacd(6),
+		iso88023-csmacd(7),
+		iso88024-tokenBus(8),
+		iso88025-tokenRing(9),
+		iso88026-man(10),
+		starLan(11),
+		proteon-10Mbit(12),
+		proteon-80Mbit(13),
+		hyperchannel(14),
+		fddi(15),
+		lapb(16),
+		sdlc(17),
+		ds1(18),           -- T-1
+		e1(19),            -- european equiv. of T-1
+		basicISDN(20),
+		primaryISDN(21),   -- proprietary serial
+		propPointToPointSerial(22),
+		ppp(23),
+		softwareLoopback(24),
+		eon(25),            -- CLNP over IP [11]
+		ethernet-3Mbit(26),
+		nsip(27),           -- XNS over IP
+		slip(28),           -- generic SLIP
+		ultra(29),          -- ULTRA technologies
+		ds3(30),            -- T-3
+		sip(31),            -- SMDS
+		frame-relay(32)
+	    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The type of interface, distinguished according to
+	    the physical/link protocol(s) immediately `below'
+	    the network layer in the protocol stack."
+    ::= { portInfoTableEntry 7 }
+
+portInfoPhyIfMtu OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The size of the largest datagram which can be
+	    sent/received on the interface, specified in
+	    octets.  For interfaces that are used for
+	    transmitting network datagrams, this is the size
+	    of the largest network datagram that can be sent
+	    on the interface."
+    ::= { portInfoTableEntry 8 }
+
+portInfoPhyIfPhysAddress OBJECT-TYPE
+    SYNTAX  PhysAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The interface's address at the protocol layer
+	    immediately `below' the network layer in the
+	    protocol stack.  For interfaces which do not have
+	    such an address (e.g., a serial line), this object
+	    should contain an octet string of zero length."
+    ::= { portInfoTableEntry 9 }
+
+portInfoPhyIfOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+		up(1),       -- ready to pass packets
+		down(2),
+		testing(3)   -- in some test mode
+	    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The current operational state of the interface.
+	    The testing(3) state indicates that no operational
+	    packets can be passed."
+    ::= { portInfoTableEntry 10 }
+
+portInfoPhyIfLastChange OBJECT-TYPE
+    SYNTAX  TimeTicks
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The value of sysUpTime at the time the interface
+	    entered its current operational state.  If the
+	    current state was entered prior to the last re-
+	    initialization of the local network management
+	    subsystem, then this object contains a zero
+	    value."
+    ::= { portInfoTableEntry 11 }
+
+portStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of port statistics."
+    ::= { port-stats 1 }
+
+portStatsTableEntry OBJECT-TYPE
+    SYNTAX  PortStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the port stats table."
+    INDEX   { portStatsIndx }
+    ::= { portStatsTable 1 }
+
+PortStatsTableEntry ::=
+    SEQUENCE {
+	portStatsIndx
+	    INTEGER,
+	portStatsPhyIfInOctets
+	    Counter,
+	portStatsPhyIfInUcastPkts
+	    Counter,
+	portStatsPhyIfInNUcastPkts
+	    Counter,
+	portStatsPhyIfInDiscards
+	    Counter,
+	portStatsPhyIfInErrors
+	    Counter,
+	portStatsPhyIfInUnknownProtos
+	    Counter,
+	portStatsPhyIfOutOctets
+	    Counter,
+	portStatsPhyIfOutUcastPkts
+	    Counter,
+	portStatsPhyIfOutNUcastPkts
+	    Counter,
+	portStatsPhyIfOutDiscards
+	    Counter,
+	portStatsPhyIfOutErrors
+	    Counter,
+	portStatsPhyIfOutQLen
+	    Gauge,
+        portStatsPhyIfInBroadcastPkts
+            Counter,
+        portStatsPhyIfOutBroadcastPkts
+            Counter
+    }
+
+portStatsIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port index."
+    ::= { portStatsTableEntry 1 }
+
+portStatsPhyIfInOctets OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The total number of octets received on the
+	    interface, including framing characters."
+    ::= { portStatsTableEntry 2 }
+
+portStatsPhyIfInUcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of subnetwork-unicast packets
+	    delivered to a higher-layer protocol."
+    ::= { portStatsTableEntry 3 }
+
+portStatsPhyIfInNUcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of non-unicast (i.e., subnetwork-
+	    broadcast or subnetwork-multicast) packets
+	    delivered to a higher-layer protocol."
+    ::= { portStatsTableEntry 4 }
+
+portStatsPhyIfInDiscards OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of inbound packets which were chosen
+	    to be discarded even though no errors had been
+	    detected to prevent their being deliverable to a
+	    higher-layer protocol.  One possible reason for
+	    discarding such a packet could be to free up
+	    buffer space."
+    ::= { portStatsTableEntry 5 }
+
+portStatsPhyIfInErrors OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of inbound packets that contained
+	    errors preventing them from being deliverable to a
+	    higher-layer protocol."
+    ::= { portStatsTableEntry 6 }
+
+portStatsPhyIfInUnknownProtos OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of packets received via the interface
+	    which were discarded because of an unknown or
+	    unsupported protocol."
+    ::= { portStatsTableEntry 7 }
+
+portStatsPhyIfOutOctets OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The total number of octets transmitted out of the
+	    interface, including framing characters."
+    ::= { portStatsTableEntry 8 }
+
+portStatsPhyIfOutUcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The total number of packets that higher-level
+	    protocols requested be transmitted to a
+	    subnetwork-unicast address, including those that
+	    were discarded or not sent."
+    ::= { portStatsTableEntry 9 }
+
+portStatsPhyIfOutNUcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The total number of packets that higher-level
+	    protocols requested be transmitted to a non-
+	    unicast (i.e., a subnetwork-broadcast or
+	    subnetwork-multicast) address, including those
+	    that were discarded or not sent."
+    ::= { portStatsTableEntry 10 }
+
+portStatsPhyIfOutDiscards OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of outbound packets which were chosen
+	    to be discarded even though no errors had been
+	    detected to prevent their being transmitted.  One
+	    possible reason for discarding such a packet could
+	    be to free up buffer space."
+    ::= { portStatsTableEntry 11 }
+
+portStatsPhyIfOutErrors OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of outbound packets that could not be
+	    transmitted because of errors."
+    ::= { portStatsTableEntry 12 }
+
+portStatsPhyIfOutQLen OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The length of the output packet queue (in
+	    packets)."
+    ::= { portStatsTableEntry 13 }
+
+portStatsPhyIfInBroadcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to
+            a higher (sub-)layer, which were addressed to a
+            broadcast address at this sub-layer."
+    ::= { portStatsTableEntry 14 }
+
+portStatsPhyIfOutBroadcastPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION
+	    "The total number of packets that higher-level
+            protocols requested be transmitted, and which were
+            addressed to a broadcast address at this sub-layer,
+            including those that were discarded or not sent."
+    ::= { portStatsTableEntry 15 }
+
+mirrOper        OBJECT IDENTIFIER ::= { operCmds 3 }
+
+mirrOperMonitoringPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The switch port where the mirrored traffic are sent to.  A zero
+         value indicates this field has not been configured."
+    ::= { mirrOper 1 }
+
+mirrOperMirroredPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The switch port where the egress traffic to be mirrored.  A zero
+         value indicates this field has not been configured."
+    ::= { mirrOper 2 }
+
+mirrOperType OBJECT-TYPE
+    SYNTAX INTEGER {
+	none(1),
+        in(2),
+        out(3),
+        both(4)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Type of packets to be sent to the monitor port.
+         in = packets received at the mirrored port
+         out = packets sent from the mirrored port
+         both = packets sent and received by the mirrored port
+        "
+    ::= { mirrOper 3 }
+
+mirrOperTimeout OBJECT-TYPE
+    SYNTAX INTEGER (0..86400)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The duration in seconds for activating the mirroring rule.  Zero
+         means forever."
+    ::= { mirrOper 4 }
+
+mirrOperState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Enable or disable port mirroring."
+    ::= { mirrOper 5 }
+
+END

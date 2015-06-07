@@ -1,0 +1,340 @@
+CTRON-SFPS-FLOOD-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-flood-mib.txt
+--  Revision: 0.0.3
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsISPFlood, sfpsResolveCounter, sfpsMobileUserTable, sfpsMobileUserReset      
+        
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+SfpsAddress ::= OCTET STRING (SIZE (6))
+-- this will map to a MAC address
+
+
+
+--
+
+
+-- FLOOD
+
+ sfpsServiceCenterFloodTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsServiceCenterFloodEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table gives flood semantics to call processing."
+        ::= { sfpsISPFlood 1 }
+
+sfpsServiceCenterFloodEntry    OBJECT-TYPE
+        SYNTAX  SfpsServiceCenterFloodEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the configuration of the Flood Entry."
+        INDEX   { sfpsServiceCenterFloodAddress } 
+        ::= { sfpsServiceCenterFloodTable 1 }
+
+SfpsServiceCenterFloodEntry ::=
+        SEQUENCE {
+                sfpsServiceCenterFloodAddress           HexInteger,  
+                sfpsServiceCenterFloodMetric    INTEGER,  
+                sfpsServiceCenterFloodName      DisplayString,  
+                sfpsServiceCenterFloodOperStatus        INTEGER,  
+                sfpsServiceCenterFloodAdminStatus     INTEGER,
+                sfpsServiceCenterFloodStatusTime        TimeTicks,
+                sfpsServiceCenterFloodRequests  INTEGER,
+                sfpsServiceCenterFloodResponses         INTEGER
+                  
+         }  
+
+sfpsServiceCenterFloodAddress   OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server hash, part of instance key."
+        ::= { sfpsServiceCenterFloodEntry 1 }
+
+sfpsServiceCenterFloodMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines order servers are called low to high."
+        ::= { sfpsServiceCenterFloodEntry 2 }
+
+sfpsServiceCenterFloodName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server name."
+        ::= { sfpsServiceCenterFloodEntry 3 }
+
+sfpsServiceCenterFloodOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsServiceCenterFloodEntry 4 }
+
+sfpsServiceCenterFloodAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER       {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative State of Entry."
+        ::= { sfpsServiceCenterFloodEntry 5 }
+
+sfpsServiceCenterFloodStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time Tick of last operStatus change."
+        ::= { sfpsServiceCenterFloodEntry 6 }
+
+sfpsServiceCenterFloodRequests   OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests made to server."
+        ::= { sfpsServiceCenterFloodEntry 7 }
+
+sfpsServiceCenterFloodResponses   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GOOD replies by server."
+        ::= { sfpsServiceCenterFloodEntry 8 }
+ 
+
+-- Mobile User Table
+
+sfpsMobileUserTableAOType     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 1 }
+
+sfpsMobileUserTableAOValue     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 2 }
+
+sfpsMobileUserTableCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 3 }
+
+sfpsMobileUserTableNewSwitch     OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 4 }
+
+sfpsMobileUserTableLastSeen     OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 5 }
+
+sfpsMobileUserTableFirstSceen     OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 6 }
+
+sfpsMobileUserTablePort     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserTable 7 }
+
+
+--  Mobile User Reset 
+
+sfpsMobileUserResetReset     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserReset 1 }
+
+sfpsMobileUserResetCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+                ""
+        ::= { sfpsMobileUserReset 2 }
+
+
+-- Resolve Counter
+
+sfpsResolveCounterTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsResolveCounterTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounter 1 }
+
+sfpsResolveCounterTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsResolveCounterTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsResolveCounterTableSource } 
+        ::= { sfpsResolveCounterTable 1 }
+
+SfpsResolveCounterTableEntry ::=
+        SEQUENCE {
+                sfpsResolveCounterTableSource           SfpsAddress,  
+                sfpsResolveCounterTableNumReq           INTEGER,  
+                sfpsResolveCounterTableNumRep           INTEGER,  
+                sfpsResolveCounterTableNumUnkRep        INTEGER,  
+                sfpsResolveCounterTableTicReq           TimeTicks,  
+                sfpsResolveCounterTableTicRep           TimeTicks,  
+                sfpsResolveCounterTableTicUnkRep        TimeTicks  
+                  
+         }  
+
+sfpsResolveCounterTableSource   OBJECT-TYPE
+        SYNTAX  SfpsAddress  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 1 }
+
+sfpsResolveCounterTableNumReq   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 2 }
+
+sfpsResolveCounterTableNumRep   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 3 }
+
+sfpsResolveCounterTableNumUnkRep   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 4 }
+
+sfpsResolveCounterTableTicReq   OBJECT-TYPE
+        SYNTAX  TimeTicks 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 5 }
+
+sfpsResolveCounterTableTicRep   OBJECT-TYPE
+        SYNTAX  TimeTicks 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 6 }
+
+sfpsResolveCounterTableTicUnkRep   OBJECT-TYPE
+        SYNTAX  TimeTicks 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveCounterTableEntry 7 }
+
+END

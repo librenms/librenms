@@ -1,0 +1,414 @@
+ENTERASYS-LICENSE-KEY-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-license-key-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' License Key MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright August, 2004 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString 
+        FROM SNMP-FRAMEWORK-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysLicenseKeyMIB MODULE-IDENTITY
+    LAST-UPDATED "200411031952Z"  -- Wed Nov  3 19:52 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks, Inc.
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining
+         to the configuration of license keys."
+
+    REVISION    "200411031952Z"  -- Wed Nov  3 19:52 GMT 2004
+    DESCRIPTION "Added the etsysLicenseKeyPhysicalTable to represent
+                 licensable features that are bound to specific 
+                 physical subsystems.  Obsoleted the etsysLicenseKeyTable
+                 since it can be represented in the 
+                 etsysLicenseKeyPhysicalTable."
+
+    REVISION    "200408301452Z"  -- Mon Aug 30 14:52 GMT 2004
+    DESCRIPTION "Added a new enumeration to the etsysLicenseKeyStatus 
+                 object to indicate licenses that are valid but
+                 the system has not yet activated."
+
+    REVISION    "200408171635Z"  -- Tue Aug 17 16:35 GMT 2004
+    DESCRIPTION "The initial version of this MIB module."
+    ::= { etsysModules 54 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+LicenseKeyStatus  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention enumerates the possible status 
+         values for a given license key."
+    SYNTAX  INTEGER {
+                      other(1),
+                      active(2),
+                      invalid(3),
+                      expired(4),
+                      restricted(5),
+                      uninitialized(6),
+                      validNotActive(7)
+                    }
+
+
+-- ---------------------------------------------------------- --
+-- MIB Objects
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyObjects
+        OBJECT IDENTIFIER ::= { etsysLicenseKeyMIB 1 }
+
+etsysLicenseKeyConfiguration
+        OBJECT IDENTIFIER ::= { etsysLicenseKeyObjects 1 }
+
+
+-- ---------------------------------------------------------- --
+-- The License Key Table
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysLicenseKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete
+    DESCRIPTION
+        "This table contains license keys for optional features."
+    ::= { etsysLicenseKeyConfiguration 1 }
+
+etsysLicenseKeyEntry OBJECT-TYPE
+    SYNTAX        EtsysLicenseKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete
+    DESCRIPTION
+        "Information for a particular license key."
+    INDEX { etsysLicenseKeyIndex }
+    ::= { etsysLicenseKeyTable 1 }
+
+EtsysLicenseKeyEntry ::=
+    SEQUENCE { 
+        etsysLicenseKeyIndex                  Unsigned32,
+        etsysLicenseKeyIdentifier             OBJECT IDENTIFIER,
+        etsysLicenseKeyDescription            SnmpAdminString,
+        etsysLicenseKeyString                 SnmpAdminString,
+        etsysLicenseKeyStatus                 LicenseKeyStatus,
+        etsysLicenseKeyStatusText             SnmpAdminString,
+        etsysLicenseKeyLastModified           DateAndTime,
+        etsysLicenseKeyExpiration             DateAndTime
+    }
+
+etsysLicenseKeyIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies each entry in
+         this table.  This value is only unique within a given managed 
+         device."
+    ::= { etsysLicenseKeyEntry 1 }
+
+etsysLicenseKeyIdentifier OBJECT-TYPE
+    SYNTAX        OBJECT IDENTIFIER
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "The unique OID for this licensable feature."
+    ::= { etsysLicenseKeyEntry 2 }
+
+etsysLicenseKeyDescription OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "A textual description of this licensable feature."
+    ::= { etsysLicenseKeyEntry 3 }
+
+etsysLicenseKeyString OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION
+        "The textual license key for this feature that has been,
+         or will be, entered by the end user."
+    DEFVAL { "" }
+    ::= { etsysLicenseKeyEntry 4 }
+
+etsysLicenseKeyStatus OBJECT-TYPE
+    SYNTAX        LicenseKeyStatus
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "The status of the license key for this feature."
+    ::= { etsysLicenseKeyEntry 5 }
+
+etsysLicenseKeyStatusText OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "A textual description of the status of the license key for
+         this feature."
+    ::= { etsysLicenseKeyEntry 6 }
+
+etsysLicenseKeyLastModified OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "The local date and time at which the license key string,
+         etsysLicenseKeyString, associated with this row was last
+         modified.  If this information is not available, or the
+         license key string has not been modified, this object
+         MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { etsysLicenseKeyEntry 7 }
+
+etsysLicenseKeyExpiration OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "The local date and time at which this license key will
+         expire.  Once the key has expired this object will
+         indicate the local date and time when the key expired.
+         If the key does not have an expiration period then this
+         object MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { etsysLicenseKeyEntry 8 }
+
+-- ---------------------------------------------------------- --
+-- The License Key Physical Table
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyPhysicalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysLicenseKeyPhysicalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains license keys for optional features."
+    ::= { etsysLicenseKeyConfiguration 2 }
+
+etsysLicenseKeyPhysicalEntry OBJECT-TYPE
+    SYNTAX        EtsysLicenseKeyPhysicalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing per physical component information for a 
+         particular license key.  Only physical indexes that have
+         unique licensable features are represented in this table.
+         Such physical entities may include, but are not limited to,
+         ports, slots in a chassis, or the chassis itself."
+    INDEX { entPhysicalIndex, etsysLicenseKeyPhysicalIndex }
+    ::= { etsysLicenseKeyPhysicalTable 1 }
+
+EtsysLicenseKeyPhysicalEntry ::=
+    SEQUENCE { 
+        etsysLicenseKeyPhysicalIndex                  Unsigned32,
+        etsysLicenseKeyPhysicalIdentifier             OBJECT IDENTIFIER,
+        etsysLicenseKeyPhysicalDescription            SnmpAdminString,
+        etsysLicenseKeyPhysicalString                 SnmpAdminString,
+        etsysLicenseKeyPhysicalStatus                 LicenseKeyStatus,
+        etsysLicenseKeyPhysicalStatusText             SnmpAdminString,
+        etsysLicenseKeyPhysicalLastModified           DateAndTime,
+        etsysLicenseKeyPhysicalExpiration             DateAndTime
+    }
+
+etsysLicenseKeyPhysicalIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies each entry in
+         this table.  This value is only unique within a given managed 
+         device."
+    ::= { etsysLicenseKeyPhysicalEntry 1 }
+
+etsysLicenseKeyPhysicalIdentifier OBJECT-TYPE
+    SYNTAX        OBJECT IDENTIFIER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The unique OID for this licensable feature."
+    ::= { etsysLicenseKeyPhysicalEntry 2 }
+
+etsysLicenseKeyPhysicalDescription OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual description of this licensable feature."
+    ::= { etsysLicenseKeyPhysicalEntry 3 }
+
+etsysLicenseKeyPhysicalString OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The textual license key for this feature that has been,
+         or will be, entered by the end user."
+    DEFVAL { "" }
+    ::= { etsysLicenseKeyPhysicalEntry 4 }
+
+etsysLicenseKeyPhysicalStatus OBJECT-TYPE
+    SYNTAX        LicenseKeyStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The status of the license key for this feature."
+    ::= { etsysLicenseKeyPhysicalEntry 5 }
+
+etsysLicenseKeyPhysicalStatusText OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual description of the status of the license key for
+         this feature."
+    ::= { etsysLicenseKeyPhysicalEntry 6 }
+
+etsysLicenseKeyPhysicalLastModified OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local date and time at which the license key string,
+         etsysLicenseKeyPhysicalString, associated with this row was last
+         modified.  If this information is not available, or the
+         license key string has not been modified, this object
+         MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { etsysLicenseKeyPhysicalEntry 7 }
+
+etsysLicenseKeyPhysicalExpiration OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local date and time at which this license key will
+         expire.  Once the key has expired this object will
+         indicate the local date and time when the key expired.
+         If the key does not have an expiration period then this
+         object MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { etsysLicenseKeyPhysicalEntry 8 }
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys Product License MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyConformance
+    OBJECT IDENTIFIER ::= { etsysLicenseKeyMIB 2 }
+
+etsysLicenseKeyGroups
+    OBJECT IDENTIFIER ::= { etsysLicenseKeyConformance 1 }
+
+etsysLicenseKeyCompliances
+    OBJECT IDENTIFIER ::= { etsysLicenseKeyConformance 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+        etsysLicenseKeyIdentifier,
+        etsysLicenseKeyDescription,
+        etsysLicenseKeyString,
+        etsysLicenseKeyStatus,
+        etsysLicenseKeyStatusText,
+        etsysLicenseKeyLastModified,
+        etsysLicenseKeyExpiration
+    }
+    STATUS obsolete
+    DESCRIPTION
+        "A collection of objects for configuring license keys
+         for optional features."
+    ::= { etsysLicenseKeyGroups 1 }
+
+etsysLicenseKeyPhysicalConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysLicenseKeyPhysicalIdentifier,
+        etsysLicenseKeyPhysicalDescription,
+        etsysLicenseKeyPhysicalString,
+        etsysLicenseKeyPhysicalStatus,
+        etsysLicenseKeyPhysicalStatusText,
+        etsysLicenseKeyPhysicalLastModified,
+        etsysLicenseKeyPhysicalExpiration
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for configuring license keys
+         that are bound to a specific physical subsystem of the device."
+    ::= { etsysLicenseKeyGroups 2 }
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysLicenseKeyCompliance MODULE-COMPLIANCE
+    STATUS obsolete
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys License Key MIB."
+
+    MODULE
+        MANDATORY-GROUPS { etsysLicenseKeyConfigurationGroup }
+
+    ::= { etsysLicenseKeyCompliances 1 }
+
+etsysLicenseKeyCompliance2 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys License Key MIB."
+
+    MODULE
+        MANDATORY-GROUPS { etsysLicenseKeyPhysicalConfigGroup }
+
+    ::= { etsysLicenseKeyCompliances 2 }
+END

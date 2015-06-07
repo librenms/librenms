@@ -1,0 +1,204 @@
+ENGENIUS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
+	enterprises, IpAddress, Counter32, Gauge32, TimeTicks, Integer32,
+	Counter64                                              
+            	FROM SNMPv2-SMI
+                                                   
+	DisplayString, MacAddress, TruthValue, TimeStamp,
+	TimeInterval, DateAndTime, RowStatus, TEXTUAL-CONVENTION
+	FROM SNMPv2-TC
+
+	MODULE-COMPLIANCE, OBJECT-GROUP
+	FROM SNMPv2-CONF
+
+	ifIndex
+	    FROM RFC1213-MIB
+        
+        InetAddressType, InetAddress 
+           FROM INET-ADDRESS-MIB;	    
+
+engeniusmesh MODULE-IDENTITY
+    LAST-UPDATED "200705021000Z"
+    ORGANIZATION "Senao Networks, Inc"
+    CONTACT-INFO
+       "Senao Networks, Inc.
+	  No. 500, Fusing 3rd Rd,
+	  Hwa-Ya Technology Park Kuei-Shan Hsiang,
+	  Taoyuan County 333, 
+        Taiwan.
+     	  Website: http://www.engeniustech.com/corporate/"
+    DESCRIPTION
+        "MIB Definition used in the EnGenius Mesh Product Line:
+         iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+         engenius(14125).engeniusmesh(1)"
+
+    REVISION 	"200705021000Z"
+    DESCRIPTION	"First Release for client purpose"
+	    
+    ::= { engenius 1 }
+
+engenius 				OBJECT IDENTIFIER ::= { enterprises 14125 }
+
+nodeConfiguration		OBJECT IDENTIFIER ::= { engeniusmesh 2 }
+nodeConfigurationSignallevel	OBJECT IDENTIFIER ::= { nodeConfiguration 30 }
+
+-- ==================| nodeConfigurationSignallevel |==================
+
+signallevelTable OBJECT-TYPE
+    	SYNTAX SEQUENCE OF SignallevelTableEntry
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+	"This table contains the list of signal level between the node and its neighbour nodes." 
+    ::= { nodeConfigurationSignallevel 2 }
+
+signallevelTableEntry OBJECT-TYPE
+    	SYNTAX SignallevelTableEntry
+   	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+	"Represent the entry in the Signal Level table."
+    INDEX { signallevelTableIndex }
+    ::= { signallevelTable 1 }
+
+SignallevelTableEntry::=
+    SEQUENCE
+    {
+	signallevelTableIndex		Integer32, 
+	signallevelTableSource		OCTET STRING,
+	signallevelTableDestination	OCTET STRING,
+	signallevelTableRssi		OCTET STRING	
+    }
+
+signallevelTableIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..32)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Specify the index of the node Signal Level table."
+    ::= { signallevelTableEntry 1 }
+
+signallevelTableSource OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The source node's IP Address"
+    ::= { signallevelTableEntry 2 } 
+
+signallevelTableDestination OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The destination node's IP Address"
+    ::= { signallevelTableEntry 3 } 
+
+signallevelTableRssi OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The singal level between the source node and destination node in RSSI."
+    ::= { signallevelTableEntry 4 } 
+
+signallevelExecute OBJECT-TYPE
+	SYNTAX Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"A command to execute the RSSI update"
+	::= { nodeConfigurationSignallevel 1 }
+
+
+
+clientInfoTable OBJECT-TYPE
+    	SYNTAX SEQUENCE OF ClientInfoTableEntry
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+	"This table contains the list of clients info of the nodes." 
+    ::= { nodeConfigurationSignallevel 3 }
+
+clientInfoTableEntry OBJECT-TYPE
+    	SYNTAX ClientInfoTableEntry
+   	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+	"Represent the entry in the Client Info table."
+    INDEX { clientInfoTableIndex }
+    ::= { clientInfoTable 1 }
+
+ClientInfoTableEntry::=
+    SEQUENCE
+    {
+	clientInfoTableIndex		Integer32, 
+	clientInfoTableEssid		OCTET STRING,
+	clientInfoTableMac		OCTET STRING,
+	clientInfoTableChannel		OCTET STRING,
+	clientInfoTableRate		OCTET STRING,	
+	clientInfoTableRssi		OCTET STRING,
+	clientInfoTableIdletime		OCTET STRING	
+    }
+
+clientInfoTableIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Specify the index of the node Client Info table."
+    ::= { clientInfoTableEntry 1 }
+
+clientInfoTableEssid OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The ESSID of the AP"
+    ::= { clientInfoTableEntry 2 } 
+
+clientInfoTableMac OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The MAC Address of the client"
+    ::= { clientInfoTableEntry 3 } 
+
+clientInfoTableChannel OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The channel of the Client"
+    ::= { clientInfoTableEntry 4 } 
+
+clientInfoTableRate OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The speed rate of the client in kbps"
+    ::= { clientInfoTableEntry 5 } 
+
+
+clientInfoTableRssi OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The singal level between the client and node in RSSI."
+    ::= { clientInfoTableEntry 6 } 
+
+clientInfoTableIdletime OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The idle timeout in second of the client."
+	::= { clientInfoTableEntry 7 } 
+	
+
+END

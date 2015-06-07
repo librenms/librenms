@@ -1,0 +1,2560 @@
+    F10-CHASSIS-MIB DEFINITIONS ::= BEGIN
+    --  Force10 Networks, Inc.
+    --  1440 McCarthy Blvd
+    --  Milpitas, CA 95035-7438
+
+    --  This module provides authoritative definitions for Force10
+    --  enterprise Chassis MIB.
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Gauge32, Integer32,
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        f10Mgmt
+            FROM FORCE10-SMI
+        F10SystemPortType, F10SystemCardType, F10ProcessorModuleType,
+        F10SlotState, F10SwDate, F10MfgDate, F10ChassisMode,
+        F10ChassisType, F10HundredthdB, F10CardOperStatus
+            FROM FORCE10-TC;
+
+
+    f10ChassisMib MODULE-IDENTITY
+    LAST-UPDATED "200809021200Z"  -- Sep. 2, 2008 12:00:00 GMT
+    ORGANIZATION
+      "Force10 Networks, Inc."
+    CONTACT-INFO
+      "Force10 Networks, Inc
+       350 Holger Way
+       San Jose, CA 95134
+       (408) 571-3500
+       support@force10networks.com
+       http://www.force10networks.com"
+
+    DESCRIPTION
+       "Force10 Enterprise Chassis MIB. "
+    
+    REVISION     "200809021200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.23
+         Import F10CardOperStatus."
+
+    REVISION     "200804301200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.22
+         Add chAlarmAcDcMixedPowerSupplyDetect notification.
+        "
+        
+    REVISION     "200804161200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.21
+         Add the Sram Parity error counters:
+         - chSysCardParityPhantomError
+         - chSysCardParityRecoverableError
+         - chSysCardParityNonrecovrableError
+        "
+        
+    REVISION     "200802291200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.20
+         Add chAlarmSRAMParityErrorDetect notification.
+        "
+        
+    REVISION     "200706281200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.19
+         Import F10ChassisType.
+         Redefine XFP received power object.
+        "
+
+    REVISION     "200705221200Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.18
+         - add new table: chLineCardUtilTable
+         - add new enum value, e1200i(6), to chType
+         - use Gauge32 to define utilization objects
+         - add notification group"
+
+    REVISION     "0605220000Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.17
+         Add new XFP Received power to port table.
+        "
+
+    REVISION     "0101020000Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.16
+         Add new chassis types E610.
+        "
+
+    REVISION     "0310020000Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.15
+        "
+
+    REVISION     "0310020000Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.14
+        1. Rename chSysPortOperStatus variables
+              a) 'cableProblem' to 'portDown'
+              b) 'notConfigured to 'notPresent'
+        "
+
+    REVISION     "0307300000Z"
+    DESCRIPTION
+        "Force10 Chassis MIB version 1.13
+        1. Add support for E300 chassis.
+        2. Move all textual convention to the Textual-Convention MIB f10-tc.mib
+        "
+
+    REVISION     "0307200000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.12
+       Create SFM Group to add Utilization objects.
+       Changed some OCTET STRING to DisplayString to work around
+       the SNMPc browser problem.
+       "
+
+    REVISION     "0206010000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.11
+       Added CPU utilization support and added trap information.
+       Added traps descriptions that we supported.
+       Changed linecard name from F12PD to F12PE.
+       "
+
+    REVISION     "0204010000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.10
+       Added new linecards and port type Morphesus EoMpls,
+       Promatheus 80km & WAN, Cronus ED2 and Apollo
+       "
+
+    REVISION     "0212250000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.9
+       Added New Linecards, fixed Cronus EE port type
+       "
+
+    REVISION     "0208080000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.8
+       Added New Linecards
+       "
+
+    REVISION     "0206160000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.7
+       Added force10 product order number to card,
+       SFM, and the overall chassis.
+       "
+
+    REVISION     "0205120000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.6
+       Added force10 date textual convention.
+       Refine the descriptions of chRpmCOAlarmStatus.
+       "
+
+    REVISION     "0205010000Z"
+    DESCRIPTION
+         "Force10 Chassis MIB version 1.5
+       Modify textual convention,
+       f10SystemPortType to add port
+       types.
+       "
+
+    REVISION     "0204150000Z"
+    DESCRIPTION
+          "Force10 Chassis MIB version 1.4
+       Update for E600 series chassis
+       specification.  Modify slot bitmap
+       description and add power supply
+       type. Update chassis, card and SFM
+       tables.
+       "
+
+    REVISION     "0111070000Z"
+    DESCRIPTION
+          "Force10 Chassis MIB version 1.3
+       Modify Card Table -
+       to match the latest chassis manager
+       specification."
+
+    REVISION     "0103260000Z"
+    DESCRIPTION
+          "Force10 Chassis MIB version 1.2
+       Modify Software Module Table -
+       to match the latest download manager
+       specification."
+
+    REVISION     "0011210000Z"
+    DESCRIPTION
+          "Force10 Chassis MIB version 1.1.
+         Add more port types and removed
+         Air Filter Table."
+
+    REVISION     "0010200000Z"
+    DESCRIPTION
+          "Force10 Chassis MIB version 1.0."
+
+    REVISION     "0010280000Z"
+    DESCRIPTION
+          "Updates with review comments from marketing,
+         hardware and software groups.
+         Added more RPM information - 2nd draft revision."
+    REVISION     "0010180000Z"
+    DESCRIPTION
+          "Updates with first draft review comments.
+         Changes to software release information."
+    REVISION     "0010010000Z"
+    DESCRIPTION
+          "First draft revision of Force10 chassis mib."
+
+           ::= { f10Mgmt 1 }
+
+
+    -- ### Groups ###
+
+    f10ChassisMibObject OBJECT IDENTIFIER ::={ f10ChassisMib 1 }
+    chObjects           OBJECT IDENTIFIER ::={ f10ChassisMibObject 1 }
+    chSysObjects        OBJECT IDENTIFIER ::={ f10ChassisMibObject 2 }
+    chRpmObjects        OBJECT IDENTIFIER ::={ f10ChassisMibObject 3 }
+    chAlarmObjects      OBJECT IDENTIFIER ::={ f10ChassisMibObject 4 }
+    chLineCardObjects   OBJECT IDENTIFIER ::={ f10ChassisMibObject 5 }
+
+    -- ### Chassis Information
+
+       chType           OBJECT-TYPE
+        SYNTAX          F10ChassisType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The FORCE10 type of chassis."
+        ::= { chObjects 1 }
+
+       chSerialNumber OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 chassis's serial number."
+        ::= { chObjects 2 }
+
+       chVendorId     OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 manufacturer's id."
+        ::= { chObjects 3 }
+
+       chMfgDate      OBJECT-TYPE
+        SYNTAX        F10MfgDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date the chassis was manufactured.
+            "
+        ::= { chObjects 4 }
+
+       chEcLevel      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+            "The EC Level of the FORCE10 chassis."
+        ::= { chObjects 5 }
+
+       chNumFanTrays  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of fan trays
+            on the chassis."
+        ::= { chObjects 6 }
+
+       chNumPowerSupplies     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of power supply
+            in the FORCE10 chassis"
+        ::= { chObjects 7 }
+
+       chNumSlots     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of physical slots
+            in the chassis for line cards and
+            route process module (rpm ) cards."
+        ::= { chObjects 8 }
+
+       chNumSfmSlots  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of switch fabric
+            modules (sfm) slots in the chassis."
+        ::= { chObjects 9 }
+
+       chNumAirFilters  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION
+            "The total number of air intake
+            filters in the chassis."
+        ::= { chObjects 10 }
+
+       chSlot1to16    OBJECT-TYPE
+        SYNTAX        F10SlotState
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object has been obsoleted and will not
+            be supported by future Force10 Chassis. The
+            information here is for reference only.
+
+            This variable indicates the slot states.
+            Each slot occupies a bit. The value 1
+            indicates slot is in used and 0 indicates
+            the slot is empty.
+
+               The placement of line cards and rpm cards
+            in a E1200 chassis are as follows :
+
+                ( physical slot numbers )
+                        1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+                        |           |      |                 |
+                        -------------      -------------------
+                             |        | |           |
+                         line cards   | |       line card
+                                      | |
+                                      | + ----> RPM card
+                                      +-------> RPM card
+
+            The most significant bit is slot 1 and the
+            least significant bit is slot 16.
+
+               The placement of line cards and rpm cards
+            in a E600 chassis are as follows :
+
+                ( physical slot numbers )
+                        1 2 3 4 5 6 7 8 9
+                        |           |
+                        -------------
+                             |        | |
+                         line cards   | |
+                                      | |
+                                      | + ----> RPM card
+                                      +-------> RPM card
+
+            The most significant bit is slot 1 and the
+            least significant bit is slot 9."
+
+        ::= { chObjects 11 }
+
+       chCountryCode  OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 manufacturer's y code."
+        ::= { chObjects 12 }
+
+       chPartNum      OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 manufacturer's part number."
+        ::= { chObjects 13 }
+
+       chProductRev   OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 manufacturer's product revision."
+        ::= { chObjects 14 }
+
+       chProductOrder OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 product order number"
+        ::= { chObjects 15 }
+
+       chChassisMode  OBJECT-TYPE
+        SYNTAX        F10ChassisMode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FORCE10 chassis mode of this chassis."
+        ::= { chObjects 16 }
+
+    -- ### Chassis System  ###
+
+    -- ### Power Supply Table
+
+       chSysPowerSupplyTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysPowerSupplyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of power supply resident
+            in this chassis."
+        ::= { chSysObjects 1 }
+
+      chSysPowerSupplyEntry    OBJECT-TYPE
+        SYNTAX        ChSysPowerSupplyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A power supply entry containing objects for a
+            particular power supply."
+        INDEX    { chSysPowerSupplyIndex }
+        ::= { chSysPowerSupplyTable 1 }
+
+      ChSysPowerSupplyEntry    ::=
+        SEQUENCE {
+           chSysPowerSupplyIndex        Integer32,
+           chSysPowerSupplyOperStatus   INTEGER,
+           chSysPowerSupplyType         INTEGER
+        }
+
+       chSysPowerSupplyIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unique index of the power supply."
+        ::= { chSysPowerSupplyEntry 1 }
+
+       chSysPowerSupplyOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of the power supply."
+        ::= { chSysPowerSupplyEntry 2 }
+
+       chSysPowerSupplyType    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ac(1),
+                        dc(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the power supply."
+        ::= { chSysPowerSupplyEntry 3 }
+
+    -- ## Fan Tray Table
+
+       chSysFanTrayTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysFanTrayEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of fan tray resident in this chassis."
+        ::= { chSysObjects 2 }
+
+      chSysFanTrayEntry    OBJECT-TYPE
+        SYNTAX        ChSysFanTrayEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A fan entry containing objects for a
+            particular fan tray."
+        INDEX    { chSysFanTrayIndex }
+        ::= { chSysFanTrayTable 1 }
+
+      ChSysFanTrayEntry    ::=
+        SEQUENCE {
+           chSysFanTrayIndex        Integer32,
+           chSysFanTrayOperStatus   INTEGER
+        }
+
+       chSysFanTrayIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unique index of the fan tray."
+        ::= { chSysFanTrayEntry 1 }
+
+       chSysFanTrayOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the fan tray."
+        ::= { chSysFanTrayEntry 2 }
+
+    -- ## Card Table
+
+    -- The chassis is a multi-slots physical box.
+    -- In the chassis, there are physical slots available for
+    -- plug-in cards.  There are two types of plug-in cards,
+      -- rpm cards and line cards.
+    -- The chassis also contains number of slots for
+    -- switch fabric modules.
+
+       -- The card table contains the card information of
+    -- each slot in the chassis. Each slot entry containing
+    -- the management information applicable to a particular
+    -- line card or route pocess module (rpm) card.
+
+        chSysCardTable        OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysCardEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                        "A list of cards resident in the chassis.
+
+                        The placement of line cards and rpm cards
+                        in the E1200 chassis are as follows :
+
+                                ( physical slot numbers )
+                        1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+                                ( Force10 card number )
+                        0 1 2 3 4 5 6 0 1  7  8  9 10 11 12 13
+                        |           |      |                 |
+                        -------------      -------------------
+                             |        | |           |
+                         line card    | |       line card
+                                      | |
+                                      | + ----> RPM card
+                                      +-------> RPM card
+
+                        The placement of line cards and rpm cards
+                        in the E600 chassis are as follows :
+
+                        ( physical slot numbers )
+                        1 2 3 4 5 6 7 8 9
+                        ( Force10 card number )
+                        0 1 2 3 4 5 6 0 1
+                        |           |
+                        -------------
+                             |        | |
+                         line card    | |
+                                      | |
+                                      | + ----> RPM card
+                                      +-------> RPM card
+                                      
+                        The placement of line cards and rpm cards
+                        in the E300 chassis are as follows :
+
+                        ( physical slot numbers )
+                        1 2 3 4 5 6 7 8
+                        ( Force10 card number )
+                        0 1 0 1 2 3 4 5
+                            |         |
+                            -----------
+                        | |      |      
+                        | |   line card
+                        | |
+                        | + ----> RPM card
+                        +-------> RPM card
+                        "
+        ::= { chSysObjects 3 }
+
+      chSysCardEntry  OBJECT-TYPE
+        SYNTAX        ChSysCardEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of cards entries containing information
+             for line card or rpm card."
+        INDEX    { chSysCardSlotIndex }
+        ::= { chSysCardTable 1 }
+
+      ChSysCardEntry    ::=
+        SEQUENCE {
+           chSysCardSlotIndex       Integer32,
+           chSysCardType            F10SystemCardType,
+           chSysCardNumber          Integer32,
+           chSysCardSerialNumber    DisplayString,
+           chSysCardVendorId        DisplayString,
+           chSysCardMfgDate         F10MfgDate,
+           chSysCardEcLevel         Integer32,
+           chSysCardUpperTemp       Gauge32,
+           chSysCardLowerTemp       Gauge32,
+           chSysCardNumProcessors   Integer32,
+           chSysCardNumPhyPorts     Integer32,
+           chSysCardNumLgcPorts     Integer32,
+           chSysCardUpTime          TimeTicks,
+           chSysCardAdminStatus     INTEGER,
+           chSysCardOperStatus      F10CardOperStatus,
+           chSysCardFaultStatus     INTEGER,
+           chSysCardLogStream       OCTET STRING,
+           chSysCardCountryCode     OCTET STRING,
+           chSysCardPartNum         DisplayString,
+           chSysCardProductRev      DisplayString,
+           chSysCardProdOrder       DisplayString,
+           chSysCardParityPhantomError Gauge32,
+           chSysCardParityRecoverableError Gauge32,
+           chSysCardParityNonrecovrableError Gauge32
+        }
+
+       chSysCardSlotIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each slot within
+                the chassis.
+                This value is the physical slot number
+                and the value is determined
+                by the chassis slot location where
+                          the card is inserted.  Valid entries
+                          are 1 to the value of chNumSlots."
+        ::= { chSysCardEntry 1 }
+
+       chSysCardType  OBJECT-TYPE
+        SYNTAX        F10SystemCardType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Type of card in this slot.  The type
+            of cards are defined in F10SystemCardType."
+        ::= { chSysCardEntry 2 }
+
+       chSysCardNumber    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This is the card number assigned to the line
+            cards and the RPM cards in the chassis.
+            The line cards number are from 0 to 13 and the
+            RPM are from 0 to 1."
+        ::= { chSysCardEntry 3 }
+
+       chSysCardSerialNumber    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The serial number of the card in this slot."
+        ::= { chSysCardEntry 4 }
+
+       chSysCardVendorId    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The vendor id that manufactured the
+            card in this slot."
+        ::= { chSysCardEntry 5 }
+
+       chSysCardMfgDate    OBJECT-TYPE
+        SYNTAX        F10MfgDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date the card is manufactured."
+        ::= { chSysCardEntry 6 }
+
+       chSysCardEcLevel    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+            "The EC Level of the card."
+        ::= { chSysCardEntry 7 }
+
+       chSysCardUpperTemp    OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The temperature of the card. If
+            the temperature is too high,
+            alarm chAlarmCardTemperatureHigh
+            will be sent."
+        ::= { chSysCardEntry 8 }
+
+       chSysCardLowerTemp    OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This temperature field is
+            not used at the moment."
+        ::= { chSysCardEntry 9 }
+
+       chSysCardNumProcessors OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of Processors in the
+            card.  The number of processors
+            are depended on the type of card
+            plugged into the slot."
+        ::= { chSysCardEntry 10 }
+
+       chSysCardNumPhyPorts    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of physical ports
+            in each card. The card can have
+            one or more ports depending on
+            the type of cards.
+            If it is a logical card,
+            the value set to zero. "
+        ::= { chSysCardEntry 11 }
+
+       chSysCardNumLgcPorts    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of logical ports
+            in each card. The card can have
+            one or more ports depending on
+            the type of cards.
+            If it is a physical card,
+            the value set to zero. "
+        ::= { chSysCardEntry 12 }
+
+
+       chSysCardUpTime    OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SysUpTime for this slot.
+            This variable indicates the
+            time since the card
+            last reset."
+        ::= { chSysCardEntry 13 }
+
+       chSysCardAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The admin status of the card.
+            The valid status are as followed:
+            'up'   - card present and ready.
+            'down' - card is not ready."
+        ::= { chSysCardEntry 14 }
+
+       chSysCardOperStatus    OBJECT-TYPE
+        SYNTAX      F10CardOperStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current operational state of the card."
+        ::= { chSysCardEntry 15 }
+
+       chSysCardFaultStatus     OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        on(1),
+                        off(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Fault status of the card.
+            The valid status are as followed:
+            'on'  - the system fault light is on.
+            'off' - the system fault light is off."
+        DEFVAL    {2}
+        ::= { chSysCardEntry 16 }
+
+
+       chSysCardLogStream    OBJECT-TYPE
+        SYNTAX        OCTET STRING
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reserved field.  This fields should
+            return null."
+        ::= { chSysCardEntry 17 }
+
+       chSysCardCountryCode    OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card manufacturer's country
+            code"
+        ::= { chSysCardEntry 18 }
+
+       chSysCardPartNum    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card part number"
+        ::= { chSysCardEntry 19 }
+
+       chSysCardProductRev    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card manufacturer's product
+            revision"
+        ::= { chSysCardEntry 20 }
+
+       chSysCardProdOrder    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The F10 product order number"
+        ::= { chSysCardEntry 21 }
+
+       chSysCardParityPhantomError    OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Counters indicating Transient Phantom 
+            Parity Errors on this card.
+            Applied to Linecards only."
+        ::= { chSysCardEntry 22 }
+
+       chSysCardParityRecoverableError    OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Counters indicating Transient Recoverable
+            Parity Errors on this card.
+            Applied to Linecards only."
+        ::= { chSysCardEntry 23 }
+
+       chSysCardParityNonrecovrableError    OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Counters indicating Transient Non-Recoverable
+            Parity Errors on this card.
+            Applied to Linecards only."
+        ::= { chSysCardEntry 24 }
+
+    -- ## Port Table
+
+       chSysPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of ports in a slot."
+        ::= { chSysObjects 4 }
+
+      chSysPortEntry  OBJECT-TYPE
+        SYNTAX        ChSysPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A port entry containing objects for a
+            particular slot."
+        INDEX    { chSysPortSlotIndex,chSysPortIndex }
+        ::= { chSysPortTable 1 }
+
+      ChSysPortEntry    ::=
+        SEQUENCE {
+           chSysPortSlotIndex   Integer32,
+           chSysPortIndex       Integer32,
+           chSysPortType        F10SystemPortType,
+           chSysPortAdminStatus INTEGER,
+           chSysPortOperStatus  INTEGER,
+           chSysPortIfIndex     Integer32,
+           chSysXfpRecvPower    F10HundredthdB
+        }
+
+       chSysPortSlotIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each slot within
+                the chassis. This value is determined by
+                the chassis slot number where the card
+                          is inserted.  Valid entries are 1
+                          to the value of chNumSlots"
+        ::= { chSysPortEntry 1 }
+
+       chSysPortIndex OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A unique index for each slot within the card.
+                     This value is determined by the variable
+            chSysSlotNumPorts. This value can also be
+            determined by the chSysCardType.
+            Valid entries are 1 to the value of
+            number of ports availabled"
+        ::= { chSysPortEntry 2 }
+
+       chSysPortType  OBJECT-TYPE
+        SYNTAX        F10SystemPortType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of port in the card."
+        ::= { chSysPortEntry 3 }
+
+       chSysPortAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The admin status of the card.
+            The port admin status is Up if
+            the user has configured it to be up
+            otherwise, the admin status is Down."
+        ::= { chSysPortEntry 4 }
+
+       chSysPortOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      ready(1),
+                      portDown(2),
+                      portProblem(3),
+                      cardProblem(4),
+                      cardDown(5),
+                      notPresent(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status provides further
+            condition of the card.
+            If the chSysPortAdminStatus is 'up', the
+            valid state is
+            'ready' - the card is present and
+                    ready and the chSysPortAdminStatus
+                    status is 'up'.
+            'portDown'    - the port is down or not enabled.
+            'portProblem' - port hardware problems.
+                        'cardProblem' - not used.  Same as cardDown.
+            'cardDown'    - the card is downed.
+            'notPresent' - the card is not present."
+        ::= { chSysPortEntry 5 }
+
+       chSysPortIfIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The index of ifIndex in the Interface Mib.
+            This index can link to the ifEntry to get
+            this interface/port information"
+        ::= { chSysPortEntry 6 }
+
+       chSysXfpRecvPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) received for
+            interface on 10G linecard.
+            "
+        ::= { chSysPortEntry 7 }
+
+    -- ## Air Filters Table
+    -- ## Removed from this MIB.
+
+    -- ## Processor Table
+
+    -- Each card has one or more processors.
+       -- The Processor table contains information on the
+    -- processor and the memory.
+
+       chSysProcessorTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysProcessorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of Processors resident in this slot."
+        ::= { chSysObjects 6 }
+
+      chSysProcessorEntry    OBJECT-TYPE
+        SYNTAX        ChSysProcessorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of Processor entries."
+        INDEX    { chSysProcessorSlotIndex, chSysProcessorIndex }
+        ::= { chSysProcessorTable 1 }
+
+      ChSysProcessorEntry    ::=
+        SEQUENCE {
+           chSysProcessorSlotIndex    Integer32,
+           chSysProcessorIndex        Integer32,
+           chSysProcessorModule       F10ProcessorModuleType,
+           chSysProcessorUpTime       TimeTicks,
+           chSysProcessorNvramSize    Integer32,
+           chSysProcessorMemSize      Integer32,
+           chSysProcessorLogStream    OCTET STRING
+        }
+
+       chSysProcessorSlotIndex        OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each slot within
+                the chassis. This value is determined by
+                the chassis slot number where the card
+                          is inserted.  Valid entries are 1
+                          to the value of chNumSlots"
+        ::= { chSysProcessorEntry 1 }
+
+       chSysProcessorIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each Processor within the
+                 card.    This value is determined by the variable
+                chSysSlotNumProcessors. the valid entries
+                are 1 to the value of number of processors"
+        ::= { chSysProcessorEntry 2 }
+
+       chSysProcessorModule    OBJECT-TYPE
+        SYNTAX        F10ProcessorModuleType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of module running on the Processor."
+        ::= { chSysProcessorEntry 3 }
+
+       chSysProcessorUpTime    OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SysUpTime for this Processor."
+        ::= { chSysProcessorEntry 4 }
+
+       chSysProcessorNvramSize    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total Non-volatile RAM in Kbytes."
+        ::= { chSysProcessorEntry 5 }
+
+       chSysProcessorMemSize    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The size of the RAM in Mb."
+        ::= { chSysProcessorEntry 6 }
+
+       chSysProcessorLogStream    OBJECT-TYPE
+        SYNTAX        OCTET STRING
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reserved field.  Currently,
+            this field should return
+            NULL."
+        ::= { chSysProcessorEntry 7 }
+
+
+    -- ## Software Module Table
+
+       chSysSwModuleTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of software version information in
+            a processor."
+        ::= { chSysObjects 7 }
+
+      chSysSwModuleEntry    OBJECT-TYPE
+        SYNTAX        ChSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A software module entry containing version
+            number information for a particular processor."
+        INDEX    { chSysSwSlotIndex,chSysSwProcessorIndex }
+        ::= { chSysSwModuleTable 1 }
+
+      ChSysSwModuleEntry    ::=
+        SEQUENCE {
+           chSysSwSlotIndex             Integer32,
+           chSysSwProcessorIndex        Integer32,
+           chSysSwRuntimeImgVersion     DisplayString,
+           chSysSwRuntimeImgDate        F10SwDate,
+           chSysSwCurrentBootImgVersion DisplayString,
+           chSysSwCurrentBootImgDate    DateAndTime,
+           chSysSwCurrentBootImgStatus  INTEGER,
+           chSysSwBackupBootImgVersion  DisplayString,
+           chSysSwBackupBootImgDate     DateAndTime,
+           chSysSwBackupBootImgStatus   INTEGER,
+           chSysSwNextRebootImage       INTEGER,
+           chSysSwCurrentBootImage      INTEGER
+        }
+
+       chSysSwSlotIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each slot within
+                the chassis. This value is determined by
+                the chassis slot number where the card
+                          is inserted.  Valid entries are 1
+                          to the value of chNumSlots"
+        ::= { chSysSwModuleEntry 1 }
+
+       chSysSwProcessorIndex        OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each CPU within the card.
+                   This value is determined by the variable
+                chSysSlotNumCPUs. This value can also be
+                determined by the chSysSlotType.
+                Valid entries are 1 to the value of
+                number of cpu"
+        ::= { chSysSwModuleEntry 2 }
+
+       chSysSwRuntimeImgVersion    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This variable indicates the software
+            module version that is currently
+            running on the processor.
+            The software release version is in
+            the format as follow:
+            <major version>.<minor version>.<minor
+            version>......
+            '1.1' indicate major version of 1 and
+            minor release of 1."
+        ::= { chSysSwModuleEntry 3 }
+
+       chSysSwRuntimeImgDate    OBJECT-TYPE
+        SYNTAX        F10SwDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The release date of this software
+            module."
+        ::= { chSysSwModuleEntry 4 }
+
+       chSysSwCurrentBootImgVersion    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The software release version is in
+            the format as follow:
+            <major version>.<minor version>.<minor
+            version>......
+            '1.1' indicate major version of 1 and
+            minor release of 1."
+        ::= { chSysSwModuleEntry 5 }
+
+       chSysSwCurrentBootImgDate    OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The release date of this software module
+            If the CPU is reset, the software module
+            running date (chSysSwModuleRunningDate)
+            will change to this current date."
+        ::= { chSysSwModuleEntry 6 }
+
+       chSysSwCurrentBootImgStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        ok(1),
+                        failed(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of current boot image."
+        ::= { chSysSwModuleEntry 7 }
+
+       chSysSwBackupBootImgVersion OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The software release version is in
+                the format as follow:
+                <major version>.<minor version>.<minor
+                version>......
+                '1.1' indicate major version of 1 and
+                minor release of 1."
+        ::= { chSysSwModuleEntry 8 }
+
+       chSysSwBackupBootImgDate    OBJECT-TYPE
+       SYNTAX          DateAndTime
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "The backup boot image released date."
+       ::= { chSysSwModuleEntry 9 }
+
+       chSysSwBackupBootImgStatus  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           ok(1),
+                           failed(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+            "The status of the backup boot image."
+       ::= { chSysSwModuleEntry 10 }
+
+       chSysSwNextRebootImage  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           bootImage-A(1),
+                           bootImage-B(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+        "The boot flash image selection. When the
+         chassis is rebooted, this is the boot
+         image to use."
+       ::= { chSysSwModuleEntry 11 }
+
+       chSysSwCurrentBootImage  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           bootImage-A(1),
+                           bootImage-B(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+        "The current boot image. This is the boot image described by the
+        chSysSwCurrentBootImgVersion, chSysSwCurrentBootImgDate, and
+        chSysSwCurrentBootImgStatus objects.
+        "
+       ::= { chSysSwModuleEntry 12 }
+
+
+    -- ## SFM Table
+
+       chSysSfmTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysSfmEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of Swicth Fabric Module in a slot."
+        ::= { chSysObjects 8 }
+
+      chSysSfmEntry   OBJECT-TYPE
+        SYNTAX        ChSysSfmEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A SFM entry containing objects for a
+            particular slot."
+        INDEX    { chSysSfmIndex }
+        ::= { chSysSfmTable 1 }
+
+      ChSysSfmEntry    ::=
+        SEQUENCE {
+           chSysSfmIndex            Integer32,
+           chSysSfmSerialNumber     DisplayString,
+           chSysSfmVendorId         DisplayString,
+           chSysSfmMfgDate          F10MfgDate,
+           chSysSfmEcLevel          Integer32,
+           chSysSfmAdminStatus      INTEGER,
+           chSysSfmOperStatus       INTEGER,
+           chSysSfmErrorStatus      INTEGER,
+           chSysSfmCountryCode      OCTET STRING,
+           chSysSfmPartNum          DisplayString,
+           chSysSfmProductRev       DisplayString,
+           chSysSfmProdOrder        DisplayString
+        }
+
+       chSysSfmIndex  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each SFM within
+                the chassis. The number of SFM slots
+                can be determined with chNumSfmSlots."
+        ::= { chSysSfmEntry 1 }
+
+       chSysSfmSerialNumber    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The serial number of the SFM."
+        ::= { chSysSfmEntry 2 }
+
+       chSysSfmVendorId    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The vendor id that manufactured the SFM."
+        ::= { chSysSfmEntry 3 }
+
+       chSysSfmMfgDate    OBJECT-TYPE
+        SYNTAX        F10MfgDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date the SFM is manufactured."
+        ::= { chSysSfmEntry 4 }
+
+       chSysSfmEcLevel    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+            "The EC Level of the SFM."
+        ::= { chSysSfmEntry 5 }
+
+       chSysSfmAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The admin status of
+                each SFM."
+        ::= { chSysSfmEntry 6 }
+
+
+       chSysSfmOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        active(1),
+                        absent(2),
+                        standby(3),
+                        incomp(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Operational status provides further
+            condition of Switch Fabric Module card.
+            If the chSysSfmAdminStatus is 'up', the
+            valid state is
+            'active' - the card is present and
+                    ready and the chSysSfmAdminStatus
+                    status is 'up'.
+            If the chSysCardOperStatus is 'down', the
+            service states can be as followed:
+            'absent'      - the card is not present.
+            'standby'     - the card is in standby mode.
+            'incomp'      - incompatible with current sfm switch mode.
+            "
+        ::= { chSysSfmEntry 7 }
+
+       chSysSfmErrorStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ok(1),
+                        error(2),
+                        not-available(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Operational status provides further
+            condition of Switch Fabric Module card.
+            If the chSysSfmAdminStatus is 'up', the
+            valid state is
+            'ok' - the card is present and
+                    ready and the chSysSfmAdminStatus
+                    status is 'up'.
+            If the chSysSfmAdminStatus is 'down', the
+            error status can be as followed:
+            'not-available'  - status not available.
+            'error'       - the card is in error state."
+        ::= { chSysSfmEntry 8 }
+
+       chSysSfmCountryCode    OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFM manufacturer's country
+            code"
+        ::= { chSysSfmEntry 9 }
+
+       chSysSfmPartNum    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFM manufacturer's part number"
+        ::= { chSysSfmEntry 10 }
+
+       chSysSfmProductRev    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFM manufacturer's product
+            revision"
+        ::= { chSysSfmEntry 11 }
+
+       chSysSfmProdOrder    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFM product order number."
+        ::= { chSysSfmEntry 12 }
+
+
+    -- ## SFM Group
+
+
+    chSysSfmGroup     OBJECT IDENTIFIER ::={ chSysObjects 9 }
+
+    chSfmUtil5Sec     OBJECT-TYPE
+    SYNTAX            Gauge32(0..100)
+    UNITS             "percent"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "SFM utilization in percentage for last 5 Seconds."
+    ::= { chSysSfmGroup 1 }
+
+    chSfmUtil1Min     OBJECT-TYPE
+    SYNTAX            Gauge32(0..100)
+    UNITS             "percent"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "SFM utilization in percentage for last 1 minute."
+    ::= { chSysSfmGroup 2 }
+
+    chSfmUtil5Min     OBJECT-TYPE
+    SYNTAX            Gauge32(0..100)
+    UNITS             "percent"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "SFM utilization in percentage for last 5 minute."
+    ::= { chSysSfmGroup 3 }
+
+
+    -- ## Primary Routing Process Module
+
+       chRpmNumRpms   OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of RPM installed
+            in the chassis.  There is always one
+            primary RPM, but a secondary RPM can
+            also be installed as backup."
+        ::= { chRpmObjects 1 }
+
+       chRpmSlotNumber  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The primary routing process module
+            slot number.  If the primary RPM is
+            switched to secondary RPM, the slot
+            number will be updated here."
+        ::= { chRpmObjects 2 }
+
+       chRpmUptime    OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SysUpTime of the last time the RPM
+            is reset.  Used the SysUpTime of the
+            control processor as this variable."
+        ::= { chRpmObjects 3 }
+
+       chRpmLastSwitchDate    OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date and time when the Routing
+            Process Module is switched."
+        ::= { chRpmObjects 4 }
+
+       chRpmCOAlarmStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(1),
+                        on(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Central Office (CO) Alarm on RPM card.
+            The valid status are as followed:
+            'off' - CO Alarm light is off.
+            'on'  - CO Alarm light is on.
+            Please refer to Force10 Alarm document -
+            Appendix C for the condition when this
+            CO alarm is triggered.
+            "
+        DEFVAL    {1}
+        ::= { chRpmObjects 5 }
+
+       chRpmFlashStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        absent(1),
+                        present(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Compact Flash on RPM card.
+            The valid status are as followed:
+            'absent'  - external flash is not present.
+            'present'  - external flash is present.
+            "
+        DEFVAL    {1}
+        ::= { chRpmObjects 6 }
+
+    -- ## Primary Routing Process Module CPU and Memory Utilization
+
+       chRpmUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChRpmUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table listing the cpu and memory utilization
+             in master RPM."
+        ::= { chRpmObjects 7  }
+
+      chRpmUtilEntry  OBJECT-TYPE
+        SYNTAX        ChRpmUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in each processor cpu and mmory utilization"
+        INDEX    { chRpmCpuIndex }
+        ::= { chRpmUtilTable 1 }
+
+      ChRpmUtilEntry    ::=
+        SEQUENCE {
+           chRpmCpuIndex        Integer32,
+           chRpmCpuType         F10ProcessorModuleType,
+           chRpmCpuUtil5Sec     Gauge32,
+           chRpmCpuUtil1Min     Gauge32,
+           chRpmCpuUtil5Min     Gauge32,
+           chRpmMemUsageUtil    Gauge32
+        }
+
+       chRpmCpuIndex  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "A unique index for each Processor within the
+                 RPM.    This value is determined by the variable
+                chSysSlotNumProcessors. the valid entries
+                are 1 to the value of number of processors"
+        ::= { chRpmUtilEntry 1 }
+
+       chRpmCpuType   OBJECT-TYPE
+        SYNTAX        F10ProcessorModuleType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of module running on the Processor."
+        ::= { chRpmUtilEntry 2 }
+
+       chRpmCpuUtil5Sec OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 seconds."
+        ::= { chRpmUtilEntry 3 }
+
+       chRpmCpuUtil1Min     OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 1 minute."
+        ::= { chRpmUtilEntry 4 }
+
+       chRpmCpuUtil5Min     OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 minutes."
+        ::= { chRpmUtilEntry 5 }
+
+       chRpmMemUsageUtil    OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total RPM's memory usage in percentage."
+        ::= { chRpmUtilEntry 6 }
+
+       chRpmMajorAlarmStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Major Alarm LED on the Primary RPM card."
+        ::= { chRpmObjects 8 }
+
+       chRpmMinorAlarmStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(1),
+                        on(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Minor Alarm LED on the Primary RPM card."
+        ::= { chRpmObjects 9 }
+
+    -- ## Line card CPU and Memory Utilization
+
+       chLineCardUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChLineCardUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table listing the cpu and memory utilization
+             in line cards."
+        ::= { chLineCardObjects 1  }
+
+      chLineCardUtilEntry  OBJECT-TYPE
+        SYNTAX        ChLineCardUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in each line card cpu and memory utilization"
+        INDEX    { chSysCardNumber }
+        ::= { chLineCardUtilTable 1 }
+
+      ChLineCardUtilEntry    ::=
+        SEQUENCE {
+           chLineCardCpuUtil5Sec     Gauge32,
+           chLineCardCpuUtil1Min     Gauge32,
+           chLineCardCpuUtil5Min     Gauge32,
+           chLineCardMemUsageUtil    Gauge32
+        }
+
+      chLineCardCpuUtil5Sec OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 seconds."
+        ::= { chLineCardUtilEntry 1 }
+
+       chLineCardCpuUtil1Min OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 1 minute."
+        ::= { chLineCardUtilEntry 2 }
+
+       chLineCardCpuUtil5Min OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 minutes."
+        ::= { chLineCardUtilEntry 3 }
+
+       chLineCardMemUsageUtil OBJECT-TYPE
+        SYNTAX        Gauge32(0..100)
+        UNITS         "percent"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Memory usage in percentage."
+        ::= { chLineCardUtilEntry 4 }
+
+    --
+    -- ## Alarm Group or Traps
+    --
+
+    chAlarmMibNotifications     OBJECT IDENTIFIER ::= { chAlarmObjects 0 }
+    chAlarmVariable             OBJECT IDENTIFIER ::= { chAlarmObjects 1 }
+
+    --
+    -- TRAP VarBind Data
+    --
+
+    chAlarmVarInteger OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "An generic integer value in the TRAP object"
+        ::= { chAlarmVariable 1 }
+
+    chAlarmVarString OBJECT-TYPE
+        SYNTAX       OCTET STRING
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "An generic string value in the TRAP object"
+        ::= { chAlarmVariable 2 }
+
+    chAlarmVarSlot   OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The chassis slot number.
+            For the traps that does not have slot information the value will
+            -1 in the TRAP PDU.
+            "
+        ::= { chAlarmVariable 3 }
+
+    chAlarmVarPort   OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The chassis port number.
+            For the traps that does not have port information the value will
+            -1 in the TRAP PDU.
+            "
+        ::= { chAlarmVariable 4 }
+
+    --
+    -- TRAPS
+    --
+
+    chAlarmCardDown     NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card operational status is down."
+        ::= { chAlarmMibNotifications 1 }
+
+    chAlarmCardUp       NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card operational status is up."
+        ::= { chAlarmMibNotifications 2 }
+
+
+    chAlarmCardReset    NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card is reset."
+        ::= { chAlarmMibNotifications 3 }
+
+    chAlarmCardOffline  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card is set to offline."
+        ::= { chAlarmMibNotifications 4 }
+
+    chAlarmCardMismatch NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card is not the same as configured"
+        ::= { chAlarmMibNotifications 5 }
+
+    chAlarmCardRemove   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card is removed"
+        ::= { chAlarmMibNotifications 6 }
+
+    chAlarmCardProblem  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             card is indicated wht status card problem"
+        ::= { chAlarmMibNotifications 7 }
+
+    chAlarmCutoff       NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "This trap is generated if the alarm
+            cut off button on RPM is pressed."
+        ::= { chAlarmMibNotifications 8 }
+
+    chAlarmSfmUp        NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             SFM operational status is up."
+        ::= { chAlarmMibNotifications 9 }
+
+    chAlarmSfmDown      NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             SFM operational status is down."
+        ::= { chAlarmMibNotifications 10 }
+
+    chAlarmRpmUp        NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The primary RPM generate this trap when the primary RPM or
+            the secondary RPM is up and running."
+        ::= { chAlarmMibNotifications 11 }
+
+    chAlarmRpmDown      NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The primary RPM generate this trap when the secondary RPM is
+            down, either by software reset or being physically removed from
+            the chassis."
+        ::= { chAlarmMibNotifications 12 }
+
+    chAlarmPowersupplyDown  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             power supply is not operational."
+        ::= { chAlarmMibNotifications 13 }
+
+
+    chAlarmMinorTemperatureHigh NOTIFICATION-TYPE
+        OBJECTS                 {   chAlarmVarInteger,
+                                    chAlarmVarString,
+                                    chAlarmVarSlot,
+                                    chAlarmVarPort
+                                }
+        STATUS                  current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             chassis's temperature exceed the minor threshold."
+        ::= { chAlarmMibNotifications 14 }
+
+    chAlarmMajorTemperatureHigh     NOTIFICATION-TYPE
+        OBJECTS                     {   chAlarmVarInteger,
+                                        chAlarmVarString,
+                                        chAlarmVarSlot,
+                                        chAlarmVarPort
+                                    }
+        STATUS                      current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             chassis's temperature exceede the major threshold."
+        ::= { chAlarmMibNotifications 15 }
+
+    chAlarmFanTrayDown  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             fan tray is missing or down."
+        ::= { chAlarmMibNotifications 16 }
+
+    chAlarmPowersupplyClear     NOTIFICATION-TYPE
+        OBJECTS                 {   chAlarmVarInteger,
+                                    chAlarmVarString,
+                                    chAlarmVarSlot,
+                                    chAlarmVarPort
+                                }
+        STATUS                  current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             power supply is now operational."
+        ::= { chAlarmMibNotifications 17 }
+
+    chAlarmMinorTemperatureClear    NOTIFICATION-TYPE
+        OBJECTS                     {   chAlarmVarInteger,
+                                        chAlarmVarString,
+                                        chAlarmVarSlot,
+                                        chAlarmVarPort
+                                    }
+        STATUS                      current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             chassis's temperature within the minor threshold."
+        ::= { chAlarmMibNotifications 18 }
+
+    chAlarmMajorTemperatureClear    NOTIFICATION-TYPE
+        OBJECTS                     {   chAlarmVarInteger,
+                                        chAlarmVarString,
+                                        chAlarmVarSlot,
+                                        chAlarmVarPort
+                                    }
+        STATUS                      current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             chassis's temperature within the major threshold."
+        ::= { chAlarmMibNotifications 19 }
+
+    chAlarmFanTrayClear NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             fan tray is now operational."
+        ::= { chAlarmMibNotifications 20 }
+
+    chAlarmMinorFanBadClear     NOTIFICATION-TYPE
+        OBJECTS                 {   chAlarmVarInteger,
+                                    chAlarmVarString,
+                                    chAlarmVarSlot,
+                                    chAlarmVarPort
+                                }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             minor fan tray that was bad is now operational."
+        ::= { chAlarmMibNotifications 21 }
+
+    chAlarmMajorSfmDown     NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             majority of SFM are down."
+        ::= { chAlarmMibNotifications 22 }
+
+    chAlarmMajorSfmDownClr  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             majority of SFM were down are now operational."
+        ::= { chAlarmMibNotifications 23 }
+
+    chAlarmMinorSfmDown     NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             majority of SFM are down."
+        ::= { chAlarmMibNotifications 24 }
+
+    chAlarmMinorSfmDownClr  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The driver/agent generate this trap when a
+             majority of SFM were down are now operational."
+        ::= { chAlarmMibNotifications 25 }
+
+    chAlarmTaskSuspend      NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The system generate this trap when a
+             a task is suspended."
+        ::= { chAlarmMibNotifications 26 }
+
+    chAlarmTaskTerm         NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The system generate this trap when a
+             a task is terminated."
+        ::= { chAlarmMibNotifications 27 }
+
+    chAlarmVrrpGoMaster NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The VRRP generate this trap when it
+             become the master."
+        ::= { chAlarmMibNotifications 28 }
+
+    chAlarmVrrpGiveupMaster NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The VRRP generate this trap when it
+             is no longer the master."
+        ::= { chAlarmMibNotifications 29 }
+
+    chAlarmBgpEstb    NOTIFICATION-TYPE
+        OBJECTS       {   chAlarmVarInteger,
+                          chAlarmVarString,
+                          chAlarmVarSlot,
+                          chAlarmVarPort
+                      }
+        STATUS        current
+        DESCRIPTION
+            "BGP task neighbour established."
+        ::= { chAlarmMibNotifications 30 }
+
+    chAlarmBgpXsition   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "BGP task is in transition.
+            "
+        ::= { chAlarmMibNotifications 31 }
+
+    chAlarmMajorPS      NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             power supply major alarm is issued."
+        ::= { chAlarmMibNotifications 32 }
+
+    chAlarmMajorPSClr   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             power supply major alarm is cleared."
+        ::= { chAlarmMibNotifications 33 }
+
+    chAlarmMinorPS      NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             power supply minor alarm is issued."
+        ::= { chAlarmMibNotifications 34 }
+
+    chAlarmMinorPSClr   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             power supply minor alarm is cleared."
+        ::= { chAlarmMibNotifications 35 }
+
+    chAlarmMinorFanBad  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when
+             fan is bad."
+        ::= { chAlarmMibNotifications 36 }
+
+    chAlarmExdCpuThreshold  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The agent generate this trap when
+             cpu utilization excceded 80%."
+        ::= { chAlarmMibNotifications 37 }
+
+    chAlarmClrCpuThreshold  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The agent generate this trap when
+             cpu utilization falls below threshold."
+        ::= { chAlarmMibNotifications 38 }
+
+    chAlarmExdMemThreshold  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The agent generate this trap when
+             memory utilization excceded 80%."
+        ::= { chAlarmMibNotifications 39 }
+
+    chAlarmClrMemThreshold  NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The agent generate this trap when
+             memory utilization falls below threshold."
+        ::= { chAlarmMibNotifications 40 }
+
+    chAlarmMacStationMove   NOTIFICATION-TYPE
+        OBJECTS             {   chAlarmVarInteger,
+                                chAlarmVarString,
+                                chAlarmVarSlot,
+                                chAlarmVarPort
+                            }
+        STATUS              current
+        DESCRIPTION
+            "The agent generate this trap when a MAC station move exceed the
+            threshold.
+            "
+        ::= { chAlarmMibNotifications 41 }
+
+    chAlarmSfmAdd       NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a SFM is added to the chassis.
+            "
+        ::= { chAlarmMibNotifications 42 }
+
+    chAlarmSfmRemove    NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a SFM is removed from the chassis.
+            "
+        ::= { chAlarmMibNotifications 43 }
+
+    chAlarmRpmPrimary   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a standby RPM become Primary RPM
+            after fail-over.
+            "
+        ::= { chAlarmMibNotifications 44 }
+
+    chSnmpIpAclDeny     NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when SNMP Agent deny a SNMP request
+            based on the IP ACL rules.
+            "
+        ::= { chAlarmMibNotifications 45 }
+
+    chAlarmSRAMParityErrorDetect    NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a linecard detects SRAM
+            parity error and then tries to recover but can't recover
+            that section.
+            "
+        ::= { chAlarmMibNotifications 47 }
+
+    chAlarmAcDcMixedPowerSupplyDetect    NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a system detects AC and
+            DC mixed power supply.
+            Applied to C-series only.
+            "
+        ::= { chAlarmMibNotifications 48 }
+
+
+    -- ### conformance information ###
+    f10ChassisMibConformance    OBJECT IDENTIFIER    ::=    { f10ChassisMib 2 }
+    f10ChassisMibCompliances    OBJECT IDENTIFIER    ::=    { f10ChassisMibConformance 1 }
+    f10ChassisMibGroups         OBJECT IDENTIFIER    ::=    { f10ChassisMibConformance 2 }
+
+    -- ## compliance statements
+    f10ChassisMibCompliance     MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for Force10
+            product which implement the f10
+            Chassis MIB."
+        MODULE    -- this module
+        MANDATORY-GROUPS {
+            f10ComponentGroup,
+            f10SystemGroup,
+            f10RpmGroup,
+            f10LineCardGroup,
+            f10ChassisNotificationGroup
+        }
+        ::= { f10ChassisMibCompliances 1 }
+
+    -- ## units of conformance
+
+    f10ComponentGroup    OBJECT-GROUP
+        OBJECTS {
+        chType,
+        chSerialNumber,
+        chVendorId,
+        chMfgDate,
+        chEcLevel,
+        chNumFanTrays,
+        chNumPowerSupplies,
+        chNumSlots,
+        chNumSfmSlots,
+        chSlot1to16,
+        chCountryCode,
+        chPartNum,
+        chProductRev,
+        chProductOrder
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            overall chassis information."
+        ::= { f10ChassisMibGroups 1 }
+
+    f10SystemGroup    OBJECT-GROUP
+        OBJECTS {
+        chSysPowerSupplyOperStatus,
+        chSysFanTrayOperStatus,
+        chSysCardNumber,
+        chSysCardType,
+        chSysCardSerialNumber,
+        chSysCardVendorId,
+        chSysCardMfgDate,
+        chSysCardEcLevel,
+        chSysCardUpperTemp,
+        chSysCardLowerTemp,
+        chSysCardNumProcessors,
+        chSysCardNumPhyPorts,
+        chSysCardNumLgcPorts,
+        chSysCardUpTime,
+        chSysCardAdminStatus,
+        chSysCardOperStatus,
+        chSysCardFaultStatus,
+        chSysCardLogStream,
+        chSysCardCountryCode,
+        chSysCardPartNum,
+        chSysCardProductRev,
+        chSysCardProdOrder,
+        chSysCardParityPhantomError,
+        chSysCardParityRecoverableError,
+        chSysCardParityNonrecovrableError,
+        chSysProcessorModule,
+        chSysProcessorUpTime,
+        chSysProcessorNvramSize,
+        chSysProcessorMemSize,
+        chSysProcessorLogStream,
+        chSysPortType,
+        chSysPortAdminStatus,
+        chSysPortOperStatus,
+        chSysPortIfIndex,
+        chSysXfpRecvPower,
+        chSysSwRuntimeImgVersion,
+        chSysSwRuntimeImgDate,
+        chSysSwCurrentBootImgVersion,
+        chSysSwCurrentBootImgDate,
+        chSysSwCurrentBootImgStatus,
+        chSysSwBackupBootImgVersion,
+        chSysSwBackupBootImgDate,
+        chSysSwBackupBootImgStatus,
+        chSysSwNextRebootImage,
+        chSysSfmSerialNumber,
+        chSysSfmVendorId,
+        chSysSfmMfgDate,
+        chSysSfmEcLevel,
+        chSysSfmAdminStatus,
+        chSysSfmOperStatus,
+        chSysSfmErrorStatus,
+        chSysSfmCountryCode,
+        chSysSfmPartNum,
+        chSysSfmProductRev,
+        chSysSfmProdOrder
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            chassis system hardware information."
+        ::= { f10ChassisMibGroups 2 }
+
+    f10RpmGroup    OBJECT-GROUP
+        OBJECTS {
+        chRpmNumRpms,
+        chRpmSlotNumber,
+        chRpmUptime,
+        chRpmLastSwitchDate,
+        chRpmCOAlarmStatus,
+        chRpmFlashStatus,
+        chRpmCpuType,
+        chRpmCpuUtil5Sec,
+        chRpmCpuUtil1Min,
+        chRpmCpuUtil5Min,
+        chRpmMemUsageUtil
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            Route Process Module (RPM) information."
+        ::= { f10ChassisMibGroups 3 }
+
+    f10LineCardGroup    OBJECT-GROUP
+        OBJECTS {
+        chLineCardCpuUtil5Sec,
+        chLineCardCpuUtil1Min,
+        chLineCardCpuUtil5Min,
+        chLineCardMemUsageUtil
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing
+            CPU and Memory Utilization in the Line cards."
+        ::= { f10ChassisMibGroups 4 }
+
+    f10ChassisNotificationGroup    NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        chAlarmCardDown,
+        chAlarmCardUp,
+        chAlarmCardReset,
+        chAlarmCardOffline,
+        chAlarmCardMismatch,
+        chAlarmCardRemove,
+        chAlarmCardProblem,
+        chAlarmCutoff,
+        chAlarmSfmUp,
+        chAlarmSfmDown,
+        chAlarmRpmUp,
+        chAlarmRpmDown,
+        chAlarmPowersupplyDown,
+        chAlarmMinorTemperatureHigh,
+        chAlarmMajorTemperatureHigh,
+        chAlarmFanTrayDown,
+        chAlarmPowersupplyClear,
+        chAlarmMinorTemperatureClear,
+        chAlarmMajorTemperatureClear,
+        chAlarmFanTrayClear,
+        chAlarmMinorFanBadClear,
+        chAlarmMajorSfmDown,
+        chAlarmMajorSfmDownClr,
+        chAlarmMinorSfmDown,
+        chAlarmMinorSfmDownClr,
+        chAlarmTaskSuspend,
+        chAlarmTaskTerm,
+        chAlarmVrrpGoMaster,
+        chAlarmVrrpGiveupMaster,
+        chAlarmBgpEstb,
+        chAlarmBgpXsition,
+        chAlarmMajorPS,
+        chAlarmMajorPSClr,
+        chAlarmMinorPS,
+        chAlarmMinorPSClr,
+        chAlarmMinorFanBad,
+        chAlarmExdCpuThreshold,
+        chAlarmClrCpuThreshold,
+        chAlarmExdMemThreshold,
+        chAlarmClrMemThreshold,
+        chAlarmMacStationMove,
+        chAlarmSfmAdd,
+        chAlarmSfmRemove,
+        chAlarmRpmPrimary,
+        chSnmpIpAclDeny,
+        chAlarmSRAMParityErrorDetect,
+        chAlarmAcDcMixedPowerSupplyDetect
+        }
+        STATUS    current
+        DESCRIPTION
+            "Notifications for Force10 Chassis mib"
+        ::= { f10ChassisMibGroups 5 }
+
+    END

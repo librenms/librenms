@@ -1,0 +1,137 @@
+	DEVSERVER-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		IpAddress
+			FROM RFC1155-SMI
+		OBJECT-TYPE, MODULE-IDENTITY
+			FROM SNMPv2-SMI
+		DisplayString
+			FROM SNMPv2-TC
+		device
+			FROM ANIROOT-MIB;
+
+
+	-- the aniDevServer group
+
+aniDevServer  MODULE-IDENTITY
+	LAST-UPDATED "0105091130Z"      -- Wed May 9 11:30:00 PDT 2001
+	ORGANIZATION "Aperto Networks"
+	CONTACT-INFO
+	  "       
+	  Postal:  Aperto Networks Inc
+		   1637 S Main Street 
+		   Milpitas, California 95035
+	  Tel:	   +1 408 719 9977
+	  "       
+	DESCRIPTION
+	"This group describes all server related information. 
+	 It is common for both BSU and SU.
+	" 
+	::= { device 5 }
+
+aniDevTftpServer OBJECT-TYPE	
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The IP address of the TFTP server responsible for
+	    downloading provisioning and configuration parameters
+	    to this device.
+	    If this parameter is not configured, the value 0.0.0.0 
+	    will be returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 1 }
+
+aniDevDhcpServer OBJECT-TYPE 
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The IP address of the DHCP server.
+	    If this parameter is not configured, the value 0.0.0.0 
+	    will be returned.
+
+	    When BSU is in point to point mode, this parameter is
+	    not applicable and will display 0.0.0.0. Similarly, for
+	    a PacketWave 610 SU and for PacketWave 750 system, 
+	    and for SU running in local mode, this object will 
+	    display 0.0.0.0.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 2 }
+
+aniDevDhcpLeaseExpiration OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..22))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "The date and time at which the DHCP Lease will Expire.
+
+	    When BSU is in point to point mode, this parameter is 
+	    not applicable and will display a blank string. Similarly,
+	    for a PacketWave 610 SU, this object will display a blank
+	    string. The same applies for PacketWave 750 and for 
+	    SU running in local mode.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 3 }
+
+aniDevSuDhcpServer OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	   "The IP address of the DHCP Server configured on BSU for 
+	    the SU.
+	    
+	    When the BSU is in bridge mode, this parameter is not valid.
+	    The agent will return 0.0.0.0.
+
+	    If an SNMP Get is sent on SU for this parameter, 0.0.0.0 is 
+	    returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 4 }
+
+aniDevTimeServer OBJECT-TYPE	 
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The IP address of the Time server. It is also known as the 
+	    SNTP server IP address.
+	    On SU, the value 0.0.0.0 will be returned. This object cannot
+	    be changed on the SU.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 5 }
+
+aniDevSyslogServer OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	   "The IP address of the syslog server.
+	    If this parameter is not configured, the value 0.0.0.0 
+	    will be returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 6 }
+
+aniDevSmtpServer OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	   "The IP address of the SMTP server.
+	    If this parameter is not configured, the value 
+	    0.0.0.0 will be returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevServer 7 }
+
+
+END
+
+

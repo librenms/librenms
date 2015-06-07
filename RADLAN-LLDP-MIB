@@ -1,0 +1,49 @@
+RADLAN-LLDP-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                RADLAN LLDP ROS
+--                       Private LLDP MIB
+-- Version:              7.42
+-- Date:                 12 Dec 2005
+
+IMPORTS
+    rnd                                     FROM RADLAN-MIB
+    OBJECT-TYPE, MODULE-IDENTITY            FROM SNMPv2-SMI
+    TruthValue                              FROM RADLAN-SNMPv2;
+
+rlLldp MODULE-IDENTITY
+         LAST-UPDATED "200506200000Z"
+         ORGANIZATION "Radlan Computer Communications Ltd."
+         CONTACT-INFO
+                "radlan.com"
+         DESCRIPTION
+                "This private MIB module adds MIBs to LLDP (Link Layer Discovery Protocol)."
+         REVISION "200506200000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { rnd 110 }
+
+rlLldpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Setting this variable to 'true' will globally enable the LLDP feature
+             (both transmit and receive functionalities). Setting this variable
+             to 'false' will globally disable the LLDP feature. Thus, the
+             administratively desired status of a local port is determined by
+             both this variable and the MIB lldpPortConfigAdminStatus."
+    ::= { rlLldp 1 }
+
+--rlLldpLocChassisId  OBJECT-TYPE
+--    SYNTAX      OCTET STRING(SIZE(1..20))
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--            "The string value used to identify the chassis component associated
+--             with the local system. As a result of updating this variable,
+--             lldpLocChassisid will have the same value, and the MIB
+--             lldpLocChassisIdSubtype will have the value local(7). "
+--    ::= { rlLldp 2}
+
+END
+

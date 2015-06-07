@@ -1,0 +1,2889 @@
+ALCATEL-IND1-AAA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DisplayString, MacAddress, RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+	SnmpAdminString	       FROM SNMP-FRAMEWORK-MIB
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        softentIND1AAA, alaAaaTraps
+            FROM ALCATEL-IND1-BASE;
+
+
+    alcatelIND1AAAMIB MODULE-IDENTITY
+        LAST-UPDATED  "200704030000Z"
+        ORGANIZATION  "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                      Alcatel-Lucent, Enterprise Solutions Division
+                    (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Authentication, Authorization, and Accounting (AAA) Subsystem.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "200704030000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+
+        ::= { softentIND1AAA 1 }
+
+
+
+    alcatelIND1AAAMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Managed Objects."
+        ::= { alcatelIND1AAAMIB 1 }
+
+
+    alcatelIND1AAAMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Conformance Information."
+        ::= { alcatelIND1AAAMIB 2 }
+
+
+    alcatelIND1AAAMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1AAAMIBConformance 1 }
+
+
+    alcatelIND1AAAMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1AAAMIBConformance 2 }
+
+
+
+--    Overview of the AAA MIB
+--
+--    this MIB provides configuration of the AAA services including the
+--    servers and the local user database
+--
+
+--    AAA server MIB
+
+    aaaServerMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 1 }
+
+--
+--    Server configuration table
+--
+
+    aaaServerTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for each AAA server."
+        ::= { aaaServerMIB 1 }
+
+    aaaServerEntry OBJECT-TYPE
+        SYNTAX        AaaServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An AAA server configuration identified by its protocol
+             and its index. An entry is created/removed when a server
+             is defined or undefined with IOS configuration commands
+             via CLI or by issuing appropriate sets to this table
+             using snmp."
+        INDEX     { aaasName }
+        ::= { aaaServerTable 1 }
+
+    AaaServerEntry ::= SEQUENCE
+        {
+            aaasName            DisplayString,
+            aaasProtocol        INTEGER,
+            aaasHostName        DisplayString,
+            aaasIpAddress       IpAddress,
+            aaasHostName2       DisplayString,
+            aaasIpAddress2      IpAddress,
+            aaasRetries         INTEGER,
+            aaasTimout          INTEGER,
+            aaasRadKey          DisplayString,
+            aaasRadAuthPort     INTEGER,
+            aaasRadAcctPort     INTEGER,
+            aaasLdapPort        INTEGER,
+            aaasLdapDn          DisplayString,
+            aaasLdapPasswd      DisplayString,
+            aaasLdapSearchBase  DisplayString,
+            aaasLdapServType    INTEGER,
+            aaasLdapEnableSsl   INTEGER,
+            aaasAceClear        INTEGER,
+            aaasRowStatus       RowStatus,
+            aaasTacacsKey	DisplayString,
+            aaasTacacsPort      INTEGER,
+            aaasHttpPort        INTEGER,
+            aaasHttpDirectory   DisplayString,
+            aaasHttpProxyHostName  DisplayString,
+            aaasHttpProxyIpAddress IpAddress,
+            aaasHttpProxyPort      INTEGER,
+            aaasVrfName            DisplayString
+        }
+
+    aaasName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            This name is given by the operator to refer the server."
+        ::= { aaaServerEntry 1}
+
+    aaasProtocol OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                          radius(1),
+                            ldap(2),
+                             ace(3),
+                          tacacs(4)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Protocol used with the server:
+                 radius(1) - RADIUS
+                   ldap(2) - LDAP
+                    ace(3) - ACE
+                 tacacs(4) - TACACS+"
+        ::= { aaaServerEntry 2}
+
+    aaasHostName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "DNS name of the server host."
+        ::= { aaaServerEntry 3}
+
+    aaasIpAddress OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP address of the server host."
+        ::= { aaaServerEntry 4}
+
+    aaasHostName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "DNS name of the backup server host."
+        ::= { aaaServerEntry 5}
+
+    aaasIpAddress2 OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "IP address of the backup server host."
+        ::= { aaaServerEntry 6}
+
+    aaasRetries OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 32 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Number of retries the switch makes to the server to
+            authenticate a user before trying the next backup server.
+            The default value is 3."
+        DEFVAL        { 3 }
+        ::= { aaaServerEntry 7}
+
+    aaasTimout OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 512 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Time-out for server replies to authentication requests.
+            The default value is 2."
+        DEFVAL        { 2 }
+        ::= { aaaServerEntry 8}
+
+    aaasRadKey OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The shared secret is a string of characters known to the switch
+            and to the RADIUS server, but it is not sent out over the network.
+            The secret can be any text string and must be configured here as
+            well as on the server. The secret is stored encrypted using a two
+            way algorithm."
+        ::= { aaaServerEntry 9}
+
+
+    aaasRadAuthPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For RADIUS server only.
+            Port number for authentication request;
+            the host is not used for authentication if set to 0.
+            The default value is 1645."
+        DEFVAL        { 1645 }
+        ::= { aaaServerEntry 10}
+
+    aaasRadAcctPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For RADIUS server only.
+            Port number for accounting request;
+            the host is not used for authentication if set to 0.
+            The default value is 1646."
+        DEFVAL        { 1646 }
+        ::= { aaaServerEntry 11}
+
+    aaasLdapPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            Port number for LDAP server host."
+        DEFVAL        { 0 }
+        ::= { aaaServerEntry 12}
+
+    aaasLdapDn OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            the super user dn, i.e., the administrative distinguished name
+            recognized by the LDAP-enabled directory servers
+            (e.g., cn=manager)"
+        ::= { aaaServerEntry 13}
+
+    aaasLdapPasswd OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            the super user password, i.e., the administrative password
+            recognized by LDAP-enabled directory servers (e.g., secret).
+            The secret is stored encrypted using a two way algorithm."
+        ::= { aaaServerEntry 14}
+
+    aaasLdapSearchBase OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+             Search base recognized by LDAP-enabled
+             directory servers (e.g.,o=company, c=US)."
+        ::= { aaaServerEntry 15}
+
+    aaasLdapServType OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                                 ns(0),
+                            generic(1),
+                           netscape(2),
+                             novell(3),
+                                sun(4),
+                          microsoft(5)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+             Directory server type used in LDAP Authentication:
+                        ns(0) - non significant value
+                   generic(1) - Generic Schema
+                  netscape(2) - Netscape Directory Server
+                    novell(3) - Novell NDS
+                       sun(4) - Sun Directory Services
+                 microsoft(5) - Microsoft Active Directory"
+        DEFVAL        { netscape }
+        ::= { aaaServerEntry 16}
+
+    aaasLdapEnableSsl OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                             ns(0),
+                           true(1),
+                          false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Only for LDAP server.
+            Specify if the connection between the swtich and the LDAP server
+            use a SSL session."
+        DEFVAL        { false }
+        ::= { aaaServerEntry 17}
+
+    aaasAceClear OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                             ns(0),
+                           true(1),
+                          false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Only for ACE server.
+            The ACE/Server generates a secrets that it sends to clients
+            for authentication. While you cannot configure the secret on
+            the switch, you can clear it.
+            To clear the current ACE/Server secret, set this OID.
+            After clearing the secret on the switch, you must also clear
+            the secret from the ACE server."
+        DEFVAL        { false }
+        ::= { aaaServerEntry 18}
+
+
+    aaasRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaServerEntry 19}
+
+   aaasTacacsKey OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The shared secret is a string of characters known to the switch
+            and to the TACACS+ server, but it is not sent out over the network.
+            The secret can be any text string and must be configured here as
+            well as on the server. The secret is stored encrypted using a two
+            way algorithm."
+        ::= { aaaServerEntry 20}
+
+
+    aaasTacacsPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For TACACS+ server only.
+            Port number for LDAP server host."
+        DEFVAL        { 49 }
+        ::= { aaaServerEntry 21}
+
+    aaasHttpPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HTTP server only.
+            Port number for LDAP server host."
+        ::= { aaaServerEntry 22}
+
+    aaasHttpDirectory OBJECT-TYPE
+        SYNTAX DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HTTP server only.
+            A combination of directory tree and filename where the CRL can be found."
+        ::= { aaaServerEntry 23}
+
+    aaasHttpProxyHostName  OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HTTP server only.
+            DNS name of the proxy server."
+        ::= { aaaServerEntry 24}
+
+    aaasHttpProxyIpAddress OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HTTP server only.
+            IP address of the proxy server."
+        ::= { aaaServerEntry 25}
+
+    aaasHttpProxyPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HTTP server only.
+            Port number for HTTP proxy server."
+        ::= { aaaServerEntry 26}
+
+    aaasVrfName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the VRF that the server is on.
+            This VRF name is valid only when the server type is RADIUS.
+            (aaasProtocol = 1 (Radius)."
+        ::= { aaaServerEntry 27}
+
+
+
+--    AAA authentication accounting MIB
+
+    aaaAuthAcctMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 2 }
+
+--
+--    Authenticated Vlan configuration table
+--
+
+    aaaAuthVlanTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table allow to display and modify the configuration of the
+            authentication servers for the authenticated vlans."
+        ::= { aaaAuthAcctMIB 1 }
+
+    aaaAuthVlanEntry OBJECT-TYPE
+        SYNTAX        AaaAuthVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "There can be one or several entries in this table. In case of
+            single authority, all vlan are authenticated by the same set of
+            servers, the aaatvVlan index is then equal to 0. In case of multiple
+            authorities, each authenticated vlan has its own list of servers."
+        INDEX    { aaatvVlan }
+        ::= { aaaAuthVlanTable 1 }
+
+    AaaAuthVlanEntry ::= SEQUENCE
+        {
+            aaatvVlan         INTEGER,
+            aaatvName1        DisplayString,
+            aaatvName2        DisplayString,
+            aaatvName3        DisplayString,
+            aaatvName4        DisplayString,
+            aaatvRowStatus    RowStatus,
+            aaatvCertificate  INTEGER
+        }
+
+    aaatvVlan OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "It indicate the vlan number authenticated by the servers.
+            The value (0) means that all vlan are authenticated by the same
+            servers (single mode configuration)."
+        ::= { aaaAuthVlanEntry 1}
+
+    aaatvName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            An Ace server can not be used in front hand."
+        ::= { aaaAuthVlanEntry 2}
+
+    aaatvName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            An Ace server can not be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthVlanEntry 3}
+
+    aaatvName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            An Ace server can not be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthVlanEntry 4}
+
+    aaatvName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            An Ace server can not be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthVlanEntry 5}
+
+    aaatvRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuthVlanEntry 6}
+
+    aaatvCertificate OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        noCertificate(0),
+                        certificateOnly(1),
+                        certificateWithPassword(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "use of x509 user certificate during the HTTPs session establisment.
+            noCertificate(0)- no user certificate is required,
+            certificateOnly(1) - the DN from the certifiicate is used to access to the authorization
+            data of the user
+            certificateWithPassword(2) - the user must execute a log-in procedure with user
+            name and password after his certificate validation"
+            DEFVAL        { noCertificate }
+            ::= { aaaAuthVlanEntry 7}
+
+
+--
+--    Authenticated switch access configuration table
+--
+
+    aaaAuthSATable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table allow to display and modify the configuration of the
+            authentication servers for the switch accesses."
+        ::= { aaaAuthAcctMIB 2 }
+
+    aaaAuthSAEntry OBJECT-TYPE
+        SYNTAX        AaaAuthSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A switch access authentication entry is specified by the type
+            of access."
+        INDEX { aaatsInterface}
+        ::= { aaaAuthSATable 1 }
+
+    AaaAuthSAEntry ::= SEQUENCE
+        {
+            aaatsInterface    INTEGER,
+            aaatsName1        DisplayString,
+            aaatsName2        DisplayString,
+            aaatsName3        DisplayString,
+            aaatsName4        DisplayString,
+            aaatsRowStatus    RowStatus,
+            aaatsCertificate  INTEGER
+        }
+
+    aaatsInterface OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                          default(1),
+                          console(2),
+                           telnet(3),
+                              ftp(4),
+                             http(5),
+                             snmp(6),
+                              ssh(7)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Type of connection that must be authenticated
+            default(1) -define the default authentication method for console,
+            telnet, ftp, snmp , http and ssh. If the operator
+            interface is not especially configured the default value
+            is applied to this interface."
+        ::= { aaaAuthSAEntry 1}
+
+
+    aaatsName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        ::= { aaaAuthSAEntry 2}
+
+    aaatsName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 3}
+
+    aaatsName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 4}
+
+    aaatsName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 5}
+
+    aaatsRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuthSAEntry 7}
+
+   aaatsCertificate OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        noCertificate(0),
+                        certificateOnly(1),
+                        certificateWithPassword(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "use of x509 user certificate during the HTTPs session establisment.
+            noCertificate(0)- no user certificate is required,
+            certificateOnly(1) - the DN from the certifiicate is used to access to the authorization
+            data of the user
+            certificateWithPassword(2) - the user must execute a log-in procedure with user
+            name and password after his certificate validation"
+            DEFVAL        { noCertificate }
+            ::= { aaaAuthSAEntry 8}
+
+--
+--    Accounting configuration table for vlan
+--
+
+    aaaAcctVlanTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table allows to display and configure the accounting
+            servers for authenticated Vlans."
+        ::= { aaaAuthAcctMIB 3 }
+
+    aaaAcctVlanEntry OBJECT-TYPE
+        SYNTAX        AaaAcctVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "There can be one or several entries in this table. In case of
+            single authority, accounting information for all vlans are sent
+            to the same set of servers, the aaatVlan index is then equal to 0. In case of multiple
+            authorities, each authenticated vlan has its own list of servers."
+        INDEX { aaacvVlan }
+        ::= { aaaAcctVlanTable 1 }
+
+    AaaAcctVlanEntry ::= SEQUENCE
+        {
+            aaacvVlan         INTEGER,
+            aaacvName1        DisplayString,
+            aaacvName2        DisplayString,
+            aaacvName3        DisplayString,
+            aaacvName4        DisplayString,
+            aaacvRowStatus    RowStatus
+        }
+
+
+    aaacvVlan OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Current vlan number.
+            The value (0) for avlan interface means that all authenticated
+            vlans use the same servers for authentication."
+        ::= { aaaAcctVlanEntry 1}
+
+    aaacvName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        ::= { aaaAcctVlanEntry 2}
+
+    aaacvName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+        ::= { aaaAcctVlanEntry 3}
+
+    aaacvName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctVlanEntry 4}
+
+    aaacvName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctVlanEntry 5}
+
+    aaacvRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctVlanEntry 6}
+
+
+
+--
+--    Accounting configuration table for switch accesses
+--
+
+    aaaAcctSATable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for Switch access accounting."
+    ::= { aaaAuthAcctMIB 4 }
+
+    aaaAcctSAEntry OBJECT-TYPE
+        SYNTAX        AaaAcctSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Accounting configuration for switch access."
+        INDEX     { aaacsInterface }
+        ::= { aaaAcctSATable 1 }
+
+    AaaAcctSAEntry ::= SEQUENCE
+        {
+            aaacsInterface    INTEGER,
+            aaacsName1        DisplayString,
+            aaacsName2        DisplayString,
+            aaacsName3        DisplayString,
+            aaacsName4        DisplayString,
+            aaacsRowStatus    RowStatus
+        }
+
+    aaacsInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, accounting for console, telnet, ftp, http, snmp, ssh are stored
+            in the same set of servers, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaAcctSAEntry 1}
+
+
+    aaacsName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        ::= { aaaAcctSAEntry 2}
+
+    aaacsName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+        ::= { aaaAcctSAEntry 3}
+
+    aaacsName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctSAEntry 4}
+
+    aaacsName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctSAEntry 5}
+
+    aaacsRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctSAEntry 6}
+
+
+--
+--    Authenticated 802.1x configuration table
+--
+
+   aaaAuth8021xTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuth8021xEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for 802.1X authentication."
+    ::= { aaaAuthAcctMIB 5 }
+
+    aaaAuth8021xEntry OBJECT-TYPE
+        SYNTAX        AaaAuth8021xEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "configuration for 802.1X authentication."
+        INDEX     { aaatxInterface }
+        ::= { aaaAuth8021xTable 1 }
+
+    AaaAuth8021xEntry ::= SEQUENCE
+        {
+            aaatxInterface    INTEGER,
+            aaatxName1        DisplayString,
+            aaatxName2        DisplayString,
+            aaatxName3        DisplayString,
+            aaatxName4        DisplayString,
+            aaatxOpen         INTEGER,
+            aaatxRowStatus    RowStatus
+        }
+
+
+    aaatxInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaAuth8021xEntry 1}
+
+
+    aaatxName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        ::= { aaaAuth8021xEntry 2}
+
+    aaatxName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuth8021xEntry 3}
+
+    aaatxName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuth8021xEntry 4}
+
+    aaatxName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuth8021xEntry 5}
+
+    aaatxOpen OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                         global(1),
+                         unique(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "Type of port openning after authentication. If open-global(1) the port treats packet with unknown MAC addresses like an un-authenticated port. If open-unique(2), the port drops incomming packet with unknown MAC addresses."
+        DEFVAL        { unique}
+        ::= { aaaAuth8021xEntry 6}
+
+    aaatxRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuth8021xEntry 7}
+
+--
+--    Accounting configuration table  for 802.1x
+--
+
+
+   aaaAcct8021xTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcct8021xEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for 802.1X accounting."
+    ::= { aaaAuthAcctMIB  6 }
+
+    aaaAcct8021xEntry OBJECT-TYPE
+        SYNTAX        AaaAcct8021xEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Configuration for 802.1X accounting."
+        INDEX     { aaacxInterface }
+        ::= { aaaAcct8021xTable 1 }
+
+    AaaAcct8021xEntry ::= SEQUENCE
+        {
+            aaacxInterface    INTEGER,
+            aaacxName1        DisplayString,
+            aaacxName2        DisplayString,
+            aaacxName3        DisplayString,
+            aaacxName4        DisplayString,
+            aaacxRowStatus    RowStatus
+        }
+
+
+    aaacxInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaAcct8021xEntry 1}
+
+    aaacxName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        ::= { aaaAcct8021xEntry 2}
+
+    aaacxName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAcct8021xEntry 3}
+
+    aaacxName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAcct8021xEntry 4}
+
+    aaacxName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAcct8021xEntry 5}
+
+    aaacxRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcct8021xEntry 6}
+
+
+--
+--    PKI agent configuration
+--
+
+   aaaPkiTable        OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaPkiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for PKI."
+    ::= { aaaAuthAcctMIB  7 }
+
+    aaaPkiEntry       OBJECT-TYPE
+        SYNTAX        AaaPkiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Configuration for PKI."
+        INDEX     { aaatpInterface }
+        ::= { aaaPkiTable 1 }
+
+    AaaPkiEntry ::= SEQUENCE
+        {
+            aaatpInterface    INTEGER,
+            aaatpName1        DisplayString,
+            aaatpName2        DisplayString,
+            aaatpName3        DisplayString,
+            aaatpName4        DisplayString,
+            aaatpLevel        INTEGER,
+            aaatpRowStatus    RowStatus
+        }
+
+
+    aaatpInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaPkiEntry 1}
+
+    aaatpName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server contening the CRL.
+            It corresponds to an index value of the aaaServerTable"
+        ::= { aaaPkiEntry 2}
+
+    aaatpName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server contening the CRL.
+            It corresponds to an index value of the aaaServerTable"
+        DEFVAL { "" }
+        ::= { aaaPkiEntry 3}
+
+    aaatpName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server contening the CRL.
+            It corresponds to an index value of the aaaServerTable"
+        DEFVAL { "" }
+        ::= { aaaPkiEntry 4}
+
+    aaatpName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server contening the CRL.
+            It corresponds to an index value of the aaaServerTable"
+        DEFVAL { "" }
+        ::= { aaaPkiEntry 5}
+
+    aaatpLevel OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        certificate(1),
+                        notRevoked(2),
+                        repository(3)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "level of control to do on the user certificate.
+                certificate means that there is a valid chain of certificate between the user certificate and a root certificate known by the switch. The root certificates are managed using specific pki commands.
+                All certificates are valid and well signed.
+                not-revoked means that using CRL or other ways configuring using pki commands the non-revocation of the certificate is checked.
+                repository means that after the precedent control, there is a binary comparison of the certificate on the server and the one received during the authorization (instantaneous revocation possible)
+                This verification is only possible when the access handler is configured with certificateOnly"
+        DEFVAL        { certificate }
+        ::= { aaaPkiEntry 6}
+
+   aaatpRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaPkiEntry 7}
+
+
+--
+--    Servers used for MAC based authentication --
+
+   aaaAuthMACTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthMACEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for non-suplicant ( MAC based ) authentication."
+    ::= { aaaAuthAcctMIB 8 }
+
+    aaaAuthMACEntry OBJECT-TYPE
+        SYNTAX        AaaAuthMACEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "configuration for MAC based authentication."
+        INDEX     { aaatxInterface }
+        ::= { aaaAuthMACTable 1 }
+
+    AaaAuthMACEntry ::= SEQUENCE
+        {
+            aaaMacInterface    	   INTEGER,
+            aaaMacSrvrName1        DisplayString,
+            aaaMacSrvrName2        DisplayString,
+            aaaMacSrvrName3        DisplayString,
+            aaaMacSrvrName4        DisplayString,
+            aaaMacSrvrRowStatus    RowStatus
+        }
+
+
+    aaaMacInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaAuthMACEntry 1}
+
+
+    aaaMacSrvrName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        ::= { aaaAuthMACEntry 2}
+
+    aaaMacSrvrName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthMACEntry 3}
+
+    aaaMacSrvrName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthMACEntry 4}
+
+    aaaMacSrvrName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthMACEntry 5}
+
+
+    aaaMacSrvrRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuthMACEntry 6}
+
+
+--
+--    Accounting configuration table for commands 
+--
+    aaaAcctCmdTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctCmdEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table stores the commands that will be logged during an accounting session.
+			 This feature is valid only for Tacacs+ accounting"
+    ::= { aaaAuthAcctMIB 9 }
+
+    aaaAcctCmdEntry OBJECT-TYPE
+        SYNTAX        AaaAcctCmdEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Tacacs+ Accounting configuration for executed commands."
+        INDEX     { aaacmdInterface }
+        ::= { aaaAcctCmdTable 1 }
+
+    AaaAcctCmdEntry ::= SEQUENCE
+        {
+            aaacmdInterface    	  INTEGER,
+            aaacmdSrvName1        DisplayString,
+            aaacmdSrvName2        DisplayString,
+            aaacmdSrvName3        DisplayString,
+            aaacmdSrvName4        DisplayString,
+            aaacmdRowStatus       RowStatus
+        }
+
+    aaacmdInterface OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For now, accounting for console, telnet, ftp, http, snmp, ssh are stored
+            in the same set of servers, the index is always (1)."
+        DEFVAL        { 1 }
+        ::= { aaaAcctCmdEntry 1}
+
+
+    aaacmdSrvName1 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+ server.
+            Other name correspond to an index value of the aaaServerTable"
+        ::= { aaaAcctCmdEntry 2}
+
+    aaacmdSrvName2 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+  server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+        ::= { aaaAcctCmdEntry 3}
+
+    aaacmdSrvName3 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+  server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+    ::= { aaaAcctCmdEntry 4}
+
+    aaacmdSrvName4 OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+ server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+    ::= { aaaAcctCmdEntry 5}
+
+    aaacmdRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctCmdEntry 6}
+
+
+
+--
+--    user local database configuration table
+--
+    aaaUserMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 3 }
+
+    aaaUserTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for the local user database."
+        ::= { aaaUserMIB 1 }
+
+    aaaUserEntry OBJECT-TYPE
+        SYNTAX        AaaUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An user configuration identified by its user name."
+        INDEX { aaauUserName }
+        ::= { aaaUserTable 1 }
+
+    AaaUserEntry ::= SEQUENCE
+        {
+            aaauUserName       DisplayString,
+            aaauPassword       DisplayString,
+            aaauReadRight1     Unsigned32,
+            aaauReadRight2     Unsigned32,
+            aaauWriteRight1    Unsigned32,
+            aaauWriteRight2    Unsigned32,
+            aaauProfile        INTEGER,
+            aaauSnmpLevel      INTEGER,
+            aaauSnmpAuthKey    OCTET STRING,
+            aaauRowStatus      RowStatus,
+            aaauOldPassword    DisplayString,
+            aaauEndUserProfile DisplayString,
+	    aaauPasswordExpirationDate		DisplayString,
+	    aaauPasswordExpirationInMinute      INTEGER,
+	    aaauPasswordAllowModifyDate		DisplayString,
+	    aaauPasswordLockoutEnable		INTEGER,
+	    aaauBadAtempts			INTEGER
+	    
+        }
+
+    aaauUserName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 63 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the user."
+        ::= { aaaUserEntry 1}
+
+    aaauPassword OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 47 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Password of the user. For get response the password in encoded in a
+            one way method. This makes the password readable by noone."
+        ::= { aaaUserEntry 2}
+
+    aaauReadRight1 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 3}
+
+    aaauReadRight2 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 4}
+
+
+    aaauWriteRight1 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 5}
+
+    aaauWriteRight2 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 6}
+
+    aaauProfile OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 2147483647 )
+        MAX-ACCESS    read-create
+        STATUS        obsolete
+        DESCRIPTION
+            "Specifies the profile number.
+            A profile number in the user account database represents the geographic
+            privilege. This number points to an entry in the table of the user profiles."
+        DEFVAL        { 0 }
+        ::= { aaaUserEntry 7}
+
+    aaauSnmpLevel OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                               no(1),
+                           noauth(2),
+                              sha(3),
+                              md5(4),
+                          shaDes(5),
+                          md5Des(6)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies if the user is authorized to use SNMP and if yes its security level.
+                     no(1) - Not authorized to use SNMP.
+                 noauth(2) - SNMPv1,SNMPv2c or SNMPv3 without authentication.
+                    sha(3) - SNMPv3 with SHA authentication and no encryption.
+                    md5(4) - SNMPv3 with MD5 authentication and no encryption.
+                sha-des(5) - SNMPv3 with SHA authentication and encryption.
+                md5-des(6) - SNMPv3 with MD5 authentication and encryption.
+             If the value is not specified, the value configured for the 'default' user
+             is taken"
+        ::= { aaaUserEntry 8}
+
+    aaauSnmpAuthKey OBJECT-TYPE
+        SYNTAX        OCTET STRING ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Authentication key of the user. The key is encoded in a two way method.
+            The encryption key is deducted from this key."
+        ::= { aaaUserEntry 9}
+
+    aaauRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaUserEntry 10}
+
+    aaauOldPassword OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 47 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Internal use"
+        ::= { aaaUserEntry 11}
+
+    aaauEndUserProfile OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the END user profile name."
+        ::= { aaaUserEntry 12}
+
+    aaauPasswordExpirationDate OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 16 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The local time of when the password would be expired.
+	     This date will be reset once the value of
+	     aaaAsaDefaultPasswordExpirationInDays is updated.
+
+             Only the following format is valid:
+
+             mm/dd/yyyy hh:mm
+
+             where
+             mm   - month  (1-12)
+             dd   - day    (1-31)
+             yyyy - year   (2000-2050)
+	     hh   - hour   (1-24)
+	     mm   - minute (1-59)
+
+	     Password will not be expired if set to empty string"
+        ::= { aaaUserEntry 13}
+
+    aaauPasswordExpirationInMinute OBJECT-TYPE
+        SYNTAX        INTEGER ( -1 .. 216000 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Number of minutes from now till the password expiration time.
+	     Setting this object will update aaauPasswordExpirationDate.
+	     If -1, password will not be expired.
+	     If  0, password has been expired."
+        ::= { aaaUserEntry 14}
+
+     aaauPasswordAllowModifyDate OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 16 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The local time of when the password can be start to be modified.
+	     This date will be reset once the value of
+	     aaauPasswordAllowModifyDate is updated.
+
+             Only the following format is valid:
+
+             mm/dd/yyyy hh:mm
+
+             where
+             mm   - month  (1-12)
+             dd   - day    (1-31)
+             yyyy - year   (2000-2050)
+	     hh   - hour   (1-24)
+	     mm   - minute (1-59)
+
+	     Password will not be expired if set to empty string"
+        ::= { aaaUserEntry 15}
+	    
+     aaauPasswordLockoutEnable OBJECT-TYPE
+        SYNTAX        INTEGER {lockout(1),unlock(2),expired(3)}
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Indicate whether this account is locked out."
+            DEFVAL { unlock }
+	::= { aaaUserEntry 16}
+
+     aaauBadAtempts OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 999 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number bad password attempts in the observation window."
+	    DEFVAL { 0 }
+        ::= { aaaUserEntry 17}
+
+--
+--    Authenticated users table
+--
+
+    aaaAuthenticatedUserTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthenticatedUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Provide the list of users currently authenticated into the
+            switch for bridging purpose."
+        ::= { alcatelIND1AAAMIBObjects 4 }
+
+    aaaAuthenticatedUserEntry OBJECT-TYPE
+        SYNTAX        AaaAuthenticatedUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the AaaAuthenticatedUserTable."
+        INDEX {aaaaMacAddress}
+        ::= { aaaAuthenticatedUserTable 1 }
+
+    AaaAuthenticatedUserEntry ::= SEQUENCE
+        {
+            aaaaMacAddress  MacAddress,
+            aaaaUserName    DisplayString,
+            aaaaSlot        INTEGER,
+            aaaaPort        INTEGER,
+            aaaaVlan        INTEGER,
+            aaaaDrop        INTEGER
+        }
+
+    aaaaMacAddress OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Mac address of the user's device."
+        ::= { aaaAuthenticatedUserEntry 1 }
+
+    aaaaUserName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Login name of the user."
+        ::= { aaaAuthenticatedUserEntry 2 }
+
+    aaaaSlot OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 2147483647 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Slot number on which user is connected."
+        ::= { aaaAuthenticatedUserEntry 3 }
+
+    aaaaPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 2147483647 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Port number on which the user is connected."
+        ::= { aaaAuthenticatedUserEntry 4 }
+
+    aaaaVlan OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Vlan number on which the user is authenticated."
+        ::= { aaaAuthenticatedUserEntry 5 }
+
+    aaaaDrop OBJECT-TYPE
+        SYNTAX        INTEGER { true(1), false(2) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Allow to remove a Mac address from a Vlan.
+            The corresponding user is logged out of the network."
+        DEFVAL        { false }
+        ::= { aaaAuthenticatedUserEntry 6 }
+
+
+
+--    Authenticated vlan specific configuration MIB
+
+    aaaAvlanConfig    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 5 }
+
+--
+--    Authenticated vlan configuration group
+--
+
+    aaaAvlanDnsName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Dns name used to get the authentication Web
+	     page when authenticating using http."
+        ::= { aaaAvlanConfig 1}
+
+
+    aaaAvlanDhcpDefGateway OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP address that is used as the DHCP gateway address
+		before the user get authenticated.It specifies the subnet
+		into which a client receives its IP address prior to
+		authentication"
+        ::= { aaaAvlanConfig 2}
+
+    aaaAvlanDefaultTraffic OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        ns(0),
+                        true(1),
+                        false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "Enable the traffic in the default vlan prior to authentication
+		 if the value is true"
+        ::= { aaaAvlanConfig 3}
+
+    aaaAvlanPortBound OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        ns(0),
+                        true(1),
+                        false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "Associate a MAC address to a specific Vlan on an authenticated
+		 port (printers, ...)"
+        ::= { aaaAvlanConfig 4}
+
+    aaaAvlanLanguage OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        ns(0),
+                        true(1),
+                        false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "Force to read the language specific file for HTTP AVLAN (label.txt)"
+        ::= { aaaAvlanConfig 5}
+
+
+--    ASA specific configuration MIB
+
+    aaaAsaConfig    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 6 }
+
+--
+--    ASA configuration group
+--
+
+    aaaAsaPasswordSizeMin OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 14 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of digits of the passwords
+            ( nominator aaauPassword)."
+	  DEFVAL     { 0 }
+        ::= { aaaAsaConfig 1}
+
+    aaaAsaDefaultPasswordExpirationInDays OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 150 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Default password expiration time in days to be applied to all users.
+	     Updating this object will reset aaauPasswordExpirationDate.
+             Password expiration will not be enforced if set to 0."
+	  DEFVAL     { 0 }
+        ::= { aaaAsaConfig 2}
+
+   aaaAsaPasswordContainUserName OBJECT-TYPE
+        SYNTAX        INTEGER {enable(1),disable(2)}
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Indicate whether check password contains username or not."
+            DEFVAL { disable }
+	::= { aaaAsaConfig 3}
+
+   aaaAsaPasswordMinUpperCase OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of English uppercase characters required for password. 0 is disable"
+            DEFVAL     { 0 }
+	::= { aaaAsaConfig 4} 
+
+   aaaAsaPasswordMinLowerCase OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of English lowercase characters required for password 0 is disable."
+            DEFVAL     { 0 }
+	::= { aaaAsaConfig 5} 
+
+    aaaAsaPasswordMinDigit OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of base-10 digits required for password. 0 is disable"
+            DEFVAL     { 0 }
+	::= { aaaAsaConfig 6} 
+
+    aaaAsaPasswordMinNonAlphan OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of non-alphanumeric required for password. 0 is disable"
+            DEFVAL     { 0 }
+	::= { aaaAsaConfig 7} 
+  
+    aaaAsaPasswordHistory OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 24 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Password history feature will prevent users from repeatedly using the same password. 0 is disable"
+            DEFVAL     { 4 }
+	::= { aaaAsaConfig 8} 
+
+  aaaAsaPasswordMinAge OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 150 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The password can't be modified in these days. 0 is disable"
+            DEFVAL     { 0 }
+	::= { aaaAsaConfig 9} 
+
+   aaaAsaLockoutWindow OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 99999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The window of time in which the system increments the bad logon count.(minutes) 0 is disable"
+        DEFVAL        { 0 }
+	::= { aaaAsaConfig 10}
+
+   aaaAsaLockoutDuration OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 99999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The amount of time that an account is locked due to the aaauLockoutThreshold being exceeded.(minutes) 0 is disable"	   
+        DEFVAL        { 0 }
+	::= { aaaAsaConfig 11}
+
+   aaaAsaLockoutThreshold OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+             "The number of invalid logon attempts that are permitted before the account is locked out. 0 is disable"
+        DEFVAL        { 0 }
+	::= { aaaAsaConfig 12}
+
+    aaaAsaROUserPingTrtEnable OBJECT-TYPE
+        SYNTAX        INTEGER {
+        disable (0),
+        enable  (1)
+        }
+        MAX-ACCESS    read-write
+        STATUS        obsolete
+        DESCRIPTION
+             "Global user config to allow/deny ping
+             and traceroute cmds for read-only user.
+             0 - disable
+             1 - enable "
+	DEFVAL { disable }
+	::= { aaaAsaConfig 13}
+
+    aaaAsaAccessPolicyAdminConsoleOnly OBJECT-TYPE
+        SYNTAX        INTEGER {enable(1),disable(2)}
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+             "Enable or disable AdminUser console only restriction"
+	DEFVAL { disable }
+	::= { aaaAsaConfig 14}
+
+--    Authenticated IP address vlan specific configuration MIB
+
+    aaaAvlanAddressTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAvlanAddressEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Vlan authenticated IP address Table"
+        ::= { alcatelIND1AAAMIBObjects 7 }
+
+    aaaAvlanAddressEntry OBJECT-TYPE
+        SYNTAX        AaaAvlanAddressEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Vlan authenticated IP address entry"
+        INDEX {aaaAvlanId}
+        ::= { aaaAvlanAddressTable 1 }
+
+    AaaAvlanAddressEntry ::= SEQUENCE
+        {
+            aaaAvlanId      INTEGER,
+            aaaAvlanIpAddress IpAddress
+
+        }
+
+    aaaAvlanId OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 4094 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Vlan Id corresponding to the authenticated IP address"
+        ::= { aaaAvlanAddressEntry 1 }
+
+    aaaAvlanIpAddress OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Authenticated IP address for this vlan id"
+        ::= { aaaAvlanAddressEntry 2}
+
+
+
+--    User Network Profile Table configuration MIB
+
+    aaaUserNetProfileTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaUserNetProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "User Network Profile Table"
+        ::= { alcatelIND1AAAMIBObjects 8 }
+
+    aaaUserNetProfileEntry OBJECT-TYPE
+        SYNTAX        AaaUserNetProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "User Network Profile entry"
+        INDEX {aaaUserNetProfileName}
+        ::= { aaaUserNetProfileTable 1 }
+
+    AaaUserNetProfileEntry ::= SEQUENCE
+        {
+            aaaUserNetProfileName              DisplayString,
+            aaaUserNetProfileVlanID            INTEGER,
+            aaaUserNetProfileRowStatus         RowStatus,
+            aaaUserNetProfileHICflag           INTEGER,
+            aaaUserNetProfileQosPolicyListName DisplayString
+        }
+
+    aaaUserNetProfileName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 1 .. 32 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The name of this profile."
+        ::= { aaaUserNetProfileEntry 1 }
+
+    aaaUserNetProfileVlanID OBJECT-TYPE
+        SYNTAX        INTEGER (1 .. 4094)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The VLAN id for this profile."
+        ::= { aaaUserNetProfileEntry 2}
+
+    aaaUserNetProfileRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { aaaUserNetProfileEntry 3}
+
+    aaaUserNetProfileHICflag OBJECT-TYPE
+        SYNTAX        INTEGER (1 .. 2)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The flag to indicate if HIC is enabled (1) or disabled (2)."
+        ::= { aaaUserNetProfileEntry 4}
+
+    aaaUserNetProfileQosPolicyListName OBJECT-TYPE
+        SYNTAX        DisplayString ( SIZE( 1 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The name of the QoS Policy List name that will be used if this 
+             User Network Profile is applied for a given device along with
+             aaaUserNetProfileVlanID."
+        ::= { aaaUserNetProfileEntry 5 }
+
+
+
+
+--   Radius Agent IP Information
+
+     aaaRadAgentConfig OBJECT-TYPE
+	 SYNTAX      INTEGER (1 .. 3)
+	 MAX-ACCESS read-write
+	 STATUS       obsolete 
+	 DESCRIPTION
+		"The Agent Config Information
+		 1 -- Default(Loopback0 or closest IP)
+		 2 -- Non Loopback0
+		 3 -- Interface IP Specified by User
+		This object has been obsoleted. Use the alaIpManagedIntfEntry objects 
+		in AlcatelIND1Ip.mib"
+	 DEFVAL        { 1 }
+	 ::= {  alcatelIND1AAAMIBObjects 9}
+
+     aaaRadAgentIP  OBJECT-TYPE
+         SYNTAX     IpAddress   
+         MAX-ACCESS read-write
+         STATUS       obsolete 
+         DESCRIPTION
+		"The Agent IP Address in Radius Packets.
+		This object has been obsoleted. Use the alaIpManagedIntfEntry 
+		objects in AlcatelIND1Ip.mib"	
+         ::= {  alcatelIND1AAAMIBObjects 10}
+
+
+-- START: AAA HIC-Related MIB ------------------
+    aaaHicConfig    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 11 }
+	
+--  HIC Server Table MIB --
+
+    aaaHicSvrTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaHicSvrEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for each HIC server."
+        ::= { aaaHicConfig 1 }
+
+    aaaHicSvrEntry OBJECT-TYPE
+        SYNTAX        AaaHicSvrEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A HIC server configuration."
+        INDEX     { aaaHicSvrName }
+        ::= { aaaHicSvrTable 1 }
+
+    AaaHicSvrEntry ::= SEQUENCE
+        {
+            aaaHicSvrName	SnmpAdminString,
+            aaaHicSvrIpAddr	IpAddress,
+            aaaHicSvrPort	INTEGER,
+            aaaHicSvrKey	SnmpAdminString,
+	    aaaHicSvrRowStatus	RowStatus,	
+            aaaHicSvrStatus	INTEGER
+        }
+
+    aaaHicSvrName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 31 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            This name is given by the operator to refer the server."
+        ::= { aaaHicSvrEntry 1}
+
+    aaaHicSvrIpAddr OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP address of the server host."
+        ::= { aaaHicSvrEntry 2}
+
+
+    aaaHicSvrPort OBJECT-TYPE
+        SYNTAX        INTEGER ( 1025 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For HIC server only. Port number for HIC request"
+        DEFVAL        { 11707 }
+        ::= { aaaHicSvrEntry 3}
+
+    aaaHicSvrKey OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The shared secret is a string of characters known to the switch
+            and to the HIC server. It is used to compute the digest to 
+	    preserve the integrity between the HIC server and the AoS Switch.
+	    The secret is stored encrypted using a two way algorithm."
+        ::= { aaaHicSvrEntry 4}
+
+    aaaHicSvrRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { aaaHicSvrEntry 5}
+
+   aaaHicSvrStatus OBJECT-TYPE
+        SYNTAX        INTEGER {down(1), up(2)}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HIC server status."
+        DEFVAL { down }
+        ::= { aaaHicSvrEntry 6}
+
+
+--  HIC Allowed/Exception IP Table MIB --
+
+    aaaHicAllowedTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaHicAllowedEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table contains the list of allowed/exception IP Addresses the 
+	     the HIC hosts allowed to access during HIC. Those are the IP addresses
+             of the Remediation/Patch servers, and the Web Agent Download server."
+        ::= { aaaHicConfig 2 }
+
+    aaaHicAllowedEntry OBJECT-TYPE
+        SYNTAX        AaaHicAllowedEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A Remediation server configuration."
+        INDEX     { aaaHicAllowedName }
+        ::= { aaaHicAllowedTable 1 }
+
+    AaaHicAllowedEntry ::= SEQUENCE
+        {
+            aaaHicAllowedName	SnmpAdminString,
+            aaaHicAllowedIpAddr	IpAddress,
+	    aaaHicAllowedIpMask IpAddress,
+	    aaaHicAllowedRowStatus	RowStatus	
+        }
+
+    aaaHicAllowedName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 31 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            This name is given by the operator to refer the server."
+        ::= { aaaHicAllowedEntry 1}
+
+    aaaHicAllowedIpAddr OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP address of the allowed entry."
+        ::= { aaaHicAllowedEntry 2}
+
+    aaaHicAllowedIpMask OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP Mask of the allowed entry."
+        DEFVAL      { 'ffffffff'h }
+        ::= { aaaHicAllowedEntry 3}
+
+    aaaHicAllowedRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { aaaHicAllowedEntry 4}
+
+--  HIC Override MAC Table MIB --
+
+    aaaHicOverrideTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaHicOverrideEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows list of MAC addresses that overrides the
+	     existing HIC status."
+        ::= { aaaHicConfig 3 }
+
+    aaaHicOverrideEntry OBJECT-TYPE
+        SYNTAX        AaaHicOverrideEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "HIC MAC override list configuration."
+        INDEX     { aaaHicOverrideMac }
+        ::= { aaaHicOverrideTable 1 }
+
+    AaaHicOverrideEntry ::= SEQUENCE
+        {
+            aaaHicOverrideMac		MacAddress,
+            aaaHicOverrideStatus	INTEGER,
+	    aaaHicOverrideRowStatus	RowStatus
+        }
+
+    aaaHicOverrideMac OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Static MAC address index to each override entry."
+        ::= { aaaHicOverrideEntry 1}
+
+    aaaHicOverrideStatus OBJECT-TYPE
+        SYNTAX        INTEGER {enforce(1),bypass(2)}
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "Overriding status of each static MAC address."
+	DEFVAL { enforce }
+        ::= { aaaHicOverrideEntry 2}
+
+    aaaHicOverrideRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { aaaHicOverrideEntry 3}
+
+
+--  HIC Host Table MIB --
+
+    aaaHicHostTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaHicHostEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows list of HIC Hosts and their active HIC status."
+        ::= { aaaHicConfig 4 }
+
+    aaaHicHostEntry OBJECT-TYPE
+        SYNTAX        AaaHicHostEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "HIC Host status information."
+        INDEX     { aaaHicHostMac }
+        ::= { aaaHicHostTable 1 }
+
+    AaaHicHostEntry ::= SEQUENCE
+        {
+            aaaHicHostMac		MacAddress,
+            aaaHicHostStatus		INTEGER
+        }
+
+    aaaHicHostMac OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Static MAC address index to each override entry."
+        ::= { aaaHicHostEntry 1}
+
+    aaaHicHostStatus OBJECT-TYPE
+        SYNTAX        INTEGER {inprogress(1),success(2),fail(3),timeout(4)}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "HIC status of each HIC Host."
+	DEFVAL { fail }
+        ::= { aaaHicHostEntry 2}
+
+--  Global HIC Configuration Information --
+   aaaHicConfigInfo 	OBJECT IDENTIFIER ::= {  aaaHicConfig 5 }
+
+   aaaHicStatus OBJECT-TYPE
+        SYNTAX        INTEGER {enable(1), disable(2)} 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "HIC Status. The HIC server has to be configured before HIC
+	     can be enabled."
+	DEFVAL { disable }
+        ::= { aaaHicConfigInfo 1}
+
+    aaaHicAllowed1Name OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Name of the rem server.
+            This name is given by the operator to refer the remediation server."
+        ::= { aaaHicConfigInfo 2}
+
+    aaaHicAllowed2Name OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Name of the rem server.
+            This name is given by the operator to refer the alternate remediation server."
+        ::= { aaaHicConfigInfo 3}
+
+    aaaHicAllowed3Name OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Name of the rem server.
+            This name is given by the operator to refer the alternate remediation server."
+        ::= { aaaHicConfigInfo 4}
+
+    aaaHicAllowed4Name OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Name of the rem server.
+            This name is given by the operator to refer the alternate remediation server."
+        ::= { aaaHicConfigInfo 5 }
+
+    aaaHicWebAgentDownloadUrl OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 127 ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The URL for web agent download."
+        ::= { aaaHicConfigInfo 6}
+
+    aaaHicCustomHttpProxyPort OBJECT-TYPE
+        SYNTAX        INTEGER  ( 1025 .. 65535 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The custom HTTP port for QoS to intercept the host's initial HTTP request."
+	DEFVAL { 8080 }
+        ::= { aaaHicConfigInfo 7}
+
+
+
+
+-- END: AAA HIC-Related MIB ------------------
+
+	
+
+        -- AAA Classification IP network address rule  ***
+
+        aaaUNPIpNetRuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AaaUNPIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of IP network address rules.  This is used to match 
+                 the InetAddress of a packet to a User Network Profile entry."
+            ::= { alcatelIND1AAAMIBObjects 12 }
+
+        aaaUNPIpNetRuleEntry  OBJECT-TYPE
+            SYNTAX  AaaUNPIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "An IP network address rule entry."
+            INDEX { aaaUNPIpNetRuleAddrType, 
+                    aaaUNPIpNetRuleAddr,
+                    aaaUNPIpNetRuleMask }
+            ::= { aaaUNPIpNetRuleTable 1 }
+
+        AaaUNPIpNetRuleEntry ::= SEQUENCE {
+                aaaUNPIpNetRuleAddrType
+                        InetAddressType,
+                aaaUNPIpNetRuleAddr
+                        InetAddress,
+                aaaUNPIpNetRuleMask
+                        InetAddress,
+                aaaUNPIpNetRuleProfileName
+                        SnmpAdminString,
+                aaaUNPIpNetRuleRowStatus
+                        RowStatus
+                }
+
+        aaaUNPIpNetRuleAddrType  OBJECT-TYPE
+            SYNTAX  InetAddressType
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address type used for VLAN classification.  For now
+                   Only IPv4 is supported."
+            ::= { aaaUNPIpNetRuleEntry 1 }
+
+        aaaUNPIpNetRuleAddr  OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address used for VLAN classification.  Only IPv4 is 
+                  supported."
+            ::= { aaaUNPIpNetRuleEntry 2 }
+
+        aaaUNPIpNetRuleMask  OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network mask applying to the IP network address."
+            ::= { aaaUNPIpNetRuleEntry 3 }
+
+
+        aaaUNPIpNetRuleProfileName  OBJECT-TYPE
+            SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                 "The profile name in the User Network Profile Table to be 
+                  applied."
+            ::= { aaaUNPIpNetRuleEntry 4 }
+
+        aaaUNPIpNetRuleRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "Row Status for creating/deleting rules."
+            ::= { aaaUNPIpNetRuleEntry 5 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+        -- AAA Classification MAC address rule  ***
+
+        aaaUNPMacRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AaaUNPMacRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC address rules.  This is used to match 
+                 the MAC Address of a packet to a User Network Profile entry "
+                ::= { alcatelIND1AAAMIBObjects 13 }
+
+        aaaUNPMacRuleEntry  OBJECT-TYPE
+            SYNTAX  AaaUNPMacRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC rule entry."
+            INDEX {aaaUNPMacRuleAddr }
+            ::= { aaaUNPMacRuleTable 1 }
+
+        AaaUNPMacRuleEntry ::= SEQUENCE {
+                aaaUNPMacRuleAddr
+                        MacAddress,
+                aaaUNPMacRuleProfileName
+                        SnmpAdminString,
+                aaaUNPMacRuleRowStatus
+                        RowStatus
+                }
+
+        aaaUNPMacRuleAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for VLAN classification."
+                ::= { aaaUNPMacRuleEntry 1 }
+
+        aaaUNPMacRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be 
+                  applied."
+                ::= { aaaUNPMacRuleEntry 2 }
+
+        aaaUNPMacRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { aaaUNPMacRuleEntry 3 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- AAA Classification MAC range rule  ***
+
+        aaaUNPMacRangeRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AaaUNPMacRangeRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC range rules.  This is used to match 
+                 the MAC Address Range of a packet to a User Network Profile entry."
+                ::= { alcatelIND1AAAMIBObjects 14 }
+
+        aaaUNPMacRangeRuleEntry  OBJECT-TYPE
+            SYNTAX  AaaUNPMacRangeRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC range rule entry."
+            INDEX {aaaUNPMacRangeRuleLoAddr }
+            ::= { aaaUNPMacRangeRuleTable 1 }
+
+        AaaUNPMacRangeRuleEntry ::= SEQUENCE {
+                aaaUNPMacRangeRuleLoAddr
+                        MacAddress,
+                aaaUNPMacRangeRuleHiAddr
+                        MacAddress,
+                aaaUNPMacRangeRuleProfileName
+                        SnmpAdminString,
+                aaaUNPMacRangeRuleRowStatus
+                        RowStatus
+                }
+
+        aaaUNPMacRangeRuleLoAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The lower bound of  MAC address range used for VLAN classification."
+                ::= { aaaUNPMacRangeRuleEntry 1 }
+
+        aaaUNPMacRangeRuleHiAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "The upper bound of MAC address range used for VLAN classification."
+                ::= { aaaUNPMacRangeRuleEntry 2 }
+
+        aaaUNPMacRangeRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be 
+                  applied."
+                ::= { aaaUNPMacRangeRuleEntry 3 }
+
+        aaaUNPMacRangeRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { aaaUNPMacRangeRuleEntry 4 }
+
+--
+-- AAA-HIC Trap description
+--
+
+alaAaaTrapsDesc  OBJECT IDENTIFIER ::= { alaAaaTraps 1 }
+alaAaaTrapsDescRoot  OBJECT IDENTIFIER ::= { alaAaaTrapsDesc 0 }
+alaAaaTrapsObj  OBJECT IDENTIFIER ::= { alaAaaTraps 2 }
+
+    aaaHicServerTrap  NOTIFICATION-TYPE
+        OBJECTS {
+	    aaaHSvrIpAddress
+	}
+	STATUS  current
+        DESCRIPTION
+	    "AAA HIC server down Trap is sent when the HIC server is down."
+	::= {alaAaaTrapsDescRoot 1 }
+
+--
+-- Object used in the trap
+--
+
+        aaaHSvrIpAddress       OBJECT-TYPE
+            SYNTAX               IpAddress
+            MAX-ACCESS           accessible-for-notify
+            STATUS               current
+            DESCRIPTION          "HIC/Rem/WebDL server's IP address."
+            ::= { alaAaaTrapsObj 1 }
+
+
+--
+-- Compliance Statements
+--
+
+    alcatelIND1AAAMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             Authentication, Authorization, and Accounting (AAA) Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                aaaServerMIBGroup,
+                aaaAuthAcctGroup,
+                aaaUserMIBGroup
+            }
+
+        ::= { alcatelIND1AAAMIBCompliances 1 }
+
+
+--
+-- Units Of Conformance
+--
+
+    aaaServerMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+            aaasName,           -- Server configuration table
+            aaasProtocol,
+            aaasHostName,
+            aaasIpAddress,
+            aaasHostName2,
+            aaasIpAddress2,
+            aaasRetries,
+            aaasTimout,
+            aaasRadKey,
+            aaasRadAuthPort,
+            aaasRadAcctPort,
+            aaasLdapPort,
+            aaasLdapDn,
+            aaasLdapPasswd,
+            aaasLdapSearchBase,
+            aaasLdapServType,
+            aaasLdapEnableSsl,
+            aaasAceClear,
+            aaasRowStatus,
+            aaasTacacsKey,
+            aaasTacacsPort,
+            aaasHttpPort,
+            aaasHttpDirectory,
+            aaasHttpProxyHostName,
+            aaasHttpProxyIpAddress,
+            aaasHttpProxyPort,
+            aaasVrfName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA Server."
+        ::= { alcatelIND1AAAMIBGroups 1 }
+
+
+    aaaAuthAcctGroup OBJECT-GROUP
+        OBJECTS
+        {
+            aaatvVlan,          -- Authenticated Vlan configuration table
+            aaatvName1,
+            aaatvName2,
+            aaatvName3,
+            aaatvName4,
+            aaatvRowStatus,
+         aaatvCertificate,
+
+            aaatsInterface,     -- Authenticated switch access configuration table
+            aaatsName1,
+            aaatsName2,
+            aaatsName3,
+            aaatsName4,
+            aaatsRowStatus,
+            aaatsCertificate,
+
+            aaacvVlan,          -- Accounting configuration table for vlan
+            aaacvName1,
+            aaacvName2,
+            aaacvName3,
+            aaacvName4,
+            aaacvRowStatus,
+
+            aaacsInterface,     -- Accounting configuration table for switch accesses
+            aaacsName1,
+            aaacsName2,
+            aaacsName3,
+            aaacsName4,
+            aaacsRowStatus,
+
+            aaatxInterface,     -- Authentication configuration table for 802.1x
+            aaatxName1,
+            aaatxName2,
+            aaatxName3,
+            aaatxName4,
+            aaatxOpen,
+            aaatxRowStatus,
+
+            aaacxInterface,     -- Accounting configuration table for 802.1x
+            aaacxName1,
+            aaacxName2,
+            aaacxName3,
+            aaacxName4,
+            aaacxRowStatus,
+
+            aaatpInterface,     -- PKI agent configuration
+            aaatpName1,
+            aaatpName2,
+            aaatpName3,
+            aaatpName4,
+            aaatpLevel,
+            aaatpRowStatus,
+
+            aaacmdInterface,
+            aaacmdSrvName1,
+            aaacmdSrvName2,
+            aaacmdSrvName3,
+            aaacmdSrvName4,
+            aaacmdRowStatus
+}
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA Authentication Accounting."
+        ::= { alcatelIND1AAAMIBGroups 2 }
+
+
+    aaaUserMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+		aaauUserName,       -- User local database configuration table
+		aaauPassword,
+		aaauReadRight1,
+		aaauReadRight2,
+		aaauWriteRight1,
+		aaauWriteRight2,
+		aaauProfile,
+		aaauSnmpLevel,
+		aaauSnmpAuthKey,
+		aaauRowStatus,
+		aaauOldPassword,
+		aaauEndUserProfile,
+		aaauPasswordExpirationDate,
+		aaauPasswordExpirationInMinute,
+		aaauPasswordAllowModifyDate,
+		aaauPasswordLockoutEnable ,
+		aaauBadAtempts, 
+		aaaAsaPasswordSizeMin, -- ASA specific configuration MIB
+		aaaAsaDefaultPasswordExpirationInDays,
+		aaaAsaPasswordContainUserName,
+		aaaAsaPasswordMinUpperCase,
+		aaaAsaPasswordMinLowerCase,
+		aaaAsaPasswordMinDigit,
+		aaaAsaPasswordMinNonAlphan,
+		aaaAsaPasswordHistory,
+		aaaAsaPasswordMinAge,
+		aaaAsaLockoutWindow,
+		aaaAsaLockoutDuration,
+		aaaAsaLockoutThreshold,
+		aaaAsaROUserPingTrtEnable,
+		aaaAsaAccessPolicyAdminConsoleOnly 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA User Local Database."
+        ::= { alcatelIND1AAAMIBGroups 3 }
+
+    aaaHicGroup OBJECT-GROUP
+        OBJECTS
+        {
+	     		-- HIC Server table
+            aaaHicSvrIpAddr,
+            aaaHicSvrPort,
+            aaaHicSvrKey,
+	    aaaHicSvrRowStatus,
+	    aaaHicSvrStatus,
+             		-- Allowed/Exception IP Address table
+            aaaHicAllowedIpAddr,
+	    aaaHicAllowedRowStatus,	
+            		-- HIC Override table
+            aaaHicOverrideStatus,
+	    aaaHicOverrideRowStatus,
+            		-- HIC Host status table
+            aaaHicHostStatus,
+            aaaHicStatus,    	-- Global HIC config data
+            aaaHicAllowed1Name,
+            aaaHicAllowed2Name,
+	    aaaHicAllowed3Name,
+	    aaaHicAllowed4Name,
+            aaaHicWebAgentDownloadUrl,
+	    aaaHicCustomHttpProxyPort
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA HIC."
+        ::= { alcatelIND1AAAMIBGroups 4 }
+
+    aaaTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	    aaaHicServerTrap
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for AAA HIC servers."
+        ::= { alcatelIND1AAAMIBGroups 5 }
+
+END

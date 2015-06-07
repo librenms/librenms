@@ -1,0 +1,4498 @@
+-- =================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-ETHOAM-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+-- ==================================================================
+
+    HUAWEI-ETHOAM-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            CounterBasedGauge64            
+                FROM HCNUM-TC            
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            dot1agCfmMdIndex, dot1agCfmMdName, dot1agCfmMdLevel, dot1agCfmMaIndex, dot1agCfmMaName, 
+            dot1agCfmMaVlanVid, dot1agCfmMepIdentifier, dot1agCfmMepMacAddress, dot1agCfmMdEntry, dot1agCfmMaEntry, 
+            dot1agCfmMepEntry, Dot1agCfmMaintenanceDomainLevel, Dot1agCfmMepId, Dot1agCfmMhfCreation, Dot1agCfmCcmInterval, 
+            Dot1agCfmHighestDefectPri, Dot1agCfmLowestAlarmPri            
+                FROM IEEE802171-CFM-MIB            
+            ifIndex, InterfaceIndex, InterfaceIndexOrZero            
+                FROM IF-MIB            
+            EnabledStatus            
+                FROM P-BRIDGE-MIB            
+            VlanIdOrNone            
+                FROM Q-BRIDGE-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, BITS, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            MacAddress, TruthValue, RowStatus, TimeInterval, TimeStamp, 
+            TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        hwEthOamMib MODULE-IDENTITY 
+            LAST-UPDATED "200611020000Z"        -- November 02, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd.
+                "
+            CONTACT-INFO 
+                "
+                R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd.,
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085
+                Http://www.huawei.com
+                E-mail:support@huawei.com
+                "
+            DESCRIPTION 
+                "Ethernet OAM MIB"
+            ::= { hwEthOam 1 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+        HWDot1agCfmIfType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "
+                Type of interfaces, 1:vlan, 2:vsi.
+                "
+            SYNTAX INTEGER
+                {
+                vlan(1),
+                vsi(2)
+                }
+
+--  
+-- Textual conventions
+-- 
+        HWDetectType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "
+                Detect the mode type:
+                Fast detect and standard detect
+                "
+            SYNTAX INTEGER
+                {
+                normalDetect(1),
+                fastDetect(2)
+                }
+
+--  Textual conventions for OAM MIB
+-- 
+        HWDot3Oui ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "24-bit Organizationally Unique Identifier.  Information on
+                OUIs can be found in IEEE 802-2001 [802-2001] Clause 9."
+            SYNTAX OCTET STRING (SIZE (3))
+
+        HWTestMessageSendSpeed ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "
+                Transmission rate:
+                1Mbps and 5Mbps.
+                "
+            SYNTAX INTEGER
+                {
+                oneMbps(1),
+                fiveMbps(2)
+                }
+
+        HWTestMessageFinishedValue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "
+                The five values indicates: has not run/is running/the previous test terminates normally/the previous test terminates abnormally/the previous test is interrupted (through ctrl+c or mib)
+                "
+            REFERENCE 
+                "                  "
+            SYNTAX INTEGER
+                {
+                ready(1),
+                testing(2),
+                finished(3),
+                failed(4),
+                stop(5)
+                }
+
+--  RFC2863
+        HWDot1agCfmRelayActionFieldValue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Indicates the possible values the Relay action field can take."
+            REFERENCE 
+                "802.1ag clauses 12.14.7.5.3 g), 20.32.2.5, and Table 21-24"
+            SYNTAX INTEGER
+                {
+                rlyHit(1),
+                rlyFdb(2),
+                rlyMpdb(3)
+                }
+
+        HWDot1agCfmIngressActionFieldValue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Possible values returned in the ingress action field."
+            REFERENCE 
+                "802.1ag clauses 12.14.7.5.3 k), 21.9.9.1, 20.35.2.6 and
+                Table 21-26.
+                 "
+            SYNTAX INTEGER
+                {
+                ingOk(1),
+                ingDown(2),
+                ingBlocked(3),
+                ingVid(4)
+                }
+
+        HWLldpPortIdSubtype ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "LLDP interface ID sub type"
+            SYNTAX INTEGER
+                {
+                interfaceAlias(1),
+                portComponent(2),
+                macAddress(3),
+                networkAddress(4),
+                interfaceName(5),
+                agentCircuitId(6),
+                local(7)
+                }
+
+        HWLldpPortId ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This TC describes the format of a port identifier string.
+                Objects of this type are always used with an associated
+                LldpPortIdSubtype object, which identifies the format of the
+                particular LldpPortId object instance.
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'interfaceAlias(1)', then the octet string identifies a
+                particular instance of the ifAlias object (defined in IETF
+                RFC 2863).  If the particular ifAlias object does not contain
+                any values, another port identifier type should be used.
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'portComponent(2)', then the octet string identifies a
+                particular instance of the entPhysicalAlias object (defined
+                in IETF RFC 2737) for a port or backplane component.
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'macAddress(3)', then this string identifies a particular
+                unicast source address (encoded in network byte order
+                and IEEE 802.3 canonical bit order) associated with the port
+                (IEEE Std 802-2001).
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'networkAddress(4)', then this string identifies a network
+                address associated with the port.  The first octet contains
+                the IANA AddressFamilyNumbers enumeration value for the
+                specific address type, and octets 2 through N contain the
+                networkAddress address value in network byte order.
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'interfaceName(5)', then the octet string identifies a
+                particular instance of the ifName object (defined in IETF
+                RFC 2863).  If the particular ifName object does not contain
+                any values, another port identifier type should be used.
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'agentCircuitId(6)', then this string identifies a agent-local
+                identifier of the circuit (defined in RFC 3046).
+                
+                If the associated LldpPortIdSubtype object has a value of
+                'local(7)', then this string identifies a locally
+                assigned port ID."
+            SYNTAX OCTET STRING (SIZE (1..255))
+
+        HWDot1agCfmEgressActionFieldValue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Possible values returned in the egress action field"
+            REFERENCE 
+                "802.1ag clauses 12.14.7.5.3 o), 21.9.10.1 and Table 21-28"
+            SYNTAX INTEGER
+                {
+                egrOK(1),
+                egrDown(2),
+                egrBlocked(3),
+                egrVid(4)
+                }
+
+        HWLldpManAddress ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The value of a management address associated with the LLDP
+                agent that may be used to reach higher layer entities to
+                assist discovery by network management.
+                
+                It should be noted that appropriate security credentials,
+                such as SNMP engineId, may be required to access the LLDP
+                agent using a management address.  These necessary credentials
+                should be known by the network management and the objects
+                associated with the credentials are not included in the
+                LLDP agent."
+            SYNTAX OCTET STRING (SIZE (1..31))
+
+    
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+        hwEthOam OBJECT IDENTIFIER ::= { hwDatacomm 136 }
+
+        
+        hwEthOam1ag OBJECT IDENTIFIER ::= { hwEthOamMib 1 }
+
+        
+--   1ag global scalar node
+        hwDot1agCfmEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable the Connectivity Fault Management globally on the device, which is the prerequisite for all the CFM related operations.
+                Disabling the CFM can delete all the previous CFM configurations.
+                "
+            ::= { hwEthOam1ag 1 }
+
+        
+        hwDot1agCfmErrMsgStatisticsEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable all the debugging of the error packet statistics globally.
+                "
+            ::= { hwEthOam1ag 2 }
+
+        
+        hwDot1agCfmMipCreation OBJECT-TYPE
+            SYNTAX Dot1agCfmMhfCreation
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the MIP creation rules globally.
+                "
+            ::= { hwEthOam1ag 3 }
+
+        
+        hwDot1agCfmMacTunnelTraceResponseEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable/Disable the Trace reverse function for the middle node of the MAC Tunnel.
+                "
+            ::= { hwEthOam1ag 4 }
+
+        
+        hwDot1agCfmErrorSmacStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics source mac for the global error packets.
+                "
+            ::= { hwEthOam1ag 5 }
+
+        
+        hwDot1agCfmErrorIntervalStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics interval for the global error packets.
+                "
+            ::= { hwEthOam1ag 6 }
+
+        
+        hwDot1agCfmErrorMaIdStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics MAID for the global error packets.
+                "
+            ::= { hwEthOam1ag 7 }
+
+        
+        hwDot1agCfmMdObjet OBJECT IDENTIFIER ::= { hwEthOam1ag 8 }
+
+        
+--   hwDot1agCfmMdObjet 
+        hwDot1agCfmMdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmMdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " 
+                MD table.
+                "
+            REFERENCE
+                "802.1ag clause 3.16 and 18.2"
+            ::= { hwDot1agCfmMdObjet 1 }
+
+        
+        hwDot1agCfmMdEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmMdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MD table entry."
+            AUGMENTS { dot1agCfmMdEntry }
+            ::= { hwDot1agCfmMdTable 1 }
+
+        
+        HwDot1agCfmMdEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmMdErrMsgStatisticsEnabled
+                    EnabledStatus,
+                hwDot1agCfmMdErrorSmacStatistics
+                    Counter32,
+                hwDot1agCfmMdErrorIntervalStatistics
+                    Counter32,
+                hwDot1agCfmMdErrorMaIdStatistics
+                    Counter32
+             }
+
+        hwDot1agCfmMdErrMsgStatisticsEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Md enables the debugging of the error packet statistics.
+                "
+            ::= { hwDot1agCfmMdEntry 11 }
+
+        
+        hwDot1agCfmMdErrorSmacStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics source mac for the error packets in Md
+                "
+            ::= { hwDot1agCfmMdEntry 12 }
+
+        
+        hwDot1agCfmMdErrorIntervalStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics interval for the error packets in Md
+                "
+            ::= { hwDot1agCfmMdEntry 13 }
+
+        
+        hwDot1agCfmMdErrorMaIdStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics MAID for the error packets in Md
+                "
+            ::= { hwDot1agCfmMdEntry 14 }
+
+        
+        hwDot1agCfmMaObjet OBJECT IDENTIFIER ::= { hwEthOam1ag 9 }
+
+        
+--  hwDot1agCfmMaObject
+        hwDot1agCfmMaTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmMaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " "
+            REFERENCE
+                "802.1ag clause 3.16 and 18.2"
+            ::= { hwDot1agCfmMaObjet 1 }
+
+        
+        hwDot1agCfmMaEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmMaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MA table entry."
+            AUGMENTS { dot1agCfmMaEntry }
+            ::= { hwDot1agCfmMaTable 1 }
+
+        
+        HwDot1agCfmMaEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmPriority
+                    Dot1agCfmMaintenanceDomainLevel,
+                hwDot1agCfmMaCcmInterval
+                    INTEGER,
+                hwDot1agCcSendEnabled
+                    EnabledStatus,
+                hwDot1agCcReceiveEnabled
+                    EnabledStatus,
+                hwDot1agCfmMaErrMsgStatisticsEnabled
+                    EnabledStatus,
+                hwDot1agCfmMaErrorSmacStatistics
+                    Counter32,
+                hwDot1agCfmMaErrorIntervalStatistics
+                    Counter32,
+                hwDot1agCfmMaErrorMaIdStatistics
+                    Counter32,
+                hwDot1agCfmMaDetectMalfunction
+                    Integer32,
+                hwDot1agCfmMaBindIfId
+                    Integer32,
+                hwDot1agCfmMaUnBindIfId
+                    Integer32,
+                hwDot1agCfmMaIfType
+                    INTEGER
+             }
+
+        hwDot1agCfmPriority OBJECT-TYPE
+            SYNTAX Dot1agCfmMaintenanceDomainLevel
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CFM priority,0~7    "
+            REFERENCE
+                "802.1ag clause 12.14.6.1.4"
+            DEFVAL { 6 }
+            ::= { hwDot1agCfmMaEntry 11 }
+
+        
+        hwDot1agCfmMaCcmInterval OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            intervalInvalid(0),
+            interval300hz(1),
+            interval10ms(2),
+            interval100ms(3),
+            interval1s(4),
+            interval10s(5),
+            interval1min(6),
+            interval10min(7),
+            interval20ms(8),
+            interval30ms(9),
+            interval50ms(10)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Interval between CCM transmissions to be used by all MEPs
+                in the MA.
+                "
+            REFERENCE
+                "802.1ag clause 12.14.6.1.3"
+            DEFVAL { 4 }
+            ::= { hwDot1agCfmMaEntry 12 }
+
+        
+        hwDot1agCcSendEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "TO ALL MEP: CC-Send enable       "
+            REFERENCE
+                "802.1ag clause 12.14.6.1.4"
+            ::= { hwDot1agCfmMaEntry 13 }
+
+        
+        hwDot1agCcReceiveEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Enable the CC reception debugging in Ma
+                "
+            REFERENCE
+                "802.1ag clause 12.14.6.1.4"
+            ::= { hwDot1agCfmMaEntry 14 }
+
+        
+        hwDot1agCfmMaErrMsgStatisticsEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "MD enables the debugging of the error packets."
+            ::= { hwDot1agCfmMaEntry 15 }
+
+        
+        hwDot1agCfmMaErrorSmacStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The results of the statistics source mac for the error packets in Ma"
+            ::= { hwDot1agCfmMaEntry 16 }
+
+        
+        hwDot1agCfmMaErrorIntervalStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The results of the statistics interval for the error packets in Ma"
+            ::= { hwDot1agCfmMaEntry 17 }
+
+        
+        hwDot1agCfmMaErrorMaIdStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The results of the statistics MAID for the error packets in Ma"
+            ::= { hwDot1agCfmMaEntry 18 }
+
+        
+        hwDot1agCfmMaDetectMalfunction OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "802.1ag malfunction informations from 802.1ag-self and associate modules."
+            ::= { hwDot1agCfmMaEntry 19 }
+
+        
+        hwDot1agCfmMaBindIfId OBJECT-TYPE
+            SYNTAX Integer32 (0..4096 | 65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Index of interfaces associated with MA."
+            ::= { hwDot1agCfmMaEntry 20 }
+
+        
+        hwDot1agCfmMaUnBindIfId OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Index of interfaces unassociated with MA."
+            ::= { hwDot1agCfmMaEntry 21 }
+
+        
+        hwDot1agCfmMaIfType OBJECT-TYPE
+        SYNTAX INTEGER
+            {            
+            vlan(1),
+            vsi(2),
+            unbind(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of interfaces associated with MA."
+        DEFVAL { 1 }
+            ::= { hwDot1agCfmMaEntry 22 }
+
+        
+        hwDot1agCfmMepObjet OBJECT IDENTIFIER ::= { hwEthOam1ag 10 }
+
+        
+        hwDot1agCfmMepTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmMepEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "  The expansion of the MEP table of the public MIB"
+            REFERENCE
+                "802.1ag clauses 3.17, 12.14.7 and 19.2"
+            ::= { hwDot1agCfmMepObjet 1 }
+
+        
+        hwDot1agCfmMepEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmMepEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MEP table entry"
+            AUGMENTS { dot1agCfmMepEntry }
+            ::= { hwDot1agCfmMepTable 1 }
+
+        
+        HwDot1agCfmMepEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmCcmOutIfIndex
+                    InterfaceIndex,
+                hwDot1agCfmLbmOutIfIndex
+                    InterfaceIndex,
+                hwDot1agCfmLtmOutIfIndex
+                    InterfaceIndex,
+                hwDot1agCfmLbmPacketSize
+                    Integer32
+             }
+
+        hwDot1agCfmCcmOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specify the outbound interface for the MEP in Up type."
+            DEFVAL { "" }
+            ::= { hwDot1agCfmMepEntry 11 }
+
+        
+        hwDot1agCfmLbmOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specify the outbound interface for the LBM."
+            DEFVAL { "" }
+            ::= { hwDot1agCfmMepEntry 12 }
+
+        
+        hwDot1agCfmLtmOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specify the outbound interface for the LTM."
+            REFERENCE
+                "802.1ag clauses 12.14.7.1.3 and 20.9.1"
+            DEFVAL { "" }
+            ::= { hwDot1agCfmMepEntry 13 }
+
+        
+        hwDot1agCfmLbmPacketSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify the size of the LBM packets."
+            ::= { hwDot1agCfmMepEntry 14 }
+
+        
+        hwDot1agCfmRMepObjet OBJECT IDENTIFIER ::= { hwEthOam1ag 11 }
+
+        
+        hwDot1agCfmRMepTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmRMepEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " 
+                The remote MEP table
+                "
+            ::= { hwDot1agCfmRMepObjet 1 }
+
+        
+        hwDot1agCfmRMepEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmRMepEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The remote MEP entity
+                "
+            INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, hwDot1agCfmRMepIdentifier }
+            ::= { hwDot1agCfmRMepTable 1 }
+
+        
+        HwDot1agCfmRMepEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmRMepIdentifier
+                    Dot1agCfmMepId,
+                hwDot1agCfmRMepMacAddress
+                    MacAddress,
+                hwDot1agCfmRMepCcReceiveEnabled
+                    EnabledStatus,
+                hwDot1agCfmRMepErrMsgStatisticsEnabled
+                    EnabledStatus,
+                hwDot1agCfmRMepHighestPrDefect
+                    Dot1agCfmHighestDefectPri,
+                hwDot1agCfmRMepLowPrDef
+                    Dot1agCfmLowestAlarmPri,
+                hwDot1agCfmRMepSomeRMepCcmDefect
+                    TruthValue,
+                hwDot1agCfmRMepErrorCcmDefect
+                    TruthValue,
+                hwDot1agCfmRMepXconCcmDefect
+                    TruthValue,
+                hwDot1agCfmRMepSomeRdiDefect
+                    TruthValue,
+                hwDot1agCfmRMepErrMacStatus
+                    TruthValue,
+                hwDot1agCfmRMepFngAlarmTime
+                    Integer32,
+                hwDot1agCfmRMepFngResetTime
+                    Integer32,
+                hwDot1agCfmRMepErrorSmacStatistics
+                    Counter32,
+                hwDot1agCfmRMepErrorIntervalStatistics
+                    Counter32,
+                hwDot1agCfmRMepErrorMaIdStatistics
+                    Counter32,
+                hwDot1agCfmRMepRowStatus
+                    RowStatus
+             }
+
+        hwDot1agCfmRMepIdentifier OBJECT-TYPE
+            SYNTAX Dot1agCfmMepId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " 
+                The identifier of the RMEP
+                "
+            ::= { hwDot1agCfmRMepEntry 1 }
+
+        
+        hwDot1agCfmRMepMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "MAC address of the RMEP."
+            ::= { hwDot1agCfmRMepEntry 11 }
+
+        
+        hwDot1agCfmRMepCcReceiveEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " 
+                Enable the reception function of the RMEP CCM packets.
+                "
+            ::= { hwDot1agCfmRMepEntry 12 }
+
+        
+        hwDot1agCfmRMepErrMsgStatisticsEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                RMEP enables the debugging of the error packet statistics.
+                "
+            ::= { hwDot1agCfmRMepEntry 13 }
+
+        
+        hwDot1agCfmRMepHighestPrDefect OBJECT-TYPE
+            SYNTAX Dot1agCfmHighestDefectPri
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The highest level of the faults found by the RMep
+                "
+            REFERENCE
+                "802.1ag clause 12.14.7.1.3  20.32.9 and Table 20-1"
+            ::= { hwDot1agCfmRMepEntry 14 }
+
+        
+        hwDot1agCfmRMepLowPrDef OBJECT-TYPE
+            SYNTAX Dot1agCfmLowestAlarmPri
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The lowest level of the faults that produce the alarms. The alarms that are higher than this level will be reported.
+                "
+            REFERENCE
+                "802.1ag clause 12.14.7.1.3 and 20.8.6 and Table 20-1"
+            DEFVAL { macRemErrXcon }
+            ::= { hwDot1agCfmRMepEntry 15 }
+
+        
+        hwDot1agCfmRMepSomeRMepCcmDefect OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The node indicates whether all the local MEPs in the MA receive the CC packets of the RMEP normally.
+                "
+            ::= { hwDot1agCfmRMepEntry 16 }
+
+        
+        hwDot1agCfmRMepErrorCcmDefect OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The node indicates that the error CC packets of the RMEP are received.
+                "
+            ::= { hwDot1agCfmRMepEntry 17 }
+
+        
+        hwDot1agCfmRMepXconCcmDefect OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The node indicates that the CC packets received from the RMEP and the local MAID do not match with each other.
+                "
+            ::= { hwDot1agCfmRMepEntry 18 }
+
+        
+        hwDot1agCfmRMepSomeRdiDefect OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The node indicates whether the CC packets received from RMEP carry the RDI information.
+                "
+            ::= { hwDot1agCfmRMepEntry 19 }
+
+        
+        hwDot1agCfmRMepErrMacStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The node indicates whether the CCM packets received from the remote end carry theInterface TLV information.
+                "
+            ::= { hwDot1agCfmRMepEntry 20 }
+
+        
+        hwDot1agCfmRMepFngAlarmTime OBJECT-TYPE
+            SYNTAX Integer32 (250..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The time that defects must be present before a Fault Alarm is
+                issued (fngAlarmTime. 20.29.4) (default 2.5s).
+                "
+            REFERENCE
+                "802.1ag clauses 12.14.6.1.3 and 20.32.3"
+            DEFVAL { 250 }
+            ::= { hwDot1agCfmRMepEntry 21 }
+
+        
+        hwDot1agCfmRMepFngResetTime OBJECT-TYPE
+            SYNTAX Integer32 (250..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The time that defects must be absent before re-enabling a
+                Fault Alarm (fngResetTime,20.29.5) (default 10s).
+                "
+            REFERENCE
+                "802.1ag clauses 12.14.6.1.3 and 20.32.4"
+            DEFVAL { 1000 }
+            ::= { hwDot1agCfmRMepEntry 22 }
+
+        
+        hwDot1agCfmRMepErrorSmacStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics for the error source mac packets received from RMEP
+                "
+            ::= { hwDot1agCfmRMepEntry 23 }
+
+        
+        hwDot1agCfmRMepErrorIntervalStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics for the error interval packets received from RMEP
+                "
+            ::= { hwDot1agCfmRMepEntry 24 }
+
+        
+        hwDot1agCfmRMepErrorMaIdStatistics OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the statistics for the error MAID packets received from RMEP
+                "
+            ::= { hwDot1agCfmRMepEntry 25 }
+
+        
+        hwDot1agCfmRMepRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The status of the row.
+                The writable columns in a row can not be changed if the row
+                is active. All columns must have a valid value before a row
+                can be activated.
+                "
+            ::= { hwDot1agCfmRMepEntry 51 }
+
+        
+        hwDot1agCfmMipObjet OBJECT IDENTIFIER ::= { hwEthOam1ag 12 }
+
+        
+-- hwDot1agCfmMipObject
+        hwDot1agCfmMipCreationTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmMipCreationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the MIP rule table on the interface.
+                "
+            ::= { hwDot1agCfmMipObjet 1 }
+
+        
+        hwDot1agCfmMipCreationEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmMipCreationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the MIP rule entity on the interface.
+                "
+            INDEX { hwDot1agCfmIfIndex }
+            ::= { hwDot1agCfmMipCreationTable 1 }
+
+        
+        HwDot1agCfmMipCreationEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmIfIndex
+                    InterfaceIndex,
+                hwDot1agCfmMipCreationType
+                    Dot1agCfmMhfCreation,
+                hwDot1agCfmMipCreationTypeRowStatus
+                    RowStatus
+             }
+
+        hwDot1agCfmIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Create the interface index of the MIP"
+            ::= { hwDot1agCfmMipCreationEntry 1 }
+
+        
+        hwDot1agCfmMipCreationType OBJECT-TYPE
+            SYNTAX Dot1agCfmMhfCreation
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "MIP creation rules"
+            ::= { hwDot1agCfmMipCreationEntry 11 }
+
+        
+        hwDot1agCfmMipCreationTypeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of the row.
+                The writable columns in a row can not be changed if the row
+                is active. All columns must have a valid value before a row
+                can be activated."
+            ::= { hwDot1agCfmMipCreationEntry 51 }
+
+        
+        hwDot1agCfmMipTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1agCfmMipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the MIP rule table on the interface.
+                "
+            ::= { hwDot1agCfmMipObjet 2 }
+
+        
+        hwDot1agCfmMipEntry OBJECT-TYPE
+            SYNTAX HwDot1agCfmMipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the MIP rule entity on the interface.
+                "
+            INDEX { hwDot1agCfmMipIfIndex }
+            ::= { hwDot1agCfmMipTable 1 }
+
+        
+        HwDot1agCfmMipEntry ::=
+            SEQUENCE { 
+                hwDot1agCfmMipIfIndex
+                    InterfaceIndex,
+                hwDot1agCfmMipLevel
+                    Dot1agCfmMaintenanceDomainLevel
+             }
+
+        hwDot1agCfmMipIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of the MIP interface"
+            ::= { hwDot1agCfmMipEntry 1 }
+
+        
+        hwDot1agCfmMipLevel OBJECT-TYPE
+            SYNTAX Dot1agCfmMaintenanceDomainLevel
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Maintenance Domain Level."
+            REFERENCE
+                "802.1ag clause 12.14.5.1.3 b)"
+            DEFVAL { 0 }
+            ::= { hwDot1agCfmMipEntry 11 }
+
+        
+        hwEthOam3ah OBJECT IDENTIFIER ::= { hwEthOamMib 2 }
+
+        
+--  ---------------------------------------------    
+-- hwDot3ah
+-- ---------------------------------------------
+        hwDot3ahEfmEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable the EFM globally.
+                "
+            ::= { hwEthOam3ah 1 }
+
+        
+--  EfmObject        
+        hwDot3ahEfmObject OBJECT IDENTIFIER ::= { hwEthOam3ah 2 }
+
+        
+--  DetectModeTable        
+        hwDot3ahEfmDetectModeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmDetectModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Set the detection mode table in the last one kilometer on the interface.
+                "
+            ::= { hwDot3ahEfmObject 1 }
+
+        
+        hwDot3ahEfmDetectModeEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmDetectModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Set the detection mode entity in the last one kilometer on the interface.
+                "
+            AUGMENTS { hwDot3ahEfmEntry }
+            ::= { hwDot3ahEfmDetectModeTable 1 }
+
+        
+        HwDot3ahEfmDetectModeEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmDetectMode
+                    HWDetectType,
+                hwDot3ahEfmDetectInterval
+                    TimeInterval,
+                hwDot3ahEfmDetectMalfunction
+                    Integer32
+             }
+
+        hwDot3ahEfmDetectMode OBJECT-TYPE
+            SYNTAX HWDetectType
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Detection mode ( fast detection and standard detection)
+                "
+            DEFVAL { NormalDetect }
+            ::= { hwDot3ahEfmDetectModeEntry 11 }
+
+        
+        hwDot3ahEfmDetectInterval OBJECT-TYPE
+            SYNTAX TimeInterval
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Time interval of detection
+                "
+            ::= { hwDot3ahEfmDetectModeEntry 12 }
+
+        
+        hwDot3ahEfmDetectMalfunction OBJECT-TYPE
+            SYNTAX Integer32 (0..768)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Failure description from 802.3ah and from associated modules.
+                "
+            ::= { hwDot3ahEfmDetectModeEntry 13 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Control group
+-- 
+        hwDot3ahEfmTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the primary controls and status for the
+                OAM capabilities of an Ethernet like interface.  There will be
+                one row in this table for each Ethernet like interface in the
+                system that supports the OAM functions defined in [802.3ah].
+                "
+            ::= { hwDot3ahEfmObject 2 }
+
+        
+        hwDot3ahEfmEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table, containing information on the Ethernet
+                OAM function for a single Ethernet like interface. Entries in
+                the table are created automatically for each interface
+                supporting Ethernet OAM. The status of the row entry can be
+                determined from hwDot3ahEfmOperStatus.  
+                
+                A hwDot3ahEfmEntry is indexed in the hwDot3ahEfmTable by the ifIndex
+                object of the Interfaces MIB.  
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmTable 1 }
+
+        
+        HwDot3ahEfmEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmAdminState
+                    EnabledStatus,
+                hwDot3ahEfmOperStatus
+                    INTEGER,
+                hwDot3ahEfmMode
+                    INTEGER,
+                hwDot3ahEfmMaxOamPduSize
+                    Unsigned32,
+                hwDot3ahEfmConfigRevision
+                    Unsigned32,
+                hwDot3ahEfmFunctionsSupported
+                    BITS
+             }
+
+        hwDot3ahEfmAdminState OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to provision the default administrative
+                OAM mode for this interface.  This object represents the
+                desired state of OAM for this interface.  
+                
+                The hwDot3ahEfmAdminState always starts in the disabled(2) state
+                until an explicit management action or configuration
+                information retained by the system causes a transition to the
+                enabled(2) state.   When enabled(1), Ethernet OAM will attempt
+                to operate over this interface.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.2"
+            ::= { hwDot3ahEfmEntry 1 }
+
+        
+        hwDot3ahEfmOperStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                disabled(1),
+                linkFault(2),
+                passiveWait(3),
+                activeSendLocal(4),
+                sendLocalAndRemote(5),
+                sendLocalAndRemoteOk(6),
+                oamPeeringLocallyRejected(7),
+                oamPeeringRemotelyRejected(8),
+                operational(9),
+                nonOperHalfDuplex(10)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "At initialization and failure conditions, two OAM entities on
+                the same full-duplex Ethernet link begin a discovery phase to
+                determine what OAM capabilities may be used on that link.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.4, 30.3.6.1.10, 30.3.6.1.11"
+            ::= { hwDot3ahEfmEntry 2 }
+
+        
+        hwDot3ahEfmMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                active(1),
+                passive(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object configures the mode of OAM operation for this
+                Ethernet like interface.  OAM on Ethernet interfaces may be in
+                'active' mode or 'passive' mode.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.3"
+            ::= { hwDot3ahEfmEntry 3 }
+
+        
+        hwDot3ahEfmMaxOamPduSize OBJECT-TYPE
+            SYNTAX Unsigned32 (64..1518)
+            UNITS "octets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The largest OAMPDU that the OAM entity supports.  OAM
+                entities exchange maximum OAMPDU sizes and negotiate to use
+                the smaller of the two maximum OAMPDU sizes between the peers.
+                This value is determined by the local implementation.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.8"
+            ::= { hwDot3ahEfmEntry 4 }
+
+        
+        hwDot3ahEfmConfigRevision OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The configuration revision of the OAM entity as reflected in
+                the latest OAMPDU sent by the OAM entity.  The config revision
+                is used by OAM entities to indicate configuration changes have
+                occurred which might require the peer OAM entity to
+                re-evaluate whether OAM peering is allowed. 
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.12"
+            ::= { hwDot3ahEfmEntry 5 }
+
+        
+        hwDot3ahEfmFunctionsSupported OBJECT-TYPE
+            SYNTAX BITS
+                {
+                unidirectionalSupport(0),
+                loopbackSupport(1),
+                eventSupport(2),
+                variableSupport(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OAM functions supported on this Ethernet like interface.
+                OAM consists of separate functional sets beyond the basic
+                discovery process which is always required.  These functional
+                groups can be supported independently by any implementation.
+                These values are communicated to the peer via the local
+                configuration field of Information OAMPDUs.  
+                
+                Setting 'unidirectionalSupport(0)' indicates that the OAM
+                entity supports the transmission of OAMPDUs on links that are
+                operating in unidirectional mode (traffic flowing in one
+                direction only).  Setting 'loopbackSupport(1)' indicates the
+                OAM entity can initiate and respond to loopback commands.
+                Setting 'eventSupport(2)' indicates the OAM entity can send
+                and receive Event Notification OAMPDUs. Setting
+                'variableSupport(3)' indicates the OAM entity can send and
+                receive Variable Request and Response OAMPDUs.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.6"
+            ::= { hwDot3ahEfmEntry 6 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Peer group
+-- 
+        hwDot3ahEfmPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains information about the OAM peer for a
+                particular Ethernet like interface. OAM entities communicate
+                with a single OAM peer entity on Ethernet links on which OAM
+                is enabled and operating properly.  There is one entry in this
+                table for each entry in the hwDot3ahEfmTable for which information
+                on the peer OAM entity is available.  
+                "
+            ::= { hwDot3ahEfmObject 3 }
+
+        
+        hwDot3ahEfmPeerEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table, containing information on the peer OAM
+                entity for a single Ethernet like interface.  
+                
+                Note that there is at most one OAM peer for each Ethernet like
+                interface.  Entries are automatically created when information
+                about the OAM peer entity becomes available, and automatically
+                deleted when the OAM peer entity is no longer in
+                communication.  Peer information is not available when
+                hwDot3ahEfmOperStatus is disabled(1), linkFault(2),
+                passiveWait(3), activeSendLocal(4). or nonOperHalfDuplex(10)). 
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmPeerTable 1 }
+
+        
+        HwDot3ahEfmPeerEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmPeerMacAddress
+                    MacAddress,
+                hwDot3ahEfmPeerVendorOui
+                    HWDot3Oui,
+                hwDot3ahEfmPeerVendorInfo
+                    Unsigned32,
+                hwDot3ahEfmPeerMode
+                    INTEGER,
+                hwDot3ahEfmPeerMaxOamPduSize
+                    Unsigned32,
+                hwDot3ahEfmPeerConfigRevision
+                    Unsigned32,
+                hwDot3ahEfmPeerFunctionsSupported
+                    BITS
+             }
+
+        hwDot3ahEfmPeerMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The MAC address of the peer OAM entity.  The MAC address is
+                derived from the most recently received OAMPDU.
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.5."
+            ::= { hwDot3ahEfmPeerEntry 1 }
+
+        
+        hwDot3ahEfmPeerVendorOui OBJECT-TYPE
+            SYNTAX HWDot3Oui
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OUI of the OAM peer as reflected in the latest
+                Information OAMPDU received with a Local Information TLV.  The
+                OUI can be used to identify the vendor of the remote OAM
+                entity.  This value is initialized to zero before any Local
+                Information TLV is received.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.16."
+            ::= { hwDot3ahEfmPeerEntry 2 }
+
+        
+        hwDot3ahEfmPeerVendorInfo OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Vendor Info of the OAM peer as reflected in the latest
+                Information OAMPDU received with a Local Information TLV.  The
+                vendor information field is within the Local Information TLV,
+                and can be used to determine additional information about the
+                peer entity.  The format of the vendor information is
+                unspecified within the 32-bit field.  This value is
+                initialized to zero before any Local Information TLV is
+                received.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.17."
+            ::= { hwDot3ahEfmPeerEntry 3 }
+
+        
+        hwDot3ahEfmPeerMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                active(1),
+                passive(2),
+                unknown(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The mode of the OAM peer as reflected in the latest
+                Information OAMPDU received with a Local Information TLV.  The
+                mode of the peer can be determined from the Configuration
+                field in the Local Information TLV of the last Information
+                OAMPDU received from the peer.  The value is unknown(3)
+                whenever no Local Information TLV has been received.  The
+                values of active(1) and passive(2) are returned when a Local
+                Information TLV has been received indicating the peer is in
+                active or passive mode, respectively. 
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.7."
+            ::= { hwDot3ahEfmPeerEntry 4 }
+
+        
+        hwDot3ahEfmPeerMaxOamPduSize OBJECT-TYPE
+            SYNTAX Unsigned32 (0..1518)
+            UNITS "octets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum size of OAMPDU supported by the peer as reflected
+                in the latest Information OAMPDU received with a Local
+                Information TLV.   Ethernet OAM on this interface must not use
+                OAMPDUs that exceed this size.  The maximum OAMPDU size can be
+                determined from the PDU Configuration field of the Local
+                Information TLV of the last Information OAMPDU received from
+                the peer.  A value of zero is returned if no Local Information
+                TLV has been received.  Otherwise, the value of the OAM peer's
+                maximum OAMPDU size is returned in this value.  
+                Note that the values 1..63 are invalid sizes for Ethernet
+                frames and should never appear. 
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.9."
+            ::= { hwDot3ahEfmPeerEntry 5 }
+
+        
+        hwDot3ahEfmPeerConfigRevision OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The configuration revision of the OAM peer as reflected in
+                the latest OAMPDU.  This attribute is changed by the peer
+                whenever it has a local configuration change for Ethernet OAM
+                this interface.  The configuration revision can be determined
+                from the Revision field of the Local Information TLV of the
+                most recently received Information OAMPDU with a Local
+                Information TLV. A value of zero is returned if no Local
+                Information TLV has been received.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.13."
+            ::= { hwDot3ahEfmPeerEntry 6 }
+
+        
+        hwDot3ahEfmPeerFunctionsSupported OBJECT-TYPE
+            SYNTAX BITS
+                {
+                unidirectionalSupport(0),
+                loopbackSupport(1),
+                eventSupport(2),
+                variableSupport(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OAM functions supported on this Ethernet like interface.
+                OAM consists of separate functionality sets above the basic
+                discovery process.  This value indicates the capabilities of
+                the peer OAM entity with respect to these functions.  This
+                value is initialized so all bits are clear. 
+                
+                If unidirectionalSupport(0) is set, then the peer OAM entity
+                supports sending OAM frames on Ethernet interfaces when the
+                receive path is known to be inoperable.   If
+                loopbackSupport(1) is set, then the peer OAM entity can send
+                and receive OAM loopback commands.  If eventSupport(2) is set,
+                then the peer OAM entity can send and receive event OAMPDUs to
+                signal various error conditions. If variableSupport(3) is set,
+                then the peer OAM entity can send and receive variable
+                requests to monitor attribute value as described in Clause 57
+                of [802.3ah].   
+                
+                The capabilities of the OAM peer can be determined from the
+                configuration field of the Local Information TLV of the most
+                recently received Information OAMPDU with a Local Information
+                TLV.  All zeros are returned if no Local Information TLV has
+                yet been received. 
+                "
+            REFERENCE
+                "[802.3ah], REFERENCE 30.3.6.1.7."
+            ::= { hwDot3ahEfmPeerEntry 7 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Loopback group
+--  
+        hwDot3ahEfmLoopbackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains controls for the loopback state of the
+                local link as well as indicating the status of the loopback
+                function.  There is one entry in this table for each entry in
+                hwDot3ahEfmTable that supports loopback functionality (where
+                hwDot3ahEfmFunctionsSupported includes the loopbackSupport bit
+                set).
+                
+                Loopback can be used to place the remote OAM entity in a state
+                where every received frame (except OAMPDUs) is echoed back
+                over the same interface on which they were received.   In this
+                state, at the remote entity, 'normal' traffic is disabled as
+                only the looped back frames are transmitted on the interface.
+                Loopback is thus an intrusive operation that prohibits normal
+                data flow and should be used accordingly.  "
+            ::= { hwDot3ahEfmObject 4 }
+
+        
+        hwDot3ahEfmLoopbackEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table, containing information on the loopback
+                status for a single Ethernet like interface.  Entries in the
+                table are automatically created whenever the local OAM entity
+                supports loopback capabilities.  The loopback status on the
+                interface can be determined from the hwDot3ahEfmLoopbackStatus
+                object.  
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmLoopbackTable 1 }
+
+        
+        HwDot3ahEfmLoopbackEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmLoopbackStatus
+                    INTEGER,
+                hwDot3ahEfmLoopbackIgnoreRx
+                    INTEGER,
+                hwDot3ahEfmLoopbackTimeout
+                    Unsigned32
+             }
+
+        hwDot3ahEfmLoopbackStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                noLoopback(1),
+                initiatingLoopback (2),
+                remoteLoopback(3),
+                terminatingLoopback(4),
+                localLoopback(5),
+                unknown(6)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The loopback status of the OAM entity. When
+                operating in normal mode with no loopback in progress, the
+                status reads noLoopback(1). 
+                The values initiatingLooopback(2) and terminatingLoopback(4)
+                can be read or written.  The other values can only be read -
+                they can never be written.      
+                "
+            REFERENCE
+                "[802.3ah], REFERENCE 57.2.11, 30.3.61.14, 
+                30.3.6.1.15"
+            ::= { hwDot3ahEfmLoopbackEntry 1 }
+
+        
+        hwDot3ahEfmLoopbackIgnoreRx OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ignore(1),
+                process(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Since OAM loopback is a disruptive operation (user traffic
+                does not pass), this attribute provides a mechanism to provide
+                controls over whether received OAM loopback commands are
+                processed or ignored.  When the value is ignore(1), received
+                loopback commands are ignored.  When the value is process(2),
+                OAM loopback commands are processed.  The default value is to
+                ignore loopback commands (ignore(1)).  
+                "
+            REFERENCE
+                "[802.3ah], REFERENCE 57.2.11, 30.3.61.14, 
+                30.3.6.1.15"
+            ::= { hwDot3ahEfmLoopbackEntry 2 }
+            
+            
+        hwDot3ahEfmLoopbackTimeout OBJECT-TYPE
+            SYNTAX Unsigned32 (0..1000)
+            UNITS "minutes"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object specifies the timeout period for a remote loopback. The 
+                 value ranges from 0 to 1000 in minutes. The default value is 20 
+                 minutes. 0 indicates that no timeout period is set.
+                "
+            DEFVAL { 20 }
+            ::= { hwDot3ahEfmLoopbackEntry 3 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Statistics group
+-- 
+        hwDot3ahEfmStatsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains statistics for the OAM function on a
+                particular Ethernet like interface. There is an entry in the
+                table for every entry in the hwDot3ahEfmTable. 
+                
+                The counters in this table are defined as 32-bit entries to
+                match the counter size as defined in [802.3ah].  Given the OAM
+                protocol is a slow protocol, the counters increment at a slow
+                rate. 
+                "
+            ::= { hwDot3ahEfmObject 5 }
+
+        
+        hwDot3ahEfmStatsEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table, containing statistics information on
+                the Ethernet OAM function for a single Ethernet like
+                interface.  Entries are automatically created for every entry
+                in the hwDot3ahEfmTable.  Counters are maintained across
+                transitions in hwDot3ahEfmOperStatus.  
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmStatsTable 1 }
+
+        
+        HwDot3ahEfmStatsEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmInformationTx
+                    Counter32,
+                hwDot3ahEfmInformationRx
+                    Counter32,
+                hwDot3ahEfmUniqueEventNotificationTx
+                    Counter32,
+                hwDot3ahEfmUniqueEventNotificationRx
+                    Counter32,
+                hwDot3ahEfmDuplicateEventNotificationTx
+                    Counter32,
+                hwDot3ahEfmDuplicateEventNotificationRx
+                    Counter32,
+                hwDot3ahEfmLoopbackControlTx
+                    Counter32,
+                hwDot3ahEfmLoopbackControlRx
+                    Counter32,
+                hwDot3ahEfmVariableRequestTx
+                    Counter32,
+                hwDot3ahEfmVariableRequestRx
+                    Counter32,
+                hwDot3ahEfmVariableResponseTx
+                    Counter32,
+                hwDot3ahEfmVariableResponseRx
+                    Counter32,
+                hwDot3ahEfmOrgSpecificTx
+                    Counter32,
+                hwDot3ahEfmOrgSpecificRx
+                    Counter32,
+                hwDot3ahEfmUnsupportedCodesTx
+                    Counter32,
+                hwDot3ahEfmUnsupportedCodesRx
+                    Counter32,
+                hwDot3ahEfmFramesLostDueToOam
+                    Counter32
+             }
+
+        hwDot3ahEfmInformationTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Information OAMPDUs transmitted on
+                this interface.
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.20."
+            ::= { hwDot3ahEfmStatsEntry 1 }
+
+        
+        hwDot3ahEfmInformationRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Information OAMPDUs received on this
+                interface.
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.21."
+            ::= { hwDot3ahEfmStatsEntry 2 }
+
+        
+        hwDot3ahEfmUniqueEventNotificationTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of unique Event OAMPDUs transmitted on
+                this interface.  Event notifications may be sent in duplicate
+                to increase the probability of successfully being received,
+                given the possibility that a frame may be lost in transit.
+                Duplicate Event Notification transmissions are counted by
+                hwDot3ahEfmDuplicateEventNotificationTx.  
+                
+                A unique Event Notification OAMPDU is indicated as an Event
+                Notification OAMPDU with a Sequence Number field that is
+                distinct from the previously transmitted Event Notification
+                OAMPDU Sequence Number.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.22."
+            ::= { hwDot3ahEfmStatsEntry 3 }
+
+        
+        hwDot3ahEfmUniqueEventNotificationRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of unique Event OAMPDUs received on
+                this interface.  Event notification OAMPDUs may be sent in
+                duplicate to increase the probability of successfully being
+                received, given the possibility that a frame may be lost in
+                transit.  Duplicate Event Notification receptions are counted
+                by hwDot3ahEfmDuplicateEventNotificationRx.  
+                
+                A unique Event Notification OAMPDU is indicated as an Event
+                Notification OAMPDU with a Sequence Number field that is
+                distinct from the previously received Event Notification
+                OAMPDU Sequence Number.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.24."
+            ::= { hwDot3ahEfmStatsEntry 4 }
+
+        
+        hwDot3ahEfmDuplicateEventNotificationTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of duplicate Event OAMPDUs transmitted
+                on this interface.  Event notification OAMPDUs may be sent in
+                duplicate to increase the probability of successfully being
+                received, given the possibility that a frame may be lost in
+                transit.  
+                
+                A duplicate Event Notification OAMPDU is indicated as an Event
+                Notification OAMPDU with a Sequence Number field that is
+                identical to the previously transmitted Event Notification
+                OAMPDU Sequence Number.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.23."
+            ::= { hwDot3ahEfmStatsEntry 5 }
+
+        
+        hwDot3ahEfmDuplicateEventNotificationRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of duplicate Event OAMPDUs received on
+                this interface.  Event notification OAMPDUs may be sent in
+                duplicate to increase the probability of successfully being
+                received, given the possibility that a frame may be lost in
+                transit.  
+                
+                A duplicate Event Notification OAMPDU is indicated as an Event
+                Notification OAMPDU with a Sequence Number field that is
+                identical to the previously received Event Notification OAMPDU
+                Sequence Number.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.25."
+            ::= { hwDot3ahEfmStatsEntry 6 }
+
+        
+        hwDot3ahEfmLoopbackControlTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Loopback Control OAMPDUs transmitted
+                on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.26."
+            ::= { hwDot3ahEfmStatsEntry 7 }
+
+        
+        hwDot3ahEfmLoopbackControlRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Loopback Control OAMPDUs received
+                on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.27."
+            ::= { hwDot3ahEfmStatsEntry 8 }
+
+        
+        hwDot3ahEfmVariableRequestTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Variable Request OAMPDUs transmitted
+                on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.28."
+            ::= { hwDot3ahEfmStatsEntry 9 }
+
+        
+        hwDot3ahEfmVariableRequestRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Variable Request OAMPDUs received on
+                this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.29."
+            ::= { hwDot3ahEfmStatsEntry 10 }
+
+        
+        hwDot3ahEfmVariableResponseTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Variable Response OAMPDUs
+                transmitted on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.30."
+            ::= { hwDot3ahEfmStatsEntry 11 }
+
+        
+        hwDot3ahEfmVariableResponseRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Variable Response OAMPDUs received
+                on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.31."
+            ::= { hwDot3ahEfmStatsEntry 12 }
+
+        
+        hwDot3ahEfmOrgSpecificTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Organization Specific OAMPDUs
+                transmitted on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.32."
+            ::= { hwDot3ahEfmStatsEntry 13 }
+
+        
+        hwDot3ahEfmOrgSpecificRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of Organization Specific OAMPDUs
+                received on this interface.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.33."
+            ::= { hwDot3ahEfmStatsEntry 14 }
+
+        
+        hwDot3ahEfmUnsupportedCodesTx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of OAMPDUs transmitted on this
+                interface with an unsupported op-code.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.18."
+            ::= { hwDot3ahEfmStatsEntry 15 }
+
+        
+        hwDot3ahEfmUnsupportedCodesRx OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of OAMPDUs received on this interface
+                with an unsupported op-code.  
+                
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.19."
+            ::= { hwDot3ahEfmStatsEntry 16 }
+
+        
+        hwDot3ahEfmFramesLostDueToOam OBJECT-TYPE
+            SYNTAX Counter32
+            UNITS "frames"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A count of the number of frames that were dropped by the OAM
+                multiplexer.  Since the OAM multiplexer has multiple inputs
+                and a single output, there may be cases where frames are
+                dropped due to transmit resource contention.  This counter is
+                incremented whenever a frame is dropped by the OAM layer.
+                Note that any Ethernet frame, not just OAMPDUs, may be dropped
+                by the OAM layer.  This can occur when an OAMPDU takes
+                precedence over a 'normal' frame resulting in the 'normal'
+                frame being dropped.  
+                
+                When this counter is incremented, no other counters in this
+                MIB are incremented.  
+                              
+                Discontinuities of this counter can occur at re-initialization
+                of the management system, and at other times as indicated by
+                the value of the ifCounterDiscontinuityTime.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.46."
+            ::= { hwDot3ahEfmStatsEntry 17 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Event Configuration group
+-- 
+        hwDot3ahEfmEventConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmEventConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Ethernet OAM includes the ability to generate and receive
+                Event Notification OAMPDUs to indicate various link problems.
+                This table contains the mechanisms to enable Event
+                Notifications and configure the thresholds to generate the
+                standard Ethernet OAM events.  There is one entry in the table
+                for every entry in hwDot3ahEfmTable that supports OAM events
+                (where hwDot3ahEfmFunctionsSupported includes the eventSupport
+                bit set). The values in the table are maintained across
+                changes to hwDot3ahEfmOperStatus.  
+                
+                The standard threshold crossing events are:
+                  - Errored Symbol Period Event.  Generated when the number of
+                    symbol errors exceeds a threshold within a given window 
+                    defined by a number of symbols (for example, 1,000 symbols
+                    out of 1,000,000 had errors).  
+                  - Errored Frame Period Event.  Generated when the number of 
+                    frame errors exceeds a threshold within a given window 
+                    defined by a number of frames (for example, 10 frames out
+                    of 1000 had errors).  
+                  - Errored Frame Event.  Generated when the number of frame 
+                    errors exceeds a threshold within a given window defined 
+                    by a period of time (for example, 10 frames in 1 second 
+                    had errors).
+                  - Errored Frame Seconds Summary Event.  Generated when the 
+                    number of errored frame seconds exceeds a threshold within
+                    a given time period (for example, 10 errored frame seconds
+                    within the last 100 seconds).  An errored frame second is 
+                    defined as a 1 second interval which had >0 frame errors.  
+                There are other events (dying gasp, critical events) that are
+                not threshold crossing events but which can be
+                enabled/disabled via this table.  
+                "
+            ::= { hwDot3ahEfmObject 6 }
+
+        
+        hwDot3ahEfmEventConfigEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmEventConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries are automatically created and deleted from this
+                table, and exist whenever the OAM entity supports Ethernet OAM
+                events (as indicated by the eventSupport bit in
+                hwDot3ahEfmFunctionsSuppported).  Values in the table are
+                maintained across changes to the value of hwDot3ahEfmOperStatus.
+                
+                Event configuration controls when the local management entity
+                sends Event Notification OAMPDUs to its OAM peer, and when
+                certain event flags are set or cleared in OAMPDUs. 
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmEventConfigTable 1 }
+
+        
+        HwDot3ahEfmEventConfigEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmErrSymPeriodWindowHi
+                    Unsigned32,
+                hwDot3ahEfmErrSymPeriodWindowLo
+                    Unsigned32,
+                hwDot3ahEfmErrSymPeriodThresholdHi
+                    Unsigned32,
+                hwDot3ahEfmErrSymPeriodThresholdLo
+                    Unsigned32,
+                hwDot3ahEfmErrSymPeriodEvNotifEnable
+                    TruthValue,
+                hwDot3ahEfmErrFramePeriodWindow
+                    Unsigned32,
+                hwDot3ahEfmErrFramePeriodThreshold
+                    Unsigned32,
+                hwDot3ahEfmErrFramePeriodEvNotifEnable
+                    TruthValue,
+                hwDot3ahEfmErrFrameWindow
+                    Unsigned32,
+                hwDot3ahEfmErrFrameThreshold
+                    Unsigned32,
+                hwDot3ahEfmErrFrameEvNotifEnable
+                    TruthValue,
+                hwDot3ahEfmErrFrameSecsSummaryWindow
+                    Integer32,
+                hwDot3ahEfmErrFrameSecsSummaryThreshold
+                    Integer32,
+                hwDot3ahEfmErrFrameSecsEvNotifEnable
+                    TruthValue,
+                hwDot3ahEfmDyingGaspEnable
+                    TruthValue,
+                hwDot3ahEfmCriticalEventEnable
+                    TruthValue
+             }
+
+        hwDot3ahEfmErrSymPeriodWindowHi OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "2^32 symbols"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The two objects hwDot3ahEfmErrSymPeriodWindowHi and
+                hwDot3ahEfmErrSymPeriodLo together form an unsigned 64-bit
+                integer representing the number of symbols over which this
+                threshold event is defined.  This is defined as
+                
+                hwDot3ahEfmErrSymPeriodWindow = ((2^32)*hwDot3ahEfmErrSymPeriodWindowHi)
+                                                + hwDot3ahEfmErrSymPeriodWindowLo
+                
+                If hwDot3ahEfmErrSymPeriodThreshold symbol errors occur within a
+                window of hwDot3ahEfmErrSymPeriodWindow symbols, an Event
+                Notification OAMPDU should be generated with an Errored Symbol
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                
+                The default value for hwDot3ahEfmErrSymPeriodWindow is the number
+                of symbols in one second for the underlying physical layer.
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.34"
+            ::= { hwDot3ahEfmEventConfigEntry 1 }
+
+        
+        hwDot3ahEfmErrSymPeriodWindowLo OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "symbols"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The two objects hwDot3ahEfmErrSymPeriodWindowHi and
+                hwDot3ahEfmErrSymPeriodWindowLo together form an unsigned 64-bit
+                integer representing the number of symbols over which this
+                threshold event is defined.  This is defined as
+                
+                hwDot3ahEfmErrSymPeriodWindow = ((2^32)*hwDot3ahEfmErrSymPeriodWindowHi)
+                                                + hwDot3ahEfmErrSymPeriodWindowLo
+                
+                If hwDot3ahEfmErrSymPeriodThreshold symbol errors occur within a
+                window of hwDot3ahEfmErrSymPeriodWindow symbols, an Event
+                Notification OAMPDU should be generated with an Errored Symbol
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                
+                The default value for hwDot3ahEfmErrSymPeriodWindow is the number
+                of symbols in one second for the underlying physical layer. 
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.34"
+            ::= { hwDot3ahEfmEventConfigEntry 2 }
+
+        
+        hwDot3ahEfmErrSymPeriodThresholdHi OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "2^32 symbols"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The two objects hwDot3ahEfmErrSymPeriodThresholdHi and
+                hwDot3ahEfmErrSymPeriodThresholdLo together form an unsigned
+                64-bit integer representing the number of symbol errors that
+                must occur within a given window to cause this event.  
+                
+                This is defined as
+                
+                  hwDot3ahEfmErrSymPeriodThreshold =
+                                    ((2^32) * hwDot3ahEfmErrSymPeriodThresholdHi)
+                                            + hwDot3ahEfmErrSymPeriodThresholdLo
+                                   
+                If hwDot3ahEfmErrSymPeriodThreshold symbol errors occur within a
+                window of hwDot3ahEfmErrSymPeriodWindow symbols, an Event
+                Notification OAMPDU should be generated with an Errored Symbol
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                
+                The default value for hwDot3ahEfmErrSymPeriodThreshold is one
+                symbol errors.  If the threshold value is zero, then an Event
+                Notification OAMPDU is sent periodically (at the end of every
+                window).  This can be used as an asynchronous notification to
+                the peer OAM entity of the statistics related to this
+                threshold crossing alarm.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.34"
+            ::= { hwDot3ahEfmEventConfigEntry 3 }
+
+        
+        hwDot3ahEfmErrSymPeriodThresholdLo OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "symbols"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The two objects hwDot3ahEfmErrSymPeriodThresholdHi and
+                hwDot3ahEfmErrSymPeriodThresholdLo together form an unsigned
+                64-bit integer representing the number of symbol errors that
+                must occur within a given window to cause this event.  
+                
+                This is defined as
+                
+                  hwDot3ahEfmErrSymPeriodThreshold =
+                                    ((2^32) * hwDot3ahEfmErrSymPeriodThresholdHi)
+                                            + hwDot3ahEfmErrSymPeriodThresholdLo
+                                   
+                If hwDot3ahEfmErrSymPeriodThreshold symbol errors occur within a
+                window of hwDot3ahEfmErrSymPeriodWindow symbols, an Event
+                Notification OAMPDU should be generated with an Errored Symbol
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                
+                The default value for hwDot3ahEfmErrSymPeriodThreshold is one
+                symbol error. If the threshold value is zero, then an Event
+                Notification OAMPDU is sent periodically (at the end of every
+                window).  This can be used as an asynchronous notification to
+                the peer OAM entity of the statistics related to this
+                threshold crossing alarm. 
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.34"
+            ::= { hwDot3ahEfmEventConfigEntry 4 }
+
+        
+        hwDot3ahEfmErrSymPeriodEvNotifEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the OAM entity should send an Event Notification
+                OAMPDU when an Errored Symbol Period Event occurs.                  
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored.
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 5 }
+
+        
+        hwDot3ahEfmErrFramePeriodWindow OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "frames"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of frames over which the threshold is defined.
+                The default value of the window is the number of minimum size
+                Ethernet frames that can be received over the physical layer
+                in one second.  
+                                
+                If hwDot3ahEfmErrFramePeriodThreshold frame errors occur within a
+                window of hwDot3ahEfmErrFramePeriodWindow frames, an Event
+                Notification OAMPDU should be generated with an Errored Frame
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.38"
+            ::= { hwDot3ahEfmEventConfigEntry 6 }
+
+        
+        hwDot3ahEfmErrFramePeriodThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "frames"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of frame errors that must occur for this event to
+                be triggered.  The default value is one frame error.  If the
+                threshold value is zero, then an Event Notification OAMPDU is
+                sent periodically (at the end of every window).  This can be
+                used as an asynchronous notification to the peer OAM entity of
+                the statistics related to this threshold crossing alarm.
+                                
+                If hwDot3ahEfmErrFramePeriodThreshold frame errors occur within a
+                window of hwDot3ahEfmErrFramePeriodWindow frames, an Event
+                Notification OAMPDU should be generated with an Errored Frame
+                Period Event TLV indicating the threshold has been crossed in
+                this window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.38"
+            ::= { hwDot3ahEfmEventConfigEntry 7 }
+
+        
+        hwDot3ahEfmErrFramePeriodEvNotifEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the OAM entity should send an Event Notification
+                OAMPDU when an Errored Frame Period Event occurs. 
+                
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored. 
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 8 }
+
+        
+        hwDot3ahEfmErrFrameWindow OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "tenths of a second"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The amount of time (in 100ms increments) over which the
+                threshold is defined.  The default value is 10 (1 second).  
+                                
+                If hwDot3ahEfmErrFrameThreshold frame errors occur within a window
+                of hwDot3ahEfmErrFrameWindow seconds (measured in tenths of
+                seconds), an Event Notification OAMPDU should be generated
+                with an Errored Frame Event TLV indicating the threshold has
+                been crossed in this window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.36"
+            ::= { hwDot3ahEfmEventConfigEntry 9 }
+
+        
+        hwDot3ahEfmErrFrameThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "frames"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of frame errors that must occur for this event to
+                be triggered.  The default value is one frame error. If the
+                threshold value is zero, then an Event Notification OAMPDU is
+                sent periodically (at the end of every window).  This can be
+                used as an asynchronous notification to the peer OAM entity of
+                the statistics related to this threshold crossing alarm. 
+                                
+                If hwDot3ahEfmErrFrameThreshold frame errors occur within a window
+                of hwDot3ahEfmErrFrameWindow (in tenths of seconds), an Event
+                Notification OAMPDU should be generated with an Errored Frame
+                Event TLV indicating the threshold has been crossed in this
+                window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.36"
+            ::= { hwDot3ahEfmEventConfigEntry 10 }
+
+        
+        hwDot3ahEfmErrFrameEvNotifEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the OAM entity should send an Event Notification
+                OAMPDU when an Errored Frame Event occurs. 
+                                
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored. 
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 11 }
+
+        
+        hwDot3ahEfmErrFrameSecsSummaryWindow OBJECT-TYPE
+            SYNTAX Integer32 (100..9000)
+            UNITS "tenths of a second"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The amount of time (in 100ms intervals) over which the
+                threshold is defined.  The default value is 600 (60 seconds).  
+                                
+                If hwDot3ahEfmErrFrameSecsSummaryThreshold frame errors occur
+                within a window of hwDot3ahEfmErrFrameSecsSummaryWindow (in tenths
+                of seconds), an Event Notification OAMPDU should be generated
+                with an Errored Frame Seconds Summary Event TLV indicating the
+                threshold has been crossed in this window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.40"
+            ::= { hwDot3ahEfmEventConfigEntry 12 }
+
+        
+        hwDot3ahEfmErrFrameSecsSummaryThreshold OBJECT-TYPE
+            SYNTAX Integer32 (0..900)
+            UNITS "errored frame seconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of errored frame seconds that must occur for this
+                event to be triggered.  The default value is one errored frame
+                second. If the threshold value is zero, then an Event
+                Notification OAMPDU is sent periodically (at the end of every
+                window).  This can be used as an asynchronous notification to
+                the peer OAM entity of the statistics related to this
+                threshold crossing alarm. 
+                                
+                If hwDot3ahEfmErrFrameSecsSummaryThreshold frame errors occur
+                within a window of hwDot3ahEfmErrFrameSecsSummaryWindow (in tenths
+                of seconds), an Event Notification OAMPDU should be generated
+                with an Errored Frame Seconds Summary Event TLV indicating the
+                threshold has been crossed in this window.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.40"
+            ::= { hwDot3ahEfmEventConfigEntry 13 }
+
+        
+        hwDot3ahEfmErrFrameSecsEvNotifEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the local OAM entity should send an Event
+                Notification OAMPDU when an Errored Frame Seconds Event
+                occurs. 
+                                
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored.
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 14 }
+
+        
+        hwDot3ahEfmDyingGaspEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the local OAM entity should attempt to indicate a
+                dying gasp via the OAMPDU flags field to its peer OAM entity
+                when a dying gasp event occurs.  The exact definition of a
+                dying gasp event is implementation dependent.  If the system
+                does not support dying gasp capability, setting this object
+                has no effect, and reading the object should always result in
+                'false'.  
+                                
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored.
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 15 }
+
+        
+        hwDot3ahEfmCriticalEventEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If true, the local OAM entity should attempt to indicate a
+                critical event via the OAMPDU flags to its peer OAM entity
+                when a critical event occurs.   The exact definition of a
+                critical event is implementation dependent.  If the system
+                does not support critical event capability, setting this
+                object has no effect, and reading the object should always
+                result in 'false'.  
+                                
+                By default, this object should have the value true for
+                Ethernet like interfaces that support OAM.  If the OAM layer
+                does not support event notifications (as indicated via the
+                hwDot3ahEfmFunctionsSupported attribute), this value is ignored.
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 16 }
+
+        
+--  **************************************************************
+-- 
+-- Ethernet OAM Event Log group 
+-- 
+        hwDot3ahEfmEventLogTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmEventLogEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table records a history of the events that have occurred
+                at the Ethernet OAM level.  These events can include locally
+                detected events, which may result in locally generated
+                OAMPDUs, and remotely detected events, which are detected by
+                the OAM peer entity and signaled to the local entity via
+                Ethernet OAM.  Ethernet OAM events can be signaled by Event
+                Notification OAMPDUs or by the flags field in any OAMPDU.  
+                
+                This table contains both threshold crossing events and
+                non-threshold crossing events.  The parameters for the
+                threshold window, threshold value, and actual value
+                (hwDot3ahEfmEventLogWindowXX, hwDot3ahEfmEventLogThresholdXX,
+                hwDot3ahEfmEventLogValue) are only applicable to threshold
+                crossing events, and are returned as all F's (2^32 - 1) for
+                non-threshold crossing events.  
+                Entries in the table are automatically created when such
+                events are detected.  The size of the table is implementation
+                dependent.  When the table reaches its maximum size, older
+                entries are automatically deleted to make room for newer
+                entries. 
+                "
+            ::= { hwDot3ahEfmObject 7 }
+
+        
+        hwDot3ahEfmEventLogEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmEventLogEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the hwDot3ahEfmEventLogTable.  Entries are
+                automatically created whenever Ethernet OAM events occur at
+                the local OAM entity, and when Event Notification OAMPDUs are
+                received at the local OAM entity (indicating events have
+                occurred at the peer OAM entity).  The size of the table is
+                implementation dependent, but when the table becomes full,
+                older events are automatically deleted to make room for newer
+                events.  The table index hwDot3ahEfmEventLogIndex increments for
+                each new entry, and when the maximum value is reached the
+                value restarts at zero.  
+                "
+            INDEX { ifIndex, hwDot3ahEfmEventLogIndex }
+            ::= { hwDot3ahEfmEventLogTable 1 }
+
+        
+        HwDot3ahEfmEventLogEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmEventLogIndex
+                    Unsigned32,
+                hwDot3ahEfmEventLogTimestamp
+                    TimeStamp,
+                hwDot3ahEfmEventLogOui
+                    HWDot3Oui,
+                hwDot3ahEfmEventLogType
+                    Unsigned32,
+                hwDot3ahEfmEventLogLocation
+                    INTEGER,
+                hwDot3ahEfmEventLogWindowHi
+                    Unsigned32,
+                hwDot3ahEfmEventLogWindowLo
+                    Unsigned32,
+                hwDot3ahEfmEventLogThresholdHi
+                    Unsigned32,
+                hwDot3ahEfmEventLogThresholdLo
+                    Unsigned32,
+                hwDot3ahEfmEventLogValue
+                    CounterBasedGauge64,
+                hwDot3ahEfmEventLogRunningTotal
+                    CounterBasedGauge64,
+                hwDot3ahEfmEventLogEventTotal
+                    Unsigned32
+             }
+
+        hwDot3ahEfmEventLogIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An arbitrary integer for identifying individual events
+                within the event log.  "
+            ::= { hwDot3ahEfmEventLogEntry 1 }
+
+        
+        hwDot3ahEfmEventLogTimestamp OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of sysUpTime at the time of the logged event.  For
+                locally generated events, the time of the event can be
+                accurately retrieved from sysUpTime.  For remotely generated
+                events, the time of the event is indicated by the reception of
+                the Event Notification OAMPDU indicating the event occurred on
+                the peer.  A system may attempt to adjust the timestamp value
+                to more accurately reflect the time of the event at the peer
+                OAM entity by using other information, such as that found in
+                the timestamp found of the Event Notification TLVs, which
+                provides an indication of the relative time between events at
+                the peer entity.  "
+            ::= { hwDot3ahEfmEventLogEntry 2 }
+
+        
+        hwDot3ahEfmEventLogOui OBJECT-TYPE
+            SYNTAX HWDot3Oui
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OUI of the entity defining the object type.  All IEEE
+                802.3 defined events (as appearing in [802.3ah] except for the
+                Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of
+                0x0180C2.  Organizations defining their own Event Notification
+                TLVs include their OUI in the Event Notification TLV which
+                gets reflected here.  "
+            ::= { hwDot3ahEfmEventLogEntry 3 }
+
+        
+        hwDot3ahEfmEventLogType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of event that generated this entry in the event log.
+                
+                When the OUI is the IEEE 802.3 OUI of 0x0180C2, the following
+                event types are defined:
+                    erroredSymbolEvent(1), 
+                    erroredFramePeriodEvent (2), 
+                    erroredFrameEvent(3),
+                    erroredFrameSecondsEvent(4), 
+                    linkFault(256), 
+                    dyingGaspEvent(257),
+                    criticalLinkEvent(258)
+                The first four are considered threshold crossing events as
+                they are generated when a metric exceeds a given value within
+                a specified window.  The other three are not threshold
+                crossing events.  
+                
+                When the OUI is not 71874 (0x0180C2 in hex), then some other
+                organization has defined the event space.  If event subtyping
+                is known to the implementation, it may be reflected here.
+                Otherwise, this value should return all Fs (2^32 - 1).  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.10 and 57.5.3."
+            ::= { hwDot3ahEfmEventLogEntry 4 }
+
+        
+        hwDot3ahEfmEventLogLocation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                remote(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Whether this event occurred locally (local(1)), or was 
+                received from the OAM peer via Ethernet OAM (remote(2)).
+                "
+            ::= { hwDot3ahEfmEventLogEntry 5 }
+
+        
+        hwDot3ahEfmEventLogWindowHi OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the event represents a threshold crossing event, the two
+                objects hwDot3ahEfmEventWindowHi and hwDot3ahEfmEventWindowLo form an
+                unsigned 64-bit integer yielding the window over which the
+                value was measured for the threshold crossing event (for
+                example, 5, when 11 occurrences happened in 5 seconds while
+                the threshold was 10).   The two objects are combined as:
+                
+                hwDot3ahEfmEventLogWindow = ((2^32) * hwDot3ahEfmEventLogWindowHi)
+                                                + hwDot3ahEfmEventLogWindowLo
+                
+                
+                Otherwise, this value is returned as all F's (2^32 - 1) and 
+                adds no useful information.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 6 }
+
+        
+        hwDot3ahEfmEventLogWindowLo OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the event represents a threshold crossing event, the two
+                objects hwDot3ahEfmEventWindowHi and hwDot3ahEfmEventWindowLo form an
+                unsigned 64-bit integer yielding the window over which the
+                value was measured for the threshold crossing event (for
+                example, 5, when 11 occurrences happened in 5 seconds while
+                the threshold was 10).   The two objects are combined as:
+                
+                hwDot3ahEfmEventLogWindow = ((2^32) * hwDot3ahEfmEventLogWindowHi)
+                                                + hwDot3ahEfmEventLogWindowLo
+                
+                Otherwise, this value is returned as all F's (2^32 - 1) and 
+                adds no useful information.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 7 }
+
+        
+        hwDot3ahEfmEventLogThresholdHi OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the event represents a threshold crossing event, the two
+                objects hwDot3ahEfmEventThresholdHi and hwDot3ahEfmEventThresholdLo
+                form an unsigned 64-bit integer yielding the value that was
+                crossed for the threshold crossing event (for example, 10,
+                when 11 occurrences happened in 5 seconds while the threshold
+                was 10).  The two objects are combined as:
+                
+                hwDot3ahEfmEventLogThreshold = ((2^32) * hwDot3ahEfmEventLogThresholdHi)
+                                                 + hwDot3ahEfmEventLogThresholdLo
+                
+                Otherwise, this value is returned as all F's (2^32 -1) and 
+                adds no useful information.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 8 }
+
+        
+        hwDot3ahEfmEventLogThresholdLo OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the event represents a threshold crossing event, the two
+                objects hwDot3ahEfmEventThresholdHi and hwDot3ahEfmEventThresholdLo
+                form an unsigned 64-bit integer yielding the value that was
+                crossed for the threshold crossing event (for example, 10,
+                when 11 occurrences happened in 5 seconds while the threshold
+                was 10).  The two objects are combined as:
+                
+                hwDot3ahEfmEventLogThreshold = ((2^32) * hwDot3ahEfmEventLogThresholdHi)
+                                                 + hwDot3ahEfmEventLogThresholdLo
+                
+                Otherwise, this value is returned as all F's (2^32 - 1) and
+                adds no useful information.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 9 }
+
+        
+        hwDot3ahEfmEventLogValue OBJECT-TYPE
+            SYNTAX CounterBasedGauge64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the event represents a threshold crossing event, this
+                value indicates the value of the parameter within the given
+                window that generated this event (for example, 11, when 11
+                occurrences happened in 5 seconds while the threshold was 10).  
+                
+                Otherwise, this value is returned as all F's 
+                (2^64 - 1) and adds no useful information.  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 10 }
+
+        
+        hwDot3ahEfmEventLogRunningTotal OBJECT-TYPE
+            SYNTAX CounterBasedGauge64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Each Event Notification TLV contains a running total of the
+                number of times an event has occurred, as well as the number
+                of times an Event Notification for the event has been
+                transmitted.  For non-threshold crossing events, the number of
+                events (hwDot3ahEfmLogRunningTotal) and the number of resultant
+                Event Notifications (hwDot3ahEfmLogEventTotal) should be
+                identical. 
+                
+                For threshold crossing events, since multiple occurrences may
+                be required to cross the threshold, these values are likely
+                different.  This value represents the total number of times
+                this event has happened since the last reset (for example,
+                3253, when 3253 symbol errors have occurred since the last
+                reset, which has resulted in 51 symbol error threshold
+                crossing events since the last reset).  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 11 }
+
+        
+        hwDot3ahEfmEventLogEventTotal OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Each Event Notification TLV contains a running total of the
+                number of times an event has occurred, as well as the number
+                of times an Event Notification for the event has been
+                transmitted.  For non-threshold crossing events, the number of
+                events (hwDot3ahEfmLogRunningTotal) and the number of resultant
+                Event Notifications (hwDot3ahEfmLogEventTotal) should be
+                identical. 
+                
+                For threshold crossing events, since multiple occurrences may
+                be required to cross the threshold, these values are likely
+                different.  This value represents the total number of times
+                one or more of these occurrences have resulted in an Event
+                Notification (for example, 51 when 3253 symbol errors have
+                occurred since the last reset, which has resulted in 51 symbol
+                error threshold crossing events since the last reset).  
+                "
+            REFERENCE
+                "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+            ::= { hwDot3ahEfmEventLogEntry 12 }
+
+        hwDot3ahEfmManagerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot3ahEfmManagerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains configurations of binding relationships 
+                 between EFM and other modules.
+                "
+            ::= { hwDot3ahEfmObject 8 }
+
+        
+        hwDot3ahEfmManagerEntry OBJECT-TYPE
+            SYNTAX HwDot3ahEfmManagerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This entry contains configurations of binding relationships 
+                 between EFM and other modules. 
+                "
+            INDEX { ifIndex }
+            ::= { hwDot3ahEfmManagerTable 1 }
+
+        
+        HwDot3ahEfmManagerEntry ::=
+            SEQUENCE { 
+                hwDot3ahEfmTriggerIfDown
+                    EnabledStatus
+             }
+
+        hwDot3ahEfmTriggerIfDown OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether EFM is bound to the interface. 
+                 If it is enabled(1), after EFM checks that the link times out, 
+                 the current Ethernet interface is shut down for three seconds 
+                 and then recovers. 
+                 
+                 The default value is disabled(2).  
+                "
+            ::= { hwDot3ahEfmManagerEntry 1 }
+
+
+-- Ethernet OAM EVRRP group
+-- add by liujin 64168 2008-9-25
+
+
+      
+      hwDot3ahEvrrpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HwDot3ahEvrrpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+          "This table contains information about the OAM Evrrp project for
+          a particular Ethernet like interface.  
+          " 
+        ::= { hwDot3ahEfmObject 9 }    
+   
+      hwDot3ahEvrrpEntry OBJECT-TYPE
+        SYNTAX      HwDot3ahEvrrpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+          "An entry in the table of hwDot3ahEvrrpTable, containing information on 
+          the OAM Evrrp entity for a single Ethernet like interface.  
+   
+          Note that there is at most one OAM Evrrp for each Ethernet like
+          interface. 
+          "
+        INDEX       { ifIndex }
+        ::= { hwDot3ahEvrrpTable 1 }
+   
+   
+      HwDot3ahEvrrpEntry ::=
+        SEQUENCE {
+          hwDot3ahEvrrpCpuState                INTEGER,
+          hwDot3ahEvrrpTriggerIfDown           EnabledStatus
+        }
+   
+      hwDot3ahEvrrpCpuState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      master(1),
+                      slave(2),
+                      unknown(3) 
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+          "This object indicates the state in the OAMPDU which sended by 
+          the peer interface. 
+          
+          If it is master(1), EFM will make the link work as the master 
+          state. And if it is slave(2), EFM will make the link works as 
+          the slave chain link. 
+          
+          The default state is unknown(3). That means the peer interface
+          didn't send any OAMPDU which contains the state of link status.
+          "
+        ::= { hwDot3ahEvrrpEntry 1 }
+
+   
+      hwDot3ahEvrrpTriggerIfDown OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+          "This object indicates whether EFM is bound to the interface. 
+          If it is enabled(1), after EFM checks that the link times out, 
+          the current Ethernet interface link state will be set to EFM 
+          down. And all of the PDU operation will be stop.  
+                 
+          The default value is disabled(2). 
+          "
+        ::= { hwDot3ahEvrrpEntry 2 }
+        
+------------------------------------------------------------------------------
+--  END for EVRRP    
+------------------------------------------------------------------------------
+            
+        hwOamManager OBJECT IDENTIFIER ::= { hwEthOamMib 3 }
+
+        
+        hwTestMessage OBJECT IDENTIFIER ::= { hwEthOamMib 4 }
+
+        
+        hwTestMessageObject OBJECT IDENTIFIER ::= { hwTestMessage 1 }
+
+        
+--  hwTestMessageTableNextIndex 
+        hwTestMessageTableNextIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Search the next hwTestMessageTable instance.
+                "
+            ::= { hwTestMessageObject 1 }
+
+        
+--  hwDot3ahEfmDetectModeTable                                                    
+        hwTestMessageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTestMessageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The definition of the tested packets format and the transmission of the tested packets
+                "
+            ::= { hwTestMessageObject 2 }
+
+        
+        hwTestMessageEntry OBJECT-TYPE
+            SYNTAX HwTestMessageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry for Test Message Table."
+            INDEX { hwTestMessageIndex }
+            ::= { hwTestMessageTable 1 }
+
+        
+        HwTestMessageEntry ::=
+            SEQUENCE { 
+                hwTestMessageIndex
+                    Unsigned32,
+                hwTestMessageMacAddress
+                    MacAddress,
+                hwTestMessageVlanID
+                    Unsigned32,
+                hwTestMessageInterface
+                    OCTET STRING,
+                hwTestMessageServiceInstance
+                    OCTET STRING,
+                hwTestMessagePacketSize
+                    Unsigned32,
+                hwTestMessageSendPackets
+                    Unsigned32,
+                hwTestMessageSendSpeed
+                    HWTestMessageSendSpeed,
+                hwTestMessageSendEnabled
+                    TruthValue,
+                hwTestMessageSendFinished
+                    HWTestMessageFinishedValue,
+                hwTestMessageRowStatus
+                    RowStatus
+             }
+
+        hwTestMessageIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Set the index for the tested packets table
+                "
+            ::= { hwTestMessageEntry 1 }
+
+        
+        hwTestMessageMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The destination MAC address
+                
+                "
+            ::= { hwTestMessageEntry 11 }
+
+        
+        hwTestMessageVlanID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                VLAN index
+                "
+            ::= { hwTestMessageEntry 12 }
+
+        
+        hwTestMessageInterface OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                If the interface is specified, specify the interface name.
+                "
+            ::= { hwTestMessageEntry 13 }
+
+        
+        hwTestMessageServiceInstance OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Name of the service instance
+                "
+            ::= { hwTestMessageEntry 14 }
+
+        
+        hwTestMessagePacketSize OBJECT-TYPE
+            SYNTAX Unsigned32 (64..1518)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " 
+                The length of the sent tested packets ranges from 64 to 1500 in byte, and the default value is 64.
+                "
+            DEFVAL { 64 }
+            ::= { hwTestMessageEntry 15 }
+
+        
+        hwTestMessageSendPackets OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the sent tested packets ranges from 1 to 65535 in integer, and the default value is 5.
+                "
+            DEFVAL { 5 }
+            ::= { hwTestMessageEntry 16 }
+
+        
+        hwTestMessageSendSpeed OBJECT-TYPE
+            SYNTAX HWTestMessageSendSpeed
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Enumerated type indicates the rate of sending the packets: 1Mbps and 5. The default is 1Mbps.
+                "
+            DEFVAL { oneMbps }
+            ::= { hwTestMessageEntry 17 }
+
+        
+        hwTestMessageSendEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The sending and termination of the tested packets
+                "
+            ::= { hwTestMessageEntry 18 }
+
+        
+        hwTestMessageSendFinished OBJECT-TYPE
+            SYNTAX HWTestMessageFinishedValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                View whether the tested packets are stopped to be sent:
+                1, 2, 3, 4, and 5 indicate that has not run/is running/the previous test terminates normally/the previous test terminates abnormally/the previous test is interrupted (through ctrl+c or mib)
+                "
+            ::= { hwTestMessageEntry 19 }
+
+        
+        hwTestMessageRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The status of the row.
+                
+                The writable columns in a row can not be changed if the row
+                is active. All columns must have a valid value before a row
+                can be activated.
+                "
+            ::= { hwTestMessageEntry 51 }
+
+        
+        hwTestMessageResultTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTestMessageResultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                View the returned results after tests
+                "
+            ::= { hwTestMessageObject 3 }
+
+        
+        hwTestMessageResultEntry OBJECT-TYPE
+            SYNTAX HwTestMessageResultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry for Test Message Table."
+            INDEX { hwTestMessageIndex }
+            ::= { hwTestMessageResultTable 1 }
+
+        
+        HwTestMessageResultEntry ::=
+            SEQUENCE { 
+                hwTestMessageResultSendPackets
+                    Unsigned32,
+                hwTestMessageResultReceivedPackets
+                    Unsigned32,
+                hwTestMessageResultPacketsLost
+                    Unsigned32,
+                hwTestMessageResultSendBytes
+                    Unsigned32,
+                hwTestMessageResultReceivedBytes
+                    Unsigned32,
+                hwTestMessageResultBytesLost
+                    Unsigned32,
+                hwTestMessageBeginTimeStamp
+                    TimeStamp,
+                hwTestMessageEndTimeStamp
+                    TimeStamp
+             }
+
+        hwTestMessageResultSendPackets OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the sent packets
+                "
+            ::= { hwTestMessageResultEntry 11 }
+
+        
+        hwTestMessageResultReceivedPackets OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the received packets
+                "
+            ::= { hwTestMessageResultEntry 12 }
+
+        
+        hwTestMessageResultPacketsLost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Packets loss ratio
+                "
+            ::= { hwTestMessageResultEntry 13 }
+
+        
+        hwTestMessageResultSendBytes OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the sent bytes
+                "
+            ::= { hwTestMessageResultEntry 14 }
+
+        
+        hwTestMessageResultReceivedBytes OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the received bytes
+                "
+            ::= { hwTestMessageResultEntry 15 }
+
+        
+        hwTestMessageResultBytesLost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the lost bytes
+                "
+            ::= { hwTestMessageResultEntry 16 }
+
+        
+        hwTestMessageBeginTimeStamp OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The time of starting the Test operation
+                "
+            ::= { hwTestMessageResultEntry 17 }
+
+        
+        hwTestMessageEndTimeStamp OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The time of ending the Test operation
+                "
+            ::= { hwTestMessageResultEntry 18 }
+
+        
+        hwGmacObjects OBJECT IDENTIFIER ::= { hwEthOamMib 5 }
+
+        
+        hwGmacPingEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable the Gmac Ping globally.
+                "
+            ::= { hwGmacObjects 1 }
+
+        
+        hwGmacTraceEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Enable the Gmac Trace globally.
+                "
+            ::= { hwGmacObjects 2 }
+
+        
+        hwGmacPingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGmacPingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entries related to the Gmac Ping include the parameters input by users and the returned results.
+                "
+            ::= { hwGmacObjects 3 }
+
+        
+        hwGmacPingEntry OBJECT-TYPE
+            SYNTAX HwGmacPingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The table entry of the GmacPing
+                "
+            INDEX { hwGmacPingIndex }
+            ::= { hwGmacPingTable 1 }
+
+        
+        HwGmacPingEntry ::=
+            SEQUENCE { 
+                hwGmacPingIndex
+                    Unsigned32,
+                hwGmacPingEnable
+                    EnabledStatus,
+                hwGmacPingTimeStamp
+                    TimeStamp,
+                hwGmacPingMacAddress
+                    MacAddress,
+                hwGmacPingVlanVid
+                    VlanIdOrNone,
+                hwGmacPingTimeOut
+                    Integer32,
+                hwGmacPingTimes
+                    Integer32,
+                hwGmacPingOutIfIndex
+                    InterfaceIndexOrZero,
+                hwGmacPingSize
+                    Integer32,
+                hwGmacPingRespondIn
+                    Counter32,
+                hwGmacPingRTTMin
+                    Unsigned32,
+                hwGmacPingRTTMax
+                    Unsigned32,
+                hwGmacPingRTTAvg
+                    Unsigned32,
+                hwGmacPingPacketLossRatio
+                    Unsigned32,
+                hwGmacPingVsiVid
+                    Integer32,
+                hwGmacPingIfType
+                    HWDot1agCfmIfType,
+                hwGmacPingRowStatus
+                    RowStatus
+             }
+
+        hwGmacPingIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index of the Gmac Ping test case
+                "
+            ::= { hwGmacPingEntry 1 }
+
+        
+        hwGmacPingEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Start the Gmac Ping operation
+                "
+            ::= { hwGmacPingEntry 11 }
+
+        
+        hwGmacPingTimeStamp OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The time of starting the Gmac Ping
+                "
+            ::= { hwGmacPingEntry 12 }
+
+        
+        hwGmacPingMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The destination MAC address of the Gmac Ping
+                "
+            ::= { hwGmacPingEntry 13 }
+
+        
+        hwGmacPingVlanVid OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Identify that based on which VLAN the Gmac Ping carries out the Ping operation.
+                "
+            ::= { hwGmacPingEntry 14 }
+
+        
+        hwGmacPingTimeOut OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The timeout time of the Gmac Ping input by users is in ms, and the default value is 2000.
+                "
+            DEFVAL { 2000 }
+            ::= { hwGmacPingEntry 15 }
+
+        
+--  
+        hwGmacPingTimes OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The times for the users to input the Gmac Ping operation
+                "
+            DEFVAL { 5 }
+            ::= { hwGmacPingEntry 16 }
+
+        
+        hwGmacPingOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Specify of the outbound interface for the Gmac Ping operation.
+                "
+            DEFVAL { 0 }
+            ::= { hwGmacPingEntry 17 }
+
+        
+        hwGmacPingSize OBJECT-TYPE
+            SYNTAX Integer32 (95..1500)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The size of the Gmac Ping packets input by users
+                "
+            DEFVAL { 95 }
+            ::= { hwGmacPingEntry 18 }
+
+        
+        hwGmacPingRespondIn OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of the legal packets received from the Gmac Ping
+                "
+            ::= { hwGmacPingEntry 19 }
+
+        
+        hwGmacPingRTTMin OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The minimum delay
+                "
+            ::= { hwGmacPingEntry 20 }
+
+        
+        hwGmacPingRTTMax OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The maximum delay
+                "
+            ::= { hwGmacPingEntry 21 }
+
+        
+        hwGmacPingRTTAvg OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The average delay
+                "
+            ::= { hwGmacPingEntry 22 }
+
+        
+        hwGmacPingPacketLossRatio OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The packet loss ratio
+                "
+            ::= { hwGmacPingEntry 23 }
+
+        
+        hwGmacPingVsiVid OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Identify the source VSI of Gmac Ping.
+                "
+            ::= { hwGmacPingEntry 24 }
+
+        
+        hwGmacPingIfType OBJECT-TYPE
+            SYNTAX HWDot1agCfmIfType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of interfaces associated with Ping, 1:vlan, 2:vsi."
+            ::= { hwGmacPingEntry 25 }
+
+        
+        hwGmacPingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of the row.
+                
+                The writable columns in a row can not be changed if the row
+                is active. All columns must have a valid value before a row
+                can be activated."
+            ::= { hwGmacPingEntry 51 }
+
+        
+        hwGmacTraceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGmacTraceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entries related to the Gmac Trace include the parameters input by users and the filed value of the sent Trace packets.
+                "
+            ::= { hwGmacObjects 4 }
+
+        
+        hwGmacTraceEntry OBJECT-TYPE
+            SYNTAX HwGmacTraceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the GMAC Trace table entry."
+            INDEX { hwGmacTraceIndex }
+            ::= { hwGmacTraceTable 1 }
+
+        
+        HwGmacTraceEntry ::=
+            SEQUENCE { 
+                hwGmacTraceIndex
+                    Unsigned32,
+                hwGmacTraceEnable
+                    EnabledStatus,
+                hwGmacTraceTimeStamp
+                    TimeStamp,
+                hwGmacTraceMacAddress
+                    MacAddress,
+                hwGmacTraceVlanVid
+                    VlanIdOrNone,
+                hwGmacTraceTimeOut
+                    Integer32,
+                hwGmacTraceOutIfIndex
+                    InterfaceIndexOrZero,
+                hwGmactraceSendSeqNumber
+                    Unsigned32,
+                hwGmacTraceEgressIdentifier
+                    OCTET STRING,
+                hwGmacTraceResult
+                    TruthValue,
+                hwGmacTraceVsiVid
+                    Integer32,
+                hwGmacTraceIfType
+                    HWDot1agCfmIfType,
+                hwGmacTraceRowStatus
+                    RowStatus
+             }
+
+        hwGmacTraceIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index of the Gmac Trace test case
+                "
+            ::= { hwGmacTraceEntry 1 }
+
+        
+        hwGmacTraceEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Start the Gmac Trace operation
+                "
+            ::= { hwGmacTraceEntry 11 }
+
+        
+        hwGmacTraceTimeStamp OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The time of starting the Gmac Trace
+                "
+            ::= { hwGmacTraceEntry 12 }
+
+        
+        hwGmacTraceMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The destination MAC address of the Gmac Trace
+                "
+            ::= { hwGmacTraceEntry 13 }
+
+        
+        hwGmacTraceVlanVid OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  
+                Identify that on which VLAN the Gmac Trace carries out the Trace operation.
+                "
+            ::= { hwGmacTraceEntry 14 }
+
+        
+        hwGmacTraceTimeOut OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The timeout time input by users is in ms, and the default value is 2000.
+                "
+            DEFVAL { 2000 }
+            ::= { hwGmacTraceEntry 15 }
+
+        
+        hwGmacTraceOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Specify the outbound interface for the Gmac Trace operation.
+                "
+            DEFVAL { 0 }
+            ::= { hwGmacTraceEntry 16 }
+
+        
+        hwGmactraceSendSeqNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The sequence number of the packets sent by the Gmac Trace
+                "
+            ::= { hwGmacTraceEntry 17 }
+
+        
+        hwGmacTraceEgressIdentifier OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The EgressID field in the sent Gmac Trace packets
+                "
+            ::= { hwGmacTraceEntry 18 }
+
+        
+        hwGmacTraceResult OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Judge whether the Gmac Trace operation is complete based on the following tow conditions: Trace arrive at the destination or the timeout time ends.
+                Either of the two previous conditions indicates that the Gmac Trace operation is complete.
+                "
+            ::= { hwGmacTraceEntry 19 }
+
+        
+        hwGmacTraceVsiVid OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  
+                Identify the source VSI of Gmac Trace.
+                "
+            ::= { hwGmacTraceEntry 20 }
+
+        
+        hwGmacTraceIfType OBJECT-TYPE
+            SYNTAX HWDot1agCfmIfType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of interfaces associated with Trace, 1:vlan, 2:vsi."
+            ::= { hwGmacTraceEntry 21 }
+
+        
+        hwGmacTraceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of the row.
+                
+                The writable columns in a row can not be changed if the row
+                is active. All columns must have a valid value before a row
+                can be activated."
+            ::= { hwGmacTraceEntry 51 }
+
+        
+        hwGmacTraceRespondTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGmacTraceRespondEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The results of the Gmac Trace
+                "
+            ::= { hwGmacObjects 5 }
+
+        
+        hwGmacTraceRespondEntry OBJECT-TYPE
+            SYNTAX HwGmacTraceRespondEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the gmactrace table entry."
+            INDEX { hwGmacTraceRespondSeqNumber, hwGmacTraceRespondReceiveOrder }
+            ::= { hwGmacTraceRespondTable 1 }
+
+        
+        HwGmacTraceRespondEntry ::=
+            SEQUENCE { 
+                hwGmacTraceRespondSeqNumber
+                    Unsigned32,
+                hwGmacTraceRespondReceiveOrder
+                    Unsigned32,
+                hwGmacTraceRespondTtl
+                    Unsigned32,
+                hwGmacTraceRespondForwarded
+                    TruthValue,
+                hwGmacTraceRespondLastEgressIdentifier
+                    OCTET STRING,
+                hwGmacTraceRespondNextEgressIdentifier
+                    OCTET STRING,
+                hwGmacTraceRespondRelay
+                    HWDot1agCfmRelayActionFieldValue,
+                hwGmacTraceRespondIngress
+                    HWDot1agCfmIngressActionFieldValue,
+                hwGmacTraceRespondIngressMac
+                    MacAddress,
+                hwGmacTraceRespondIngressPortIdSubtype
+                    HWLldpPortIdSubtype,
+                hwGmacTraceRespondIngressPortId
+                    HWLldpPortId,
+                hwGmacTraceRespondEgress
+                    HWDot1agCfmEgressActionFieldValue,
+                hwGmacTraceRespondEgressMac
+                    MacAddress,
+                hwGmacTraceRespondEgressPortIdSubtype
+                    HWLldpPortIdSubtype,
+                hwGmacTraceRespondEgressPortId
+                    HWLldpPortId
+             }
+
+        hwGmacTraceRespondSeqNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The sequence number carried by the sent Gmac Trace echo packets
+                "
+            REFERENCE
+                "802.1ag clause 12.14.7.5"
+            ::= { hwGmacTraceRespondEntry 1 }
+
+        
+        hwGmacTraceRespondReceiveOrder OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index value assigned internally. If a series of echo packets for the same Gmac Trace packet, the device differentiates these echo packets through the value pair.
+                "
+            ::= { hwGmacTraceRespondEntry 2 }
+
+        
+        hwGmacTraceRespondTtl OBJECT-TYPE
+            SYNTAX Unsigned32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The TTL field in this Gmac Trace echo packet
+                "
+            ::= { hwGmacTraceRespondEntry 11 }
+
+        
+        hwGmacTraceRespondForwarded OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates whether the device that sends the echo packets continues to send the Gmac Trace packets
+                "
+            ::= { hwGmacTraceRespondEntry 12 }
+
+        
+        hwGmacTraceRespondLastEgressIdentifier OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The LastEgressIdentifier field in the Gmac Trace echo packet
+                "
+            ::= { hwGmacTraceRespondEntry 13 }
+
+        
+        hwGmacTraceRespondNextEgressIdentifier OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The NextEgressIdentifier field in the Gmac Trace echo packet
+                "
+            ::= { hwGmacTraceRespondEntry 14 }
+
+        
+        hwGmacTraceRespondRelay OBJECT-TYPE
+            SYNTAX HWDot1agCfmRelayActionFieldValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the value in the Relay Action field."
+            ::= { hwGmacTraceRespondEntry 15 }
+
+        
+        hwGmacTraceRespondIngress OBJECT-TYPE
+            SYNTAX HWDot1agCfmIngressActionFieldValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The Ingress Action Field field in the Gmac Trace echo packet
+                "
+            ::= { hwGmacTraceRespondEntry 16 }
+
+        
+        hwGmacTraceRespondIngressMac OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "MAC address returned in the ingress MAC address field."
+            ::= { hwGmacTraceRespondEntry 17 }
+
+        
+        hwGmacTraceRespondIngressPortIdSubtype OBJECT-TYPE
+            SYNTAX HWLldpPortIdSubtype
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Format of the Ingress Port ID."
+            ::= { hwGmacTraceRespondEntry 18 }
+
+        
+        hwGmacTraceRespondIngressPortId OBJECT-TYPE
+            SYNTAX HWLldpPortId
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Ingress Port ID."
+            ::= { hwGmacTraceRespondEntry 19 }
+
+        
+        hwGmacTraceRespondEgress OBJECT-TYPE
+            SYNTAX HWDot1agCfmEgressActionFieldValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The Egress Action Field field in the Gmac Trace echo packet.
+                "
+            ::= { hwGmacTraceRespondEntry 20 }
+
+        
+        hwGmacTraceRespondEgressMac OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "MAC address returned in the egress MAC address field."
+            ::= { hwGmacTraceRespondEntry 21 }
+
+        
+        hwGmacTraceRespondEgressPortIdSubtype OBJECT-TYPE
+            SYNTAX HWLldpPortIdSubtype
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Format of the egress Port ID."
+            ::= { hwGmacTraceRespondEntry 22 }
+
+        
+        hwGmacTraceRespondEgressPortId OBJECT-TYPE
+            SYNTAX HWLldpPortId
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Egress Port ID."
+            ::= { hwGmacTraceRespondEntry 23 }
+
+        
+        hwEthOamTraps OBJECT IDENTIFIER ::= { hwEthOamMib 6 }
+
+        
+--  ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever a MEP loses/restores contact with one or more other MEPs.
+-- ****************************************************************** 
+        hwCfmFaultAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDot1agCfmRMepMacAddress, hwDot1agCfmRMepHighestPrDefect, dot1agCfmMdName, dot1agCfmMdLevel, dot1agCfmMaName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "A MEP has lost contact with one or more MEPs. A notification
+                (fault alarm) is sent to the management entity with the OID
+                of the MEP that has detected the fault.
+                
+                Whenever a MEP loses contact with one or more other MEPs,
+                it may or may not generate a Fault Alarm to warn the system
+                administrator of the problem, as controlled by the MEP
+                Fault Notification Generator State Machine and associated
+                Managed Objects. Only the highest-priority defect, as shown
+                in Table 20-1, is reported in the Fault Alarm. 
+                          hwDot1agCfmRMepMacAddress   The MAC address of the remote faulty MEP
+                          hwDot1agCfmRMepHighestPrDefect   The fault in the highest level
+                          dot1agCfmMdName                  The name of the faulty MD
+                          dot1agCfmMdLevel                 The level of the faulty MD
+                          dot1agCfmMaName                  The name of the faulty MA
+                             "
+            REFERENCE 
+                "802.1ag clause 12.14.7.7"
+            ::= { hwEthOamTraps 1 }
+
+        
+        hwTestMessageFailed NOTIFICATION-TYPE
+            OBJECTS { hwTestMessageSendFinished }
+            STATUS current
+            DESCRIPTION 
+                "
+                The events after tests are reported.
+                1,2,3,4, and 5 indicate has not run/is running/the previous test terminates normally/the previous test terminate abnormally/the previous test is interrupted.
+                (through ctrl+c or mib)
+                "
+            REFERENCE 
+                " "
+            ::= { hwEthOamTraps 2 }
+
+        
+        hwTestMessageCompleted NOTIFICATION-TYPE
+            OBJECTS { hwTestMessageSendFinished, hwTestMessageResultSendPackets, hwTestMessageResultReceivedPackets, hwTestMessageResultPacketsLost, hwTestMessageResultSendBytes, 
+                hwTestMessageResultReceivedBytes, hwTestMessageResultBytesLost, hwTestMessageBeginTimeStamp, hwTestMessageEndTimeStamp }
+            STATUS current
+            DESCRIPTION 
+                "
+                After the test is complete, report the results to the network management.
+                "
+            REFERENCE 
+                " "
+            ::= { hwEthOamTraps 3 }
+
+        
+--  ***************************************************************
+-- 
+-- Ethernet OAM Notifications
+-- 
+        hwDot3ahEfmThresholdEvent NOTIFICATION-TYPE
+            OBJECTS { hwDot3ahEfmEventLogTimestamp, hwDot3ahEfmEventLogOui, hwDot3ahEfmEventLogType, hwDot3ahEfmEventLogLocation, hwDot3ahEfmEventLogWindowHi, 
+                hwDot3ahEfmEventLogWindowLo, hwDot3ahEfmEventLogThresholdHi, hwDot3ahEfmEventLogThresholdLo, hwDot3ahEfmEventLogValue, hwDot3ahEfmEventLogRunningTotal, 
+                hwDot3ahEfmEventLogEventTotal }
+            STATUS current
+            DESCRIPTION 
+                "A hwDot3ahEfmThresholdEvent notification is sent when a local or
+                remote threshold crossing event is detected.  A local
+                threshold crossing event is detected by the local entity,
+                while a remote threshold crossing event is detected by the
+                reception of an Ethernet OAM Event Notification OAMPDU
+                indicating a threshold event.  
+                
+                This notification should not be sent more than once per
+                second.
+                
+                The OAM entity can be derived from extracting the ifIndex from
+                the variable bindings.  The objects in the notification
+                correspond to the values in a row instance of in the
+                hwDot3ahEfmEventLogTable.  
+                
+                The management entity should periodically check
+                hwDot3ahEfmEventLogTable to detect any missed events."
+            ::= { hwEthOamTraps 4 }
+
+        
+        hwDot3ahEfmNonThresholdEvent NOTIFICATION-TYPE
+            OBJECTS { hwDot3ahEfmEventLogTimestamp, hwDot3ahEfmEventLogOui, hwDot3ahEfmEventLogType, hwDot3ahEfmEventLogLocation, hwDot3ahEfmEventLogEventTotal
+                 }
+            STATUS current
+            DESCRIPTION 
+                "A hwDot3ahEfmNonThresholdEvent notification is sent when a local
+                or remote non-threshold crossing event is detected.  A local
+                event is detected by the local entity, while a remote event is
+                detected by the reception of an Ethernet OAM Event
+                Notification OAMPDU indicating a non-threshold crossing event.  
+                
+                This notification should not be sent more than once per
+                second.
+                
+                The OAM entity can be derived from extracting the ifIndex from
+                the variable bindings.  The objects in the notification
+                correspond to the values in a row instance of the
+                hwDot3ahEfmEventLogTable.  
+                
+                The management entity should periodically check
+                hwDot3ahEfmEventLogTable to detect any missed events."
+            ::= { hwEthOamTraps 5 }
+              
+        hwEthOamConformance OBJECT IDENTIFIER ::= { hwEthOamMib 7 }
+
+        
+        hwEthOamCompliances OBJECT IDENTIFIER ::= { hwEthOamConformance 1 }
+
+        
+        hwEthOamCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for the HUAWEI-ETHOAM-MIB"
+            MODULE -- this module
+                MANDATORY-GROUPS { hwDot1agCfmMdGroup, hwDot1agCfmMaGroup, hwDot1agCfmMepGroup, hwDot1agCfmRMepGroup, hwDot1agCfmMipGroup, 
+                    hwDot3ahEfmDetectModeGroup, hwTestMessageGroup, hwTestMessageResultGroup, hwEthOamTrapsGroup, hwCfmGroup, 
+                    hwGmacPingGroup, hwGmacTraceGroup, hwGmacTraceRespondGroup, hwDot3ahEfmControlGroup, hwDot3ahEfmPeerGroup, 
+                    hwDot3ahEfmStatsBaseGroup, hwDot3ahEfmManagerGroup }
+                OBJECT hwDot1agCfmRMepRowStatus
+                    SYNTAX RowStatus
+                        {
+                        active(1),
+                        notInService(2)
+                        }
+                    WRITE-SYNTAX RowStatus
+                        {
+                        notInService(2),
+                        createAndGo(4),
+                        destroy(6)
+                        }
+                    DESCRIPTION 
+                        "Support for createAndWait is not required."
+                OBJECT hwDot1agCfmMipCreationTypeRowStatus
+                    SYNTAX RowStatus
+                        {
+                        active(1),
+                        notInService(2)
+                        }
+                    WRITE-SYNTAX RowStatus
+                        {
+                        notInService(2),
+                        createAndGo(4),
+                        destroy(6)
+                        }
+                    DESCRIPTION 
+                        "Support for createAndWait is not required."
+                OBJECT hwTestMessageRowStatus
+                    SYNTAX RowStatus
+                        {
+                        active(1),
+                        notInService(2)
+                        }
+                    WRITE-SYNTAX RowStatus
+                        {
+                        notInService(2),
+                        createAndGo(4),
+                        destroy(6)
+                        }
+                    DESCRIPTION 
+                        "Support for createAndWait is not required."
+                GROUP hwDot3ahEfmLoopbackGroup
+                    DESCRIPTION 
+                        "This group is mandatory for all IEEE 802.3 OAM
+                        implementations that support loopback functionality. "
+                GROUP hwDot3ahEfmErrSymbolPeriodEventGroup
+                    DESCRIPTION 
+                        "This group is mandatory for all IEEE 802.3 OAM
+                        implementations that support event functionality. "
+                GROUP hwDot3ahEfmErrFramePeriodEventGroup
+                    DESCRIPTION 
+                        "This group is mandatory for all IEEE 802.3 OAM
+                        implementations that support event functionality. "
+                GROUP hwDot3ahEfmErrFrameEventGroup
+                    DESCRIPTION 
+                        "This group is mandatory for all IEEE 802.3 OAM
+                        implementations that support event functionality. "
+                GROUP hwDot3ahEfmErrFrameSecsSummaryEventGroup
+                    DESCRIPTION 
+                        "This group is mandatory for all IEEE 802.3 OAM
+                        implementations that support event functionality. "
+                GROUP hwDot3ahEfmFlagEventGroup
+                    DESCRIPTION 
+                        "This group is optional for all IEEE 802.3 OAM
+                        implementations.  The ability to send critical events or dying
+                        gasp events is not required in any system."
+                GROUP hwDot3ahEfmEventLogGroup
+                    DESCRIPTION 
+                        "This group is optional for all IEEE 802.3 OAM
+                        implementations. Entries in this table are dependent on what
+                        event functionality is supported in the local OAM
+                        implementation.  At least one type of event must be supported
+                        for entries to appear in this table.  "
+            ::= { hwEthOamCompliances 1 }
+
+        
+        hwEthOamGroups OBJECT IDENTIFIER ::= { hwEthOamConformance 2 }
+
+        
+        hwDot1agCfmMdGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmMdErrMsgStatisticsEnabled, hwDot1agCfmMdErrorSmacStatistics, hwDot1agCfmMdErrorIntervalStatistics, hwDot1agCfmMdErrorMaIdStatistics }
+            STATUS current
+            DESCRIPTION 
+                "Objects for the hwDot1agCfmMd group."
+            ::= { hwEthOamGroups 1 }
+
+        
+        hwDot1agCfmMaGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmMaCcmInterval, hwDot1agCcSendEnabled, hwDot1agCcReceiveEnabled, hwDot1agCfmMaErrMsgStatisticsEnabled, hwDot1agCfmPriority, 
+                hwDot1agCfmMaErrorSmacStatistics, hwDot1agCfmMaErrorIntervalStatistics, hwDot1agCfmMaErrorMaIdStatistics, hwDot1agCfmMaDetectMalfunction, hwDot1agCfmMaBindIfId, 
+                hwDot1agCfmMaUnBindIfId, hwDot1agCfmMaIfType }
+            STATUS current
+            DESCRIPTION 
+                "Objects for the hwDot1agCfmMa group."
+            ::= { hwEthOamGroups 2 }
+
+        
+        hwDot1agCfmMepGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmCcmOutIfIndex, hwDot1agCfmLbmOutIfIndex, hwDot1agCfmLtmOutIfIndex, hwDot1agCfmLbmPacketSize }
+            STATUS current
+            DESCRIPTION 
+                "Objects for the hwDot1agCfmMep group."
+            ::= { hwEthOamGroups 3 }
+
+        
+        hwDot1agCfmRMepGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmRMepMacAddress, hwDot1agCfmRMepCcReceiveEnabled, hwDot1agCfmRMepErrMsgStatisticsEnabled, hwDot1agCfmRMepHighestPrDefect, hwDot1agCfmRMepLowPrDef, 
+                hwDot1agCfmRMepSomeRMepCcmDefect, hwDot1agCfmRMepErrorCcmDefect, hwDot1agCfmRMepXconCcmDefect, hwDot1agCfmRMepSomeRdiDefect, hwDot1agCfmRMepErrMacStatus, 
+                hwDot1agCfmRMepFngAlarmTime, hwDot1agCfmRMepFngResetTime, hwDot1agCfmRMepErrorSmacStatistics, hwDot1agCfmRMepErrorIntervalStatistics, hwDot1agCfmRMepErrorMaIdStatistics, 
+                hwDot1agCfmRMepRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "RMEP configuration group"
+            ::= { hwEthOamGroups 4 }
+
+        
+        hwDot1agCfmMipGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmMipCreationType, hwDot1agCfmMipCreationTypeRowStatus, hwDot1agCfmMipLevel }
+            STATUS current
+            DESCRIPTION 
+                "MIP configuration group"
+            ::= { hwEthOamGroups 5 }
+
+        
+        hwDot3ahEfmDetectModeGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmEnabled, hwDot3ahEfmDetectMode, hwDot3ahEfmDetectInterval, hwDot3ahEfmDetectMalfunction }
+            STATUS current
+            DESCRIPTION 
+                "Test mode group"
+            ::= { hwEthOamGroups 6 }
+
+        
+        hwTestMessageGroup OBJECT-GROUP
+            OBJECTS { hwTestMessageTableNextIndex, hwTestMessageInterface, hwTestMessageServiceInstance, hwTestMessageMacAddress, hwTestMessageVlanID, 
+                hwTestMessagePacketSize, hwTestMessageSendPackets, hwTestMessageSendSpeed, hwTestMessageSendEnabled, hwTestMessageSendFinished, 
+                hwTestMessageRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Test packets setting group"
+            ::= { hwEthOamGroups 7 }
+
+        
+        hwTestMessageResultGroup OBJECT-GROUP
+            OBJECTS { hwTestMessageResultSendPackets, hwTestMessageResultReceivedPackets, hwTestMessageResultPacketsLost, hwTestMessageResultSendBytes, hwTestMessageResultReceivedBytes, 
+                hwTestMessageResultBytesLost, hwTestMessageBeginTimeStamp, hwTestMessageEndTimeStamp }
+            STATUS current
+            DESCRIPTION 
+                "The group for the tested packets results to be returned."
+            ::= { hwEthOamGroups 8 }
+
+        
+        hwEthOamTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwCfmFaultAlarm, hwTestMessageFailed, hwTestMessageCompleted, hwDot3ahEfmThresholdEvent, hwDot3ahEfmNonThresholdEvent
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Objects for the Notifications group.
+                A collection of notifications used by Ethernet OAM to signal
+                to a management entity that local or remote events have
+                occurred on a specified Ethernet link. 
+                This group is optional for all IEEE 802.3 OAM
+                implementations.  Since the information in the notifications
+                is dependent on the hwDot3ahEfmEventLogTable, that table must be
+                implemented for notifications."
+            ::= { hwEthOamGroups 9 }
+
+        
+        hwCfmGroup OBJECT-GROUP
+            OBJECTS { hwDot1agCfmEnabled, hwDot1agCfmErrMsgStatisticsEnabled, hwDot1agCfmMipCreation, hwDot1agCfmMacTunnelTraceResponseEnabled, hwDot1agCfmErrorSmacStatistics, 
+                hwDot1agCfmErrorIntervalStatistics, hwDot1agCfmErrorMaIdStatistics }
+            STATUS current
+            DESCRIPTION 
+                "Cfm enabling and statistics group"
+            ::= { hwEthOamGroups 10 }
+
+        
+        hwGmacPingGroup OBJECT-GROUP
+            OBJECTS { hwGmacPingEnabled, hwGmacPingEnable, hwGmacPingTimeStamp, hwGmacPingMacAddress, hwGmacPingVlanVid, 
+                hwGmacPingTimeOut, hwGmacPingTimes, hwGmacPingOutIfIndex, hwGmacPingSize, hwGmacPingRespondIn, 
+                hwGmacPingRTTMin, hwGmacPingRTTMax, hwGmacPingRTTAvg, hwGmacPingPacketLossRatio, hwGmacPingVsiVid, 
+                hwGmacPingIfType, hwGmacPingRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Gmac Ping starting and statistics group"
+            ::= { hwEthOamGroups 11 }
+
+        
+        hwGmacTraceGroup OBJECT-GROUP
+            OBJECTS { hwGmacTraceEnabled, hwGmacTraceEnable, hwGmacTraceTimeStamp, hwGmacTraceMacAddress, hwGmacTraceVlanVid, 
+                hwGmacTraceTimeOut, hwGmacTraceOutIfIndex, hwGmactraceSendSeqNumber, hwGmacTraceEgressIdentifier, hwGmacTraceResult, 
+                hwGmacTraceVsiVid, hwGmacTraceIfType, hwGmacTraceRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Gmac Trace starting and statistics group"
+            ::= { hwEthOamGroups 12 }
+
+        
+        hwGmacTraceRespondGroup OBJECT-GROUP
+            OBJECTS { hwGmacTraceRespondTtl, hwGmacTraceRespondForwarded, hwGmacTraceRespondLastEgressIdentifier, hwGmacTraceRespondNextEgressIdentifier, hwGmacTraceRespondRelay, 
+                hwGmacTraceRespondIngress, hwGmacTraceRespondIngressMac, hwGmacTraceRespondIngressPortIdSubtype, hwGmacTraceRespondIngressPortId, hwGmacTraceRespondEgress, 
+                hwGmacTraceRespondEgressMac, hwGmacTraceRespondEgressPortIdSubtype, hwGmacTraceRespondEgressPortId }
+            STATUS current
+            DESCRIPTION 
+                "Gmac Trace starting and statistics group"
+            ::= { hwEthOamGroups 13 }
+
+        
+        hwDot3ahEfmControlGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmAdminState, hwDot3ahEfmOperStatus, hwDot3ahEfmMode, hwDot3ahEfmMaxOamPduSize, hwDot3ahEfmConfigRevision, 
+                hwDot3ahEfmFunctionsSupported }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing the abilities,
+                configuration, and status of an Ethernet OAM entity.  "
+            ::= { hwEthOamGroups 14 }
+
+        
+        hwDot3ahEfmPeerGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmPeerMacAddress, hwDot3ahEfmPeerVendorOui, hwDot3ahEfmPeerVendorInfo, hwDot3ahEfmPeerMode, hwDot3ahEfmPeerFunctionsSupported, 
+                hwDot3ahEfmPeerMaxOamPduSize, hwDot3ahEfmPeerConfigRevision }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing the abilities,
+                configuration, and status of a peer Ethernet OAM entity.  "
+            ::= { hwEthOamGroups 15 }
+
+        
+        hwDot3ahEfmStatsBaseGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmInformationTx, hwDot3ahEfmInformationRx, hwDot3ahEfmUniqueEventNotificationTx, hwDot3ahEfmUniqueEventNotificationRx, hwDot3ahEfmDuplicateEventNotificationTx, 
+                hwDot3ahEfmDuplicateEventNotificationRx, hwDot3ahEfmLoopbackControlTx, hwDot3ahEfmLoopbackControlRx, hwDot3ahEfmVariableRequestTx, hwDot3ahEfmVariableRequestRx, 
+                hwDot3ahEfmVariableResponseTx, hwDot3ahEfmVariableResponseRx, hwDot3ahEfmOrgSpecificTx, hwDot3ahEfmOrgSpecificRx, hwDot3ahEfmUnsupportedCodesTx, 
+                hwDot3ahEfmUnsupportedCodesRx, hwDot3ahEfmFramesLostDueToOam }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing the statistics for the
+                number of various transmit and receive events for OAM on an
+                Ethernet like interface.  Note that all of these counters must
+                be supported even if the related function (as described in
+                hwDot3ahEfmFunctionsSupported) is not supported.  "
+            ::= { hwEthOamGroups 16 }
+
+        
+        hwDot3ahEfmLoopbackGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmLoopbackStatus, hwDot3ahEfmLoopbackIgnoreRx, hwDot3ahEfmLoopbackTimeout }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for controlling the OAM remote
+                loopback function.  "
+            ::= { hwEthOamGroups 17 }
+
+        
+        hwDot3ahEfmErrSymbolPeriodEventGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmErrSymPeriodWindowHi, hwDot3ahEfmErrSymPeriodWindowLo, hwDot3ahEfmErrSymPeriodThresholdHi, hwDot3ahEfmErrSymPeriodThresholdLo, hwDot3ahEfmErrSymPeriodEvNotifEnable
+                 }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the thresholds for an
+                Errored Symbol Period Event.  
+                
+                Each [802.3ah] defined Event Notification TLV has its own
+                conformance group because each event can be implemented
+                independently of any other.  "
+            ::= { hwEthOamGroups 18 }
+
+        
+        hwDot3ahEfmErrFramePeriodEventGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmErrFramePeriodWindow, hwDot3ahEfmErrFramePeriodThreshold, hwDot3ahEfmErrFramePeriodEvNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the thresholds for an
+                Errored Frame Period Event.  
+                
+                Each [802.3ah] defined Event Notification TLV has its own
+                conformance group because each event can be implemented
+                independently of any other.  "
+            ::= { hwEthOamGroups 19 }
+
+        
+        hwDot3ahEfmErrFrameEventGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmErrFrameWindow, hwDot3ahEfmErrFrameThreshold, hwDot3ahEfmErrFrameEvNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the thresholds for an
+                Errored Frame Event.  
+                
+                Each [802.3ah] defined Event Notification TLV has its own
+                conformance group because each event can be implemented
+                independently of any other.  "
+            ::= { hwEthOamGroups 20 }
+
+        
+        hwDot3ahEfmErrFrameSecsSummaryEventGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmErrFrameSecsSummaryWindow, hwDot3ahEfmErrFrameSecsSummaryThreshold, hwDot3ahEfmErrFrameSecsEvNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the thresholds for an
+                Errored Frame Seconds Summary Event.  
+                
+                Each [802.3ah] defined Event Notification TLV has its own
+                conformance group because each event can be implemented
+                independently of any other.  "
+            ::= { hwEthOamGroups 21 }
+
+        
+        hwDot3ahEfmFlagEventGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmDyingGaspEnable, hwDot3ahEfmCriticalEventEnable }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the sending OAMPDUs
+                with the critical event flag or dying gasp flag enabled.  "
+            ::= { hwEthOamGroups 22 }
+
+        
+        hwDot3ahEfmEventLogGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmEventLogTimestamp, hwDot3ahEfmEventLogOui, hwDot3ahEfmEventLogType, hwDot3ahEfmEventLogLocation, hwDot3ahEfmEventLogWindowHi, 
+                hwDot3ahEfmEventLogWindowLo, hwDot3ahEfmEventLogThresholdHi, hwDot3ahEfmEventLogThresholdLo, hwDot3ahEfmEventLogValue, hwDot3ahEfmEventLogRunningTotal, 
+                hwDot3ahEfmEventLogEventTotal }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for configuring the thresholds for an
+                Errored Frame Seconds Summary Event and maintaining the event
+                information.  "
+            ::= { hwEthOamGroups 23 }
+
+        hwDot3ahEfmManagerGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEfmTriggerIfDown }
+            STATUS current
+            DESCRIPTION
+                "hwDot3ahEfmManagerGroup "
+            ::= { hwEthOamGroups 24 }           
+            
+        hwDot3ahEvrrpGroup OBJECT-GROUP
+            OBJECTS { hwDot3ahEvrrpCpuState, hwDot3ahEvrrpTriggerIfDown }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for displaying and maintaining 
+                the infomation for Evrrp state. "
+            ::= { hwEthOamGroups 25 }       
+
+    
+    END
+
+

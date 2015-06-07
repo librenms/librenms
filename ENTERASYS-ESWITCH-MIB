@@ -1,0 +1,624 @@
+ENTERASYS-ESWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                           FROM SNMPv2-SMI
+    TruthValue, TEXTUAL-CONVENTION       FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP                         FROM SNMPv2-CONF
+    EnabledStatus                        FROM P-BRIDGE-MIB
+    PortList                             FROM Q-BRIDGE-MIB
+    ifIndex                              FROM IF-MIB 
+    etsysModules                         FROM ENTERASYS-MIB-NAMES;
+
+
+enterasysESwitchMIB MODULE-IDENTITY
+    LAST-UPDATED    "200203071950Z"  -- Thu Mar  7 19:50 GMT 2002
+    ORGANIZATION    "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal:        Enterasys Networks
+                    35 Industrial Way, P.O. Box 5005
+                    Rochester, NH 03867-0505
+                
+    Phone:          +1-603-332-9400
+    E-Mail:         support@enterasys.com
+    WWW:            http://www.enterasys.com"
+   
+    DESCRIPTION
+       "The Enterasys Networks Proprietary MIB module for 
+        entities implementing the Extended Switch Objects."
+
+    REVISION "200203071950Z"  -- Thu Mar  7 19:50 GMT 2002
+    DESCRIPTION
+       "Imported etsysModules from the correct MIB."
+
+    REVISION "200102131100Z" 
+    DESCRIPTION
+       "The initial version of this MIB module."
+
+    ::= { etsysModules 10 }
+
+
+-- ----------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+-- ----------------------------------------------------------------------------
+--
+--  "DURABLE":   
+--  Objects that are saved across a system reset and/or power cycle
+--  are noted as "DURABLE" for convenience in the DESCRIPTION
+--  section of the object definition.  Code must be explicitly
+--  written to implement these DURABLE objects.
+--     
+--  "PERSISTENT": 
+--  This keyword is used to define persistent NVM+ objects (i.e., 
+--  object values that survive a system "reset to factory
+--  defaults").
+--
+    
+-- ----------------------------------------------------------------------------
+--  Enterasys Extended Switch MIB-OIDs for Access Point.
+-- ----------------------------------------------------------------------------
+
+    etsysESwitchObjects       OBJECT IDENTIFIER   ::= { enterasysESwitchMIB 1 }
+
+-- ****************************************************************************
+
+    etsysESwitchParams          OBJECT IDENTIFIER   ::= { etsysESwitchObjects 1 }
+    etsysESwitchRateLimiting    OBJECT IDENTIFIER   ::= { etsysESwitchObjects 2 } 
+    etsysESwitchFilter          OBJECT IDENTIFIER   ::= { etsysESwitchObjects 3 }
+    etsysESwitchProtocolObjects OBJECT IDENTIFIER   ::= { etsysESwitchObjects 4 }
+
+-- ****************************************************************************
+
+--
+--  etsysESwitchParams - The Extended system module
+--  This group consists of objects that detremine the state of 
+--  the Access Piont.
+--
+
+     etsysESwitchAdminStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "DURABLE:
+            The meanings of the values are:
+
+            enabled(1) - setting this object to enabled causes the 
+                device to begin it's power up sequence and attempt to 
+                enter its operational state.  If the value of this object
+                was disabled, then the non-volatile value of this object
+                is changed to enabled.  As part of the power up sequence, 
+                the device's management parameters may or may not be 
+                reset.  (In other words, the device may go through the 
+                equivalent of a reset or before returning to the online state.  
+                If the device is capable of going directly from the disabled
+                state to the enabled state without resetting any of its
+                management parameters, then it may do so.  Such action is 
+                product specific.)
+
+            disabled(2) - setting this object to offline causes the 
+                device to cease network activity and enter a quiescent 
+                state.  A disabled device must still be able to respond 
+                to management messages.  
+
+                The value enable(1) or disable(2) shall be stored
+                in non-volatile memory for the initial reset value
+                of this variable.  The factory default NV value is enable(1)."
+
+        ::= { etsysESwitchParams 1 }
+ 
+
+-- ****************************************************************************
+
+
+    etsysESwitchRateLimitingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EtsysESwitchRateLimitingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table allows rate limiting of multicast frames 
+             received on bridge ports. A typical application of this 
+             might be to limit a broadcast storm to the confines 
+             of the LAN connected by the bridge.
+             
+             All objects in this table must be saved across a system 
+             reset and/or a power cycle."
+        
+        ::= {  etsysESwitchRateLimiting 1 }
+
+    etsysESwitchRateLimitingEntry OBJECT-TYPE
+        SYNTAX EtsysESwitchRateLimitingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the RateLimiting Table.
+             A collection of objects containing information for  
+             enabling and configuring RateLimiting."             
+             
+        INDEX {ifIndex}
+        
+        ::= {  etsysESwitchRateLimitingTable 1 }
+
+    EtsysESwitchRateLimitingEntry ::=
+        SEQUENCE {
+                    etsysESwitchRateLimitSwitch         TruthValue,
+                    etsysESwitchRateLimit               Unsigned32          
+                 }  
+  
+
+    etsysESwitchRateLimitSwitch OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current        
+        DESCRIPTION
+            "DURABLE:
+            By default, rate limiting will be disabled.  It can be
+            enabled by setting this object to 'true(1)'."
+         
+        ::= { etsysESwitchRateLimitingEntry 1 }
+
+    etsysESwitchRateLimit OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current        
+        DESCRIPTION
+            "DURABLE:
+            This is the maximum number of rate-limited frames per second
+            that the bridge will forward per second."
+        ::= { etsysESwitchRateLimitingEntry 2 }        
+
+-- ***********************************************************************
+
+
+--
+--  etsysESwitchFilter - The Extended Switch Filter group
+--  These are bridge objects implemented in Enterasys Extended Switch 
+--  over and above what is required by the Standard Bridge MIBs
+--
+--  etsysESwitchFilter - per-port address filtering switches
+--  for multiport switch
+
+    etsysESwitchAddrFilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     EtsysESwitchAddrFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by ifNumber, defined in MIB-II."
+        ::= { etsysESwitchFilter 1 }
+
+    etsysESwitchAddrFilterEntry OBJECT-TYPE
+        SYNTAX      EtsysESwitchAddrFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects containing information for a
+            given interface."
+        INDEX       { ifIndex }
+        ::= { etsysESwitchAddrFilterTable 1 }
+
+    EtsysESwitchAddrFilterEntry ::=
+        SEQUENCE {
+                etsysESwitchAddressFilter TruthValue
+            }
+
+    etsysESwitchAddressFilter OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "DURABLE:
+            A switch that controls address filtering.  When true,
+            the bridge purges the learned entries from its forwarding
+            database, stops its learning process, and forwards only
+            frames with destination and source addresses that have
+            been specified via management."
+        ::= { etsysESwitchAddrFilterEntry 1 }
+
+-- ***********************************************************************
+
+-- -------------------------------------------------------------------------
+-- User-defined EtherType table
+-- -------------------------------------------------------------------------
+
+etsysESwitchEtherTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysESwitchEtherTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for defining the meaning of the 'userEtherType' rows in the
+         etsysESwitchProtocolTable."
+    ::= { etsysESwitchProtocolObjects 1 }
+
+etsysESwitchEtherTypeEntry OBJECT-TYPE
+    SYNTAX      EtsysESwitchEtherTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row defines a particular EtherType that may be used as a basis
+         for protocol filtering and VLAN classification."
+    INDEX   {
+        etsysESwitchEtherTypeIndex
+    }
+    ::= { etsysESwitchEtherTypeTable 1 }
+
+EtsysESwitchEtherTypeEntry ::=
+    SEQUENCE {
+        etsysESwitchEtherTypeIndex
+            INTEGER,
+        etsysESwitchEtherTypeValue
+            OCTET STRING,
+        etsysESwitchEtherTypeStatus
+            INTEGER,
+        etsysESwitchEtherTypePreempted
+            TruthValue
+    }
+
+etsysESwitchEtherTypeIndex OBJECT-TYPE
+    SYNTAX      INTEGER( 1..1000 )
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and N that identifies a table row, and that serves
+         to link entries in this table to those in etsysESwitchProtocolTable."
+    ::= { etsysESwitchEtherTypeEntry 1 }
+
+etsysESwitchEtherTypeValue OBJECT-TYPE
+    SYNTAX      OCTET STRING( SIZE(2) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines an EtherType for use with etsysESwitchESwitchProtocolTable."
+    ::= { etsysESwitchEtherTypeEntry 2 }
+
+etsysESwitchEtherTypeStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    permanent(3),
+                    deleteOnReset(4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the administrative status of this entry.
+
+            other(1) - This entry is currently in effect, but the conditions
+                under which it will remain so differ from the ones described
+                for the other enumeration values
+
+            invalid(2) - Writing this value invalidates the entry.  The agent
+                may (but is not required to) delete the row.
+
+            permanent(3) - This entry is currently in use and will remain so
+                after the next reset of the bridge.
+
+            deleteOnReset(4) - This entry is currently in use and will remain
+                so until the next reset of the bridge."
+    DEFVAL      { permanent }
+    ::= { etsysESwitchEtherTypeEntry 3 }
+
+etsysESwitchEtherTypePreempted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, indicates that the switch has taken control of this row and
+         its associated resources (e.g., to support 802.1x authentication)."
+    ::= { etsysESwitchEtherTypeEntry 4 }
+
+
+-- -------------------------------------------------------------------------
+-- Protocol-based filtering/VLAN table
+-- -------------------------------------------------------------------------
+
+etsysESwitchProtocolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysESwitchProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring, and obtaining information about, protocol-
+         based filtering and VLAN assignment."
+    ::= { etsysESwitchProtocolObjects 2 }
+
+etsysESwitchProtocolEntry OBJECT-TYPE
+    SYNTAX      EtsysESwitchProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row in etsysESwitchProtocolTable holds filtering instructions,
+         or VLAN classification instructions, for one (port, protocol) pair."
+    INDEX   {
+        etsysESwitchProtocolReceivePort,
+        etsysESwitchProtocolType,
+        etsysESwitchProtocolIndex
+    }
+    ::= { etsysESwitchProtocolTable 1 }
+
+EtsysESwitchProtocolEntry ::=
+    SEQUENCE {
+        etsysESwitchProtocolReceivePort
+            INTEGER,
+        etsysESwitchProtocolType
+            INTEGER,
+        etsysESwitchProtocolIndex
+            INTEGER,
+        etsysESwitchProtocolConstraint
+            INTEGER,
+        etsysESwitchProtocolAllowedToGoTo
+            PortList,
+        etsysESwitchProtocolVlanId
+            INTEGER,
+        etsysESwitchProtocolStatus
+            INTEGER,
+        etsysESwitchProtocolPreempted
+            TruthValue
+    }
+
+etsysESwitchProtocolReceivePort OBJECT-TYPE
+    SYNTAX      INTEGER ( 0..2147483647 )
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the receive port to which the protocol filter is to be
+         applied.  The value '0' (when allowed) represents 'all ports'."
+    ::= { etsysESwitchProtocolEntry 1 }
+
+etsysESwitchProtocolType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          userEtherType(1),
+                          ipv4(2),
+                          ipxEthernet(3),
+                          ipxRaw(4),
+                          ipxLlc(5),
+                          ipxSnap(6),
+                          sna(7),
+                          netBios(8),
+                          decnet(9),
+                          ipv6(10)
+                        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the protocol type.  The switch chip in the RoamAbout M2
+         can recognize nine predefined high-level protocol types, and up to
+         three user-defined EtherTypes.  (Some or all EtherType filters may
+         be reserved for use in implementing other features.)
+
+         Protocol types are as follows:
+
+             userEtherType(1) - Packets whose Ethernet V2 EtherTypes or IEEE
+                 802.3 LLC/SNAP EtherTypes match the user-defined EtherType
+                 etsysESwitchEtherType[ etsysESwitchProtocolIndex ].
+
+             ipv4(2) - Internet Protocol version 4 carried in Ethernet V2
+                 frames or IEEE 802.3 frames with LLC/SNAP headers.  Also,
+                 ARP packets carried in Ethernet V2 frames.
+
+             ipxEthernet(3) - IPX carried in Ethernet V2 frames.
+
+             ipxRaw(4) - IPX carried in IEEE 802.3 frames with no LLC.
+
+             ipxLlc(5) - IPX carried in IEEE 802.3 frames with LLC headers.
+
+             ipxSnap(6) - IPX carried in IEEE 802.3 frames with LLC/SNAP
+                 headers.
+
+             sna(7) - SNA carried in IEEE 802.3 frames with LLC headers.
+
+             netBios(8) - NetBIOS carried in IEEE 802.3 frames with LLC
+                 headers.
+
+             decnet(9) - DECnet carried in Ethernet V2 frames or in IEEE 802.3
+                 frames with LLC/SNAP headers.
+
+             ipv6(10) - Internet Protocol version 6 carried in Ethernet V2
+                 frames or IEEE 802.3 frames with LLC/SNAP headers"
+    ::= { etsysESwitchProtocolEntry 2 }
+
+etsysESwitchProtocolIndex OBJECT-TYPE
+    SYNTAX      INTEGER ( 1..1000 )
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "When etsysESwitchProtocolType indicates a user-defined protocol type,
+         this index should identify the corresponding protocol definition.
+         That is, to say, for a 'userEtherType' row, this index should point
+         to a row in the etsysESwitchEtherTypeTable.
+
+         When etsysESwitchProtocolType completely specifies the protocol type,
+         this index should be set to 1."
+    ::= { etsysESwitchProtocolEntry 3 }
+
+etsysESwitchProtocolConstraint OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          portMask(1),
+                          vlan(2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates what type of constraint the switch should apply to packets
+         caught by the (port, protocol) filter.
+
+            portMask(1) - Use the etsysESwitchProtocolAllowedToGoTo mask to
+                determine where the packets may be forwarded.
+
+            vlan(2) - Classify the packets as belonging to the VLAN
+                etsysESwitchProtocolVlanId.
+
+         Note that on the RoamAbout AccessPoint R2, port/protocol constraints
+         can sometimes take a back seat to other kinds of access controls."
+    DEFVAL      { portMask }
+    ::= { etsysESwitchProtocolEntry 4 }
+
+etsysESwitchProtocolAllowedToGoTo OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A port mask object indicating where packets that match this row's
+         (port, protocol) filter are allowed to go.
+
+         It applies when etsysESwitchProtocolConstraint has the value
+         portMask(1) and this row is valid."
+    ::= { etsysESwitchProtocolEntry 5 }
+
+etsysESwitchProtocolVlanId OBJECT-TYPE
+    SYNTAX      INTEGER ( 0..2147483647 )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A number identifying a VLAN to which packets that match this row's
+         (port, protocol) filter should be assigned.
+
+         It applies when etsysESwitchProtocolConstraint has the value vlan(2)
+         and this row is valid."
+    ::= { etsysESwitchProtocolEntry 6 }
+
+etsysESwitchProtocolStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    permanent(3),
+                    deleteOnReset(4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the administrative status of this entry.
+
+            other(1) - This entry is currently in effect, but the conditions
+                under which it will remain so differ from the ones described
+                for the other enumeration values
+
+            invalid(2) - Writing this value to the object deletes the filter
+                or VLAN constraint.  The agent may delete the SNMP table row
+                or return an AdminStatus of 'invalid' at its discretion.
+
+            permanent(3) - This entry is currently in use and will remain so
+                after the next reset of the bridge.
+
+            deleteOnReset(4) - This entry is currently in use and will remain
+                so until the next reset of the bridge."
+    DEFVAL      { permanent }
+    ::= { etsysESwitchProtocolEntry 7 }
+
+etsysESwitchProtocolPreempted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, indicates that the switch has taken control of this row and
+         its associated resources (e.g., to support 802.1x authentication)."
+    ::= { etsysESwitchProtocolEntry 8 }
+
+  
+-- ----------------------------------------------------------------------------
+-- Conformance Information
+-- ----------------------------------------------------------------------------
+
+etsysESwitchConformance     OBJECT IDENTIFIER ::= { enterasysESwitchMIB 2 }
+
+    etsysESwitchGroups      OBJECT IDENTIFIER ::= { etsysESwitchConformance 1 }
+    etsysESwitchCompliances OBJECT IDENTIFIER ::= { etsysESwitchConformance 2 }
+
+-- ----------------------------------------------------------------------------
+-- Units of conformance
+-- ----------------------------------------------------------------------------
+
+    etsysESwitchBaseGroup   OBJECT-GROUP
+        OBJECTS {   
+            etsysESwitchAdminStatus,
+            etsysESwitchRateLimitSwitch,
+            etsysESwitchRateLimit,
+            etsysESwitchAddressFilter
+        }
+        STATUS      current
+        DESCRIPTION
+            "The basic etsysESwitch objects."
+        ::= { etsysESwitchGroups 1 }
+
+    etsysESwitchEtherTypeGroup OBJECT-GROUP
+        OBJECTS {
+            etsysESwitchEtherTypeValue,
+            etsysESwitchEtherTypeStatus,
+            etsysESwitchEtherTypePreempted
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects for configuring user-defined EtherTypes."
+        ::= { etsysESwitchGroups 2 }
+
+    etsysESwitchProtocolGroup OBJECT-GROUP
+        OBJECTS {
+            etsysESwitchProtocolConstraint,
+            etsysESwitchProtocolAllowedToGoTo,
+            etsysESwitchProtocolVlanId,
+            etsysESwitchProtocolStatus,
+            etsysESwitchProtocolPreempted
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects for configuring protocol-based filtering."
+        ::= { etsysESwitchGroups 3 }
+
+   
+-- ----------------------------------------------------------------------------
+-- Compliance statements
+-- ----------------------------------------------------------------------------
+
+    etsysESwitchCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for devices that support 
+            Extended Switch."
+        MODULE      ENTERASYS-ESWITCH-MIB
+                    MANDATORY-GROUPS { etsysESwitchBaseGroup }
+
+                    GROUP       etsysESwitchEtherTypeGroup
+                        DESCRIPTION
+                            "This group is optional."
+
+                    GROUP       etsysESwitchProtocolGroup
+                        DESCRIPTION
+                            "This group is optional."
+
+                    OBJECT      etsysESwitchEtherTypeValue
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                            "Write access is not required."
+
+                    OBJECT      etsysESwitchEtherTypeStatus
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                            "Write access is not required.  An implementation does 
+                            not need to support all possible status types."
+
+                    OBJECT      etsysESwitchProtocolConstraint
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                             "Write access is not required.  An implementation does 
+                             not need to support all possible constraint types."
+
+                    OBJECT      etsysESwitchProtocolAllowedToGoTo
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                             "Write access is not required."
+
+                    OBJECT      etsysESwitchProtocolVlanId
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                             "Write access is not required."
+
+                    OBJECT      etsysESwitchProtocolStatus
+                        MIN-ACCESS  read-only
+                        DESCRIPTION
+                             "Write access is not required.  An implementation does 
+                             not need to support all possible status types."
+     
+        ::= { etsysESwitchCompliances 1 }
+ 
+END

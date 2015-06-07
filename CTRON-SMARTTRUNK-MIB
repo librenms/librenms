@@ -1,0 +1,443 @@
+CTRON-SMARTTRUNK-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-smarttrunk-mib.txt
+--  Revision: 01.00.01
+--  Part Number:
+--  Date: April 14, 1999
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific port-trunking MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright February 1999 Cabletron Systems
+
+--  Note:  the design of this MIB owes much to designers of the LEC MIB.
+--  Rev: 1.00.01 cleaned up some spaces to allow import into Spectrum MIB Tools. 
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+                  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+                  FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+                  FROM SNMPv2-CONF
+        InterfaceIndex, ifIndex
+                  FROM IF-MIB
+        ctSmartTrunkBranch
+                  FROM CTRON-MIB-NAMES;
+
+ctSmartTrunk  MODULE-IDENTITY
+    LAST-UPDATED "199812160000Z"
+    ORGANIZATION "Cabletron Systems, Inc"
+    CONTACT-INFO
+    "Cabletron Systems, Inc.
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@cabletron.com
+     http://www.ctron.com"
+    DESCRIPTION
+            "This mib module defines a portion of the SNMP enterprise MIBs under Cabletron
+             enterprise OID pertaining to configuration of Smart TRUNK network links."
+         ::= { ctSmartTrunkBranch 1 } 
+
+ctSmartTrunkConfig    OBJECT IDENTIFIER ::= { ctSmartTrunk 1 }
+ctSmartTrunkDebug     OBJECT IDENTIFIER ::= { ctSmartTrunk 2 }
+
+-- Textual Conventions
+
+   CTSmartTrunkProtocol ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION
+           "Type of trunking protocol used. LLAP based switches should use decHuntGroup.
+            noProcol applies to all other types of connections."
+   SYNTAX INTEGER {
+     noProtocol(1),
+     decHuntGroup(2)
+   }
+
+   CTSmartTrunkIndex ::= TEXTUAL-CONVENTION
+   STATUS   current
+   DESCRIPTION
+                "Most of the tables in this MIB are indexed in whole
+                 or in part by 'ctTrunkIndex' - not by 'ifIndex'.
+                 Why is there a separate index?
+                 Traditionally, ifIndex values are chosen by agents,
+                 and are permitted to change across restarts.  Using
+                 ifIndex to index ctTrunkConfigTable could complicate
+                 row creation and/or cause interoperability problems
+                 (if each agent had special restrictions on ifIndex).
+                 Having a separate index avoids these problems."
+   SYNTAX      INTEGER ( 1..2147483647 )
+
+   CTSmartTrunkName ::= TEXTUAL-CONVENTION
+   STATUS   current
+   DESCRIPTION
+           "A textual description of this virtual port."
+   SYNTAX DisplayString (SIZE(0..32))
+
+   CTSmartTrunkLoadBalanceType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+            "The algorithm in use to assign flows to each link in a Smart TRUNK."
+   SYNTAX INTEGER {
+        balancingUnspecified(1),
+        roundRobin(2),
+        linkUtilization(3)
+   }
+
+--
+-- Smart Trunk Configuration
+--
+
+    ctTrunkGlobalStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The state of Smart TRUNK capability for this entire managed entity. Default Value is True(1). If set to False(2)
+                 all smart trunks are put into ifAdminStatus down."
+        ::= { ctSmartTrunkConfig 1 }
+
+      ctTrunkConfigTable OBJECT-TYPE
+          SYNTAX       SEQUENCE OF CtTrunkConfigEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+                  "A table describing all of the trunk interfaces
+                   implemented by this host.  Each trunk has a row
+                   in the MIB-II/RFC 2233 Interfaces table (describing
+                   the structure of the trunk interface it presents to higher
+                   layers).  Each trunk interface also has a row in this and
+                   other CTRON-SMARTTRUNK-MIB tables. Smart Trunks use
+                   ifType propMultiplexor(54). Counters represent the aggregate of
+                   all physcal links.
+
+                   Unlike hardware ports, trunk interfaces can be created by
+                   management.  However, the RFC 2233 Interfaces table
+                   does not directly support row creation.  Therefore,
+                   creating or deleting a row in the ctTrunkConfigTable is
+                   defined to have the side effect of creating or
+                   deleting corresponding rows in
+
+                       -  the MIB-II / RFC 2233 Interfaces table,
+                       -  any other dependent tables
+
+                   New Interfaces table rows for trunk intefaces
+                   always have 'ifAdminStatus' set to 'down' until the row
+                   state is becomes Active. Then administration of the
+                   interface uses normal ifTable ifAdminStatus to enabled it."
+
+          ::= { ctSmartTrunkConfig 3 }
+
+      ctTrunkConfigEntry OBJECT-TYPE
+          SYNTAX       CtTrunkConfigEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+                  "Each table entry contains configuration information for one trunk interface."
+          INDEX   { ctTrunkIndex }
+          ::= { ctTrunkConfigTable 1 }
+
+      CtTrunkConfigEntry ::=
+          SEQUENCE {
+              ctTrunkIndex                      CTSmartTrunkIndex,
+              ctTrunkConfigName                 CTSmartTrunkName,
+              ctTrunkConfigProtocol             CTSmartTrunkProtocol,
+              ctTrunkConfigLoadBalance          CTSmartTrunkLoadBalanceType,
+              ctTrunkIfIndex                    InterfaceIndex,
+              ctTrunkRowStatus                  RowStatus
+          }
+
+      ctTrunkIndex OBJECT-TYPE
+          SYNTAX      CTSmartTrunkIndex
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                  "A value which uniquely identifies this conceptual
+                   row in the ctTrunkConfigTable. The Table allows sparse values.
+
+                   If the conceptual row identified by this value of
+                   ctTrunkIndex is recreated following an agent restart,
+                   the same value of ctTrunkIndex must be used to identify
+                   the recreated row.  (However, the Interfaces table
+                   index associated with the client may change. ifAlias in ifXTable is used
+                   then to reassociate ifIndexes based on ifAlias. In the case of the SSR,
+                   Smart Trunks are manipulated as st.ctTrunkIndex"
+          ::= { ctTrunkConfigEntry 1 }
+
+        ctTrunkConfigName OBJECT-TYPE
+          SYNTAX      CTSmartTrunkName
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                  "The Trunk's Name, just for informational purposes. It may be changed
+                   regardless of the RowStatus value."
+
+          DEFVAL { "" }
+          ::= { ctTrunkConfigEntry 2 }
+
+        ctTrunkConfigProtocol OBJECT-TYPE
+          SYNTAX      CTSmartTrunkProtocol
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+             "Trunking protocol in use. Once the row is active, it can not be changed."
+          DEFVAL { decHuntGroup }
+          ::= { ctTrunkConfigEntry 3 }
+
+        ctTrunkConfigLoadBalance OBJECT-TYPE
+          SYNTAX     CTSmartTrunkLoadBalanceType
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                  "The type of load balance algorithm applied to this trunk.
+                   Once Row is active, the agent may override this value with an implmentation specific
+                   default."
+          DEFVAL  { balancingUnspecified }
+          ::= { ctTrunkConfigEntry 4 }
+
+       ctTrunkIfIndex OBJECT-TYPE
+          SYNTAX        InterfaceIndex
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                "The ifIndex in ifTable, ifXTable that is associated with the trunk that is
+                 represented by this row."
+        ::= { ctTrunkConfigEntry 5 }
+
+       ctTrunkRowStatus OBJECT-TYPE
+          SYNTAX      RowStatus
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                  "This object lets network managers create and delete
+                   trunk interfaces, on systems that support this
+                   optional capability.
+
+                   It does not control the activation and deactivation
+                   of these interfaces; they are controlled by 'ifAdminStatus'
+                   in the ifTable.  However, changing row state from active
+                   to notInService. will have the side effect of changing
+                   their 'ifAdminStatus' values to 'noPresent' or 'down',
+                   thus causing any active trunk connections to be terminated.
+
+                   When creating a trunk interface, it is up to the
+                   management station to determine a suitable 'ctTrunkIndex'.
+                   To facilitate interoperability, agents should not put
+                   any restrictions on the 'ctTrunkIndex' beyond the obvious
+                   ones that it be valid and unused.
+
+                   The Managed Objects that must be set in this table
+                   for a row to change from nonExistent/notReady to notInService/Active
+                   is simply an index. Ports can then be added to the Smart TRUNK
+                   via the ifStackTable.
+
+                   If you create a trunk interface via this object,
+                   it will initially have
+                       'ifAdminStatus' = 'down'
+                       'ifOperStatus' = 'down' when RowStatus is changed to active."
+          ::= { ctTrunkConfigEntry 6 }
+
+  --
+  --  SmartTrunk Connection Table
+  --
+
+  ctTrunkConnectionTable OBJECT-TYPE
+          SYNTAX       SEQUENCE OF CtTrunkConnectionEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+                  "This table describes how local interfaces that are
+                   participating in a trunk are connected to remote
+                   interfaces.
+
+                   With this table, a management entity can determine
+                   that (for example) local interfaces 3, 4, and 6 are
+                   connected to remote interfaces 10, 17, and 19.
+
+                   This table is useful to debug configuration errors
+                   with remote devices. If ifAdminStatus/ifOperState is
+                   up, and no corresponding row is found in this table,
+                   then a management station can assume a the remote
+                   end does not have the decHuntGroup protocol active.
+
+                   Note:  this entire table is read-only.  Rows are
+                   created and deleted from this table as a side
+                   effect of trunks being created and deleted.
+
+                   Note:  a managment entity could determine (for
+                   example) that interface 3 was participating in
+                   trunk 3 by using the ifStackTable and ctTrunkIfIndex."
+          ::= { ctSmartTrunkConfig 4 }
+
+      ctTrunkConnectionEntry OBJECT-TYPE
+          SYNTAX       CtTrunkConnectionEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+                  "Each table entry contains configuration information
+                   for one interface that is participating in a trunk."
+          INDEX   { ifIndex }
+          ::= { ctTrunkConnectionTable 1 }
+
+      CtTrunkConnectionEntry ::=
+          SEQUENCE {
+                ctTrunkPortRemoteIfIndex        InterfaceIndex
+          }
+
+     ctTrunkPortRemoteIfIndex OBJECT-TYPE
+         SYNTAX  InterfaceIndex
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                 "The ifIndex of the interface at the other end of
+                  this part of the trunk link.  If this value is 0,
+                  then for some reason there is no interface on the
+                  other side of this link.  This might be a temporary
+                  condition or it might represent a real problem.
+
+                  Note:  this table is indexed by ifIndex.  So the
+                  index is the local ifIndex value and
+                  ctTrunkPortRemoteIfIndex is the remote ifIndex."
+        ::= { ctTrunkConnectionEntry 1 }
+
+-- END of ctTrunkConnectionTable
+
+  ctTrunkLLAPRequirement OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    required(1),
+                    notRequired(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates whether this managed entity requires the
+                 LLAP updates to perform the trunking function.
+
+                 Certain families of products require LLAP (decHuntGroup Protocol)
+                 order for the Smart TRUNK functionality to work.
+                 A value of 1 implies that LLAP is necessary for smart-trunking
+                 to work on this platform, a value of 2 indicates that it is
+                 not necessary."
+        ::= { ctSmartTrunkDebug 1 }
+
+    ctTrunkMaxTrunks OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The maximum number of trunks that can be configured
+                on this managed entity."
+        ::= { ctSmartTrunkDebug 2 }
+
+       -- The Trunk-Flow Diagnostic table
+       --
+       -- this table is optional; it will be implemented on those devices
+       -- that use "flows"
+       ctTrunkFlowDiagnosticTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF CtTrunkFlowDiagnosticEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION "Provide a means to programmatically evaluate the load
+         balancing of a smart trunk. Assumes that load balancing is done on a
+         flow by flow basis."
+       ::= { ctSmartTrunkDebug 4 }
+
+       ctTrunkFlowDiagnosticEntry OBJECT-TYPE
+       SYNTAX CtTrunkFlowDiagnosticEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION "Each row refers to a specific smart trunk and port within
+         that smart trunk."
+       INDEX { ctTrunkIndex,  ifIndex }
+       ::= { ctTrunkFlowDiagnosticTable 1 }
+
+       CtTrunkFlowDiagnosticEntry ::=
+          SEQUENCE {
+                ctTrunkFlowDiagnosticInstalledFlows     Counter32
+       }
+
+       ctTrunkFlowDiagnosticInstalledFlows OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION  "A counter of the flows installed on this port since it was
+         first operational."
+       ::= { ctTrunkFlowDiagnosticEntry 1 }
+
+       -- END of ctTrunkFlowDiagnosticTable
+
+   --
+   -- Compliance
+   --
+
+ctTrunkConformance OBJECT IDENTIFIER ::= { ctSmartTrunk 3 }
+ctTrunkCompliances OBJECT IDENTIFIER ::= { ctTrunkConformance 1 }
+ctTrunkGroups OBJECT IDENTIFIER ::= { ctTrunkConformance 2 }
+
+ctTrunkComplianceV10 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the CTRON-SMARTTRUNK-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ctTrunkConfGroupV10 }
+
+    GROUP       ctTrunkFlowDiagnosticGroup
+    DESCRIPTION
+       "This group is mandatory for all network devices
+        which utilize 'flows'. in order to pass packets along their
+        way."
+
+    ::= { ctTrunkCompliances 1 }
+
+ctTrunkConfGroupV10  OBJECT-GROUP
+   OBJECTS {
+     ctTrunkGlobalStatus,
+     ctTrunkRowStatus,
+     ctTrunkConfigName,
+     ctTrunkConfigProtocol,
+     ctTrunkConfigLoadBalance,
+     ctTrunkIfIndex,
+     ctTrunkPortRemoteIfIndex,
+     ctTrunkLLAPRequirement,
+     ctTrunkMaxTrunks
+}
+ STATUS current
+DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the CTRON-SMARTTRUNK-MIB."
+   ::= { ctTrunkGroups 1 }
+
+ ctTrunkFlowDiagnosticGroup    OBJECT-GROUP
+       OBJECTS { ctTrunkFlowDiagnosticInstalledFlows }
+       STATUS  current
+       DESCRIPTION
+               "A collection of diagnostic information related to
+                interfaces participating in SmartTrunks; specifically
+                to interfaces on devices that use 'flows'."
+       ::= { ctTrunkGroups 2 }
+
+END

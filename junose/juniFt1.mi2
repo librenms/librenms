@@ -1,0 +1,305 @@
+
+-- *****************************************************************************
+-- Juniper-FRACTIONAL-T1-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Fractional T1 MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-FRACTIONAL-T1-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex, JuniTimeSlotMap
+        FROM Juniper-TC;
+
+juniFt1MIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Fractional T1 MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200009261730Z"  -- 26-Sep-00 01:50 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION      "9907140000Z"  -- 14-Jul-99
+    DESCRIPTION
+        "Obsoleted juniFt1IfDataPolarity and updated corresponding compliances."
+    REVISION      "9811130000Z"  -- 13-Nov-98
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 6 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFt1Objects     OBJECT IDENTIFIER ::= { juniFt1MIB 1 }
+
+--
+-- This MIB contains managed objects for Fractional T1 arrangements.
+-- Management objects are provided to query for an available
+-- interface index, and to create/delete interfaces of this type.
+-- Creating/deleting this interface type using this MIB has
+-- the side effect of creating/deleting corresponding entries
+-- in the Interface MIB ifTable/ifXTable, and in the Juniper
+-- Enterprise Interface MIB juniIfTable.
+--
+
+-- //////////////////////////////////////////////////////////////////////
+--
+-- Fractional T1 Interfaces
+--
+-- //////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new FT1 interfaces
+--
+juniFt1NextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniFt1IfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniFt1Objects 1 }
+
+
+--
+-- The FT1 Interface Table
+--
+juniFt1IfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFt1IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for FT1 interfaces present in the system."
+    ::= { juniFt1Objects 2 }
+
+juniFt1IfEntry OBJECT-TYPE
+    SYNTAX      JuniFt1IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an FT1 interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created /deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniFt1IfIndex }
+    ::= { juniFt1IfTable 1 }
+
+JuniFt1IfEntry ::= SEQUENCE {
+    juniFt1IfIndex              InterfaceIndex,
+    juniFt1IfRowStatus          RowStatus,
+    juniFt1IfLowerIfIndex       InterfaceIndexOrZero,
+    juniFt1IfTimeSlotMap        JuniTimeSlotMap,
+    juniFt1IfTimeSlotRate       INTEGER,
+    juniFt1IfDataPolarity       INTEGER,
+    juniFt1IfLoopbackConfig     INTEGER }
+
+juniFt1IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the FT1 interface.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniFt1NextIfIndex."
+    ::= { juniFt1IfEntry 1 }
+
+juniFt1IfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniFt1IfRowStatus
+            juniFt1IfLowerIfIndex
+            juniFt1IfTimeSlotMap
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniFt1IfIndex must have been determined previously, by
+            reading juniFt1NextIfIndex.
+
+            The DS1 interface identified by juniFt1IfLowerIfIndex must exist.
+
+            The DS0s specified in juniFt1IfTimeSlotMap must be available
+            (unallocated) on the DS1 interface identified by
+            juniFt1IfLowerIfIndex.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniFt1IfEntry 2 }
+
+juniFt1IfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a DS1 interface over which this FT1 interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniFt1IfEntry 3 }
+
+juniFt1IfTimeSlotMap OBJECT-TYPE
+    SYNTAX      JuniTimeSlotMap
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing the DS0s on the underlying DS1 interface that
+        have been allocated to this FT1 interface."
+    ::= { juniFt1IfEntry 4 }
+
+juniFt1IfTimeSlotRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nx56kbps(0),
+                    nx64kbps(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Data rate per time slot allocated to this FT1 interface."
+    DEFVAL    { nx64kbps }
+    ::= { juniFt1IfEntry 5 }
+
+juniFt1IfDataPolarity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    inverted(1) }
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete.  Polarity of data transmitted on this FT1 interface.
+        Inverted data is used for certain line coding configurations to ensure
+        sufficient one's density for timing recovery by the remote end."
+    DEFVAL    { normal }
+    ::= { juniFt1IfEntry 6 }
+
+juniFt1IfLoopbackConfig OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noLoop(0),
+                    loop(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Selects loopback configuration.  loop(1) causes received data to be
+        looped back out the transmitter."
+    DEFVAL    { noLoop }
+    ::= { juniFt1IfEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniFt1TrapControl      OBJECT IDENTIFIER ::= { juniFt1MIB 2 }
+-- juniFt1Traps            OBJECT IDENTIFIER ::= { juniFt1MIB 3 }
+-- juniFt1TrapPrefix       OBJECT IDENTIFIER ::= { juniFt1Traps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFt1Conformance OBJECT IDENTIFIER ::= { juniFt1MIB 4 }
+juniFt1Compliances OBJECT IDENTIFIER ::= { juniFt1Conformance 1 }
+juniFt1Groups      OBJECT IDENTIFIER ::= { juniFt1Conformance 2 }
+
+--
+-- compliance statements
+--
+juniFt1Compliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        FT1 MIB.  This statement became obsolete when the interface data
+        polarity object was obsoleted."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFt1Group }
+    ::= { juniFt1Compliances 1 }
+
+juniFt1Compliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper FT1
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFt1Group2 }
+    ::= { juniFt1Compliances 2 }
+
+--
+-- units of conformance
+--
+juniFt1Group OBJECT-GROUP
+    OBJECTS {
+        juniFt1NextIfIndex,
+
+        juniFt1IfRowStatus,
+        juniFt1IfLowerIfIndex,
+        juniFt1IfTimeSlotMap,
+        juniFt1IfTimeSlotRate,
+        juniFt1IfDataPolarity,
+        juniFt1IfLoopbackConfig }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of FT1 interfaces
+        in a Juniper product.  This group became obsolete when the interface
+        data polarity object was obsoleted."
+    ::= { juniFt1Groups 1 }
+
+juniFt1Group2 OBJECT-GROUP
+    OBJECTS {
+        juniFt1NextIfIndex,
+
+        juniFt1IfRowStatus,
+        juniFt1IfLowerIfIndex,
+        juniFt1IfTimeSlotMap,
+        juniFt1IfTimeSlotRate,
+        juniFt1IfLoopbackConfig }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of FT1 interfaces in a
+        Juniper product."
+    ::= { juniFt1Groups 2 }
+
+END

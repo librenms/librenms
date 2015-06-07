@@ -1,0 +1,118 @@
+ZIPLOCK-MIB DEFINITIONS ::= BEGIN
+
+        --  ZIPLOCK-MIB  The Cabletron Ziplock MIB
+        --  Revision: 01.00.00
+        --  Date: September 4, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provide authoritative definitions for
+        --      object identifiers created for the support of the 
+        --      Ziplock Daughter Board optionally used on Cabletron
+        --      products. 
+        --
+        --      enterprise.cabletron.mibs.ctron.
+        --              ctPhysical.ctResource.sysResourceInstalled
+        --                                                                                                      .ctZiplock
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 1997 Cabletron Systems
+
+
+        IMPORTS
+                OBJECT-TYPE     FROM    RFC-1212
+                ctResource      FROM    CTRON-MIB-NAMES;
+
+                ctZiplock       OBJECT IDENTIFIER ::= { ctResource 3 }
+
+--  
+--  ctZiplock Group
+-- 
+
+        ctZiplockTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtZiplockEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+         "Table containing Ziplock daughter board information
+         including presence, revision and status"
+        ::= { ctZiplock 1 }
+
+        ctZiplockEntry OBJECT-TYPE
+        SYNTAX  CtZiplockEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Ziplock daughter board information."
+        INDEX   { ctZiplockNumber }
+        ::= { ctZiplockTable 1 }
+
+        CtZiplockEntry ::= SEQUENCE 
+        {
+                ctZiplockNumber         INTEGER,
+                ctZiplockPresence       INTEGER,
+                ctZiplockRevision       INTEGER,
+                ctZiplockStatus         INTEGER
+        }
+
+    ctZiplockNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object provides an index into the Ziplock Table.
+                and represents the Ziplock daughter board number."
+        ::= { ctZiplockEntry 1 }
+
+    ctZiplockPresence OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates the presence of a Ziplock daughter
+                board on the host platform. 1 indicates presence, 2
+                indicates absence."
+        ::= { ctZiplockEntry 2 }
+
+    ctZiplockRevision OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object represents the hardware revision of the Ziplock
+                daughter board." 
+        ::= { ctZiplockEntry 3 }
+
+    ctZiplockStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates the status of the Ziplock
+                daughter board.  
+                
+                1=GOOD, 
+                2=BAD, 
+                3=UNKNOWN."
+        ::= { ctZiplockEntry 4 }
+
+END

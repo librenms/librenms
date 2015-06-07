@@ -1,0 +1,202 @@
+-- ============================================================================
+-- AT-PRODUCTS.MIB, Allied Telesis enterprise MIB
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PRODUCT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY
+		FROM SNMPv2-SMI
+
+	alliedTelesis
+		FROM AT-SMI-MIB
+;
+
+products MODULE-IDENTITY
+	LAST-UPDATED "200803061300Z"
+	ORGANIZATION "Allied Telesis, Inc."
+	CONTACT-INFO
+		"  http://www.alliedtelesis.com"
+	DESCRIPTION
+		"This file defines the identities of Allied Telesis products.
+		 OID products is the root OBJECT IDENTIFIER. Beneath it there are subtree 
+		 bridgeRouter and routerSwitch, which are is defined in AT-SMI-MIB."
+
+	REVISION      "200803061300Z"
+	DESCRIPTION
+		" Added systemOID 69,70,75,76,77. "
+	
+	REVISION      "200711150000Z"
+	DESCRIPTION
+		"Changed systemOID 67 from AT-8824R to 8724SL-V2."
+	
+	REVISION      "200703210000Z"
+	DESCRIPTION
+		"Added systemOID for x900-48FS."
+	
+	REVISION      "200702070000Z"
+	DESCRIPTION
+		"Added systemOID for AT-8824R."
+	
+	REVISION      "200606140000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+
+	::= { alliedTelesis 1 }
+
+bridgeRouter OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree beneath which brige product MIB object ids are assigned."
+	::= { products 1 }
+
+routerSwitch OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree beneath which router and switch product MIB object ids are assigned."
+	::= { products 14 }
+
+-- bridge router
+    centreCOMAR300Router    OBJECT IDENTIFIER ::= { bridgeRouter 8 }
+    centreCOMAR720Router    OBJECT IDENTIFIER ::= { bridgeRouter 11 }
+    centreCOMAR300LRouter   OBJECT IDENTIFIER ::= { bridgeRouter 12 }
+    centreCOMAR310Router    OBJECT IDENTIFIER ::= { bridgeRouter 13 }
+    centreCOMAR300LURouter  OBJECT IDENTIFIER ::= { bridgeRouter 14 }
+    centreCOMAR300URouter   OBJECT IDENTIFIER ::= { bridgeRouter 15 }
+    centreCOMAR310URouter   OBJECT IDENTIFIER ::= { bridgeRouter 16 }
+    centreCOMAR350Router    OBJECT IDENTIFIER ::= { bridgeRouter 17 }
+    centreCOMAR370Router    OBJECT IDENTIFIER ::= { bridgeRouter 18 }
+    centreCOMAR330Router    OBJECT IDENTIFIER ::= { bridgeRouter 19 }
+    centreCOMAR395Router    OBJECT IDENTIFIER ::= { bridgeRouter 20 }
+    centreCOMAR390Router    OBJECT IDENTIFIER ::= { bridgeRouter 21 }
+    centreCOMAR370URouter   OBJECT IDENTIFIER ::= { bridgeRouter 22 }
+    centreCOMAR740Router    OBJECT IDENTIFIER ::= { bridgeRouter 23 }
+    centreCOMAR140SRouter   OBJECT IDENTIFIER ::= { bridgeRouter 24 }
+    centreCOMAR140URouter   OBJECT IDENTIFIER ::= { bridgeRouter 25 }
+    centreCOMAR320Router    OBJECT IDENTIFIER ::= { bridgeRouter 26 }
+    centreCOMAR130SRouter   OBJECT IDENTIFIER ::= { bridgeRouter 27 }
+    centreCOMAR130URouter   OBJECT IDENTIFIER ::= { bridgeRouter 28 }
+    centreCOMAR160Router    OBJECT IDENTIFIER ::= { bridgeRouter 29 }
+    atAR740RouterDC         OBJECT IDENTIFIER ::= { bridgeRouter 43 }
+    centreCOMAR120Router    OBJECT IDENTIFIER ::= { bridgeRouter 44 }
+    atAR410Router           OBJECT IDENTIFIER ::= { bridgeRouter 47 }
+    atAR725Router           OBJECT IDENTIFIER ::= { bridgeRouter 48 }
+    atAR745Router           OBJECT IDENTIFIER ::= { bridgeRouter 49 }
+    atAR410v2Router         OBJECT IDENTIFIER ::= { bridgeRouter 50 }
+    atAR410v3Router         OBJECT IDENTIFIER ::= { bridgeRouter 51 }
+    atAR725RouterDC         OBJECT IDENTIFIER ::= { bridgeRouter 52 }
+    atAR745RouterDC         OBJECT IDENTIFIER ::= { bridgeRouter 53 }
+    atAR450Router           OBJECT IDENTIFIER ::= { bridgeRouter 54 }
+    atAR450DualRouter       OBJECT IDENTIFIER ::= { bridgeRouter 55 }
+    atAR440Router           OBJECT IDENTIFIER ::= { bridgeRouter 59 }
+    atAR441Router           OBJECT IDENTIFIER ::= { bridgeRouter 60 }
+    atAR442Router           OBJECT IDENTIFIER ::= { bridgeRouter 61 }
+    atAR443Router           OBJECT IDENTIFIER ::= { bridgeRouter 62 }
+    atAR444Router           OBJECT IDENTIFIER ::= { bridgeRouter 63 }
+    atAR420Router           OBJECT IDENTIFIER ::= { bridgeRouter 64 }
+    atAR415SRouter          OBJECT IDENTIFIER ::= { bridgeRouter 71 }
+    atAR415SRouterDC        OBJECT IDENTIFIER ::= { bridgeRouter 72 }
+	atAR550Router			 OBJECT IDENTIFIER ::= { bridgeRouter 73 }
+	atAR551Router			 OBJECT IDENTIFIER ::= { bridgeRouter 74 }
+	atAR552Router			 OBJECT IDENTIFIER ::= { bridgeRouter 75 }
+	atAR550SRouterDP		 OBJECT IDENTIFIER ::= { bridgeRouter 76 }
+	atAR570Router			 OBJECT IDENTIFIER ::= { bridgeRouter 78 }
+	atAR770Router			 OBJECT IDENTIFIER ::= { bridgeRouter 79 }
+	atAR750SRouterDP		 OBJECT IDENTIFIER ::= { bridgeRouter 80 }
+
+-- router switch
+    atRapier24              OBJECT IDENTIFIER ::= { routerSwitch 1 }
+    atRapier16fSC           OBJECT IDENTIFIER ::= { routerSwitch 2 }
+    atRapier16fVF           OBJECT IDENTIFIER ::= { routerSwitch 3 }
+    atRapier16fMT           OBJECT IDENTIFIER ::= { routerSwitch 4 }
+    atRapier48              OBJECT IDENTIFIER ::= { routerSwitch 5 }
+    atRapier8t8fSC          OBJECT IDENTIFIER ::= { routerSwitch 6 }
+    atRapier8t8fSCi         OBJECT IDENTIFIER ::= { routerSwitch 7 }
+    atRapier8t8fMT          OBJECT IDENTIFIER ::= { routerSwitch 8 }
+    atRapier8t8fMTi         OBJECT IDENTIFIER ::= { routerSwitch 9 }
+    atRapier8fSC            OBJECT IDENTIFIER ::= { routerSwitch 10 }
+    atRapier8fSCi           OBJECT IDENTIFIER ::= { routerSwitch 11 }
+    atRapier8fMT            OBJECT IDENTIFIER ::= { routerSwitch 12 }
+    atRapier8fMTi           OBJECT IDENTIFIER ::= { routerSwitch 13 }
+    atRapier16fMTi          OBJECT IDENTIFIER ::= { routerSwitch 14 }
+    atRapierG6              OBJECT IDENTIFIER ::= { routerSwitch 15 }
+    atRapierG6SX            OBJECT IDENTIFIER ::= { routerSwitch 16 }
+    atRapierG6LX            OBJECT IDENTIFIER ::= { routerSwitch 17 }
+    atRapierG6MT            OBJECT IDENTIFIER ::= { routerSwitch 18 }
+    atRapier16fSCi          OBJECT IDENTIFIER ::= { routerSwitch 19 }
+    atRapier24i             OBJECT IDENTIFIER ::= { routerSwitch 20 }
+    atRapier48i             OBJECT IDENTIFIER ::= { routerSwitch 21 }
+    atSwitchblade4AC        OBJECT IDENTIFIER ::= { routerSwitch 22 }
+    atSwitchblade4DC        OBJECT IDENTIFIER ::= { routerSwitch 23 }
+    atSwitchblade8AC        OBJECT IDENTIFIER ::= { routerSwitch 24 }
+    atSwitchblade8DC        OBJECT IDENTIFIER ::= { routerSwitch 25 }
+    at9816GF                OBJECT IDENTIFIER ::= { routerSwitch 26 }
+    at9812TF                OBJECT IDENTIFIER ::= { routerSwitch 27 }
+    at9816GB                OBJECT IDENTIFIER ::= { routerSwitch 28 }
+    at9812T                 OBJECT IDENTIFIER ::= { routerSwitch 29 }
+	at8724XL                OBJECT IDENTIFIER ::= { routerSwitch 30 }
+	at8748XL                OBJECT IDENTIFIER ::= { routerSwitch 31 }
+	at8724XLDC              OBJECT IDENTIFIER ::= { routerSwitch 32 }
+	at8748XLDC              OBJECT IDENTIFIER ::= { routerSwitch 33 }
+	at9816GBDC             OBJECT IDENTIFIER ::= { routerSwitch 34 }
+	at9812TDC              OBJECT IDENTIFIER ::= { routerSwitch 35 }
+	at8824                  OBJECT IDENTIFIER ::= { routerSwitch 36 }
+	at8848                  OBJECT IDENTIFIER ::= { routerSwitch 37 }
+	at8824DC               OBJECT IDENTIFIER ::= { routerSwitch 38 }
+	at8848DC               OBJECT IDENTIFIER ::= { routerSwitch 39 }
+    at8624XL80             OBJECT IDENTIFIER ::= { routerSwitch 41 }
+	at8724XL80             OBJECT IDENTIFIER ::= { routerSwitch 42 }
+	at8748XL80             OBJECT IDENTIFIER ::= { routerSwitch 43 }
+	at8948EX                OBJECT IDENTIFIER ::= { routerSwitch 44 }
+	at8948i                 OBJECT IDENTIFIER ::= { routerSwitch 45 }
+	at8624T2M               OBJECT IDENTIFIER ::= { routerSwitch 46 }
+	atRapier24iDCNEBS     OBJECT IDENTIFIER ::= { routerSwitch 47 }
+	at8724XLDCNEBS        OBJECT IDENTIFIER ::= { routerSwitch 48 }
+	at9924T                 OBJECT IDENTIFIER ::= { routerSwitch 49 }
+	at9924SP                OBJECT IDENTIFIER ::= { routerSwitch 50 }
+	at9924T4SP             OBJECT IDENTIFIER ::= { routerSwitch 51 }
+	at9924TEMC              OBJECT IDENTIFIER ::= { routerSwitch 53 }
+	at8724MLB               OBJECT IDENTIFIER ::= { routerSwitch 55 }
+	at8624POE               OBJECT IDENTIFIER ::= { routerSwitch 56 }
+	at9924Ts                OBJECT IDENTIFIER ::= { routerSwitch 57 }
+	at86482SP               OBJECT IDENTIFIER ::= { routerSwitch 58 }
+	at9924Ti                OBJECT IDENTIFIER ::= { routerSwitch 59 }
+	at9924SPi               OBJECT IDENTIFIER ::= { routerSwitch 60 }
+--
+--1.3.6.1.4.1.207.1.14.61 AW version x900-24XT
+	at9924Tsi  			 OBJECT IDENTIFIER ::= { routerSwitch 61 }
+--
+--1.3.6.1.4.1.207.1.14.62 AW version x900-24XST
+	at9924SPsi	             OBJECT IDENTIFIER ::= { routerSwitch 62 }
+--
+	at8948iN               OBJECT IDENTIFIER ::= { routerSwitch 63 }
+	at9924TsiN			 OBJECT IDENTIFIER ::= { routerSwitch 64 }
+    atRapier48w             OBJECT IDENTIFIER ::= { routerSwitch 65 }
+    at8724SLV2             OBJECT IDENTIFIER ::= { routerSwitch 67 }
+	x90048FS			     OBJECT IDENTIFIER ::= { routerSwitch 68 }
+	atSwitchBladex908		 OBJECT IDENTIFIER ::= { routerSwitch 69 }
+	atx90012XTS			 OBJECT IDENTIFIER ::= { routerSwitch 70 }
+	atRapier48wb            OBJECT IDENTIFIER ::= { routerSwitch 71 }
+	atRapier48wAC          OBJECT IDENTIFIER ::= { routerSwitch 72 }
+	atRapier48wbAC         OBJECT IDENTIFIER ::= { routerSwitch 73 }
+--
+--1.3.6.1.4.1.207.1.14.75 AWPlus version x900-24XT
+	atx90024XT			 OBJECT IDENTIFIER ::= { routerSwitch 75 }
+--
+--1.3.6.1.4.1.207.1.14.76 AWPlus version x900-24XS
+	atx90024XS			 OBJECT IDENTIFIER ::= { routerSwitch 76 }
+--
+--1.3.6.1.4.1.207.1.14.77 AWPlus version x900-24XT-N
+	atx90024XTN			 OBJECT IDENTIFIER ::= { routerSwitch 77 }
+
+	atx60024Ts			 OBJECT IDENTIFIER ::= { routerSwitch 80 }
+	atx60024TsXP			 OBJECT IDENTIFIER ::= { routerSwitch 81 }
+	atx60048Ts			 OBJECT IDENTIFIER ::= { routerSwitch 82 }
+	atx60048TsXP			 OBJECT IDENTIFIER ::= { routerSwitch 83 }
+
+END

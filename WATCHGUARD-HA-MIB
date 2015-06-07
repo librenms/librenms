@@ -1,0 +1,372 @@
+WATCHGUARD-HA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, Counter64, Gauge32, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks               FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-MIB;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes general information
+             of WatchGuard system.  Mainly, the information 
+             obtained from this MIB is used by wgInfoSystemMIB,
+             wgClientMIB, wgSystemStatisticsMIB, wgIpsecTunnelMIB,
+             wgHAMIB."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+    wgHAMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all HA related
+             branches."
+        ::= { wgInfoModule 6 }
+        
+    wgHALocal OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all objects which are
+            belong to local appliance."
+        ::= { wgHAMIB 1 }
+
+    wgHAPeer OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all objects which are
+            belong to peer appliance."
+        ::= { wgHAMIB 2 }
+
+    wgHAStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        unknown(1),
+                        as-primary-active(2),
+                        as-secondary-active(3),
+                        aa-primary-ative(4),
+                        aa-secondary-active(5),
+                        aa-primary-takeover(6),
+                        aa-secondary-takeover(7),
+                        standby(8),
+                        admin(9),
+                        failed(10),
+                        unavailable(11)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates current status of local appliance. 
+             disabled:               The local appliance of HA system is not enabled. 
+             unknown:                The local appliance of HA system is in initialization
+             as-primary-active:      The local appliance that is the primary appliance of 
+                                     HA/AS system is in active mode. This status is also called 
+                                     MASTER in some systems.
+             as-secondary-active:    The local appliance that is the secondary appliance of 
+                                     HA/AS system is in active mode. This status is also called
+                                     BACKUP in some systems.
+             aa-primary-ative:       The local appliance that is the primary appliance of 
+                                     HA/AA system is in active mode.
+             aa-secondary-active:    The local appliance that is the secondary appliance of 
+                                     HA/AA system is in active mode.
+             aa-primary-takeover:    The local appliance that is the primary appliance of 
+                                     HA/AA system has taken over the peer's duty.
+             aa-secondary-takeover:  The local appliance of the secondary appliance of 
+                                     HA/AA system has taken over the peer's duty.
+             standby:                The local appliance of HA/AS system is in standby mode.
+             admin:                  The local appliance of HA system detects an mismatched
+                                     configuration and waits for system administrator to reslove
+                                     the conflict.
+             failed:                 The local appliance of the HA system is down due to forced failover
+                                     or other reasons.
+             unavailable:            It's reported when local appliance of HA system is unabled 
+                                     to get status information.
+            "
+        ::= { wgHALocal 1 }
+
+    wgHAPeerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unavailable(0),
+                        active(1),
+                        standby(2),
+                        admin(3),
+                        failed(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates current status of peer appliance.
+             unavailable:    It's reported when peer appliance of HA system is unabled
+                             to get status information. 
+             active:         The peer applicance of HA system is in active mode.
+             standby:        The peer applicance of HA system is in standby mode.
+             admin:          The peer applicance of HA system dectects an mismatched
+                             configuration and waits for system administrator to reslove the conflict. 
+             failed:         The peer appliance of HA system is down due to forced failover or other reasons.
+            "
+        ::= {wgHALocal 2 }
+        
+   wgHALastDBSyncTime OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS  read-only
+        STATUS                current
+        DESCRIPTION
+            "The last DB synchronized time of local appliance."
+        ::= { wgHALocal 3 }
+        
+    wgHAError OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        no-error(0),
+                        mismatched-ha-id(1),
+                        mismatched-software(2),
+                        mismatched-database(3),
+                        mismatched-hardware(4),
+                        forced-fail(5),
+                        invalid-ha-role(6),
+                        link-down(7),
+                        lost-mia-heartbeat(8),
+                        mia-not-responding(9),
+                        admin-command-failed(10),
+                        detect-ha-error(11),
+                        unavailable(12),
+                        hotsync-failed(13),
+                        config-sync-failed(14)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Reports the current error that occurred in local appliance ."
+        ::= { wgHALocal 4 }
+
+    wgHAPeerError OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        no-error(0),
+                        mismatched-ha-id(1),
+                        mismatched-software(2),
+                        mismatched-database(3),
+                        mismatched-hardware(4),
+                        forced-fail(5),
+                        invalid-ha-role(6),
+                        link-down(7),
+                        lost-mia-heartbeat(8),
+                        mia-not-responding(9),
+                        admin-command-failed(10),
+                        detect-ha-error(11),
+                        unavailable(12),
+                        hotsync-failed(13),
+                        config-sync-failed(14)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Reports the current error that occurred in peer appliance."
+        ::= { wgHALocal 5 }
+
+    wgHAPeerSerialNumber OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The serial number of peer appliance."
+        ::= { wgHAPeer 1 }
+            
+    wgHAPeerLastDBSyncTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The last DB synchronized time of peer appliance."
+        ::= { wgHAPeer 2}
+
+    wgHAPeerDevice OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION
+           "This is the base object for parameters and configuration
+           data of devices in this entity."
+       ::= { wgHAPeer 3 }
+
+    wgHAPeerCounters OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION
+           "This is the base object for parameters and configuration
+           data of devices in this entity."
+       ::= { wgHAPeer 4 }
+
+     wgHAPeerIfNumber  OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The number of RapidCard installed in this entity."
+       ::= { wgHAPeerDevice 1 }                  
+
+     wgHAPeerIfTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF WGHAPeerIfEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A list of RapidCard entries.  The number of
+           entries is given by the value of wgHAPeerDeviceNumber."
+       ::= { wgHAPeerDevice 2 }
+
+     wgHAPeerIfEntry  OBJECT-TYPE
+       SYNTAX      WGHAPeerIfEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A RapidCard entry containing objects for a
+           particular RapidCard."
+       INDEX { wgHAPeerIfIndex }
+       ::= { wgHAPeerIfTable 1 }
+
+     WGHAPeerIfEntry ::= SEQUENCE {
+         wgHAPeerIfIndex         Unsigned32,
+         wgHAPeerIfIpAddr        IpAddress,
+         wgHAPeerIfLinkStatus    INTEGER
+     }
+
+     wgHAPeerIfIndex   OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The unique value for each interface."
+       ::= { wgHAPeerIfEntry 1 }
+
+     wgHAPeerIfIpAddr   OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The ip address of the interface."
+       ::= { wgHAPeerIfEntry 4 }
+
+     wgHAPeerIfLinkStatus   OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       down(0),
+                       up(1),
+                       other(2)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The current state of the interface."
+       ::= { wgHAPeerIfEntry 9 }
+
+    wgHAPeerSystemCpuUtil OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization of the peer system in last 5 
+            seconds."
+        ::= { wgHAPeerCounters 1 }
+
+    wgHAPeerSystemTotalSendBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes sent since peer system 
+            is up."
+        ::= { wgHAPeerCounters 2 }
+
+    wgHAPeerSystemTotalRecvBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes received since peer system 
+            is up."
+        ::= { wgHAPeerCounters 3 }
+
+    wgHAPeerSystemTotalSendPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets sent since peer system is 
+            up."
+        ::= { wgHAPeerCounters 4 }
+
+    wgHAPeerSystemTotalRecvPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received since peer 
+            system is up."
+        ::= { wgHAPeerCounters 5 }
+
+    wgHAPeerSystemStreamReqTotal OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the connection requests since 
+            system is up."
+        ::= { wgHAPeerCounters 6 }
+
+    wgHAPeerSystemStreamReqDrop OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the connection requests being 
+            dropped since system is up."
+        ::= { wgHAPeerCounters 7 }
+    
+    wgHAPeerSystemCurrIpsecTunnels OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of ipsec tunnels in the peer system 
+            currently."
+        ::= {wgHAPeerCounters 8 }
+
+    wgHAPeerSystemCpuUtil1 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization of the peer system in last 1 
+            minute."
+        ::= { wgHAPeerCounters 9 }
+
+    wgHAPeerSystemCpuUtil5 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization of the peer system in last 5 
+            minutes."
+        ::= { wgHAPeerCounters 10 }
+
+    wgHAPeerSystemCpuUtil15 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization of the peer system in last 15 
+            minutes."
+        ::= { wgHAPeerCounters 11 }
+
+END
+                            

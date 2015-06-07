@@ -1,0 +1,1013 @@
+ALCATEL-IND1-IPX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	RowStatus, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	OBJECT-IDENTITY, OBJECT-TYPE, MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+	routingIND1Ipx
+		FROM ALCATEL-IND1-BASE;
+
+alcatelIND1IPXMIB       MODULE-IDENTITY
+
+	LAST-UPDATED "200704030000Z"
+	ORGANIZATION "Alcatel-Lucent"
+	CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
+         
+        	       	    Alcatel-Lucent, Enterprise Solutions Division
+               		    (Formerly Alcatel Internetworking, Incorporated)
+                           	26801 West Agoura Road
+                        	Agoura Hills, CA  91301-5122
+                          	United States Of America
+        
+             Telephone:              North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+        
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+	DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+             This is the proprietary MIB for the IPX routing sub-sytem.
+         
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+         
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+         
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+         
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+	::= {routingIND1Ipx 1}
+
+alcatelIND1IPXMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IPXMIB 1 }
+
+-- 
+
+NetNumber ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"IPX network number.  It is a 32-bit value divided into 
+		4 octets."
+	SYNTAX OCTET STRING(SIZE(4))
+
+HostAddress ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"IPX host MAC address.  It is a group of the 6 octets from the
+		MAC address."
+	SYNTAX OCTET STRING(SIZE(6))
+
+-- Object groups
+
+alaIpxRoutingGroup	OBJECT-IDENTITY
+					STATUS	current
+					DESCRIPTION
+					"IPX routing information."
+					::= {alcatelIND1IPXMIBObjects 1}
+alaIpxFilterGroup 	OBJECT-IDENTITY
+					STATUS	current
+					DESCRIPTION
+					"IPX filtering information."
+					::= {alcatelIND1IPXMIBObjects 2}
+alaIpxTimerGroup 	OBJECT-IDENTITY
+					STATUS	current
+					DESCRIPTION
+					"IPX timer information."
+					::= {alcatelIND1IPXMIBObjects 3}
+
+-- Objects
+
+--Static Routes Table
+	-- This table contains the information about all the static routes
+	-- defined.There may be more than one static route to any given
+	-- destination.Only the route currently being used will also be
+	-- present in the Destination Table defined above.
+
+alaIpxStaticRouteTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXStaticRouteEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The Static Routes table is used and add entries and extract 
+		information from the static routes configured in the system."
+	::= {alaIpxRoutingGroup 1}
+
+alaIpxStaticRouteEntry OBJECT-TYPE
+	SYNTAX IPXStaticRouteEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one static route."
+	INDEX {
+		alaIpxStaticRouteNetNum
+	}
+	::= {alaIpxStaticRouteTable 1}
+
+IPXStaticRouteEntry ::= SEQUENCE {
+	alaIpxStaticRouteNetNum
+		NetNumber,
+	alaIpxStaticRouteNextHopNet
+		NetNumber,
+	alaIpxStaticRouteNextHopNode
+		HostAddress,
+	alaIpxStaticRouteTicks
+		INTEGER,
+	alaIpxStaticRouteHopCount
+		INTEGER,
+	alaIpxStaticRouteRowStatus
+		RowStatus
+	}
+
+alaIpxStaticRouteNetNum OBJECT-TYPE
+	SYNTAX NetNumber
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX network number of the route's destination."
+	DEFVAL { '00000000'h }
+	::= {alaIpxStaticRouteEntry 1}
+
+alaIpxStaticRouteNextHopNet OBJECT-TYPE
+	SYNTAX NetNumber
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The IPX network number of the router used to
+		reach the first hop in the static route."
+	DEFVAL { '00000000'h }
+	::= {alaIpxStaticRouteEntry 2}
+
+alaIpxStaticRouteNextHopNode OBJECT-TYPE
+	SYNTAX HostAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The IPX node number of the router used to
+		reach the first hop in the static route."
+	DEFVAL { '000000000000'h }
+	::= {alaIpxStaticRouteEntry 3}
+
+alaIpxStaticRouteTicks OBJECT-TYPE
+	SYNTAX INTEGER(0..65535)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The delay, in ticks, to reach the route's destination."
+	DEFVAL { 0 }
+	::= {alaIpxStaticRouteEntry 4}
+
+alaIpxStaticRouteHopCount OBJECT-TYPE
+	SYNTAX INTEGER(0..16)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The number of hops necessary to reach the destination."
+	DEFVAL { 0 }
+	::= {alaIpxStaticRouteEntry 5}
+
+alaIpxStaticRouteRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxStaticRouteTable is constrained
+		by the operational state of the corresponding static route.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxStaticRouteEntry 6}
+
+
+
+--This table contains the information about the default route
+-- for IPX.
+
+alaIpxDefRouteTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXDefRouteEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The default route table contains information about
+		the destinations to which all packets are sent when the
+		destination network is not known."
+	::= {alaIpxRoutingGroup 2}
+
+
+alaIpxDefRouteEntry OBJECT-TYPE
+	SYNTAX IPXDefRouteEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"One table entry per switch for default route."
+	INDEX {
+			alaIpxDefRouteVlanId
+			}
+	::= {alaIpxDefRouteTable 1}
+
+IPXDefRouteEntry ::= SEQUENCE {
+	alaIpxDefRouteVlanId
+		INTEGER,
+	alaIpxDefRouteNet
+		NetNumber,
+	alaIpxDefRouteNode
+		HostAddress,
+	alaIpxDefRouteRowStatus
+		RowStatus
+	}
+
+
+alaIpxDefRouteVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VlanId for this filter.  If VlanId equals 0, the filter
+		is applied globally."
+	DEFVAL { 0 }
+	::= {alaIpxDefRouteEntry 1}
+
+alaIpxDefRouteNet OBJECT-TYPE
+	SYNTAX NetNumber
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The IPX network number of the router used to
+		reach the first hop in the default route."
+	DEFVAL { '00000000'h }
+	::= {alaIpxDefRouteEntry 2}
+
+alaIpxDefRouteNode OBJECT-TYPE
+	SYNTAX HostAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The IPX node number of the router used to
+		reach the first hop in the default route."
+	DEFVAL { '000000000000'h }
+	::= {alaIpxDefRouteEntry 3}
+
+alaIpxDefRouteRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxDefRouteTable is constrained
+		by the operational state of the corresponding default route entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxDefRouteEntry 4}
+
+
+--This table contains the information about the extended RIP / SAP
+-- messages for IPX.
+
+
+alaIpxExtMsgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXExtMsgEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The extended RIP and SAP messages table contains information 
+		about which vlans use extended RIP and SAP packets."
+	::= {alaIpxRoutingGroup 3}
+
+alaIpxExtMsgEntry OBJECT-TYPE
+	SYNTAX IPXExtMsgEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"One table entry per Vlan."
+	INDEX {
+			alaIpxExtMsgVlanId
+			}
+	::= {alaIpxExtMsgTable 1}
+
+IPXExtMsgEntry ::= SEQUENCE {
+	alaIpxExtMsgVlanId
+		INTEGER,
+	alaIpxExtMsgMode
+		INTEGER,
+      alaIpxExtMsgRowStatus
+                RowStatus
+	}
+
+alaIpxExtMsgVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VlanId for this filter.  If VlanId equals 0, the filter
+		is applied globally."
+	DEFVAL { 0 }
+	::= {alaIpxExtMsgEntry 1}
+
+alaIpxExtMsgMode OBJECT-TYPE
+	SYNTAX INTEGER {
+					disabled(1),
+					enabled(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"Indicates whether extended RIP/SAP
+		packets are sent and received."
+	DEFVAL { disabled }
+	::= {alaIpxExtMsgEntry 2}
+
+alaIpxExtMsgRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+	  "The row status variable, used in accordance to installation
+	        and removal conventions for conceptual rows.  The RowStatus of
+	        a currenty active row in the alaIpxExtMsgTable is constrained
+	        by the operational state of the corresponding watchdog entry.
+	        The RowStatus values that are supported are the following:
+	        	active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+	                        the system."
+	::= {alaIpxExtMsgEntry 3}
+
+alaIpxFlush OBJECT-TYPE
+	SYNTAX INTEGER {rip(1), sap(2), both(3)}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+		"Flushes the routing and the SAP tables.  The tables will then
+		be rebuilt from the broadcast messages received from the
+		networks.  Reading this variable is undefined"
+	::= {alaIpxRoutingGroup 4}
+
+--RIP / SAP Filter Table
+-- This table contains the information about all of the IPX RIP / SAP
+-- filters that have been defined.
+
+alaIpxRipSapFilterTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXRipSapFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Rip/Sap Filter Table contains information about
+		all filters that have been defined."
+	::= {alaIpxFilterGroup 1}
+
+alaIpxRipSapFilterEntry OBJECT-TYPE
+	SYNTAX IPXRipSapFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one filter."
+	INDEX {
+		alaIpxRipSapFilterVlanId,
+		alaIpxRipSapFilterType,
+		alaIpxRipSapFilterNet,
+		alaIpxRipSapFilterNetMask,
+		alaIpxRipSapFilterNode,
+		alaIpxRipSapFilterNodeMask,
+		alaIpxRipSapFilterSvcType
+	}
+	::= {alaIpxRipSapFilterTable 1}
+
+IPXRipSapFilterEntry ::= SEQUENCE {
+	alaIpxRipSapFilterVlanId
+	INTEGER,
+	alaIpxRipSapFilterType
+	INTEGER,
+	alaIpxRipSapFilterNet
+	NetNumber,
+	alaIpxRipSapFilterNetMask
+	NetNumber,
+	alaIpxRipSapFilterNode
+	HostAddress,
+	alaIpxRipSapFilterNodeMask
+	HostAddress,
+	alaIpxRipSapFilterSvcType
+	INTEGER,
+	alaIpxRipSapFilterMode
+	INTEGER,
+	alaIpxRipSapFilterRowStatus
+	RowStatus
+}
+
+alaIpxRipSapFilterVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VlanId for this filter.  If VlanId equals 0, the filter
+		is applied globally."
+	DEFVAL { 0 }
+	::= {alaIpxRipSapFilterEntry 1}
+
+alaIpxRipSapFilterType OBJECT-TYPE
+	SYNTAX INTEGER {
+				sapOutput(1),
+				sapInput(2),
+				gnsOutput(3),
+				ripOutput(4),
+				ripInput(5)
+				}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The type of filter. "
+	DEFVAL { 1 }
+	::= {alaIpxRipSapFilterEntry 2}
+
+alaIpxRipSapFilterNet OBJECT-TYPE
+	SYNTAX NetNumber
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Network Address to filter.  A network address
+		of all 0 's is used to denote All Networks."
+	DEFVAL { '00000000'h }
+	::= {alaIpxRipSapFilterEntry 3}
+
+alaIpxRipSapFilterNetMask OBJECT-TYPE
+	SYNTAX NetNumber
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Network Mask to be used."
+	DEFVAL { 'ffffffff'h }
+	::= {alaIpxRipSapFilterEntry 4}
+
+alaIpxRipSapFilterNode OBJECT-TYPE
+	SYNTAX HostAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX node address to filter. A node address
+		of all 0 's is used to denote All Nodes."
+	DEFVAL { '000000000000'h }
+	::= {alaIpxRipSapFilterEntry 5}
+
+alaIpxRipSapFilterNodeMask OBJECT-TYPE
+	SYNTAX HostAddress	
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX node address mask to be used."
+	DEFVAL { 'ffffffffffff'h }
+	::= {alaIpxRipSapFilterEntry 6}
+
+alaIpxRipSapFilterSvcType OBJECT-TYPE
+	SYNTAX INTEGER(0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The SAP service type on which to filter.  The SAP
+		service types are defined by Novell.A value of
+		ALL(65535) indicates that all services will be filtered."
+	DEFVAL { 65535 }
+	::= {alaIpxRipSapFilterEntry 7}
+
+alaIpxRipSapFilterMode OBJECT-TYPE
+	SYNTAX INTEGER {
+					allow(1),
+					block(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"The action defined by this filter. block (1) means
+		packets matching this filter will be blocked, and
+		allow(0) means that packets matching this filter
+		will be allowed."
+	DEFVAL { allow }
+	::= {alaIpxRipSapFilterEntry 8}
+
+alaIpxRipSapFilterRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxRipSapFilterTable is constrained
+		by the operational state of the corresponding filter entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxRipSapFilterEntry 10}
+
+--This table contains the information about the IPX Watchdog Spoofing
+-- status of all of the WAN routing services.
+
+alaIpxWatchdogSpoofTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXWatchdogSpoofEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Watchdog Spoofing Table contains information about
+		all of the current IPX WAN watchdog spoofing entry statuses."
+	::= {alaIpxFilterGroup 2}
+
+alaIpxWatchdogSpoofEntry OBJECT-TYPE
+	SYNTAX IPXWatchdogSpoofEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one WAN routing service."
+	INDEX {
+			alaIpxWatchdogSpoofVlanId
+			}
+	::= {alaIpxWatchdogSpoofTable 1}
+
+IPXWatchdogSpoofEntry ::= SEQUENCE {
+	alaIpxWatchdogSpoofVlanId
+		INTEGER,
+	alaIpxWatchdogSpoofMode
+		INTEGER,
+	alaIpxWatchdogSpoofRowStatus
+		RowStatus
+	}
+
+alaIpxWatchdogSpoofVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VlanId of the WAN routing service that this entry
+		applies to.  If VlanId equals 0, the filter
+		is applied globally to all WAN Vlans."
+	DEFVAL { 0 }
+	::= {alaIpxWatchdogSpoofEntry 1}
+
+alaIpxWatchdogSpoofMode OBJECT-TYPE
+	SYNTAX INTEGER {
+					disabled(1),
+					enabled(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether the IPX Watchdog Spoofing is
+		enabled or disabled.When enabled, this routing service
+		will spoof IPX Watchdog packets.When disabled,
+		this routing service will not spoof IPX Watchdog packets."
+	DEFVAL { enabled }
+	::= {alaIpxWatchdogSpoofEntry 2}
+
+alaIpxWatchdogSpoofRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxWatchdogSpoofTable is constrained
+		by the operational state of the corresponding watchdog entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxWatchdogSpoofEntry 3}
+
+--This table contains the information about the IPX Serialization
+-- Filtering Status of all of the WAN routing services.
+
+alaIpxSerialFilterTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXSerialFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Serialization Filtering Table contains information about
+		all of the current IPX WAN serialization filtering entry statuses."
+	::= {alaIpxFilterGroup 3}
+
+alaIpxSerialFilterEntry OBJECT-TYPE
+	SYNTAX IPXSerialFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one WAN routing service."
+	INDEX {
+			alaIpxSerialFilterVlanId
+			}
+	::= {alaIpxSerialFilterTable 1}
+
+IPXSerialFilterEntry ::= SEQUENCE {
+	alaIpxSerialFilterVlanId
+		INTEGER,
+	alaIpxSerialFilterMode
+		INTEGER,
+	alaIpxSerialFilterRowStatus
+		RowStatus
+	}
+
+alaIpxSerialFilterVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VlanId of the WAN routing service that this entry
+		applies to.  If VlanId equals 0, the filter
+		is applied globally to all WAN Vlans."
+	DEFVAL { 0 }
+	::= {alaIpxSerialFilterEntry 1}
+
+alaIpxSerialFilterMode OBJECT-TYPE
+	SYNTAX INTEGER {
+					disabled(1),
+					enabled(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether the IPX Serialization Filtering is
+		enabled or disabled.When enabled, this routing service
+		will filter IPX Serialization packets.When disabled,
+		this routing service will not filter IPX Serialization
+		packets."
+	DEFVAL { enabled }
+	::= {alaIpxSerialFilterEntry 2}
+
+alaIpxSerialFilterRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxSerialFilterTable is constrained
+		by the operational state of the corresponding filter entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxSerialFilterEntry 3}
+
+--This table contains the information about the SPX Keepalive Spoofing
+-- status of all of the WAN routing services.
+
+alaSpxKeepaliveSpoofTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SPXKeepaliveSpoofEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The SPX Keepalive Spoofing Table contains information about
+		all of the current IPX WAN SPX spoofing filtering entry statuses."
+	::= {alaIpxFilterGroup 4}
+
+alaSpxKeepaliveSpoofEntry OBJECT-TYPE
+	SYNTAX SPXKeepaliveSpoofEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one WAN routing service."
+	INDEX {
+			alaSpxKeepaliveSpoofVlanId
+			}
+	::= {alaSpxKeepaliveSpoofTable 1}
+
+SPXKeepaliveSpoofEntry ::= SEQUENCE {
+	alaSpxKeepaliveSpoofVlanId
+		INTEGER,
+	alaSpxKeepaliveSpoofMode
+		INTEGER,
+	alaSpxKeepaliveSpoofRowStatus
+		RowStatus
+	}
+
+alaSpxKeepaliveSpoofVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible 
+	STATUS current
+	DESCRIPTION 
+		"The VlanId of the WAN routing service that this entry
+		applies to.  If VlanId equals 0, the filter
+		is applied globally to all WAN Vlans."
+	DEFVAL { 0 }
+	::= {alaSpxKeepaliveSpoofEntry 1}
+
+alaSpxKeepaliveSpoofMode OBJECT-TYPE
+	SYNTAX INTEGER {
+					disabled(1),
+					enabled(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether the SPX Keepalive Spoofing is
+		enabled or disabled.When enabled, this routing service
+		will spoof SPX Keepalive packets.When disabled,
+		this routing service will not spoof SPX Keepalive packets."
+	DEFVAL { enabled }
+	::= {alaSpxKeepaliveSpoofEntry 2}
+
+alaSpxKeepaliveSpoofRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxKeepaliveSpoofTable is constrained
+		by the operational state of the corresponding keepalive entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaSpxKeepaliveSpoofEntry 3}
+
+--This table contains the information about the IPX Type 20 packet
+-- control for NetBios over IPX control.
+
+alaIpxType20Table OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXType20Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Type 20 Table contains information about
+		all of the current Type 20 filtering entry statuses."
+	::= {alaIpxFilterGroup 5}
+
+alaIpxType20Entry OBJECT-TYPE
+	SYNTAX IPXType20Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"Each entry corresponds to one Virtual LAN."
+	INDEX {
+			alaIpxType20VlanId
+			}
+	::= {alaIpxType20Table 1}
+
+IPXType20Entry ::= SEQUENCE {
+	alaIpxType20VlanId
+		INTEGER,
+	alaIpxType20Mode
+		INTEGER,
+	alaIpxType20RowStatus
+		RowStatus
+	}
+
+alaIpxType20VlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VLAN Id of the routing interface that this entry
+		applies to.  If VlanId equals 0, the filter
+		is applied globally."
+	DEFVAL { 0 }
+	::= {alaIpxType20Entry 1}
+
+alaIpxType20Mode OBJECT-TYPE
+	SYNTAX INTEGER {
+					disabled(1),
+					enabled(2)
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether IPX Type 20 packet are
+		enabled or disabled.When enabled, this routing interface
+		will forward Type 20 packets.When disabled,
+		the packets will not."
+	DEFVAL { enabled }
+	::= {alaIpxType20Entry 2}
+
+alaIpxType20RowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxType20Table is constrained
+		by the operational state of the corresponding type 20 entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxType20Entry 3}
+
+--This table contains the information about the IPX RIP and SAP timer
+-- control.
+
+alaIpxTimerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IPXTimerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The IPX Timer Table contains information about
+		all of the current Timer adjustments entry statuses."
+	::= {alaIpxTimerGroup 1}
+
+alaIpxTimerEntry OBJECT-TYPE
+	SYNTAX IPXTimerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+    DESCRIPTION 
+		"Each entry corresponds to one Virtual LAN."
+	INDEX {
+			alaIpxTimerVlanId
+			}
+	::= {alaIpxTimerTable 1}
+
+IPXTimerEntry ::= SEQUENCE {
+	alaIpxTimerVlanId
+		INTEGER,
+	alaIpxTimerRip
+		INTEGER,
+	alaIpxTimerSap
+		INTEGER,
+	alaIpxTimerRowStatus
+		RowStatus
+	}
+
+alaIpxTimerVlanId OBJECT-TYPE
+	SYNTAX INTEGER(0..4094)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION 
+		"The VLAN Id of the routing interface that this entry
+		applies to.  If VlanId equals 0, the filter
+		is applied globally."
+	DEFVAL { 0 }
+	::= {alaIpxTimerEntry 1}
+
+alaIpxTimerSap OBJECT-TYPE
+	SYNTAX INTEGER(1..180)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether IPX SAP packet timer duration."
+	DEFVAL { 60 }
+	::= {alaIpxTimerEntry 2}
+
+alaIpxTimerRip OBJECT-TYPE
+	SYNTAX INTEGER(1..180)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+		"This controls whether IPX RIP packet timer duration."
+	DEFVAL { 60 }
+	::= {alaIpxTimerEntry 3}
+
+alaIpxTimerRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+        "The row status variable, used in accordance to installation
+		and removal conventions for conceptual rows.  The RowStatus of
+		a currenty active row in the alaIpxTimerTable is constrained
+		by the operational state of the corresponding timer entry.
+		The RowStatus values that are supported are the following:
+			active:  This indicates that the row is active and valid.
+			createAndGo:  This will create the row and activate it.
+			destroy:  This value will deactivate the row and delete from 
+				the system."
+	::= {alaIpxTimerEntry 4}
+
+-- conformance information
+
+alcatelIND1IPXMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPXMIB 2 }
+alcatelIND1IPXMIBCompliances OBJECT IDENTIFIER
+			 ::= { alcatelIND1IPXMIBConformance 1 }
+
+alcatelIND1IPXMIBGroups OBJECT IDENTIFIER 
+			::= { alcatelIND1IPXMIBConformance 2 }
+
+--
+
+alcatelIND1IPXMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for IPX Subsystem and
+            ALCATEL-IND1-IPX-MIB."
+    MODULE  -- this module
+	MANDATORY-GROUPS { alcatelIND1IPXMIBStaticRouteGroup, alcatelIND1IPXMIBDefRouteGroup,
+			alcatelIND1IPXMIBExtMsgGroup, alcatelIND1IPXMIBFlushGroup,
+			alcatelIND1IPXMIBRipSapFilterGroup, alcatelIND1IPXMIBWatchdogSpoofGroup,
+			alcatelIND1IPXMIBSerialFilterGroup, alcatelIND1IPXMIBKeepaliveSpoofGroup,
+			alcatelIND1IPXMIBType20Group, alcatelIND1IPXMIBTimerGroup }
+
+    ::= { alcatelIND1IPXMIBCompliances 1 }
+
+-- units of conformance
+
+alcatelIND1IPXMIBStaticRouteGroup OBJECT-GROUP
+    OBJECTS {   alaIpxStaticRouteNextHopNet, alaIpxStaticRouteNextHopNode,
+		alaIpxStaticRouteTicks, alaIpxStaticRouteHopCount,
+		alaIpxStaticRouteRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from Static Route Table."
+    ::= { alcatelIND1IPXMIBGroups 1 }
+
+alcatelIND1IPXMIBDefRouteGroup OBJECT-GROUP
+    OBJECTS {   alaIpxDefRouteNet, alaIpxDefRouteNode, alaIpxDefRouteRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from Default Route Table."
+    ::= { alcatelIND1IPXMIBGroups 2 }
+
+alcatelIND1IPXMIBExtMsgGroup OBJECT-GROUP
+    OBJECTS { alaIpxExtMsgMode, alaIpxExtMsgRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from Extended Message Table."
+    ::= { alcatelIND1IPXMIBGroups 3 }
+
+alcatelIND1IPXMIBFlushGroup OBJECT-GROUP
+    OBJECTS {   alaIpxFlush
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to flush the RIP and SAP tables."
+    ::= { alcatelIND1IPXMIBGroups 4 }
+
+alcatelIND1IPXMIBRipSapFilterGroup OBJECT-GROUP
+    OBJECTS {   alaIpxRipSapFilterMode, alaIpxRipSapFilterRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from  the RIP and SAP Filter tables."
+    ::= { alcatelIND1IPXMIBGroups 5 }
+
+alcatelIND1IPXMIBWatchdogSpoofGroup OBJECT-GROUP
+    OBJECTS {   alaIpxWatchdogSpoofMode, alaIpxWatchdogSpoofRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from the Watchdog spoof tables."
+    ::= { alcatelIND1IPXMIBGroups 6 }
+
+alcatelIND1IPXMIBSerialFilterGroup OBJECT-GROUP
+    OBJECTS {   alaIpxSerialFilterMode, alaIpxSerialFilterRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from the Serialization Filter tables."
+    ::= { alcatelIND1IPXMIBGroups 7 }
+
+alcatelIND1IPXMIBKeepaliveSpoofGroup OBJECT-GROUP
+    OBJECTS {  alaSpxKeepaliveSpoofMode, alaSpxKeepaliveSpoofRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from the Keepalive Spoof tables."
+    ::= { alcatelIND1IPXMIBGroups 8 }
+
+alcatelIND1IPXMIBType20Group OBJECT-GROUP
+    OBJECTS {  alaIpxType20Mode, alaIpxType20RowStatus 
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from the Type 20 packet tables."
+    ::= { alcatelIND1IPXMIBGroups 9 }
+
+alcatelIND1IPXMIBTimerGroup OBJECT-GROUP
+    OBJECTS { alaIpxTimerRip, alaIpxTimerSap, alaIpxTimerRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects from the RIP and SAP Timer tables."
+    ::= { alcatelIND1IPXMIBGroups 10 }
+
+END

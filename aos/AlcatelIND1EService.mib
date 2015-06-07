@@ -1,0 +1,1452 @@
+
+ALCATEL-IND1-E-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY, 
+                OBJECT-IDENTITY,
+		OBJECT-TYPE, 
+                Integer32, Counter64	        FROM SNMPv2-SMI
+		OBJECT-GROUP, 
+                MODULE-COMPLIANCE	        FROM SNMPv2-CONF
+		softentIND1eService    	FROM ALCATEL-IND1-BASE
+		RowStatus, 
+                TEXTUAL-CONVENTION,
+                DisplayString,
+                MacAddress			FROM SNMPv2-TC
+		InterfaceIndex 			FROM IF-MIB
+		;
+
+        alcatelIND1EServiceMIB MODULE-IDENTITY
+		LAST-UPDATED "201001200000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+                "Please consult with Customer Service to ensure the most appropriate
+                version of this document is used with the products in question:
+ 	
+				                   Alcatel-Lucent, Enterprise Solutions Division
+			                    (Formerly Alcatel Internetworking, Incorporated)
+				                         26801 West Agoura Road
+			 	                       Agoura Hills, CA  91301-5122
+			      		                United States Of America
+	
+                Telephone:	    North America	+1 800 995 2696
+				                        Latin America 	+1 877 919 9526
+                                Europe		+31 23 556 0100
+                                Asia		+65 394 7933
+                                All Other	+1 818 878 4507
+	
+                Electronic Mail:	support@ind.alcatel.com
+                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                DESCRIPTION
+                "The parameters for configuration of the E-Service feature.
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect, special, or
+                consequential damages whatsoever arising from or related to this 
+                document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with 
+                management of the products for which it is intended to be used.
+
+                               Copyright (C) 1995-2006 Alcatel-Lucent
+	                                 ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION "201001200000Z"
+		DESCRIPTION
+			 "Added notAssigned value for objects alaEServiceSapProfilePriorityMapMode 
+			  	and alaEServiceSapProfileBandwidthShare."
+	
+		REVISION "200912160000Z"
+		DESCRIPTION
+			 "The below listed objects are made as read-create in 6.6.1.680.R01
+				  Post GA.
+				alaEServiceUNIProfile8021xTreatment, alaEServiceUNIProfile8021ABTreatment,
+				alaEServiceUNIProfile8023adTreatment & alaEServiceUNIProfileAmapTreatment."
+
+		::= { softentIND1eService 1}
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- Textual Conventions
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+AlaEServiceUNIProfileProtocolTreatment ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The behavior of the bridge in regards to the given protocols packets received on 
+        the UNI. Tunnel (1) enables the packets to be tunneled across the provider 
+        network.  Discard (2) causes the packets to be discarded and not enter
+        the provider network. Peer (3) means that on this port the bridge is to 
+        participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        SYNTAX   INTEGER
+        {
+                tunnel (1),
+                drop (2),
+                peer (3),
+		macTunnel (4)
+        }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1eServiceMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For E-Service Managed Objects."
+     	::= { alcatelIND1EServiceMIB 1 }
+
+alcatelIND1EServiceMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For E-Service Conformance Information."
+    	::= { alcatelIND1EServiceMIB 2 }
+
+alcatelIND1EServiceMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For E-Service Units Of Conformance."
+     	::= { alcatelIND1EServiceMIBConformance 1 }
+
+alcatelIND1EServiceMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For E-Service Compliance Statements."
+    	 ::= { alcatelIND1EServiceMIBConformance 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service Group 
+
+     alaEService OBJECT IDENTIFIER ::= { alcatelIND1eServiceMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEServiceInfo OBJECT IDENTIFIER ::= { alaEService 1 }
+
+
+alaEServiceMode  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                legacyMode (1),
+                eServiceMode (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The current mode configured for Vlan Stacking and Layer 2 tunnel configuration. 
+        legacyMode (1) indicates that the commands from AlcatelIND1VLANStacking.mib are
+        to be used. eServiceMode (2) indicates the commands from this MIB are to be used."
+        DEFVAL { legacyMode }
+        ::= { alaEServiceInfo 1 }
+
+alaEServiceStatReset   OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                default(0),
+                reset(1)
+        }
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+        "Defines the global clear statistics control for ethernet-service
+        counters.
+        default(0) - default value for this object,
+        reset(1)   - indicates that all ethernet-service counters should be
+                     cleared."
+        DEFVAL  { default }
+        ::= { alaEServiceInfo 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service SAP Profile Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceSapProfileTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceSapProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains service profiles containing performance and control attributes. 
+        An entry in this table is created when a new service profile is defined."
+        ::= { alaEService 2 }
+
+alaEServiceSapProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceSapProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A E-Service Service Profile entry."
+        INDEX   { IMPLIED alaEServiceSapProfileID }
+        ::= { alaEServiceSapProfileTable 1 }
+
+AlaEServiceSapProfileEntry ::= SEQUENCE 
+        {
+                alaEServiceSapProfileID		                DisplayString, 
+		alaEServiceSapProfileCVLANTreatment		INTEGER,
+		alaEServiceSapProfileReplacementCVLAN		INTEGER,
+		alaEServiceSapProfilePriorityMapMode	        INTEGER, 
+		alaEServiceSapProfileFixedPriority	        INTEGER,
+		alaEServiceSapProfileIngressBW    		Integer32,
+                alaEServiceSapProfileBandwidthShare             INTEGER,
+		alaEServiceSapProfileRowStatus                  RowStatus,
+                alaEServiceSapProfileEgressBW                   Integer32,
+                alaEServiceSapProfileCIR                        Integer32,
+                alaEServiceSapProfileCBS                        Integer32,
+                alaEServiceSapProfilePIR                        Integer32,
+                alaEServiceSapProfilePBS                        Integer32
+
+        }
+
+alaEServiceSapProfileID OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS not-accessible 
+        STATUS  current
+        DESCRIPTION
+        "A label given to uniquely identify this profile. Must be at least one character long."
+        ::= { alaEServiceSapProfileEntry 1 }
+
+alaEServiceSapProfileCVLANTreatment  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                stackSVLAN (1),
+                translate (2),
+                changeCVLAN (3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The type of VLAN stacking operation to be performed on a customer frame entering 
+        this service.  Stack Svlan (1) indicates that the SVLAN is to be pre-pended on the 
+        frame before any existing 802.1Q tag.  Translate (2) means to replace the existing 
+        802.1Q tag with the SVLAN.  Change CVLAN (3) indicates that the customer tag is to 
+        remain on the frame but its value is to be changed to the supplied value."
+        DEFVAL { stackSVLAN }
+        ::= { alaEServiceSapProfileEntry 2 }
+
+alaEServiceSapProfileReplacementCVLAN  OBJECT-TYPE
+        SYNTAX  INTEGER (1..4094)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The CVLAN ID to use when using the Change CVLAN treatment mode."
+        ::= { alaEServiceSapProfileEntry 3 }
+
+alaEServiceSapProfilePriorityMapMode  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+		notAssigned(0),
+                mapInnerPtoOuterP (1),
+                mapInnerDscpToOuterP(2),
+                fixedP (3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the source of the value for the priority field of the SVLAN 
+        802.1Q tag when pre-pended to the customer data frame.  If set to notAssigned(0), SAP 
+	priority limit parameter will not be effective, QoS priority settings needs to be 
+	configured. mapInnerPtoOuterP (1) uses the priority field of the incoming frame when 
+	tagged to fill in the priority field of the SVLAN tag. mapInnerDscpToOuterP (2) uses 
+	the frames priority bits in its IP DSCP field to fill in the priority field of the
+        SVLAN tag. FixedP (3) uses the supplied FixedPriorityValue to fill in the SVLAN tag 
+	priority bits."
+        DEFVAL { fixedP }
+        ::= { alaEServiceSapProfileEntry 4 }
+
+alaEServiceSapProfileFixedPriority  OBJECT-TYPE
+        SYNTAX  INTEGER (0..7)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the value of the priority field of the 802.1Q SVLAN tag 
+        pre-pended to customer data frames when the fixed priority mapping mode is selected." 
+        DEFVAL { 0 }
+        ::= { alaEServiceSapProfileEntry 5 }
+
+alaEServiceSapProfileIngressBW  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes this limit of ingress bandwidth for the traffic to which 
+        this profile is applied. If 0, no bandwidth limit is applied.  This number represents 
+        traffic in units of 1,000,000 bits per second. Note that all CVLAN that belong to this
+        SAP will share this aggregated limit."
+        ::= { alaEServiceSapProfileEntry 6 }
+
+alaEServiceSapProfileBandwidthShare  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+	        notApplicable(0),	
+                shared (1),
+                notShared(2),
+		notAssigned(3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the use of the bandwidth limit in how it is applied across 
+        multiple ports of the SAP. If set to notApplicable(0), the SAP is not used. If set 
+	to Shared (1), all the ports that are part of the SAP will use aggregated
+        bandwidth, sharing some part of the bandwidth limit. If set to notShared (2),
+        each port will use its own bandwidth meter for this SAP. This value is not used
+        if ingressBandwidth is 0. If set to notAssigned(3), SAP bandwidth limit parameter 
+	will not be effective, QoS bandwith settings needs to be configured."
+        DEFVAL { shared }
+        ::= { alaEServiceSapProfileEntry 7 }
+
+alaEServiceSapProfileRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaEServiceSapProfileEntry 8 }
+
+alaEServiceSapProfileEgressBW  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes this limit of egress bandwidth for each UNI 
+        of the SAP to which this profile is applied. If 0, no bandwidth limit 
+        is applied.  This number represents traffic in units of Megabits per 
+        second. Note that all CVLAN that belong to this SAP will share this 
+        aggregated limit."
+        DEFVAL { 0 } 
+        ::= { alaEServiceSapProfileEntry 9 }
+
+alaEServiceSapProfileCIR OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Committed Information Rate - bandwidth values in bits per second."
+        DEFVAL      { 0 }
+        ::= { alaEServiceSapProfileEntry 10 }
+
+alaEServiceSapProfileCBS  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Committed Burst Size - bucket size in byte."
+        DEFVAL      { 0 }
+        ::= { alaEServiceSapProfileEntry 11 }
+
+alaEServiceSapProfilePIR  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Peak Information Rate - bandwidth values in bits per second."
+        DEFVAL      { 0 }
+        ::= { alaEServiceSapProfileEntry 12 }
+
+alaEServiceSapProfilePBS  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Peak Burst Size - bucket size in byte."
+        DEFVAL      { 0 }
+        ::= { alaEServiceSapProfileEntry 13 }
+  
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Profile Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIProfileTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceUNIProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains service profiles containing performance and control attributes. 
+        An entry in this table is created when a new service profile is defined."
+        ::= { alaEService 3 }
+
+alaEServiceUNIProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A E-Service Service Profile entry."
+        INDEX   { IMPLIED alaEServiceUNIProfileID }
+        ::= { alaEServiceUNIProfileTable 1 }
+
+AlaEServiceUNIProfileEntry ::= SEQUENCE 
+        {
+                alaEServiceUNIProfileID		                DisplayString, 
+		alaEServiceUNIProfileStpBpduTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfile8021xTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfile8021ABTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfile8023adTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfileGvrpTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfileAmapTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfileRowStatus                  RowStatus,
+                alaEServiceUNIProfileMvrpTreatment                AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfileTunnelMac                  MacAddress,
+                alaEServiceUNIProfileLacpMarkerTreatment        AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileOamTreatment               AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoPagpTreatment         AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoUdldTreatment         AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoCdpTreatment          AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoVtpTreatment          AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoDtpTreatment          AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoPvstTreatment         AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoVlanTreatment         AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileCiscoUplinkTreatment       AlaEServiceUNIProfileProtocolTreatment
+        }
+
+alaEServiceUNIProfileID OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A label given to uniquely identify this profile. Must be at least one character long."
+        ::= { alaEServiceUNIProfileEntry 1 }
+
+alaEServiceUNIProfileStpBpduTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the spanning tree 
+        protocol BPDU received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        DEFVAL { tunnel }
+        ::= { alaEServiceUNIProfileEntry 2 }
+
+alaEServiceUNIProfile8021xTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1x PDU 
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 3 }
+
+alaEServiceUNIProfile8021ABTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1AB PDU 
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling." 
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 4 }
+
+alaEServiceUNIProfile8023adTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1ad PDU 
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        DEFVAL { peer }
+        ::= { alaEServiceUNIProfileEntry 5 }
+
+alaEServiceUNIProfileGvrpTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the GVRP PDU 
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        DEFVAL { tunnel }
+        ::= { alaEServiceUNIProfileEntry 6 }
+
+alaEServiceUNIProfileAmapTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the Alcatel
+        propietary AMAP PDU frames received on the UNI. Tunnel (1) enables the PDU to 
+        be tunneled across the provider network.  Discard (2) causes the PDU of the 
+        protocol to be discarded and not enter the provider network. Peer (3) means 
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+        Currenly mac-tunnel is not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 7 }
+
+alaEServiceUNIProfileRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaEServiceUNIProfileEntry 8 }	
+
+alaEServiceUNIProfileMvrpTreatment  OBJECT-TYPE	 
+         SYNTAX  AlaEServiceUNIProfileProtocolTreatment	 
+         MAX-ACCESS  read-create	 
+         STATUS  current	 
+         DESCRIPTION	 
+         "This object describes the behavior of the bridge in regards to the MVRP PDU 	 
+         frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 	 
+         the provider network.  Discard (2) causes the PDU of the protocol to be discarded 	 
+         and not enter the provider network. Peer (3) means that on this port the bridge 	 
+         is to participate in the protocol. Currently peer is not supported for MVRP"	 
+         DEFVAL { tunnel }	 
+         ::= { alaEServiceUNIProfileEntry 9 }
+
+alaEServiceUNIProfileTunnelMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the tunnel mac used to tunnel L2 protocol to NNI ports"
+        ::= { alaEServiceUNIProfileEntry 10 }
+
+
+alaEServiceUNIProfileLacpMarkerTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the LACP MARKER PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling." 
+        DEFVAL { peer }
+        ::= { alaEServiceUNIProfileEntry 11 }
+
+alaEServiceUNIProfileOamTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the OAM PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling." 
+        DEFVAL { peer }
+        ::= { alaEServiceUNIProfileEntry 12 }
+
+alaEServiceUNIProfileCiscoPagpTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the PAGP PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+        Currently peer is not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 13 }
+
+alaEServiceUNIProfileCiscoUdldTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the UDLD PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling." 
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 14 }
+
+alaEServiceUNIProfileCiscoCdpTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the CDC PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+        Currently peer is not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 15 }
+
+alaEServiceUNIProfileCiscoVtpTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the VTP PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling. 
+        Currently peer is not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 16 }
+
+alaEServiceUNIProfileCiscoDtpTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the DTP PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling. 
+        Currently peer not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 17 }
+
+
+alaEServiceUNIProfileCiscoPvstTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the PVST PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+	Currently peer not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 18 }
+
+alaEServiceUNIProfileCiscoVlanTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the VLAN PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+	Currently peer not supported"
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 19 }
+
+alaEServiceUNIProfileCiscoUplinkTreatment OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the UPLINK PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to
+        be tunneled across the provider network.  Discard (2) causes the PDU of the
+        protocol to be discarded and not enter the provider network. Peer (3) means
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel(4) enables mac-tunnelling.
+	Currently peer not supported." 
+        DEFVAL { drop }
+        ::= { alaEServiceUNIProfileEntry 20 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service Service Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the services and their assigned SVLAN for the
+        E-Service feature."
+        ::= { alaEService 4 }
+        
+alaEServiceEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The svlan/ipmvlan-port association."
+        INDEX   { IMPLIED alaEServiceID }
+        ::= { alaEServiceTable 1 }
+        
+AlaEServiceEntry ::=   SEQUENCE 
+        {
+                alaEServiceID       		DisplayString,
+		alaEServiceSVLAN    		INTEGER,
+                alaEServiceVlanType             INTEGER,
+		alaEServiceRowStatus		RowStatus,
+                alaEServiceStatGreenCount       Counter64,
+                alaEServiceStatYellowCount      Counter64,
+                alaEServiceStatRedCount         Counter64
+        }
+
+alaEServiceID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A label given to uniquely identify this Service. Must be at least one character long."
+        ::= { alaEServiceEntry 1 }
+
+alaEServiceSVLAN OBJECT-TYPE
+        SYNTAX  INTEGER (1..4094)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The SVLAN number of the SVLAN chosen to the be transport for this service."
+        ::= { alaEServiceEntry 2 }
+        
+alaEServiceVlanType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  unknown(0),
+                  svlan(1),
+                  ipmvlan(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The type of the vlan this service is going to attach to. When creating the service,
+        the type should match the vlanId specified in the request."
+        ::= { alaEServiceEntry 3 }
+
+alaEServiceRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry.  The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a service. When
+        creating or deleting the service, the user needs to provide both
+        the svlan and the vlantype objects."
+        ::= { alaEServiceEntry 4 }	
+
+alaEServiceStatGreenCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Green compliant (i.e. in case of srTCM
+        and trTCM, packet is CIR/CBS compliant)."
+        ::= { alaEServiceEntry 5 }
+
+alaEServiceStatYellowCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Yellow compliant (i.e. in case of srTCM
+        and trTCM, packet is PIR/PBS compliant)."
+        ::= { alaEServiceEntry 6 }
+
+alaEServiceStatRedCount  OBJECT-TYPE
+SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Red compliant (i.e. in case of srTCM
+        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant)."
+        ::= { alaEServiceEntry 7 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service SAP Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEServiceSapTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceSapEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the Service Access Points (Sap) listed by ID. 
+        This table is used to create, delete, and modify the SAP's profile"
+        ::= { alaEService 5 }
+        
+alaEServiceSapEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceSapEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of SAP."
+        INDEX   { alaEServiceSapID}
+        ::= { alaEServiceSapTable 1 }
+        
+AlaEServiceSapEntry ::=   SEQUENCE 
+        {
+                alaEServiceSapID		Integer32,
+                alaEServiceSapServiceID         DisplayString,
+                alaEServiceSapProfile           DisplayString,
+		alaEServiceSapRowStatus		RowStatus
+        }
+
+alaEServiceSapID  OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A Number given to uniquely identify the SAP."
+        ::= { alaEServiceSapEntry 1 }
+
+alaEServiceSapServiceID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "A label given to uniquely identify the Service this SAP is for. Must 
+        be at least one character long."
+        ::= { alaEServiceSapEntry 2 }
+
+alaEServiceSapProfile  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The string identifying the SAP Profile this sap is to use. If specified, must match an existing 
+        SAP Profile."
+        ::= { alaEServiceSapEntry 3 }
+
+alaEServiceSapRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry. The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a sap. When 
+        creating the sap, the user needs to provide the service name in
+        the same set request."
+        ::= { alaEServiceSapEntry 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service SAP CVLAN Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceSapCvlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceSapCvlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the Service Access Points (Sap) where the CVLANs are bound 
+        to their service."
+        ::= { alaEService 6 }
+        
+alaEServiceSapCvlanEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceSapCvlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The CVLAN to Sap binding."
+        INDEX   { alaEServiceSapCvlanSapID, alaEServiceSapCvlanCvlan }
+        ::= { alaEServiceSapCvlanTable 1 }
+        
+AlaEServiceSapCvlanEntry ::=   SEQUENCE 
+        {
+                alaEServiceSapCvlanSapID   	Integer32,
+		alaEServiceSapCvlanCvlan	INTEGER,
+		alaEServiceSapCvlanMapType      INTEGER,
+		alaEServiceSapCvlanRowStatus		RowStatus
+        }
+
+alaEServiceSapCvlanSapID  OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A Number given to uniquely identify this SAP."
+        ::= { alaEServiceSapCvlanEntry 1 }
+
+alaEServiceSapCvlanCvlan  OBJECT-TYPE
+        SYNTAX INTEGER (0..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "This object is the CVLAN ID that this binding is targeted at.  The CVLAN ID 
+        may be 0, which indicates an all or untagged only mapping type."
+        ::= { alaEServiceSapCvlanEntry 2 }
+
+alaEServiceSapCvlanMapType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                single (1),
+                all(2),
+                untaggedOnly (3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object is the mapping type that defines what CVLANs are mapped into this service.
+        Multiple mappings can be defined for CVLAN to service, however only one all (2) or 
+        untaggedOnly (3) mapping entry can be created per UNI.  A mapping type of Single (1) 
+        denotes a specific CVLAN value to bind to the service. A mapping type of All (2) 
+        denotes that all customer frames that do not map to any other SAP, 
+        will be mapped into this service.  A mapping type of Untagged (3) denotes that only 
+        the untagged frames will be mapped into this service."
+        DEFVAL { single }
+        ::= { alaEServiceSapCvlanEntry 3 }
+
+alaEServiceSapCvlanRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry.  The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a SAP."
+        ::= { alaEServiceSapCvlanEntry 4 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service Port Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServicePortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServicePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the ports used by the EService feature.  Both UNI and NNI
+        are listed here."
+        ::= { alaEService 7 }
+        
+alaEServicePortEntry  OBJECT-TYPE
+        SYNTAX  AlaEServicePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of ports being used by EService."
+        INDEX   { alaEServicePortID}
+        ::= { alaEServicePortTable 1 }
+        
+AlaEServicePortEntry ::=   SEQUENCE 
+        {
+                alaEServicePortID		InterfaceIndex,
+                alaEServicePortType		INTEGER,
+		alaEServicePortVendorTpid	Integer32,
+		alaEServicePortLegacyStpBpdu	INTEGER,
+		alaEServicePortLegacyGvrpPdu	INTEGER,
+		alaEServicePortUniProfile	DisplayString,
+		alaEServicePortTransBridging    INTEGER,
+                alaEServicePortLegacyMvrpPdu        INTEGER
+        }
+
+alaEServicePortID  OBJECT-TYPE
+        SYNTAX InterfaceIndex 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The IfIndex of this UNI or NNI Port."
+        ::= { alaEServicePortEntry 1 }
+
+alaEServicePortType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                uni (1),
+                nni (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The type of port for Vlan Stacking operation. uni (1) represents a customer facing
+        port on which traffic may enter the E-Service.  nni (2) respresents a provider network 
+        port over which the E-Service may be connected."
+        DEFVAL { uni }
+        ::= { alaEServicePortEntry 2 }
+
+alaEServicePortVendorTpid  OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "he TPID for this port if type is NNI. It is used for the incoming data
+        traffic parsing and it is substituted to the 802.1Q standard Tpid for 
+        the outgoing data traffic. This is used for compatibility with other vendor 
+        equipment. The default value is the standard value 0x8100."
+        DEFVAL { 33024 }
+        ::= { alaEServicePortEntry 3 }
+
+alaEServicePortLegacyStpBpdu  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+		notApplicable (0),
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The legacy STP BPDU treatment for this port if NNI. It defines the type of processing 
+         applied to STP legacy BPDUs on network ports. Legacy BPDU refer to conventional/customer
+         BPDUs with MAC address 01:80:c2:00:00:00 and its processing on network ports can be 
+         enabled/disabled by this object.By default the value is disabled i.e 
+         provider MAC BPDU with MAC address 01:80:c2:00:00:08 would be processed at network ports."
+        DEFVAL { disable }
+        ::= { alaEServicePortEntry 4 }
+
+alaEServicePortLegacyGvrpPdu  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+		notApplicable (0),
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The legacy GVRP PDU treatment for this port if NNI. It defines the type of processing 
+         applied to GVRP PDUs on network ports. "
+        DEFVAL { disable }
+        ::= { alaEServicePortEntry 5 }
+ 
+alaEServicePortUniProfile OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The label of an existing UNI profile that which contains various properties to be 
+        applied to this port if UNI."
+        ::= { alaEServicePortEntry 6 }
+
+alaEServicePortTransBridging  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The Transparent Bridging status for the nni Port."
+        DEFVAL { disable }
+        ::= { alaEServicePortEntry 7 }
+
+alaEServicePortLegacyMvrpPdu  OBJECT-TYPE	 
+       SYNTAX  INTEGER	 
+       {	 
+               notApplicable (0),	 
+               enable (1),	 
+               disable (2)	 
+       }	 
+       MAX-ACCESS  read-write	 
+       STATUS  current	 
+       DESCRIPTION	 
+       "The legacy MVRP PDU treatment for this port if NNI. It defines the type of processing 	 
+        applied to MVRP PDUs on network ports. "	 
+       DEFVAL { disable }	 
+       ::= { alaEServicePortEntry 8 }	
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service SAP-UNI Binding Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEServiceSapUniTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceSapUniEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the UNI that are bound to each SAP for classifying 
+        traffic into each EService. Not that writing to this table may create
+        a new UNI."
+        ::= { alaEService 8 }
+        
+alaEServiceSapUniEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceSapUniEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of SAP-UNI bindings being used by EService."
+        INDEX   { alaEServiceSapUniSap, alaEServiceSapUniUni}
+        ::= { alaEServiceSapUniTable 1 }
+        
+AlaEServiceSapUniEntry ::=   SEQUENCE 
+        {
+                alaEServiceSapUniSap		Integer32,
+                alaEServiceSapUniUni	        InterfaceIndex,
+		alaEServiceSapUniRowStatus	RowStatus
+        }
+
+
+alaEServiceSapUniSap  OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The SAP ID that is configured onto this port."
+        ::= { alaEServiceSapUniEntry 1 }
+
+alaEServiceSapUniUni  OBJECT-TYPE
+        SYNTAX InterfaceIndex 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The IfIndex of this UNI Port."
+        ::= { alaEServiceSapUniEntry 2 }
+
+alaEServiceSapUniRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry. The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a binding"
+        ::= { alaEServiceSapUniEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service NNI-SVLAN Binding Table 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEServiceNniSvlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceNniSvlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the SVLANs bound to each NNI for use by the 
+        EService feature."
+        ::= { alaEService 9 }
+        
+alaEServiceNniSvlanEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceNniSvlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of NNI-SVLAN bindings being used by EService."
+        INDEX   { alaEServiceNniSvlanNni, alaEServiceNniSvlanSvlan}
+        ::= { alaEServiceNniSvlanTable 1 }
+        
+AlaEServiceNniSvlanEntry ::=   SEQUENCE 
+        {
+                alaEServiceNniSvlanNni		InterfaceIndex,
+                alaEServiceNniSvlanSvlan	INTEGER,
+		alaEServiceNniSvlanRowStatus	RowStatus,
+                alaEServiceNniSvlanVpaType	INTEGER
+        }
+
+alaEServiceNniSvlanNni  OBJECT-TYPE
+        SYNTAX InterfaceIndex 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The IfIndex of this NNI Port."
+        ::= { alaEServiceNniSvlanEntry 1 }
+
+alaEServiceNniSvlanSvlan  OBJECT-TYPE
+        SYNTAX INTEGER (2..4094) 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The SVLAN bound to this port. SVLAN cannot be 1."
+        ::= { alaEServiceNniSvlanEntry 2 }
+
+alaEServiceNniSvlanRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry. The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a binding"
+        ::= { alaEServiceNniSvlanEntry 3 }
+
+-- alaEServiceNniSvlanVpaType is added in 6.3.4.R01
+ 
+alaEServiceNniSvlanVpaType  OBJECT-TYPE
+        SYNTAX INTEGER {
+                         stp (1),
+                         erp (2)  
+                       } 
+        MAX-ACCESS  read-create 
+        STATUS  current
+        DESCRIPTION
+        "The object is used to specify whether the VPA state is to 
+        be controlled by an ERP or a STP. By default VPA state is 
+        controlled by STP."
+        DEFVAL  { stp }
+        ::= { alaEServiceNniSvlanEntry 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The E-Service srTCM and trTCM Counter Statistics Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceSapCvlanPortStatTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceSapCvlanPortStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A statistics table that contains the counters per SAP."
+        ::= { alaEService 10 }
+
+alaEServiceSapCvlanPortStatEntry OBJECT-TYPE
+        SYNTAX  AlaEServiceSapCvlanPortStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A E-Service Statistics Entry."
+        INDEX { alaEServiceSapCvlanPortStatSapID,
+                alaEServiceSapCvlanPortStatCvlanID,
+                alaEServiceSapCvlanPortStatPortID }
+        ::= { alaEServiceSapCvlanPortStatTable 1 }
+
+AlaEServiceSapCvlanPortStatEntry ::=   SEQUENCE
+        {
+                alaEServiceSapCvlanPortStatSapID        Integer32,
+                alaEServiceSapCvlanPortStatCvlanID      INTEGER,
+                alaEServiceSapCvlanPortStatPortID       InterfaceIndex,
+                alaEServiceSapCvlanPortStatGreenCount   Counter64,
+                alaEServiceSapCvlanPortStatYellowCount  Counter64,
+                alaEServiceSapCvlanPortStatRedCount     Counter64
+        }
+
+alaEServiceSapCvlanPortStatSapID OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A Number given to uniquely identify the SAP."
+        ::= { alaEServiceSapCvlanPortStatEntry 1 }
+
+alaEServiceSapCvlanPortStatCvlanID OBJECT-TYPE
+        SYNTAX INTEGER (0..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "This object is the CVLAN ID that this binding is targeted at.  The CVLAN ID
+        may be 0, which indicates an all or untagged only mapping type."
+        ::= { alaEServiceSapCvlanPortStatEntry 2 }
+
+alaEServiceSapCvlanPortStatPortID OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The IfIndex of this UNI Port."
+        ::= { alaEServiceSapCvlanPortStatEntry 3 }
+
+alaEServiceSapCvlanPortStatGreenCount OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Green compliant (i.e. in case of srTCM
+        and trTCM, packet is CIR/CBS compliant) per UNI port, per CVLAN. This object is applicable
+        only when ingress bandwidth is not shared across SAP ports and CVLANs."
+        ::= { alaEServiceSapCvlanPortStatEntry 4 }
+
+alaEServiceSapCvlanPortStatYellowCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Yellow compliant (i.e. in case of srTCM
+        and trTCM, packet is PIR/PBS compliant) per UNI port, per CVLAN. This object is applicable
+        only when ingress bandwidth is not shared across SAP ports and CVLANs."
+        ::= { alaEServiceSapCvlanPortStatEntry 5 }
+
+alaEServiceSapCvlanPortStatRedCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the number of packets/bytes being Red compliant (i.e. in case of srTCM
+        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant) per UNI port, per CVLAN.
+        This object is applicable only when ingress bandwidth is not shared across SAP
+        ports and CVLANs."
+        ::= { alaEServiceSapCvlanPortStatEntry 6 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1EServiceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "Compliance statement for E-Service."
+        MODULE  MANDATORY-GROUPS
+                {
+                alaEServiceSapProfileGroup,
+                alaEServiceUNIProfileGroup,
+                alaEServiceGroup,
+                alaEServiceSapGroup,
+                alaEServiceSapUniGroup,
+                alaEServiceSapCvlanGroup,
+                alaEServicePortGroup, 
+                alaEServiceNniSvlanGroup,
+		alaEServiceSapCvlanPortStatGroup,
+                alaEServiceInfoGroup
+                }
+        ::= { alcatelIND1EServiceMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceSapProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceSapProfileCVLANTreatment,    
+		alaEServiceSapProfileReplacementCVLAN,  
+		alaEServiceSapProfilePriorityMapMode,   
+		alaEServiceSapProfileFixedPriority,     
+		alaEServiceSapProfileIngressBW,         
+                alaEServiceSapProfileBandwidthShare,
+		alaEServiceSapProfileRowStatus,
+                alaEServiceSapProfileEgressBW,
+                alaEServiceSapProfileCIR,
+                alaEServiceSapProfileCBS,
+                alaEServiceSapProfilePIR,
+                alaEServiceSapProfilePBS
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service Sap Profiles."
+        ::= { alcatelIND1EServiceMIBGroups 1 }
+
+alaEServiceUNIProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceUNIProfileStpBpduTreatment,	   
+		alaEServiceUNIProfile8021xTreatment,	   
+		alaEServiceUNIProfile8021ABTreatment,	   
+		alaEServiceUNIProfile8023adTreatment,	   
+		alaEServiceUNIProfileGvrpTreatment,	   
+		alaEServiceUNIProfileAmapTreatment,	   
+		alaEServiceUNIProfileRowStatus,
+                alaEServiceUNIProfileMvrpTreatment,
+		alaEServiceUNIProfileTunnelMac,
+                alaEServiceUNIProfileLacpMarkerTreatment,       
+                alaEServiceUNIProfileOamTreatment,      
+                alaEServiceUNIProfileCiscoPagpTreatment,      
+                alaEServiceUNIProfileCiscoUdldTreatment,       
+                alaEServiceUNIProfileCiscoCdpTreatment,
+                alaEServiceUNIProfileCiscoVtpTreatment,         
+                alaEServiceUNIProfileCiscoDtpTreatment,        
+                alaEServiceUNIProfileCiscoPvstTreatment,          
+                alaEServiceUNIProfileCiscoVlanTreatment,            
+                alaEServiceUNIProfileCiscoUplinkTreatment          
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of EService UNI Profiles."
+        ::= { alcatelIND1EServiceMIBGroups 2 }
+
+alaEServiceGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceSVLAN,    	
+                alaEServiceVlanType,
+		alaEServiceRowStatus,
+                alaEServiceStatGreenCount,
+                alaEServiceStatYellowCount,
+                alaEServiceStatRedCount
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Services."
+        ::= { alcatelIND1EServiceMIBGroups 3 }
+		
+alaEServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        {
+
+                alaEServiceSapServiceID,
+                alaEServiceSapProfile,
+		alaEServiceSapRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service SAPs."
+        ::= { alcatelIND1EServiceMIBGroups 4 }
+
+alaEServiceSapCvlanGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceSapCvlanMapType,      
+		alaEServiceSapCvlanRowStatus		
+
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service SAP CVLAN bindings."
+        ::= { alcatelIND1EServiceMIBGroups 5 }
+
+
+alaEServicePortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServicePortType,
+		alaEServicePortVendorTpid,
+		alaEServicePortLegacyStpBpdu,
+		alaEServicePortLegacyGvrpPdu,
+		alaEServicePortUniProfile,
+		alaEServicePortTransBridging,
+                alaEServicePortLegacyMvrpPdu
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service Ports."
+        ::= { alcatelIND1EServiceMIBGroups 6 }
+
+alaEServiceSapUniGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceSapUniRowStatus
+
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service SAP to UNI 
+        Binding."
+        ::= { alcatelIND1EServiceMIBGroups 7 }
+
+alaEServiceNniSvlanGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaEServiceNniSvlanRowStatus,
+		alaEServiceNniSvlanVpaType
+
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service SVLAN to NNI
+        Binding."
+        ::= { alcatelIND1EServiceMIBGroups 8 }
+
+alaEServiceSapCvlanPortStatGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServiceSapCvlanPortStatGreenCount,
+                alaEServiceSapCvlanPortStatYellowCount,
+                alaEServiceSapCvlanPortStatRedCount
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for srTCM and trTCM Counters."
+        ::= { alcatelIND1EServiceMIBGroups 9 }
+
+alaEServiceInfoGroup    OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServiceMode,
+                alaEServiceStatReset
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of E-Service Global Objects."
+        ::= { alcatelIND1EServiceMIBGroups 10 }
+
+END
+

@@ -1,0 +1,659 @@
+
+-- *****************************************************************************
+-- Juniper-RADIUS-CLIENT-CONF
+--
+-- SNMP Agent Capabilities definitions for the RADIUS Client MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2009 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-RADIUS-CLIENT-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniRadiusClientAgent  MODULE-IDENTITY
+    LAST-UPDATED "200902101520Z"  -- 10-Feb-09 08:50 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Remote Authentication Dial
+        In User Service (RADIUS) Client component of the SNMP agent in the
+        Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200902101520Z"  -- 10-Feb-09 08:50 PM EST  - JUNOSe 10.2
+    DESCRIPTION
+        "Added rsRadiusClientIncludeIpv6AccountingInAcctStop.
+
+        Added rsRadiusClientIncludeDelegatedIpv6PrefixInAcctStart,
+        rsRadiusClientIncludeDelegatedIpv6PrefixInAcctStop,
+        rsRadiusClientIncludeFramedIpv6PoolInAcctStart,
+        rsRadiusClientIncludeFramedIpv6PoolInAcctStop,
+        rsRadiusClientIncludeFramedIpv6RouteInAcctStart,
+        rsRadiusClientIncludeFramedIpv6RouteInAcctStop,
+        rsRadiusClientIncludeIpv6LocalInterfaceInAcctStart,
+        rsRadiusClientIncludeIpv6LocalInterfaceInAcctStop,
+        rsRadiusClientIncludeIpv6NdRaPrefixInAcctStart,
+        rsRadiusClientIncludeIpv6NdRaPrefixInAcctStop,
+        rsRadiusClientIncludeIpv6PrimaryDnsInAcctStart,
+        rsRadiusClientIncludeIpv6PrimaryDnsInAcctStop,
+        rsRadiusClientIncludeIpv6SecondaryDnsInAcctStart,
+        rsRadiusClientIncludeIpv6SecondaryDnsInAcctStop,
+        rsRadiusClientIncludeIpv6VirtualRouterInAcctStart,
+        rsRadiusClientIncludeIpv6VirtualRouterInAcctStop."
+    REVISION    "200712141500Z"  -- 14-Dec-07 10:00 AM EST  - JUNOSe 9.1
+    DESCRIPTION
+        "Added rsRadiusClientIncludeDownStreamCalculatedQosRateInAccessReq,
+        rsRadiusClientIncludeUpStreamCalculatedQosRateInAccessReq,
+        rsRadiusClientIncludeDownStreamCalculatedQosRateInAcctStart,
+        rsRadiusClientIncludeUpStreamCalculatedQosRateInAcctStart,
+        rsRadiusClientIncludeDownStreamCalculatedQosRateInAcctStop,
+        rsRadiusClientIncludeUpStreamCalculatedQosRateInAcctStop."
+    REVISION    "200709181822Z"  -- 18-Sep-07 02:22 PM EDT  - JUNOSe 8.2
+    DESCRIPTION
+        "Added rsRadiusClientIncludeInterfaceIdInAcctStart,
+        rsRadiusClientIncludeIpv6PrefixInAcctStart,
+        rsRadiusClientIncludeInterfaceIdInAcctStop,
+        rsRadiusClientIncludeIpAddrInAcctStop,
+        rsRadiusClientIncludeIpv6PrefixInAcctStop."
+    REVISION    "200704100103Z"  -- 09-Apr-07 09:03 PM EDT  - JUNOSe 8.1
+    DESCRIPTION
+	"Added rsRadiusClientIncludeL2cAccessLoopCircuitIdInAccessReq,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdBinaryInAccessReq,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdAsciiInAccessReq,
+        rsRadiusClientIncludeL2cActualDataRateUstrInAccessReq,
+        rsRadiusClientIncludeL2cActualDataRateDstrInAccessReq,
+        rsRadiusClientIncludeL2cMinimumDataRateUstrInAccessReq,
+        rsRadiusClientIncludeL2cMinimumDataRateDstrInAccessReq,
+        rsRadiusClientIncludeL2cAttainDataRateUstrInAccessReq,
+        rsRadiusClientIncludeL2cAttainDataRateDstrInAccessReq,
+        rsRadiusClientIncludeL2cMaximumDataRateUstrInAccessReq,
+        rsRadiusClientIncludeL2cMaximumDataRateDstrInAccessReq,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateUstrInAccessReq,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateDstrInAccessReq,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayUstrInAccessReq,
+        rsRadiusClientIncludeL2cActInterleavingDelayUstrInAccessReq,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayDstrInAccessReq,
+        rsRadiusClientIncludeL2cActInterleavingDelayDstrInAccessReq,
+        rsRadiusClientIncludeL2cDslLineStateInAccessReq,
+        rsRadiusClientIncludeL2cDslTypeInAccessReq,
+        rsRadiusClientIncludeL2cAccessLoopCircuitIdInAcctStart,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdBinaryInAcctStart,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdAsciiInAcctStart,
+        rsRadiusClientIncludeL2cActualDataRateUstrInAcctStart,
+        rsRadiusClientIncludeL2cActualDataRateDstrInAcctStart,
+        rsRadiusClientIncludeL2cMinimumDataRateUstrInAcctStart,
+        rsRadiusClientIncludeL2cMinimumDataRateDstrInAcctStart,
+        rsRadiusClientIncludeL2cAttainDataRateUstrInAcctStart,
+        rsRadiusClientIncludeL2cAttainDataRateDstrInAcctStart,
+        rsRadiusClientIncludeL2cMaximumDataRateUstrInAcctStart,
+        rsRadiusClientIncludeL2cMaximumDataRateDstrInAcctStart,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateUstrInAcctStart,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateDstrInAcctStart,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayUstrInAcctStart,
+        rsRadiusClientIncludeL2cActInterleavingDelayUstrInAcctStart,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayDstrInAcctStart,
+        rsRadiusClientIncludeL2cActInterleavingDelayDstrInAcctStart,
+        rsRadiusClientIncludeL2cDslLineStateInAcctStart,
+        rsRadiusClientIncludeL2cDslTypeInAcctStart,
+        rsRadiusClientIncludeL2cAccessLoopCircuitIdInAcctStop,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdBinaryInAcctStop,
+        rsRadiusClientIncludeL2cAccessAggrCircuitIdAsciiInAcctStop,
+        rsRadiusClientIncludeL2cActualDataRateUstrInAcctStop,
+        rsRadiusClientIncludeL2cActualDataRateDstrInAcctStop,
+        rsRadiusClientIncludeL2cMinimumDataRateUstrInAcctStop,
+        rsRadiusClientIncludeL2cMinimumDataRateDstrInAcctStop,
+        rsRadiusClientIncludeL2cAttainDataRateUstrInAcctStop,
+        rsRadiusClientIncludeL2cAttainDataRateDstrInAcctStop,
+        rsRadiusClientIncludeL2cMaximumDataRateUstrInAcctStop,
+        rsRadiusClientIncludeL2cMaximumDataRateDstrInAcctStop,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateUstrInAcctStop,
+        rsRadiusClientIncludeL2cMinLowPowerDataRateDstrInAcctStop,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayUstrInAcctStop,
+        rsRadiusClientIncludeL2cActInterleavingDelayUstrInAcctStop,
+        rsRadiusClientIncludeL2cMaxInterleavingDelayDstrInAcctStop,
+        rsRadiusClientIncludeL2cActInterleavingDelayDstrInAcctStop,
+        rsRadiusClientIncludeL2cDslLineStateInAcctStop,
+        rsRadiusClientIncludeL2cDslTypeInAcctStop allowing to control
+        generation and format of decoded L2C Attributes."
+    REVISION    "200602172200Z"  -- 17-Feb-06 05:00 PM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Added new objects BRAS group to allow inclusion of DSL Forum
+        attributes into radius requests."
+    REVISION    "200601122200Z"  -- 12-Jan-06 05:00 PM EST  - JUNOSe 7.2
+    DESCRIPTION
+        "Added new objects BRAS group to allow inclusion of L2C information,
+        L2C up and down stream data into radius requests."
+    REVISION    "200412060232Z"  -- 05-Dec-04 09:32 PM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added new objects BRAS group to allow inclusion of interface
+        description into radius requests."
+    REVISION    "200412032212Z"  -- 03-Dec-04 05:12 PM EST  - JUNOSe 6.1
+    DESCRIPTION
+        "Added a new object to the BRAS group to allow override of
+        nas-ip-address and nas-identifier from authentication router.
+        Added new objects to the BRAS group to allow override of nas-port-id
+        and calling-station-id with PPPoE Remote Circuit Id."
+    REVISION    "200312182103Z"  -- 18-Dec-03 04:03 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "A new object was added to the BRAS group to indicate which RADIUS
+        attributes should be included or excluded from RADIUS packets."
+    REVISION    "200305211918Z"  -- 21-May-03 03:18 PM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added new accounting counters."
+    REVISION    "200303101951Z"  -- 10-Mar-03 02:51 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added new configuration objects."
+    REVISION    "200301271836Z"  -- 27-Jan-03 01:36 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added objects to ignore attributes from the access-accept RADIUS
+         packets.
+         Added objects for RADIUS trap enable/disable control and detailed
+         accounting statistics.
+         Added notifications for available RADIUS servers."
+    REVISION    "200211211926Z"  -- 21-Nov-02 02:26 PM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Added notifications for unavailable RADIUS servers."
+    REVISION    "200110191444Z"  -- 19-Oct-01 10:44 AM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "New objects were added to the BRAS group to indicate which RADIUS
+        attributes should be included or excluded from RADIUS packets."
+    REVISION    "200110162045Z"  -- 16-Oct-01 04:45 PM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "A new object was added to the BRAS group."
+    REVISION    "200109071235Z"  -- 07-Sep-01 08:35 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 35 }
+
+
+-- *****************************************************************************
+-- The RADIUS Client dynamic interface SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniRadiusClientDynamicAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for RADIUS Client
+        application which provides complete dynamic interface support in
+        addition to basic authentication for CLI access."
+    ::= { juniRadiusClientAgent 1 }
+
+juniRadiusClientDynamicAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 1.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when a new object was added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusGeneralClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 1 }
+
+juniRadiusClientDynamicAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 2.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new objects were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusGeneralClientGroup2,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 2 }
+
+juniRadiusClientDynamicAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 3.0 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new B-RAS objects were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup,
+            juniRadiusBrasClientGroup,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 3 }
+
+juniRadiusClientDynamicAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 3.1 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new objects were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup,
+            juniRadiusBrasClientGroup2,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 4 }
+
+juniRadiusClientDynamicAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 3.2 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when a new object was added to the BRAS group."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup3,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 5 }
+
+juniRadiusClientDynamicAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 3.3 and subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new objects were added to indicate which RADIUS attributes should
+        be included or excluded from RADIUS packets."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup4,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 6 }
+
+juniRadiusClientDynamicAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when notifications for unavailable RADIUS servers were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup5,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup,
+            juniRadiusAcctClientGroup }
+    ::= { juniRadiusClientDynamicAgent 7 }
+
+juniRadiusClientDynamicAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 4.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when attribute-ignore objects were added to the B-RAS group and RADIUS
+        accounting and authentication servers available traps were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup5,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup2,
+            juniRadiusAcctClientGroup2,
+            juniRadiusAuthNotificationGroup,
+            juniRadiusAcctNotificationGroup }
+    ::= { juniRadiusClientDynamicAgent 8 }
+
+juniRadiusClientDynamicAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new B-RAS configuration objects were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup6,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup3,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 9 }
+
+juniRadiusClientDynamicAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 5.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when new accounting counters were added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup7,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup3,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 10 }
+
+juniRadiusClientDynamicAgentV11  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 11 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component was
+        supported in JUNOSe 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe.  These capabilities became obsolete
+        when a new B-RAS object was added."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup8,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 11 }
+
+juniRadiusClientDynamicAgentV12  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 12 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  These capabilities became obsolete when a new
+        B-RAS object was added."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup9,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 12 }
+
+juniRadiusClientDynamicAgentV13  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 13 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 6.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup10,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 13 }
+
+
+juniRadiusClientDynamicAgentV14  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 14 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 6.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup11,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 14 }
+
+juniRadiusClientDynamicAgentV15  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 15 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 6.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup12,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 15 }
+
+juniRadiusClientDynamicAgentV16  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 16 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 7.2 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup13,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 16 }
+
+juniRadiusClientDynamicAgentV17  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 17 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 7.3 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup14,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 17 }
+
+juniRadiusClientDynamicAgentV18  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 18 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 8.1.2 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup15,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 18 } 
+
+juniRadiusClientDynamicAgentV19  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 19 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 8.2.2 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup16,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 19 } 
+
+juniRadiusClientDynamicAgentV20  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 20 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 9.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup17,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 20 } 
+
+juniRadiusClientDynamicAgentV21  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 21 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 10.2 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup19,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 21 }
+
+juniRadiusClientDynamicAgentV22  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 22 of the RADIUS Client dynamic interface component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 10.2 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client dynamic
+        interface application in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusBrasClientGroup20,
+            juniRadiusTunnelClientGroup,
+            juniRadiusAuthClientGroup3,
+            juniRadiusAcctClientGroup4,
+            juniRadiusAuthNotificationGroup2,
+            juniRadiusAcctNotificationGroup2 }
+    ::= { juniRadiusClientDynamicAgent 22 } 
+
+-- *****************************************************************************
+-- The RADIUS Client basic CLI access authentication agent capabilities.
+-- *****************************************************************************
+juniRadiusClientBasicAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for the RADIUS Client
+        application which only provides basic authentication for CLI access to
+        JUNOSe."
+    ::= { juniRadiusClientAgent 2 }
+
+juniRadiusClientBasicAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the basic authentication RADIUS Client component of the
+        JUNOSe SNMP agent.  This version of the RADIUS Client component is
+        supported in JUNOSe 3.2 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the RADIUS Client basic
+        authentication application which only supports basic authentication for
+        remote CLI access in JUNOSe."
+    SUPPORTS    Juniper-RADIUS-CLIENT-MIB
+        INCLUDES {
+            juniRadiusBasicClientGroup2,
+            juniRadiusAuthClientGroup }
+    ::= { juniRadiusClientBasicAgent 1 }
+
+END

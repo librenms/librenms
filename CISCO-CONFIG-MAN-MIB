@@ -1,0 +1,1007 @@
+-- Exp $
+-- *****************************************************************
+-- CISCO-CONFIG-MAN-MIB.my:  Configuration Management MIB
+--   
+-- January 2002, A S Kiran Koushik
+--   
+-- Copyright (c) 1995-2004, 2006 by cisco systems, Inc.
+--   
+-- All rights reserved.
+--   
+-- *****************************************************************
+-- $Endlog
+
+CISCO-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    TimeTicks,
+    Integer32,
+    Counter32,
+    IpAddress,
+    Gauge32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString,
+    TruthValue,
+    DateAndTime,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Unsigned64
+        FROM CISCO-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoConfigManMIB MODULE-IDENTITY
+    LAST-UPDATED    "200704270000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+            "Configuration management MIB.
+
+            The MIB represents a model of configuration data that
+            exists in various locations:
+
+            running       in use by the running system
+            terminal      saved to whatever is attached as the terminal        
+            local         saved locally in NVRAM or flash
+            remote        saved to some server on the network
+
+            Although some of the system functions that relate here
+            can be used for general file storage and transfer, this
+            MIB intends to include only such operations as clearly
+            relate to configuration.  Its primary emphasis is to
+            track changes and saves of the running configuration.
+
+            As saved data moves further from startup use, such as
+            into different local flash files or onto the network,
+            tracking becomes difficult to impossible, so the MIB's
+            interest and functions are confined in that area.
+
+            Information from ccmCLIHistoryCommandTable can be used
+            to track the exact configuration changes that took
+            place within a particular Configuration History
+            event. NMS' can use this information to update 
+            the related components. 
+            For example:
+                If commands related only to MPLS are entered
+                then the NMS need to update only the MPLS related
+                management information rather than updating
+                all of its management information.
+                Acronyms and terms:
+
+                CLI   Command Line Interface."
+                
+    REVISION        "200704270000Z"
+    DESCRIPTION
+        "Changes to definition of terminal as an output
+        location."
+                
+    REVISION        "200608170000Z"
+    DESCRIPTION
+            "Added a new group of objects to store the information
+            related to the Config Change Tracking ID (CTID) feature. 
+
+            CTID will provide a version number that is unique for 
+            version-incrementing changes to the IOS
+            running-configuration. It will also provide information
+            about when CTID last changed.
+
+            Added scalars: 
+            * ccmCTID
+            * ccmCTIDLastChangeTime
+            * ccmCTIDWhoChanged
+            * ccmCTIDRolledOverNotifEnable
+
+            Added Notification:
+            * ccmCTIDRolledOver
+
+            Added Object Group:
+            * ciscoConfigManCTIDObjectGroup
+
+            Added Notification Group:
+            * ciscoConfigManCTIDNotifyGroup
+
+            Added Compliance:
+            ciscoConfigManMIBComplianceRev4"
+    REVISION        "200406180000Z"
+    DESCRIPTION
+            "The Objects ccmHistoryEventCommandSourceAddress and
+            ccmHistoryEventServerAddress are deprecated since
+            they support only IPv4 address. These objects have
+            been replaced by two new objects 
+            ccmHistoryEventCommandSourceAddrRev1 and 
+            ccmHistoryEventServerAddrRev1. In addition to these
+            objects two more new objects are defined
+            ccmHistoryEventCommandSourceAddrType and
+            ccmHistoryEventServerAddrType"
+    REVISION        "200206070000Z"
+    DESCRIPTION
+            "Added new enumerations networkFtp(8) and
+            networkScp(9) to HistoryEventMedium."
+    REVISION        "200203120000Z"
+    DESCRIPTION
+            "Added ccmCLIHistoryCommandTable for
+            storing the CLI commands that took effect during
+            a configuration event.
+
+            Added scalars ccmCLIHistoryMaxCmdEntries
+            ccmCLIHistoryCmdEntries and 
+            ccmCLIHistoryCmdEntriesAllowed.
+
+            Added ccmHistoryCLICmdEntriesBumped to 
+            ccmHistoryEventTable to store the number of
+            corresponding bumped entries in the 
+            ccmCLIHistoryCommandTable.
+
+            Added the ccmCLIRunningConfigChanged notification.
+            Added ccmCLICfgRunConfNotifEnable to control the
+            ccmCLIRunningConfigChanged notification.
+
+            Added notification group 
+            ciscoConfigManHistNotifyGroup.
+
+            Updated the MIB description to indicate the use of
+            the above additions."
+    REVISION        "9511280000Z"
+    DESCRIPTION
+            "Initial version of this MIB module."
+          ::= { ciscoMgmt 43 }
+
+
+ciscoConfigManMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIB 1 }
+
+ccmHistory  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBObjects 1 }
+
+ccmCLIHistory  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBObjects 2 }
+
+ccmCLICfg  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBObjects 3 }
+
+ccmCTIDObjects  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBObjects 4 }
+
+-- Textual Conventions
+
+HistoryEventMedium ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+            "The source or destination of a configuration change,
+            save, or copy.
+
+            erase        erasing destination (source only)
+            running        live operational data
+            commandSource    the command source itself
+            startup        what the system will use next reboot
+            local        local NVRAM or flash
+            networkTftp    network host via Trivial File Transfer
+            networkRcp    network host via Remote Copy
+            networkFtp       network host via File transfer
+            networkScp       network host via Secure Copy
+            "
+    SYNTAX          INTEGER  {
+                        erase(1),
+                        commandSource(2),
+                        running(3),
+                        startup(4),
+                        local(5),
+                        networkTftp(6),
+                        networkRcp(7),
+                        networkFtp(8),
+                        networkScp(9)
+                    }
+
+-- Configuration History
+ccmHistoryRunningLastChanged OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The value of sysUpTime when the running configuration
+            was last changed.
+
+                    If the value of ccmHistoryRunningLastChanged is
+                    greater than ccmHistoryRunningLastSaved, the 
+                    configuration has been changed but not saved." 
+    ::= { ccmHistory 1 }
+
+ccmHistoryRunningLastSaved OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The value of sysUpTime when the running configuration
+            was last saved (written).
+
+            If the value of ccmHistoryRunningLastChanged is 
+            greater than ccmHistoryRunningLastSaved, the 
+            configuration has been changed but not saved.
+
+            What constitutes a safe saving of the running
+            configuration is a management policy issue beyond the
+            scope of this MIB.  For some installations, writing the
+            running configuration to a terminal may be a way of
+            capturing and saving it.  Others may use local or
+            remote storage.  Thus ANY write is considered saving
+            for the purposes of the MIB." 
+    ::= { ccmHistory 2 }
+
+ccmHistoryStartupLastChanged OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The value of sysUpTime when the startup configuration
+            was last written to.  In general this is the
+            default configuration used when cold starting the
+            system.  It may have been changed by a save of the
+            running configuration or by a copy from elsewhere." 
+    ::= { ccmHistory 3 }
+
+ccmHistoryMaxEventEntries OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The maximum number of entries that can be held in
+            ccmHistoryEventTable.
+
+            The recommended value for implementations is 10." 
+    ::= { ccmHistory 4 }
+
+ccmHistoryEventEntriesBumped OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The number of times the oldest entry in
+            ccmHistoryEventTable was deleted to make room 
+            for a new entry." 
+    ::= { ccmHistory 5 }
+
+ccmHistoryEventTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CcmHistoryEventEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table of configuration events on this router."
+    ::= { ccmHistory 6 }
+
+ccmHistoryEventEntry OBJECT-TYPE
+    SYNTAX          CcmHistoryEventEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "Information about a configuration event on this
+            router."
+    INDEX           { ccmHistoryEventIndex } 
+    ::= { ccmHistoryEventTable 1 }
+
+CcmHistoryEventEntry ::= SEQUENCE {
+        ccmHistoryEventIndex                 Integer32,
+        ccmHistoryEventTime                  TimeTicks,
+        ccmHistoryEventCommandSource         INTEGER ,
+        ccmHistoryEventConfigSource          HistoryEventMedium,
+        ccmHistoryEventConfigDestination     HistoryEventMedium,
+        ccmHistoryEventTerminalType          INTEGER ,
+        ccmHistoryEventTerminalNumber        Integer32,
+        ccmHistoryEventTerminalUser          DisplayString,
+        ccmHistoryEventTerminalLocation      DisplayString,
+        ccmHistoryEventCommandSourceAddress  IpAddress,
+        ccmHistoryEventVirtualHostName       DisplayString,
+        ccmHistoryEventServerAddress         IpAddress,
+        ccmHistoryEventFile                  DisplayString,
+        ccmHistoryEventRcpUser               DisplayString,
+        ccmHistoryCLICmdEntriesBumped        Counter32,
+        ccmHistoryEventCommandSourceAddrType InetAddressType,
+        ccmHistoryEventCommandSourceAddrRev1 InetAddress,
+        ccmHistoryEventServerAddrType        InetAddressType,
+        ccmHistoryEventServerAddrRev1        InetAddress
+}
+
+ccmHistoryEventIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..2147483647 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A monotonically increasing integer for the sole
+            purpose of indexing events.  When it reaches the 
+            maximum value, an extremely unlikely event, the agent 
+            wraps the value back to 1 and may flush existing 
+            entries." 
+    ::= { ccmHistoryEventEntry 1 }
+
+ccmHistoryEventTime OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of sysUpTime when the event occurred." 
+    ::= { ccmHistoryEventEntry 2 }
+
+ccmHistoryEventCommandSource OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        commandLine(1),
+                        snmp(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The source of the command that instigated the event." 
+    ::= { ccmHistoryEventEntry 3 }
+
+ccmHistoryEventConfigSource OBJECT-TYPE
+    SYNTAX          HistoryEventMedium
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The configuration data source for the event." 
+    ::= { ccmHistoryEventEntry 4 }
+
+ccmHistoryEventConfigDestination OBJECT-TYPE
+    SYNTAX          HistoryEventMedium
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The configuration data destination for the event." 
+    ::= { ccmHistoryEventEntry 5 }
+
+ccmHistoryEventTerminalType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        notApplicable(1),
+                        unknown(2),
+                        console(3),
+                        terminal(4),
+                        virtual(5),
+                        auxiliary(6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventCommandSource is 'commandLine',
+            the terminal type, otherwise 'notApplicable'." 
+    ::= { ccmHistoryEventEntry 6 }
+
+ccmHistoryEventTerminalNumber OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventCommandSource is 'commandLine',
+            the terminal number.  The value is -1 if not available
+            or not applicable." 
+    ::= { ccmHistoryEventEntry 7 }
+
+ccmHistoryEventTerminalUser OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (0..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventCommandSource is 'commandLine',
+            the name of the logged in user.  The length is zero if
+            not available or not applicable." 
+    ::= { ccmHistoryEventEntry 8 }
+
+ccmHistoryEventTerminalLocation OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (0..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventCommandSource is 'commandLine',
+            the hard-wired location of the terminal or the remote 
+            host for an incoming connection.  The length is zero 
+            if not available or not applicable." 
+    ::= { ccmHistoryEventEntry 9 }
+
+ccmHistoryEventCommandSourceAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+            "If ccmHistoryEventTerminalType is 'virtual', the
+            internet address of the connected system.
+
+            If ccmHistoryEventCommandSource is 'snmp', the internet
+            address of the requester.
+
+            The value is 0.0.0.0 if not available or not 
+            applicable.
+
+            This object is deprecated by
+            ccmHistoryEventCommandSourceAddrRev1" 
+    ::= { ccmHistoryEventEntry 10 }
+
+ccmHistoryEventVirtualHostName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (0..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventTerminalType is 'virtual', the host
+            name of the connected system.  The length is zero if
+            not available or not applicable." 
+    ::= { ccmHistoryEventEntry 11 }
+
+ccmHistoryEventServerAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+            "If ccmHistoryEventConfigSource or
+            ccmHistoryEventConfigDestination is 'networkTftp' or
+            'networkRcp', the internet address of the storage file
+            server.  The value is 0.0.0.0 if not applicable or not
+                    available.
+                    This object is deprecated by
+                    ccmHistoryEventServerAddrRev1" 
+    ::= { ccmHistoryEventEntry 12 }
+
+ccmHistoryEventFile OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (0..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventConfigSource or
+            ccmHistoryEventConfigDestination is 'networkTftp' or
+            'networkRcp', the configuration file name at the
+            storage file server.  The length is zero if not
+            available or not applicable." 
+    ::= { ccmHistoryEventEntry 13 }
+
+ccmHistoryEventRcpUser OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (0..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventConfigSource or
+            ccmHistoryEventConfigDestination is 'networkRcp', the
+            remote user name.  The length is zero if not applicable
+            or not available." 
+    ::= { ccmHistoryEventEntry 14 }
+
+ccmHistoryCLICmdEntriesBumped OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The number of times the oldest entry in
+            ccmCLIHistoryCommandTable with first index as 
+            ccmHistoryEventIndex was deleted to make 
+            room for a new entry.
+
+            This object is applicable only if 
+            ccmHistoryEventCommandSource has a value 
+            of 'commandLine'." 
+    ::= { ccmHistoryEventEntry 15 }
+
+ccmHistoryEventCommandSourceAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the transport type of the
+            address contained in
+            ccmHistoryEventCommandSourceAddrRev1.
+
+            The value will be zero if not available or not
+            applicable." 
+    ::= { ccmHistoryEventEntry 16 }
+
+ccmHistoryEventCommandSourceAddrRev1 OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventTerminalType is 'virtual', the
+            internet address of the connected system.
+
+            If ccmHistoryEventCommandSource is 'snmp', the
+            internet address of the requester.
+
+            The value of all bit's is zero  if not available or
+            not applicable.
+
+            The Format of this address depends on the value of the
+            ccmHistoryEventCommandSourceAddrType object.
+
+            This object deprecates
+            ccmHistoryEventCommandSourceAddress" 
+    ::= { ccmHistoryEventEntry 17 }
+
+ccmHistoryEventServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the transport type of the
+            address contained in ccmHistoryEventServerAddrRev1.
+
+            The value will be zero if not available or not
+            aplicable." 
+    ::= { ccmHistoryEventEntry 18 }
+
+ccmHistoryEventServerAddrRev1 OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "If ccmHistoryEventConfigSource or
+            ccmHistoryEventConfigDestination is 'networkTftp' or
+            'networkRcp', the internet address of the storage file
+            server. 
+
+            The value of all bits is 0s if not applicable or not
+            available.
+
+            The Format of this address depends on the value of the
+            ccmHistoryEventServerAddrType object.
+
+            This object deprecates ccmHistoryEventServerAddress." 
+    ::= { ccmHistoryEventEntry 19 }
+ 
+
+
+-- ccmCLIHistory
+ccmCLIHistoryMaxCmdEntries OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295 )
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "The maximum number of entries that can be held in
+            ccmCLIHistoryCommandTable.
+
+            The recommended value for implementations is 100.
+
+            If the number of entries in ccmCLIHistoryCommandTable 
+            exceeds the value of this object, old entries will be 
+            bumped to make room for new entries.
+
+            The ccmCLIHistoryCommandTable will not be populated
+            if the value of this object is 0." 
+    ::= { ccmCLIHistory 1 }
+
+ccmCLIHistoryCmdEntries OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The current number of entries in
+            ccmCLIHistoryCommandTable." 
+    ::= { ccmCLIHistory 2 }
+
+ccmCLIHistoryCmdEntriesAllowed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the upper limit on the
+            number of entries allowed in 
+            ccmCLIHistoryCommandTable by the managed system." 
+    ::= { ccmCLIHistory 3 }
+
+ccmCLIHistoryCommandTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CcmCLIHistoryCommandEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A table of CLI commands that took effect during
+            configuration events."
+    ::= { ccmCLIHistory 4 }
+
+ccmCLIHistoryCommandEntry OBJECT-TYPE
+    SYNTAX          CcmCLIHistoryCommandEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "Information about the CLI commands that took effect
+            during the configuration event pointed by 
+            ccmCLIHistoryEventIndex.
+
+            A set of rows in this table having the first
+            index as ccmHistoryEventIndex will store the
+            CLI commands entered during the corresponding 
+            configuration event in ccmHistoryEventTable.
+
+            An entry will be created in this table only if 
+            the corresponding entry in ccmHistoryEventTable has 
+            a value of 'commandLine' for 
+            ccmHistoryEventCommandSource."
+    INDEX           {
+                        ccmHistoryEventIndex,
+                        ccmCLIHistoryCommandIndex
+                    } 
+    ::= { ccmCLIHistoryCommandTable 1 }
+
+CcmCLIHistoryCommandEntry ::= SEQUENCE {
+        ccmCLIHistoryCommandIndex Unsigned32,
+        ccmCLIHistoryCommand      DisplayString
+}
+
+ccmCLIHistoryCommandIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A monotonically increasing integer for the
+            purpose of indexing CLI commands which took effect
+            during a configuration event." 
+    ::= { ccmCLIHistoryCommandEntry 1 }
+
+ccmCLIHistoryCommand OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The CLI command entered which took effect
+            during the configuration event pointed by 
+            ccmHistoryEventIndex." 
+    ::= { ccmCLIHistoryCommandEntry 2 }
+ 
+
+
+ccmCLICfgRunConfNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This variable indicates whether the system produces
+            the ccmCLIRunningConfigChanged notification. A false 
+            value will prevent notifications from being generated 
+            by this system."
+    DEFVAL          { false } 
+    ::= { ccmCLICfg 1 }
+
+ccmCTID OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the Config Change Tracking ID which
+            uniquely represents version-incrementing changes to the IOS 
+            running configuration." 
+    ::= { ccmCTIDObjects 1 }
+
+ccmCTIDLastChangeTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the time when the Config Change Tracking
+            ID last changed." 
+    ::= { ccmCTIDObjects 2 }
+
+ccmCTIDWhoChanged OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the user who last reset the Config Change
+            Tracking ID." 
+    ::= { ccmCTIDObjects 3 }
+
+ccmCTIDRolledOverNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This variable indicates whether the system produces the
+            ccmCTIDRolledOver notification. A false value will prevent
+            notifications from being generated by this system."
+    DEFVAL          { false } 
+    ::= { ccmCTIDObjects 4 }
+-- Notifications
+ciscoConfigManMIBNotificationPrefix  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIB 2 }
+
+ciscoConfigManMIBNotifications  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBNotificationPrefix 0 }
+
+
+
+ciscoConfigManEvent NOTIFICATION-TYPE
+    OBJECTS         {
+                        ccmHistoryEventCommandSource,
+                        ccmHistoryEventConfigSource,
+                        ccmHistoryEventConfigDestination
+                    }
+    STATUS          current
+    DESCRIPTION
+            "Notification of a configuration management event as
+            recorded in ccmHistoryEventTable."
+   ::= { ciscoConfigManMIBNotifications 1 }
+
+
+ccmCLIRunningConfigChanged NOTIFICATION-TYPE
+    OBJECTS         {
+                        ccmHistoryRunningLastChanged,
+                        ccmHistoryEventTerminalType
+                    }
+    STATUS          current
+    DESCRIPTION
+            "This notification indicates that the running
+            configuration of the managed system has changed
+            from the CLI.
+
+            If the managed system supports a separate 
+            configuration mode(where the configuration commands 
+            are entered under a  configuration session which 
+            affects the running configuration of the system), 
+            then this notification is sent when the configuration 
+            mode is exited.
+            During this configuration session there can be 
+            one or more running configuration changes."
+   ::= { ciscoConfigManMIBNotifications 2 }
+
+
+ccmCTIDRolledOver NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+            "This notification indicates that the Config Change Tracking
+            ID has rolled over and will be reset."
+   ::= { ciscoConfigManMIBNotifications 3 }
+-- Conformance
+ciscoConfigManMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIB 3 }
+
+ciscoConfigManMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBConformance 1 }
+
+ciscoConfigManMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoConfigManMIBConformance 2 }
+
+
+-- Compliance
+ciscoConfigManMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco Configuration Management MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoConfigManHistoryGroup }
+    ::= { ciscoConfigManMIBCompliances 1 }
+
+ciscoConfigManMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco Configuration Management MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoConfigManHistoryGroupRev1 }
+
+    GROUP           ciscoConfigManCLIHistCmdGroup
+    DESCRIPTION
+            "This Optional group contains information about
+            the CLI commands entered during a particular
+            configuration event. Implementation of this 
+            group is mandatory if the system can be 
+            configured via CLI."
+
+    GROUP           ciscoConfigManHistNotifyGroup
+    DESCRIPTION
+            "This optional group contains the
+            notifications which represent various
+            configuration events on the system.
+            Implementation of this group is mandatory 
+            if the system can be configured via CLI."
+    ::= { ciscoConfigManMIBCompliances 2 }
+
+ciscoConfigManMIBComplianceRev3 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco Configuration Management MIB.
+
+            This compliance module deprecates
+            ciscoConfigManMIBCompliance."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoConfigManHistoryGroupRev2 }
+
+    GROUP           ciscoConfigManCLIHistCmdGroup
+    DESCRIPTION
+            "This Optional group contains information about
+            the CLI commands entered during a particular
+            configuration event. Implementation of this 
+            group is mandatory if the system can be 
+            configured via CLI."
+
+    GROUP           ciscoConfigManHistNotifyGroup
+    DESCRIPTION
+            "This optional group contains the
+            notifications which represent various
+            configuration events on the system.
+            Implementation of this group is mandatory 
+            if the system can be configured via CLI."
+    ::= { ciscoConfigManMIBCompliances 3 }
+
+ciscoConfigManMIBComplianceRev4 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco Configuration Management MIB.
+
+            This compliance module deprecates
+            ciscoConfigManMIBCompliance."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoConfigManHistoryGroupRev2 }
+
+    GROUP           ciscoConfigManCLIHistCmdGroup
+    DESCRIPTION
+            "This Optional group contains information about
+            the CLI commands entered during a particular
+            configuration event. Implementation of this 
+            group is mandatory if the system can be 
+            configured via CLI."
+
+    GROUP           ciscoConfigManHistNotifyGroup
+    DESCRIPTION
+            "This optional group contains the
+            notifications which represent various
+            configuration events on the system.
+            Implementation of this group is mandatory 
+            if the system can be configured via CLI."
+
+    GROUP           ciscoConfigManCTIDNotifyGroup
+    DESCRIPTION
+            "This optional group contains the
+            notifications which represent the various
+            Config Change Tracking ID events on the system."
+
+    GROUP           ciscoConfigManCTIDObjectGroup
+    DESCRIPTION
+            "This optional group contains objects that expose
+            Config Change Tracking ID and the associated 
+            information.  This group is mandatory when the 
+            device implements the Config Change Tracking ID
+            feature."
+    ::= { ciscoConfigManMIBCompliances 4 }
+
+-- Units of Conformance
+ciscoConfigManHistoryGroup OBJECT-GROUP
+    OBJECTS         {
+                        ccmHistoryRunningLastChanged,
+                        ccmHistoryRunningLastSaved,
+                        ccmHistoryStartupLastChanged,
+                        ccmHistoryMaxEventEntries,
+                        ccmHistoryEventEntriesBumped,
+                        ccmHistoryEventTime,
+                        ccmHistoryEventCommandSource,
+                        ccmHistoryEventConfigSource,
+                        ccmHistoryEventConfigDestination,
+                        ccmHistoryEventTerminalType,
+                        ccmHistoryEventTerminalNumber,
+                        ccmHistoryEventTerminalUser,
+                        ccmHistoryEventTerminalLocation,
+                        ccmHistoryEventCommandSourceAddress,
+                        ccmHistoryEventVirtualHostName,
+                        ccmHistoryEventServerAddress,
+                        ccmHistoryEventFile,
+                        ccmHistoryEventRcpUser
+                    }
+    STATUS          deprecated
+    DESCRIPTION     "Configuration history."
+    ::= { ciscoConfigManMIBGroups 1 }
+
+ciscoConfigManHistoryGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        ccmHistoryRunningLastChanged,
+                        ccmHistoryRunningLastSaved,
+                        ccmHistoryStartupLastChanged,
+                        ccmHistoryMaxEventEntries,
+                        ccmHistoryEventEntriesBumped,
+                        ccmHistoryEventTime,
+                        ccmHistoryEventCommandSource,
+                        ccmHistoryEventConfigSource,
+                        ccmHistoryEventConfigDestination,
+                        ccmHistoryEventTerminalType,
+                        ccmHistoryEventTerminalNumber,
+                        ccmHistoryEventTerminalUser,
+                        ccmHistoryEventTerminalLocation,
+                        ccmHistoryEventCommandSourceAddress,
+                        ccmHistoryEventVirtualHostName,
+                        ccmHistoryEventServerAddress,
+                        ccmHistoryEventFile,
+                        ccmHistoryEventRcpUser,
+                        ccmHistoryCLICmdEntriesBumped
+                    }
+    STATUS          deprecated
+    DESCRIPTION     "Configuration history."
+    ::= { ciscoConfigManMIBGroups 2 }
+
+ciscoConfigManHistNotifyGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoConfigManEvent,
+                        ccmCLIRunningConfigChanged
+                    }
+    STATUS          current
+    DESCRIPTION
+            "Notifications of a configuration management event."
+    ::= { ciscoConfigManMIBGroups 3 }
+
+ciscoConfigManHistoryGroupRev2 OBJECT-GROUP
+    OBJECTS         {
+                        ccmHistoryRunningLastChanged,
+                        ccmHistoryRunningLastSaved,
+                        ccmHistoryStartupLastChanged,
+                        ccmHistoryMaxEventEntries,
+                        ccmHistoryEventEntriesBumped,
+                        ccmHistoryEventTime,
+                        ccmHistoryEventCommandSource,
+                        ccmHistoryEventConfigSource,
+                        ccmHistoryEventConfigDestination,
+                        ccmHistoryEventTerminalType,
+                        ccmHistoryEventTerminalNumber,
+                        ccmHistoryEventTerminalUser,
+                        ccmHistoryEventTerminalLocation,
+                        ccmHistoryEventVirtualHostName,
+                        ccmHistoryEventFile,
+                        ccmHistoryEventRcpUser,
+                        ccmHistoryCLICmdEntriesBumped,
+                        ccmHistoryEventCommandSourceAddrType,
+                        ccmHistoryEventCommandSourceAddrRev1,
+                        ccmHistoryEventServerAddrType,
+                        ccmHistoryEventServerAddrRev1
+                    }
+    STATUS          current
+    DESCRIPTION
+            "Configuration history.
+
+            This group deprecates the old group
+            ciscoConfigManHistoryGroupRev1"
+    ::= { ciscoConfigManMIBGroups 5 }
+
+ciscoConfigManCLIHistCmdGroup OBJECT-GROUP
+    OBJECTS         {
+                        ccmCLIHistoryMaxCmdEntries,
+                        ccmCLIHistoryCmdEntries,
+                        ccmCLIHistoryCmdEntriesAllowed,
+                        ccmCLIHistoryCommand,
+                        ccmCLICfgRunConfNotifEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+            "CLI commands entered during a configuration history
+            event."
+    ::= { ciscoConfigManMIBGroups 4 }
+
+ciscoConfigManCTIDNotifyGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { ccmCTIDRolledOver }
+    STATUS          current
+    DESCRIPTION
+            "Notifications of a Config Change Tracking ID event."
+    ::= { ciscoConfigManMIBGroups 6 }
+
+ciscoConfigManCTIDObjectGroup OBJECT-GROUP
+    OBJECTS         {
+                        ccmCTID,
+                        ccmCTIDLastChangeTime,
+                        ccmCTIDWhoChanged,
+                        ccmCTIDRolledOverNotifEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+            "Information about the current CTID value, when CTID last
+            changed, and who last changed the CTID."
+    ::= { ciscoConfigManMIBGroups 7 }
+
+END

@@ -1,0 +1,150 @@
+--
+-- Juniper Enterprise Specific MIB: Ethernet MAC MIB
+-- 
+-- Copyright (c) 2002-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, MacAddress
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    jnxMibs 
+        FROM JUNIPER-SMI;
+
+jnxMac MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:55 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for Ethernet Mac Stats"
+
+    -- revision history
+    REVISION "200210100000Z"    -- 10 October, 2002
+    DESCRIPTION
+            "MacStats MIB added."
+
+    ::= { jnxMibs 23 }
+
+JnxVlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables. A values of 0 
+        is not permitted. The value of 4095 is reserved
+        for untagged interfaces; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX      Unsigned32
+
+
+-- MacStatsTable
+
+    jnxMacStats OBJECT IDENTIFIER ::= { jnxMac 1 }
+
+-- Mac Statistics table contains statistics information on the entity's
+-- GE PIC.
+-- The stats (inoctets, inframes, outoctets, outpframes)
+-- are the stats value for each src mac address and vlan id 
+-- by mac learning process on ethernet ports.
+
+-- The order of index is "ifIndex, jnxVlanIndex, jnxSourceMacAddress"
+-- for the preference on grouping vlan-based stats and accounting.
+
+    jnxMacStatsTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxMacStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                  "a list of MacStats entry for GE ethernet interfaces"
+        ::= { jnxMacStats 1 }
+
+    jnxMacStatsEntry OBJECT-TYPE
+        SYNTAX     JnxMacStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry containing statistics information applicable to a
+            particular GE ethernet interfaces."
+        INDEX   { ifIndex, jnxVlanIndex, jnxSourceMacAddress }
+        ::= { jnxMacStatsTable 1 }
+
+    JnxMacStatsEntry ::=
+        SEQUENCE {
+            jnxVlanIndex                 JnxVlanIndex,
+            jnxSourceMacAddress          MacAddress,
+            jnxMacHCInOctets             Counter64,
+            jnxMacHCInFrames             Counter64,
+            jnxMacHCOutOctets            Counter64,
+            jnxMacHCOutFrames            Counter64
+        }
+
+    jnxVlanIndex OBJECT-TYPE
+        SYNTAX      JnxVlanIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The VLAN ID refering to this VLAN."
+        ::= { jnxMacStatsEntry 1 }
+
+    jnxSourceMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The Source MAC address."
+        ::= { jnxMacStatsEntry 2 }
+
+    jnxMacHCInOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total octets received in this VLAN/MAC Address."
+        ::= { jnxMacStatsEntry 3 }
+
+    jnxMacHCInFrames OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total frames received in this VLAN/MAC Address."
+        ::= { jnxMacStatsEntry 4 }
+
+    jnxMacHCOutOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total octets transmitted in this VLAN/MAC Address."
+        ::= { jnxMacStatsEntry 5 }
+
+    jnxMacHCOutFrames OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total frames transmitted in this VLAN/MAC Address."
+        ::= { jnxMacStatsEntry 6 }
+
+END

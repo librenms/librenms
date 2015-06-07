@@ -1,0 +1,412 @@
+-- *****************************************************************
+-- FORCE10-TRAP-ALRM-MIB
+--
+--
+-- Copyright (c) 2003-2005 by Force10 Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+FORCE10-TRAP-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32,IpAddress, TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+		RowStatus,DateAndTime,
+        DisplayString,RowPointer
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        f10Mgmt
+            FROM FORCE10-SMI
+        ;
+ 
+f10TrapEventMib   MODULE-IDENTITY
+        LAST-UPDATED    "200510050000Z"
+        ORGANIZATION    "Force10 Networks, Inc."
+        CONTACT-INFO
+            "Force10 Networks, Inc
+            1440 McCarthy Blvd
+            Milpitas, CA 95035
+            (408) 571-3500
+            support@force10networks.com
+            http://www.force10networks.com"
+        DESCRIPTION
+            "Force10 Trap Alarm MIB.
+            Force10 Trap Event MIB allows users to track or to view 
+            the trap events logged by the system.  There are two types
+            of trap event tables, hostory trap event table and active
+            trap event table.
+
+            All the traps sent by the system are logged to history trap
+            event table. The trap that need action will logged to active
+            trap event table; 'Card down' trap event will go to the active
+            trap event table, and the trap will be cleared as soon as
+            'Card Up' event is issued. 
+            "
+        ::= { f10Mgmt 6 }   
+
+
+f10TrapEventObjects  OBJECT IDENTIFIER ::= { f10TrapEventMib 1 }
+f10HistoryTrapEvent  OBJECT IDENTIFIER ::= { f10TrapEventObjects 1 } 
+f10ActiveTrapEvent   OBJECT IDENTIFIER ::= { f10TrapEventObjects 2 } 
+f10TrapVarbindEvent  OBJECT IDENTIFIER ::= { f10TrapEventObjects 3 } 
+
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+
+
+f10ChassisTrapEventId OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The f10ChassisTrapEventId used the timestamp as the ID
+         to uniquely identify the current trap event table.
+          
+         Each time a NMS connect to F10 Chassis, it should verify
+         its f10ChassisTrapEventId.  If the ID is different, it should
+         refresh its history and active tables. 
+
+         But, if the f10ChassisTrapEventId is the same, then it should
+         query the f10LastTrapEventSeqId and update its history and active
+         tables  from its own f10LastTrapEventSeqId to the chassis
+         f10LastTrapEventSeqId.
+        "
+    ::= { f10HistoryTrapEvent 1 }
+
+f10LastTrapEventSeqId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "
+         f10LastTrapEventSeqId is a sequential ID indicated the number of 
+         traps sent by the syatem since chassis is loaded.  The same id can
+         also be used as the index to the history and active tables.
+            
+         Anytime, if an NMS dropped its connection with F10 Chassis, it should
+         sync up its history tables from its own f10LastTrapEventSeqId to
+         the chassis f10LastTrapEventSeqId.
+        "
+    ::= { f10HistoryTrapEvent 2 }
+
+f10MaxHistoryTableSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "
+         f10MaxHistoryTableSize is the maximum rows in history table.
+		This also limits the active/varbind tables.
+		Whenever there is a chance of overflow, the oldest entry 
+		will be deleted form the history table.
+		Respective entry from active table also will be deleted 
+		and the corresponding varbind entries will be deleted 
+		from varbind table.
+        "
+    ::= { f10HistoryTrapEvent 3 }
+
+f10HistoryTrapEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF F10HistoryTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of history trap event table."
+    ::= { f10HistoryTrapEvent 4 }
+
+f10HistoryTrapEventEntry OBJECT-TYPE
+    SYNTAX F10HistoryTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of history trap event table.
+	"
+
+    INDEX { historyTrapEventSeqId }
+    ::= { f10HistoryTrapEventTable 1 }
+
+
+F10HistoryTrapEventEntry ::= SEQUENCE {
+    historyTrapEventSeqId 	Integer32,
+    historyTrapEventSeverity 	Integer32,
+    historyTrapEventType 	Integer32,
+    historyTrapEventMsg 	DisplayString,
+    historyTrapEventOid 	RowPointer,
+    historyTrapEventSlotPort 	Integer32,
+    historyTrapEventTimeStamp 	TimeTicks
+
+    }
+
+historyTrapEventSeqId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         historyTrapEventSeqId is a sequential ID and the index to
+         history trap table.
+        "
+    ::= { f10HistoryTrapEventEntry 1 }
+
+historyTrapEventSeverity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap severity level. 
+        "
+    ::= { f10HistoryTrapEventEntry 2 }
+
+historyTrapEventType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.  
+        "
+    ::= { f10HistoryTrapEventEntry 3 }
+
+historyTrapEventMsg OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The message or the description of the trap.
+        "
+    ::= { f10HistoryTrapEventEntry 4 }
+
+historyTrapEventOid OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { f10HistoryTrapEventEntry 5 }
+
+historyTrapEventSlotPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The slot or port number that relate to this trap.
+         for example if card is down, this field will have the
+         card slot number.
+        "
+    ::= { f10HistoryTrapEventEntry 6 }
+
+historyTrapEventTimeStamp OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The timestamp when the trap is sent.
+        "
+    ::= { f10HistoryTrapEventEntry 7 }
+
+-- End of historyTrapEventTable
+
+
+-- Active Trap Event table.
+
+f10ActiveTrapEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF F10ActiveTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of active trap event table."
+    ::= { f10ActiveTrapEvent 1 }
+
+f10ActiveTrapEventEntry OBJECT-TYPE
+    SYNTAX F10ActiveTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of active trap event table.
+	"
+
+    INDEX { activeTrapEventSeqId }
+    ::= { f10ActiveTrapEventTable 1 }
+
+
+F10ActiveTrapEventEntry ::= SEQUENCE {
+    activeTrapEventSeqId 	Integer32,
+    activeTrapEventSeverity 	Integer32,
+    activeTrapEventType 	Integer32,
+    activeTrapEventMsg 		DisplayString,
+    activeTrapEventOid 		RowPointer,
+    activeTrapEventSlotPort 	Integer32,
+    activeTrapEventTimeStamp 	TimeTicks
+
+    }
+
+activeTrapEventSeqId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         activeTrapEventSeqId is a sequential ID and the index to
+         active trap table.
+        "
+    ::= { f10ActiveTrapEventEntry 1 }
+
+activeTrapEventSeverity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap severity level.
+        "
+    ::= { f10ActiveTrapEventEntry 2 }
+
+activeTrapEventType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.
+        "
+    ::= { f10ActiveTrapEventEntry 3 }
+
+activeTrapEventMsg OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The message or the description of the trap.
+        "
+    ::= { f10ActiveTrapEventEntry 4 }
+
+activeTrapEventOid OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { f10ActiveTrapEventEntry 5 }
+
+activeTrapEventSlotPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The numeric iof slot or port that relate to this trap.
+         for example if card is down, this field will have the
+         card slot number.
+        "
+    ::= { f10ActiveTrapEventEntry 6 }
+
+activeTrapEventTimeStamp OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The timestamp when the trap is sent.
+        "
+    ::= { f10ActiveTrapEventEntry 7 }
+
+-- End of ActiveTrapEventTable
+
+-- Trap Event varbind table.
+
+f10TrapEventVarbindTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF F10TrapEventVarbindEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of trap event varbind table."
+    ::= { f10TrapVarbindEvent 1 }
+
+f10TrapEventVarbindEntry OBJECT-TYPE
+    SYNTAX F10TrapEventVarbindEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of trap event varbind table.
+	"
+    INDEX { trapEventVarbindSeqId, trapEventVarbindId }
+    ::= { f10TrapEventVarbindTable 1 }
+
+
+F10TrapEventVarbindEntry ::= SEQUENCE {
+    trapEventVarbindSeqId 	Integer32,
+    trapEventVarbindId 		Integer32,
+    trapEventVarbindOid		OBJECT IDENTIFIER,
+    trapEventVarbindType 	Integer32,
+    trapEventVarbindValue 	DisplayString
+    }
+
+trapEventVarbindSeqId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         trapEventVarbindSeqId is a sequential ID and the index to
+         varbind trap table.
+        "
+    ::= { f10TrapEventVarbindEntry 1 }
+
+trapEventVarbindId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         trapEventVarbindId is the ID and the index to
+         history trap table.
+        "
+    ::= { f10TrapEventVarbindEntry 2 }
+
+trapEventVarbindOid OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { f10TrapEventVarbindEntry 3 }
+
+trapEventVarbindType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.
+        "
+    ::= { f10TrapEventVarbindEntry 4 }
+
+trapEventVarbindValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         This is the result or data in this trap.
+        "
+    ::= { f10TrapEventVarbindEntry 5 }
+
+END

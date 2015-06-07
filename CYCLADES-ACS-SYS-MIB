@@ -1,0 +1,303 @@
+CYCLADES-ACS-SYS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyACSMgmt
+		FROM CYCLADES-ACS-MIB
+	OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+cyACSSys   MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				  3541 Gateway Boulevard
+				  Fremont, CA 94538, USA
+			 e-mail : Technical Support
+				  support@cyclades.com"
+	DESCRIPTION	"This module defines the ACS/TS System Information"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200306300000Z"
+	DESCRIPTION	"Included informations about RAM size, flash size, CPU freq and Device Id"
+	REVISION	"200210100000Z"
+	DESCRIPTION	"Included PCMCIA and Power Supply informations"
+	REVISION	"200209200000Z"
+	DESCRIPTION	"First Draft"
+::= { cyACSMgmt 1 }
+
+cyACSpname OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The product's name - ACSxx (xx - the number of the serial ports )"
+::= { cyACSSys 1 }
+
+cyACSversion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The firmware's version"
+::= {cyACSSys 2}
+
+cyACSPower OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION "It gives information about Power Supply"
+::= { cyACSSys 3 }
+
+cyACSPwNum OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of the power supplies"
+::= { cyACSPower 1 }
+
+cyACSPw1 OBJECT-TYPE
+	SYNTAX INTEGER {
+		noinstalled(0),
+		powerON(1),
+		powerOFF(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "State of the first power supply"
+::= { cyACSPower 2 }
+
+cyACSPw2 OBJECT-TYPE
+	SYNTAX INTEGER {
+		noinstalled(0),
+		powerON(1),
+		powerOFF(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "State of the second power supply"
+::= { cyACSPower 3 }
+
+cyACSPcmcia OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION "PCMCIA card information"
+::= {cyACSSys 4}
+
+cyACSNPcmcia OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of the cards PCMCIA available"
+::= { cyACSPcmcia 1 }
+
+cyCardIdentTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CyCardIdentEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Card identification"
+::= { cyACSPcmcia 2 }
+
+cyCardIdentEntry OBJECT-TYPE
+	SYNTAX CyCardIdentEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "One particular association between PCMCIA socket and card identification"
+	INDEX { cyCardIdentIndex }
+::= { cyCardIdentTable 1 }
+
+CyCardIdentEntry ::= SEQUENCE {
+	cyCardIdentIndex Integer32,
+	cyCardIdentProd DisplayString,
+	cyCardIdentMan DisplayString ,
+	cyCardIdentFunc DisplayString,
+	cyCardIdentPCI DisplayString
+}
+
+cyCardIdentIndex OBJECT-TYPE
+	SYNTAX Integer32(0..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "number to identifier the socket Card"
+::= { cyCardIdentEntry 1 }
+
+cyCardIdentProd OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Product identification strings"
+::= { cyCardIdentEntry 2 }
+
+cyCardIdentMan OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Manufacturer ID codes"
+::= { cyCardIdentEntry 3 }
+
+cyCardIdentFunc OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Function ID code"
+::= { cyCardIdentEntry 4 }
+
+cyCardIdentPCI OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PCI ID"
+::= { cyCardIdentEntry 5 }
+
+cyCardConfTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CyCardConfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This table has the socket configuration "
+::= { cyACSPcmcia 3 }
+
+cyCardConfEntry OBJECT-TYPE
+	SYNTAX CyCardConfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "One particular association between PCMCIA socket and its configuration"
+	INDEX { cyCardConfIndex }
+::= { cyCardConfTable 1 }
+
+CyCardConfEntry ::= SEQUENCE {
+	cyCardConfIndex Integer32,
+	cyCardConfPower DisplayString,
+	cyCardConfType DisplayString ,
+	cyCardConfInter DisplayString,
+	cyCardConfFunc DisplayString,
+	cyCardConfCardv DisplayString,
+	cyCardConfPort1 DisplayString,
+	cyCardConfPort2 DisplayString
+}
+
+cyCardConfIndex OBJECT-TYPE
+	SYNTAX Integer32(0..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "number to identifier the socket PCMCIA"
+::= { cyCardConfEntry 1 }
+
+cyCardConfPower OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Power Settings"
+::= { cyCardConfEntry 2 }
+
+cyCardConfType OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Interface Type"
+::= { cyCardConfEntry 3 }
+
+cyCardConfInter OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Interrupt number"
+::= { cyCardConfEntry 4 }
+
+cyCardConfFunc OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "function"
+::= { cyCardConfEntry 5 }
+
+cyCardConfCardv OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Card values"
+::= { cyCardConfEntry 6 }
+
+cyCardConfPort1 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "I/O Port 1"
+::= { cyCardConfEntry 7 }
+
+cyCardConfPort2 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "I/O Port 2"
+::= { cyCardConfEntry 8 }
+
+cyCardStatusTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CyCardStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This table has the current socket status flags "
+::= { cyACSPcmcia 4 }
+
+cyCardStatusEntry OBJECT-TYPE
+	SYNTAX CyCardStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "One particular association between PCMCIA socket and its status"
+	INDEX { cyCardStatusIndex }
+::= { cyCardStatusTable 1 }
+
+CyCardStatusEntry ::= SEQUENCE {
+	cyCardStatusIndex Integer32,
+	cyCardStatusCard DisplayString,
+	cyCardStatusFunc DisplayString
+}
+
+cyCardStatusIndex OBJECT-TYPE
+	SYNTAX Integer32(0..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "number to identifier the socket PCMCIA"
+::= { cyCardStatusEntry 1 }
+
+cyCardStatusCard OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current Card State"
+::= { cyCardStatusEntry 2 }
+
+cyCardStatusFunc OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current Function"
+::= { cyCardStatusEntry 3 }
+
+cyACSFlashSize OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Total amount of flash memory in Mbytes"
+::= {cyACSSys 5}
+
+cyACSRAMSize OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Total amount of RAM in Mbytes"
+::= {cyACSSys 6}
+
+cyACSCPUfreq OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "CPU clock in MHz"
+::= {cyACSSys 7}
+
+cyACSDevId OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The product's identifier"
+::= { cyACSSys 8 }
+
+END
+

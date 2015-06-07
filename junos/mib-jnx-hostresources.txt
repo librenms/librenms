@@ -1,0 +1,81 @@
+--
+-- Juniper Enterprise Specific MIB: Host Resources MIB
+-- 
+-- Copyright (c) 2004, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-HOSTRESOURCES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32
+        FROM SNMPv2-SMI
+    hrStorageEntry
+        FROM HOST-RESOURCES-MIB
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+    jnxHostResourcesMIB  MODULE-IDENTITY
+        LAST-UPDATED "200408180000Z" -- Aug 18, 2004
+        ORGANIZATION "Juniper Networks, Inc." 
+        CONTACT-INFO
+                "        Juniper Technical Assistance Center
+    		     Juniper Networks, Inc.
+    		     1194 N. Mathilda Avenue
+    		     Sunnyvale, CA 94089
+    		     E-mail: support@juniper.net"
+    
+        DESCRIPTION
+                "Extends the HOST-RESOURCES-MIB (rfc2790)."
+    
+        -- revision history
+        REVISION  "200408180000Z"
+        DESCRIPTION
+                "Fixed typo in description clauses."
+        REVISION  "200405050000Z"
+        DESCRIPTION
+                "Initial revision."
+        ::= { jnxMibs 31 }
+    
+
+   -- The Host Resources Storage Group
+
+    jnxHrStorage OBJECT IDENTIFIER ::= { jnxHostResourcesMIB 1 }
+
+    jnxHrStorageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxHrStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Augments the hrStorageTable with additional data."
+       ::= { jnxHrStorage 1 }
+    
+    jnxHrStorageEntry OBJECT-TYPE
+        SYNTAX      JnxHrStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry provides additional file system data beyond that
+            available in the hrStorageTable."
+        AUGMENTS { hrStorageEntry }
+        ::= { jnxHrStorageTable 1 }
+    
+    JnxHrStorageEntry ::=
+        SEQUENCE {
+            jnxHrStoragePercentUsed    Gauge32
+        }
+
+    jnxHrStoragePercentUsed OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of the storage represented by this entry
+            that is allocated, as a percentage of the total amount
+            available."
+        ::= { jnxHrStorageEntry 1 }
+
+
+END

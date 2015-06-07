@@ -1,0 +1,125 @@
+-- ================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+--
+-- Description:The mib file is for management of huawei RIP extension
+-- Reference:
+-- Version: V1.0
+-- History:
+-- 2006.5.18, publish
+-- ================================================================
+
+    HUAWEI-RIPV2-EXT-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+                   hwDatacomm
+                     FROM HUAWEI-MIB
+                   Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY                  
+                     FROM SNMPv2-SMI
+                   RowStatus, DisplayString
+                     FROM SNMPv2-TC; 
+                    
+-- 1.3.6.1.4.1.2011.5.25.120
+    hwRipv2Ext MODULE-IDENTITY
+        LAST-UPDATED "200605261430Z"        -- November 29, 2002 at 09:00 GMT
+        ORGANIZATION
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com                                      
+            E-mail:support@huawei.com"
+        DESCRIPTION
+            "The HUAWEI-RIPv2-EXT-MIB.mib contains objects to configure RIP
+        module, including query RIP process, RIP VPN-instance configuration
+        and status. This MIB module objects indicate hwRip2ProcInstTable.
+                 
+            RIP can support many processes, but mib can support only one of
+        them. To get more RIP configuration, it is required to locate one 
+        specified RIP process. "
+        ::= { hwDatacomm 120 }
+
+
+-- RIP Process-Instance Private Table
+
+    hwRip2ProcInstTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF HwRip2ProcInstEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of Process id and their VRF Name."
+       ::= { hwRipv2Ext 1 }
+
+   hwRip2ProcInstEntry OBJECT-TYPE
+       SYNTAX   HwRip2ProcInstEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "Information about the VRF of a process."
+      INDEX { hwRip2ProcessId }
+      ::= { hwRip2ProcInstTable 1 }
+
+    HwRip2ProcInstEntry ::=
+        SEQUENCE {
+            hwRip2ProcessId
+                INTEGER,
+            hwRip2VrfName
+                OCTET STRING,
+            hwRip2CurrentProcId
+                INTEGER
+            }
+
+    hwRip2ProcessId OBJECT-TYPE
+        SYNTAX   INTEGER ( 1..65535 )
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The RIP process id."
+       ::= { hwRip2ProcInstEntry 1 }
+
+    hwRip2VrfName OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(1..31))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "VRF Name."
+       ::= { hwRip2ProcInstEntry 2 }
+
+    hwRip2CurrentProcId OBJECT-TYPE
+        SYNTAX   INTEGER ( 1..65535 )
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The current process id for which processing is being
+            done."
+       ::= { hwRip2ProcInstEntry 3 }      
+-- conformance information
+
+hwRip2Conformance OBJECT IDENTIFIER ::= { hwRipv2Ext 2 }
+hwRip2Groups      OBJECT IDENTIFIER ::= { hwRip2Conformance 1 }
+hwRip2Compliances OBJECT IDENTIFIER ::= { hwRip2Conformance 2 }
+
+-- compliance statements
+
+hwRip2Compliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+       "The compliance statement for SNMPv2 entities
+       which implement the HUAWEI RIP extension MIB."
+
+   MODULE  -- this module
+   MANDATORY-GROUPS { hwRip2ExtGroup }
+
+   ::= { hwRip2Compliances 1 }
+
+-- units of conformance
+
+hwRip2ExtGroup OBJECT-GROUP
+    OBJECTS { hwRip2VrfName, hwRip2CurrentProcId
+    }
+    STATUS  current
+    DESCRIPTION
+       "The HUAWEI RIPv2 extension Table."
+    ::= { hwRip2Groups 2 }
+END

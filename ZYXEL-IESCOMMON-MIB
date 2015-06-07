@@ -1,0 +1,2569 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+
+-- $Log: zyxel-IESCommon.mib $
+-- Revision 1.2  2009/04/29 03:48:59  Ives
+-- Revision 1.1  2008/07/11 09:36:03  maverick
+-- Initial revision
+-- Revision 1.1  2008/07/07 05:54:40  JeFF
+-- Initial revision
+-- Revision 1.1  2006/08/28 05:32:53  kenny
+-- Initial revision
+-- Revision 1.7  2006/06/08 09:18:12  niceguy
+-- Revision 1.6  2006/05/29 06:52:00  niceguy
+-- Revision 1.5  2006/03/29 06:17:22  niceguy
+-- Revision 1.4  2006/03/24 08:04:14  niceguy
+-- Revision 1.3  2006/03/10 06:11:09  niceguy
+-- Revision 1.2  2006/03/07 06:36:57  niceguy
+-- Revision 1.1  2005/11/23 12:48:14  niceguy
+-- Initial revision
+-- Revision 1.4  2005/10/28 06:54:03  niceguy
+-- Revision 1.3  2005/09/21 08:59:14  niceguy
+-- Revision 1.2  2005/08/24 09:47:20  niceguy
+-- Revision 1.1  2005/08/18 13:30:39  Jeff
+-- Initial revision
+-- Revision 1.24  2005/06/17 05:42:50  jackho
+-- Add 'slc1224-22' for iesSlotModuleType, 'reject IP' for iesPacketFilter, iesRSTPEnable, iesSwitchMode and traps for adsl.
+-- Revision 1.23  2005/06/08 08:04:30  jennyhsu
+-- Changes for IES-2k/3k R3.02
+-- Revision 1.22  2004/06/08 10:12:12  jenny
+-- enhancement for R3.0: mac filter, packet filter, mac count limiting, 802.1x setting, radius server, new traps,
+-- new bit definition in system current status and module status
+-- Revision 1.21  2004/04/19 12:04:35  jennyhsu
+-- Change the value definition in iesSystemTimeZone to be synced with FW
+-- Revision 1.20  2004/02/26 03:59:03  jennyhsu
+-- Add objcet iesMscPortVLANTrunking and mscSwitchOverOK
+-- Revision 1.19  2004/02/05 10:17:00  Admin
+-- add "moduleDown" in iesSlotModuleAlarmStatus
+-- Revision 1.18  2003/11/25 04:00:47  jennyhsu
+-- add ADSL ETSI mode
+-- Revision 1.17  2003/11/07 09:17:02  jennyhsu
+-- Revision 1.16  2003/11/07 09:02:23  jennyhsu
+-- Add iesSNMPTrapDestTable
+-- Change FrameID to FrameNumber
+-- Revision 1.15  2003/09/19 05:00:51  jennyhsu
+-- Add thermalSensorFailure trap.
+-- Change the syntax of iesSysDhcpRelayOption82Info to be DisplayString
+-- Change iesSlotModuleAlarmStatus's definition
+-- Add  iesMscPortMode
+-- Revision 1.14  2003/09/10 12:26:51  jennyhsu
+-- add DHCP setup
+-- Revision 1.13  2003/06/06 09:16:38  jennyhsu
+-- Revise the descriptions of iesMaintenanceDSLConfTarget
+-- Revision 1.12  2003/06/06 01:39:49  jennyhsu
+-- Add objects for DSL configuration in batch mode
+-- Revision 1.11  2003/05/07 06:47:25  jennyhsu
+-- Remove module type msc1300, vlc1316. Add msc1000A
+-- Revision 1.10  2003/03/28 01:38:01  jennyhsu
+-- Modify syntax of iesSlotModuleType and iesMscPortType
+-- Revision 1.9  2003/03/13 08:57:05  jennyhsu
+-- Revision 1.8  2003/03/13 07:56:29  jennyhsu
+-- Revision 1.7  2003/02/17 09:10:06  jennyhsu
+-- modify iesSlotModuleType, add alc1024-63 definition
+-- Revision 1.6  2003/01/06 09:01:03  jennyhsu
+-- Modify the Access of iesMscPortSpeed, iesMscPortDuplex, iesPortFlowControl,
+-- iesMscPortDefaultVLANTagging
+-- Revision 1.5  2002/12/03 07:47:15  jennyhsu
+-- Add modulePlugIn and modulePullOut trap
+-- Revision 1.4  2002/11/20 11:35:09  jennyhsu
+-- Modify the variable  bindings in the moduleUp trap
+-- Revision 1.3  2002/11/20 08:40:11  jennyhsu
+-- Modify the enterprise clause of trap definition from iesSeriesCommon to
+-- iesSeries
+-- Revision 1.2  2002/11/12 07:47:20  jennyhsu
+-- Revision 1.1  2002/11/12 07:40:50  jennyhsu
+-- Initial revision
+
+
+ZYXEL-IESCOMMON-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+	OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress
+		FROM SNMPv2-SMI
+--		FROM RFC-1212
+	DisplayString, ifIndex, PhysAddress
+	  	FROM RFC1213-MIB
+	RowStatus
+		FROM SNMPv2-TC
+	PortList
+		FROM Q-BRIDGE-MIB
+	TRAP-TYPE
+		FROM RFC-1215
+	MacAddress, Timeout, BridgeId
+		FROM BRIDGE-MIB
+	iesSeries, iesSeriesCommon
+		FROM ZYXEL-MIB;
+
+	iesChassis 	OBJECT IDENTIFIER ::= { iesSeriesCommon 1 }
+	iesHWMonitor 	OBJECT IDENTIFIER ::= { iesSeriesCommon 2 }
+	iesSysMgnt 	OBJECT IDENTIFIER ::= { iesSeriesCommon 3 }
+
+	iesSysState     	OBJECT IDENTIFIER ::= { iesSysMgnt 1 }
+	iesSysMaintenance 	OBJECT IDENTIFIER ::= { iesSysMgnt 2 }
+	iesSysTimeSetup 	OBJECT IDENTIFIER ::= { iesSysMgnt 3 }
+	iesSysAccessControl 	OBJECT IDENTIFIER ::= { iesSysMgnt 4 }
+	iesSysStaticRoute	OBJECT IDENTIFIER ::= { iesSysMgnt 5 }
+	iesSyslogSetup 	    	OBJECT IDENTIFIER ::= { iesSysMgnt 6 }
+	iesSysDhcpSetup		OBJECT IDENTIFIER ::= { iesSysMgnt 7 }
+	iesSysSNMPSetup		OBJECT IDENTIFIER ::= { iesSysMgnt 8 }
+	iesSysDot1xSetup	OBJECT IDENTIFIER ::= { iesSysMgnt 9 }
+	iesSysMacFilter		OBJECT IDENTIFIER ::= { iesSysMgnt 10 }
+	iesSysPacketFilter	OBJECT IDENTIFIER ::= { iesSysMgnt 11 }
+	iesSysMacCountFilter	OBJECT IDENTIFIER ::= { iesSysMgnt 12 }
+	iesSysMulticastGroup	OBJECT IDENTIFIER ::= { iesSysMgnt 13 }
+	iesSysIgmpFilter	OBJECT IDENTIFIER ::= { iesSysMgnt 14 }
+
+	iesL2SW    	OBJECT IDENTIFIER ::= { iesSeriesCommon 4 }
+
+	iesStats	OBJECT IDENTIFIER ::= { iesSeriesCommon 5 }
+	iesMacStats    	OBJECT IDENTIFIER ::= { iesStats 1 }
+	
+	
+-- Chassis, slot information
+
+	iesNumOfChassis OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of chassis in the IES-2000/3000 system"
+	::= { iesChassis 1 }
+
+	iesChassisTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF IesChassisEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The table which contains the chassis information in IES-2000/3000
+		system"
+	::= { iesChassis 2 }
+
+	iesChassisEntry	OBJECT-TYPE
+	SYNTAX	IesChassisEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		""
+	INDEX	{ iesChassisId }
+	::= { iesChassisTable 1 }
+
+	IesChassisEntry ::=
+	SEQUENCE {
+		iesChassisId		INTEGER,
+		iesChassisFrameNumber	INTEGER,
+		iesChassisSerialNumber  DisplayString,
+		iesChassisNumber	INTEGER,
+		iesChassisStatus  	INTEGER
+	}
+
+	iesChassisId	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The Chassis ID"
+	::= { iesChassisEntry 1 }
+
+	iesChassisFrameNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The Frame ID"
+	::= { iesChassisEntry 2 }
+
+
+	iesChassisSerialNumber	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The Chassis Serial Number"
+	::= { iesChassisEntry 3 }
+
+	iesChassisNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The Chassis Number which is defined by the system administrator
+		for management purpose"
+	::= { iesChassisEntry 4 }
+
+	iesChassisStatus 	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			empty(1),
+			up(2),
+			down(3),
+			testing(4)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The current status of the chassis."
+	::= { iesChassisEntry 5 }
+
+	iesSlotTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF IesSlotEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The table which contains the slot information in a chassis of
+		IES-2000/3000 system"
+	::= { iesChassis 3 }
+
+	iesSlotEntry	OBJECT-TYPE
+	SYNTAX	IesSlotEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		""
+	INDEX	{ iesChassisId, iesSlotId }
+	::= { iesSlotTable 1 }
+
+	IesSlotEntry ::=
+	SEQUENCE {
+		iesSlotId		INTEGER,
+		iesSlotModuleType	INTEGER,
+		iesSlotModuleDescr	DisplayString,
+		iesSlotModuleFWVersion  DisplayString,
+		iesSlotModuleDriverVersion DisplayString,
+		iesSlotModuleModemCodeVersion DisplayString,
+		iesSlotModuleStatus	INTEGER,
+		iesSlotModuleAlarmStatus INTEGER
+	}
+
+	iesSlotId	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Identity of the slot"
+	::= { iesSlotEntry 1 }
+
+	iesSlotModuleType	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			unknown(1),
+			msc1000-L2(2),
+			msc1000-ML(3),
+			alc1024-61(4),
+			vlc1012(5),
+			slc1024(6),
+			alc1024-63(7),
+			msc1000A(8),
+			vlc1124(9),
+			alc1224-71(10),
+			alc1224-73(11),
+			slc1224-22(12),
+			alc1224-51(13),
+			alc1224-53(14)			
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Card type of the plug-in card in IES-2000/3000."
+	::= { iesSlotEntry 2 }
+
+	iesSlotModuleDescr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The descriptions of the plug-in card in IES-2000/3000."
+	::= { iesSlotEntry 3 }
+
+
+	iesSlotModuleFWVersion	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The firmware version of the plug-in card in IES-2000/3000."
+	::= { iesSlotEntry 4 }
+
+	iesSlotModuleDriverVersion	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The DSL driver  of the plug-in card in IES-2000/3000."
+	::= { iesSlotEntry 5 }
+
+	iesSlotModuleModemCodeVersion	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The DSL modem code version of the plug-in card in IES-2000/3000"
+	::= { iesSlotEntry 6 }
+
+
+	iesSlotModuleStatus	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			empty(1),
+			up(2),
+			down(3),
+			testing(4),
+			standby(5)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The module state of the plug-in card in IES-2000/3000"
+	::= { iesSlotEntry 7 }
+
+	iesSlotModuleAlarmStatus	OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This variable indicates the alarm status of the module.
+       		     It is a bit map represented as a sum, therefore, it can represent
+       		     multiple defects simultaneously. The moduleNoDefect should be set
+       		     if and only if no other flag is set.
+
+       		     The various bit positions are:
+                     1   moduleNoDefect
+             	     2   moduleOverHeat
+		     3	 moduleFanRpmLow
+		     4	 moduleVoltageLow
+		     5   moduleThermalSensorFailure
+		     6   modulePullOut
+		     7   powerDC48VAFailure
+		     8   powerDC48VBFailure
+		     9   extAlarmInputTrigger
+		    10   moduleDown
+		    11 	 mscSwitchOverOK
+		    12	 networkTopologyChange"
+	::= { iesSlotEntry 8 }
+
+
+
+	iesMscPortConfTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF IesMscPortConfEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The table contains port configuration information in MSC1000."
+	::= { iesChassis 4 }
+
+	iesMscPortConfEntry	OBJECT-TYPE
+	SYNTAX	IesMscPortConfEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		""
+	INDEX	{ iesChassisId,iesSlotId,iesMscPortId }
+	::= { iesMscPortConfTable 1}
+
+	IesMscPortConfEntry ::=
+	SEQUENCE {
+		iesMscPortId			INTEGER,
+		iesMscPortType			INTEGER,
+		iesMscPortIfIndex		INTEGER,
+		iesMscPortSpeed			INTEGER,
+		iesMscPortDuplex		INTEGER,
+		iesMscPortFlowControl   	INTEGER,
+		iesMscPortDefaultVLANTagging	INTEGER,
+		iesMscPortTrunkGroupId		INTEGER,
+		iesMscPortMode			INTEGER,
+		iesMscPortVLANTrunking		INTEGER
+	}
+
+	iesMscPortId	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Identity of the extension slot in MSC1000."
+	::= { iesMscPortConfEntry 1 }
+
+	iesMscPortType	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				unknown(1),
+				e1000BaseT(2),
+				e1000BaseLX(3),
+				e1000BaseSX(4),
+				e100BaseFX(5),
+				e100BaseTX(6),
+				e1000BaseGBIC(7)
+			}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Port type of the extension slot in MSC1000."
+	::= { iesMscPortConfEntry 2 }
+
+	iesMscPortIfIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 3 }
+
+	iesMscPortSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				auto(1),
+				e1000M(2),
+				e100M(3),
+				e10M(4)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 4 }
+
+	iesMscPortDuplex	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				full(1),
+				half(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 5 }
+
+	iesMscPortFlowControl	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				true(1),
+				false(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 6 }
+
+	iesMscPortDefaultVLANTagging	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				true(1),
+				false(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 7 }
+
+	iesMscPortTrunkGroupId	OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { iesMscPortConfEntry 8 }
+
+	iesMscPortMode	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				uplink(1),
+				subtending(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		" The operational mode for uplink and subtending ports in MSC. Only
+		the operational mode of subtending ports can be modified."
+	::= { iesMscPortConfEntry 9 }
+
+	iesMscPortVLANTrunking	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				enable(1),
+				disable(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		" The VLAN trunking setting for uplink and subtending ports in MSC."
+	::= { iesMscPortConfEntry 10 }
+
+
+
+-- System Hardware Monitoring
+
+-- Fan rpm table
+
+        iesFanRpmTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesFanRpmEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                    	"A table that contains rpm information about the fans."
+        ::= { iesHWMonitor 1 }
+
+        iesFanRpmEntry OBJECT-TYPE
+        SYNTAX  IesFanRpmEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of rpm information for each fan."
+        INDEX  { iesChassisId,iesFanRpmIndex }
+        ::= { iesFanRpmTable 1 }
+
+        IesFanRpmEntry ::=
+           SEQUENCE {
+        	iesFanRpmIndex		INTEGER,
+		iesFanRpmCurValue	INTEGER,
+		iesFanRpmMaxValue	INTEGER,
+		iesFanRpmMinValue	INTEGER,
+		iesFanRpmLowThresh	INTEGER,
+		iesFanRpmDescr		DisplayString
+           }
+
+        iesFanRpmIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The identity of the fan."
+        ::= { iesFanRpmEntry 1 }
+
+        iesFanRpmCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The current rpm of the fan."
+        ::= { iesFanRpmEntry 2 }
+
+        iesFanRpmMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum rpm ever performed by the fan."
+        ::= { iesFanRpmEntry 3 }
+
+        iesFanRpmMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The minimum rpm ever performed by the fan."
+        ::= { iesFanRpmEntry 4 }
+
+        iesFanRpmLowThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The low threshold of the rpm of the fan. If the current rpm is less than
+			the threshold, the device will initiate the fanRpmLow trap."
+        ::= { iesFanRpmEntry 5 }
+
+        iesFanRpmDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The description of the fan (e.g. location, function, etc.)."
+        ::= { iesFanRpmEntry 6 }
+
+
+
+-- Voltage table
+
+        iesVoltageTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesVoltageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                      	"A table that contains voltage information about the system."
+        ::= { iesHWMonitor 2 }
+
+        iesVoltageEntry OBJECT-TYPE
+        SYNTAX  IesVoltageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of voltage information for each sensor."
+        INDEX  { iesChassisId,iesSlotId,iesVoltageIndex }
+        ::= { iesVoltageTable 1 }
+
+        IesVoltageEntry ::=
+           SEQUENCE {
+        	iesVoltageIndex			INTEGER,
+		iesVoltageCurValue		INTEGER,
+		iesVoltageMaxValue		INTEGER,
+		iesVoltageMinValue		INTEGER,
+		iesVoltageNominalValue		INTEGER,
+		iesVoltageLowThresh		INTEGER,
+		iesVoltageDescr			DisplayString
+           }
+
+        iesVoltageIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The identity of the sensor."
+        ::= { iesVoltageEntry 1 }
+
+        iesVoltageCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The current voltage detected by the sensor (in milli-voltage)."
+        ::= { iesVoltageEntry 2 }
+
+        iesVoltageMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum voltage ever detected by the sensor (in milli-voltage)."
+        ::= { iesVoltageEntry 3 }
+
+        iesVoltageMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The minimum voltage ever detected by the sensor (in milli-voltage)."
+        ::= { iesVoltageEntry 4 }
+
+        iesVoltageNominalValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The nominal voltage which the power should supply (in milli-voltage)."
+        ::= { iesVoltageEntry 5 }
+
+        iesVoltageLowThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The low threshold of the voltage (in milli-voltage). If the current voltage
+			is less than the threshold, the device will initiate the voltageLow trap."
+        ::= { iesVoltageEntry 6 }
+
+        iesVoltageDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The description of the voltage (e.g. location, nominal value, etc.)."
+        ::= { iesVoltageEntry 7 }
+
+
+
+-- System temperature table
+
+        iesSysTempTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesSysTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                      	"A table that contains temperature information about system."
+        ::= { iesHWMonitor 3 }
+
+        iesSysTempEntry OBJECT-TYPE
+        SYNTAX  IesSysTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of temperature information for each sensor."
+        INDEX  { iesChassisId,iesSlotId,iesSysTempIndex }
+        ::= { iesSysTempTable 1 }
+
+        IesSysTempEntry ::=
+           SEQUENCE {
+        	iesSysTempIndex		INTEGER,
+		iesSysTempCurValue	INTEGER,
+		iesSysTempMaxValue	INTEGER,
+		iesSysTempMinValue	INTEGER,
+		iesSysTempHighThresh	INTEGER,
+		iesSysTempDescr		DisplayString
+           }
+
+        iesSysTempIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The identity of the sensor."
+        ::= { iesSysTempEntry 1 }
+
+        iesSysTempCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The current temperature detected in Celsius by the sensor."
+        ::= { iesSysTempEntry 2 }
+
+        iesSysTempMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum temperature ever detected in Celsius by the sensor."
+        ::= { iesSysTempEntry 3 }
+
+        iesSysTempMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The minimum temperature ever detected in Celsius by the sensor."
+        ::= { iesSysTempEntry 4 }
+
+        iesSysTempHighThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The high threshold of the temperature in Celsius. If the current temperature
+			is higher than the threshold, the device will initiate the overheat trap."
+        ::= { iesSysTempEntry 5 }
+
+        iesSysTempDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The description of the temperature sensor (e.g. location, function, etc.)."
+        ::= { iesSysTempEntry 6 }
+
+
+
+-- System Management
+
+	-- System Status
+
+	iesSystemCurrentStatus OBJECT-TYPE
+    	SYNTAX  INTEGER(0..255)
+    	MAX-ACCESS  read-only
+    	STATUS  current
+    	DESCRIPTION "This variable indicates the status of the system.
+       		     The sysCurrentStatus is a bit map represented
+       		     as a sum, therefore, it can represent multiple defects
+       		     simultaneously. The sysNoDefect should be set if and only if
+       		     no other flag is set.
+
+       		     The various bit positions are:
+                     1   sysNoDefect
+         2   sysTemperatureAbnormal
+		     3	 sysFanRpmAbnormal
+		     4	 sysVoltageAbnormal
+		     5   sysThermalSensorFailure
+		     6   modulePullOut
+		     7   powerDC48VAFailure
+		     8   powerDC48VBFailure
+		     9   extAlarmInputTrigger
+		    10   moduleDown
+		    11 	 mscSwitchOverOK
+		    12	 networkTopologyChange"
+
+     	::= {iesSysState 1 }
+
+        iesProblemCause OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"It describes the problem occurred in the system, e.g. maintenance
+                      	operation failures, system reboot, error log, ...etc."
+        ::= { iesSysState 2 }
+
+
+
+-- System Maintenance
+
+        iesMaintenanceOps OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The managed object is for system maintenance. When the EMS
+                      	 wants to trigger the system maitenance operation, the EMS
+                      	 shall send SNMP-SET message to set the corresponding bit value
+                      	 to be 1. The various bit positions are:
+                      	 BIT 1: config save
+                      	 BIT 2: reset
+			 BIT 3: local loopback test
+			 BIT 4: remote loopback test
+			 BIT 5: clear system alarms
+			 BIT 6: F4 loopback test
+			 BIT 7: F5 loopback test
+			 BIT 8: DSL Line Diagnostic"
+        ::= { iesSysMaintenance 1 }
+
+        iesMaintenanceTarget OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The managed object is used for identify the target on which
+			 the maintenance operation should be performed. The target can
+			 be a chassis, a plug-in module, and a port.
+		 	 The value of the object will be:
+		 	 	(Chassisid * 10000 + slotid * 100 + portid)
+		 	  where
+		 	 	chassisid: 0~3,
+		 	 	slotid: 1~16,
+		 	 	portid: 1~24"
+        ::= { iesSysMaintenance 2 }
+
+
+-- variables for provisioning DSL line in batch mode
+
+        iesMaintenanceDSLConfOps OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The managed object is for xDSL line configuration. When the EMS
+                      	 wants to issue the desired operation, the EMS
+                      	 shall send SNMP-SET message to set the corresponding bit value
+                      	 to be 1. The various bit positions are:
+                      	 BIT  1: enable port
+                      	 BIT  2: disable port
+			 BIT  3: set DSL mode
+			 BIT  4: set profile
+			 BIT  5: enable mac filter
+			 BIT  6: disable mac filter
+			 BIT  7: set packet filter
+			 BIT  8: enable dot1x
+			 BIT  9: disable dot1x
+			 BIT 10: set dot1x control
+			 BIT 11: enable dot1x re-authentication
+			 BIT 12: disable dot1x re-authentication
+			 BIT 13: set dot1x re-authentication period
+			 BIT 14: enable mac count filter
+			 BIT 15: disable mac count filter
+			 BIT 16: set mac count filter
+			 BIT 17: set alarm profile
+			 BIT 18: set Annex L (Only in AnnexA)
+			 BIT 19: set power management
+			 BIT 20: set rate adaptation mode
+			 BIT 21: set IGMP filter
+			 BIT 22: enable Annex M
+			 BIT 23: disable Annex M"
+        ::= { iesSysMaintenance 3 }
+
+        iesMaintenanceDSLConfTarget OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The managed object is used for identify the target on which
+			 the line configuration should be performed. The target is encoded
+		         as:
+		         Byte 1: the octet specifies a set of eight Chassis, Chassis 0 through 7
+		         Byte 2~3: each octet specifies a set of eight slots, with the
+		                     first octet specifying slots 1 through 8 and the second
+		                     octet specifying slots 9 through 16.
+		         Byte 4: reserved
+		         Byte 5~11: each octet specifies a set of eight ports, with the first
+		                   octet specifying ports 1 through 8, etc."
+        ::= { iesSysMaintenance 4 }
+
+        iesMaintenanceDSLConfProfileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The DSL profile name"
+        ::= { iesSysMaintenance 5 }
+
+        iesMaintenanceDSLConfMode OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The DSL mode. The semantic for each bit is:
+                      	Bit 1: ADSL, G.lite
+                      	Bit 2: ADSL, G.dmt
+                      	Bit 3: ADSL, T1.413
+                      	Bit 4: ADSL, Auto
+                      	Bit 5: ADSL, ETSI
+                      	Bit 6: ADSL2,
+                      	Bit 7: ADSL2+"
+        ::= { iesSysMaintenance 6 }
+
+        iesMaintenanceDSLConfPktFilter OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The packet filter. The semantic for each bit is:
+                      	Bit 1: accept all
+                      	Bit 2: accept PPPoE only
+                      	Bit 3: reject ARP
+                      	Bit 4: reject DHCP
+			Bit 5: reject EAPOL
+                      	Bit 6: reject PPPoE
+			Bit 7: reject NetBIOS
+			Bit 8: reject IGMP
+			Bit 9: reject IP"
+        ::= { iesSysMaintenance 7 }
+
+        iesMaintenanceDSLConfDot1xControl OBJECT-TYPE
+        SYNTAX INTEGER {
+        		auto(1),
+			forceAuth(2),
+			forceUnAuth(3)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The configuration defines the 802.1x control type."
+	::= { iesSysMaintenance 8 }
+
+        iesMaintenanceDSLConfDot1xReauthPeriod OBJECT-TYPE
+        SYNTAX 	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The configuration defines the 802.1x re-authentication period (seconds)."
+	::= { iesSysMaintenance 9 }
+
+        iesMaintenanceDSLConfMacCount OBJECT-TYPE
+        SYNTAX 	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The configuration defines the number of mac addresses which can pass through the port."
+	::= { iesSysMaintenance 10 }
+
+        iesMaintenanceVpi OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"VPI of the channel"
+        ::= { iesSysMaintenance 11 }
+
+        iesMaintenanceVci OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"VCI of the channel"
+        ::= { iesSysMaintenance 12 }
+
+        iesMaintenanceDSLConfAlarmProfileName OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The DSL alarm profile name"
+        ::= { iesSysMaintenance 13 }
+
+        iesMaintenanceDSLConfAnnexL OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		enableNarrowMode(1),
+        		enableWideMode(2),
+        		disable(3)
+        	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The annex L setting of the ADSL line (Only in AnnexA)."
+        ::= { iesSysMaintenance 14 }
+
+        iesMaintenanceDSLConfPmMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		enableL2Mode(1),
+        		enableL3Mode(2),
+        		disable(3)
+        	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The power management mode of the ADSL line."
+        ::= { iesSysMaintenance 15 }
+
+        iesMaintenanceDSLConfRateMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+                 	fixed(1),		-- no rate adaptation
+                 	adaptAtStartup(2),	-- perform rate adaptation
+                                         	-- only at initialization
+                 	adaptAtRuntime(3)	-- perform rate adaptation at
+                                         	-- any time
+             	}
+        MAX-ACCESS  read-write
+        STATUS	current
+        DESCRIPTION
+                 	"Defines what form of transmit rate adaptation is
+                 	configured on this modem.  See ADSL Forum TR-005 [3]
+                 	for more information."
+        ::= { iesSysMaintenance 16 }
+
+        iesMaintenanceDSLConfIgmpFilter OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The IGMP filter name."
+        ::= { iesSysMaintenance 17 }
+
+
+ -- System Time Setup
+
+        iesTimeServerMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        		none(1),
+			daytime(2),
+			time(3),
+			ntp(4)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The mechanism of Time Server when the system boots up."
+	::= { iesSysTimeSetup 1 }
+
+	iesTimeServerIP OBJECT-TYPE
+        SYNTAX IpAddress
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The IP Address of Time Server"
+	::= { iesSysTimeSetup 2 }
+
+	iesSystemTime OBJECT-TYPE
+        SYNTAX DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The system time"
+	::= { iesSysTimeSetup 3 }
+
+	iesSystemDate OBJECT-TYPE
+        SYNTAX DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The system date"
+	::= { iesSysTimeSetup 4 }
+
+	iesSystemTimeZone OBJECT-TYPE
+	SYNTAX INTEGER {
+        			utc-1200(1),
+        			utc-1100(2),
+        			utc-1000(3),
+        			utc-0900(4),
+        			utc-0800(5),
+        			utc-0700(6),
+        			utc-0600(7),
+        			utc-0500(8),
+        			utc-0400(9),
+        			utc-0300(10),
+        			utc-0200(11),
+        			utc-0100(12),
+        			utc(13),
+        			utc0100(14),
+        			utc0200(15),
+        			utc0300(16),
+        			utc0400(17),
+        			utc0500(18),
+        			utc0600(19),
+        			utc0700(20),
+        			utc0800(21),
+        			utc0900(22),
+        			utc1000(23),
+        			utc1100(24),
+        			utc1200(25)
+			}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The system time zone"
+	::= { iesSysTimeSetup 5 }
+
+
+
+-- System Access Control
+
+        iesAccessCtrlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesAccessCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                      	"A table that contains information about service access control."
+        ::= { iesSysAccessControl 1 }
+
+        iesAccessCtrlEntry OBJECT-TYPE
+        SYNTAX  IesAccessCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of access control entry."
+        INDEX  { iesAccessCtrlService }
+        ::= { iesAccessCtrlTable 1 }
+
+        IesAccessCtrlEntry ::=
+           SEQUENCE {
+        	iesAccessCtrlService	INTEGER,
+		iesAccessCtrlEnable	INTEGER,
+		iesAccessCtrlPort	INTEGER
+           }
+
+        iesAccessCtrlService OBJECT-TYPE
+        SYNTAX  INTEGER {
+			telnet(1),
+			ftp(2),
+			web(3),
+			icmp(4)
+	}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The service type of the access control entry."
+        ::= { iesAccessCtrlEntry 1 }
+
+        iesAccessCtrlEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+			enable(1),
+			disable(2)
+	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable or disable the service."
+        ::= { iesAccessCtrlEntry 2 }
+
+        iesAccessCtrlPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The port number which the service uses."
+        ::= { iesAccessCtrlEntry 3 }
+
+	-- secured client table
+	iesMaxNumOfSecuredClients OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum number of sets of secured clients."
+        ::= { iesSysAccessControl 2}
+
+        iesSecuredClientTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesSecuredClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                      	"A table that contains information about secured clients."
+        ::= { iesSysAccessControl 3 }
+
+        iesSecuredClientEntry OBJECT-TYPE
+        SYNTAX  IesSecuredClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of secured client entry."
+        INDEX  { iesSecuredClientStartIp, iesSecuredClientEndIp }
+        ::= { iesSecuredClientTable 1 }
+
+        IesSecuredClientEntry ::=
+           SEQUENCE {
+        	iesSecuredClientStartIp	IpAddress,
+		iesSecuredClientEndIp		IpAddress,
+		iesSecuredClientService	INTEGER,
+		iesSecuredClientRowStatus	RowStatus
+           }
+
+        iesSecuredClientStartIp OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The starting IP address of a set of secured clients."
+        ::= { iesSecuredClientEntry 1 }
+
+        iesSecuredClientEndIp OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The ending IP address of a set of secured clients."
+        ::= { iesSecuredClientEntry 2 }
+
+        iesSecuredClientService OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"Each bit corresponds to a service. The bit is set to 1 if the
+			 service is enabled, and set to 0 if the service is disabled.
+			 The various bit positions are:
+             BIT 1: telnet
+             BIT 2: FTP
+			 BIT 3: web
+			 BIT 4: ICMP"
+        ::= { iesSecuredClientEntry 3 }
+
+        iesSecuredClientRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"This object is used to create a new row or modify or delete an existing row
+			 in this table. A row is activated by setting this object to `active', and is
+			 deactivated by setting it to 'notInService'."
+        ::= { iesSecuredClientEntry 4 }
+
+
+
+-- Static Route
+
+        iesMaxNumOfStaticRoutes OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum number of static routes."
+        ::= { iesSysStaticRoute 1 }
+
+        iesStaticRouteTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesStaticRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                      	"A table that contains information about static routes."
+        ::= { iesSysStaticRoute 2 }
+
+        iesStaticRouteEntry OBJECT-TYPE
+        SYNTAX  IesStaticRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"A list of static route entry."
+        INDEX  { iesStaticRouteName }
+        ::= { iesStaticRouteTable 1 }
+
+        IesStaticRouteEntry ::=
+           SEQUENCE {
+        	iesStaticRouteName		DisplayString,
+		iesStaticRouteDest		IpAddress,
+		iesStaticRouteMask		IpAddress,
+		iesStaticRouteGateway		IpAddress,
+		iesStaticRouteMetric		INTEGER,
+		iesStaticRouteRowStatus		RowStatus
+           }
+
+        iesStaticRouteName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The name of the static route."
+        ::= { iesStaticRouteEntry 1 }
+
+        iesStaticRouteDest OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"The destination IP address of the static route."
+        ::= { iesStaticRouteEntry 2 }
+
+        iesStaticRouteMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"The subnet mask of the static route."
+        ::= { iesStaticRouteEntry 3 }
+
+        iesStaticRouteGateway OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"The gateway IP address of the static route."
+        ::= { iesStaticRouteEntry 4 }
+
+        iesStaticRouteMetric OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"The routing metric of the static route."
+        ::= { iesStaticRouteEntry 5 }
+
+        iesStaticRouteRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                      	"This object is used to create a new row or modify or delete an existing row
+			 in this table. A row is activated by setting this object to `active', and is
+			 deactivated by setting it to 'notInService'."
+        ::= { iesStaticRouteEntry 6 }
+
+
+
+-- syslog
+
+        iesSysLogEnable OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable/disable syslog function."
+        ::= { iesSyslogSetup 1 }
+
+        iesSysLogServer OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"IP address of the syslog server."
+        ::= { iesSyslogSetup 2 }
+
+        iesSysLogFacility OBJECT-TYPE
+        SYNTAX  INTEGER {
+			local1(1),
+			local2(2),
+			local3(3),
+			local4(4),
+			local5(5),
+			local6(6),
+			local7(7)
+			}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Log facility used by the syslog function."
+        ::= { iesSyslogSetup 3 }
+
+
+
+-- DHCP Setup
+
+        iesDhcpRelayEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable/disable DHCP relay function."
+        ::= { iesSysDhcpSetup 1 }
+
+        iesDhcpRelayOption82Enable OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable/disable DHCP relay Option82 function."
+        ::= { iesSysDhcpSetup 2 }
+
+        iesDhcpRelayOption82Info OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"User specific Option82 information."
+        ::= { iesSysDhcpSetup 3 }
+
+	iesMaxNumOfDhcpServers OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum number of DHCP servers."
+        ::= { iesSysDhcpSetup 4 }
+
+	iesDhcpServerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesDhcpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains DHCP server information."
+        ::= { iesSysDhcpSetup 5 }
+
+        iesDhcpServerEntry OBJECT-TYPE
+        SYNTAX  IesDhcpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"The entry of DHCP server table."
+        INDEX  { iesDhcpServerIp }
+        ::= { iesDhcpServerTable 1 }
+
+        IesDhcpServerEntry ::=
+           SEQUENCE {
+        	iesDhcpServerIp		 	IpAddress,
+		iesDhcpServerRowStatus		RowStatus
+           }
+
+	iesDhcpServerIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The IP address of the DHCP server."
+	::= { iesDhcpServerEntry 1 }
+
+	iesDhcpServerRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the DHCP server entry."
+	::= { iesDhcpServerEntry 2 }
+
+
+
+-- SNMP setup, Trap Destination
+
+	iesMaxNumberOfTrapDestinations OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of the trap destinations."
+	::= { iesSysSNMPSetup 1 }
+
+	iesSNMPTrapDestTable	OBJECT-TYPE
+    	SYNTAX  SEQUENCE OF IesSNMPTrapDestEntry
+    	MAX-ACCESS  not-accessible
+    	STATUS  current
+    	DESCRIPTION
+                "A table that contains SNMP trap destination information."
+    	::= { iesSysSNMPSetup 2 }
+
+    	iesSNMPTrapDestEntry OBJECT-TYPE
+        SYNTAX  IesSNMPTrapDestEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"The entry of SNMP trap destination table."
+        INDEX  { iesTrapDestIp, iesTrapDestPort }
+        ::= { iesSNMPTrapDestTable 1 }
+
+   	IesSNMPTrapDestEntry ::=
+           SEQUENCE {
+            iesTrapDestIp		 	IpAddress,
+            iesTrapDestPort			INTEGER,
+	    iesTrapDestRowStatus		RowStatus
+    	   }
+
+	iesTrapDestIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The IP address of the trap destination."
+	::= { iesSNMPTrapDestEntry 1 }
+
+	iesTrapDestPort OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The UDP port of the trap destination."
+	::= { iesSNMPTrapDestEntry 2 }
+
+	iesTrapDestRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the trap destination entry."
+	::= { iesSNMPTrapDestEntry 3}
+
+	iesSnmpGetCommunity OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The SNMP get community."
+	::= { iesSysSNMPSetup 3 }
+
+	iesSnmpSetCommunity OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The SNMP set community."
+	::= { iesSysSNMPSetup 4 }
+
+	iesSnmpTrapCommunity OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The SNMP trap community."
+	::= { iesSysSNMPSetup 5 }
+
+
+-- RADIUS Server setup
+
+	iesMaxNumberOfRadiusServers OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of the RADIUS Servers."
+	::= { iesSysDot1xSetup 1 }
+
+	iesRadiusServerTable	OBJECT-TYPE
+   	SYNTAX  SEQUENCE OF IesRadiusServerEntry
+    	MAX-ACCESS  not-accessible
+    	STATUS  current
+    	DESCRIPTION
+                "A table that contains Radius Server information."
+    	::= { iesSysDot1xSetup 2 }
+
+    	iesRadiusServerEntry OBJECT-TYPE
+        SYNTAX  IesRadiusServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"The entry of Radius Server table."
+        INDEX  { iesRadiusServerIndex }
+        ::= { iesRadiusServerTable 1 }
+
+   	IesRadiusServerEntry ::=
+           SEQUENCE {
+            iesRadiusServerIndex		INTEGER,
+            iesRadiusServerIp		 	IpAddress,
+            iesRadiusServerPort			INTEGER,
+            iesRadiusSharedSecret		DisplayString,
+	    iesRadiusServerRowStatus		RowStatus
+    	   }
+
+        iesRadiusServerIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        	"The identity of the RADIUS server."
+        ::= { iesRadiusServerEntry 1 }
+
+	iesRadiusServerIp OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The IP address of the Radius Server."
+	::= { iesRadiusServerEntry 2 }
+
+	iesRadiusServerPort OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The UDP port of the Radius Server."
+	::= { iesRadiusServerEntry 3 }
+
+	iesRadiusSharedSecret OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The shared secret of the Radius Server."
+	::= { iesRadiusServerEntry 4 }
+
+	iesRadiusServerRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the Radius Server entry."
+	::= { iesRadiusServerEntry 5 }
+
+
+-- 802.1x option
+
+	iesDot1xEnable OBJECT-TYPE
+	SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        MAX-ACCESS  read-write
+	STATUS	current
+	DESCRIPTION
+		"Enable/disable the 802.1x function."
+	::= { iesSysDot1xSetup 3 }
+
+
+
+-- 802.1x Table
+
+        iesDot1xPortTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IesDot1xPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"This table includes the configuration of 802.1x."
+        ::= { iesSysDot1xSetup 4 }
+
+	iesDot1xPortEntry OBJECT-TYPE
+        SYNTAX	IesDot1xPortEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION
+		"An entry in iesDot1xPortTable."
+        INDEX   { ifIndex }
+        ::= { iesDot1xPortTable 1 }
+
+        IesDot1xPortEntry ::=
+           SEQUENCE {
+		iesDot1xPortEnable	  	INTEGER,
+		iesDot1xPortControl	  	INTEGER,
+		iesDot1xPortReAuthEnable	INTEGER,
+		iesDot1xPortReAuthPeriod	INTEGER
+           }
+
+        iesDot1xPortEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The option defines if the port enables 802.1x
+		settings."
+         ::= { iesDot1xPortEntry 1 }
+
+        iesDot1xPortControl    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				auto(1),
+				forceAuth(2),
+				forceUnAuth(3)
+			}
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The configuration defines the 802.1x port control
+		type."
+         ::= { iesDot1xPortEntry 2 }
+
+	iesDot1xPortReAuthEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				on(1),
+				off(2)
+			}
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The option defines if the port enables 802.1x
+		re-authentication."
+         ::= { iesDot1xPortEntry 3 }
+
+        iesDot1xPortReAuthPeriod    OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The configuration defines the 802.1x
+		re-authentication period (seconds) for each port."
+         ::= { iesDot1xPortEntry 4 }
+
+
+
+-- Mac Filter
+
+        iesMacFilterStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IesMacFilterStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"This table includes the status of mac filtering for each port."
+        ::= { iesSysMacFilter 1 }
+
+	iesMacFilterStatusEntry OBJECT-TYPE
+        SYNTAX	IesMacFilterStatusEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION
+		"An entry in iesMacFilterStatusTable."
+        INDEX   { ifIndex }
+        ::= { iesMacFilterStatusTable 1 }
+
+        IesMacFilterStatusEntry ::=
+           SEQUENCE {
+		iesMacFilterStatusEnable	INTEGER
+           }
+
+        iesMacFilterStatusEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enableaccept(1),
+				disable(2),
+				enabledeny(3)
+			}
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The option defines if the port enables mac filtering."
+         ::= { iesMacFilterStatusEntry 1 }
+
+	iesMaxNumberOfMacFilters OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of the mac filters in the system."
+	::= { iesSysMacFilter 2 }
+
+	iesMaxNumberOfMacFiltersPerPort OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of the mac filters for each port."
+	::= { iesSysMacFilter 3 }
+
+	iesCurrNumberOfMacFilters OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The current number of the mac filters in the system."
+	::= { iesSysMacFilter 4 }
+
+	iesMacFilterTable OBJECT-TYPE
+   	SYNTAX  SEQUENCE OF IesMacFilterEntry
+    	MAX-ACCESS  not-accessible
+    	STATUS  current
+    	DESCRIPTION
+                "A table that contains the mac filtering information."
+    	::= { iesSysMacFilter 5 }
+
+    	iesMacFilterEntry OBJECT-TYPE
+        SYNTAX  IesMacFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"The entry of iesMacFilterTable."
+        INDEX  { ifIndex, iesMacFilterMacAddr }
+        ::= { iesMacFilterTable 1 }
+
+   	IesMacFilterEntry ::=
+           SEQUENCE {
+	    iesMacFilterMacAddr			PhysAddress,
+	    iesMacFilterRowStatus		RowStatus
+    	   }
+
+        iesMacFilterMacAddr OBJECT-TYPE
+        SYNTAX  PhysAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        	"The mac address which can pass through the port."
+        ::= { iesMacFilterEntry 1 }
+
+	iesMacFilterRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the entry."
+	::= { iesMacFilterEntry 2 }
+
+
+
+-- Packet Filter
+
+        iesPacketFilterTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IesPacketFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"This table includes packet filtering for each port."
+        ::= { iesSysPacketFilter 1 }
+
+	iesPacketFilterEntry OBJECT-TYPE
+        SYNTAX	IesPacketFilterEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION
+		"An entry in iesPacketFilterTable."
+        INDEX   { ifIndex }
+        ::= { iesPacketFilterTable 1 }
+
+        IesPacketFilterEntry ::=
+           SEQUENCE {
+		iesPacketFilter	INTEGER
+           }
+
+        iesPacketFilter OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The packet filter. The semantic for each bit is:
+                      	Bit 1: accept all
+                      	Bit 2: accept PPPoE only
+                      	Bit 3: reject ARP
+                      	Bit 4: reject DHCP
+			Bit 5: reject EAPOL
+                      	Bit 6: reject PPPoE
+			Bit 7: reject NetBIOS
+			Bit 8: reject IGMP
+			Bit 9: reject IP"
+         ::= { iesPacketFilterEntry 1 }
+
+
+
+-- Mac Count Filter
+
+        iesMacCountFilterTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IesMacCountFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"This table includes mac count filtering for each port."
+        ::= { iesSysMacCountFilter 1 }
+
+	iesMacCountFilterEntry OBJECT-TYPE
+        SYNTAX	IesMacCountFilterEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION
+		"An entry in iesMacCountFilterTable."
+        INDEX   { ifIndex }
+        ::= { iesMacCountFilterTable 1 }
+
+        IesMacCountFilterEntry ::=
+           SEQUENCE {
+		iesMacCountFilterStatus	INTEGER,
+		iesMacCountFilterCount	INTEGER
+           }
+
+        iesMacCountFilterStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The option defines if the port enables mac count filtering."
+         ::= { iesMacCountFilterEntry 1 }
+
+        iesMacCountFilterCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS	read-write
+        STATUS	current
+        DESCRIPTION
+                "The number of mac addresses which can pass through the port."
+         ::= { iesMacCountFilterEntry 2 }
+
+
+
+-- Static Multicast Group
+
+	iesMaxNumberOfMulticastGroups OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of static multicast groups in the system."
+	::= { iesSysMulticastGroup 1 }
+
+	iesMulticastGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesMulticastGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains static multicast group information."
+        ::= { iesSysMulticastGroup 2 }
+
+        iesMulticastGroupEntry OBJECT-TYPE
+        SYNTAX  IesMulticastGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"The entry of multicast group table."
+        INDEX  { iesMulticastGroupMacAddr }
+        ::= { iesMulticastGroupTable 1 }
+
+        IesMulticastGroupEntry ::=
+           SEQUENCE {
+        	iesMulticastGroupMacAddr		PhysAddress,
+        	iesMulticastGroupPorts			PortList,
+		iesMulticastGroupRowStatus		RowStatus
+           }
+
+	iesMulticastGroupMacAddr OBJECT-TYPE
+	SYNTAX PhysAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The multicast MAC address of the group."
+	::= { iesMulticastGroupEntry 1 }
+
+	iesMulticastGroupPorts OBJECT-TYPE
+	SYNTAX PortList
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The port list which specifies the ports joining the multicast group."
+	::= { iesMulticastGroupEntry 2 }
+
+	iesMulticastGroupRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The row status of the multicast group entry."
+	::= { iesMulticastGroupEntry 3 }
+
+
+-- IGMP Filter
+
+	iesMaxNumberOfIgmpFilters OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The max number of IGMP filters in the system."
+	::= { iesSysIgmpFilter 1 }
+
+	iesIgmpFilterTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesIgmpFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains IGMP filters."
+        ::= { iesSysIgmpFilter 2 }
+
+        iesIgmpFilterEntry OBJECT-TYPE
+        SYNTAX  IesIgmpFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"The entry of IGMP filter table."
+        INDEX  { iesIgmpFilterName, iesIgmpFilterIndex }
+        ::= { iesIgmpFilterTable 1 }
+
+        IesIgmpFilterEntry ::=
+           SEQUENCE {
+        	iesIgmpFilterName		OCTET STRING,
+        	iesIgmpFilterIndex		INTEGER,
+        	iesIgmpFilterStartIp		IpAddress,
+        	iesIgmpFilterEndIp		IpAddress,
+		iesIgmpFilterRowStatus		RowStatus
+           }
+
+	iesIgmpFilterName OBJECT-TYPE
+	SYNTAX 	OCTET STRING (SIZE (1..31))
+	MAX-ACCESS 	read-only
+	STATUS 	current
+	DESCRIPTION
+		"The IGMP filter name."
+	::= { iesIgmpFilterEntry 1 }
+
+	iesIgmpFilterIndex OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index which specifies the filter rule."
+	::= { iesIgmpFilterEntry 2 }
+
+	iesIgmpFilterStartIp OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The start IP of the filter rule."
+	::= { iesIgmpFilterEntry 3 }
+
+	iesIgmpFilterEndIp OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The end IP of the filter rule."
+	::= { iesIgmpFilterEntry 4 }
+
+	iesIgmpFilterRowStatus OBJECT-TYPE
+	SYNTAX	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the IGMP filter entry."
+	::= { iesIgmpFilterEntry 5 }
+
+        iesIgmpFilterPortTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IesIgmpFilterPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	"This table specifies the IGMP filter of the port."
+        ::= { iesSysIgmpFilter 3 }
+
+	iesIgmpFilterPortEntry OBJECT-TYPE
+        SYNTAX	IesIgmpFilterPortEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in iesIgmpFilterPortTable."
+        INDEX          	{ ifIndex }
+        ::= { iesIgmpFilterPortTable 1 }
+
+        IesIgmpFilterPortEntry ::=
+           SEQUENCE {
+		iesIgmpFilterPortFilter		OCTET STRING
+           }
+
+        iesIgmpFilterPortFilter OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The IGMP filter of the port."
+        ::= { iesIgmpFilterPortEntry 1 }
+
+
+-- L2 Switch Configuration
+
+	iesIGMPSnoopingEnabled OBJECT-TYPE
+        SYNTAX INTEGER {
+        			true(1),
+        			false(2)
+        		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"A flag indicating whether IGMP snooping function is enabled or not."
+	::= { iesL2SW 1 }
+
+	iesManagementVLANId OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The VLAN ID for management."
+	::= { iesL2SW 2 }
+
+	iesMaxNumOfStaticVlans OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The maximum number of static VLANs supported by the system."
+	::= { iesL2SW 3 }
+
+	iesPortIsolationEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+        			enable(1),
+        			disable(2)
+        		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"A flag indicating whether VLAN port isolation function is enabled or not."
+	::= { iesL2SW 6 }
+
+	iesRSTPEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+        			enable(1),
+        			disable(2)
+        		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Enable/Disable RSTP."
+	::= { iesL2SW 7 }
+
+	iesSwitchMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        			daisychain(1),
+        			standalone(2)
+        		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Switch DSLAM's operatrion Mode."
+	::= { iesL2SW 8 }
+
+
+	-- Trunk Group
+
+	iesMaxNumOfTrunkGroups OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The maximum number of trunk groups."
+        ::= { iesL2SW 4}
+
+	iesTrunkGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IesTrunkGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains trunk group configuration."
+        ::= { iesL2SW 5 }
+
+        iesTrunkGroupEntry OBJECT-TYPE
+        SYNTAX  IesTrunkGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        		"The entry of trunk group table"
+        INDEX  { iesTrunkGroupId }
+        ::= { iesTrunkGroupTable 1 }
+
+        IesTrunkGroupEntry ::=
+           SEQUENCE {
+        	iesTrunkGroupId		 	INTEGER,
+        	iesTrunkGroupName		DisplayString,
+		iesTrunkGroupPorts		PortList,
+		iesTrunkGroupRowStatus		RowStatus
+           }
+
+	iesTrunkGroupId OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The ID of the trunk group"
+	::= { iesTrunkGroupEntry 1 }
+
+	iesTrunkGroupName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The name of the trunk group"
+	::= { iesTrunkGroupEntry 2 }
+
+	iesTrunkGroupPorts OBJECT-TYPE
+	SYNTAX 	PortList
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The port list of the trunk group"
+	::= { iesTrunkGroupEntry 3 }
+
+	iesTrunkGroupRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"The row status of the trunk group entry"
+	::= { iesTrunkGroupEntry 4 }
+
+--------------------
+--  Statistics
+--------------------
+		
+	iesMacDisplayTarget OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This managed object is a filter used for identify the target from which 
+		the MAC addresses are learned in macTable. The target could be:
+		1: Subtending port 1
+		2: Subtending port 2
+		3: Uplink port 1
+		4: Uplink port 2
+		5: All of the four uplink ports
+		6: All ports in the system
+		IfIndex is used for identifying subscriber ports (e.g. 300 means all ports in slot 3
+		and 301 means port 1 in slot 3)."
+	::= { iesMacStats 1 }
+
+-- macTable
+	
+        iesMacTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IesMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        	"A table that contains information about unicast
+                entries for which the bridge has forwarding and/or
+                filtering information. This information is used
+                by the transparent bridging function in
+                determining how to propagate a received frame."
+        ::= { iesMacStats 2 }
+
+        iesMacEntry OBJECT-TYPE
+        SYNTAX IesMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        	"An entry of iesMacTable."
+        INDEX { iesMacAddress }
+        ::= { iesMacTable 1 }
+
+        IesMacEntry ::=
+        	SEQUENCE {
+                  	iesMacAddress	MacAddress,
+                  	iesMacPort	INTEGER,
+                  	iesMacStatus	INTEGER
+              	}
+
+        iesMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"A unicast MAC address for which the bridge has
+                forwarding and/or filtering information."
+        ::= { iesMacEntry 1 }
+
+        iesMacPort OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"The port from which the mac address has been learned."
+        ::= { iesMacEntry 2 }
+
+        iesMacStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+        	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"The status of this entry."
+	::= { iesMacEntry 3 }
+			        
+
+-- Enterprise specific traps
+
+	reboot	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is going to reboot.
+	                 The variable is the reason why the system reboots."
+	::= 1
+
+	systemShutdown	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is going to shutdown.
+	                 The variable is the reason that causes the system to shutdown."
+	::= 2
+
+	overheat	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesSlotId,
+                        	iesSysTempIndex,
+                        	iesSysTempCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is overheated.
+	                 The variable in the binding list is the current temperature in Celsius
+	                 of the system."
+	::= 3
+
+	overheatOver	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesSlotId,
+                        	iesSysTempIndex,
+                        	iesSysTempCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the overheated condition is over.
+	                 The variable in the binding list is the current temperature in Celsius
+	                 of the system."
+	::= 4
+
+ 	errLog		TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that an error log is created in system.
+			The variable in the binding list is the content of the error log."
+	::= 5
+
+	fanRpmLow	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesFanRpmIndex,
+                        	iesFanRpmCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the rpm of the fan is too low.
+	                 The variable in the binding list is the current rpm of the fan."
+	::= 6
+
+	fanRpmNormal	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesFanRpmIndex,
+                        	iesFanRpmCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the low-rpm condition of the fan is over.
+	                 The variable in the binding list is the current rpm of the fan."
+	::= 7
+
+	voltageOutOfRange	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesSlotId,
+                        	iesVoltageIndex,
+                        	iesVoltageCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the voltage of the system is out of range.
+	                 The variable in the binding list is the current voltage in volt
+	                 of the system."
+	::= 8
+
+	voltageNormal	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+                        	iesChassisId,
+                        	iesSlotId,
+                        	iesVoltageIndex,
+                        	iesVoltageCurValue
+                        }
+	DESCRIPTION	"Send a message to the manager that the low-voltage condition is over.
+	                 The variable in the binding list is the current voltage in volt
+	                 of the system."
+	::= 9
+
+	systemMaintenanceFailure	TRAP-TYPE
+	ENTERPRISE	iesSeries
+        VARIABLES       {
+        			iesChassisId,
+                        	iesSlotId,
+                        	iesProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system maintence operation
+	                 fail. The variable in the variable binding indicates the problem."
+	::= 10
+
+	configChange TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId,
+      				iesProblemCause
+      			}
+      	DESCRIPTION	"This notification indicates that the configuration data of one module is changed."
+      	::= 11
+
+	moduleUp TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"A moduleUp trap signifies that the sending
+                	protocol entity recognizes that one of the
+                	modules represented in the agent's
+                	configuration has come up."
+      	::= 12
+
+	moduleDown TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"A moduleDown trap signifies that the sending
+                	protocol entity recognizes a failure in one of
+                	the modules represented in the agent's
+                	configuration."
+      	::= 13
+
+      	modulePlugIn TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"A modulePlugIn trap signifies that the sending
+                	protocol entity recognizes that one module is
+                	plugged into the device."
+      	::= 14
+
+	modulePullOut TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"A modulePullOut trap signifies that the sending
+                	protocol entity recognizes one module is pulled out
+                	from the device."
+      	::= 15
+
+      	powerDC48VAFailure TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--      			}
+      	DESCRIPTION	"The trap signifies that the power supply of DC 48V at the
+      	                 right side of main Chassis (front view) failed."
+      	::= 16
+
+      	powerDC48VANormal TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--     			}
+      	DESCRIPTION	"The trap signifies that the power supply of DC 48V at the
+      	                 right side of main Chassis (front view) is in normal state."
+      	::= 17
+
+      	powerDC48VBFailure TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--      			}
+      	DESCRIPTION	"The trap signifies that the power supply of DC 48V at the
+      	                 left side of main Chassis (front view) failed."
+      	::= 18
+
+      	powerDC48VBNormal TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--      			}
+      	DESCRIPTION	"The trap signifies that the power supply of DC 48V at the
+      	                 left side of main Chassis (front view) is in normal state."
+      	::= 19
+
+      	extAlarmInputTrigger TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--     			}
+      	DESCRIPTION	"The trap signifies that the external alarm input of MSC card
+      			is triggered."
+      	::= 20
+
+      	extAlarmInputRelease TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--      		}
+      	DESCRIPTION	"The trap signifies that the external alarm input of MSC card
+      			is released."
+      	::= 21
+
+      	thermalSensorFailure TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"The trap signifies that the thermal sensor failed."
+      	::= 22
+
+
+
+      	mscSwitchOverOK TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+      				iesChassisId,
+      				iesSlotId
+      			}
+      	DESCRIPTION	"The trap signifies that MSC card is switched over successfully. The value of
+      	     		iesSlotId is the slot ID of the current working MSC."
+      	::= 23
+
+
+      	networkTopologyChange TRAP-TYPE
+	ENTERPRISE	iesSeries
+--	VARIABLES	{
+--      			}
+      	DESCRIPTION	"The trap signifies the network topology is changed."
+      	::= 24
+
+      	adslAtucLof 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-C Loss of Framing."
+      	::= 25
+
+      	adslAturLof 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Framing."
+      	::= 26
+
+      	adslAtucLos 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-C Loss of Signal."
+      	::= 27
+
+      	adslAturLos 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Signal."
+      	::= 28
+
+      	adslAturLpr 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Power."
+      	::= 29
+
+      	adslAtucLofClear	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-C Loss of Framing is cleared."
+      	::= 30
+
+      	adslAturLofClear 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Framing is cleared."
+      	::= 31
+
+      	adslAtucLosClear 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-C Loss of Signal is cleared."
+      	::= 32
+
+      	adslAturLosClear 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Signal is cleared."
+      	::= 33
+
+      	adslAturLprClear 	TRAP-TYPE
+	ENTERPRISE	iesSeries
+	VARIABLES	{
+				ifIndex
+      			}
+      	DESCRIPTION	"The trap signifies ATU-R Loss of Power is cleared."
+      	::= 34
+
+END
