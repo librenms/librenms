@@ -177,11 +177,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $object = new Client();
         $object->setAdapter($adapter);
 
-        $this->object->mark([
+        $object->mark([
             "database" => "udp.test",
-            "tags" => [
-                "dc"  => "eu-west-1",
-            ],
             "points" => [
                 [
                     "name" => "vm-serie",
@@ -197,6 +194,65 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->options->setDatabase("udp.test");
         $body = $this->object->query("select * from \"vm-serie\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
+        $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][2]);
+    }
+
+    /**
+     * @group udp
+     * @group tags
+     */
+    public function testTagsAreWrittenCorrectly()
+    {
+        $rawOptions = $this->rawOptions;
+        $options = new Options();
+        $options->setHost($rawOptions["udp"]["host"]);
+        $options->setUsername($rawOptions["udp"]["username"]);
+        $options->setPassword($rawOptions["udp"]["password"]);
+        $options->setPort($rawOptions["udp"]["port"]);
+        $options->setDatabase($rawOptions["udp"]["database"]);
+
+        $adapter = new UdpAdapter($options);
+        $object = new Client();
+        $object->setAdapter($adapter);
+
+        $object->mark([
+            "database" => "udp.test",
+            "tags" => [
+                "region"  => "eu",
+            ],
+            "points" => [
+                [
+                    "name" => "vm-serie",
+                    "tags" => [
+                        "dc"  => "eu-west-1",
+                        "one"  => "two",
+                    ],
+                    "fields" => [
+                        "cpu" => 18.12,
+                        "free" => 712423,
+                    ],
+                ],
+                [
+                    "name" => "vm-serie",
+                    "tags" => [
+                        "dc"  => "us-east-1",
+                    ],
+                    "fields" => [
+                        "cpu" => 28.12,
+                        "free" => 412923,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(1);
+
+        $this->options->setDatabase("udp.test");
+        $body = $this->object->query("select * from \"vm-serie\" where dc='eu-west-1'");
 
         $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
         $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
