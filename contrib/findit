@@ -9,4 +9,4 @@ find . \
 	-path ./mibs -prune -o \
 	-path ./rrd -prune -o \
 	-name .git -prune -o \
-		-type f -print|xargs grep "$@"
+		-type f -print0|xargs -0 grep "$@"
