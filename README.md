@@ -7,6 +7,8 @@
 
 Send metrics to InfluxDB and query for any data.
 
+**For InfluxDB v0.8 checkout branch 0.3**
+
 ## Install it
 
 Just use composer
@@ -33,6 +35,27 @@ $client->mark("app.search", [
     "key" => "this is my search"
 ]);
 ```
+
+Or use InfluxDB direct messages
+
+```php
+$client->mark([
+    "database" => "mydb",
+    "tags" => [
+        "dc" => "eu-west-1",
+    ],
+    "points" => [
+        [
+            "name" => "vm-serie",
+            "fields" => [
+                "cpu" => 18.12,
+                "free" => 712423,
+            ],
+        ],
+    ]
+]);
+```
+
 
 Retrieve existing points:
 
@@ -61,7 +84,7 @@ php -m | grep sockets
 If you don't have the `sockets` extension, you can proceed in two ways:
 
 - Recompile your PHP whith the `--enable-sockets` flag
-- Or just compile the `sockets` extension extracting it from the PHP source.  
+- Or just compile the `sockets` extension extracting it from the PHP source.
   1. Download the source relative to the PHP version that you on from [here](https://github.com/php/php-src/releases)
   2. Enter in the `ext/sockets` directory
   3. Issue a `phpize && ./configure && make -j && sudo make install`
@@ -124,25 +147,12 @@ $client->mark("error.404", ["page" => "/a-missing-page"]);
 Of course you can always use the DiC or your service manager in order to create
 a valid client instance.
 
-### Time Precision write/read queries
-
-You can set the `time_precision` for query query
-
-```php
-$client->mark("app.search", $points, "s"); //points contains "time" that is in seconds
-```
-
-```php
-$client->query("select * from app.search", "s"); // retrieve points using seconds for time column
-```
-
 ### Query InfluxDB
 
 You can query the time series database using the query method.
 
 ```php
 $influx->query("select * from mine");
-$influx->query("select * from mine", "s"); // with time_precision
 ```
 
 You can query the database only if the adapter is queryable (implements

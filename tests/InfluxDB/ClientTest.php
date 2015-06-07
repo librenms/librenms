@@ -98,6 +98,36 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group tcp
+     */
+    public function testWriteDirectMessages()
+    {
+        $this->object->mark([
+            "database" => "tcp.test",
+            "tags" => [
+                "dc"  => "eu-west-1",
+            ],
+            "points" => [
+                [
+                    "name" => "vm-serie",
+                    "fields" => [
+                        "cpu" => 18.12,
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(1);
+
+        $body = $this->object->query("select * from \"vm-serie\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
+    }
+
+    /**
      * @group udp
      */
     public function testUdpIpWriteData()
