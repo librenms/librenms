@@ -79,7 +79,6 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ["InfluxDB\\Adapter\\GuzzleAdapter"],
-            ["InfluxDB\\Adapter\\HttpAdapter"],
         ];
     }
 
