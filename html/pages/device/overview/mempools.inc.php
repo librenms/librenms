@@ -22,7 +22,7 @@ if (count($mempools))
   foreach ($mempools as $mempool)
   {
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
       if($debug) { print_r($state); }
