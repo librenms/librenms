@@ -191,65 +191,6 @@ $config['autodiscovery']['nets-exclude'][] = "169.254.0.0/16";
 $config['autodiscovery']['nets-exclude'][] = "224.0.0.0/4";
 $config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
 
-// Mailer backend Settings
-
-$config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
-$config['email_from']                 = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
-$config['email_user']                 = $config['project_id'];
-$config['email_sendmail_path']        = '/usr/sbin/sendmail'; // The location of the sendmail program.
-$config['email_smtp_host']            = 'localhost';          // Outgoing SMTP server name.
-$config['email_smtp_port']            = 25;                   // The port to connect.
-$config['email_smtp_timeout']         = 10;                   // SMTP connection timeout in seconds.
-$config['email_smtp_secure']          = NULL;                 // Enable encryption. Use 'tls' or 'ssl'
-$config['email_smtp_auth']            = FALSE;                // Whether or not to use SMTP authentication.
-$config['email_smtp_username']        = NULL;                 // SMTP username.
-$config['email_smtp_password']        = NULL;                 // Password for SMTP authentication.
-
-// Alerting Settings
-
-$config['alert'] = array(
-	'macros' => array(                    //Macros:
-		'rule' => array(                    //  For Rules
-			//Time Macros
-			'now'      => 'NOW()',
-			'past_5m'  => 'DATE_SUB(NOW(),INTERVAL 5 MINUTE)',
-			'past_10m' => 'DATE_SUB(NOW(),INTERVAL 10 MINUTE)',
-			'past_15m' => 'DATE_SUB(NOW(),INTERVAL 15 MINUTE)',
-			'past_30m' => 'DATE_SUB(NOW(),INTERVAL 30 MINUTE)',
-			'past_60m' => 'DATE_SUB(NOW(),INTERVAL 60 MINUTE)',
-
-			//Device Macros
-			'device' => '%devices.disabled = "0" && %devices.ignore = "0"',
-			'device_up' => '%devices.status = "1" && %macros.device',
-			'device_down' => '%devices.status = "0" && %macros.device',
-
-			//Port Macros
-			'port' => '%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0"',
-			'port_up' => '%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port',
-			'port_down' => '%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port',
-			'port_usage_perc' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100',
-
-			//Misc Macros
-		),
-	),
-	'transports' => array(                //Transports:
-		'dummy' => false,                   //  Dummy alerting (debug)
-		'mail'  => false,                   //  E-Mail alerting
-		'irc'   => false,                   //  IRC Alerting
-	),
-	'syscontact' => true,                 //Issue to SysContact (or it's override)
-	'globals' => false,                   //Issue to global-read users
-	'admins' => false,                    //Issue to administrators
-	'default_only' => false,              //Only issue to default
-	'default_mail' => '',                 //Default email
-	'tolerance-window' => 10,             //Allow +/-10s tolerance to delay values to counter cron-irregularities
-	'fixed-contacts' => true,             //If true any changes in user-permissions,user-mail,syscontact,default-mail will not be honoured until the next alert triggers.
-);
-
-//Legacy options
-
-$config['alerts']['email']['default']      = NULL;    // Default alert recipient
-$config['alerts']['email']['default_only'] = FALSE;   // Only use default recipient
 $config['alerts']['email']['enable']       = FALSE;   // Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    // Populate as an array() with ASNs to alert on.
 $config['alerts']['port']['ifdown']        = FALSE;   // Generate alerts for ports that go down
@@ -670,4 +611,7 @@ $config['ipmi']['type'][]                                = "lan";
 $config['ipmi']['type'][]                                = "imb";
 $config['ipmi']['type'][]                                = "open";
 
+// Options needed for dyn config - do NOT edit
+$dyn_config['email_backend'] = array('mail','sendmail','smtp');
+$dyn_config['email_smtp_secure'] = array('', 'tls', 'ssl');
 ?>
