@@ -4,184 +4,115 @@
 # systems in the cluster, you'll have to set the hostname to an IP or something
 # that can be resolved here.
 # hostname = ""
-
 bind-address = "0.0.0.0"
 
+# The default cluster and API port
+port = 8086
+
 # Once every 24 hours InfluxDB will report anonymous data to m.influxdb.com
-# The data includes raft name (random 8 bytes), os, arch and version
+# The data includes raft id (random 8 bytes), os, arch and version
 # We don't track ip addresses of servers reporting. This is only used
-# to track the number of instances running and the versions which
+# to track the number of instances running and the versions, which
 # is very helpful for us.
 # Change this option to true to disable reporting.
 reporting-disabled = false
 
-[logging]
-# logging level can be one of "debug", "info", "warn" or "error"
-level  = "info"
-file   = "/opt/influxdb/shared/log.txt"         # stdout to log to standard out
+# Controls settings for initial start-up. Once a node is successfully started,
+# these settings are ignored.  If a node is started with the -join flag,
+# these settings are ignored.
+[initialization]
+join-urls = "" # Comma-delimited URLs, in the form http://host:port, for joining another cluster.
+
+# Control authentication
+# If not set authetication is DISABLED. Be sure to explicitly set this flag to
+# true if you want authentication.
+[authentication]
+enabled = false
 
 # Configure the admin server
 [admin]
-port   = 8083              # binding is disabled if the port isn't set
-assets = "/opt/influxdb/current/admin"
+enabled = true
+port = 8083
 
-# Configure the http api
+# Configure the HTTP API endpoint. All time-series data and queries uses this endpoint.
 [api]
-port     = 8086    # binding is disabled if the port isn't set
-# ssl-port = 8084    # Ssl support is enabled if you set a port and cert
-# ssl-cert = /path/to/cert.pem
+# ssl-port = 8087    # SSL support is enabled if you set a port and cert
+# ssl-cert = "/path/to/cert.pem"
 
-# connections will timeout after this amount of time. Ensures that clients that misbehave
-# and keep alive connections they don't use won't end up connection a million times.
-# However, if a request is taking longer than this to complete, could be a problem.
-read-timeout = "5s"
+# Configure the Graphite plugins.
+[[graphite]] # 1 or more of these sections may be present.
+enabled = false
+# protocol = "" # Set to "tcp" or "udp"
+# address = "0.0.0.0" # If not set, is actually set to bind-address.
+# port = 2003
+# name-position = "last"
+# name-separator = "-"
+# database = ""  # store graphite data in this database
 
-[input_plugins]
+# Configure the collectd input.
+[collectd]
+enabled = false
+#address = "0.0.0.0" # If not set, is actually set to bind-address.
+#port = 25827
+#database = "collectd_database"
+#typesdb = "types.db"
 
-  # Configure the graphite api
-  [input_plugins.graphite]
-  enabled = false
-  # port = 2003
-  # database = ""  # store graphite data in this database
-  # udp_enabled = true # enable udp interface on the same port as the tcp interface
+# Configure the OpenTSDB input.
+[opentsdb]
+enabled = false
+#address = "0.0.0.0" # If not set, is actually set to bind-address.
+#port = 4242
+#database = "opentsdb_database"
 
-  # Configure the udp api
-  #[input_plugins.udp]
-  #enabled = true
-  #port = 4444
-  # database = ""
+# Configure UDP listener for series data.
+[udp]
+enabled = true
+bind-address = "0.0.0.0"
+port = 4444
 
-  # Configure multiple udp apis each can write to separate db.  Just
-  # repeat the following section to enable multiple udp apis on
-  # different ports.
-  [[input_plugins.udp_servers]] # array of tables
-  enabled = true
-  port = 5551
-  database = "udp.test"
+# Broker configuration. Brokers are nodes which participate in distributed
+# consensus.
+[broker]
+enabled = true
+# Where the Raft logs are stored. The user running InfluxDB will need read/write access.
+dir  = "/var/opt/influxdb/raft"
+truncation-interval = "10m"
+max-topic-size = 52428800
+max-segment-size = 10485760
 
-# Raft configuration
+# Raft configuration. Controls the distributed consensus system.
 [raft]
-# The raft port should be open between all servers in a cluster.
-# However, this port shouldn't be accessible from the internet.
+apply-interval = "10ms"
+election-timeout = "5s"
+heartbeat-interval = "100ms"
+reconnect-timeout = "10ms"
 
-port = 8090
+# Data node configuration. Data nodes are where the time-series data, in the form of
+# shards, is stored.
+[data]
+enabled = true
+dir = "/var/opt/influxdb/db"
 
-# Where the raft logs are stored. The user running InfluxDB will need read/write access.
-dir  = "/opt/influxdb/shared/data/raft"
+# Auto-create a retention policy when a database is created. Defaults to true.
+retention-auto-create = true
 
-# election-timeout = "1s"
+# Control whether retention policies are enforced and how long the system waits between
+# enforcing those policies.
+retention-check-enabled = true
+retention-check-period = "10m"
 
-[storage]
+# Configuration for snapshot endpoint.
+[snapshot]
+enabled = true # Enabled by default if not set.
 
-dir = "/opt/influxdb/shared/data/db"
-# How many requests to potentially buffer in memory. If the buffer gets filled then writes
-# will still be logged and once the local storage has caught up (or compacted) the writes
-# will be replayed from the WAL
-write-buffer-size = 10000
+[logging]
+write-tracing = false # If true, enables detailed logging of the write system.
+raft-tracing = false # If true, enables detailed logging of Raft consensus.
+http-access = true # If true, logs each HTTP access to the system.
 
-# the engine to use for new shards, old shards will continue to use the same engine
-default-engine = "rocksdb"
-
-# The default setting on this is 0, which means unlimited. Set this to something if you want to
-# limit the max number of open files. max-open-files is per shard so this * that will be max.
-max-open-shards = 0
-
-# The default setting is 100. This option tells how many points will be fetched from LevelDb before
-# they get flushed into backend.
-point-batch-size = 100
-
-# The number of points to batch in memory before writing them to leveldb. Lowering this number will
-# reduce the memory usage, but will result in slower writes.
-write-batch-size = 5000000
-
-# The server will check this often for shards that have expired that should be cleared.
-retention-sweep-period = "10m"
-
-[storage.engines.leveldb]
-
-# Maximum mmap open files, this will affect the virtual memory used by
-# the process
-max-open-files = 1000
-
-# LRU cache size, LRU is used by leveldb to store contents of the
-# uncompressed sstables. You can use `m` or `g` prefix for megabytes
-# and gigabytes, respectively.
-lru-cache-size = "200m"
-
-[storage.engines.rocksdb]
-
-# Maximum mmap open files, this will affect the virtual memory used by
-# the process
-max-open-files = 1000
-
-# LRU cache size, LRU is used by rocksdb to store contents of the
-# uncompressed sstables. You can use `m` or `g` prefix for megabytes
-# and gigabytes, respectively.
-lru-cache-size = "200m"
-
-[storage.engines.hyperleveldb]
-
-# Maximum mmap open files, this will affect the virtual memory used by
-# the process
-max-open-files = 1000
-
-# LRU cache size, LRU is used by rocksdb to store contents of the
-# uncompressed sstables. You can use `m` or `g` prefix for megabytes
-# and gigabytes, respectively.
-lru-cache-size = "200m"
-
-[storage.engines.lmdb]
-
-map-size = "100g"
-
-[cluster]
-# A comma separated list of servers to seed
-# this server. this is only relevant when the
-# server is joining a new cluster. Otherwise
-# the server will use the list of known servers
-# prior to shutting down. Any server can be pointed to
-# as a seed. It will find the Raft leader automatically.
-
-# Here's an example. Note that the port on the host is the same as the raft port.
-# seed-servers = ["hosta:8090","hostb:8090"]
-
-# Replication happens over a TCP connection with a Protobuf protocol.
-# This port should be reachable between all servers in a cluster.
-# However, this port shouldn't be accessible from the internet.
-
-protobuf_port = 8099
-protobuf_timeout = "2s" # the write timeout on the protobuf conn any duration parseable by time.ParseDuration
-protobuf_heartbeat = "200ms" # the heartbeat interval between the servers. must be parseable by time.ParseDuration
-protobuf_min_backoff = "1s" # the minimum backoff after a failed heartbeat attempt
-protobuf_max_backoff = "10s" # the maxmimum backoff after a failed heartbeat attempt
-
-# How many write requests to potentially buffer in memory per server. If the buffer gets filled then writes
-# will still be logged and once the server has caught up (or come back online) the writes
-# will be replayed from the WAL
-write-buffer-size = 1000
-
-# the maximum number of responses to buffer from remote nodes, if the
-# expected number of responses exceed this number then querying will
-# happen sequentially and the buffer size will be limited to this
-# number
-max-response-buffer-size = 100
-
-# When queries get distributed out to shards, they go in parallel. This means that results can get buffered
-# in memory since results will come in any order, but have to be processed in the correct time order.
-# Setting this higher will give better performance, but you'll need more memory. Setting this to 1 will ensure
-# that you don't need to buffer in memory, but you won't get the best performance.
-concurrent-shard-query-limit = 10
-
-[wal]
-
-dir   = "/opt/influxdb/shared/data/wal"
-flush-after = 1000 # the number of writes after which wal will be flushed, 0 for flushing on every write
-bookmark-after = 1000 # the number of writes after which a bookmark will be created
-
-# the number of writes after which an index entry is created pointing
-# to the offset of the first request, default to 1k
-index-after = 1000
-
-# the number of requests per one log file, if new requests came in a
-# new log file will be created
-requests-per-logfile = 10000
+# InfluxDB can store statistical and diagnostic information about itself. This is useful for
+# monitoring purposes. This feature is disabled by default, but if enabled, these data can be
+# queried like any other data.
+[monitoring]
+enabled = false
+write-interval = "1m"          # Period between writing the data.
