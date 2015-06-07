@@ -78,47 +78,6 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
         return $this->get($options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDatabases()
-    {
-        $options = [
-            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
-            "query" => [
-                "q" => "show databases",
-            ],
-        ];
-
-        return $this->get($options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function createDatabase($name)
-    {
-        $httpMessage = [
-            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
-            "query" => ["q" => "CREATE DATABASE \"{$name}\""],
-        ];
-
-        return $this->get($httpMessage);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function deleteDatabase($name)
-    {
-        $httpMessage = [
-            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
-            "query" => ["q" => "drop database \"{$name}\""],
-        ];
-
-        return $this->get($httpMessage);
-    }
-
     private function get(array $httpMessage)
     {
         $endpoint = $this->options->getHttpQueryEndpoint();

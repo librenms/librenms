@@ -98,41 +98,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group tcp
-     */
-    public function testGuzzleHttpQueryApiWithTimePrecision()
-    {
-        $this->markTestSkipped("Skip time precision");
-        $this->object->mark("tcp.test", ["mark" => "element"]);
-
-        sleep(1);
-
-        $body = $this->object->query("select mark from \"tcp.test\"", "s");
-
-        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
-        $this->assertEquals("mark", $body["results"][0]["series"][0]["columns"][1]);
-        $this->assertEquals("element", $body["results"][0]["series"][0]["values"][0][1]);
-    }
-
-    /**
-     * @group tcp
-     */
-    public function testGuzzleHttpWriteApiWithTimePrecision()
-    {
-        $this->markTestSkipped("Skip time precision");
-        $this->object->mark("tcp.test", ["time" => 1410591552, "mark" => "element"], "s");
-
-        sleep(1);
-
-        $body = $this->object->query("select mark from \"tcp.test\"", "ms");
-
-        $this->assertCount(1, $body[0]["points"]);
-        $this->assertEquals("tcp.test", $body[0]["name"]);
-
-        $this->assertEquals("1410591552000", $body[0]["points"][0][0]);
-    }
-
-    /**
      * @group udp
      */
     public function testUdpIpWriteData()
