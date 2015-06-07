@@ -75,9 +75,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             $options["query"]["time_precision"] = $timePrecision;
         }
 
-        $endpoint = $this->options->getHttpQueryEndpoint();
-
-        return $this->httpClient->get($endpoint, $options)->json();
+        return $this->get($options);
     }
 
     /**
@@ -92,8 +90,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             ],
         ];
 
-        $endpoint = $this->options->getHttpQueryEndpoint();
-        return $this->httpClient->get($endpoint, $options)->json();
+        return $this->get($options);
     }
 
     /**
@@ -106,8 +103,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             "query" => ["q" => "CREATE DATABASE \"{$name}\""],
         ];
 
-        $endpoint = $this->options->getHttpQueryEndpoint();
-        return $this->httpClient->get($endpoint, $httpMessage)->json();
+        return $this->get($httpMessage);
     }
 
     /**
@@ -120,6 +116,11 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             "query" => ["q" => "drop database \"{$name}\""],
         ];
 
+        return $this->get($httpMessage);
+    }
+
+    private function get(array $httpMessage)
+    {
         $endpoint = $this->options->getHttpQueryEndpoint();
         return $this->httpClient->get($endpoint, $httpMessage)->json();
     }
