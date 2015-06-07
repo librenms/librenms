@@ -193,6 +193,7 @@ The impact using UDP or HTTP adapters
 Corley\Benchmarks\InfluxDB\AdapterEvent
     Method Name                Iterations    Average Time      Ops/second
     ------------------------  ------------  --------------    -------------
-    sendDataUsingHttpAdapter: [1,000     ] [0.0026700308323] [374.52751]
-    sendDataUsingUdpAdapter : [1,000     ] [0.0000436344147] [22,917.69026]
+    sendDataUsingHttpAdapter: [1,000     ] [0.0098177127838] [101.85672]
+    sendDataUsingUdpAdapter : [1,000     ] [0.0000694372654] [14,401.48880]
 ```
+
